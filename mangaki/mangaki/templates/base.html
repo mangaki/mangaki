@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mangaki</title>
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+<style type="text/css">
+body {
+    padding-top: 100px;
+    background: #eee;
+    font-family: Arial;
+}
+ul {
+    list-style-type: square;
+    margin: 0;
+    padding-left: 1.5em;
+}
+ul li {
+    margin: 0;
+    padding: 0;
+}
+/* .btn-group {
+    display: block;
+    margin-top: 1em;
+} */
+.fixed {
+    width: 4em;
+}
+.col-xs-4 .btn img {
+    margin-left: auto;
+    margin-right: 7px;
+    display: block;
+}
+.col-xs-4 .btn {
+    -o-transition:.5s;
+    -ms-transition:.5s;
+    -moz-transition:.5s;
+    -webkit-transition:.5s;
+    transition:.5s;
+}
+.well {
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">Mangaki</a>
+        <div class="nav-collapse">
+            <ul class="nav navbar-nav">
+                <li style="width: 800px"> </li>
+                {% if not user.is_authenticated %}
+                    <li><a href="/user/login/">Connexion</a></li>
+                    <li><a href="/user/signup/">Inscription</a></li>
+                {% else %}
+                    <li><a href="/user/logout/">Quitter</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="container">
+    {% block body %}{% endblock %}
+</div>
+<footer class="navbar-inverse" style="position: absolute; bottom: 0; padding-left: 400px">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">Mangaki</a>
+        <div class="nav-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="reco.html">Recommandation</a></li>
+                <li><a href="zankyou.html">Qui sommes-nous ?</a></li>
+                <li><a href="zankyou.html">FAQ</a></li>
+                <li><a href="zankyou.html">CGU</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+<!-- <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script>
+$("[href='']").parents("li").addClass('active');
+</script> -->
+</body>    
+</html>

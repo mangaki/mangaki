@@ -1,0 +1,6 @@
+.DS_Store
+venv
+secret.py
+db.sqlite3
+*.pyc
+*.json

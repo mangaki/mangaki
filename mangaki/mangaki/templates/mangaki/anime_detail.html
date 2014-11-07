@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="row">
+    <div class="col-xs-3">
+        <img src="{{ object.poster }}" style="float: right" />
+    </div>
+    <div class="col-xs-6">
+        <h1>{{ object.title }}</h1>
+        <p>Anime<br />XXXX<br />
+        XX épisodes, terminée.<br />
+        <a>Réalisateur</a>, <a>Compositeur</a></p>
+        <h4>Liens</h4>
+        <ul>
+            <li><a href="#">Regarder sur Wakanim</a></li>
+            <li><a href="#">Acheter sur Kazé</a></li>
+        </ul>
+        <h4>Actualité</h4>
+        <ul>
+            <li><a href="#">La 2e OST est sortie !</a></li>
+            <li><a href="#">Fiche sur myAnimeList</a></li>
+        </ul>
+    </div>
+</div>
+<br />
+<div class="well">{{ object.synopsis }}</div>
+{% endblock %}
