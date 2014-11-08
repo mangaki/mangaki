@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="row">
-    <div class="col-xs-3">
-        <img src="{{ object.poster }}" style="float: right" />
+<div class="row mangas-list">
+    <div class="col-xs-3 manga-sheet">
+        <div class="row">
+            {% include "work_rating.html" with work=object %}
+        </div>
     </div>
     <div class="col-xs-6">
         <h1>{{ object.title }}</h1>
-        <p>Anime<br />XXXX<br />
+        <p>Anime <!--<br />XXXX<br />
         XX épisodes, terminée.<br />
         <a>Réalisateur</a>, <a>Compositeur</a></p>
         <h4>Liens</h4>
         <ul>
-            <li><a href="#">Regarder sur Wakanim</a></li>
-            <li><a href="#">Acheter sur Kazé</a></li>
+            <li>Voir la fiche sur Animeka</li>
+            <li><a href="#">Acheter sur Kazé</a></li> -->
         </ul>
-        <h4>Actualité</h4>
+        <!-- <h4>Actualité</h4>
         <ul>
             <li><a href="#">La 2e OST est sortie !</a></li>
             <li><a href="#">Fiche sur myAnimeList</a></li>
-        </ul>
+        </ul> -->
     </div>
 </div>
 <br />
-<div class="well">{{ object.synopsis }}</div>
+<div class="well">{{ object.synopsis }} (cc) <a href="http://animeka.com/animes/detail{{ object.source }}" target="_blank">Animeka</a></div>
 {% endblock %}

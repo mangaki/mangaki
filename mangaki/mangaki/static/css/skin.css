@@ -1,0 +1,118 @@
+/*************
+ *  GENERAL  *
+ *************/
+body {
+	background: #EEE;
+	font-family: Arial;
+}
+
+/************
+ *  HEADER  *
+ ************/
+/* Header nav */
+header nav.navbar {
+	margin: 0;
+}
+
+/**********
+ *  BODY  *
+ **********/
+/* Margin for body to prevent unused space from the header/footer nav menu. */
+body > .container {
+	margin-top: 75px;
+	margin-bottom: 75px;
+}
+
+/************
+ *  FOOTER  *
+ ************/
+/* Centering the content in the footer nav menu. */
+footer .navbar-collapse {
+	text-align: center;
+}
+footer .navbar-nav {
+	display: inline-block;
+	float: none;
+	margin: 0;
+}
+
+/* Footer is not fixed on small devices. */
+@media(max-width: 768px) {
+	footer .navbar-fixed-bottom {
+		position: inherit;
+	}
+}
+
+
+
+
+
+
+
+.mangas-list .manga-sheet .row {
+	margin-left: 0;
+	margin-right: 0;
+}
+.mangas-list .manga-sheet .row > div {
+	padding: 0;
+}
+.mangas-list .manga-sheet:hover .thumbnail {
+	background-color: #CCC;
+/*	margin-left: -10px;
+	padding-left: 10px;
+	margin-right: -10px;
+	padding-right: 10px; */
+}
+.mangas-list .manga-sheet:hover .manga-snapshot .manga-snapshot-image {
+	width: 100%;
+}
+.mangas-list .manga-sheet .thumbnail:not(:hover) {
+	/*background-color: #DDD;*/
+	/*border-color: #DDD;*/
+	opacity: 0.8;
+}
+
+.mangas-list .manga-sheet .manga-snapshot {
+	z-index: 64;
+}
+.mangas-list .manga-sheet .manga-snapshot .manga-snapshot-image {
+/*	width: 110%; */
+	height: 300px;
+	background-size: cover;
+	border-radius: 8px;
+}
+
+.mangas-list .manga-sheet .manga-votes {
+	margin-top: 10px;
+}
+
+.mangas-list .manga-sheet .row .btn {
+	margin-top: 1px;
+	position: relative;
+}
+.mangas-list .manga-sheet .row .btn:hover {
+	z-index: 128;
+}
+@media(min-width: 769px) {
+	.mangas-list .manga-sheet .row .btn {
+		border-top-left-radius: 0px;
+		border-bottom-left-radius: 0px;
+	}
+}
+
+.thumbnail .col-md-12 {
+	height: 4em;
+	line-height: 4em;
+}
+
+.manga-sheet h1 {
+	margin: 0;
+	vertical-align: middle;
+	display: inline-block;
+	font-size: 1.5em;
+	/* height: 2em; */
+}
+
+.not-chosen {
+	opacity: 0.2;
+}

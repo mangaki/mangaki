@@ -1,85 +1,89 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<title>Mangaki</title>
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
-<style type="text/css">
-body {
-    padding-top: 100px;
-    background: #eee;
-    font-family: Arial;
-}
-ul {
-    list-style-type: square;
-    margin: 0;
-    padding-left: 1.5em;
-}
-ul li {
-    margin: 0;
-    padding: 0;
-}
-/* .btn-group {
-    display: block;
-    margin-top: 1em;
-} */
-.fixed {
-    width: 4em;
-}
-.col-xs-4 .btn img {
-    margin-left: auto;
-    margin-right: 7px;
-    display: block;
-}
-.col-xs-4 .btn {
-    -o-transition:.5s;
-    -ms-transition:.5s;
-    -moz-transition:.5s;
-    -webkit-transition:.5s;
-    transition:.5s;
-}
-.well {
-    font-weight: bold;
-}
-</style>
+    <meta charset="utf-8">
+    <title>Mangaki</title>
+    <!-- <link rel="icon" href="/img/favicon.ico"> -->
+    <script src="/static/js/jquery-latest.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/csrf.js"></script>
+    <script src="/static/js/skin.js"></script>
+    <script src="/static/js/vote.js"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/skin.css" />
 </head>
 <body>
-<div class="navbar navbar-default navbar-fixed-top">
+    <header class="navbar navbar-default navbar-fixed-top">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-collapse">
+                        <span class="sr-only">Ouvrir le menu</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">
+                        Mangaki
+                    </a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="menu-collapse">   
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">               
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Présentation
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">  
+                                <li class=""><a href="#">Le projet Mangaki</a></li>
+                                <li><a href="#">L'équipe</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">               
+                            <a href="/anime/">
+                                Liste d'anime
+                            </a>
+                        </li>
+                    {% if user.is_authenticated %}
+                        <li class="dropdown">               
+                            <a href="/list/">
+                                Mes notes
+                            </a>
+                        </li>
+                    {% endif %}
+                    </ul>
+                    
+                    <ul class="nav navbar-nav navbar-right">
+                    {% if not user.is_authenticated %}
+                        <li><a href="/user/login"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
+                        <li><a href="/user/signup"><span class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
+                    {% else %}
+                        <li><a href="/user/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Quitter</a></li>
+                    {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
     <div class="container">
-        <a class="navbar-brand" href="index.html">Mangaki</a>
-        <div class="nav-collapse">
-            <ul class="nav navbar-nav">
-                <li style="width: 800px"> </li>
-                {% if not user.is_authenticated %}
-                    <li><a href="/user/login/">Connexion</a></li>
-                    <li><a href="/user/signup/">Inscription</a></li>
-                {% else %}
-                    <li><a href="/user/logout/">Quitter</a></li>
-                {% endif %}
-            </ul>
-        </div>
+        {% block body %}{% endblock %}
     </div>
-</div>
-<div class="container">
-    {% block body %}{% endblock %}
-</div>
-<footer class="navbar-inverse" style="position: absolute; bottom: 0; padding-left: 400px">
-    <div class="container">
-        <a class="navbar-brand" href="index.html">Mangaki</a>
-        <div class="nav-collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="index.html">Accueil</a></li>
-                <li><a href="reco.html">Recommandation</a></li>
-                <li><a href="zankyou.html">Qui sommes-nous ?</a></li>
-                <li><a href="zankyou.html">FAQ</a></li>
-                <li><a href="zankyou.html">CGU</a></li>
-            </ul>
-        </div>
-    </div>
-</footer>
-<!-- <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script>
-$("[href='']").parents("li").addClass('active');
-</script> -->
+    
+    <footer>
+        <nav class="navbar navbar-inverse navbar-fixed-bottom">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="#"><span class="glyphicon glyphicon-home"></span>&nbsp;Accueil</a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Qui sommes-nous ?</a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
+                </ul>
+            </div>
+        </nav>
+    </footer>
 </body>    
 </html>
