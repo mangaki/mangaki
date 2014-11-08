@@ -2,7 +2,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from mangaki.models import Work, Anime, Rating
+from mangaki.models import Work, Anime, Rating, Page
+from markdown import markdown
 import datetime
 import random
 
@@ -53,3 +54,11 @@ def rate_work(request, work_id):
         Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': request.POST['choice']})
         return HttpResponse(request.POST['choice'])
     return HttpResponse()
+
+class MarkdownView(DetailView):
+    model = Page
+    slug_field = 'name'
+    template_name = 'static.html'
+    def get_context_data(self, **kwargs):
+        object = super(MarkdownView, self).get_object()
+        return {'html': markdown(object.markdown)}

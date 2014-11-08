@@ -40,3 +40,9 @@ class Rating(models.Model):
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
     ))
+
+class Page(models.Model):
+    name = models.SlugField()
+    markdown = models.TextField()
+    def __str__(self):
+        return self.name

@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Anime, Track, OST, Artist, Rating
+from mangaki.models import Anime, Track, OST, Artist, Rating, Page
 from django.forms import Textarea
 from django.db import models
 from django.contrib import admin, messages
@@ -19,8 +19,12 @@ class ArtistAdmin(admin.ModelAdmin):
 class RatingAdmin(admin.ModelAdmin):
     pass
 
+class PageAdmin(admin.ModelAdmin):
+    pass
+
 admin.site.register(Anime, AnimeAdmin)
 admin.site.register(Track, TrackAdmin)
 admin.site.register(OST, OSTAdmin)
 admin.site.register(Artist, ArtistAdmin)
 admin.site.register(Rating, RatingAdmin)
+admin.site.register(Page, PageAdmin)
