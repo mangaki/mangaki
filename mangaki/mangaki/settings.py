@@ -63,7 +63,7 @@ WSGI_APPLICATION = 'mangaki.wsgi.application'
 
 SITE_ID = 1
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/list/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

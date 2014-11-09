@@ -5,6 +5,8 @@
     <img src="/static/img/mangaki.png" style="margin-top: -10px" />
     <!-- <h3 style="text-align: center">Site de recommandation par profil d'anime, manga, OST</h3> -->
     <p></p>
-    <a class="btn btn-primary btn-lg" href="/user/signup">Essayer</a>
+    {% if not user.is_authenticated %}
+        <a class="btn btn-primary btn-lg" href="/user/signup">Essayer</a>
+    {% endif %}
 </div>
 {% endblock %}
