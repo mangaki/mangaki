@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 
 {% block body %}
+<div class="row">
+    <form class="typeahead-demo {{ category }}">
+        <input type="text" data-category="{{ category }}" class="typeahead" />
+    </form>
+</div>
 <div class="row mangas-list">
     {% for object in object_list %}
         {% include "work_poster.html" with work=object rating=object.rating %}
     {% endfor %}
 </div>
+<script>
+loadMenu('anime');
+</script>
 {% endblock %}

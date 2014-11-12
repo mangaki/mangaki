@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^$', 'mangaki.views.index'),
+    url(r'^data/(?P<category>\w+)\.json$', 'mangaki.views.get_works'),
     url(r'^user/', include('allauth.urls')),
     url(r'^list/$', RatingList.as_view()),
     url(r'^anime/$', AnimeList.as_view()),

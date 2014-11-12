@@ -6,6 +6,7 @@ from mangaki.models import Work, Anime, Rating, Page
 from markdown import markdown
 import datetime
 import random
+import json
 
 class AnimeDetail(DetailView):
     model = Anime
@@ -45,9 +46,6 @@ class RatingList(ListView):
 def index(request):
     return render(request, 'index.html')
 
-def about(request):
-    return render(request, 'about.html')
-
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -62,3 +60,11 @@ class MarkdownView(DetailView):
     def get_context_data(self, **kwargs):
         object = super(MarkdownView, self).get_object()
         return {'html': markdown(object.markdown)}
+
+def get_works(request, category):
+    if category == 'anime':
+        data = []
+        for anime in Anime.objects.all():
+            data.append({'id': anime.id, 'description': 'Test', 'value': anime.title, 'tokens': anime.title.lower().split(), 'year': 2014})
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    return HttpResponse()
