@@ -1,8 +1,10 @@
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from mangaki.models import Work, Anime, Rating, Page
+from collections import Counter
 from markdown import markdown
 import datetime
 import random
@@ -31,7 +33,7 @@ class AnimeList(ListView):
                     obj.rating = obj.rating_set.get(user=self.request.user).choice
                 except Rating.DoesNotExist:
                     pass
-        return context    
+        return context 
 
 class RatingList(ListView):
     model = Rating
@@ -68,3 +70,32 @@ def get_works(request, category):
             data.append({'id': anime.id, 'description': 'Test', 'value': anime.title, 'tokens': anime.title.lower().split(), 'year': 2014})
         return HttpResponse(json.dumps(data), content_type='application/json')
     return HttpResponse()
+
+def get_recommendations(user):
+    contest = []
+    values = {'like': 2, 'dislike': -2, 'neutral': 0.1, 'willsee': 0.5, 'wontsee': -0.5}
+    neighbors = Counter()
+    for my in Rating.objects.filter(user=user):
+        for her in Rating.objects.filter(work=my.work):
+            neighbors[her.user.id] = values[my.choice] * values[her.choice]
+    works = Counter()
+    nb_ratings = {}
+    for user_id, score in neighbors.most_common(10):
+        for her in Rating.objects.filter(user__id=user_id):
+            if her.work.id not in works:
+                works[her.work.id] = [values[her.choice], neighbors[her.user.id]]
+                nb_ratings[her.work.id] = 1
+            else:
+                works[her.work.id][0] += values[her.choice]
+                works[her.work.id][1] += score
+                nb_ratings[her.work.id] += 1
+    for work_id in works:
+        if nb_ratings[work_id] == 1 or Rating.objects.filter(user=user, work__id=work_id).count() != 0:
+            works[work_id] = (0, 0)
+        else:
+            works[work_id] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
+    return works.most_common(4)
+
+def get_reco(request):
+    object_list = map(lambda x: Anime.objects.get(id=x[0]), get_recommendations(request.user))
+    return render(request, 'mangaki/reco_list.html', {'object_list': object_list})

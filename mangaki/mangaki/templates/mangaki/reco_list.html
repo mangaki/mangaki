@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="row mangas-list">
+    {% for object in object_list %}
+        {% include "work_poster.html" with work=object rating=object.rating %}
+    {% endfor %}
+</div>
+<a class="btn btn-primary btn-lg" href="/reco" style="display: block; margin: auto">Avoir d'autres recommandations (après avoir noté celles-ci)</a>
+{% endblock %}
