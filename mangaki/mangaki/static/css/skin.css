@@ -116,3 +116,7 @@ footer .navbar-nav {
 .not-chosen {
 	opacity: 0.2;
 }
+
+.manga-snapshot-image, .manga-sheet h1 {
+	cursor: pointer;
+}

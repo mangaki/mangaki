@@ -6,7 +6,9 @@
     <!-- <h3 style="text-align: center">Site de recommandation par profil d'anime, manga, OST</h3> -->
     <p></p>
     {% if not user.is_authenticated %}
-        <a class="btn btn-primary btn-lg" href="/user/signup">Essayer</a>
+        <a class="btn btn-primary btn-lg" href="/user/signup/">Essayer</a>
+    {% else %}
+        <a class="btn btn-primary btn-lg" href="/anime/">Parcourir les <em>anime</em></a>    
     {% endif %}
 </div>
 {% endblock %}

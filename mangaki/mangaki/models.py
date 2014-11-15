@@ -4,11 +4,11 @@ from django.contrib.auth.models import User
 
 class Work(models.Model):
     title = models.CharField(max_length=64)
-    source = models.CharField(max_length=128)
+    source = models.CharField(max_length=128, blank=True)
     poster = models.CharField(max_length=128)
 
 class Anime(Work):
-    synopsis = models.TextField()
+    synopsis = models.TextField(blank=True)
     director = models.ForeignKey('Artist', related_name='directed')
     composer = models.ForeignKey('Artist', related_name='composed')
     def __str__(self):

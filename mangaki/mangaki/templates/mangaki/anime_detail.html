@@ -25,5 +25,7 @@
     </div>
 </div>
 <br />
-<div class="well">{{ object.synopsis }} (cc) <a href="http://animeka.com/animes/detail{{ object.source }}" target="_blank">Animeka</a></div>
+{% if object.synopsis %}
+    <div class="well">{{ object.synopsis }} (cc) <a href="http://animeka.com/animes/detail{{ object.source }}" target="_blank">Animeka</a></div>
+{% endif %}
 {% endblock %}

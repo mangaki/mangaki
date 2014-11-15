@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
 {% block body %}
+<p class="well">Les <em>anime</em> que vous avez notés. Pour en noter d'autres, accédez à <a href="/anime">la liste</a>.</p>
 <div class="row mangas-list">
     {% for object in object_list %}
         {% include "work_poster.html" with work=object.work rating=object.choice %}
     {% endfor %}
 </div>
+<br />
+<br />
+<br />
 {% endblock %}

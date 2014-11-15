@@ -1,7 +1,8 @@
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from mangaki.models import Work, Anime, Rating, Page
 from collections import Counter
@@ -40,7 +41,7 @@ class RatingList(ListView):
     def get_queryset(self):
         return Rating.objects.filter(user=self.request.user)
     def get_context_data(self, **kwargs):
-        ordering = ['like', 'neutral', 'dislike', 'willsee', 'wontsee']
+        ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
         context = super(RatingList, self).get_context_data(**kwargs)
         context['object_list'] = sorted(context['object_list'], key=lambda x: ordering.index(x.choice))
         return context
@@ -96,6 +97,7 @@ def get_recommendations(user):
             works[work_id] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
     return works.most_common(4)
 
+@login_required
 def get_reco(request):
-    object_list = map(lambda x: Anime.objects.get(id=x[0]), get_recommendations(request.user))
+    object_list = list(map(lambda x: Anime.objects.get(id=x[0]), get_recommendations(request.user)))
     return render(request, 'mangaki/reco_list.html', {'object_list': object_list})

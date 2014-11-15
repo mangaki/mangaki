@@ -1,10 +1,15 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="row mangas-list">
+{% if object_list|length > 0 %}
+    <p class="well">Voici quatre recommandations d'<em>anime</em>. Votez-les puis rechargez la page pour en faire apparaître d'autres.</p>
+    <div class="row mangas-list">
     {% for object in object_list %}
         {% include "work_poster.html" with work=object rating=object.rating %}
     {% endfor %}
-</div>
-<a class="btn btn-primary btn-lg" href="/reco" style="display: block; margin: auto">Avoir d'autres recommandations (après avoir noté celles-ci)</a>
+    </div>
+    <a class="btn btn-primary btn-lg" href="/reco" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
+{% else %}
+    <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/anime/">noté un <em>anime</em></a> !</p>
+{% endif %}
 {% endblock %}

@@ -63,6 +63,7 @@ WSGI_APPLICATION = 'mangaki.wsgi.application'
 
 SITE_ID = 1
 
+LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/anime/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
