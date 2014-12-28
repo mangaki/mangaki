@@ -18,6 +18,6 @@ urlpatterns = patterns('',
     url(r'^anime/(?P<pk>\d+)$', AnimeDetail.as_view()),
     url(r'^work/(?P<work_id>\d+)$', 'mangaki.views.rate_work'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^discourse/sso$', views.sso)
+    url(r'^discourse/sso$', views.sso),
     url(r'^(?P<slug>[\w-]+)/$', MarkdownView.as_view()),
 )
