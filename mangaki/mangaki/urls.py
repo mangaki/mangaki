@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from mangaki.views import AnimeDetail, AnimeList, RatingList, MarkdownView
+from mangaki.apps.discourse import views
 
 urlpatterns = patterns('',
     # Examples:
@@ -17,5 +18,6 @@ urlpatterns = patterns('',
     url(r'^anime/(?P<pk>\d+)$', AnimeDetail.as_view()),
     url(r'^work/(?P<work_id>\d+)$', 'mangaki.views.rate_work'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^discourse/sso$', views.sso)
     url(r'^(?P<slug>[\w-]+)/$', MarkdownView.as_view()),
 )

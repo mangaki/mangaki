@@ -22,7 +22,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['mangaki.fr']
 
 # Application definition
 
@@ -105,4 +105,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+STATIC_ROOT = '/srv/http/mangaki/static/'
+
+# Discourse
+
+DISCOURSE_BASE_URL = 'http://meta.mangaki.fr'
+DISCOURSE_SSO_SECRET = 'mada_dame_yo'
