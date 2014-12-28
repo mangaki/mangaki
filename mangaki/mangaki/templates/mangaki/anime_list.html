@@ -2,7 +2,15 @@
 
 {% block body %}
 {% if user.is_authenticated %}
-<p class="well">Ces <em>anime</em> sont triés par popularité. Notez-en quelques-uns pour obtenir des <a href="/reco/">recommandations</a>.<br />
+<p class="well">
+Ces <em>anime</em> sont triés
+{% if "alpha" in mode %}
+<a href="/anime/">dans l'ordre alphabétique</a>
+{% else %}
+<a href="/anime/alpha">par popularité</a>
+{% endif %}
+(<a href="/anime/alphaflat/">afficher la version réduite</a>)<br />
+Notez-en quelques-uns pour obtenir des <a href="/reco/">recommandations</a>.<br />
     <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
     <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
     <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
@@ -19,7 +27,7 @@
 </div>
 <div class="row mangas-list">
     {% for object in object_list %}
-        {% include "work_poster.html" with work=object rating=object.rating %}
+        {% include template_mode with work=object rating=object.rating %}
     {% endfor %}
 </div>
 <br />

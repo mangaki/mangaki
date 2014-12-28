@@ -109,7 +109,7 @@ footer .navbar-nav {
 	margin: 0;
 	vertical-align: middle;
 	display: inline-block;
-	font-size: 1.5em;
+	font-size: 1.3em;
 	/* height: 2em; */
 }
 
@@ -119,4 +119,14 @@ footer .navbar-nav {
 
 .manga-snapshot-image, .manga-sheet h1 {
 	cursor: pointer;
+}
+
+.flatlist:hover {
+	background: #d9d9d9;
+	/* font-size: 2em; */
+}
+
+.flatlist {
+	padding: 2px 2px 2px 5px;
+	border-radius: 4px;
 }

@@ -26,8 +26,12 @@ class AnimeDetail(DetailView):
 class AnimeList(ListView):
     model = Anime
     context_object_name = 'anime'
+    def get_queryset(self):
+        return Anime.objects.order_by('title') if 'alpha' in self.kwargs['mode'] else Anime.objects.all()
     def get_context_data(self, **kwargs):
         context = super(AnimeList, self).get_context_data(**kwargs)
+        context['mode'] = self.kwargs['mode']
+        context['template_mode'] = 'work_no_poster.html' if 'flat' in self.kwargs['mode'] else 'work_poster.html'
         if self.request.user.is_authenticated():
             for obj in context['object_list']:
                 try:
