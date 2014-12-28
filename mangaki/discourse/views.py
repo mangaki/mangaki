@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.conf import settings
 
-from urlparse import parse_qs
+from urllib import parse
 
 @login_required
 def sso(request):
@@ -36,7 +36,7 @@ def sso(request):
 
     ## Build the return payload
 
-    qs = parse_qs(decoded)
+    qs = parse(decoded)
     params = {
         'nonce': qs['nonce'][0],
         'email': request.user.email,
