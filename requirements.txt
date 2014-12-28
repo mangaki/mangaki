@@ -1,3 +1,4 @@
 Django
 django-allauth
 markdown
+django-bootstrap-form

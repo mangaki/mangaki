@@ -38,7 +38,8 @@ INSTALLED_APPS = (
     'mangaki',
     'allauth',
     'allauth.account',
-    'allauth.socialaccount'
+    'allauth.socialaccount',
+    'bootstrapform'
 )
 
 MIDDLEWARE_CLASSES = (
