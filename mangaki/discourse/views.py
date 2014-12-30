@@ -1,13 +1,11 @@
 import base64
 import hmac
 import hashlib
-import urllib
+from urllib.parse import unquote, parse_qs, urlencode
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.conf import settings
-
-from urllib import parse
 
 @login_required
 def sso(request):
@@ -20,15 +18,15 @@ def sso(request):
     ## Validate the payload
 
     try:
-        payload = urllib.unquote(payload)
-        decoded = base64.decodestring(payload)
-        assert 'nonce' in decoded
+        payload = unquote(payload)
+        decoded = base64.decodestring(bytes(payload, 'utf-8'))
+        assert 'nonce' in str(decoded)
         assert len(payload) > 0
     except AssertionError:
         return HttpResponseBadRequest('Invalid payload. Please contact support if this problem persists.')
 
-    key = str(settings.DISCOURSE_SSO_SECRET) # must not be unicode
-    h = hmac.new(key, payload, digestmod=hashlib.sha256)
+    key = str(settings.DISCOURSE_SSO_SECRET)
+    h = hmac.new(key.encode('utf-8'), payload.encode('utf-8'), digestmod=hashlib.sha256)
     this_signature = h.hexdigest()
 
     if this_signature != signature:
@@ -36,17 +34,17 @@ def sso(request):
 
     ## Build the return payload
 
-    qs = parse(decoded)
+    qs = parse_qs(decoded)
     params = {
-        'nonce': qs['nonce'][0],
+        'nonce': qs[b'nonce'][0],
         'email': request.user.email,
         'external_id': request.user.id,
         'username': request.user.username,
     }
 
-    return_payload = base64.encodestring(urllib.urlencode(params))
-    h = hmac.new(key, return_payload, digestmod=hashlib.sha256)
-    query_string = urllib.urlencode({'sso': return_payload, 'sig': h.hexdigest()})
+    return_payload = base64.encodestring(bytes(urlencode(params), 'utf-8'))
+    h = hmac.new(key.encode('utf-8'), return_payload, digestmod=hashlib.sha256)
+    query_string = urlencode({'sso': return_payload, 'sig': h.hexdigest()})
 
     ## Redirect back to Discourse
 

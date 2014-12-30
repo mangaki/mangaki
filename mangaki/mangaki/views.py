@@ -65,8 +65,8 @@ class MarkdownView(DetailView):
     slug_field = 'name'
     template_name = 'static.html'
     def get_context_data(self, **kwargs):
-        object = super(MarkdownView, self).get_object()
-        return {'html': markdown(object.markdown)}
+        page = super(MarkdownView, self).get_object()
+        return {'html': markdown(page.markdown)}
 
 def get_works(request, category):
     if category == 'anime':
@@ -95,13 +95,20 @@ def get_recommendations(user):
                 works[her.work.id][1] += score
                 nb_ratings[her.work.id] += 1
     for work_id in works:
-        if nb_ratings[work_id] == 1 or Rating.objects.filter(user=user, work__id=work_id).count() != 0:
+        if nb_ratings[work_id] == 1 or (Rating.objects.filter(user=user, work__id=work_id).count() != 0 and Rating.objects.filter(user=user, work__id=work_id, choice='willsee').count() == 0):
             works[work_id] = (0, 0)
         else:
+            # print(Work.objects.get(id=work_id).title, Rating.objects.filter(user=user, work__id=work_id).count(), )
             works[work_id] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
     return works.most_common(4)
 
 @login_required
 def get_reco(request):
-    object_list = list(map(lambda x: Anime.objects.get(id=x[0]), get_recommendations(request.user)))
-    return render(request, 'mangaki/reco_list.html', {'object_list': object_list})
+    reco_list = []
+    for work_id, _ in get_recommendations(request.user):
+        reco = Anime.objects.get(id=work_id)
+        if Rating.objects.filter(user=request.user, work__id=work_id).count() != 0:
+            reco_list.append((reco, 'willsee'))
+        else:
+            reco_list.append((reco, ''))
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list})

@@ -11,14 +11,14 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from django.conf import global_settings
-from secret import SECRET_KEY
+from secret import SECRET_KEY, DISCOURSE_SSO_SECRET
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 TEMPLATE_DEBUG = True
 
@@ -110,4 +110,3 @@ STATIC_ROOT = '/srv/http/mangaki/static/'
 # Discourse
 
 DISCOURSE_BASE_URL = 'http://meta.mangaki.fr'
-DISCOURSE_SSO_SECRET = 'mada_dame_yo'
