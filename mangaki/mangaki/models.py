@@ -46,3 +46,7 @@ class Page(models.Model):
     markdown = models.TextField()
     def __str__(self):
         return self.name
+
+class Profile(models.Model):
+    user = models.OneToOneField(User)
+    is_shared = models.BooleanField(default=True)

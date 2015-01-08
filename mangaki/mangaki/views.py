@@ -3,8 +3,8 @@ from django.views.generic.list import ListView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-from mangaki.models import Work, Anime, Rating, Page
+from django.http import HttpResponse, Http404
+from mangaki.models import Work, Anime, Rating, Page, Profile
 from collections import Counter
 from markdown import markdown
 import datetime
@@ -43,14 +43,20 @@ class AnimeList(ListView):
 class RatingList(ListView):
     model = Rating
     def get_queryset(self):
-        return Rating.objects.filter(user=self.request.user)
+        if self.request.user.username == self.kwargs['username'] or Profile.objects.get(user__username=self.kwargs['username']).is_shared:
+            return Rating.objects.filter(user__username=self.kwargs['username'])
+        else:
+            return Rating.objects.none()
     def get_context_data(self, **kwargs):
         ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
         context = super(RatingList, self).get_context_data(**kwargs)
+        context['username'] = self.kwargs['username']
         context['object_list'] = sorted(context['object_list'], key=lambda x: ordering.index(x.choice))
         return context
 
 def index(request):
+    if request.user.is_authenticated():
+        return redirect('/anime/')
     return render(request, 'index.html')
 
 def rate_work(request, work_id):
@@ -112,3 +118,8 @@ def get_reco(request):
         else:
             reco_list.append((reco, ''))
     return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list})
+
+def update_shared(request):
+    if request.user.is_authenticated() and request.method == 'POST':
+        Profile.objects.filter(user=request.user).update(is_shared=request.POST['is_shared'] == 'true')
+    return HttpResponse()
