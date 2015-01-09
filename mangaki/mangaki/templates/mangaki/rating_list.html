@@ -13,6 +13,7 @@ $("[name='is_shared']").on('switchChange.bootstrapSwitch', function(event, state
 {% else %}
 <h1>Profil de {{ username }}</h1>
 {% endif %}
+<img src="{{ avatar_url }}" alt="Avatar de {{ username }}" />
 <div class="row mangas-list">
     {% for object in object_list %}
         {% include "work_poster.html" with work=object.work rating=object.choice %}

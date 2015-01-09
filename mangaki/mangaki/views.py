@@ -7,6 +7,8 @@ from django.http import HttpResponse, Http404
 from mangaki.models import Work, Anime, Rating, Page, Profile
 from collections import Counter
 from markdown import markdown
+from secret import DISCOURSE_API_USERNAME, DISCOURSE_API_KEY
+from pydiscourse.client import DiscourseClient
 import datetime
 import random
 import json
@@ -40,6 +42,13 @@ class AnimeList(ListView):
                     pass
         return context 
 
+def get_avatar(email):
+    client = DiscourseClient('http://meta.mangaki.fr', api_username=DISCOURSE_API_USERNAME, api_key=DISCOURSE_API_KEY)
+    users = client._get('/admin/users/list/active.json?show_emails=true')
+    for user in users:
+        if user['email'] == email:
+            return user['avatar_template']
+
 class RatingList(ListView):
     model = Rating
     def get_queryset(self):
@@ -51,6 +60,7 @@ class RatingList(ListView):
         ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
         context = super(RatingList, self).get_context_data(**kwargs)
         context['username'] = self.kwargs['username']
+        context['avatar_url'] = 'http://meta.mangaki.fr' + get_avatar(User.objects.get(username=self.kwargs['username']).email).format(size=150)
         context['object_list'] = sorted(context['object_list'], key=lambda x: ordering.index(x.choice))
         return context
 
