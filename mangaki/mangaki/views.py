@@ -50,7 +50,7 @@ def get_discourse_data(email):
             if user['email'] == email:
                 return {'avatar': user['avatar_template'], 'created_at': user['created_at']}
     except:
-        return {'avatar': 'unknown.jpg', 'created_at': datetime.datetime.now()}
+        return {'avatar': 'unknown.jpg', 'created_at': datetime.datetime.now().isoformat()}
 
 def get_profile(request, username):
     is_shared = Profile.objects.get(user__username=username).is_shared
