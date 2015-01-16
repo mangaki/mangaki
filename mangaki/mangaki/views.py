@@ -44,10 +44,13 @@ class AnimeList(ListView):
 
 def get_discourse_data(email):
     client = DiscourseClient('http://meta.mangaki.fr', api_username=DISCOURSE_API_USERNAME, api_key=DISCOURSE_API_KEY)
-    users = client._get('/admin/users/list/active.json?show_emails=true')
-    for user in users:
-        if user['email'] == email:
-            return {'avatar': user['avatar_template'], 'created_at': user['created_at']}
+    try:
+        users = client._get('/admin/users/list/active.json?show_emails=true')
+        for user in users:
+            if user['email'] == email:
+                return {'avatar': user['avatar_template'], 'created_at': user['created_at']}
+    except:
+        return {'avatar': 'unknown.jpg', 'created_at': datetime.datetime.now()}
 
 def get_profile(request, username):
     is_shared = Profile.objects.get(user__username=username).is_shared
