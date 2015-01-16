@@ -66,7 +66,7 @@ WSGI_APPLICATION = 'mangaki.wsgi.application'
 SITE_ID = 1
 
 LOGIN_URL = '/user/login/'
-LOGIN_REDIRECT_URL = '/anime/'
+LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_REQUIRED = True
 
 AUTHENTICATION_BACKENDS = (

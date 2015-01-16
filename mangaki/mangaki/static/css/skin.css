@@ -130,3 +130,9 @@ footer .navbar-nav {
 	padding: 2px 2px 2px 5px;
 	border-radius: 4px;
 }
+
+#avatar {
+	width: 100%;
+	max-width: 150px;
+	border-radius: 5px;
+}

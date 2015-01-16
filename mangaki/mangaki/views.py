@@ -42,31 +42,36 @@ class AnimeList(ListView):
                     pass
         return context 
 
-def get_avatar(email):
+def get_discourse_data(email):
     client = DiscourseClient('http://meta.mangaki.fr', api_username=DISCOURSE_API_USERNAME, api_key=DISCOURSE_API_KEY)
     users = client._get('/admin/users/list/active.json?show_emails=true')
     for user in users:
         if user['email'] == email:
-            return user['avatar_template']
+            return {'avatar': user['avatar_template'], 'created_at': user['created_at']}
 
-class RatingList(ListView):
-    model = Rating
-    def get_queryset(self):
-        if self.request.user.username == self.kwargs['username'] or Profile.objects.get(user__username=self.kwargs['username']).is_shared:
-            return Rating.objects.filter(user__username=self.kwargs['username'])
-        else:
-            return Rating.objects.none()
-    def get_context_data(self, **kwargs):
-        ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
-        context = super(RatingList, self).get_context_data(**kwargs)
-        context['username'] = self.kwargs['username']
-        context['avatar_url'] = 'http://meta.mangaki.fr' + get_avatar(User.objects.get(username=self.kwargs['username']).email).format(size=150)
-        context['object_list'] = sorted(context['object_list'], key=lambda x: ordering.index(x.choice))
-        return context
+def get_profile(request, username):
+    is_shared = Profile.objects.get(user__username=username).is_shared
+    ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
+    seen_list = sorted(Rating.objects.filter(user__username=username, choice__in=['like', 'neutral', 'dislike']), key=lambda x: (ordering.index(x.choice), x.work.title))
+    unseen_list = sorted(Rating.objects.filter(user__username=username, choice__in=['willsee', 'wontsee']), key=lambda x: (ordering.index(x.choice), x.work.title))
+    discourse_data = get_discourse_data(User.objects.get(username=username).email)
+    member_time = datetime.datetime.now() - datetime.datetime.strptime(discourse_data['created_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+    return render(request, 'profile.html', {
+        'username': username,
+        'is_shared': is_shared,
+        'avatar_url': 'http://meta.mangaki.fr' + discourse_data['avatar'].format(size=150),
+        'member_days': member_time.days,
+        'anime_count': len(seen_list),
+        'seen_list': seen_list if is_shared else [],
+        'unseen_list': unseen_list if is_shared else []
+    })
 
 def index(request):
     if request.user.is_authenticated():
-        return redirect('/anime/')
+        if Rating.objects.filter(user=request.user).count() == 0:
+            return redirect('/anime/')
+        else:
+            return redirect('/u/%s' % request.user.username)
     return render(request, 'index.html')
 
 def rate_work(request, work_id):
