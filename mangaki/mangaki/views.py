@@ -14,7 +14,6 @@ from secret import DISCOURSE_API_USERNAME, DISCOURSE_API_KEY, MAL_USER, MAL_PASS
 from pydiscourse.client import DiscourseClient
 from urllib.request import urlopen
 import xml.etree.ElementTree as ET
-from slugify import slugify
 import datetime
 import requests
 import random
