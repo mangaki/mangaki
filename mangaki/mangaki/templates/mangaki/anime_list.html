@@ -3,7 +3,7 @@
 {% block body %}
 {% if user.is_authenticated %}
 <p class="well">
-Ces <em>anime</em> sont triés
+Ces <strong>{{ anime_count }}</strong> <em>anime</em> sont triés
 {% if "alpha" in mode %}
 <a href="/anime/">dans l'ordre alphabétique</a>
 {% else %}

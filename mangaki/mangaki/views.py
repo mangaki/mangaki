@@ -43,6 +43,7 @@ class AnimeList(ListView):
     def get_context_data(self, **kwargs):
         context = super(AnimeList, self).get_context_data(**kwargs)
         context['mode'] = self.kwargs['mode']
+        context['anime_count'] = Anime.objects.count()
         context['template_mode'] = 'work_no_poster.html' if 'flat' in self.kwargs['mode'] else 'work_poster.html'
         if self.request.user.is_authenticated():
             for obj in context['object_list']:
