@@ -14,7 +14,6 @@ from secret import DISCOURSE_API_USERNAME, DISCOURSE_API_KEY, MAL_USER, MAL_PASS
 from pydiscourse.client import DiscourseClient
 from urllib.request import urlopen
 import xml.etree.ElementTree as ET
-from bs4 import BeautifulSoup
 from slugify import slugify
 import datetime
 import requests
@@ -178,22 +177,6 @@ def update_shared(request):
     if request.user.is_authenticated() and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(is_shared=request.POST['is_shared'] == 'true')
     return HttpResponse()
-
-def lookup_work_link(slug):
-    b = BeautifulSoup(urlopen('http://www.animeka.com/search/index.html?req=%s' % slug)) # &go_search=1&cat=search&zone_series=1&zone_episodes=1&zone_studios=1&zone_pers=1&zone_seriesf=1&zone_rlz=1&zone_team=1&type_search=all
-    results = list(b.select('.animestxt a'))
-    try:
-        if len(results) >= 1:
-            lines = []
-            for line in results:
-                if line['href'].startswith('/animes/detail'):
-                    lines.append(line['href'].replace('/animes/detail', ''))
-            return ','.join(lines)
-        else:
-            js = b.find('script').text
-            return js[js.index('"') + 1:-1]
-    except:
-        return ''
 
 def lookup_mal_api(query):
     xml = re.sub(r'&([^alg])', r'&amp;\1', html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'&\1;', requests.get('http://myanimelist.net/api/anime/search.xml', params={'q': query}, headers={'X-Real-IP': '251.223.201.179', 'User-Agent': 'Mozilla/5.0 (X11; Linux i686 on x86_64; rv:36.0) Gecko/20100101 Firefox/36.0'}, auth=(MAL_USER, MAL_PASS)).text).replace('&lt', '&lot;').replace('&gt;', '&got;')).replace('&lot;', '&lt').replace('&got;', '&gt;'))
