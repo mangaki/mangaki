@@ -4,7 +4,8 @@ function loadMenu(category) {
   pieces = new Bloodhound({
     datumTokenizer: function(d) { return d.tokens; },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    prefetch: '/data/' + category + '.json'
+    prefetch: '/data/' + category + '.json',
+    remote: '/data/query/%QUERY.json'
   });
 
   pieces.initialize();
@@ -30,17 +31,20 @@ $(document).ready(function() {
     location.href = '/anime/' + selection.id;
     $(this).val('');
   }).on('change', function(object, datum) {
-    $(this).val('');
+    pieces.clearPrefetchCache();
+     // lookup($(this).val());
+     // $(this).val('');
   });
 })
 
 function lookup(query, category) {
-  $.post('/lookup/', {category: category, query: query}, function(id) {
-    console.log(pieces);
+  $.post('/lookup/', {query: query}, function(id) {
+    // console.log(pieces);
     pieces.clearPrefetchCache();
     promise = pieces.initialize(true);
     promise.done(function() {console.log('win')}).fail(function() {console.log('fail')});
-    vote({id: id});
+    // vote({id: id});
+    location.href = '/anime/' + id;
   })
 }
 

@@ -6,6 +6,8 @@ class Work(models.Model):
     title = models.CharField(max_length=64)
     source = models.CharField(max_length=128, blank=True)
     poster = models.CharField(max_length=128)
+    nsfw = models.BooleanField(default=False)
+    date = models.DateField(blank=True, null=True)
 
 class Anime(Work):
     synopsis = models.TextField(blank=True)
