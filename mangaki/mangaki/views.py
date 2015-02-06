@@ -39,7 +39,10 @@ class AnimeList(ListView):
     model = Anime
     context_object_name = 'anime'
     def get_queryset(self):
-        return Anime.objects.order_by('title') if 'alpha' in self.kwargs['mode'] else Anime.objects.all()[:24]
+        bundle = Anime.objects.order_by('title') if 'alpha' in self.kwargs['mode'] else Anime.objects.all()
+        if 'flat' not in self.kwargs['mode']:
+            return bundle[:24]  # Only first 24
+        return bundle
     def get_context_data(self, **kwargs):
         context = super(AnimeList, self).get_context_data(**kwargs)
         context['mode'] = self.kwargs['mode']
