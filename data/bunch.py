@@ -29,7 +29,7 @@ def synopsis(url):
         return ''
 
 data = []
-pk = 1
+pk = 31
 with open('anime.txt') as f:
     for line in f:
         title = line.strip()
