@@ -5,7 +5,9 @@ from django.db import models
 from django.contrib import admin, messages
 
 class AnimeAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ('id', 'title')
+    list_display = ('id', 'title', 'nsfw')
+    list_filter = ('nsfw',)
 
 class TrackAdmin(admin.ModelAdmin):
     pass
