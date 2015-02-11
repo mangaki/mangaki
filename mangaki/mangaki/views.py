@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
+from django.core.paginator import Paginator
 from django.dispatch import receiver
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
@@ -13,6 +14,8 @@ from markdown import markdown
 from secret import DISCOURSE_API_USERNAME, DISCOURSE_API_KEY, MAL_USER, MAL_PASS
 from pydiscourse.client import DiscourseClient
 from urllib.request import urlopen
+from urllib.parse import urlencode
+from math import ceil
 import xml.etree.ElementTree as ET
 import datetime
 import requests
@@ -20,6 +23,9 @@ import random
 import json
 import html
 import re
+
+POSTERS_PER_PAGE = 24
+TITLES_PER_PAGE = 100
 
 class AnimeDetail(DetailView):
     model = Anime
@@ -39,23 +45,44 @@ class AnimeList(ListView):
     model = Anime
     context_object_name = 'anime'
     def get_queryset(self):
-        bundle = Anime.objects.order_by('title') if 'alpha' in self.kwargs['mode'] else Anime.objects.all()
-        if 'flat' not in self.kwargs['mode']:
-            return bundle[:24]  # Only first 24
+        sort_mode = self.request.GET.get('sort')
+        flat_mode = self.request.GET.get('flat')
+        letter = self.request.GET.get('letter')
+        page = int(self.request.GET.get('page', '1'))
+        bundle = Anime.objects.order_by('title') if sort_mode == 'alpha' else Anime.objects.all()
+        if letter:
+            sort_mode = 'alpha'
+            bundle = bundle.filter(title__istartswith=letter).order_by('title')
         return bundle
     def get_context_data(self, **kwargs):
+        sort_mode = self.request.GET.get('sort', 'popularity')
+        flat_mode = self.request.GET.get('flat', '0')
+        letter = self.request.GET.get('letter', '')
+        page = int(self.request.GET.get('page', '1'))
         context = super(AnimeList, self).get_context_data(**kwargs)
-        context['mode'] = self.kwargs['mode']
+        paginator = Paginator(context['object_list'], TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
+        try:
+            anime_list = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            anime_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            anime_list = paginator.page(paginator.num_pages)
+        context['params'] = {'sort': sort_mode, 'letter': letter, 'page': page, 'flat': flat_mode}
+        context['url'] = urlencode({'sort': sort_mode, 'letter': letter})
         context['anime_count'] = Anime.objects.count()
-        context['template_mode'] = 'work_no_poster.html' if 'flat' in self.kwargs['mode'] else 'work_poster.html'
-        if self.request.user.is_authenticated():
-            for obj in context['object_list']:
-                if obj.nsfw:
-                    obj.poster = '/static/img/nsfw.jpg'  # NSFW
+        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(anime_list.number - 2, anime_list.number + 2 + 1))
+        context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
+        for obj in anime_list:
+            if obj.nsfw:
+                obj.poster = '/static/img/nsfw.jpg'  # NSFW
+            if self.request.user.is_authenticated():
                 try:
                     obj.rating = obj.rating_set.get(user=self.request.user).choice
                 except Rating.DoesNotExist:
                     pass
+        context['object_list'] = anime_list
         return context 
 
 def get_discourse_data(email):

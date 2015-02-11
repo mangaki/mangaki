@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'^user/', include('allauth.urls')),
     url(r'^u/(?P<username>.+)$', 'mangaki.views.get_profile'), # login_required?
     url(r'^reco/$', 'mangaki.views.get_reco'),
-    url(r'^anime/(?P<mode>[a-z]*)/?$', AnimeList.as_view()),
+    url(r'^anime/$', AnimeList.as_view()),
     url(r'^anime/(?P<pk>\d+)$', AnimeDetail.as_view()),
     url(r'^anime/(?P<pk>\d+)/nsfw$', 'mangaki.views.report_nsfw'),
     url(r'^work/(?P<work_id>\d+)$', 'mangaki.views.rate_work'),

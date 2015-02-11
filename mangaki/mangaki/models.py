@@ -52,3 +52,6 @@ class Page(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User)
     is_shared = models.BooleanField(default=True)
+
+class Report(models.Model):
+    pass

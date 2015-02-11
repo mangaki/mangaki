@@ -3,13 +3,17 @@
 {% block body %}
 {% if user.is_authenticated %}
 <p class="well">
-Ces <strong>{{ anime_count }}</strong> <em>anime</em> sont triés
-{% if "alpha" in mode %}
-<a href="/anime/">dans l'ordre alphabétique</a>
+Voici une liste de <strong>{{ anime_count }}</strong> <em>anime</em>
+{% if params.flat == '1' %}
+    (<a href="?{{ url }}&amp;page={{ params.page }}">afficher les posters</a>)<br />
 {% else %}
-<a href="/anime/alpha">par popularité</a>
+    (<a href="?{{ url }}&amp;page={{ params.page }}&amp;flat=1">cacher les posters</a>)<br />
 {% endif %}
-(<a href="/anime/alphaflat/">afficher la version réduite</a>)<br />
+Trier :
+{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+    <a href="/anime/?letter={{ letter|lower }}">{{ letter }}</a>
+{% endfor %}
+<br />
 Notez-en quelques-uns pour obtenir des <a href="/reco/">recommandations</a>.<br />
     <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
     <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
@@ -30,6 +34,27 @@ Notez-en quelques-uns pour obtenir des <a href="/reco/">recommandations</a>.<br 
         {% include template_mode with work=object rating=object.rating %}
     {% endfor %}
 </div>
+<nav style="text-align: center">
+  <ul class="pagination">
+    {% if object_list.has_previous %}
+    <li>
+      <a href="?{{ url }}&amp;page={{ object_list.previous_page_number }}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% endif %}
+    {% for page in pages %}
+        <li><a href="?{{ url }}&amp;page={{ page }}">{% if params.page == page %}<strong>{{ page }}</strong>{% else %}{{ page }}{% endif %}</a></li>
+    {% endfor %}
+    {% if object_list.has_next %}
+    <li>
+      <a href="?{{ url }}&amp;page={{ object_list.next_page_number }}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
 <br />
 <br />
 <br />
