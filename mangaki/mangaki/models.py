@@ -1,6 +1,7 @@
 # coding=utf8
 from django.db import models
 from django.contrib.auth.models import User
+# from django.core.urlresolvers import reverse
 
 class Work(models.Model):
     title = models.CharField(max_length=64)
@@ -8,6 +9,8 @@ class Work(models.Model):
     poster = models.CharField(max_length=128)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
+    def __str__(self):
+        return self.title
 
 class Anime(Work):
     synopsis = models.TextField(blank=True)
@@ -53,5 +56,14 @@ class Profile(models.Model):
     user = models.OneToOneField(User)
     is_shared = models.BooleanField(default=True)
 
-class Report(models.Model):
-    pass
+class Suggestion(models.Model):
+    user = models.ForeignKey(User)
+    work = models.ForeignKey(Work)
+    date = models.DateTimeField(auto_now=True)
+    problem = models.CharField(verbose_name='Problème', max_length=8, choices=(
+        ('title', 'Le titre n\'est pas le bon'),
+        ('poster', 'Le poster ne convient pas'),
+        ('synopsis', 'Le synopsis comporte des erreurs')
+    ))
+    message = models.TextField(verbose_name='Correction (facultatif)', blank=True)
+    is_checked = models.BooleanField(default=False)

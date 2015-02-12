@@ -1,5 +1,6 @@
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.views.generic.edit import FormMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -8,7 +9,9 @@ from django.core.paginator import Paginator
 from django.dispatch import receiver
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Rating, Page, Profile, Artist
+from mangaki.models import Work, Anime, Rating, Page, Profile, Artist, Suggestion
+from mangaki.mixins import AjaxableResponseMixin
+from mangaki.forms import SuggestionForm
 from collections import Counter
 from markdown import markdown
 from secret import DISCOURSE_API_USERNAME, DISCOURSE_API_KEY, MAL_USER, MAL_PASS
@@ -27,19 +30,37 @@ import re
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 100
 
-class AnimeDetail(DetailView):
+class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime
+    form_class = SuggestionForm
+    def get_success_url(self):
+        return 'anime/%d' % self.object.pk
     def get_context_data(self, **kwargs):
         context = super(AnimeDetail, self).get_context_data(**kwargs)
         if self.object.nsfw:
             context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
         context['object'].source = context['object'].source.split(',')[0]
+        context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
         if self.request.user.is_authenticated():
             try:
                 context['rating'] = self.object.rating_set.get(user=self.request.user).choice
             except Rating.DoesNotExist:
                 pass
         return context
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseForbidden()
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.save()
+        return super(AnimeDetail, self).form_valid(form)
 
 class AnimeList(ListView):
     model = Anime

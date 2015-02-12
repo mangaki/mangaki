@@ -7,3 +7,27 @@ function vote(work_id, choice) {
         }
     });
 }
+
+function suggestion(id, form) {
+    $.post('/anime/' + $('#id_work').val(), {
+        'work': $('#id_work').val(),
+        'problem': $('#id_problem').val(),
+        'message': $('#id_message').val()
+    }).success(function(data) {
+        $('#alert').hide()
+        if($('#success').css('display') == 'none')
+            $('#success').show();
+        $('#success').html('Merci d\'avoir contribué à Mangaki !');
+        setTimeout(function() {
+            $('#success').hide();
+            $('#suggestionModal').modal('hide');
+        }, 1000);
+    }).error(function(data) {
+        $('#success').hide();
+        if($('#alert').css('display') == 'none')
+            $('#alert').show();
+        // for(line in data.responseJSON) {
+        $('#alert').text(data.responseJSON['problem']);
+        // }
+    });
+}
