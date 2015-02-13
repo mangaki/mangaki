@@ -31,6 +31,7 @@
 {% if object.synopsis %}
     <div class="well">{{ object.synopsis }} (cc) <a href="http://animeka.com/animes/detail{{ object.source }}" target="_blank">Animeka</a></div>
 {% endif %}
+{% if user.is_authenticated %}
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#suggestionModal" data-whatever="@mdo">Signaler</button>
 <div class="modal fade" id="suggestionModal" tabindex="-1" role="dialog" aria-labelledby="suggestionModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -54,4 +55,5 @@
     </div>
   </div>
 </div>
+{% endif %}
 {% endblock %}

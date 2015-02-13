@@ -40,8 +40,8 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if self.object.nsfw:
             context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
         context['object'].source = context['object'].source.split(',')[0]
-        context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
         if self.request.user.is_authenticated():
+            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
                 context['rating'] = self.object.rating_set.get(user=self.request.user).choice
             except Rating.DoesNotExist:
