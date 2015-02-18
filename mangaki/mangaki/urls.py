@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from mangaki.views import AnimeDetail, AnimeList, MarkdownView
+from mangaki.views import AnimeDetail, AnimeList, MarkdownView, UserList
 from discourse import views
 
 urlpatterns = patterns('',
@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^$', 'mangaki.views.index'),
     url(r'^data/(?P<category>\w+)\.json$', 'mangaki.views.get_works'),
     url(r'^data/query/(?P<query>.+)\.json$', 'mangaki.views.get_extra_works'),
+    url(r'^users/', UserList.as_view()),
     url(r'^user/', include('allauth.urls')),
     url(r'^u/(?P<username>.+)$', 'mangaki.views.get_profile'), # login_required?
     url(r'^reco/$', 'mangaki.views.get_reco'),

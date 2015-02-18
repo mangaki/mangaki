@@ -1,7 +1,7 @@
 # coding=utf8
 from django.db import models
 from django.contrib.auth.models import User
-# from django.core.urlresolvers import reverse
+from mangaki.api import get_discourse_data
 
 class Work(models.Model):
     title = models.CharField(max_length=64)
@@ -55,6 +55,10 @@ class Page(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User)
     is_shared = models.BooleanField(default=True)
+    def anime_count(self):
+        return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike']).count()
+    def avatar_url(self):
+        return get_discourse_data(self.user.email)['avatar'].format(size=150)
 
 class Suggestion(models.Model):
     user = models.ForeignKey(User)

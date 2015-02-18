@@ -12,10 +12,10 @@ from allauth.socialaccount.signals import social_account_added
 from mangaki.models import Work, Anime, Rating, Page, Profile, Artist, Suggestion
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
+from mangaki.api import get_discourse_data
 from collections import Counter
 from markdown import markdown
-from secret import DISCOURSE_API_USERNAME, DISCOURSE_API_KEY, MAL_USER, MAL_PASS
-from pydiscourse.client import DiscourseClient
+from secret import MAL_USER, MAL_PASS
 from urllib.request import urlopen
 from urllib.parse import urlencode
 from math import ceil
@@ -106,16 +106,15 @@ class AnimeList(ListView):
         context['object_list'] = anime_list
         return context 
 
-def get_discourse_data(email):
-    client = DiscourseClient('http://meta.mangaki.fr', api_username=DISCOURSE_API_USERNAME, api_key=DISCOURSE_API_KEY)
-    try:
-        users = client._get('/admin/users/list/active.json?show_emails=true')
-        for user in users:
-            if user['email'] == email:
-                return {'avatar': 'http://meta.mangaki.fr' + user['avatar_template'], 'created_at': user['created_at']}
-        return {'avatar': '/static/img/unknown.png', 'created_at': datetime.datetime.now().isoformat() + 'Z'}
-    except:
-        return {'avatar': '/static/img/unknown.png', 'created_at': datetime.datetime.now().isoformat() + 'Z'}
+class UserList(ListView):
+    model = User
+    # context_object_name = 'anime'
+    def get_queryset(self):
+        return User.objects.filter(profile__is_shared=True).order_by('-id')[:5]
+    def get_context_data(self, **kwargs):
+        context = super(UserList, self).get_context_data(**kwargs)
+        context['trio_elm'] = User.objects.filter(username__in=['jj', 'Lily', 'Sedeto'])
+        return context
 
 def get_profile(request, username):
     try:
