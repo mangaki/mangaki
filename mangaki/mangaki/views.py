@@ -149,8 +149,14 @@ def index(request):
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
-        Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': request.POST['choice']})
-        return HttpResponse(request.POST['choice'])
+        choice = request.POST.get('choice', '')
+        if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee']:
+            return HttpResponse()
+        if Rating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
+            Rating.objects.filter(user=request.user, work=work, choice=choice).delete()
+            return HttpResponse('none')
+        Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
+        return HttpResponse(choice)
     return HttpResponse()
 
 class MarkdownView(DetailView):

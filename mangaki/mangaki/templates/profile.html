@@ -17,7 +17,7 @@
         {% endif %}
     </div>    
 </div>
-<div class="row mangas-list">
+<div class="row mangas-list{% if request.user.username != username %} another{% endif %}">
     {% if not is_shared %}
         <br />
         <p class="well">Le profil de {{ username }} n'est pas public.</p>

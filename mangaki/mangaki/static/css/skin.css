@@ -2,8 +2,12 @@
  *  GENERAL  *
  *************/
 body {
-	background: #EEE;
+	background: #fdfdfd;
 	font-family: Arial;
+}
+
+.jumbotron {
+	background: #fdfdfd;
 }
 
 /************
@@ -115,6 +119,10 @@ footer .navbar-nav {
 
 .not-chosen {
 	opacity: 0.2;
+}
+
+.another .not-chosen {
+	visibility: hidden;
 }
 
 .manga-snapshot-image, .manga-sheet h1 {
