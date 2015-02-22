@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
 from django.core.paginator import Paginator
 from django.dispatch import receiver
+from django.db.models import Count
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
 from mangaki.models import Work, Anime, Rating, Page, Profile, Artist, Suggestion
@@ -28,7 +29,7 @@ import html
 import re
 
 POSTERS_PER_PAGE = 24
-TITLES_PER_PAGE = 100
+TITLES_PER_PAGE = 24
 
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime
@@ -70,10 +71,12 @@ class AnimeList(ListView):
         flat_mode = self.request.GET.get('flat')
         letter = self.request.GET.get('letter')
         page = int(self.request.GET.get('page', '1'))
-        bundle = Anime.objects.order_by('title') if sort_mode == 'alpha' else Anime.objects.all()
+        bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=1)  # Rated by at least one person
         if letter:
             sort_mode = 'alpha'
-            bundle = bundle.filter(title__istartswith=letter).order_by('title')
+            bundle = bundle.filter(title__istartswith=letter)
+        if sort_mode == 'alpha':
+            bundle = bundle.order_by('title')
         return bundle
     def get_context_data(self, **kwargs):
         sort_mode = self.request.GET.get('sort', 'popularity')
