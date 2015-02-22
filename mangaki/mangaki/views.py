@@ -72,9 +72,13 @@ class AnimeList(ListView):
         letter = self.request.GET.get('letter')
         page = int(self.request.GET.get('page', '1'))
         bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=1)  # Rated by at least one person
+        print('hey', letter)
         if letter:
             sort_mode = 'alpha'
-            bundle = bundle.filter(title__istartswith=letter)
+            if letter == '0':  # '#'
+                bundle = bundle.exclude(title__regex=r'^[a-zA-Z]')
+            else:
+                bundle = bundle.filter(title__istartswith=letter)
         if sort_mode == 'alpha':
             bundle = bundle.order_by('title')
         return bundle

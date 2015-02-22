@@ -10,6 +10,7 @@ Voici une liste de <strong>{{ anime_count }}</strong> <em>anime</em>
     (<a href="?{{ url }}&amp;page={{ params.page }}&amp;flat=1">cacher les posters</a>)<br />
 {% endif %}
 Trier :
+<a href="/anime/?letter=0">#</a>
 {% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
     <a href="/anime/?letter={{ letter|lower }}">{{ letter }}</a>
 {% endfor %}
