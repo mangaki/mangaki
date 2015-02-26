@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 from mangaki.api import get_discourse_data
 
 class Work(models.Model):
-    title = models.CharField(max_length=64)
-    source = models.CharField(max_length=128, blank=True)
+    title = models.CharField(max_length=128)
+    source = models.CharField(max_length=1044, blank=True)
     poster = models.CharField(max_length=128)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
@@ -45,6 +45,8 @@ class Rating(models.Model):
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
     ))
+    def __str__(self):
+        return '%s %s %s' % (self.user, self.choice, self.work)
 
 class Page(models.Model):
     name = models.SlugField()
