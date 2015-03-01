@@ -73,3 +73,8 @@ class Suggestion(models.Model):
     ))
     message = models.TextField(verbose_name='Correction (facultatif)', blank=True)
     is_checked = models.BooleanField(default=False)
+
+class Neighborship(models.Model):
+    user = models.ForeignKey(User)
+    neighbor = models.ForeignKey(User, related_name='neighbor')
+    score = models.DecimalField(decimal_places=3, max_digits=8)
