@@ -3,3 +3,4 @@ django-allauth
 markdown
 django-bootstrap-form
 -e git+https://github.com/tindie/pydiscourse.git#egg=pydiscourse
+psycopg2

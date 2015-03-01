@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from django.conf import global_settings
-from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DEBUG
+from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DEBUG, DATABASES
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
@@ -72,16 +72,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
