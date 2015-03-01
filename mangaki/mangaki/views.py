@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from django.db.models import Count
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Rating, Page, Profile, Artist, Suggestion
+from mangaki.models import Work, Anime, Rating, Page, Profile, Artist, Suggestion, Neighborship
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.api import get_discourse_data
@@ -201,16 +201,21 @@ def get_extra_works(request, query, redirect=True):
 def get_recommendations(user):
     contest = []
     values = {'like': 2, 'dislike': -2, 'neutral': 0.1, 'willsee': 0.5, 'wontsee': -0.5}
-    neighbors = Counter()
+    """neighbors = Counter()
+    # c = 0
     for my in Rating.objects.filter(user=user):
         for her in Rating.objects.filter(work=my.work):
-            neighbors[her.user.id] = values[my.choice] * values[her.choice]
+            # c += 1
+            neighbors[her.user.id] += values[my.choice] * values[her.choice]
+    # print(c, 'omg')
+    print(neighbors)
+    """
     works = Counter()
     nb_ratings = {}
-    for user_id, score in neighbors.most_common(10):
+    for user_id, score in Neighborship.objects.filter(user=user).order_by('-score').values_list('neighbor', 'score')[:10]:
         for her in Rating.objects.filter(user__id=user_id):
             if her.work.id not in works:
-                works[her.work.id] = [values[her.choice], neighbors[her.user.id]]
+                works[her.work.id] = [values[her.choice], score]
                 nb_ratings[her.work.id] = 1
             else:
                 works[her.work.id][0] += values[her.choice]
