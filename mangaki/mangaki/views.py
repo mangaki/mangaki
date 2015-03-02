@@ -212,6 +212,16 @@ def get_recommendations(user):
     """
     works = Counter()
     nb_ratings = {}
+    if Neighborship.objects.filter(user=user).count() < 10:
+        c = 0
+        neighbors = Counter()
+        for my in Rating.objects.filter(user=user):
+            for her in Rating.objects.filter(work=my.work):
+                c += 1
+                neighbors[her.user.id] += values[my.choice] * values[her.choice]
+        print(c, 'operations performed')
+        for user_id in neighbors:
+            Neighborship.objects.update_or_create(user=user, neighbor=User.objects.get(id=user_id), defaults={'score': neighbors[user_id]})
     for user_id, score in Neighborship.objects.filter(user=user).order_by('-score').values_list('neighbor', 'score')[:10]:
         for her in Rating.objects.filter(user__id=user_id):
             if her.work.id not in works:
