@@ -1,7 +1,7 @@
 <div class="col-md-3 col-xs-6 text-center manga-sheet">
     <div class="row thumbnail">
         <div class="col-md-12">
-            <h1 onclick="location.href = '/anime/{{ work.id }}'">{{ work.title }}</h1>
+            <h1 onclick="location.href = '/{{ class }}/{{ work.id }}'">{{ work.title }}</h1>
         </div>
         {% include "work_rating.html" %}
     </div>

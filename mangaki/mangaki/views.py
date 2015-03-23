@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from django.db.models import Count
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Rating, Page, Profile, Artist, Suggestion, Neighborship
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, Neighborship
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.api import get_discourse_data
@@ -63,6 +63,42 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
         form.save()
         return super(AnimeDetail, self).form_valid(form)
 
+class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
+    model = Manga
+    form_class = SuggestionForm
+    def get_success_url(self):
+        return 'manga/%d' % self.object.pk
+    def get_context_data(self, **kwargs):
+        context = super(MangaDetail, self).get_context_data(**kwargs)
+        if self.object.nsfw:
+            context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
+        context['object'].source = context['object'].source.split(',')[0]
+        genres = []
+        for genre in context['object'].genre.all():
+            genres.append(genre.title)
+        context['genres'] = ', '.join(genres)
+        if self.request.user.is_authenticated():
+            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
+            try:
+                context['rating'] = self.object.rating_set.get(user=self.request.user).choice
+            except Rating.DoesNotExist:
+                pass
+        return context
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseForbidden()
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.save()
+        return super(MangaDetail, self).form_valid(form)
+
 class AnimeList(ListView):
     model = Anime
     context_object_name = 'anime'
@@ -110,7 +146,56 @@ class AnimeList(ListView):
                 except Rating.DoesNotExist:
                     pass
         context['object_list'] = anime_list
-        return context 
+        return context
+
+class MangaList(ListView):
+    model = Manga
+    context_object_name = 'manga'
+    def get_queryset(self):
+        sort_mode = self.request.GET.get('sort')
+        flat_mode = self.request.GET.get('flat')
+        letter = self.request.GET.get('letter')
+        page = int(self.request.GET.get('page', '1'))
+        bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=0).order_by('id')  # Rated by at least zero person (to be modified)
+        if letter:
+            sort_mode = 'alpha'
+            if letter == '0':  # '#'
+                bundle = bundle.exclude(title__regex=r'^[a-zA-Z]')
+            else:
+                bundle = bundle.filter(title__istartswith=letter)
+        if sort_mode == 'alpha':
+            bundle = bundle.order_by('title')
+        return bundle
+    def get_context_data(self, **kwargs):
+        sort_mode = self.request.GET.get('sort', 'popularity')
+        flat_mode = self.request.GET.get('flat', '0')
+        letter = self.request.GET.get('letter', '')
+        page = int(self.request.GET.get('page', '1'))
+        context = super(MangaList, self).get_context_data(**kwargs)
+        paginator = Paginator(context['object_list'], TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
+        try:
+            manga_list = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            manga_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            manga_list = paginator.page(paginator.num_pages)
+        context['params'] = {'sort': sort_mode, 'letter': letter, 'page': page, 'flat': flat_mode}
+        context['url'] = urlencode({'sort': sort_mode, 'letter': letter})
+        context['manga_count'] = Manga.objects.count()
+        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(manga_list.number - 2, manga_list.number + 2 + 1))
+        context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
+        for obj in manga_list:
+            if obj.nsfw:
+                obj.poster = '/static/img/nsfw.jpg'  # NSFW
+            if self.request.user.is_authenticated():
+                try:
+                    obj.rating = obj.rating_set.get(user=self.request.user).choice
+                except Rating.DoesNotExist:
+                    pass
+        context['object_list'] = manga_list
+        return context
 
 class UserList(ListView):
     model = User
@@ -129,8 +214,24 @@ def get_profile(request, username):
         Profile(user=request.user).save()  # À supprimer à terme
         is_shared = True
     ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
-    seen_list = sorted(Rating.objects.filter(user__username=username, choice__in=['like', 'neutral', 'dislike']), key=lambda x: (ordering.index(x.choice), x.work.title))
-    unseen_list = sorted(Rating.objects.filter(user__username=username, choice__in=['willsee', 'wontsee']), key=lambda x: (ordering.index(x.choice), x.work.title))
+    rating_list = sorted(Rating.objects.filter(user__username=username), key=lambda x: (ordering.index(x.choice), x.work.title))
+    seen_anime_list = []
+    unseen_anime_list = []
+    seen_manga_list = []
+    unseen_manga_list = []
+    for rating in rating_list:
+        seen = rating.choice in ['like', 'neutral', 'dislike']
+        try:
+            rating.work.anime
+            if seen:
+                seen_anime_list.append(rating)
+            else:
+                unseen_anime_list.append(rating)
+        except Anime.DoesNotExist:
+            if seen:
+                seen_manga_list.append(rating)
+            else:
+                unseen_manga_list.append(rating)
     discourse_data = get_discourse_data(User.objects.get(username=username).email)
     member_time = datetime.datetime.now() - datetime.datetime.strptime(discourse_data['created_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
     return render(request, 'profile.html', {
@@ -138,9 +239,12 @@ def get_profile(request, username):
         'is_shared': is_shared,
         'avatar_url': discourse_data['avatar'].format(size=150),
         'member_days': member_time.days,
-        'anime_count': len(seen_list),
-        'seen_list': seen_list if is_shared else [],
-        'unseen_list': unseen_list if is_shared else []
+        'anime_count': len(seen_anime_list),
+        'manga_count': len(seen_manga_list),
+        'seen_anime_list': seen_anime_list if is_shared else [],
+        'unseen_anime_list': unseen_anime_list if is_shared else [],
+        'seen_manga_list': seen_manga_list if is_shared else [],
+        'unseen_manga_list': unseen_manga_list if is_shared else []
     })
 
 def index(request):
@@ -153,7 +257,9 @@ def index(request):
 
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
+        print(work_id)
         work = get_object_or_404(Work, id=work_id)
+        print(work.title)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee']:
             return HttpResponse()

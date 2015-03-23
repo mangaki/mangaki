@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from mangaki.views import AnimeDetail, AnimeList, MarkdownView, UserList
+from mangaki.views import AnimeDetail, AnimeList, MangaDetail, MangaList, MarkdownView, UserList
 from discourse import views
 
 urlpatterns = patterns('',
@@ -18,6 +18,9 @@ urlpatterns = patterns('',
     url(r'^reco/$', 'mangaki.views.get_reco'),
     url(r'^anime/$', AnimeList.as_view()),
     url(r'^anime/(?P<pk>\d+)$', AnimeDetail.as_view()),
+    url(r'^anime/(?P<pk>\d+)/nsfw$', 'mangaki.views.report_nsfw'),
+    url(r'^manga/$', MangaList.as_view()),
+    url(r'^manga/(?P<pk>\d+)$', MangaDetail.as_view()),
     url(r'^anime/(?P<pk>\d+)/nsfw$', 'mangaki.views.report_nsfw'),
     url(r'^work/(?P<work_id>\d+)$', 'mangaki.views.rate_work'),
     url(r'^shared/$', 'mangaki.views.update_shared'),

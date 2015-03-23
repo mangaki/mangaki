@@ -9,6 +9,7 @@
         <h1>{{ username }}</h1>
         <p>Inscrit depuis {{ member_days }} jours</p>
         <p>Nombre d'<em>anime</em> vus : {{ anime_count }}</p>
+        <p>Nombre de mangas lus : {{ manga_count }}</p>
     </div>
     <div class="col-xs-3">
         {% if request.user.username == username %}
@@ -24,18 +25,38 @@
     {% else %}
         <div class="col-xs-4 col-xs-offset-1">
             <h1><a href="/anime">Anime</a> vus</h1>
-            {% for object in seen_list %}
-                {% include "work_no_poster.html" with work=object.work rating=object.choice %}
+            {% for object in seen_anime_list %}
+                {% include "work_no_poster.html" with work=object.work class="anime" rating=object.choice %}
             {% empty %}
-                <p>Soit {{ username }} n'a pas noté d'<em>anime</em>, soit son profil n'est pas public.</p>
+                <p>(Cette liste est vide.)</p>
             {% endfor %}
         </div>
         <div class="col-xs-4 col-xs-offset-1">
             <h1><a href="/anime">Anime</a> à voir (ou pas)</h1>
-            {% for object in unseen_list %}
-                {% include "work_no_poster.html" with work=object.work rating=object.choice %}
+            {% for object in unseen_anime_list %}
+                {% include "work_no_poster.html" with work=object.work class="anime" rating=object.choice %}
             {% empty %}
-                <p>Soit {{ username }} n'a pas noté d'<em>anime</em>, soit son profil n'est pas public.</p>
+                <p>(Cette liste est vide.)</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+<div class="row mangas-list{% if request.user.username != username %} another{% endif %}">
+    {% if is_shared %}
+        <div class="col-xs-4 col-xs-offset-1">
+            <h1><a href="/manga">Mangas</a> vus</h1>
+            {% for object in seen_manga_list %}
+                {% include "work_no_poster.html" with work=object.work class="manga" rating=object.choice %}
+            {% empty %}
+                <p>(Cette liste est vide.)</p>
+            {% endfor %}
+        </div>
+        <div class="col-xs-4 col-xs-offset-1">
+            <h1><a href="/manga">Mangas</a> à voir (ou pas)</h1>
+            {% for object in unseen_manga_list %}
+                {% include "work_no_poster.html" with work=object.work class="manga" rating=object.choice %}
+            {% empty %}
+                <p>(Cette liste est vide.)</p>
             {% endfor %}
         </div>
     {% endif %}

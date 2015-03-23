@@ -5,12 +5,21 @@
 <div class="row mangas-list">
     <div class="col-xs-3 manga-sheet">
         <div class="row">
-            {% include "work_rating.html" with work=object %}
+            {% include "work_rating.html" with class="manga" work=object %}
         </div>
     </div>
     <div class="col-xs-6">
         <h1>{{ object.title }}</h1>
-        <p>Anime <!--<br />XXXX<br />
+        <p>Titre original : <em>{{ object.vo_title }}</em></p>
+        <p>Dessin : {{ object.mangaka }}</p>
+        <p>Scénario : {{ object.writer }}</p>
+        <p>Éditeur : {{ object.editor }}</p>
+        <p>Origine : {{ object.origin }}</p>
+        <p>Genres : {{ genres }}</p>
+        <p>Type : {{ object.manga_type }}</p>
+         <!--<br />XXXX<br />
+        }
+        }
         XX épisodes, terminée.<br />
         <a>Réalisateur</a>, <a>Compositeur</a></p>
         <h4>Liens</h4>
@@ -29,7 +38,7 @@
 </div>
 <br />
 {% if object.synopsis %}
-    <div class="well">{{ object.synopsis }} (cc) <a href="http://animeka.com/animes/detail{{ object.source }}" target="_blank">Animeka</a></div>
+    <div class="well">{{ object.synopsis }} (cc) <a href="http://manga-news.com" target="_blank">Manga-News</a></div>
 {% endif %}
 {% if user.is_authenticated %}
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#suggestionModal" data-whatever="@mdo">Signaler</button>
@@ -40,7 +49,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="suggestionModalLabel">Signaler un bug sur {{ object.title }}</h4>
       </div>
-      <form id="suggestion" action="/anime/{{ object.id }}" method="POST">
+      <form id="suggestion" action="/manga/{{ object.id }}" method="POST">
       {% csrf_token %}
       <div class="modal-body">
         <div class="alert alert-danger" role="alert" id="alert" style="display: none"></div>
@@ -50,7 +59,7 @@
       </form>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-        <button type="button" class="btn btn-primary" onclick="suggestion('anime')">Envoyer</button>
+        <button type="button" class="btn btn-primary" onclick="suggestion('manga')">Envoyer</button>
       </div>
     </div>
   </div>

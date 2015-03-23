@@ -1,5 +1,5 @@
 <div class="row flatlist">
-    <a href="/anime/{{ work.id }}">{{ work.title }}</a>
+    <a href="/{{ class }}/{{ work.id }}">{{ work.title }}</a>
     <div id="votes_{{ work.id }}" style="float: right">
         <span data-choice='like' onclick="vote({{ work.id }}, 'like')" class="btn btn-success btn-xs{% if rating and rating != 'like' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-thumbs-up"></span></span>
         <span data-choice='neutral' onclick="vote({{ work.id }}, 'neutral')" class="btn btn-warning btn-xs{% if rating and rating != 'neutral' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-adjust"></span></span>

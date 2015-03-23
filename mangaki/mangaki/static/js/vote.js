@@ -7,8 +7,8 @@ function vote(work_id, choice) {
     });
 }
 
-function suggestion(id, form) {
-    $.post('/anime/' + $('#id_work').val(), {
+function suggestion(mangaki_class) {
+    $.post('/' + mangaki_class + '/' + $('#id_work').val(), {
         'work': $('#id_work').val(),
         'problem': $('#id_problem').val(),
         'message': $('#id_message').val()

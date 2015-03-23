@@ -3,21 +3,16 @@
 {% block body %}
 {% if user.is_authenticated %}
 <p class="well">
-
-Bienvenue !<br />
-1. Notez quelques anime : soit en parcourant la liste ci-dessous
 {% if params.flat == '1' %}
-    (<a href="?{{ url }}&amp;page={{ params.page }}">afficher les posters</a>),
+    <a href="?{{ url }}&amp;page={{ params.page }}">Afficher les posters</a><br />
 {% else %}
-    (<a href="?{{ url }}&amp;page={{ params.page }}&amp;flat=1">cacher les posters</a>),
+    <a href="?{{ url }}&amp;page={{ params.page }}&amp;flat=1">Cacher les posters</a><br />
 {% endif %}
-soit en utilisant la barre de recherche.<br />
-2. Cliquez sur l'onglet <a href="/reco/">Mes recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !<br />
-La liste compte actuellement <strong>{{ anime_count }}</strong> <em>anime</em>.<br />
+La liste compte actuellement <strong>{{ manga_count }}</strong> mangas.<br />
 Trier :
-<a href="/anime/?letter=0">#</a>
+<a href="/manga/?letter=0">#</a>
 {% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
-    <a href="/anime/?letter={{ letter|lower }}">{{ letter }}</a>
+    <a href="/manga/?letter={{ letter|lower }}">{{ letter }}</a>
 {% endfor %}
 <br />
 
@@ -29,16 +24,16 @@ Trier :
 
 </p>
 {% else %}
-<p class="well"> Nouveau sur Mangaki ? <a href="/user/signup/">Inscrivez-vous</a> puis <a href="/user/login/">connectez-vous</a> pour noter ces <em>anime</em> et obtenir des recommandations.</p>
+<p class="well"> Nouveau sur Mangaki ? <a href="/user/signup/">Inscrivez-vous</a> puis <a href="/user/login/">connectez-vous</a> pour noter ces mangas et obtenir des recommandations.</p>
 {% endif %}
-<div class="row">
+<!-- <div class="row">
     <form class="typeahead-demo {{ category }}">
         <input type="text" data-category="{{ category }}" class="typeahead" />
     </form>
-</div>
+</div> -->
 <div class="row mangas-list">
     {% for object in object_list %}
-        {% include template_mode with work=object class="anime" rating=object.rating %}
+        {% include template_mode with work=object class="manga" rating=object.rating %}
     {% endfor %}
 </div>
 <nav style="text-align: center">
@@ -66,6 +61,6 @@ Trier :
 <br />
 <br />
 <script>
-loadMenu('anime');
+loadMenu('manga');
 </script>
 {% endblock %}
