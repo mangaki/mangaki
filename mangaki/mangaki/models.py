@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from mangaki.api import get_discourse_data
+from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
@@ -9,13 +10,31 @@ class Work(models.Model):
     poster = models.CharField(max_length=128)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
+    synopsis = models.TextField(blank=True, default='')
     def __str__(self):
         return self.title
 
 class Anime(Work):
-    synopsis = models.TextField(blank=True)
     director = models.ForeignKey('Artist', related_name='directed')
     composer = models.ForeignKey('Artist', related_name='composed')
+    # editor
+    # category
+    # genre1
+    # nb_tomes
+    def __str__(self):
+        return self.title
+
+class Manga(Work):
+    vo_title = models.CharField(max_length=128)
+    mangaka = models.ForeignKey('Artist', related_name='drew')
+    writer = models.ForeignKey('Artist', related_name='wrote')
+    editor = models.CharField(max_length=32)
+    origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
+    genre = models.ManyToManyField('Genre')
+    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES)
+
+class Genre(models.Model):
+    title = models.CharField(max_length=17)
     def __str__(self):
         return self.title
 
@@ -30,7 +49,7 @@ class OST(Work):
         return self.title
 
 class Artist(models.Model):
-    first_name = models.CharField(max_length=32)
+    first_name = models.CharField(max_length=32, blank=True, null=True)
     last_name = models.CharField(max_length=32)
     def __str__(self):
         return '%s %s' % (self.first_name, self.last_name)
