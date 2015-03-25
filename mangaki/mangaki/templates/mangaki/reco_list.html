@@ -2,7 +2,11 @@
 
 {% block body %}
 {% if reco_list|length > 0 %}
-    <p class="well">Voici quatre recommandations d'<em>anime</em>. Votez-les puis rechargez la page pour en faire apparaître d'autres.</p>
+    <p class="well">
+        Voici quatre recommandations d'<em>anime</em> qui devraient vous
+        plaire. Notez-les puis rechargez la page pour en faire apparaître
+        d'autres.
+    </p>
     <div class="row mangas-list">
     {% for reco, rating in reco_list %}
         {% include "work_poster.html" with work=reco %}

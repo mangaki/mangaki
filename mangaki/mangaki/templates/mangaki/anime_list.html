@@ -2,34 +2,46 @@
 
 {% block body %}
 {% if user.is_authenticated %}
-<p class="well">
-
-Bienvenue !<br />
-1. Notez quelques anime : soit en parcourant la liste ci-dessous
-{% if params.flat == '1' %}
-    (<a href="?{{ url }}&amp;page={{ params.page }}">afficher les posters</a>),
-{% else %}
-    (<a href="?{{ url }}&amp;page={{ params.page }}&amp;flat=1">cacher les posters</a>),
-{% endif %}
-soit en utilisant la barre de recherche.<br />
-2. Cliquez sur l'onglet <a href="/reco/">Mes recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !<br />
-La liste compte actuellement <strong>{{ anime_count }}</strong> <em>anime</em>.<br />
-Trier :
-<a href="/anime/?letter=0">#</a>
-{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
-    <a href="/anime/?letter={{ letter|lower }}">{{ letter }}</a>
-{% endfor %}
-<br />
-
+<div class="well">
+  <p>Bienvenue !</p>
+  <ol>
+    <li>
+      Notez quelques anime : soit en parcourant la liste ci-dessous
+      {% if params.flat == '1' %}
+          (<a href="?{{ url }}&amp;page={{ params.page }}">afficher les posters</a>),
+      {% else %}
+          (<a href="?{{ url }}&amp;page={{ params.page }}&amp;flat=1">cacher les posters</a>),
+      {% endif %}
+      soit en utilisant la barre de recherche.
+    </li>
+    <li>
+      Cliquez sur l'onglet <a href="/reco/">Mes recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
+    </li>
+  </ol>
+  <p>
+    La liste compte actuellement <strong>{{ anime_count }}</strong> <em>anime</em>.
+    <br />
+    Trier : <a href="/anime/?letter=0">#</a>
+    {% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+        <a href="/anime/?letter={{ letter|lower }}">{{ letter }}</a>
+    {% endfor %}
+  </p>
+  <p>
     <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
     <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
     <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
     <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span>
     <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas voir</span>
-
-</p>
+  </p>
+</div>
 {% else %}
-<p class="well"> Nouveau sur Mangaki ? <a href="/user/signup/">Inscrivez-vous</a> puis <a href="/user/login/">connectez-vous</a> pour noter ces <em>anime</em> et obtenir des recommandations.</p>
+<div class="well">
+  <p>
+    Nouveau sur Mangaki ? <a href="/user/signup/">Inscrivez-vous</a> puis
+    <a href="/user/login/">connectez-vous</a> pour noter ces <em>anime</em>
+    et obtenir des recommandations.
+  </p>
+</div>
 {% endif %}
 <div class="row">
     <form class="typeahead-demo {{ category }}">

@@ -7,6 +7,12 @@
     </div>
     <div class="col-xs-7">
         <h1>{{ username }}</h1>
+	{% if request.user.username == username %}
+        <p>
+	    Pour personnaliser ton profil, rendez-vous sur
+            <a href="http://meta.mangaki.fr/users/{{ user.username }}" target="_blank">MetaMangaki</a>.
+        </p>
+        {% endif %}
         <p>Inscrit depuis {{ member_days }} jours</p>
         <p>Nombre d'<em>anime</em> vus : {{ anime_count }}</p>
         <p>Nombre de mangas lus : {{ manga_count }}</p>
