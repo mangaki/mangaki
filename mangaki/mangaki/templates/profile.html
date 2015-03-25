@@ -38,7 +38,7 @@
             {% endfor %}
         </div>
         <div class="col-xs-4 col-xs-offset-1">
-            <h1><a href="/anime">Anime</a> à voir (ou pas)</h1>
+            <h1><a href="/anime">Anime</a> à voir (ou non)</h1>
             {% for object in unseen_anime_list %}
                 {% include "work_no_poster.html" with work=object.work class="anime" rating=object.choice %}
             {% empty %}
@@ -50,7 +50,7 @@
 <div class="row mangas-list{% if request.user.username != username %} another{% endif %}">
     {% if is_shared %}
         <div class="col-xs-4 col-xs-offset-1">
-            <h1><a href="/manga">Mangas</a> vus</h1>
+            <h1><a href="/manga">Mangas</a> lus</h1>
             {% for object in seen_manga_list %}
                 {% include "work_no_poster.html" with work=object.work class="manga" rating=object.choice %}
             {% empty %}
@@ -58,7 +58,7 @@
             {% endfor %}
         </div>
         <div class="col-xs-4 col-xs-offset-1">
-            <h1><a href="/manga">Mangas</a> à voir (ou pas)</h1>
+            <h1><a href="/manga">Mangas</a> à lire (ou non)</h1>
             {% for object in unseen_manga_list %}
                 {% include "work_no_poster.html" with work=object.work class="manga" rating=object.choice %}
             {% empty %}
