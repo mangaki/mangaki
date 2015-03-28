@@ -1,5 +1,5 @@
 <div class="col-md-10 manga-snapshot">
-    <div class="manga-snapshot-image" style="background-image: url('{{ work.poster }}')" onclick="location.href = '/anime/{{ work.id }}'"></div>
+    <div class="manga-snapshot-image" style="background-image: url('{{ work.poster }}')" onclick="location.href = '/{{ class }}/{{ work.id }}'"></div>
 </div>
 <div id="votes_{{ work.id }}" class="col-md-2 manga-votes">
     <a data-choice='like' class="btn btn-success btn-block{% if rating and rating != 'like' %} not-chosen{% endif %}" onclick="vote({{ work.id }}, 'like')" title="J'aime">

@@ -9,7 +9,7 @@
     </p>
     <div class="row mangas-list">
     {% for reco, rating in reco_list %}
-        {% include "work_poster.html" with work=reco %}
+        {% include "work_poster.html" with class="anime" work=reco %}
     {% endfor %}
     </div>
     <a class="btn btn-primary btn-lg" href="/reco" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
