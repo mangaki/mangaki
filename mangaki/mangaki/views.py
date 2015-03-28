@@ -140,7 +140,7 @@ class AnimeList(ListView):
         return bundle
 
     def get_context_data(self, **kwargs):
-        my_rated_works = get_rated_works(self.request.user)
+        my_rated_works = get_rated_works(self.request.user) if self.request.user.is_authenticated() else {}
         sort_mode = self.request.GET.get('sort', 'popularity')
         flat_mode = self.request.GET.get('flat', '0')
         letter = self.request.GET.get('letter', '')
@@ -190,7 +190,7 @@ class MangaList(ListView):
         return bundle
 
     def get_context_data(self, **kwargs):
-        my_rated_works = get_rated_works(self.request.user)
+        my_rated_works = get_rated_works(self.request.user) if self.request.user.is_authenticated() else {}
         sort_mode = self.request.GET.get('sort', 'popularity')
         flat_mode = self.request.GET.get('flat', '0')
         letter = self.request.GET.get('letter', '')
