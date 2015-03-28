@@ -9,6 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.dispatch import receiver
 from django.db.models import Count
+from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
 from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, Neighborship
@@ -29,6 +30,15 @@ import re
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 
+def display_queries():
+    for line in connection.queries:
+        print(line['sql'])
+
+def get_rated_works(user):
+    rated_works = {}
+    for rating in Rating.objects.filter(user=user).select_related('work'):
+        rated_works[rating.work.id] = rating.choice
+    return rated_works
 
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime
@@ -130,6 +140,7 @@ class AnimeList(ListView):
         return bundle
 
     def get_context_data(self, **kwargs):
+        my_rated_works = get_rated_works(self.request.user)
         sort_mode = self.request.GET.get('sort', 'popularity')
         flat_mode = self.request.GET.get('flat', '0')
         letter = self.request.GET.get('letter', '')
@@ -155,10 +166,7 @@ class AnimeList(ListView):
             if obj.nsfw:
                 obj.poster = '/static/img/nsfw.jpg'  # NSFW
             if self.request.user.is_authenticated():
-                try:
-                    obj.rating = obj.rating_set.get(user=self.request.user).choice
-                except Rating.DoesNotExist:
-                    pass
+                obj.rating = my_rated_works.get(obj.id, None)
         context['object_list'] = anime_list
         return context
 
@@ -182,6 +190,7 @@ class MangaList(ListView):
         return bundle
 
     def get_context_data(self, **kwargs):
+        my_rated_works = get_rated_works(self.request.user)
         sort_mode = self.request.GET.get('sort', 'popularity')
         flat_mode = self.request.GET.get('flat', '0')
         letter = self.request.GET.get('letter', '')
@@ -208,10 +217,7 @@ class MangaList(ListView):
             if obj.nsfw:
                 obj.poster = '/static/img/nsfw.jpg'  # NSFW
             if self.request.user.is_authenticated():
-                try:
-                    obj.rating = obj.rating_set.get(user=self.request.user).choice
-                except Rating.DoesNotExist:
-                    pass
+                obj.rating = my_rated_works.get(obj.id, None)
         context['object_list'] = manga_list
         return context
 
@@ -236,7 +242,7 @@ def get_profile(request, username):
         Profile(user=request.user).save()  # À supprimer à terme
         is_shared = True
     ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
-    rating_list = sorted(Rating.objects.filter(user__username=username), key=lambda x: (ordering.index(x.choice), x.work.title))
+    rating_list = sorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title))
     seen_anime_list = []
     unseen_anime_list = []
     seen_manga_list = []
@@ -334,32 +340,32 @@ def get_extra_works(request, query, redirect=True):
     if redirect:
         return get_works(request, 'anime', query)
 
-
-def get_recommendations(user):
+def get_recommendations(user, my_rated_works):
     values = {'like': 2, 'dislike': -2, 'neutral': 0.1, 'willsee': 0.5, 'wontsee': -0.5}
     works = Counter()
     nb_ratings = {}
-    if Neighborship.objects.filter(user=user).count() < 10:
-        c = 0
-        neighbors = Counter()
-        for my in Rating.objects.filter(user=user):
-            for her in Rating.objects.filter(work=my.work):
-                c += 1
-                neighbors[her.user.id] += values[my.choice] * values[her.choice]
-        print(c, 'operations performed')
-        for user_id in neighbors:
-            Neighborship.objects.update_or_create(user=user, neighbor=User.objects.get(id=user_id), defaults={'score': neighbors[user_id]})
-    for user_id, score in Neighborship.objects.filter(user=user).order_by('-score').values_list('neighbor', 'score')[:10]:
-        for her in Rating.objects.filter(user__id=user_id):
-            if her.work.id not in works:
-                works[her.work.id] = [values[her.choice], score]
-                nb_ratings[her.work.id] = 1
-            else:
-                works[her.work.id][0] += values[her.choice]
-                works[her.work.id][1] += score
-                nb_ratings[her.work.id] += 1
+    c = 0
+    neighbors = Counter()
+    for her in Rating.objects.filter(work__in=my_rated_works.keys()).select_related('work', 'user'):
+        c += 1
+        neighbors[her.user.id] += values[my_rated_works[her.work.id]] * values[her.choice]
+    score_of_neighbor = {}
+    for user_id, score in neighbors.most_common(10):
+        score_of_neighbor[user_id] = score
+    for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).select_related('work', 'user'):
+        if her.work.id not in works:
+            works[her.work.id] = [values[her.choice], score]
+            nb_ratings[her.work.id] = 1
+        else:
+            works[her.work.id][0] += values[her.choice]
+            works[her.work.id][1] += score_of_neighbor[her.user.id]
+            nb_ratings[her.work.id] += 1
+    banned_works = set()
+    for work_id in my_rated_works:
+        if my_rated_works[work_id] != 'willsee':
+            banned_works.add(work_id)
     for work_id in works:
-        if nb_ratings[work_id] == 1 or (Rating.objects.filter(user=user, work__id=work_id).count() != 0 and Rating.objects.filter(user=user, work__id=work_id, choice='willsee').count() == 0):
+        if nb_ratings[work_id] == 1 or work_id in banned_works:
             works[work_id] = (0, 0)
         else:
             works[work_id] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
@@ -370,9 +376,13 @@ def get_recommendations(user):
 @login_required
 def get_reco(request):
     reco_list = []
-    for work_id, _ in get_recommendations(request.user):
+    my_rated_works = {}
+    my_ratings = Rating.objects.filter(user=request.user).select_related('work')
+    for rating in my_ratings:
+        my_rated_works[rating.work.id] = rating.choice
+    for work_id, _ in get_recommendations(request.user, my_rated_works):
         reco = Anime.objects.get(id=work_id)
-        if Rating.objects.filter(user=request.user, work__id=work_id).count() != 0:
+        if work_id in my_rated_works:
             reco_list.append((reco, 'willsee'))
         else:
             reco_list.append((reco, ''))
