@@ -362,8 +362,7 @@ def get_recommendations(user, my_rated_works):
             nb_ratings[her.work.id] += 1
     banned_works = set()
     for work_id in my_rated_works:
-        if my_rated_works[work_id] != 'willsee':
-            banned_works.add(work_id)
+        banned_works.add(work_id)
     for work_id in works:
         if nb_ratings[work_id] == 1 or work_id in banned_works:
             works[work_id] = (0, 0)
