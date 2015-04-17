@@ -12,33 +12,34 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, Neighborship
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.api import get_discourse_data
-from collections import Counter
+from mangaki.utils.mal import lookup_mal_api
+from mangaki.utils.recommendations import get_recommendations
+
 from markdown import markdown
-from secret import MAL_USER, MAL_PASS
 from urllib.parse import urlencode
-import xml.etree.ElementTree as ET
 import datetime
-import requests
 import json
-import html
-import re
+
 
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 
+
 def display_queries():
     for line in connection.queries:
         print(line['sql'])
+
 
 def get_rated_works(user):
     rated_works = {}
     for rating in Rating.objects.filter(user=user).select_related('work'):
         rated_works[rating.work.id] = rating.choice
     return rated_works
+
 
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime
@@ -340,37 +341,6 @@ def get_extra_works(request, query, redirect=True):
     if redirect:
         return get_works(request, 'anime', query)
 
-def get_recommendations(user, my_rated_works):
-    values = {'like': 2, 'dislike': -2, 'neutral': 0.1, 'willsee': 0.5, 'wontsee': -0.5}
-    works = Counter()
-    nb_ratings = {}
-    c = 0
-    neighbors = Counter()
-    for her in Rating.objects.filter(work__in=my_rated_works.keys()).select_related('work', 'user'):
-        c += 1
-        neighbors[her.user.id] += values[my_rated_works[her.work.id]] * values[her.choice]
-    score_of_neighbor = {}
-    for user_id, score in neighbors.most_common(10):
-        score_of_neighbor[user_id] = score
-    for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).select_related('work', 'user'):
-        if her.work.id not in works:
-            works[her.work.id] = [values[her.choice], score]
-            nb_ratings[her.work.id] = 1
-        else:
-            works[her.work.id][0] += values[her.choice]
-            works[her.work.id][1] += score_of_neighbor[her.user.id]
-            nb_ratings[her.work.id] += 1
-    banned_works = set()
-    for work_id in my_rated_works:
-        banned_works.add(work_id)
-    for work_id in works:
-        if nb_ratings[work_id] == 1 or work_id in banned_works:
-            works[work_id] = (0, 0)
-        else:
-            works[work_id] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
-
-    return works.most_common(4)
-
 
 @login_required
 def get_reco(request):
@@ -392,20 +362,6 @@ def update_shared(request):
     if request.user.is_authenticated() and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(is_shared=request.POST['is_shared'] == 'true')
     return HttpResponse()
-
-
-def lookup_mal_api(query):
-    xml = re.sub(r'&([^alg])', r'&amp;\1', html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'&\1;', requests.get('http://myanimelist.net/api/anime/search.xml', params={'q': query}, headers={'X-Real-IP': '251.223.201.179', 'User-Agent': 'Mozilla/5.0 (X11; Linux i686 on x86_64; rv:36.0) Gecko/20100101 Firefox/36.0'}, auth=(MAL_USER, MAL_PASS)).text).replace('&lt', '&lot;').replace('&gt;', '&got;')).replace('&lot;', '&lt').replace('&got;', '&gt;'))
-    entries = []
-    try:
-        for entry in ET.fromstring(xml).findall('entry'):
-            data = {}
-            for child in entry:
-                data[child.tag] = child.text
-            entries.append(data)
-    except ET.ParseError:
-        pass
-    return entries
 
 
 def report_nsfw(request, pk):
