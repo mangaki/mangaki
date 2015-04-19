@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Rating, Page, Suggestion
+from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Rating, Page, Suggestion, SearchIssue
 from django.contrib import admin
 
 
@@ -44,6 +44,10 @@ class SuggestionAdmin(admin.ModelAdmin):
     list_filter = ('problem',)
 
 
+class SearchIssueAdmin(admin.ModelAdmin):
+    list_display = ('title', 'date', 'user')
+
+
 admin.site.register(Anime, AnimeAdmin)
 admin.site.register(Manga, MangaAdmin)
 admin.site.register(Genre, GenreAdmin)
@@ -53,3 +57,4 @@ admin.site.register(Artist, ArtistAdmin)
 admin.site.register(Rating, RatingAdmin)
 admin.site.register(Page, PageAdmin)
 admin.site.register(Suggestion, SuggestionAdmin)
+admin.site.register(SearchIssue, SearchIssueAdmin)

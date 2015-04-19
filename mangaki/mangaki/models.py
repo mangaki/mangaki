@@ -123,3 +123,12 @@ class Neighborship(models.Model):
     user = models.ForeignKey(User)
     neighbor = models.ForeignKey(User, related_name='neighbor')
     score = models.DecimalField(decimal_places=3, max_digits=8)
+
+
+class SearchIssue(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User)
+    title = models.CharField(max_length=128)
+    poster = models.CharField(max_length=128, blank=True, null=True)
+    mal_id = models.IntegerField(blank=True, null=True)
+    score = models.IntegerField(blank=True, null=True)

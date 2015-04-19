@@ -16,7 +16,7 @@ from allauth.socialaccount.signals import social_account_added
 from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
-from mangaki.utils.mal import lookup_mal_api
+from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
 from mangaki.utils.recommendations import get_recommendations
 
 from markdown import markdown
@@ -321,25 +321,10 @@ def get_works(request, category, query=''):
     return HttpResponse()
 
 
-def get_extra_works(request, query, redirect=True):
+def get_extra_works(request, query):
     entries = lookup_mal_api(query)
-    unknown = Artist.objects.get(id=1)
-    for entry in entries:
-        if Anime.objects.filter(poster=entry['image']).count() == 0:  # SCANDALE
-            title = entry['english'] if entry['english'] else entry['title']
-            if '0000' in entry['start_date']:
-                anime_date = None
-            elif '00-00' in entry['start_date']:
-                anime_date = entry['start_date'].replace('00-00', '01-01')
-            elif '-00' in entry['start_date']:
-                anime_date = entry['start_date'].replace('-00', '-01')
-            else:
-                anime_date = entry['start_date']
-
-            Anime.objects.create(director=unknown, composer=unknown, title=title, source='http://myanimelist.net/anime/' + entry['id'], poster=entry['image'], date=anime_date)
-
-    if redirect:
-        return get_works(request, 'anime', query)
+    retrieve_anime(entries)
+    return get_works(request, 'anime', query)
 
 
 @login_required
@@ -361,6 +346,13 @@ def get_reco(request):
 def update_shared(request):
     if request.user.is_authenticated() and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(is_shared=request.POST['is_shared'] == 'true')
+    return HttpResponse()
+
+
+def import_from_mal(request, mal_username):
+    if request.method == 'POST':
+        nb_added, fails = import_mal(mal_username, request.user.username)
+        return HttpResponse('%d added; %d fails: %s' % (nb_added, len(fails), '\n'.join(fails)))
     return HttpResponse()
 
 
