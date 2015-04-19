@@ -7,11 +7,11 @@
         {% for user in object_list %}
         <div class="row">
             <div class="col-xs-3">
-                <img src="{{ user.profile.avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
+                <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
             </div>
             <div class="col-xs-7">
                 <h1><a href="/u/{{ user.username }}">{{ user.username }}</a></h1>
-                <p>Nombre d'<em>anime</em> vus : {{ user.profile.anime_count }}</p>
+                <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
             </div>
         </div>
         {% endfor %}
@@ -21,11 +21,11 @@
         {% for user in trio_elm %}
         <div class="row">
             <div class="col-xs-3">
-                <img src="{{ user.profile.avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
+                <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
             </div>
             <div class="col-xs-7">
                 <h1><a href="/u/{{ user.username }}">{{ user.username }}</a></h1>
-                <p>Nombre d'<em>anime</em> vus : {{ user.profile.anime_count }}</p>
+                <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
             </div>
         </div>
         {% endfor %}

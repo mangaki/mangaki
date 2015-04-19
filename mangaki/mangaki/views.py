@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseForbidden
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils.timezone import utc
 
 from django.dispatch import receiver
 from django.db.models import Count
@@ -15,7 +16,6 @@ from allauth.socialaccount.signals import social_account_added
 from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
-from mangaki.api import get_discourse_data
 from mangaki.utils.mal import lookup_mal_api
 from mangaki.utils.recommendations import get_recommendations
 
@@ -242,6 +242,7 @@ def get_profile(request, username):
     except Profile.DoesNotExist:
         Profile(user=request.user).save()  # À supprimer à terme
         is_shared = True
+    user = User.objects.get(username=username)
     ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
     rating_list = sorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title))
     seen_anime_list = []
@@ -261,12 +262,11 @@ def get_profile(request, username):
                 seen_manga_list.append(rating)
             else:
                 unseen_manga_list.append(rating)
-    discourse_data = get_discourse_data(User.objects.get(username=username).email)
-    member_time = datetime.datetime.now() - datetime.datetime.strptime(discourse_data['created_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+    member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
     return render(request, 'profile.html', {
         'username': username,
         'is_shared': is_shared,
-        'avatar_url': discourse_data['avatar'].format(size=150),
+        'avatar_url': user.profile.get_avatar_url,
         'member_days': member_time.days,
         'anime_count': len(seen_anime_list),
         'manga_count': len(seen_manga_list),

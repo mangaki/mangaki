@@ -92,12 +92,18 @@ class Page(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User)
     is_shared = models.BooleanField(default=True)
+    avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
+    mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
 
-    def anime_count(self):
+    def get_anime_count(self):
         return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike']).count()
 
-    def avatar_url(self):
-        return get_discourse_data(self.user.email)['avatar'].format(size=150)
+    def get_avatar_url(self):
+        if not self.avatar_url:
+            avatar_url = get_discourse_data(self.user.email)['avatar'].format(size=150)
+            self.avatar_url = avatar_url
+            self.save()
+        return self.avatar_url
 
 
 class Suggestion(models.Model):
