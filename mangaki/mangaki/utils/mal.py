@@ -54,7 +54,7 @@ def lookup_mal_api(query):
     SEARCH_URL = 'http://myanimelist.net/api/anime/search.xml'
     HEADERS = {
         'X-Real-IP': random_ip(),
-        'User-Agent': 'Mozilla/5.0 (X11; Linux i686 on x86_64; rv:36.0) Gecko/20100101 Firefox/36.0'
+        'User-Agent': MAL_USER_AGENT
     }
 
     r = requests.get(SEARCH_URL, params={'q': query}, headers=HEADERS,
