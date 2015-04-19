@@ -164,8 +164,7 @@ p {
 .typeahead,
 .tt-hint {
   width: 574px;
-  height: 30px;
-  padding: 8px 12px;
+  padding: 0 12px;
   font-size: 24px;
   line-height: 30px;
   border: 1px solid #024e6a;
