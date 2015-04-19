@@ -28,7 +28,8 @@ def run():
     print(cp1 - cp0)
     seen_titles = set()
     for rating in Rating.objects.filter(user__id=KING_ID).select_related('work'):
-        seen_titles.add(rating.work.title)
+        if rating.choice != 'willsee':
+            seen_titles.add(rating.work.title)
     cp2 = datetime.now()
     print(cp2 - cp1)
     nb_users = max(user.id for user in User.objects.all())
