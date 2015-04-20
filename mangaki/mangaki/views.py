@@ -266,7 +266,7 @@ def get_profile(request, username):
     return render(request, 'profile.html', {
         'username': username,
         'is_shared': is_shared,
-        'avatar_url': user.profile.get_avatar_url,
+        'avatar_url': user.profile.get_avatar_url(),
         'member_days': member_time.days,
         'anime_count': len(seen_anime_list),
         'manga_count': len(seen_manga_list),
