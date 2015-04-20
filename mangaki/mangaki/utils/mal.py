@@ -37,8 +37,8 @@ def retrieve_anime(entries):
             title = entry['english'] if entry['english'] else entry['title']
             if '0000' in entry['start_date']:
                 anime_date = None
-            elif '00-00' in entry['start_date']:
-                anime_date = entry['start_date'].replace('00-00', '01-01')
+            elif '-00-00' in entry['start_date']:
+                anime_date = entry['start_date'].replace('-00-00', '-01-01')
             elif '-00' in entry['start_date']:
                 anime_date = entry['start_date'].replace('-00', '-01')
             else:
@@ -64,7 +64,6 @@ def lookup_mal_api(query):
 
     entries = []
     try:
-        print(xml)
         for entry in ET.fromstring(xml).findall('entry'):
             data = {}
             for child in entry:
