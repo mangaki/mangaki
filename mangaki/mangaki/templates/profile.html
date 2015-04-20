@@ -9,8 +9,8 @@
         <h1>{{ username }}</h1>
 	{% if request.user.username == username %}
         <p>
-	    Pour personnaliser ton profil, rendez-vous sur
-            <a href="http://meta.mangaki.fr/users/{{ user.username }}" target="_blank">MetaMangaki</a>.
+	    Pour personnaliser ton profil, connecte-toi sur
+            <a href="http://meta.mangaki.fr/session/sso" target="_blank">Meta Mangaki</a>.
         </p>
         {% endif %}
         <p>Inscrit depuis {{ member_days }} jours</p>
