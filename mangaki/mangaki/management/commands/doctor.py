@@ -21,10 +21,12 @@ def merge_anime(ids):
                 anime.save()
     for anime_id in ids:
         if anime_id != chosen_id:
-            if Rating.objects.filter(work__id=chosen_id).count() == 0:
-                Rating.objects.filter(work__id=anime_id).update(work=Anime.objects.get(id=chosen_id))
-            else:
-                Rating.objects.filter(work__id=anime_id).delete()
+            for rating in Rating.objects.filter(work__id=anime_id).select_related('user'):
+                if Rating.objects.filter(user=rating.user, work__id=chosen_id).count() == 0:  # Has not yet rated the other one
+                    rating.work = Anime.objects.get(id=chosen_id)
+                    rating.save()
+                else:
+                    rating.delete()
             assert Anime.objects.get(id=anime_id).rating_set.count() == 0
             Anime.objects.filter(id=anime_id).delete()
             print('ID %d deleted' % anime_id)
