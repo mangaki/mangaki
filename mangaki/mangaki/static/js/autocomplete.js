@@ -1,11 +1,11 @@
 var pieces;
 
-function loadMenu(category) {
+function loadMenu() {
   pieces = new Bloodhound({
     datumTokenizer: function(d) { return d.tokens; },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     prefetch: '/data/' + category + '.json',
-    remote: '/data/query/%QUERY.json'
+    remote: '/data/' + category + '/%QUERY.json'
   });
 
   pieces.initialize();
@@ -25,10 +25,10 @@ function loadMenu(category) {
 
 $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
-    location.href = '/anime/' + selection.id;
+    location.href = '/' + category + '/' + selection.id;
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
-    location.href = '/anime/' + selection.id;
+    location.href = '/' + category + '/' + selection.id;
     $(this).val('');
   }).on('change', function(object, datum) {
     pieces.clearPrefetchCache();
@@ -44,7 +44,7 @@ function lookup(query, category) {
     promise = pieces.initialize(true);
     promise.done(function() {console.log('win')}).fail(function() {console.log('fail')});
     // vote({id: id});
-    location.href = '/anime/' + id;
+    location.href = '/' + category + '/' + id;
   })
 }
 

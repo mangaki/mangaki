@@ -13,7 +13,7 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -134,7 +134,7 @@ def get_controversy_scores(bundle):
     ratings = Rating.objects.filter(work__in=bundle).values('work', 'choice').annotate(count=Count('pk')).order_by('work', 'choice')
     score = {}
     for anime_id, ratings in groupby(ratings, lambda rating: rating['work']):
-        nb_likes = nb_likes = 0
+        nb_likes = nb_dislikes = 0
         for rating in ratings:
             if rating['choice'] == 'like':
                 nb_likes = rating['count']
@@ -209,7 +209,7 @@ class MangaList(ListView):
     context_object_name = 'manga'
 
     def get_queryset(self):
-        sort_mode = self.request.GET.get('sort')
+        sort_mode = self.request.GET.get('sort', 'popularity')
         letter = self.request.GET.get('letter')
         bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=0).order_by('id')  # Rated by at least zero person (to be modified)
         if letter:
@@ -220,6 +220,10 @@ class MangaList(ListView):
                 bundle = bundle.filter(title__istartswith=letter)
         if sort_mode == 'alpha':
             bundle = bundle.order_by('title')
+        elif sort_mode == 'popularity':
+            bundle = bundle.order_by('-rating__count')
+        elif sort_mode == 'controversy' or sort_mode == 'random':
+            bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=1)
         return bundle
 
     def get_context_data(self, **kwargs):
@@ -229,6 +233,12 @@ class MangaList(ListView):
         letter = self.request.GET.get('letter', '')
         page = int(self.request.GET.get('page', '1'))
         context = super(MangaList, self).get_context_data(**kwargs)
+        context['object_list'] = list(context['object_list'])
+        if sort_mode == 'random':
+            shuffle(context['object_list'])
+        elif sort_mode == 'controversy':
+            score = get_controversy_scores(context['object_list'])
+            context['object_list'].sort(key=lambda anime: -score[anime.id])
         paginator = Paginator(context['object_list'], TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
 
         try:
@@ -349,13 +359,25 @@ def get_works(request, category, query=''):
         for anime in Anime.objects.all() if not query else Anime.objects.filter(title__icontains=query):
             data.append({'id': anime.id, 'description': anime.synopsis[:50] + '…', 'value': anime.title, 'tokens': anime.title.lower().split(), 'year': '' if not anime.date else anime.date.year})
         return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        data = []
+        for manga in Manga.objects.all() if not query else Manga.objects.filter(title__icontains=query):
+            data.append({'id': manga.id, 'description': manga.synopsis[:50] + '…', 'value': manga.title, 'tokens': manga.title.lower().split(), 'year': '' if not manga.date else manga.date.year})
+        return HttpResponse(json.dumps(data), content_type='application/json')
     return HttpResponse()
 
 
-def get_extra_works(request, query):
+def get_extra_anime(request, query):
+    print('=> looking for anime:', query)
     entries = lookup_mal_api(query)
     retrieve_anime(entries)
     return get_works(request, 'anime', query)
+
+
+def get_extra_manga(request, query):
+    print('=> looking for manga:', query)
+    SearchIssue(user=request.user, title=query).save()
+    return HttpResponse()
 
 
 @login_required
