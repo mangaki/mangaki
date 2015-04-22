@@ -21,6 +21,8 @@ from mangaki.utils.recommendations import get_recommendations
 
 from markdown import markdown
 from urllib.parse import urlencode
+from itertools import groupby
+from random import shuffle
 import datetime
 import json
 
@@ -122,12 +124,32 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         return super(MangaDetail, self).form_valid(form)
 
 
+def controversy(nb_likes, nb_dislikes):
+    if nb_likes == 0 or nb_dislikes == 0:
+        return 0
+    return (nb_likes + nb_dislikes) ** min(float(nb_likes) / nb_dislikes, float(nb_dislikes) / nb_likes)
+
+
+def get_controversy_scores(bundle):
+    ratings = Rating.objects.filter(work__in=bundle).values('work', 'choice').annotate(count=Count('pk')).order_by('work', 'choice')
+    score = {}
+    for anime_id, ratings in groupby(ratings, lambda rating: rating['work']):
+        nb_likes = nb_likes = 0
+        for rating in ratings:
+            if rating['choice'] == 'like':
+                nb_likes = rating['count']
+            elif rating['choice'] == 'dislike':
+                nb_dislikes = rating['count']
+        score[anime_id] = controversy(nb_likes, nb_dislikes)
+    return score
+
+
 class AnimeList(ListView):
     model = Anime
     context_object_name = 'anime'
 
     def get_queryset(self):
-        sort_mode = self.request.GET.get('sort')
+        sort_mode = self.request.GET.get('sort', 'popularity')
         letter = self.request.GET.get('letter')
         bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=1).order_by('id')  # Rated by at least one person
         if letter:
@@ -138,6 +160,10 @@ class AnimeList(ListView):
                 bundle = bundle.filter(title__istartswith=letter)
         if sort_mode == 'alpha':
             bundle = bundle.order_by('title')
+        elif sort_mode == 'popularity':
+            bundle = bundle.order_by('-rating__count')
+        elif sort_mode == 'controversy' or sort_mode == 'random':
+            bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=6)
         return bundle
 
     def get_context_data(self, **kwargs):
@@ -147,6 +173,12 @@ class AnimeList(ListView):
         letter = self.request.GET.get('letter', '')
         page = int(self.request.GET.get('page', '1'))
         context = super(AnimeList, self).get_context_data(**kwargs)
+        context['object_list'] = list(context['object_list'])
+        if sort_mode == 'random':
+            shuffle(context['object_list'])
+        elif sort_mode == 'controversy':
+            score = get_controversy_scores(context['object_list'])
+            context['object_list'].sort(key=lambda anime: -score[anime.id])
         paginator = Paginator(context['object_list'], TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
 
         try:
@@ -213,7 +245,6 @@ class MangaList(ListView):
         context['manga_count'] = Manga.objects.count()
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(manga_list.number - 2, manga_list.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
-
         for obj in manga_list:
             if obj.nsfw:
                 obj.poster = '/static/img/nsfw.jpg'  # NSFW
