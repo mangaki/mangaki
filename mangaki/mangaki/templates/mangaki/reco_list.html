@@ -7,9 +7,15 @@
         plaire. Notez-les puis rechargez la page pour en faire apparaître
         d'autres.
     </p>
+    <ul class="nav nav-tabs">
+        <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="/reco/">Tout</a></li>
+        <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="/reco/?category=anime"><em>Anime</em> seulement</a></li>
+        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="/reco/?category=manga">Manga seulement</a></li>
+    </ul>
+    <br />
     <div class="row mangas-list">
-    {% for reco, rating in reco_list %}
-        {% include "work_poster.html" with class="anime" work=reco %}
+    {% for reco, category in reco_list %}
+        {% include "work_poster.html" with class=category work=reco %}
     {% endfor %}
     </div>
     <a class="btn btn-primary btn-lg" href="/reco" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>

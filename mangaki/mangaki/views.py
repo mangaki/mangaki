@@ -384,18 +384,18 @@ def get_extra_manga(request, query):
 
 @login_required
 def get_reco(request):
+    category = request.GET.get('category', 'all')
     reco_list = []
     my_rated_works = {}
     my_ratings = Rating.objects.filter(user=request.user).select_related('work')
     for rating in my_ratings:
         my_rated_works[rating.work.id] = rating.choice
-    for work_id, _ in get_recommendations(request.user, my_rated_works):
-        reco = Anime.objects.get(id=work_id)
-        if work_id in my_rated_works:
-            reco_list.append((reco, 'willsee'))
-        else:
-            reco_list.append((reco, ''))
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list})
+    for (work_id, is_manga), _ in get_recommendations(request.user, my_rated_works, category):
+        reco = Work.objects.get(id=work_id)
+        if reco.nsfw:
+            reco.poster = '/static/img/nsfw.jpg'  # NSFW
+        reco_list.append((reco, 'manga' if is_manga else 'anime'))
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category})
 
 
 def update_shared(request):

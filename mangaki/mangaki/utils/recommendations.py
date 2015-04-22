@@ -1,8 +1,9 @@
 from collections import Counter
-from mangaki.models import Rating
+from mangaki.models import Manga, Rating
+from django.contrib.auth.models import User
+from django.db.models import Count
 
-
-def get_recommendations(user, my_rated_works):
+def get_recommendations(user, my_rated_works, category):
     values = {
         'like': 2,
         'dislike': -2,
@@ -12,6 +13,7 @@ def get_recommendations(user, my_rated_works):
     }
 
     works = Counter()
+    final_works = Counter()
     nb_ratings = {}
     c = 0
     neighbors = Counter()
@@ -20,10 +22,16 @@ def get_recommendations(user, my_rated_works):
         neighbors[her.user.id] += values[my_rated_works[her.work.id]] * values[her.choice]
 
     score_of_neighbor = {}
-    for user_id, score in neighbors.most_common(10):
+    for user_id, score in neighbors.most_common(30 if category == 'manga' else 15):
         score_of_neighbor[user_id] = score
 
-    for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).select_related('work', 'user'):
+    bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=1).prefetch_related('rating_set').filter(rating__user__in=score_of_neighbor.keys())
+    manga_ids = set(bundle.values_list('id', flat=True))
+
+    for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']).select_related('work', 'user'):
+        is_manga = her.work.id in manga_ids
+        if (is_manga and category == 'anime') or (not is_manga and category == 'manga'):
+            continue
         if her.work.id not in works:
             works[her.work.id] = [values[her.choice], score]
             nb_ratings[her.work.id] = 1
@@ -36,10 +44,9 @@ def get_recommendations(user, my_rated_works):
     for work_id in my_rated_works:
         banned_works.add(work_id)
 
-    for work_id in works:
-        if nb_ratings[work_id] == 1 or work_id in banned_works:
-            works[work_id] = (0, 0)
-        else:
-            works[work_id] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
+    for i, work_id in enumerate(works):
+        # Temporarily, a recommendation can be issued from one single user (beware of hentai)
+        if (nb_ratings[work_id] > 1 or work_id in manga_ids) and work_id not in banned_works and works[work_id][0] > 0:
+            final_works[(work_id, work_id in manga_ids)] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
 
-    return works.most_common(4)
+    return final_works.most_common(4)
