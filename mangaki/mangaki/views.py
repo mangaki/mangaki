@@ -284,6 +284,7 @@ def get_profile(request, username):
         Profile(user=request.user).save()  # À supprimer à terme
         is_shared = True
     user = User.objects.get(username=username)
+    category = request.GET.get('category', 'anime')
     ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
     rating_list = sorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title))
     seen_anime_list = []
@@ -304,17 +305,18 @@ def get_profile(request, username):
             else:
                 unseen_manga_list.append(rating)
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
+    seen_list = seen_anime_list if category == 'anime' else seen_manga_list
+    unseen_list = unseen_anime_list if category == 'anime' else unseen_manga_list
     return render(request, 'profile.html', {
         'username': username,
         'is_shared': is_shared,
+        'category': category,
         'avatar_url': user.profile.get_avatar_url(),
         'member_days': member_time.days,
         'anime_count': len(seen_anime_list),
         'manga_count': len(seen_manga_list),
-        'seen_anime_list': seen_anime_list if is_shared else [],
-        'unseen_anime_list': unseen_anime_list if is_shared else [],
-        'seen_manga_list': seen_manga_list if is_shared else [],
-        'unseen_manga_list': unseen_manga_list if is_shared else []
+        'seen_list': seen_list if is_shared else [],
+        'unseen_list': unseen_list if is_shared else []
     })
 
 
