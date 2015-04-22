@@ -18,7 +18,7 @@
         {% include "work_poster.html" with class=category work=reco %}
     {% endfor %}
     </div>
-    <a class="btn btn-primary btn-lg" href="/reco" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
+    <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
 {% else %}
     <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/anime/">noté un <em>anime</em></a> !</p>
 {% endif %}
