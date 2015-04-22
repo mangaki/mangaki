@@ -34,6 +34,7 @@ Trier :
 <ul class="nav nav-tabs">
     <li role="presentation"{% if params.sort == 'popularity' %} class="active"{% endif %}><a href="/manga/">Les plus populaires</a></li>
     <li role="presentation"{% if params.sort == 'controversy' %} class="active"{% endif %}><a href="/manga/?sort=controversy">Les plus controversés</a></li>
+    <li role="presentation"{% if params.sort == 'top' %} class="active"{% endif %}><a href="/manga/?sort=top">Les plus aimés</a></li>
     <li role="presentation"{% if params.sort == 'random' %} class="active"{% endif %}><a href="/manga/?sort=random">Sélection au hasard</a></li>
 </ul>
 <br />

@@ -130,17 +130,22 @@ def controversy(nb_likes, nb_dislikes):
     return (nb_likes + nb_dislikes) ** min(float(nb_likes) / nb_dislikes, float(nb_dislikes) / nb_likes)
 
 
-def get_controversy_scores(bundle):
+def get_scores(bundle, ranking='controversy'):
     ratings = Rating.objects.filter(work__in=bundle).values('work', 'choice').annotate(count=Count('pk')).order_by('work', 'choice')
     score = {}
-    for anime_id, ratings in groupby(ratings, lambda rating: rating['work']):
+    for work_id, ratings in groupby(ratings, lambda rating: rating['work']):
         nb_likes = nb_dislikes = 0
         for rating in ratings:
             if rating['choice'] == 'like':
                 nb_likes = rating['count']
             elif rating['choice'] == 'dislike':
                 nb_dislikes = rating['count']
-        score[anime_id] = controversy(nb_likes, nb_dislikes)
+        if ranking == 'controversy':
+            score[work_id] = controversy(nb_likes, nb_dislikes)
+        elif ranking == 'top':
+            score[work_id] = nb_likes if nb_dislikes <= 5 else 0
+        else:
+            score[work_id] = nb_likes if nb_dislikes == 0 and nb_likes >= 3 else 0
     return score
 
 
@@ -162,6 +167,8 @@ class AnimeList(ListView):
             bundle = bundle.order_by('title')
         elif sort_mode == 'popularity':
             bundle = bundle.order_by('-rating__count')
+        elif sort_mode == 'top':
+            bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=15)
         elif sort_mode == 'controversy' or sort_mode == 'random':
             bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=6)
         return bundle
@@ -175,9 +182,12 @@ class AnimeList(ListView):
         context = super(AnimeList, self).get_context_data(**kwargs)
         context['object_list'] = list(context['object_list'])
         if sort_mode == 'random':
+            score = get_scores(context['object_list'], sort_mode)
+            context['object_list'] = list(filter(lambda anime: score[anime.id], context['object_list']))
+            print('currently', len(context['object_list']))
             shuffle(context['object_list'])
-        elif sort_mode == 'controversy':
-            score = get_controversy_scores(context['object_list'])
+        elif sort_mode == 'top' or sort_mode == 'controversy':
+            score = get_scores(context['object_list'], sort_mode)
             context['object_list'].sort(key=lambda anime: -score[anime.id])
         paginator = Paginator(context['object_list'], TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
 
@@ -222,6 +232,8 @@ class MangaList(ListView):
             bundle = bundle.order_by('title')
         elif sort_mode == 'popularity':
             bundle = bundle.order_by('-rating__count')
+        elif sort_mode == 'top':
+            bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=1)  # Please increase this number later
         elif sort_mode == 'controversy' or sort_mode == 'random':
             bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=1)
         return bundle
@@ -236,8 +248,8 @@ class MangaList(ListView):
         context['object_list'] = list(context['object_list'])
         if sort_mode == 'random':
             shuffle(context['object_list'])
-        elif sort_mode == 'controversy':
-            score = get_controversy_scores(context['object_list'])
+        elif sort_mode == 'top' or sort_mode == 'controversy':
+            score = get_scores(context['object_list'], sort_mode)
             context['object_list'].sort(key=lambda anime: -score[anime.id])
         paginator = Paginator(context['object_list'], TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
 
