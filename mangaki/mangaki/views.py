@@ -176,7 +176,7 @@ def pick_card(bundle, sort_mode, my_rated_works, deja_vu):
 
 
 def get_card(request, category, sort_id=1):
-    deja_vu = request.GET.get('dejavu', []).split(',')
+    deja_vu = request.GET.get('dejavu', '').split(',')
     sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
     work = pick_card(get_bundle(category, sort_mode), sort_mode, get_rated_works(request.user), deja_vu)
     card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category}

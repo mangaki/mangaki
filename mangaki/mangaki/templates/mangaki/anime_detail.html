@@ -3,8 +3,8 @@
 
 {% block body %}
 <div class="row mangas-list">
-    <div class="col-xs-3 manga-sheet" data-category="anime" data-id="{{ object.id }}">
-        <div class="row">
+    <div class="col-xs-3 manga-sheet">
+        <div class="row" data-category="anime" data-id="{{ object.id }}">
             {% include "work_rating.html" with category="anime" work=object %}
         </div>
     </div>
@@ -56,4 +56,7 @@
   </div>
 </div>
 {% endif %}
+<script>
+sort_mode = '';
+</script>
 {% endblock %}

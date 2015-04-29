@@ -20,6 +20,7 @@
     </div>
     <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
     <script>
+    sort_mode = '';
     $.getJSON('/data/reco/{{ category }}.json', function(data) {
         data.forEach(function(work, i) {
             displayWork(i + 1, work);
