@@ -32,7 +32,8 @@ Trier :
     </form>
 </div>
 <ul class="nav nav-tabs">
-    <li role="presentation"{% if params.sort == 'popularity' %} class="active"{% endif %}><a href="/manga/">Les plus populaires</a></li>
+    <li role="presentation"{% if params.sort == 'mosaic' %} class="active"{% endif %}><a href="/manga/">Mosaïque</a></li>
+    <li role="presentation"{% if params.sort == 'popularity' %} class="active"{% endif %}><a href="/manga/?sort=popularity">Les plus populaires</a></li>
     <li role="presentation"{% if params.sort == 'controversy' %} class="active"{% endif %}><a href="/manga/?sort=controversy">Les plus controversés</a></li>
     <li role="presentation"{% if params.sort == 'top' %} class="active"{% endif %}><a href="/manga/?sort=top">Les plus aimés</a></li>
     <li role="presentation"{% if params.sort == 'random' %} class="active"{% endif %}><a href="/manga/?sort=random">Sélection au hasard</a></li>
@@ -43,6 +44,7 @@ Trier :
         {% include template_mode with work=object category="manga" rating=object.rating %}
     {% endfor %}
 </div>
+{% if params.sort != 'mosaic' %}
 <nav style="text-align: center">
   <ul class="pagination">
     {% if object_list.has_previous %}
@@ -64,11 +66,17 @@ Trier :
     {% endif %}
   </ul>
 </nav>
+{% endif %}
 <br />
 <br />
 <br />
 <script>
 category = 'manga';
+sort_mode = '{{ params.sort }}';
 loadMenu('manga');
+{% if params.sort == 'mosaic' %}
+for(pos = 1; pos <= 4; pos++)
+    loadCard(pos);
+{% endif %}
 </script>
 {% endblock %}

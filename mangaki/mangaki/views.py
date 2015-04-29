@@ -144,9 +144,43 @@ def get_scores(bundle, ranking='controversy'):
             score[work_id] = controversy(nb_likes, nb_dislikes)
         elif ranking == 'top':
             score[work_id] = nb_likes if nb_dislikes <= 5 else 0
-        else:
+        elif ranking == 'random':  # Perles au hasard
             score[work_id] = nb_likes if nb_dislikes == 0 and nb_likes >= 3 else 0
     return score
+
+
+def get_bundle(category, sort_mode):
+    if category == 'anime':
+        bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=1)  # Rated by at least one person
+    elif category == 'manga':
+        bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=0)  # Rated by at least zero person (to be modified)
+    if sort_mode == 'popularity':
+        return bundle.order_by('-rating__count')
+    elif sort_mode == 'top':
+        return bundle.filter(rating__count__gte=15) if category == 'anime' else bundle.filter(rating__count__gte=1)  # Please increase this number later
+    elif sort_mode == 'controversy' or sort_mode == 'random':
+        return bundle.filter(rating__count__gte=6) if category == 'anime' else bundle.filter(rating__count__gte=1)
+    else:
+        return bundle.order_by('title')
+
+
+def pick_card(bundle, sort_mode, my_rated_works, deja_vu):
+    score = get_scores(bundle, sort_mode)
+    score_max = float('-inf')
+    card = None
+    for work in bundle:
+        if work.id not in my_rated_works and str(work.id) not in deja_vu and score.get(work.id, 0) > score_max:
+            card = work
+            score_max = score.get(work.id, 0)
+    return card
+
+
+def get_card(request, category, sort_id=1):
+    deja_vu = request.GET.get('dejavu', []).split(',')
+    sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
+    work = pick_card(get_bundle(category, sort_mode), sort_mode, get_rated_works(request.user), deja_vu)
+    card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category}
+    return HttpResponse(json.dumps(card), content_type='application/json')
 
 
 class AnimeList(ListView):
@@ -154,37 +188,29 @@ class AnimeList(ListView):
     context_object_name = 'anime'
 
     def get_queryset(self):
-        sort_mode = self.request.GET.get('sort', 'popularity')
-        letter = self.request.GET.get('letter')
-        bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=1).order_by('id')  # Rated by at least one person
+        sort_mode = self.request.GET.get('sort', 'mosaic')
+        letter = self.request.GET.get('letter', '')
+        bundle = get_bundle('anime', sort_mode)
         if letter:
-            sort_mode = 'alpha'
             if letter == '0':  # '#'
                 bundle = bundle.exclude(title__regex=r'^[a-zA-Z]')
             else:
                 bundle = bundle.filter(title__istartswith=letter)
-        if sort_mode == 'alpha':
-            bundle = bundle.order_by('title')
-        elif sort_mode == 'popularity':
-            bundle = bundle.order_by('-rating__count')
-        elif sort_mode == 'top':
-            bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=15)
-        elif sort_mode == 'controversy' or sort_mode == 'random':
-            bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=6)
         return bundle
 
     def get_context_data(self, **kwargs):
         my_rated_works = get_rated_works(self.request.user) if self.request.user.is_authenticated() else {}
-        sort_mode = self.request.GET.get('sort', 'popularity')
+        sort_mode = self.request.GET.get('sort', 'mosaic')
         flat_mode = self.request.GET.get('flat', '0')
         letter = self.request.GET.get('letter', '')
         page = int(self.request.GET.get('page', '1'))
         context = super(AnimeList, self).get_context_data(**kwargs)
         context['object_list'] = list(context['object_list'])
-        if sort_mode == 'random':
+        if sort_mode == 'mosaic':
+            context['object_list'] = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+        elif sort_mode == 'random':
             score = get_scores(context['object_list'], sort_mode)
             context['object_list'] = list(filter(lambda anime: score[anime.id], context['object_list']))
-            print('currently', len(context['object_list']))
             shuffle(context['object_list'])
         elif sort_mode == 'top' or sort_mode == 'controversy':
             score = get_scores(context['object_list'], sort_mode)
@@ -219,34 +245,27 @@ class MangaList(ListView):
     context_object_name = 'manga'
 
     def get_queryset(self):
-        sort_mode = self.request.GET.get('sort', 'popularity')
-        letter = self.request.GET.get('letter')
-        bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=0).order_by('id')  # Rated by at least zero person (to be modified)
+        sort_mode = self.request.GET.get('sort', 'mosaic')
+        letter = self.request.GET.get('letter', '')
+        bundle = get_bundle('manga', sort_mode)
         if letter:
-            sort_mode = 'alpha'
             if letter == '0':  # '#'
                 bundle = bundle.exclude(title__regex=r'^[a-zA-Z]')
             else:
                 bundle = bundle.filter(title__istartswith=letter)
-        if sort_mode == 'alpha':
-            bundle = bundle.order_by('title')
-        elif sort_mode == 'popularity':
-            bundle = bundle.order_by('-rating__count')
-        elif sort_mode == 'top':
-            bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=1)  # Please increase this number later
-        elif sort_mode == 'controversy' or sort_mode == 'random':
-            bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=1)
         return bundle
 
     def get_context_data(self, **kwargs):
         my_rated_works = get_rated_works(self.request.user) if self.request.user.is_authenticated() else {}
-        sort_mode = self.request.GET.get('sort', 'popularity')
+        sort_mode = self.request.GET.get('sort', 'mosaic')
         flat_mode = self.request.GET.get('flat', '0')
         letter = self.request.GET.get('letter', '')
         page = int(self.request.GET.get('page', '1'))
         context = super(MangaList, self).get_context_data(**kwargs)
         context['object_list'] = list(context['object_list'])
-        if sort_mode == 'random':
+        if sort_mode == 'mosaic':
+            context['object_list'] = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+        elif sort_mode == 'random':
             shuffle(context['object_list'])
         elif sort_mode == 'top' or sort_mode == 'controversy':
             score = get_scores(context['object_list'], sort_mode)
@@ -293,7 +312,7 @@ def get_profile(request, username):
     try:
         is_shared = Profile.objects.get(user__username=username).is_shared
     except Profile.DoesNotExist:
-        Profile(user=request.user).save()  # À supprimer à terme
+        Profile(user=request.user).save()  # À supprimer à terme # Tu parles, maintenant ça va être encore plus compliqué
         is_shared = True
     user = User.objects.get(username=username)
     category = request.GET.get('category', 'anime')
@@ -343,9 +362,7 @@ def index(request):
 
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
-        print(work_id)
         work = get_object_or_404(Work, id=work_id)
-        print(work.title)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee']:
             return HttpResponse()
@@ -382,14 +399,12 @@ def get_works(request, category, query=''):
 
 
 def get_extra_anime(request, query):
-    print('=> looking for anime:', query)
     entries = lookup_mal_api(query)
     retrieve_anime(entries)
     return get_works(request, 'anime', query)
 
 
 def get_extra_manga(request, query):
-    print('=> looking for manga:', query)
     SearchIssue(user=request.user, title=query).save()
     return HttpResponse()
 
@@ -397,10 +412,7 @@ def get_extra_manga(request, query):
 def get_reco_list(request, category):
     # category = request.GET.get('category', 'all')
     reco_list = []
-    my_rated_works = {}
-    my_ratings = Rating.objects.filter(user=request.user).select_related('work')
-    for rating in my_ratings:
-        my_rated_works[rating.work.id] = rating.choice
+    my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
     for work, is_manga in get_recommendations(request.user, my_rated_works, category):
         if work.nsfw:
             work.poster = '/static/img/nsfw.jpg'  # NSFW

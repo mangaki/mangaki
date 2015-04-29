@@ -1,5 +1,5 @@
 <div class="col-md-3 col-xs-6 text-center manga-sheet">
-    <div class="row thumbnail" data-category="{{ category }}" data-id="{{ work.id }}">
+    <div class="row thumbnail" data-category="{{ category }}" data-id="{{ work.id }}" data-pos="{{ forloop.counter }}">
         <div class="col-md-12">
             <h1><a href="/{{ category }}/{{ work.id }}">{{ work.title }}</a></h1>
         </div>

@@ -22,19 +22,9 @@
     <script>
     $.getJSON('/data/reco/{{ category }}.json', function(data) {
         data.forEach(function(work, i) {
-            selector = ':nth-child(' + (i + 1) + ')';
-            work_div = $('.manga-sheet' + selector + ' .row');
-            work_div.data('category', work['category']);
-            work_div.data('id', work['id']);
-            work_div.find('h1 a').text(work['title']);
-            work_div.find('h1 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
-            work_div.find('.manga-snapshot-image').hide().css('background-image', 'url(' + work['poster'] + ')').fadeIn();
-            work_div.find('.manga-votes').fadeIn();
-            // console.log(i, work['title'], );
-            // , $('.manga-sheet h1')[i].text());
-        })
-    })
-    // loadMenu();
+            displayWork(i + 1, work);
+        });
+    });
     </script>
 {% else %}
     <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/anime/">noté un <em>anime</em></a> !</p>
