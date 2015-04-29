@@ -82,7 +82,7 @@ footer .navbar-nav {
 .mangas-list .manga-sheet .manga-snapshot .manga-snapshot-image {
 /*	width: 110%; */
 	height: 300px;
-	/* background-size: cover; */
+	background-size: cover;
 	border-radius: 8px;
 }
 
