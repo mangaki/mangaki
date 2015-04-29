@@ -1,9 +1,15 @@
-function vote(work_id, choice) {
+function getSheet(elt) {
+    if($(elt).closest('.row').data('category') != 'dummy')
+        location.href = '/' + $(elt).closest('.row').data('category') + '/' + $(elt).closest('.row').data('id');
+}
+
+function vote(elt) {
+    work_id = $(elt).closest('.row').data('id');
+    choice = $(elt).data('choice');
     $.post('/work/' + work_id, {choice: choice}, function(rating) {
-        if(rating) {
-            $('#votes_' + work_id + ' > [data-choice!=' + rating + ']').addClass('not-chosen');
-            $('#votes_' + work_id + ' > [data-choice=' + rating + ']').removeClass('not-chosen');
-        }
+        $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
+        if(rating)
+            $(elt).removeClass('not-chosen');
     });
 }
 

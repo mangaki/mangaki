@@ -25,10 +25,13 @@ def get_recommendations(user, my_rated_works, category):
     for user_id, score in neighbors.most_common(30 if category == 'manga' else 15):
         score_of_neighbor[user_id] = score
 
-    bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=1).prefetch_related('rating_set').filter(rating__user__in=score_of_neighbor.keys())
+    bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=1).prefetch_related('rating_set').filter(rating__user__in=score_of_neighbor.keys())  # TODO : est-ce que ça regarde ceux qui y sont tous ?
     manga_ids = set(bundle.values_list('id', flat=True))
 
+    works_by_id = {}
     for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']).select_related('work', 'user'):
+        if not her.work.id in works_by_id:
+            works_by_id[her.work.id] = her.work  # Adding for future retrieval
         is_manga = her.work.id in manga_ids
         if (is_manga and category == 'anime') or (not is_manga and category == 'manga'):
             continue
@@ -45,8 +48,13 @@ def get_recommendations(user, my_rated_works, category):
         banned_works.add(work_id)
 
     for i, work_id in enumerate(works):
+        # Adding interesting works to the arena
         # Temporarily, a recommendation can be issued from one single user (beware of hentai)
         if (nb_ratings[work_id] > 1 or work_id in manga_ids) and work_id not in banned_works and works[work_id][0] > 0:
             final_works[(work_id, work_id in manga_ids)] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
 
-    return final_works.most_common(4)
+    reco = []
+    for (work_id, is_manga), _ in final_works.most_common(4):  # Retrieving top 4
+        reco.append((works_by_id[work_id], is_manga))
+
+    return reco

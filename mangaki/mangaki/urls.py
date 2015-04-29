@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     url(r'^data/(?P<category>\w+)\.json$', 'mangaki.views.get_works'),
     url(r'^data/anime/(?P<query>.+)\.json$', 'mangaki.views.get_extra_anime'),
     url(r'^data/manga/(?P<query>.+)\.json$', 'mangaki.views.get_extra_manga'),
+    url(r'^data/reco/(?P<category>\w+)\.json$', 'mangaki.views.get_reco_list'),
     url(r'^users/', UserList.as_view()),
     url(r'^user/', include('allauth.urls')),
     url(r'^u/(?P<username>.+)$', 'mangaki.views.get_profile'), # login_required?

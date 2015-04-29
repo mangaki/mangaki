@@ -3,9 +3,9 @@
 
 {% block body %}
 <div class="row mangas-list">
-    <div class="col-xs-3 manga-sheet">
+    <div class="col-xs-3 manga-sheet" data-category="anime" data-id="{{ object.id }}">
         <div class="row">
-            {% include "work_rating.html" with work=object %}
+            {% include "work_rating.html" with category="anime" work=object %}
         </div>
     </div>
     <div class="col-xs-6">

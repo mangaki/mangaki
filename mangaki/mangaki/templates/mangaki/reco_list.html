@@ -15,10 +15,27 @@
     <br />
     <div class="row mangas-list">
     {% for reco, category in reco_list %}
-        {% include "work_poster.html" with class=category work=reco %}
+        {% include "work_poster.html" with category=category work=reco %}
     {% endfor %}
     </div>
     <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
+    <script>
+    $.getJSON('/data/reco/{{ category }}.json', function(data) {
+        data.forEach(function(work, i) {
+            selector = ':nth-child(' + (i + 1) + ')';
+            work_div = $('.manga-sheet' + selector);
+            work_div.data('category', work['category']);
+            work_div.data('id', work['id']);
+            work_div.find('h1 a').text(work['title']);
+            work_div.find('h1 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
+            work_div.find('.manga-snapshot-image').hide().css('background-image', 'url(' + work['poster'] + ')').fadeIn();
+            work_div.find('.manga-votes').fadeIn();
+            // console.log(i, work['title'], );
+            // , $('.manga-sheet h1')[i].text());
+        })
+    })
+    // loadMenu();
+    </script>
 {% else %}
     <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/anime/">noté un <em>anime</em></a> !</p>
 {% endif %}

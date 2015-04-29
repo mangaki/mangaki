@@ -1,20 +1,20 @@
 <div class="col-md-10 manga-snapshot">
-    <div class="manga-snapshot-image" style="background-image: url('{{ work.poster }}')" onclick="location.href = '/{{ class }}/{{ work.id }}'"></div>
+    <div class="manga-snapshot-image" style="background-image: url('{{ work.poster }}')" onclick="getSheet(this)"></div>
 </div>
-<div id="votes_{{ work.id }}" class="col-md-2 manga-votes">
-    <a data-choice='like' class="btn btn-success btn-block{% if rating and rating != 'like' %} not-chosen{% endif %}" onclick="vote({{ work.id }}, 'like')" title="J'aime">
+<div class="col-md-2 manga-votes" style="display: {% if category == 'dummy' %}none{% else %}block{% endif %}">
+    <a data-choice='like' class="btn btn-success btn-block{% if rating and rating != 'like' %} not-chosen{% endif %}" onclick="vote(this)" title="J'aime">
         <span class="glyphicon glyphicon-thumbs-up"></span>
     </a>
-    <a data-choice='neutral' class="btn btn-warning btn-block{% if rating and rating != 'neutral' %} not-chosen{% endif %}" onclick="vote({{ work.id }}, 'neutral')" title="Neutre">
+    <a data-choice='neutral' class="btn btn-warning btn-block{% if rating and rating != 'neutral' %} not-chosen{% endif %}" onclick="vote(this)" title="Neutre">
         <span class="glyphicon glyphicon-adjust"></span>
     </a>
-    <a data-choice='dislike' class="btn btn-danger btn-block{% if rating and rating != 'dislike' %} not-chosen{% endif %}" onclick="vote({{ work.id }}, 'dislike')" title="Je n'aime pas">
+    <a data-choice='dislike' class="btn btn-danger btn-block{% if rating and rating != 'dislike' %} not-chosen{% endif %}" onclick="vote(this)" title="Je n'aime pas">
         <span class="glyphicon glyphicon-thumbs-down"></span>
     </a>
-    <a data-choice='willsee' class="btn btn-primary btn-block{% if rating and rating != 'willsee' %} not-chosen{% endif %}" onclick="vote({{ work.id }}, 'willsee')" title="Je veux voir">
+    <a data-choice='willsee' class="btn btn-primary btn-block{% if rating and rating != 'willsee' %} not-chosen{% endif %}" onclick="vote(this)" title="Je veux voir">
         <span class="glyphicon glyphicon-eye-open"></span>
     </a>
-    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote({{ work.id }}, 'wontsee')" title="Je ne veux pas voir">
+    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote(this)" title="Je ne veux pas voir">
         <span class="glyphicon glyphicon-eye-close"></span>
     </a>
 </div>

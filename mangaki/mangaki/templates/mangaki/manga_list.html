@@ -40,7 +40,7 @@ Trier :
 <br />
 <div class="row mangas-list">
     {% for object in object_list %}
-        {% include template_mode with work=object class="manga" rating=object.rating %}
+        {% include template_mode with work=object category="manga" rating=object.rating %}
     {% endfor %}
 </div>
 <nav style="text-align: center">
