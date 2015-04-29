@@ -23,7 +23,7 @@
     $.getJSON('/data/reco/{{ category }}.json', function(data) {
         data.forEach(function(work, i) {
             selector = ':nth-child(' + (i + 1) + ')';
-            work_div = $('.manga-sheet' + selector);
+            work_div = $('.manga-sheet' + selector + ' .row');
             work_div.data('category', work['category']);
             work_div.data('id', work['id']);
             work_div.find('h1 a').text(work['title']);
