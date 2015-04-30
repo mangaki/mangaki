@@ -1,14 +1,21 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="jumbotron" style="text-align: center">
-    <img src="/static/img/mangaki.png" style="margin-top: -10px" />
-    <!-- <h3 style="text-align: center">Site de recommandation par profil d'anime, manga, OST</h3> -->
-    <p></p>
-    {% if not user.is_authenticated %}
-        <a class="btn btn-primary btn-lg" href="/user/signup/">Essayer</a>
-    {% else %}
-        <a class="btn btn-primary btn-lg" href="/anime/">Parcourir les <em>anime</em></a>    
-    {% endif %}
+<div style="text-align: center">
+    <div class="col-sm-12 col-md-8">
+        <img src="/static/img/help.jpg" style="margin-top: 4em" />
+    </div>
+    <div class="col-sm-12 col-md-4">
+        <div style="margin-top: 4em">
+        {% if not user.is_authenticated %}
+            <a class="btn btn-primary btn-lg" href="/anime/">En savoir plus</a>
+            <a class="btn btn-primary btn-lg" href="/user/signup/">S'inscrire</a>
+        {% else %}
+            <a class="btn btn-primary btn-lg" href="/anime/">C'est parti !</a>
+        {% endif %}
+        </div>
+        <img src="/static/img/mangaki.png" style="margin-top: 5em; width: 100%" />
+        <br /><br /><br /><br />
+    </div>
 </div>
 {% endblock %}
