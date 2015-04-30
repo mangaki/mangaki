@@ -2,19 +2,28 @@
 
 {% block body %}
 {% if user.is_authenticated %}
-<div class="well">
-  <p>
-    Notez quelques <em>anime</em>, via les listes ci-dessous ou la barre de recherche.<br />
-    Puis cliquez sur l'onglet <a href="/reco/">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
-  </p>
-  <div align="right">
-    Légende : 
-    <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
-    <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
-    <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
-    <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span>
-    <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas voir</span>
-  </div>
+<div class="row">
+    <div class="col-xs-6">
+        <div class="well">
+          <p>
+            Notez quelques <em>anime</em>, via les listes ci-dessous ou la barre de recherche.<br />
+            Puis cliquez sur <a href="/reco/">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
+          </p>
+          <div align="right">
+          </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <p style="text-align: center">Légende : 
+        <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
+        <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
+        <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+        <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span>
+        <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas voir</span></p>
+        <form class="typeahead-demo {{ category }}">
+            <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime (actuellement {{ anime_count }})…" />
+        </form>
+    </div>
 </div>
 {% else %}
 <div class="well">
@@ -25,11 +34,6 @@
   </p>
 </div>
 {% endif %}
-<div class="row">
-    <form class="typeahead-demo {{ category }}">
-        <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime (actuellement {{ anime_count }})…" />
-    </form>
-</div>
 <ul class="nav nav-tabs">
     <li role="presentation"{% if params.sort == 'mosaic' %} class="active"{% endif %}><a href="/anime/">Mosaïque</a></li>
     <li role="presentation"{% if params.sort == 'popularity' %} class="active"{% endif %}><a href="/anime/?sort=popularity">Les plus populaires</a></li>
@@ -43,6 +47,7 @@
         {% include template_mode with work=object category="anime" rating=object.rating %}
     {% endfor %}
 </div>
+<a class="btn btn-primary btn-lg" href="/reco/?category=anime" style="display: block; margin: auto">Je n'arrive plus à noter, conseillez-moi !</a>
 {% if params.sort != 'mosaic' %}
 <nav style="text-align: center">
   <ul class="pagination">

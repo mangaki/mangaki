@@ -86,9 +86,9 @@ p {
 .typeahead-demo {
   position: relative;
   *z-index: 1;
-  width: 600px;
-  margin: 0 auto 15px auto;
-  padding: 15px;
+  width: 100%;
+  margin: 0 auto 10px auto;
+  padding: 10px;
   text-align: left;
   background-color: #0097cf;
   background-image: -moz-linear-gradient(top, #04a2dd, #03739c);
@@ -98,9 +98,9 @@ p {
   background-image: linear-gradient(to bottom, #04a2dd, #03739c);
   background-repeat: repeat-x;
   border: 1px solid #024e6a;
-  -webkit-border-radius: 10px;
-     -moz-border-radius: 10px;
-          border-radius: 10px;
+  -webkit-border-radius: 5px;
+     -moz-border-radius: 5px;
+          border-radius: 5px;
   -webkit-box-shadow: 0 0 2px #111;
      -moz-box-shadow: 0 0 2px #111;
           box-shadow: 0 0 2px #111;
@@ -111,7 +111,7 @@ p {
   top: 15px;
   right: 15px;
   height: 50px;
-  width: 602px;
+  width: 100%;
   overflow: hidden;
   cursor: pointer;
   -webkit-border-radius: 8px;
@@ -132,7 +132,7 @@ p {
   top: 0;
   left: 0;
   margin: 0;
-  width: 600px;
+  width: 100%;
   padding: 0;
   line-height: 46px;
   color: #111;
@@ -163,10 +163,10 @@ p {
 
 .typeahead,
 .tt-hint {
-  width: 574px;
+  width: 100%;
   padding: 0 12px;
   font-size: 24px;
-  line-height: 30px;
+  /* line-height: 30px; */
   border: 1px solid #024e6a;
   -webkit-border-radius: 8px;
      -moz-border-radius: 8px;
@@ -183,7 +183,7 @@ p {
 }
 
 .tt-dropdown-menu {
-  width: 600px;
+  width: 100%;
   margin-top: 12px;
   background-color: #fff;
   border: 1px solid #ccc;
@@ -219,6 +219,10 @@ p {
 
 .tt-suggestions .repo-description {
   margin: 0;
+}
+
+.twitter-typeahead {
+  display: block;
 }
 
 .twitter-typeahead .tt-suggestion.tt-cursor {
