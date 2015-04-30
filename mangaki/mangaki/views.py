@@ -33,13 +33,13 @@ TITLES_PER_PAGE = 24
 
 def display_queries():
     for line in connection.queries:
-        print(line['sql'])
+        print(line['sql'][:100], line['time'])
 
 
 def get_rated_works(user):
     rated_works = {}
-    for rating in Rating.objects.filter(user=user).select_related('work'):
-        rated_works[rating.work.id] = rating.choice
+    for rating in Rating.objects.filter(user=user):
+        rated_works[rating.work_id] = rating.choice
     return rated_works
 
 
@@ -149,19 +149,21 @@ def get_scores(bundle, ranking='controversy'):
     return score
 
 
-def get_bundle(category, sort_mode):
+def get_bundle(category, sort_mode, my_rated_works={}):
+    already_rated = ', '.join(map(str, my_rated_works.keys())) if my_rated_works.keys() else '0'
+    work_query = 'SELECT mangaki_{category}.work_ptr_id, mangaki_work.id, mangaki_work.title, mangaki_work.poster, mangaki_work.nsfw, COUNT(mangaki_work.id) rating_count FROM mangaki_{category}, mangaki_work, mangaki_rating WHERE mangaki_{category}.work_ptr_id = mangaki_work.id AND mangaki_rating.work_id = mangaki_work.id AND (mangaki_{category}.work_ptr_id NOT IN (' + already_rated + ')) GROUP BY mangaki_work.id, mangaki_{category}.work_ptr_id HAVING COUNT(mangaki_work.id) >= {min_ratings} ORDER BY {order_by}'
     if category == 'anime':
-        bundle = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=1)  # Rated by at least one person
+        obj = Anime.objects
     elif category == 'manga':
-        bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=0)  # Rated by at least zero person (to be modified)
+        obj = Manga.objects
     if sort_mode == 'popularity':
-        return bundle.order_by('-rating__count')
+        return obj.raw(work_query.format(category=category, min_ratings=6 if category == 'anime' else 0, order_by='rating_count DESC'))
     elif sort_mode == 'top':
-        return bundle.filter(rating__count__gte=15) if category == 'anime' else bundle.filter(rating__count__gte=1)  # Please increase this number later
+        return obj.raw(work_query.format(category=category, min_ratings=15 if category == 'anime' else 1, order_by='rating_count DESC'))
     elif sort_mode == 'controversy' or sort_mode == 'random':
-        return bundle.filter(rating__count__gte=6) if category == 'anime' else bundle.filter(rating__count__gte=1)
+        return obj.raw(work_query.format(category=category, min_ratings=6 if category == 'anime' else 1, order_by='rating_count DESC'))
     else:
-        return bundle.order_by('title')
+        return obj.raw(work_query.format(category=category, min_ratings=1 if category == 'anime' else 0, order_by='title'))
 
 
 def pick_card(bundle, sort_mode, my_rated_works, deja_vu):
@@ -178,7 +180,9 @@ def pick_card(bundle, sort_mode, my_rated_works, deja_vu):
 def get_card(request, category, sort_id=1):
     deja_vu = request.GET.get('dejavu', '').split(',')
     sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
-    work = pick_card(get_bundle(category, sort_mode), sort_mode, get_rated_works(request.user), deja_vu)
+    my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
+    bundle = list(get_bundle(category, sort_mode, my_rated_works))
+    work = pick_card(bundle, sort_mode, my_rated_works, deja_vu)
     card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category}
     return HttpResponse(json.dumps(card), content_type='application/json')
 
