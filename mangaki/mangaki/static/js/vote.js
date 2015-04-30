@@ -8,12 +8,16 @@ function vote(elt) {
     choice = $(elt).data('choice');
     pos = $(elt).closest('.row').data('pos');
     $.post('/work/' + work_id, {choice: choice}, function(rating) {
+        if(rating == '')
+            window.location = '/user/signup';
         dejaVu = $('[data-id]').map(function() {return $(this).data('id');}).get();
-        if(sort_mode == 'mosaic')
+        if(sort_mode == 'mosaic' && rating)
             loadCard(pos, dejaVu);
         else {
             $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
-            if(rating)
+            if(rating == 'none')
+                $(elt).addClass('not-chosen');
+            else if(rating)
                 $(elt).removeClass('not-chosen');
         }
     });
