@@ -1,5 +1,5 @@
 from collections import Counter
-from mangaki.models import Manga, Rating
+from mangaki.models import Manga, Rating, Work
 from django.contrib.auth.models import User
 from django.db.models import Count
 
@@ -17,31 +17,31 @@ def get_recommendations(user, my_rated_works, category):
     nb_ratings = {}
     c = 0
     neighbors = Counter()
-    for her in Rating.objects.filter(work__in=my_rated_works.keys()).select_related('work', 'user'):
+    for her in Rating.objects.filter(work__in=my_rated_works.keys()):
         c += 1
-        neighbors[her.user.id] += values[my_rated_works[her.work.id]] * values[her.choice]
+        neighbors[her.user_id] += values[my_rated_works[her.work_id]] * values[her.choice]
 
     score_of_neighbor = {}
     for user_id, score in neighbors.most_common(30 if category == 'manga' else 15):
         score_of_neighbor[user_id] = score
 
-    bundle = Manga.objects.annotate(Count('rating')).filter(rating__count__gte=1).prefetch_related('rating_set').filter(rating__user__in=score_of_neighbor.keys())  # TODO : est-ce que ça regarde ceux qui y sont tous ?
-    manga_ids = set(bundle.values_list('id', flat=True))
+    bundle = Manga.objects.values_list('id', flat=True)  # TODO : est-ce que ça regarde ceux qui y sont tous ?
+    manga_ids = set(bundle)
 
     works_by_id = {}
-    for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']).select_related('work', 'user'):
-        if not her.work.id in works_by_id:
-            works_by_id[her.work.id] = her.work  # Adding for future retrieval
-        is_manga = her.work.id in manga_ids
+    for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']):
+        """if not her.work.id in works_by_id:
+            works_by_id[her.work.id] = her.work  # Adding for future retrieval"""
+        is_manga = her.work_id in manga_ids
         if (is_manga and category == 'anime') or (not is_manga and category == 'manga'):
             continue
-        if her.work.id not in works:
-            works[her.work.id] = [values[her.choice], score]
-            nb_ratings[her.work.id] = 1
+        if her.work_id not in works:
+            works[her.work_id] = [values[her.choice], score]
+            nb_ratings[her.work_id] = 1
         else:
-            works[her.work.id][0] += values[her.choice]
-            works[her.work.id][1] += score_of_neighbor[her.user.id]
-            nb_ratings[her.work.id] += 1
+            works[her.work_id][0] += values[her.choice]
+            works[her.work_id][1] += score_of_neighbor[her.user_id]
+            nb_ratings[her.work_id] += 1
 
     banned_works = set()
     for work_id in my_rated_works:
@@ -55,6 +55,6 @@ def get_recommendations(user, my_rated_works, category):
 
     reco = []
     for (work_id, is_manga), _ in final_works.most_common(4):  # Retrieving top 4
-        reco.append((works_by_id[work_id], is_manga))
+        reco.append((Work.objects.get(id=work_id), is_manga))
 
     return reco
