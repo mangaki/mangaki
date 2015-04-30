@@ -66,7 +66,6 @@ function loadCard(pos, dejaVu) {
     if(dejaVu == undefined)
         dejaVu = [];
     displayWork(pos);
-    console.log(dejaVu);
     $.getJSON('/data/card/' + category + '/' + pos + '.json?dejavu=' + dejaVu.join(','), function(work) {
         dejaVu = $('[data-id]').map(function() {return $(this).data('id');}).get();
         if(dejaVu.indexOf(work['id']) != -1)
