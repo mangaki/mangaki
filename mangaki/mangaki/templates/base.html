@@ -30,7 +30,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="/">
-                        <img src="/static/img/minilogo.png" style="margin-top: -10px; margin-left: 5px" /><!-- <sub style="color: red; font-size: 0.6em">BÊTA</sub> -->
+                        <img src="/static/img/minilogo.png" style="margin-top: -10px; margin-left: 5px" />
                     </a>
                 </div>
 
@@ -65,7 +65,7 @@
                             </a>
                         </li>
                         <li class="dropdown">               
-                            <a href="/users">
+                            <a href="/users/">
                                 Utilisateurs
                             </a>
                         </li>
@@ -102,10 +102,13 @@
                     <li><a href="/about/"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le projet</a></li>
                     <li><a href="/faq/"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
                     <li><a href="/cgu/"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
+                    <li><a href="mailto:info@mangaki.fr"><span class="glyphicon glyphicon-heart"></span>&nbsp;info@mangaki.fr</a></li>
                 </ul>
             </div>
         </nav>
     </footer>
-
+    <script>
+        $("nav [href='{{ request.path }}']").parents("li").addClass('active');
+    </script>
 </body>    
 </html>

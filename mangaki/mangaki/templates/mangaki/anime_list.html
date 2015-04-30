@@ -3,36 +3,18 @@
 {% block body %}
 {% if user.is_authenticated %}
 <div class="well">
-  <p>Bienvenue !</p>
-  <ol>
-    <li>
-      Notez quelques anime : soit en parcourant la liste ci-dessous
-      {% if params.flat == '1' %}
-          (<a href="?{{ url }}&amp;page={{ params.page }}">afficher les posters</a>),
-      {% else %}
-          (<a href="?{{ url }}&amp;page={{ params.page }}&amp;flat=1">cacher les posters</a>),
-      {% endif %}
-      soit en utilisant la barre de recherche.
-    </li>
-    <li>
-      Cliquez sur l'onglet <a href="/reco/">Mes recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
-    </li>
-  </ol>
   <p>
-    La liste compte actuellement <strong>{{ anime_count }}</strong> <em>anime</em>.
-    <br />
-    Trier : <a href="/anime/?letter=0">#</a>
-    {% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
-        <a href="/anime/?letter={{ letter|lower }}">{{ letter }}</a>
-    {% endfor %}
+    Notez quelques anime, via les listes ci-dessous ou la barre de recherche.<br />
+    Puis cliquez sur l'onglet <a href="/reco/">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
   </p>
-  <p>
+  <div align="right">
+    Légende : 
     <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
     <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
     <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
     <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span>
     <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas voir</span>
-  </p>
+  </div>
 </div>
 {% else %}
 <div class="well">
@@ -45,7 +27,7 @@
 {% endif %}
 <div class="row">
     <form class="typeahead-demo {{ category }}">
-        <input type="text" data-category="{{ category }}" class="typeahead" />
+        <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime (actuellement {{ anime_count }})…" />
     </form>
 </div>
 <ul class="nav nav-tabs">
