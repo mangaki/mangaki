@@ -30,6 +30,7 @@ urlpatterns = patterns('',
     url(r'^mal/(?P<mal_username>.+)$', 'mangaki.views.import_from_mal'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^discourse/sso$', views.sso),
+    url(r'^about/$', 'mangaki.views.about'),
     # url(r'^lookup/$', 'mangaki.views.lookup_work'),
     url(r'^(?P<slug>[\w-]+)/$', MarkdownView.as_view()),
 )

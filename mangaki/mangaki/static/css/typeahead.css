@@ -333,7 +333,8 @@ p {
 
 .performer {
   float: left;
-  width: 140px;
+  margin-top: 1em;
+  margin-right: 1em;
 }
 
 #performers {

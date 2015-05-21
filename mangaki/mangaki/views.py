@@ -367,6 +367,10 @@ def index(request):
     return render(request, 'index.html')
 
 
+def about(request):
+    return render(request, 'about.html')
+
+
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
