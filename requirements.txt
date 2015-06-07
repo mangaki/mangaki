@@ -7,3 +7,4 @@ psycopg2
 scipy
 numpy
 scikit-learn
+django-debug_toolbar

@@ -1,0 +1,16 @@
+MANGAKI README
+
+How to install the development environment
+
+- Make sure you have at least Python v3 installed (you may want to call python3
+  instead of python)
+- Make sure you have installed Django ('import django' in python3 should not
+  print any errors)
+- Finally, make sure you have a running postgresql server (a few pointers:
+  http://www.postgresql.org/docs/9.1/static/postgres-user.html)
+
+Alright, now let's take care of the required Django modules. Run pip install
+-r requirements.txt. Be sure to run it with root privileges, as some package's
+installation will require it.Grab a cup of coffee, it can take some time.
+
+Now just run mangaki/manage.py runserver
