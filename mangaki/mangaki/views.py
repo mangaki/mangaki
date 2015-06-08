@@ -143,9 +143,9 @@ def get_scores(bundle, ranking='controversy'):
         if ranking == 'controversy':
             score[work_id] = controversy(nb_likes, nb_dislikes)
         elif ranking == 'top':
-            score[work_id] = nb_likes if nb_dislikes <= 5 else 0
+            score[work_id] = nb_likes if nb_dislikes <= 15 else 0
         elif ranking == 'random':  # Perles au hasard
-            score[work_id] = nb_likes if nb_dislikes == 0 and nb_likes >= 3 else 0
+            score[work_id] = nb_likes if nb_dislikes <= 5 and nb_likes >= 3 else 0
     return score
 
 
