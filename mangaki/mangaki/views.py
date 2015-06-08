@@ -159,7 +159,7 @@ def get_bundle(category, sort_mode, my_rated_works={}):
     if sort_mode == 'popularity':
         return obj.raw(work_query.format(category=category, min_ratings=6 if category == 'anime' else 0, order_by='rating_count DESC'))
     elif sort_mode == 'top':
-        return obj.raw(work_query.format(category=category, min_ratings=15 if category == 'anime' else 1, order_by='rating_count DESC'))
+        return obj.raw(work_query.format(category=category, min_ratings=100 if category == 'anime' else 1, order_by='rating_count DESC'))
     elif sort_mode == 'controversy' or sort_mode == 'random':
         return obj.raw(work_query.format(category=category, min_ratings=6 if category == 'anime' else 1, order_by='rating_count DESC'))
     else:
