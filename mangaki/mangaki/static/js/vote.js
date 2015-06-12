@@ -50,7 +50,7 @@ function suggestion(mangaki_class) {
 function displayWork(pos, work) {
     display_votes = true;
     if(work == undefined) {
-        work = {'id': 0, 'category': 'dummy', 'title': 'Chargement…', 'poster': '/static/img/chiro.gif'}
+        work = {'id': 0, 'category': 'dummy', 'title': 'Chargement…', 'poster': '/static/img/chiro.gif', 'synopsis': ''}
         display_votes = false;
     }
     selector = ':nth-child(' + pos + ')';
@@ -58,6 +58,9 @@ function displayWork(pos, work) {
     work_div.data('category', work['category']);
     work_div.data('id', work['id']);
     work_div.find('h1 a').text(work['title']);
+    work_div.find('h1 a').attr('title', work['synopsis']); 
+    // $('[data-toggle="tooltip"]').tooltip()
+    $('body').tooltip({'selector': '[data-toggle="tooltip"]'});
     work_div.find('h1 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
     work_div.find('.manga-snapshot-image').hide().css('background-image', 'url(' + work['poster'] + ')').fadeIn();
     if(display_votes)

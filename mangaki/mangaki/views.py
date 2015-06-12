@@ -183,7 +183,7 @@ def get_card(request, category, sort_id=1):
     my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
     bundle = list(get_bundle(category, sort_mode, my_rated_works))
     work = pick_card(bundle, sort_mode, my_rated_works, deja_vu)
-    card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category}
+    card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category, 'synopsis': work.synopsis}
     return HttpResponse(json.dumps(card), content_type='application/json')
 
 
@@ -372,6 +372,8 @@ def index(request):
 def about(request):
     return render(request, 'about.html')
 
+def alpha(request):
+    return render(request, 'alphabetique.html')
 
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
