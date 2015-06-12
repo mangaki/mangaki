@@ -364,9 +364,9 @@ def index(request):
     if request.user.is_authenticated():
         if Rating.objects.filter(user=request.user).count() == 0:
             return redirect('/anime/')
-    texte = Announcement.objects.get(title='Flash News').text
-    context = {'annonce': texte}
-    return render(request, 'index.html',context)
+    # texte = Announcement.objects.get(title='Flash News').text
+    # context = {'annonce': texte}
+    return render(request, 'index.html')
 
 
 def about(request):
