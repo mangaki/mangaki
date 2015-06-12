@@ -110,12 +110,18 @@ class Suggestion(models.Model):
     user = models.ForeignKey(User)
     work = models.ForeignKey(Work)
     date = models.DateTimeField(auto_now=True)
-    problem = models.CharField(verbose_name='Problème', max_length=8, choices=(
+    problem = models.CharField(verbose_name='Partie concernée', max_length=8, choices=(
         ('title', 'Le titre n\'est pas le bon'),
         ('poster', 'Le poster ne convient pas'),
-        ('synopsis', 'Le synopsis comporte des erreurs')
+        ('synopsis', 'Le synopsis comporte des erreurs'),
+        ('author','L\'auteur n\'est pas le bon'),
+        ('compositor','Le compositeur n\'est pas le bon'),
+        ('double','Ceci est un doublon'),
+        ('nsfw','L\'oeuvre est NSFW'),
+        ('n_nsfw','L\'oeuvre n\'est pas NSFW'),
+        ('empty','La page est vide')
     ))
-    message = models.TextField(verbose_name='Correction (facultatif)', blank=True)
+    message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
 
 
@@ -132,3 +138,10 @@ class SearchIssue(models.Model):
     poster = models.CharField(max_length=128, blank=True, null=True)
     mal_id = models.IntegerField(blank=True, null=True)
     score = models.IntegerField(blank=True, null=True)
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=128)
+    text = models.CharField(max_length=512)
+    
+    def __str__(self):
+        return self.title

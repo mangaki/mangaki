@@ -13,7 +13,7 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -356,7 +356,7 @@ def get_profile(request, username):
         'anime_count': len(seen_anime_list),
         'manga_count': len(seen_manga_list),
         'seen_list': seen_list if is_shared else [],
-        'unseen_list': unseen_list if is_shared else []
+        'unseen_list': unseen_list if is_shared else [],
     })
 
 
@@ -364,7 +364,9 @@ def index(request):
     if request.user.is_authenticated():
         if Rating.objects.filter(user=request.user).count() == 0:
             return redirect('/anime/')
-    return render(request, 'index.html')
+    texte = Announcement.objects.get(title='Flash News').text
+    context = {'annonce': texte}
+    return render(request, 'index.html',context)
 
 
 def about(request):
@@ -457,7 +459,6 @@ def import_from_mal(request, mal_username):
 def report_nsfw(request, pk):
     Anime.objects.filter(id=pk).update(nsfw=True)
     return redirect('/anime/%s' % pk)
-
 
 @receiver(user_signed_up)
 @receiver(social_account_added)

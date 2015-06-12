@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
 {% block body %}
+
+<div class="scroll-left">
+    <p>{{annonce}}</p>
+</div>
+
 <div style="text-align: center">
     <img src="/static/img/mangaki.png" style="max-width: 100%" />
     <div style="margin-top: 1em">
@@ -9,6 +14,7 @@
         <a class="btn btn-warning btn-lg" href="/user/signup/">S'inscrire</a>
     {% else %}
         <a class="btn btn-warning btn-lg" href="/anime/">C'est parti !</a>
+        <a class="btn btn-warning btn-lg" href="/u/{{ user.username }}">Importer myAnimeList</a>
     {% endif %}
     </div>
 </div>

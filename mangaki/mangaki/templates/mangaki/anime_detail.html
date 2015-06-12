@@ -32,6 +32,7 @@
     <div class="well">{{ object.synopsis }} (cc) <a href="http://animeka.com/animes/detail{{ object.source }}" target="_blank">Animeka</a></div>
 {% endif %}
 {% if user.is_authenticated %}
+<a href="http://meta.mangaki.fr/session/sso" target="_blank"><button type="button" class="btn btn-primary">En discuter sur le forum</button></a>
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#suggestionModal" data-whatever="@mdo">Des idées pour améliorer cette fiche ?</button>
 <div class="modal fade" id="suggestionModal" tabindex="-1" role="dialog" aria-labelledby="suggestionModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -40,6 +41,11 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="suggestionModalLabel">Proposer une amélioration pour {{ object.title }}</h4>
       </div>
+      <h5 style="text-indent:2em">Bienvenue sur l’interface d’amélioration de Mangaki :</h5>
+      <ol>
+      <li>Indiquez quelle partie de la fiche est concernée par votre proposition</li>
+      <li>Écrivez-nous votre idée/solution, et envoyez !</li>
+      </ol>
       <form id="suggestion" action="/anime/{{ object.id }}" method="POST">
       {% csrf_token %}
       <div class="modal-body">
@@ -55,6 +61,7 @@
     </div>
   </div>
 </div>
+
 {% endif %}
 <script>
 sort_mode = '';
