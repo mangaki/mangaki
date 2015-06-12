@@ -20,10 +20,13 @@ class Work(models.Model):
 class Anime(Work):
     director = models.ForeignKey('Artist', related_name='directed')
     composer = models.ForeignKey('Artist', related_name='composed')
-    # editor
-    # category
-    # genre1
-    # nb_tomes
+    """studio = models.ForeignKey('Studio')
+    author = models.ForeignKey('Artist', related_name='authored')
+    editor = models.ForeignKey('Editor')
+    anime_type = models.TextField(max_length=42, choices=ANIME_TYPE_CHOICES)
+    genre = models.ManyToManyField('Genre')
+    nb_episodes = models.IntegerField()
+    origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)"""
 
     def __str__(self):
         return self.title
