@@ -22,8 +22,9 @@ class AnimeAdmin(admin.ModelAdmin):
             message_bit = "1 anime n'est"
         else:
             message_bit = "%s animes ne sont" % rows_updated
-        self.message_user(request, "%s désormais plus NSFW" % message_bit)
+        self.message_user(request, "%s désormais plus NSFW." % message_bit)
     make_sfw.short_description = "Rendre SFW les animes sélectionnés"
+
 
 class MangaAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
@@ -44,8 +45,9 @@ class MangaAdmin(admin.ModelAdmin):
             message_bit = "1 manga n'est"
         else:
             message_bit = "%s mangas ne sont" % rows_updated
-        self.message_user(request, "%s désormais plus NSFW" % message_bit)
+        self.message_user(request, "%s désormais plus NSFW." % message_bit)
     make_sfw.short_description = "Rendre SFW les mangas sélectionnés"
+
 
 class GenreAdmin(admin.ModelAdmin):
     pass
@@ -74,23 +76,24 @@ class PageAdmin(admin.ModelAdmin):
 class SuggestionAdmin(admin.ModelAdmin):
     list_display = ('work', 'problem', 'date', 'user', 'is_checked')
     list_filter = ('problem',)
-    actions = ['check_suggestion','uncheck_suggestion']
-    def check_suggestion(self, request, queryset):
+    actions = ['check_suggestions','uncheck_suggestions']
+    def check_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=True)
         if rows_updated == 1:
             message_bit = "1 suggestion"
         else:
             message_bit = "%s suggestions" % rows_updated
-        self.message_user(request, "La validaton de %s a réussi." % message_bit)
-    check_suggestion.short_description = "Valider les suggestions sélectionnées"
-    def uncheck_suggestion(self, request, queryset):
+        self.message_user(request, "La validation de %s a réussi." % message_bit)
+    check_suggestions.short_description = "Valider les suggestions sélectionnées"
+    def uncheck_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=False)
         if rows_updated == 1:
             message_bit = "1 suggestion"
         else:
             message_bit = "%s suggestions" % rows_updated
         self.message_user(request, "L'invalidation de %s a réussi." % message_bit)
-    uncheck_suggestion.short_description = "Invalider les suggestions sélectionnées"
+    uncheck_suggestions.short_description = "Invalider les suggestions sélectionnées"
+
 
 class SearchIssueAdmin(admin.ModelAdmin):
     list_display = ('title', 'date', 'user')

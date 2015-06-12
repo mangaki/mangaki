@@ -143,9 +143,9 @@ def get_scores(bundle, ranking='controversy'):
         if ranking == 'controversy':
             score[work_id] = controversy(nb_likes, nb_dislikes)
         elif ranking == 'top':
-            score[work_id] = nb_likes if nb_dislikes <= 5 else 0
+            score[work_id] = nb_likes if nb_dislikes <= 15 else 0
         elif ranking == 'random':  # Perles au hasard
-            score[work_id] = nb_likes if nb_dislikes == 0 and nb_likes >= 3 else 0
+            score[work_id] = nb_likes if nb_dislikes <= 5 and nb_likes >= 3 else 0
     return score
 
 
@@ -159,7 +159,7 @@ def get_bundle(category, sort_mode, my_rated_works={}):
     if sort_mode == 'popularity':
         return obj.raw(work_query.format(category=category, min_ratings=6 if category == 'anime' else 0, order_by='rating_count DESC'))
     elif sort_mode == 'top':
-        return obj.raw(work_query.format(category=category, min_ratings=15 if category == 'anime' else 1, order_by='rating_count DESC'))
+        return obj.raw(work_query.format(category=category, min_ratings=100 if category == 'anime' else 1, order_by='rating_count DESC'))
     elif sort_mode == 'controversy' or sort_mode == 'random':
         return obj.raw(work_query.format(category=category, min_ratings=6 if category == 'anime' else 1, order_by='rating_count DESC'))
     else:
