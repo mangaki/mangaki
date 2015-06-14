@@ -1,0 +1,36 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; Fusionner plusieurs objets
+</div>
+{% endblock %}
+
+{% block content %}
+<form action="" method="post">{% csrf_token %}
+<p>Tout d'abord, lequel des objets souhaitez-vous conserver ?</p>
+<ul>
+{% for obj in queryset %}
+<li><label><input type="radio" name="chosen_id" value="{{ obj.pk|unlocalize }}" /> {{ obj.title }} ({{ obj.rating_set.count }} ratings)</label></li>
+{% endfor %}
+</ul>
+<p>Voulez-vous vraiment fusionner les objets sélectionnés ? Voici jusqu'à dix exemples de ratings pour chaque manga sélectionné :</p>
+{% for deletable_object in deletable_objects %}
+    <ul>{{ deletable_object|unordered_list }}</ul>
+{% endfor %}
+<div>
+{% for obj in queryset %}
+<input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+{% endfor %}
+<input type="hidden" name="action" value="merge" />
+<input type="hidden" name="post" value="yes" />
+<input type="submit" value="{% trans "Yes, I'm sure" %}" />
+</div>
+</form>
+{% endblock %}

@@ -1,7 +1,8 @@
 # coding=utf8
 from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Rating, Page, Suggestion, SearchIssue, Announcement
 from django.contrib import admin
-
+from django.template.response import TemplateResponse
+from django.contrib.admin import helpers
 
 class AnimeAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
@@ -30,7 +31,8 @@ class MangaAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('nsfw',)
-    actions = ['make_nsfw','make_sfw']
+    actions = ['make_nsfw', 'make_sfw', 'merge']
+
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
         if rows_updated == 1:
@@ -39,6 +41,7 @@ class MangaAdmin(admin.ModelAdmin):
             message_bit = "%s mangas sont" % rows_updated
         self.message_user(request, "%s désormais NSFW." % message_bit)
     make_nsfw.short_description = "Rendre NSFW les mangas sélectionnés"
+
     def make_sfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=False)
         if rows_updated == 1:
@@ -47,6 +50,35 @@ class MangaAdmin(admin.ModelAdmin):
             message_bit = "%s mangas ne sont" % rows_updated
         self.message_user(request, "%s désormais plus NSFW." % message_bit)
     make_sfw.short_description = "Rendre SFW les mangas sélectionnés"
+
+    def merge(self, request, queryset):
+        queryset = queryset.order_by('id')
+        opts = self.model._meta
+        if request.POST.get('post'):
+            chosen_id = int(request.POST.get('chosen_id'))
+            for obj in queryset:
+                if obj.id != chosen_id:
+                    for rating in Rating.objects.filter(work=obj).select_related('user'):
+                        # S'il n'a pas déjà voté pour l'autre
+                        if Rating.objects.filter(user=rating.user, work__id=chosen_id).count() == 0:
+                            rating.work_id = chosen_id
+                            rating.save()
+                        else:
+                            rating.delete()
+                    self.message_user(request, "%s a bien été supprimé." % obj.title)
+                    obj.delete()
+            return None
+        deletable_objects = []
+        for obj in queryset:
+            deletable_objects.append(Rating.objects.filter(work=obj)[:10])
+        context = {
+            'queryset': queryset,
+            'opts': opts,
+            'deletable_objects': deletable_objects,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+        }
+        return TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
+    merge.short_description = "Fusionner les mangas sélectionnés"
 
 
 class GenreAdmin(admin.ModelAdmin):
