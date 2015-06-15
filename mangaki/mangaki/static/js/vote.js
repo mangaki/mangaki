@@ -59,8 +59,7 @@ function displayWork(pos, work) {
     work_div.data('id', work['id']);
     work_div.find('h1 a').text(work['title']);
     work_div.find('h1 a').attr('title', work['synopsis']); 
-    // $('[data-toggle="tooltip"]').tooltip()
-    $('body').tooltip({'selector': '[data-toggle="tooltip"]'});
+    $('[data-toggle="tooltip"]').tooltip('fixTitle');
     work_div.find('h1 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
     work_div.find('.manga-snapshot-image').hide().css('background-image', 'url(' + work['poster'] + ')').fadeIn();
     if(display_votes)

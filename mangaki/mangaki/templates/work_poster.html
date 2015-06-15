@@ -1,7 +1,7 @@
 <div class="col-md-3 col-xs-6 text-center manga-sheet">
     <div class="row thumbnail" data-category="{{ category }}" data-id="{{ work.id }}" data-pos="{{ forloop.counter }}">
         <div class="col-md-12">
-            <h1><a href="/{{ category }}/{{ work.id }}" data-toggle="tooltip" data-placement="right" title="{{ work.synopsis }}">{{ work.title }}</a></h1>
+            <h1><a href="/{{ category }}/{{ work.id }}" data-toggle="tooltip" data-placement="right" data-container="body" title="{{ work.synopsis }}">{{ work.title }}</a></h1>
         </div>
         {% include "work_rating.html" %}
     </div>
