@@ -258,11 +258,13 @@ class MangaList(ListView):
         letter = self.request.GET.get('letter', '')
         bundle = get_bundle('manga', sort_mode)
         if letter:
+            bundle = Manga.objects.all()
             if letter == '0':  # '#'
                 bundle = bundle.exclude(title__regex=r'^[a-zA-Z]')
             else:
                 bundle = bundle.filter(title__istartswith=letter)
         return bundle
+
 
     def get_context_data(self, **kwargs):
         my_rated_works = get_rated_works(self.request.user) if self.request.user.is_authenticated() else {}
@@ -371,9 +373,6 @@ def index(request):
 
 def about(request):
     return render(request, 'about.html')
-
-def alpha(request):
-    return render(request, 'alphabetique.html')
 
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':

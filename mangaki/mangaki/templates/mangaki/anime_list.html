@@ -34,6 +34,21 @@
   </p>
 </div>
 {% endif %}
+
+<b>
+<div class="collapse navbar-collapse" id="menu-collapse">
+   <ul class="nav navbar-nav">
+{% for letter in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+     <li class="dropdown">
+     <a href="?sort=alpha&letter={{ letter|lower }}">
+         {{letter}}
+     </a>
+     </li>
+{% endfor %}
+   </ul>
+</div>
+</b>
+
 <ul class="nav nav-tabs">
     <li role="presentation"{% if params.sort == 'mosaic' %} class="active"{% endif %}><a href="/anime/">Mosaïque</a></li>
     <li role="presentation"{% if params.sort == 'popularity' %} class="active"{% endif %}><a href="/anime/?sort=popularity">Les plus populaires</a></li>

@@ -4,6 +4,7 @@ markdown
 django-bootstrap-form
 -e git+https://github.com/tindie/pydiscourse.git#egg=pydiscourse
 psycopg2
-scipy
 numpy
+scipy
 scikit-learn
+django-debug-toolbar
