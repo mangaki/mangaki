@@ -7,8 +7,5 @@ psycopg2
 numpy
 scipy
 scikit-learn
-<<<<<<< HEAD
 django-debug-toolbar
-=======
-django-debug_toolbar
->>>>>>> b586bfacd815e112138f62bac98fa7cc74f3e605
+PyYAML
