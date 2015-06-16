@@ -39,7 +39,7 @@ class Anime(Work):
     editor = models.ForeignKey('Editor', default=1)
     anime_type = models.TextField(max_length=42, default='')
     genre = models.ManyToManyField('Genre')
-    nb_episodes = models.IntegerField(default=0)
+    nb_episodes = models.TextField(default='Inconnu', max_length=16)
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
 
     def __str__(self):
@@ -58,7 +58,7 @@ class Manga(Work):
 
 class Genre(models.Model):
     title = models.CharField(max_length=17)
-    
+
     def __str__(self):
         return self.title
 

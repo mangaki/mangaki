@@ -51,35 +51,9 @@ def run():
             genre2 = create_if_not_exists(Genre, data.genre2)
             anime.genre.add(genre1)
             anime.genre.add(genre2)
+            anime.nb_episodes = data.nb_episodes
+            anime.origin = data.origin
+            anime.synopsis = data.synopsis  # The most important!
             anime.save()
-    """with open('../data/manga-news/manga.csv') as f:
-        next(f)
-        for i, line in enumerate(f):
-            title, vo_title, writer, mangaka, editor, origin, genre1, genre2, manga_type, synopsis, poster = line.split(';;')
-            try:
-                if Manga.objects.filter(title=title, vo_title=vo_title).count() == 0:
-                    manga = Manga(title=title, vo_title=vo_title, mangaka=artists[mangaka], writer=artists[writer], editor=editor, origin=origin.lower().replace('hong kong', 'hong-kong').replace('international', 'intl'), manga_type=manga_type.lower(), source='', poster=poster, synopsis=synopsis)
-                    manga.save()
-                else:
-                    manga = Manga.objects.get(title=title, vo_title=vo_title)
-                if genre1:
-                    manga.genre.add(Genre.objects.get(title=genre1))
-                if genre2:
-                    manga.genre.add(Genre.objects.get(title=genre2))
-            except IntegrityError as err:
-                print(line)
-                print(writer)
-                print(err)
-                break
-            except DataError as err:
-                print(line)
-                print(origin)
-                print(err)
-                break
-            except Genre.DoesNotExist as err:
-                print(line)
-                print('Genres: [%s] [%s]' % (genre1, genre2))
-                print(err)
-                break"""
 
 run()
