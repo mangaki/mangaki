@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Rating, Page, Suggestion, SearchIssue, Announcement
+from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -97,6 +97,14 @@ class ArtistAdmin(admin.ModelAdmin):
     pass
 
 
+class StudioAdmin(admin.ModelAdmin):
+    pass
+
+
+class EditorAdmin(admin.ModelAdmin):
+    pass
+
+
 class RatingAdmin(admin.ModelAdmin):
     pass
 
@@ -139,6 +147,8 @@ admin.site.register(Genre, GenreAdmin)
 admin.site.register(Track, TrackAdmin)
 admin.site.register(OST, OSTAdmin)
 admin.site.register(Artist, ArtistAdmin)
+admin.site.register(Studio, StudioAdmin)
+admin.site.register(Editor, EditorAdmin)
 admin.site.register(Rating, RatingAdmin)
 admin.site.register(Page, PageAdmin)
 admin.site.register(Suggestion, SuggestionAdmin)
