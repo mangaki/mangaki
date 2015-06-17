@@ -48,8 +48,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="suggestionModalLabel">Signaler un bug sur {{ object.title }}</h4>
+        <h4 class="modal-title" id="suggestionModalLabel">Proposer une amélioration pour {{ object.title }}</h4>
       </div>
+      <h5 style="text-indent:2em">Bienvenue sur l’interface d’amélioration de Mangaki :</h5>
+      <ol>
+      <li>Indiquez quelle partie de la fiche est concernée par votre proposition</li>
+      <li>Écrivez-nous votre idée/solution, et envoyez !</li>
+      </ol>
       <form id="suggestion" action="/manga/{{ object.id }}" method="POST">
       {% csrf_token %}
       <div class="modal-body">

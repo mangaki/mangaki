@@ -148,3 +148,10 @@ class Announcement(models.Model):
     
     def __str__(self):
         return self.title
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User)
+    work = models.ForeignKey(Work)
+
+    def __str__(self):
+        return '%s fav %s' % (self.user, self.work)
