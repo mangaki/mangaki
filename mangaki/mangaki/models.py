@@ -39,7 +39,7 @@ class Manga(Work):
     editor = models.CharField(max_length=32)
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
     genre = models.ManyToManyField('Genre')
-    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES)
+    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
 
 
 class Genre(models.Model):
@@ -118,11 +118,10 @@ class Suggestion(models.Model):
         ('poster', 'Le poster ne convient pas'),
         ('synopsis', 'Le synopsis comporte des erreurs'),
         ('author','L\'auteur n\'est pas le bon'),
-        ('compositor','Le compositeur n\'est pas le bon'),
+        ('composer','Le compositeur n\'est pas le bon'),
         ('double','Ceci est un doublon'),
         ('nsfw','L\'oeuvre est NSFW'),
-        ('n_nsfw','L\'oeuvre n\'est pas NSFW'),
-        ('empty','La page est vide')
+        ('n_nsfw','L\'oeuvre n\'est pas NSFW')
     ))
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)

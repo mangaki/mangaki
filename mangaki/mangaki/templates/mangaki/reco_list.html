@@ -25,6 +25,7 @@
         <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="/reco/?category=manga">Manga seulement</a></li>
     </ul>
     <br />
+<div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
     <div class="row mangas-list">
     {% for reco, category in reco_list %}
         {% include "work_poster.html" with category=category work=reco %}
