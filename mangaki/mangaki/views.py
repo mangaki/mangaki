@@ -55,6 +55,12 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if self.object.nsfw:
             context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
         context['object'].source = context['object'].source.split(',')[0]
+
+        genres = []
+        for genre in context['object'].genre.all():
+            genres.append(genre.title)
+        context['genres'] = ', '.join(genres)
+
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
@@ -100,8 +106,8 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         genres = []
         for genre in context['object'].genre.all():
             genres.append(genre.title)
-
         context['genres'] = ', '.join(genres)
+
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
@@ -391,9 +397,9 @@ def index(request):
     if request.user.is_authenticated():
         if Rating.objects.filter(user=request.user).count() == 0:
             return redirect('/anime/')
-    texte = Announcement.objects.get(title='Flash News').text
-    context = {'annonce': texte}
-    return render(request, 'index.html',context)
+    # texte = Announcement.objects.get(title='Flash News').text
+    # context = {'annonce': texte}
+    return render(request, 'index.html')
 
 
 def about(request):

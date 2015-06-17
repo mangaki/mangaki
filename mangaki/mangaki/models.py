@@ -17,16 +17,30 @@ class Work(models.Model):
         return self.title
 
 
+class Editor(models.Model):
+    title = models.CharField(max_length=33)
+
+    def __str__(self):
+        return self.title
+
+
+class Studio(models.Model):
+    title = models.CharField(max_length=35)
+
+    def __str__(self):
+        return self.title
+
+
 class Anime(Work):
-    director = models.ForeignKey('Artist', related_name='directed')
-    composer = models.ForeignKey('Artist', related_name='composed')
-    """studio = models.ForeignKey('Studio')
-    author = models.ForeignKey('Artist', related_name='authored')
-    editor = models.ForeignKey('Editor')
-    anime_type = models.TextField(max_length=42, choices=ANIME_TYPE_CHOICES)
+    director = models.ForeignKey('Artist', related_name='directed', default=1)
+    composer = models.ForeignKey('Artist', related_name='composed', default=1)
+    studio = models.ForeignKey('Studio', default=1)
+    author = models.ForeignKey('Artist', related_name='authored', default=1)
+    editor = models.ForeignKey('Editor', default=1)
+    anime_type = models.TextField(max_length=42, default='')
     genre = models.ManyToManyField('Genre')
-    nb_episodes = models.IntegerField()
-    origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)"""
+    nb_episodes = models.TextField(default='Inconnu', max_length=16)
+    origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
 
     def __str__(self):
         return self.title
@@ -44,6 +58,7 @@ class Manga(Work):
 
 class Genre(models.Model):
     title = models.CharField(max_length=17)
+
     def __str__(self):
         return self.title
 
@@ -140,6 +155,7 @@ class SearchIssue(models.Model):
     poster = models.CharField(max_length=128, blank=True, null=True)
     mal_id = models.IntegerField(blank=True, null=True)
     score = models.IntegerField(blank=True, null=True)
+
 
 class Announcement(models.Model):
     title = models.CharField(max_length=128)

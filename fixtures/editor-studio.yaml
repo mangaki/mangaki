@@ -1,0 +1,6 @@
+- fields: {title: "\xC9diteur inconnu"}
+  model: mangaki.editor
+  pk: 1
+- fields: {title: Studio inconnu}
+  model: mangaki.studio
+  pk: 1

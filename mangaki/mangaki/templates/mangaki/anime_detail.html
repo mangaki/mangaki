@@ -11,10 +11,15 @@
     </div>
     <div class="col-xs-6">
         <h1>{{ object.title }}</h1>
-        <p>Anime <!--<br />XXXX<br />
-        XX épisodes, terminée.<br />
-        <a>Réalisateur</a>, <a>Compositeur</a></p>
-        <h4>Liens</h4>
+        <p>Nombre d'épisodes : {{ object.nb_episodes }}</p>
+
+        <p>Auteur : {{ object.author }}</p>
+        <p>Éditeur : {{ object.editor }}</p>
+        <p>Origine : {{ object.origin }}</p>
+        <p>Genres : {{ genres }}</p>
+        <p>Type : {{ object.anime_type }}</p>
+
+        <!-- <h4>Liens</h4>
         <ul>
             <li>Voir la fiche sur Animeka</li>
             <li><a href="#">Acheter sur Kazé</a></li>
