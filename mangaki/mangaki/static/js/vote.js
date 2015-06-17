@@ -14,11 +14,13 @@ function vote(elt) {
         if(sort_mode == 'mosaic' && rating)
             loadCard(pos, dejaVu);
         else {
-            $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
-            if(rating == 'none')
-                $(elt).addClass('not-chosen');
-            else if(rating)
-                $(elt).removeClass('not-chosen');
+	    if (rating != 'sorry') {
+		$(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
+		if(rating == 'none')
+                    $(elt).addClass('not-chosen');
+		else if(rating)
+                    $(elt).removeClass('not-chosen');
+	    }
         }
     });
 }

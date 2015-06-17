@@ -248,7 +248,10 @@ class AnimeList(ListView):
             if obj.nsfw:
                 obj.poster = '/static/img/nsfw.jpg'  # NSFW
             if self.request.user.is_authenticated():
-                obj.rating = my_rated_works.get(obj.id, None)
+                if Favorite.objects.filter(user=self.request.user, work=obj).count() > 0:
+                    obj.rating = 'favorite'
+                else:
+                    obj.rating = my_rated_works.get(obj.id, None)
         context['object_list'] = anime_list
         return context
 
@@ -307,7 +310,10 @@ class MangaList(ListView):
             if obj.nsfw:
                 obj.poster = '/static/img/nsfw.jpg'  # NSFW
             if self.request.user.is_authenticated():
-                obj.rating = my_rated_works.get(obj.id, None)
+                if Favorite.objects.filter(user=self.request.user, work=obj).count() > 0:
+                    obj.rating = 'favorite'
+                else:
+                    obj.rating = my_rated_works.get(obj.id, None)
         context['object_list'] = manga_list
         return context
 
@@ -404,11 +410,19 @@ def rate_work(request, work_id):
                 Favorite.objects.filter(user=request.user, work=work).delete()
                 Rating.objects.filter(user=request.user, work=work).delete()
                 return HttpResponse('none')
+            try:
+                work.anime
+                if Favorite.objects.filter(user=request.user, work__in=Anime.objects.all()).count() > 9:
+                    return HttpResponse('sorry')
+            except Anime.DoesNotExist:
+                if Favorite.objects.filter(user=request.user, work__in=Manga.objects.all()).count() > 9:
+                    return HttpResponse('sorry')
             if Rating.objects.filter(user=request.user, work=work).count() > 0:
                 Rating.objects.filter(user=request.user, work=work).delete()
             Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': 'like'})
             Favorite.objects.update_or_create(user=request.user, work=work)
             return HttpResponse(choice)
+
         else:
             if Favorite.objects.filter(user=request.user, work=work).count() > 0:
                 Favorite.objects.filter(user=request.user, work=work).delete()
