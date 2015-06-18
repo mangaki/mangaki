@@ -52,7 +52,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AnimeDetail, self).get_context_data(**kwargs)
-        if self.object.nsfw:
+        if self.object.nsfw and not self.request.user.profile.nsfw_ok:
             context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
         context['object'].source = context['object'].source.split(',')[0]
 
@@ -99,7 +99,7 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(MangaDetail, self).get_context_data(**kwargs)
-        if self.object.nsfw:
+        if self.object.nsfw and not self.request.user.profile.nsfw_ok:
             context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
         context['object'].source = context['object'].source.split(',')[0]
 
@@ -251,7 +251,7 @@ class AnimeList(ListView):
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(anime_list.number - 2, anime_list.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in anime_list:
-            if obj.nsfw:
+            if obj.nsfw and not self.request.user.profile.nsfw_ok:
                 obj.poster = '/static/img/nsfw.jpg'  # NSFW
             if self.request.user.is_authenticated():
                 if Favorite.objects.filter(user=self.request.user, work=obj).count() > 0:
@@ -313,7 +313,7 @@ class MangaList(ListView):
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(manga_list.number - 2, manga_list.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in manga_list:
-            if obj.nsfw:
+            if obj.nsfw and not self.request.user.profile.nsfw_ok:
                 obj.poster = '/static/img/nsfw.jpg'  # NSFW
             if self.request.user.is_authenticated():
                 if Favorite.objects.filter(user=self.request.user, work=obj).count() > 0:
@@ -484,7 +484,7 @@ def get_reco_list(request, category):
     reco_list = []
     my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
     for work, is_manga in get_recommendations(request.user, my_rated_works, category):
-        if work.nsfw:
+        if work.nsfw and not request.user.profile.nsfw_ok :
             work.poster = '/static/img/nsfw.jpg'  # NSFW
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'category': 'manga' if is_manga else 'anime'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
@@ -505,6 +505,11 @@ def update_shared(request):
         Profile.objects.filter(user=request.user).update(is_shared=request.POST['is_shared'] == 'true')
     return HttpResponse()
 
+
+def update_nsfw(request):
+    if request.user.is_authenticated() and request.method == 'POST':
+        Profile.objects.filter(user=request.user).update(nsfw_ok=request.POST['nsfw_ok'] == 'true')
+    return HttpResponse()
 
 def import_from_mal(request, mal_username):
     if request.method == 'POST':

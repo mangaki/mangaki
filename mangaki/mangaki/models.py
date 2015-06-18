@@ -110,6 +110,7 @@ class Page(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User)
     is_shared = models.BooleanField(default=True)
+    nsfw_ok = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
 
