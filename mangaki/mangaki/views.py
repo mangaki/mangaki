@@ -52,8 +52,12 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AnimeDetail, self).get_context_data(**kwargs)
-        if self.object.nsfw and not self.request.user.profile.nsfw_ok:
-            context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
+        try:
+            if not self.request.user.profile.nsfw_ok and self.object.nsfw:
+                context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
+        except AttributeError:
+            if self.object.nsfw:
+                context['object'].poster = '/static/img/nsfw.jpg'
         context['object'].source = context['object'].source.split(',')[0]
 
         genres = []
@@ -99,10 +103,13 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(MangaDetail, self).get_context_data(**kwargs)
-        if self.object.nsfw and not self.request.user.profile.nsfw_ok:
-            context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
+        try:
+            if not self.request.user.profile.nsfw_ok and self.object.nsfw:
+                context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
+        except AttributeError:
+            if self.object.nsfw:
+                context['object'].poster = '/static/img/nsfw.jpg'
         context['object'].source = context['object'].source.split(',')[0]
-
         genres = []
         for genre in context['object'].genre.all():
             genres.append(genre.title)
@@ -251,13 +258,16 @@ class AnimeList(ListView):
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(anime_list.number - 2, anime_list.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in anime_list:
-            if obj.nsfw and not self.request.user.profile.nsfw_ok:
-                obj.poster = '/static/img/nsfw.jpg'  # NSFW
-            if self.request.user.is_authenticated():
+            try:
+                if not self.request.user.profile.nsfw_ok and obj.nsfw:
+                    obj.poster = '/static/img/nsfw.jpg'  # NSFW
                 if Favorite.objects.filter(user=self.request.user, work=obj).count() > 0:
                     obj.rating = 'favorite'
                 else:
                     obj.rating = my_rated_works.get(obj.id, None)
+            except AttributeError:
+                if obj.nsfw:
+                    obj.poster = '/static/img/nsfw.jpg'
         context['object_list'] = anime_list
         return context
 
@@ -313,13 +323,16 @@ class MangaList(ListView):
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(manga_list.number - 2, manga_list.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in manga_list:
-            if obj.nsfw and not self.request.user.profile.nsfw_ok:
-                obj.poster = '/static/img/nsfw.jpg'  # NSFW
-            if self.request.user.is_authenticated():
+            try:
+                if not self.request.user.profile.nsfw_ok and obj.nsfw:
+                    obj.poster = '/static/img/nsfw.jpg'  # NSFW
                 if Favorite.objects.filter(user=self.request.user, work=obj).count() > 0:
                     obj.rating = 'favorite'
                 else:
                     obj.rating = my_rated_works.get(obj.id, None)
+            except AttributeError:
+                if obj.nsfw:
+                    obj.poster = '/static/img/nsfw.jpg'
         context['object_list'] = manga_list
         return context
 
