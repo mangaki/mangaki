@@ -13,7 +13,7 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Favorite
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, Neighborship, SearchIssue, Announcement, Favorite
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -367,6 +367,14 @@ def get_profile(request, username):
     seen_manga_list = []
     unseen_manga_list = []
     fav_manga_list = []
+    best_neighbors_list = []
+
+
+    my_neighborships = Neighborship.objects.filter(user=user).exclude(neighbor=user)
+    my_neighborships = sorted(my_neighborships, key=lambda x : x.score, reverse=True)[:5]
+    for i in range(len(my_neighborships)):
+        best_neighbors_list.append(my_neighborships[i].neighbor)
+
     for rating in rating_list:
         seen = rating.choice in ['like', 'neutral', 'dislike']
         try:
@@ -384,10 +392,10 @@ def get_profile(request, username):
         try:
             fav.work.anime
             fav_anime_list.append(fav)
-            seen_anime_list.remove(Rating.objects.get(user=fav.user, work=fav.work))
+            seen_anime_list.remove(Rating.objects.get(user=user, work=fav.work))
         except Anime.DoesNotExist:
             fav_manga_list.append(fav)
-            seen_manga_list.remove(Rating.objects.get(user=fav.user, work=fav.work))
+            seen_manga_list.remove(Rating.objects.get(user=user, work=fav.work))
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
     seen_list = seen_anime_list if category == 'anime' else seen_manga_list
     fav_list = fav_anime_list if category == 'anime' else fav_manga_list
@@ -403,6 +411,8 @@ def get_profile(request, username):
         'seen_list': seen_list if is_shared else [],
         'unseen_list': unseen_list if is_shared else [],
         'fav_list': fav_list if is_shared else [],
+        'best_neighbors_list': best_neighbors_list if is_shared else [],
+        'neighbor_count': len(best_neighbors_list)
     })
 
 
