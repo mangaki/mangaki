@@ -1,36 +1,72 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="row">
-    <div class="col-xs-4 col-xs-offset-1">
-        <h1>Les 5 derniers inscrits</h1>
-        {% for user in object_list %}
-        <div class="row">
-            <div class="col-xs-3">
-                <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
-            </div>
-            <div class="col-xs-7">
-                <h1><a href="/u/{{ user.username }}">{{ user.username }}</a></h1>
-                <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
-            </div>
+
+<div class="container">
+    <div class="row">
+    <h1>Le Trio ELM</h1>
+    {% for user in trio_elm %}
+        <div class="col-xs-1">
+            <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
         </div>
-        {% endfor %}
+        <div class="col-xs-3">
+            <h3><a href="/u/{{ user.username }}">{{ user.username }}</a></h3>
+            <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
+        </div>
+    {% endfor %}
     </div>
-    <div class="col-xs-4 col-xs-offset-1">
-        <h1>Le Trio ELM</h1>
-        {% for user in trio_elm %}
-        <div class="row">
-            <div class="col-xs-3">
-                <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
-            </div>
-            <div class="col-xs-7">
-                <h1><a href="/u/{{ user.username }}">{{ user.username }}</a></h1>
-                <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
-            </div>
+</div>
+</br>
+<b>
+<div class="collapse navbar-collapse" id="menu-collapse">
+   <ul class="nav navbar-nav">
+{% for letter in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+     <li class="dropdown">
+     <a href="?letter={{ letter|lower }}">
+         {{letter}}
+     </a>
+     </li>
+{% endfor %}
+   </ul>
+</div>
+</b>
+</br>
+<div class="container">
+    <div class="row">
+        {% for user in object_list %}
+        <div class="col-xs-1">
+            <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
+        </div>
+        <div class="col-xs-2">
+            <h3><a href="/u/{{ user.username }}">{{ user.username }}</a></h3>
+            <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
         </div>
         {% endfor %}
     </div>
 </div>
+
+<nav style="text-align: center">
+  <ul class="pagination">
+    {% if object_list.has_previous %}
+    <li>
+      <a href="?{{ url }}&amp;page={{ object_list.previous_page_number }}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% endif %}
+    {% for page in pages %}
+        <li><a href="?{{ url }}&amp;page={{ page }}">{% if params.page == page %}<strong>{{ page }}</strong>{% else %}{{ page }}{% endif %}</a></li>
+    {% endfor %}
+    {% if object_list.has_next %}
+    <li>
+      <a href="?{{ url }}&amp;page={{ object_list.next_page_number }}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+
 <br />
 <br />
 <br />
