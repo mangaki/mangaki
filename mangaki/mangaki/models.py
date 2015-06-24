@@ -87,7 +87,8 @@ class Artist(models.Model):
 class Rating(models.Model):
     user = models.ForeignKey(User)
     work = models.ForeignKey(Work)
-    choice = models.CharField(max_length=7, choices=(
+    choice = models.CharField(max_length=8, choices=(
+        ('favorite', 'Mon favori !'),
         ('like', 'J\'aime'),
         ('dislike', 'Je n\'aime pas'),
         ('neutral', 'Neutre'),
@@ -164,10 +165,3 @@ class Announcement(models.Model):
     
     def __str__(self):
         return self.title
-
-class Favorite(models.Model):
-    user = models.ForeignKey(User)
-    work = models.ForeignKey(Work)
-
-    def __str__(self):
-        return '%s fav %s' % (self.user, self.work)

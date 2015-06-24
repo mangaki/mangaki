@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Favorite
+from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -141,9 +141,6 @@ class SearchIssueAdmin(admin.ModelAdmin):
 class AnnouncementAdmin(admin.ModelAdmin):
     exclude = ('title',)
 
-class FavoriteAdmin(admin.ModelAdmin):
-    pass
-
 admin.site.register(Anime, AnimeAdmin)
 admin.site.register(Manga, MangaAdmin)
 admin.site.register(Genre, GenreAdmin)
@@ -157,4 +154,3 @@ admin.site.register(Page, PageAdmin)
 admin.site.register(Suggestion, SuggestionAdmin)
 admin.site.register(SearchIssue, SearchIssueAdmin)
 admin.site.register(Announcement, AnnouncementAdmin)
-admin.site.register(Favorite, FavoriteAdmin)
