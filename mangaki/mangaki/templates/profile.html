@@ -20,6 +20,8 @@
             <br />
             Profil public : <input type="checkbox" name="is_shared" {% if user.profile.is_shared %} checked{% endif %}/>
             <hr />
+	    Afficher visuels pour public averti : <input type="checkbox" name="nsfw_ok" {% if user.profile.nsfw_ok %} checked{% endif %}/>
+            <hr />
             <p>Importer depuis myAnimeList :</p>
             <div class="input-group">
                 <input type="text" class="form-control" id="mal_username" placeholder="Ton login" onkeydown="if(event.keyCode == 13) {$('#import_mal').click(); this.value = ''};" />
@@ -64,6 +66,10 @@
 $("[name='is_shared']").bootstrapSwitch();
 $("[name='is_shared']").on('switchChange.bootstrapSwitch', function(event, state) {
     $.post('/shared/', {is_shared: state});
+});
+$("[name='nsfw_ok']").bootstrapSwitch();
+$("[name='nsfw_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
+    $.post('/nsfw/', {nsfw_ok: state});
 });
 $("#import_mal").on('click', function() {
     $.post('/mal/' + $('#mal_username').val(), function(data) {

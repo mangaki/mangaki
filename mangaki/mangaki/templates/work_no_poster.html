@@ -1,6 +1,7 @@
 <div class="row flatlist" data-category="{{ category }}" data-id="{{ work.id }}">
     <a href="/{{ category }}/{{ work.id }}">{{ work.title }}</a>
     <div id="votes_{{ work.id }}" style="float: right">
+        <span data-choice='favorite' onclick="vote(this)" class="btn btn-default btn-xs{% if rating and rating != 'favorite' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-star"></span></span>
         <span data-choice='like' onclick="vote(this)" class="btn btn-success btn-xs{% if rating and rating != 'like' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-thumbs-up"></span></span>
         <span data-choice='neutral' onclick="vote(this)" class="btn btn-warning btn-xs{% if rating and rating != 'neutral' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-adjust"></span></span>
         <span data-choice='dislike' onclick="vote(this)" class="btn btn-danger btn-xs{% if rating and rating != 'dislike' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-thumbs-down"></span></span>

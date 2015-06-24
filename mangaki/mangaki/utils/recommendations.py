@@ -5,6 +5,7 @@ from django.db.models import Count
 
 def get_recommendations(user, my_rated_works, category):
     values = {
+        'favorite': 5,
         'like': 2,
         'dislike': -2,
         'neutral': 0.1,

@@ -53,7 +53,7 @@ class Manga(Work):
     editor = models.CharField(max_length=32)
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
     genre = models.ManyToManyField('Genre')
-    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES)
+    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
 
 
 class Genre(models.Model):
@@ -87,7 +87,8 @@ class Artist(models.Model):
 class Rating(models.Model):
     user = models.ForeignKey(User)
     work = models.ForeignKey(Work)
-    choice = models.CharField(max_length=7, choices=(
+    choice = models.CharField(max_length=8, choices=(
+        ('favorite', 'Mon favori !'),
         ('like', 'J\'aime'),
         ('dislike', 'Je n\'aime pas'),
         ('neutral', 'Neutre'),
@@ -110,6 +111,7 @@ class Page(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User)
     is_shared = models.BooleanField(default=True)
+    nsfw_ok = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
 
@@ -133,11 +135,10 @@ class Suggestion(models.Model):
         ('poster', 'Le poster ne convient pas'),
         ('synopsis', 'Le synopsis comporte des erreurs'),
         ('author','L\'auteur n\'est pas le bon'),
-        ('compositor','Le compositeur n\'est pas le bon'),
+        ('composer','Le compositeur n\'est pas le bon'),
         ('double','Ceci est un doublon'),
         ('nsfw','L\'oeuvre est NSFW'),
-        ('n_nsfw','L\'oeuvre n\'est pas NSFW'),
-        ('empty','La page est vide')
+        ('n_nsfw','L\'oeuvre n\'est pas NSFW')
     ))
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)

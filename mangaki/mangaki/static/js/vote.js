@@ -11,14 +11,22 @@ function vote(elt) {
         if(rating == '')
             window.location = '/user/signup';
         dejaVu = $('[data-id]').map(function() {return $(this).data('id');}).get();
-        if(sort_mode == 'mosaic' && rating)
+        if(typeof sort_mode !== 'undefined' && sort_mode == 'mosaic' && rating && rating != 'sorry') {
             loadCard(pos, dejaVu);
-        else {
-            $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
-            if(rating == 'none')
-                $(elt).addClass('not-chosen');
-            else if(rating)
-                $(elt).removeClass('not-chosen');
+            $('#sorry').hide();
+        } else {
+            if (rating != 'sorry') {
+                $('#sorry').hide();
+                $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
+                if(rating == 'none')
+                    $(elt).addClass('not-chosen');
+                else if(rating)
+                    $(elt).removeClass('not-chosen');
+            } else {
+                if($('#sorry').css('display') == 'none')
+                $('#sorry').show();
+                $('#sorry').html('Désolé mais vous avez déjà 10 favoris...');
+            }
         }
     });
 }
