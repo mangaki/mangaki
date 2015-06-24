@@ -118,7 +118,7 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
-                if Rating.objects.filter(user=self.request.user, work=self.object, rating='favorite').count() > 0:
+                if Rating.objects.filter(user=self.request.user, work=self.object, choice='favorite').count() > 0:
                     context['rating'] = 'favorite'
                 else:
                     context['rating'] = self.object.rating_set.get(user=self.request.user).choice
