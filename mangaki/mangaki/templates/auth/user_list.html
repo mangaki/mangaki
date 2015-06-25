@@ -22,7 +22,7 @@
    <ul class="nav navbar-nav">
 {% for letter in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
      <li class="dropdown">
-     <a href="?letter={{ letter|lower }}">
+     <a href="?letter={% if letter == '#' %}0{% else %}{{ letter|lower }}{% endif %}">
          {{letter}}
      </a>
      </li>

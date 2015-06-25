@@ -346,9 +346,9 @@ class UserList(ListView):
         letter = self.request.GET.get('letter', '')
         if letter:
             if letter == '0':  # '#'
-                bundle = bundle.exclude(username__regex=r'^[a-zA-Z]')
+                bundle = bundle.exclude(username__regex=r'^[a-zA-Z]').order_by('username')
             else:
-                bundle = bundle.filter(username__istartswith=letter)
+                bundle = bundle.filter(username__istartswith=letter).order_by('username')
         return bundle
 
 
@@ -493,6 +493,20 @@ def rate_work(request, work_id):
     return HttpResponse()
 
 
+#def recommend_work(request, work_id,target_id):
+#    if request.user.is_authenticated() and request.method == 'POST':
+#        work = get_object_or_404(Work, id=work_id)
+#        target_user = get_object_or_404(User, id=target_id)
+#        Recommandation.objects.update_or_create(user=request.user, work=work, target_user=target_user)
+#    return HttpResponse()
+
+
+def get_user_for_recommendations(request, work_id, target_id, query=''):
+    data = []
+    for user in User.objects.all() if not query else User.objects.filter(username__icontains=query):
+        data.append({'id': user.id, 'username': user.username, 'tokens': user.username.lower().split()})
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
 class MarkdownView(DetailView):
     model = Page
     slug_field = 'name'
@@ -528,11 +542,12 @@ def get_extra_manga(request, query):
     return HttpResponse()
 
 
-def get_reco_list(request, category):
+def get_reco_list(request, category, editor):
     # category = request.GET.get('category', 'all')
+    #editor = request.GET.get('editor', '')
     reco_list = []
     my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
-    for work, is_manga in get_recommendations(request.user, my_rated_works, category):
+    for work, is_manga in get_recommendations(request.user, my_rated_works, category, editor):
         if work.nsfw and not request.user.profile.nsfw_ok :
             work.poster = '/static/img/nsfw.jpg'  # NSFW
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'category': 'manga' if is_manga else 'anime'})
@@ -542,11 +557,12 @@ def get_reco_list(request, category):
 @login_required
 def get_reco(request):
     category = request.GET.get('category', 'all')
+    editor = request.GET.get('editor', 'unspecified')
     reco_list = []
     dummy = Work(title='Chargement…', poster='/static/img/chiro.gif')
     for _ in range(4):
         reco_list.append((dummy, 'dummy'))
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category})
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor })
 
 
 def update_shared(request):

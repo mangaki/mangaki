@@ -171,3 +171,11 @@ class Favorite(models.Model):
 
     def __str__(self):
         return '%s fav %s' % (self.user, self.work)
+
+class Recommandation(models.Model):
+    user = models.ForeignKey(User)
+    target_user = models.ForeignKey(User, related_name='target_user')
+    work = models.ForeignKey(Work)
+
+    def __str__(self):
+        return '%s recommends %s to %s' % (self.user, self.work, self.target_user)
