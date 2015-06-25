@@ -13,7 +13,7 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, Neighborship, SearchIssue, Announcement, Favorite
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -68,7 +68,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
-                if Favorite.objects.filter(user=self.request.user, work=self.object).count() > 0:
+                if Rating.objects.filter(user=self.request.user, work=self.object, choice='favorite').count() > 0:
                     context['rating'] = 'favorite'
                 else:
                     context['rating'] = self.object.rating_set.get(user=self.request.user).choice
@@ -118,7 +118,7 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
-                if Favorite.objects.filter(user=self.request.user, work=self.object).count() > 0:
+                if Rating.objects.filter(user=self.request.user, work=self.object, rating='favorite').count() > 0:
                     context['rating'] = 'favorite'
                 else:
                     context['rating'] = self.object.rating_set.get(user=self.request.user).choice
@@ -261,10 +261,7 @@ class AnimeList(ListView):
             try:
                 if not self.request.user.profile.nsfw_ok and obj.nsfw:
                     obj.poster = '/static/img/nsfw.jpg'  # NSFW
-                if Favorite.objects.filter(user=self.request.user, work=obj).count() > 0:
-                    obj.rating = 'favorite'
-                else:
-                    obj.rating = my_rated_works.get(obj.id, None)
+                obj.rating = my_rated_works.get(obj.id, None)
             except AttributeError:
                 if obj.nsfw:
                     obj.poster = '/static/img/nsfw.jpg'
@@ -326,7 +323,7 @@ class MangaList(ListView):
             try:
                 if not self.request.user.profile.nsfw_ok and obj.nsfw:
                     obj.poster = '/static/img/nsfw.jpg'  # NSFW
-                if Favorite.objects.filter(user=self.request.user, work=obj).count() > 0:
+                if Rating.objects.filter(user=self.request.user, work=obj, choice='favorite').count() > 0:
                     obj.rating = 'favorite'
                 else:
                     obj.rating = my_rated_works.get(obj.id, None)
@@ -384,25 +381,14 @@ def get_profile(request, username):
         is_shared = True
     user = User.objects.get(username=username)
     category = request.GET.get('category', 'anime')
-    ordering = ['willsee', 'like', 'neutral', 'dislike', 'wontsee']
+    ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
     rating_list = sorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title))
-    fav_list = sorted(Favorite.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: x.work.title)
     seen_anime_list = []
     unseen_anime_list = []
-    fav_anime_list = []
     seen_manga_list = []
     unseen_manga_list = []
-    fav_manga_list = []
-    best_neighbors_list = []
-
-
-    my_neighborships = Neighborship.objects.filter(user=user).exclude(neighbor=user)
-    my_neighborships = sorted(my_neighborships, key=lambda x : x.score, reverse=True)[:5]
-    for i in range(len(my_neighborships)):
-        best_neighbors_list.append(my_neighborships[i].neighbor)
-
     for rating in rating_list:
-        seen = rating.choice in ['like', 'neutral', 'dislike']
+        seen = rating.choice in ['favorite', 'like', 'neutral', 'dislike']
         try:
             rating.work.anime
             if seen:
@@ -414,17 +400,8 @@ def get_profile(request, username):
                 seen_manga_list.append(rating)
             else:
                 unseen_manga_list.append(rating)
-    for fav in fav_list:
-        try:
-            fav.work.anime
-            fav_anime_list.append(fav)
-            seen_anime_list.remove(Rating.objects.get(user=user, work=fav.work))
-        except Anime.DoesNotExist:
-            fav_manga_list.append(fav)
-            seen_manga_list.remove(Rating.objects.get(user=user, work=fav.work))
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
     seen_list = seen_anime_list if category == 'anime' else seen_manga_list
-    fav_list = fav_anime_list if category == 'anime' else fav_manga_list
     unseen_list = unseen_anime_list if category == 'anime' else unseen_manga_list
     return render(request, 'profile.html', {
         'username': username,
@@ -432,13 +409,10 @@ def get_profile(request, username):
         'category': category,
         'avatar_url': user.profile.get_avatar_url(),
         'member_days': member_time.days,
-        'anime_count': len(seen_anime_list) + len(fav_anime_list),
-        'manga_count': len(seen_manga_list) + len(fav_manga_list),
+        'anime_count': len(seen_anime_list),
+        'manga_count': len(seen_manga_list),
         'seen_list': seen_list if is_shared else [],
         'unseen_list': unseen_list if is_shared else [],
-        'fav_list': fav_list if is_shared else [],
-        'best_neighbors_list': best_neighbors_list if is_shared else [],
-        'neighbor_count': len(best_neighbors_list)
     })
 
 
@@ -450,7 +424,7 @@ def index(request):
     # context = {'annonce': texte}
     return render(request, 'index.html')
 
-
+ 
 def about(request):
     return render(request, 'about.html')
 
@@ -458,38 +432,13 @@ def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
-        if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee']:
-            if choice != 'favorite':
-                return HttpResponse()
-            if Favorite.objects.filter(user=request.user, work=work).count() > 0:
-                Favorite.objects.filter(user=request.user, work=work).delete()
-                Rating.objects.filter(user=request.user, work=work).delete()
-                return HttpResponse('none')
-            try:
-                work.anime
-                if Favorite.objects.filter(user=request.user, work__in=Anime.objects.all()).count() > 9:
-                    return HttpResponse('sorry')
-            except Anime.DoesNotExist:
-                if Favorite.objects.filter(user=request.user, work__in=Manga.objects.all()).count() > 9:
-                    return HttpResponse('sorry')
-            if Rating.objects.filter(user=request.user, work=work).count() > 0:
-                Rating.objects.filter(user=request.user, work=work).delete()
-            Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': 'like'})
-            Favorite.objects.update_or_create(user=request.user, work=work)
-            return HttpResponse(choice)
-
-        else:
-            if Favorite.objects.filter(user=request.user, work=work).count() > 0:
-                Favorite.objects.filter(user=request.user, work=work).delete()
-                if Rating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
-                    return HttpResponse(choice)
-            if Rating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
-                Rating.objects.filter(user=request.user, work=work, choice=choice).delete()
-                return HttpResponse('none')
-            if Rating.objects.filter(user=request.user, work=work).count() > 0:
-                Rating.objects.filter(user=request.user, work=work).delete()
-            Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
-            return HttpResponse(choice)
+        if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee', 'favorite']:
+            return HttpResponse()        
+        if Rating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
+            Rating.objects.filter(user=request.user, work=work, choice=choice).delete()
+            return HttpResponse('none')
+        Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
+        return HttpResponse(choice)
     return HttpResponse()
 
 

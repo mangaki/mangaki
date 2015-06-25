@@ -62,12 +62,6 @@
         </div>
     {% else %}
         <div class="col-xs-4 col-xs-offset-1">
-            <h1>{% if category == 'anime' %}<a href="/anime">Anime</a> favoris{% else %}<a href="/manga">Mangas</a> favoris{% endif %}</h1>
-            {% for object in fav_list %}
-                {% include "work_no_poster.html" with work=object.work class=category rating="favorite" %}
-            {% empty %}
-                <p>(Cette liste est vide.)</p>
-            {% endfor %}
             <h1>{% if category == 'anime' %}<a href="/anime">Anime</a> vus{% else %}<a href="/manga">Mangas</a> lus{% endif %}</h1>
             {% for object in seen_list %}
                 {% include "work_no_poster.html" with work=object.work class=category rating=object.choice %}
