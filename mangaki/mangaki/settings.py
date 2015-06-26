@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.twitter',
     'bootstrapform',
-    'debug_toolbar'
+#    'debug_toolbar'
 )
 
 MIDDLEWARE_CLASSES = (
