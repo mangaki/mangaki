@@ -202,7 +202,11 @@ def get_card(request, category, sort_id=1):
     my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
     bundle = list(get_bundle(category, sort_mode, my_rated_works))
     work = pick_card(bundle, sort_mode, my_rated_works, deja_vu)
-    card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category, 'synopsis': work.synopsis}
+    if not request.user.profile.nsfw_ok and work.nsfw:
+        poster = '/static/img/nsfw.jpg'
+    else:
+        poster = work.poster
+    card = {'id': work.id, 'title': work.title, 'poster': poster, 'category': category, 'synopsis': work.synopsis}
     return HttpResponse(json.dumps(card), content_type='application/json')
 
 
