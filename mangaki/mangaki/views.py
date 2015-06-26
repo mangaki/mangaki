@@ -118,7 +118,7 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
-                if Rating.objects.filter(user=self.request.user, work=self.object, rating='favorite').count() > 0:
+                if Rating.objects.filter(user=self.request.user, work=self.object, choice='favorite').count() > 0:
                     context['rating'] = 'favorite'
                 else:
                     context['rating'] = self.object.rating_set.get(user=self.request.user).choice
@@ -495,7 +495,14 @@ def get_reco_list(request, category, editor):
     # category = request.GET.get('category', 'all')
     #editor = request.GET.get('editor', '')
     reco_list = []
-    my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
+    my_rated_works={}
+    if request.user.is_authenticated():
+        if request.user.profile.reco_willsee_ok:
+            for rating in Rating.objects.filter(user=request.user).exclude(choice='willsee'):
+                my_rated_works[rating.work_id] = rating.choice
+        else:
+            for rating in Rating.objects.filter(user=request.user):
+                my_rated_works[rating.work_id] = rating.choice
     for work, is_manga in get_recommendations(request.user, my_rated_works, category, editor):
         if work.nsfw and not request.user.profile.nsfw_ok :
             work.poster = '/static/img/nsfw.jpg'  # NSFW
@@ -523,6 +530,11 @@ def update_shared(request):
 def update_nsfw(request):
     if request.user.is_authenticated() and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(nsfw_ok=request.POST['nsfw_ok'] == 'true')
+    return HttpResponse()
+
+def update_reco_willsee(request):
+    if request.user.is_authenticated() and request.method == 'POST':
+        Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
     return HttpResponse()
 
 def import_from_mal(request, mal_username):

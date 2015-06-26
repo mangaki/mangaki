@@ -9,6 +9,7 @@
             Notez-les puis rechargez la page pour en faire apparaître
             d'autres.
         </p>
+	Inclure la liste des "À voir" dans les recommandations : <input type="checkbox" name="reco_willsee_ok" {% if user.profile.reco_willsee_ok %} checked{% endif %}/>
 	<form name="editor_choice">
 	  <div>
 	  Filtrer par éditeur :
@@ -50,6 +51,11 @@
         data.forEach(function(work, i) {
             displayWork(i + 1, work);
         });
+    });
+    $("[name='reco_willsee_ok']").bootstrapSwitch();
+    $("[name='reco_willsee_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
+       $.post('/reco_willsee/', {reco_willsee_ok: state});
+       location.href = '/reco/?category={{ category }}&editor={{ editor }}';
     });
     </script>
 {% else %}
