@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^discourse/sso$', views.sso),
     url(r'^about/$', 'mangaki.views.about'),
+    url(r'^events/$', 'mangaki.views.events'),
     # url(r'^lookup/$', 'mangaki.views.lookup_work'),
     url(r'^(?P<slug>[\w-]+)/$', MarkdownView.as_view()),
 )
