@@ -29,7 +29,7 @@ import json
 
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
-
+USERNAMES_PER_PAGE = 24
 
 def display_queries():
     for line in connection.queries:
@@ -43,6 +43,11 @@ def get_rated_works(user):
     return rated_works
 
 
+def update_poster_if_nsfw(obj, user):
+    if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
+        obj.poster = '/static/img/nsfw.jpg'  # NSFW
+
+
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime
     form_class = SuggestionForm
@@ -52,12 +57,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AnimeDetail, self).get_context_data(**kwargs)
-        try:
-            if not self.request.user.profile.nsfw_ok and self.object.nsfw:
-                context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
-        except AttributeError:
-            if self.object.nsfw:
-                context['object'].poster = '/static/img/nsfw.jpg'
+        update_poster_if_nsfw(self.object, self.request.user)
         context['object'].source = context['object'].source.split(',')[0]
 
         genres = []
@@ -103,13 +103,9 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(MangaDetail, self).get_context_data(**kwargs)
-        try:
-            if not self.request.user.profile.nsfw_ok and self.object.nsfw:
-                context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
-        except AttributeError:
-            if self.object.nsfw:
-                context['object'].poster = '/static/img/nsfw.jpg'
+        update_poster_if_nsfw(self.object, self.request.user)
         context['object'].source = context['object'].source.split(',')[0]
+
         genres = []
         for genre in context['object'].genre.all():
             genres.append(genre.title)
@@ -162,7 +158,7 @@ def get_scores(bundle, ranking='controversy'):
         if ranking == 'controversy':
             score[work_id] = controversy(nb_likes, nb_dislikes)
         elif ranking == 'top':
-            score[work_id] = nb_likes if nb_dislikes <= 15 else 0
+            score[work_id] = nb_likes if nb_dislikes <= 20 else 0
         elif ranking == 'random':  # Perles au hasard
             score[work_id] = nb_likes if nb_dislikes <= 5 and nb_likes >= 3 else 0
     return score
@@ -202,6 +198,7 @@ def get_card(request, category, sort_id=1):
     my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
     bundle = list(get_bundle(category, sort_mode, my_rated_works))
     work = pick_card(bundle, sort_mode, my_rated_works, deja_vu)
+    update_poster_if_nsfw(work, request.user)
     card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category, 'synopsis': work.synopsis}
     return HttpResponse(json.dumps(card), content_type='application/json')
 
@@ -258,13 +255,7 @@ class AnimeList(ListView):
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(anime_list.number - 2, anime_list.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in anime_list:
-            try:
-                if not self.request.user.profile.nsfw_ok and obj.nsfw:
-                    obj.poster = '/static/img/nsfw.jpg'  # NSFW
-                obj.rating = my_rated_works.get(obj.id, None)
-            except AttributeError:
-                if obj.nsfw:
-                    obj.poster = '/static/img/nsfw.jpg'
+            update_poster_if_nsfw(obj, self.request.user)
         context['object_list'] = anime_list
         return context
 
@@ -320,16 +311,7 @@ class MangaList(ListView):
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(manga_list.number - 2, manga_list.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in manga_list:
-            try:
-                if not self.request.user.profile.nsfw_ok and obj.nsfw:
-                    obj.poster = '/static/img/nsfw.jpg'  # NSFW
-                if Rating.objects.filter(user=self.request.user, work=obj, choice='favorite').count() > 0:
-                    obj.rating = 'favorite'
-                else:
-                    obj.rating = my_rated_works.get(obj.id, None)
-            except AttributeError:
-                if obj.nsfw:
-                    obj.poster = '/static/img/nsfw.jpg'
+            update_poster_if_nsfw(obj, self.request.user)
         context['object_list'] = manga_list
         return context
 
@@ -339,10 +321,36 @@ class UserList(ListView):
     # context_object_name = 'anime'
 
     def get_queryset(self):
-        return User.objects.filter(profile__is_shared=True).order_by('-id')[:5]
+        bundle = User.objects.filter(profile__is_shared=True).order_by('-id')
+        letter = self.request.GET.get('letter', '')
+        if letter:
+            if letter == '0':  # '#'
+                bundle = bundle.exclude(username__regex=r'^[a-zA-Z]').order_by('username')
+            else:
+                bundle = bundle.filter(username__istartswith=letter).order_by('username')
+        return bundle
+
 
     def get_context_data(self, **kwargs):
         context = super(UserList, self).get_context_data(**kwargs)
+
+        letter = self.request.GET.get('letter', '')
+        page = int(self.request.GET.get('page', '1'))
+        context['object_list'] = list(context['object_list'])
+        paginator = Paginator(context['object_list'], USERNAMES_PER_PAGE)
+        try:
+            user_list = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            user_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            user_list = paginator.page(paginator.num_pages)
+        context['params'] = {'letter': letter, 'page': page}
+        context['url'] = urlencode({'letter': letter})
+        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(user_list.number - 2, user_list.number + 2 + 1))
+        context['object_list'] = user_list
+
         context['trio_elm'] = User.objects.filter(username__in=['jj', 'Lily', 'Sedeto'])
         return context
 
@@ -416,6 +424,20 @@ def rate_work(request, work_id):
     return HttpResponse()
 
 
+#def recommend_work(request, work_id,target_id):
+#    if request.user.is_authenticated() and request.method == 'POST':
+#        work = get_object_or_404(Work, id=work_id)
+#        target_user = get_object_or_404(User, id=target_id)
+#        Recommandation.objects.update_or_create(user=request.user, work=work, target_user=target_user)
+#    return HttpResponse()
+
+
+def get_user_for_recommendations(request, work_id, target_id, query=''):
+    data = []
+    for user in User.objects.all() if not query else User.objects.filter(username__icontains=query):
+        data.append({'id': user.id, 'username': user.username, 'tokens': user.username.lower().split()})
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
 class MarkdownView(DetailView):
     model = Page
     slug_field = 'name'
@@ -451,13 +473,20 @@ def get_extra_manga(request, query):
     return HttpResponse()
 
 
-def get_reco_list(request, category):
+def get_reco_list(request, category, editor):
     # category = request.GET.get('category', 'all')
+    #editor = request.GET.get('editor', '')
     reco_list = []
-    my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
-    for work, is_manga in get_recommendations(request.user, my_rated_works, category):
-        if work.nsfw and not request.user.profile.nsfw_ok :
-            work.poster = '/static/img/nsfw.jpg'  # NSFW
+    my_rated_works={}
+    if request.user.is_authenticated():
+        if request.user.profile.reco_willsee_ok:
+            for rating in Rating.objects.filter(user=request.user).exclude(choice='willsee'):
+                my_rated_works[rating.work_id] = rating.choice
+        else:
+            for rating in Rating.objects.filter(user=request.user):
+                my_rated_works[rating.work_id] = rating.choice
+    for work, is_manga in get_recommendations(request.user, my_rated_works, category, editor):
+        update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'category': 'manga' if is_manga else 'anime'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
@@ -465,11 +494,12 @@ def get_reco_list(request, category):
 @login_required
 def get_reco(request):
     category = request.GET.get('category', 'all')
+    editor = request.GET.get('editor', 'unspecified')
     reco_list = []
     dummy = Work(title='Chargement…', poster='/static/img/chiro.gif')
     for _ in range(4):
         reco_list.append((dummy, 'dummy'))
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category})
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor })
 
 
 def update_shared(request):
@@ -481,6 +511,11 @@ def update_shared(request):
 def update_nsfw(request):
     if request.user.is_authenticated() and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(nsfw_ok=request.POST['nsfw_ok'] == 'true')
+    return HttpResponse()
+
+def update_reco_willsee(request):
+    if request.user.is_authenticated() and request.method == 'POST':
+        Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
     return HttpResponse()
 
 def import_from_mal(request, mal_username):

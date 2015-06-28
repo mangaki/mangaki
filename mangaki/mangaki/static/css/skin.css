@@ -144,3 +144,39 @@ footer .navbar-nav {
     max-width: 150px;
     border-radius: 5px;
 }
+
+.btn.a
+{ 
+   background-color: hsl(63, 100%, 62%) !important; 
+   background-repeat: repeat-x; 
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#f8d549", endColorstr="#f8d549"); 
+   background-image: -khtml-gradient(linear, left top, left bottom, from#f8d549(), to(#f8d549)); 
+   background-image: -moz-linear-gradient(top, #f8d549, #f8d549); 
+   background-image: -ms-linear-gradient(top, #f8d549, #f8d549); 
+   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f8d549), color-stop(100%, #f8d549)); 
+   background-image: -webkit-linear-gradient(top, #f8d549, #f8d549); 
+   background-image: -o-linear-gradient(top, #f8d549, #f8d549); 
+   background-image: linear-gradient(#f8d549,#f8d549); 
+   border-color: #f8d549 #f8d549 hsl(63, 100%, 55%); 
+   color: #ffffff !important; 
+   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.46); 
+   -webkit-font-smoothing: antialiased;
+} 
+
+.label.a
+{ 
+   background-color: hsl(63, 100%, 62%) !important; 
+   background-repeat: repeat-x; 
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#f8d549", endColorstr="#f8d549"); 
+   background-image: -khtml-gradient(linear, left top, left bottom, from#f8d549(), to(#f8d549)); 
+   background-image: -moz-linear-gradient(top, #f8d549, #f8d549); 
+   background-image: -ms-linear-gradient(top, #f8d549, #f8d549); 
+   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f8d549), color-stop(100%, #f8d549)); 
+   background-image: -webkit-linear-gradient(top, #f8d549, #f8d549); 
+   background-image: -o-linear-gradient(top, #f8d549, #f8d549); 
+   background-image: linear-gradient(#f8d549,#f8d549); 
+   border-color: #f8d549 #f8d549 hsl(63, 100%, 55%); 
+   color: #ffffff !important; 
+   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.46); 
+   -webkit-font-smoothing: antialiased;
+} 

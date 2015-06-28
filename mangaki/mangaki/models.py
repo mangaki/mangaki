@@ -112,6 +112,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User)
     is_shared = models.BooleanField(default=True)
     nsfw_ok = models.BooleanField(default=False)
+    reco_willsee_ok = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
 
@@ -165,3 +166,11 @@ class Announcement(models.Model):
     
     def __str__(self):
         return self.title
+
+class Recommandation(models.Model):
+    user = models.ForeignKey(User)
+    target_user = models.ForeignKey(User, related_name='target_user')
+    work = models.ForeignKey(Work)
+
+    def __str__(self):
+        return '%s recommends %s to %s' % (self.user, self.work, self.target_user)

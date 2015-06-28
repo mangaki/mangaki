@@ -9,9 +9,23 @@
             Notez-les puis rechargez la page pour en faire apparaître
             d'autres.
         </p>
+	Inclure la liste des "À voir" dans les recommandations : <input type="checkbox" name="reco_willsee_ok" {% if user.profile.reco_willsee_ok %} checked{% endif %}/>
+	<form name="editor_choice">
+	  <div>
+	  Filtrer par éditeur :
+	  <select name="editorURL" onChange="document.location.href=document.editor_choice.editorURL.options[document.editor_choice.editorURL.selectedIndex].value">
+	    <option value="/reco/?category={{ category }}" {% if editor == '' %} selected {% endif %}>Tous</a>
+	    <!--<option value="/reco/?category=manga&editor=Taifu" {% if editor == 'Taifu' %} selected {% endif %}> Taifu Comics</a>
+	    <option value="/reco/?category=manga&editor=Ototo" {% if editor == 'Ototo' %} selected {% endif %}>Ototo Manga</a>-->
+	    <option value="/reco/?category=manga&editor=otototaifu" {% if editor == 'otototaifu' %} selected {% endif %}>Ototo/Taifu</a>
+	    <option value="/reco/?category=manga&editor=delcourt" {% if editor == 'delcourt' %} selected {% endif %}>Delcourt</a>
+	    <option value="/reco/?category=manga&editor=kaze" {% if editor == 'kaze' %} selected {% endif %}>Kaze</a>
+	  </select>
+          </div>
+	</form>
         <div align="right">
             Légende : 
-            <span class="label label-default"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
+            <span class="sample label custom large a"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
             <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
             <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
             <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
@@ -31,13 +45,18 @@
         {% include "work_poster.html" with category=category work=reco %}
     {% endfor %}
     </div>
-    <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
+    <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}&editor={{ editor }}" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
     <script>
     sort_mode = '';
-    $.getJSON('/data/reco/{{ category }}.json', function(data) {
+    $.getJSON('/data/reco/{{ category }}/{{ editor }}.json', function(data) {
         data.forEach(function(work, i) {
             displayWork(i + 1, work);
         });
+    });
+    $("[name='reco_willsee_ok']").bootstrapSwitch();
+    $("[name='reco_willsee_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
+       $.post('/reco_willsee/', {reco_willsee_ok: state});
+       location.href = '/reco/?category={{ category }}&editor={{ editor }}';
     });
     </script>
 {% else %}
