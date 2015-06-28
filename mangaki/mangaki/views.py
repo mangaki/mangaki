@@ -43,6 +43,11 @@ def get_rated_works(user):
     return rated_works
 
 
+def update_poster_if_nsfw(obj, user):
+    if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
+        obj.poster = '/static/img/nsfw.jpg'  # NSFW
+
+
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime
     form_class = SuggestionForm
@@ -52,12 +57,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AnimeDetail, self).get_context_data(**kwargs)
-        try:
-            if not self.request.user.profile.nsfw_ok and self.object.nsfw:
-                context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
-        except AttributeError:
-            if self.object.nsfw:
-                context['object'].poster = '/static/img/nsfw.jpg'
+        update_poster_if_nsfw(self.object, self.request.user)
         context['object'].source = context['object'].source.split(',')[0]
 
         genres = []
@@ -103,13 +103,9 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(MangaDetail, self).get_context_data(**kwargs)
-        try:
-            if not self.request.user.profile.nsfw_ok and self.object.nsfw:
-                context['object'].poster = '/static/img/nsfw.jpg'  # NSFW
-        except AttributeError:
-            if self.object.nsfw:
-                context['object'].poster = '/static/img/nsfw.jpg'
+        update_poster_if_nsfw(self.object, self.request.user)
         context['object'].source = context['object'].source.split(',')[0]
+
         genres = []
         for genre in context['object'].genre.all():
             genres.append(genre.title)
@@ -202,11 +198,8 @@ def get_card(request, category, sort_id=1):
     my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
     bundle = list(get_bundle(category, sort_mode, my_rated_works))
     work = pick_card(bundle, sort_mode, my_rated_works, deja_vu)
-    if not request.user.profile.nsfw_ok and work.nsfw:
-        poster = '/static/img/nsfw.jpg'
-    else:
-        poster = work.poster
-    card = {'id': work.id, 'title': work.title, 'poster': poster, 'category': category, 'synopsis': work.synopsis}
+    update_poster_if_nsfw(work, request.user)
+    card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category, 'synopsis': work.synopsis}
     return HttpResponse(json.dumps(card), content_type='application/json')
 
 
@@ -262,13 +255,7 @@ class AnimeList(ListView):
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(anime_list.number - 2, anime_list.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in anime_list:
-            try:
-                if not self.request.user.profile.nsfw_ok and obj.nsfw:
-                    obj.poster = '/static/img/nsfw.jpg'  # NSFW
-                obj.rating = my_rated_works.get(obj.id, None)
-            except AttributeError:
-                if obj.nsfw:
-                    obj.poster = '/static/img/nsfw.jpg'
+            update_poster_if_nsfw(obj, self.request.user)
         context['object_list'] = anime_list
         return context
 
@@ -324,16 +311,7 @@ class MangaList(ListView):
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(manga_list.number - 2, manga_list.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in manga_list:
-            try:
-                if not self.request.user.profile.nsfw_ok and obj.nsfw:
-                    obj.poster = '/static/img/nsfw.jpg'  # NSFW
-                if Rating.objects.filter(user=self.request.user, work=obj, choice='favorite').count() > 0:
-                    obj.rating = 'favorite'
-                else:
-                    obj.rating = my_rated_works.get(obj.id, None)
-            except AttributeError:
-                if obj.nsfw:
-                    obj.poster = '/static/img/nsfw.jpg'
+            update_poster_if_nsfw(obj, self.request.user)
         context['object_list'] = manga_list
         return context
 
@@ -508,8 +486,7 @@ def get_reco_list(request, category, editor):
             for rating in Rating.objects.filter(user=request.user):
                 my_rated_works[rating.work_id] = rating.choice
     for work, is_manga in get_recommendations(request.user, my_rated_works, category, editor):
-        if work.nsfw and not request.user.profile.nsfw_ok :
-            work.poster = '/static/img/nsfw.jpg'  # NSFW
+        update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'category': 'manga' if is_manga else 'anime'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
