@@ -41,6 +41,10 @@
             <h3><a href="/u/{{ user.username }}">{{ user.username }}</a></h3>
             <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
         </div>
+        {% if forloop.counter|divisibleby:4 %}
+    </div>
+    <div class="row">
+        {% endif %}
         {% endfor %}
     </div>
 </div>
