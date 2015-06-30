@@ -46,11 +46,11 @@ function loadMenureco() {
 
 $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
-    if (category == undefined) { location.href = '/u/' + selection.username ; }
+    if (selection.description == undefined) { location.href = '/u/' + selection.username ; }
     else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
-    if (category == undefined) { location.href = '/u/' + selection.username ; }
+    if (selection.description == undefined) { location.href = '/u/' + selection.username ; }
     else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
   }).on('change', function(object, datum) {
