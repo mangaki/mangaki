@@ -23,12 +23,35 @@ function loadMenu() {
   });
 }
 
+function loadMenureco() {
+  pieces = new Bloodhound({
+    datumTokenizer: function(d) { return d.tokens; },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    prefetch: '/recommend/' + work_id + '/' + target_id + '.json',
+    remote: '/recommend/' + work_id + '/' + target_id + '/%QUERY.json'
+  });
+
+  pieces.initialize();
+
+  $('.typeahead').typeahead(null, {
+    name: 'pieces',
+    source: pieces.ttAdapter(),
+    templates: {
+      suggestion: Handlebars.compile([
+        '<p class="repo-name">{{ username }}</p>',
+      ].join(''))
+    }
+  });
+}
+
 $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
-    location.href = '/' + category + '/' + selection.id;
+    if (category == undefined) { location.href = '/u/' + selection.username ; }
+    else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
-    location.href = '/' + category + '/' + selection.id;
+    if (category == undefined) { location.href = '/u/' + selection.username ; }
+    else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
   }).on('change', function(object, datum) {
     pieces.clearPrefetchCache();
