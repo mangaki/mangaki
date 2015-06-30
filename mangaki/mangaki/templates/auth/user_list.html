@@ -18,6 +18,11 @@
 </div>
 </br>
 <b>
+
+<form class="typeahead-demo {{ user.username }}">
+      <input type="text" data-username="{{ user.username }}" class="typeahead" placeholder="Rechercher un utilisateur" />
+</form>
+
 <div class="collapse navbar-collapse" id="menu-collapse">
    <ul class="nav navbar-nav">
 {% for letter in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
@@ -74,4 +79,7 @@
 <br />
 <br />
 <br />
+<script>
+loadMenuUser();
+</script>
 {% endblock %}

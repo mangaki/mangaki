@@ -432,6 +432,12 @@ def rate_work(request, work_id):
 #    return HttpResponse()
 
 
+def get_users(request, query=''):
+    data = []
+    for user in User.objects.all() if not query else User.objects.filter(username__icontains=query):
+        data.append({'id': user.id, 'username': user.username, 'tokens': user.username.lower().split()})
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
 def get_user_for_recommendations(request, work_id, target_id, query=''):
     data = []
     for user in User.objects.all() if not query else User.objects.filter(username__icontains=query):
