@@ -68,6 +68,7 @@ function loadMenuUser() {
 $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
     if (selection.description == undefined) { location.href = '/u/' + selection.username ; }
+//$.post('/recommend/'+ work_id +'/'+ target_id, {variable : etat});
     else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
