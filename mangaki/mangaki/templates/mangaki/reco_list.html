@@ -2,39 +2,47 @@
 
 {% block body %}
 {% if reco_list|length > 0 %}
+<div class"row">
+<div class=" col-md-12 col-sm-12">
     <div class="well">
         <p>
             Voici quatre recommandations qui devraient vous
             plaire.<br />
             Notez-les puis rechargez la page pour en faire apparaître
             d'autres.
+
+    Inclure la liste des "À voir" dans les recommandations : <input type="checkbox" name="reco_willsee_ok" {% if user.profile.reco_willsee_ok %} checked{% endif %}/>
+    <form name="editor_choice">
+      <div>
+      Filtrer par éditeur :
+      <select name="editorURL" onChange="document.location.href=document.editor_choice.editorURL.options[document.editor_choice.editorURL.selectedIndex].value">
+        <option value="/reco/?category={{ category }}" {% if editor == '' %} selected {% endif %}>Tous</option>
+        <option value="/reco/?category=manga&editor=Taifu" {% if editor == 'Taifu' %} selected {% endif %}> Taifu Comics</option>
+        <option value="/reco/?category=manga&editor=Ototo" {% if editor == 'Ototo' %} selected {% endif %}>Ototo Manga</option>
+        <!--<option value="/reco/?category=manga&editor=otototaifu" {% if editor == 'otototaifu' %} selected {% endif %}>Ototo/Taifu</a>-->
+        <option value="/reco/?category=manga&editor=delcourt" {% if editor == 'delcourt' %} selected {% endif %}>Delcourt</option>
+        <option value="/reco/?category=manga&editor=tonkam" {% if editor == 'tonkam' %} selected {% endif %}>Tonkam</option>
+        <option value="/reco/?category=manga&editor=soleil" {% if editor == 'soleil' %} selected {% endif %}>Soleil</option>
+        <option value="/reco/?category=manga&editor=kaze" {% if editor == 'kaze' %} selected {% endif %}>Kaze</option>
+      </select>
+      </div>
+    </form>
         </p>
-	Inclure la liste des "À voir" dans les recommandations : <input type="checkbox" name="reco_willsee_ok" {% if user.profile.reco_willsee_ok %} checked{% endif %}/>
-	<form name="editor_choice">
-	  <div>
-	  Filtrer par éditeur :
-	  <select name="editorURL" onChange="document.location.href=document.editor_choice.editorURL.options[document.editor_choice.editorURL.selectedIndex].value">
-	    <option value="/reco/?category={{ category }}" {% if editor == '' %} selected {% endif %}>Tous</a>
-	    <option value="/reco/?category=manga&editor=Taifu" {% if editor == 'Taifu' %} selected {% endif %}> Taifu Comics</a>
-	    <option value="/reco/?category=manga&editor=Ototo" {% if editor == 'Ototo' %} selected {% endif %}>Ototo Manga</a>
-	    <!--<option value="/reco/?category=manga&editor=otototaifu" {% if editor == 'otototaifu' %} selected {% endif %}>Ototo/Taifu</a>-->
-	    <option value="/reco/?category=manga&editor=delcourt" {% if editor == 'delcourt' %} selected {% endif %}>Delcourt</a>
-	    <option value="/reco/?category=manga&editor=tonkam" {% if editor == 'tonkam' %} selected {% endif %}>Tonkam</a>
-	    <option value="/reco/?category=manga&editor=soleil" {% if editor == 'soleil' %} selected {% endif %}>Soleil</a>
-	    <option value="/reco/?category=manga&editor=kaze" {% if editor == 'kaze' %} selected {% endif %}>Kaze</a>
-	  </select>
-          </div>
-	</form>
-        <div align="right">
+    </div>
+</div>
+<div class="row">
+        <div class="col-md-12 col-sm-12" align="center">
             Légende : 
-            <span class="sample label custom large a"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
+             <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
             <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
             <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
             <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
             <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux lire</span>
             <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas lire</span>
         </div>
-    </div>
+</div>
+<br />
+
     <ul class="nav nav-tabs">
         <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="/reco/">Tout</a></li>
         <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="/reco/?category=anime"><em>Anime</em> seulement</a></li>
@@ -42,12 +50,16 @@
     </ul>
     <br />
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
-    <div class="row mangas-list">
-    {% for reco, category in reco_list %}
-        {% include "work_poster.html" with category=category work=reco %}
-    {% endfor %}
+<div class="mangas-list">
+{% for reco, category in reco_list %}
+    {% include "work_poster.html" with category=category work=reco rating=reco.rating %}
+{% endfor %}
+</div>
+<div class="row margin">
+    <div class="col-md-12 col-sm-12">
+        <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}&editor={{ editor }}" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
     </div>
-    <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}&editor={{ editor }}" style="display: block; margin: auto">Je veux d'autres recommandations ! (Après avoir noté celles-ci.)</a>
+</div>
     <script>
     sort_mode = '';
     $.getJSON('/data/reco/{{ category }}/{{ editor }}.json', function(data) {

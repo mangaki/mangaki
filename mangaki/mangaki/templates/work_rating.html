@@ -1,10 +1,12 @@
-<div class="col-md-10 manga-snapshot">
-    <div class="manga-snapshot-image" style="background-image: url('{{ work.poster }}')" onclick="getSheet(this)"></div>
-</div>
-<div class="col-md-2 manga-votes" style="display: {% if category == 'dummy' %}none{% else %}block{% endif %}">
-     <a data-choice='favorite' class="sample btn custom large a{% if rating and rating != 'favorite' %} not-chosen{% endif %}" onclick="vote(this)" title="Mettre en favori" >
-        <span class="glyphicon glyphicon-star"></span>
-    </a>
+<div class="row">
+   
+    <div class="col-md-10 col-sm-9 col-xs-8 manga-snapshot">
+        <div class="manga-snapshot-image" style="background-image: url('{{ work.poster }}')" onclick="getSheet(this)"></div>
+    </div>
+        <div class="col-md-2 col-sm-3 col-xs-2 manga-votes" style="display: {% if category == 'dummy' %}none{% else %}block{% endif %}">
+
+            <a data-choice='favorite' class="btn btn-favorite btn-block a{% if rating and rating != 'favorite' %} not-chosen{% endif %}" onclick="vote(this)" title="Mettre en favori" ><span class="glyphicon glyphicon-star"></span></a>
+
     <a data-choice='like' class="btn btn-success btn-block{% if rating and rating != 'like' %} not-chosen{% endif %}" onclick="vote(this)" title="J'aime">
         <span class="glyphicon glyphicon-thumbs-up"></span>
     </a>
@@ -20,4 +22,5 @@
     <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote(this)" title="Je ne veux pas voir">
         <span class="glyphicon glyphicon-eye-close"></span>
     </a>
+</div>
 </div>
