@@ -1,14 +1,17 @@
+
+
 /*************
  *  GENERAL  *
  *************/
 body {
     background: #fdfdfd;
-    font-family: Arial;
+    font-family:'Open Sans', sans-serif;
 }
 
 .jumbotron {
     background: #fdfdfd;
 }
+
 
 /************
  *  HEADER  *
@@ -21,11 +24,72 @@ header nav.navbar {
 /**********
  *  BODY  *
  **********/
+
+.margin { margin: 30px 0 30px 0;}
+.margin10top { margin-top: 10px ;}
+
 /* Margin for body to prevent unused space from the header/footer nav menu. */
 body > .container {
     margin-top: 75px;
     margin-bottom: 75px;
+    
 }
+
+.well {
+    text-align: center;
+  min-height: 20px;
+  padding: 19px;
+  margin-bottom: 20px;
+  
+ border: 0px solid #e3e3e3;
+  border-radius: 0px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0);}
+
+p{
+    margin:0px;
+}
+input{
+line-height: normal;
+
+}
+/**********
+ *  CARROUSSEL  *
+ **********/
+.carousel-control.left{
+background-image: linear-gradient(to right,rgba(0,0,0,0) 0,rgba(0,0,0,0) 100%);
+
+
+}
+.carousel-control.right{
+background-image: linear-gradient(to right,rgba(0,0,0,0) 0,rgba(0,0,0,0) 100%);
+
+
+}
+/**********
+ *  BUTTON  *
+ **********/
+.btn-mangaki{
+color: #fff;
+background-color: #E84C15;
+
+}
+.btn:hover, .btn:focus {
+color: #fff;
+text-decoration: none;
+}
+.btn-lg{
+padding: 25px 25px;
+font-size: 20px;
+line-height: 1.33;
+border-radius: 5px;
+
+
+}
+
+
+
+
 
 /************
  *  FOOTER  *
@@ -41,35 +105,38 @@ footer .navbar-nav {
 }
 
 /* Footer is not fixed on small devices. */
-@media(max-width: 768px) {
+@media(min-width: 768px) and (max-width: 1000px) {
     footer .navbar-fixed-bottom {
     position: inherit;
     }
 }
+.copyright{
 
-
-
+font-size: 9px;
+text-align: center;
+color: #b2B2B2;
+}
 
 
 
 
 .mangas-list .manga-sheet .row {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 0px;
+    margin-right: -15px;
 }
 .mangas-list .manga-sheet .row > div {
     padding: 0;
 }
 .mangas-list .manga-sheet:hover .thumbnail {
-    background-color: #CCC;
-/*    margin-left: -10px;
+    background-color: #FFF;
+   /*margin-left: -10px;
     padding-left: 10px;
     margin-right: -10px;
-    padding-right: 10px; */
+    padding-right: 10px;*/
 }
-.mangas-list .manga-sheet:hover .manga-snapshot .manga-snapshot-image {
+/*.mangas-list .manga-sheet:hover .manga-snapshot .manga-snapshot-image {
     width: 100%;
-}
+}*/
 .mangas-list .manga-sheet .thumbnail:not(:hover) {
     /*background-color: #DDD;*/
     /*border-color: #DDD;*/
@@ -80,14 +147,12 @@ footer .navbar-nav {
     z-index: 64;
 }
 .mangas-list .manga-sheet .manga-snapshot .manga-snapshot-image {
-/*    width: 110%; */
-    height: 300px;
+    height: 321px;
+    width: 225px;
     background-size: cover;
-    border-radius: 8px;
-}
-
-.mangas-list .manga-sheet .manga-votes {
-    margin-top: 10px;
+    background-repeat: no-repeat!important;
+    
+   
 }
 
 .mangas-list .manga-sheet .row .btn {
@@ -97,12 +162,25 @@ footer .navbar-nav {
 .mangas-list .manga-sheet .row .btn:hover {
     z-index: 128;
 }
-@media(min-width: 769px) {
+.thumbnail {
+  display: block;
+  padding: 4px;
+  margin-bottom: 20px;
+  line-height: 1.42857143;
+  background-color: #fff;
+  border: 0px solid #ddd;
+    border-radius: 0px;
+  -webkit-transition: all .0s ease-in-out;
+  transition: all .0s ease-in-out;
+}
+@media(min-width: 768px) and (max-width: 1000px) {
     .mangas-list .manga-sheet .row .btn {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     }
 }
+
+
 
 .thumbnail .col-md-12 {
     height: 4em;
@@ -145,38 +223,12 @@ footer .navbar-nav {
     border-radius: 5px;
 }
 
-.btn.a
-{ 
-   background-color: hsl(63, 100%, 62%) !important; 
-   background-repeat: repeat-x; 
-   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#f8d549", endColorstr="#f8d549"); 
-   background-image: -khtml-gradient(linear, left top, left bottom, from#f8d549(), to(#f8d549)); 
-   background-image: -moz-linear-gradient(top, #f8d549, #f8d549); 
-   background-image: -ms-linear-gradient(top, #f8d549, #f8d549); 
-   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f8d549), color-stop(100%, #f8d549)); 
-   background-image: -webkit-linear-gradient(top, #f8d549, #f8d549); 
-   background-image: -o-linear-gradient(top, #f8d549, #f8d549); 
-   background-image: linear-gradient(#f8d549,#f8d549); 
-   border-color: #f8d549 #f8d549 hsl(63, 100%, 55%); 
-   color: #ffffff !important; 
-   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.46); 
-   -webkit-font-smoothing: antialiased;
-} 
+.btn-favorite {
+color: #fff;
+background-color: #f8d549;
+border-color: #f8d549;
 
-.label.a
-{ 
-   background-color: hsl(63, 100%, 62%) !important; 
-   background-repeat: repeat-x; 
-   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#f8d549", endColorstr="#f8d549"); 
-   background-image: -khtml-gradient(linear, left top, left bottom, from#f8d549(), to(#f8d549)); 
-   background-image: -moz-linear-gradient(top, #f8d549, #f8d549); 
-   background-image: -ms-linear-gradient(top, #f8d549, #f8d549); 
-   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f8d549), color-stop(100%, #f8d549)); 
-   background-image: -webkit-linear-gradient(top, #f8d549, #f8d549); 
-   background-image: -o-linear-gradient(top, #f8d549, #f8d549); 
-   background-image: linear-gradient(#f8d549,#f8d549); 
-   border-color: #f8d549 #f8d549 hsl(63, 100%, 55%); 
-   color: #ffffff !important; 
-   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.46); 
-   -webkit-font-smoothing: antialiased;
-} 
+}
+.label-favorite {
+background-color: #f8d549;
+}

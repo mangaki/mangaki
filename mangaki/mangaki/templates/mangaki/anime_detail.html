@@ -5,7 +5,7 @@
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 <div class="row mangas-list">
     <div class="col-xs-3 manga-sheet">
-        <div class="row" data-category="anime" data-id="{{ object.id }}">
+        <div class="row thumbnail" data-category="anime" data-id="{{ object.id }}">
             {% include "work_rating.html" with category="anime" work=object %}
         </div>
     </div>
@@ -77,7 +77,7 @@
 <script>
 work_id='{{ object.id }}';
 target_id='{{ user.id }}';
+sort_mode = '';
 loadMenureco();
-sort_mode='';
 </script>
 {% endblock %}

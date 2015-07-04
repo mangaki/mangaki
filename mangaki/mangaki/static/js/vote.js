@@ -1,32 +1,26 @@
 function getSheet(elt) {
-    if($(elt).closest('.row').data('category') != 'dummy')
-        location.href = '/' + $(elt).closest('.row').data('category') + '/' + $(elt).closest('.row').data('id');
+    entity = $(elt).closest('.thumbnail'); // See work_poster
+    if(entity.data('category') != 'dummy')
+        location.href = '/' + entity.data('category') + '/' + entity.data('id');
 }
 
 function vote(elt) {
-    work_id = $(elt).closest('.row').data('id');
+    entity = $(elt).closest('.thumbnail');
+    work_id = entity.data('id');
     choice = $(elt).data('choice');
-    pos = $(elt).closest('.row').data('pos');
+    pos = entity.data('pos');
     $.post('/work/' + work_id, {choice: choice}, function(rating) {
         if(rating == '')
             window.location = '/user/signup';
         dejaVu = $('[data-id]').map(function() {return $(this).data('id');}).get();
-        if(typeof sort_mode !== 'undefined' && sort_mode == 'mosaic' && rating && rating != 'sorry') {
+        if(sort_mode == 'mosaic' && rating)
             loadCard(pos, dejaVu);
-            $('#sorry').hide();
-        } else {
-            if (rating != 'sorry') {
-                $('#sorry').hide();
-                $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
-                if(rating == 'none')
-                    $(elt).addClass('not-chosen');
-                else if(rating)
-                    $(elt).removeClass('not-chosen');
-            } else {
-                if($('#sorry').css('display') == 'none')
-                $('#sorry').show();
-                $('#sorry').html('Désolé mais vous avez déjà 10 favoris...');
-            }
+        else {
+            $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
+            if(rating == 'none')
+                $(elt).addClass('not-chosen');
+            else if(rating)
+                $(elt).removeClass('not-chosen');
         }
     });
 }
@@ -62,13 +56,13 @@ function displayWork(pos, work) {
         display_votes = false;
     }
     selector = ':nth-child(' + pos + ')';
-    work_div = $('.manga-sheet' + selector + ' .row');
+    work_div = $('.manga-sheet' + selector + ' .thumbnail');
     work_div.data('category', work['category']);
     work_div.data('id', work['id']);
-    work_div.find('h1 a').text(work['title']);
-    work_div.find('h1 a').attr('title', work['synopsis']); 
+    work_div.find('h4 a').text(work['title']);
+    work_div.find('h4 a').attr('title', work['synopsis']); 
     $('[data-toggle="tooltip"]').tooltip('fixTitle');
-    work_div.find('h1 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
+    work_div.find('h4 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
     work_div.find('.manga-snapshot-image').hide().css('background-image', 'url(' + work['poster'] + ')').fadeIn();
     if(display_votes)
         work_div.find('.manga-votes').fadeIn();
