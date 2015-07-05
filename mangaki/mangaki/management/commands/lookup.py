@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = 'Lookup some work'
     def handle(self, *args, **options):
         work = Work.objects.filter(title__icontains=args[0]).annotate(Count('rating')).order_by('-rating__count')[0]
-        print(work.title)
+        print(work.title, work.id)
         nb = Counter()
         for rating in Rating.objects.filter(work=work):
             nb[rating.choice] += 1
