@@ -59,7 +59,7 @@ def get_recommendations(user, my_rated_works, category, editor):
     for i, work_id in enumerate(works):
         # Adding interesting works to the arena
         # Temporarily, a recommendation can be issued from one single user (beware of hentai)
-        if (nb_ratings[work_id] > 1 or work_id in manga_ids) and work_id not in banned_works and works[work_id][0] > 0:
+        if nb_ratings[work_id] > 1 and work_id not in banned_works and works[work_id][0] > 0:
             final_works[(work_id, work_id in manga_ids)] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
 
     reco = []
