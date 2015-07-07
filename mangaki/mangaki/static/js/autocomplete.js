@@ -23,12 +23,12 @@ function loadMenu() {
   });
 }
 
-function loadMenureco() {
+function loadMenuReco() {
   pieces = new Bloodhound({
     datumTokenizer: function(d) { return d.tokens; },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    prefetch: '/recommend/' + work_id + '/' + target_id + '.json',
-    remote: '/recommend/' + work_id + '/' + target_id + '/%QUERY.json'
+    prefetch: '/getuser/' + work_id + '/' + target_id + '.json',
+    remote: '/getuser/' + work_id + '/' + target_id + '/%QUERY.json'
   });
 
   pieces.initialize();
@@ -67,12 +67,17 @@ function loadMenuUser() {
 
 $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
-    if (selection.description == undefined) { location.href = '/u/' + selection.username ; }
-//$.post('/recommend/'+ work_id +'/'+ target_id, {variable : etat});
+    if (selection.description == undefined) { 
+	if (selection.work_id == undefined) { location.href = '/u/' + selection.username ; }
+	else { $.post('/recommend/'+ selection.work_id +'/'+ selection.id); }
+    }
     else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
-    if (selection.description == undefined) { location.href = '/u/' + selection.username ; }
+    if (selection.description == undefined) { 
+	if (selection.work_id == undefined) { location.href = '/u/' + selection.username ; }
+	else { $.post('/recommend/'+ selection.work_id +'/'+ selection.id); }
+    }
     else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
   }).on('change', function(object, datum) {

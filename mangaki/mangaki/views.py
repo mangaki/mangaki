@@ -13,7 +13,7 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -428,7 +428,7 @@ def recommend_work(request, work_id,target_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         target_user = get_object_or_404(User, id=target_id)
-        Recommandation.objects.update_or_create(user=request.user, work=work, target_user=target_user)
+        Recommendation.objects.update_or_create(user=request.user, work=work, target_user=target_user)
     return HttpResponse()
 
 
@@ -441,7 +441,7 @@ def get_users(request, query=''):
 def get_user_for_recommendations(request, work_id, target_id, query=''):
     data = []
     for user in User.objects.all() if not query else User.objects.filter(username__icontains=query):
-        data.append({'id': user.id, 'username': user.username, 'tokens': user.username.lower().split()})
+        data.append({'id': user.id, 'username': user.username, 'work_id' : work_id, 'tokens': user.username.lower().split()})
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 class MarkdownView(DetailView):

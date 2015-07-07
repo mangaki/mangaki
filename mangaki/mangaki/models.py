@@ -167,7 +167,7 @@ class Announcement(models.Model):
     def __str__(self):
         return self.title
 
-class Recommandation(models.Model):
+class Recommendation(models.Model):
     user = models.ForeignKey(User)
     target_user = models.ForeignKey(User, related_name='target_user')
     work = models.ForeignKey(Work)

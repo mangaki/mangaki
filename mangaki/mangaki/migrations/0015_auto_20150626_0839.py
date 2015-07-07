@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Recommandation',
+            name='Recommendation',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('target_user', models.ForeignKey(related_name='target_user', to=settings.AUTH_USER_MODEL)),
