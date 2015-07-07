@@ -27,8 +27,8 @@ function loadMenuReco() {
   pieces = new Bloodhound({
     datumTokenizer: function(d) { return d.tokens; },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    prefetch: '/getuser/' + work_id + '/' + target_id + '.json',
-    remote: '/getuser/' + work_id + '/' + target_id + '/%QUERY.json'
+    prefetch: '/getuser/' + work_id + '.json',
+    remote: '/getuser/' + work_id + '/%QUERY.json'
   });
 
   pieces.initialize();
