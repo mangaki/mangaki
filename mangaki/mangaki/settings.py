@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.twitter',
     'bootstrapform',
-    'debug_toolbar'
+#    'debug_toolbar'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -72,7 +72,7 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend"
 )
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # TODO only debug
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

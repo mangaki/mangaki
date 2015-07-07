@@ -256,6 +256,8 @@ class AnimeList(ListView):
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in anime_list:
             update_poster_if_nsfw(obj, self.request.user)
+            if self.request.user.is_authenticated():
+                obj.rating = my_rated_works.get(obj.id, None)  # Necessary for displaying current ratings on AnimeList
         context['object_list'] = anime_list
         return context
 
@@ -312,6 +314,8 @@ class MangaList(ListView):
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
         for obj in manga_list:
             update_poster_if_nsfw(obj, self.request.user)
+            if self.request.user.is_authenticated():
+                obj.rating = my_rated_works.get(obj.id, None)
         context['object_list'] = manga_list
         return context
 
@@ -410,6 +414,11 @@ def index(request):
 def about(request):
     return render(request, 'about.html')
 
+
+def events(request):
+    return render(request, 'events.html')
+
+
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -483,17 +492,21 @@ def get_reco_list(request, category, editor):
     # category = request.GET.get('category', 'all')
     #editor = request.GET.get('editor', '')
     reco_list = []
-    my_rated_works={}
+    my_rated_works = {}
+    willsee = set()
     if request.user.is_authenticated():
         if request.user.profile.reco_willsee_ok:
-            for rating in Rating.objects.filter(user=request.user).exclude(choice='willsee'):
-                my_rated_works[rating.work_id] = rating.choice
+            for rating in Rating.objects.filter(user=request.user):
+                if rating.choice != 'willsee':
+                    my_rated_works[rating.work_id] = rating.choice
+                else:
+                    willsee.add(rating.work.id)
         else:
             for rating in Rating.objects.filter(user=request.user):
                 my_rated_works[rating.work_id] = rating.choice
     for work, is_manga in get_recommendations(request.user, my_rated_works, category, editor):
         update_poster_if_nsfw(work, request.user)
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'category': 'manga' if is_manga else 'anime'})
+        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if work.id in willsee else 'None'})  # Does not work
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 
@@ -505,7 +518,7 @@ def get_reco(request):
     dummy = Work(title='Chargement…', poster='/static/img/chiro.gif')
     for _ in range(4):
         reco_list.append((dummy, 'dummy'))
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor })
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
 
 
 def update_shared(request):
