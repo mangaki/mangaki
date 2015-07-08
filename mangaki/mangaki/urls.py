@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     url(r'^getuser/(?P<work_id>\w+)\.json$', 'mangaki.views.get_user_for_recommendations'),
     url(r'^getuser\.json$', 'mangaki.views.get_users'),
     url(r'^recommend/(?P<work_id>\w+)/(?P<target_id>\w+)$', 'mangaki.views.recommend_work'),
+    url(r'^removeReco/(?P<work_id>\d+)/(?P<username>\w+)/(?P<targetname>\w+)$', 'mangaki.views.remove_reco'),
     url(r'^users/', UserList.as_view()),
     url(r'^user/', include('allauth.urls')),
     url(r'^u/(?P<username>.+)$', 'mangaki.views.get_profile'), # login_required?

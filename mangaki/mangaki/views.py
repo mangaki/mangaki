@@ -373,6 +373,24 @@ def get_profile(request, username):
     unseen_anime_list = []
     seen_manga_list = []
     unseen_manga_list = []
+
+    received_recommendation_list = []
+    sent_recommendation_list = []
+    received_recommendations = Recommendation.objects.filter(target_user__username=username)
+    sent_recommendations = Recommendation.objects.filter(user__username=username)
+    for reco in received_recommendations:
+        try:
+            reco.work.anime
+            received_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
+        except Anime.DoesNotExist:
+            received_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
+    for reco in sent_recommendations:
+        try:
+            reco.work.anime
+            sent_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
+        except Anime.DoesNotExist:
+            sent_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
+
     for rating in rating_list:
         seen = rating.choice in ['favorite', 'like', 'neutral', 'dislike']
         try:
@@ -399,6 +417,8 @@ def get_profile(request, username):
         'manga_count': len(seen_manga_list),
         'seen_list': seen_list if is_shared else [],
         'unseen_list': unseen_list if is_shared else [],
+        'received_recommendation_list': received_recommendation_list if is_shared else [],
+        'sent_recommendation_list': sent_recommendation_list if is_shared else [],
     })
 
 
@@ -508,6 +528,12 @@ def get_reco_list(request, category, editor):
         update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if work.id in willsee else 'None'})  # Does not work
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
+
+def remove_reco(request, work_id, username, targetname):
+    work = get_object_or_404(Work, id=work_id)
+    user = get_object_or_404(User, username=username)
+    target = get_object_or_404(User, username=targetname)
+    Recommendation.objects.get(work=work,user=user,target_user=target).delete()
 
 
 @login_required

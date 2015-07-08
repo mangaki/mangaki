@@ -36,6 +36,7 @@
 <ul class="nav nav-tabs">
     <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="/u/{{ username }}">Liste d'<em>anime</em> de {{ username }} <span class="badge alert-info">{{ anime_count }}</span></a></li>
     <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="/u/{{ username }}?category=manga">Liste de mangas de {{ username }} <span class="badge alert-info">{{ manga_count }}</span></a></li>
+    <li role="presentation"{% if category == 'recommendation' %} class="active"{% endif %}><a href="/u/{{ username }}?category=recommendation">Liste de recommandations de {{ username }}</a></li>
     {% if best_neighbors_list %}
     <li role="presentation"{% if category == 'neighbor' %} class="active"{% endif %}><a href="/u/{{ username }}?category=neighbor">Les {{ neighbor_count }} plus proches voisins de {{ username }}</a></li>
     {% endif %}
@@ -61,6 +62,24 @@
            {% endfor %}  
         </div>
     {% else %}
+    {% if category == 'recommendation' %}
+        <div class="col-xs-4 col-xs-offset-1">
+            <h1>Recommandations envoyées</h1>
+            {% for object in sent_recommendation_list %}
+                <p class="row flatlist"><a href="/{{ object.category }}/{{ object.id }}">{{ object.title }}</a> a été conseillé à <a href="/u/{{ object.username }}">{{ object.username }}</a> {% if request.user.username == username %}<a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}" data-target="{{ object.username }}" data-user="{{ username }}" onclick="removeReco(this)" title="supprimer la recommandation"><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
+            {% empty %}
+                <p>(Cette liste est vide.)</p>
+            {% endfor %}
+        </div>
+        <div class="col-xs-4 col-xs-offset-1">
+            <h1>Recommandations reçues</h1>
+            {% for object in received_recommendation_list %}
+                <p class="row flatlist"><a href="/{{ object.category }}/{{ object.id }}">{{ object.title }}</a> est conseillé par <a href="/u/{{ object.username }}">{{ object.username }}</a> {% if request.user.username == username %}<a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}" data-target="{{ username }}" data-user="{{ object.username }}" onclick="removeReco(this)" title="supprimer la recommandation"><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
+            {% empty %}
+                <p>(Cette liste est vide.)</p>
+            {% endfor %}
+        </div>
+    {% else %}
         <div class="col-xs-4 col-xs-offset-1">
             <h1>{% if category == 'anime' %}<a href="/anime">Anime</a> vus{% else %}<a href="/manga">Mangas</a> lus{% endif %}</h1>
             {% for object in seen_list %}
@@ -77,6 +96,7 @@
                 <p>(Cette liste est vide.)</p>
             {% endfor %}
         </div>
+    {% endif %}
     {% endif %}
     {% endif %}
 </div>
@@ -98,5 +118,10 @@ $("#import_mal").on('click', function() {
         location.reload();
     });
 });
+
+function removeReco(elt) {
+  $.post('/removeReco/' + $(elt).data('work') + '/' + $(elt).data('user') + '/' + $(elt).data('target'));
+  location.reload();
+}
 </script>
 {% endblock %}
