@@ -448,6 +448,8 @@ def rate_work(request, work_id):
         if Rating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
             Rating.objects.filter(user=request.user, work=work, choice=choice).delete()
             return HttpResponse('none')
+        if choice in ['favorite','like','neutral','dislike']:
+            Recommendation.objects.filter(target_user=request.user, work=work).delete()
         Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
     return HttpResponse()
@@ -457,6 +459,10 @@ def recommend_work(request, work_id,target_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         target_user = get_object_or_404(User, id=target_id)
+        if target_user == request.user:
+            return HttpResponse('nonsense')
+        if Recommendation.objects.filter(user=request.user, work=work, target_user=target_user).count() > 0:
+            return HttpResponse('double')
         if not Rating.objects.filter(user=target_user, work=work, choice__in=['favorite','like','neutral','dislike']):
             Recommendation.objects.update_or_create(user=request.user, work=work, target_user=target_user)
             return HttpResponse('success')

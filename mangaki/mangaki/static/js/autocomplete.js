@@ -80,6 +80,10 @@ $(document).ready(function() {
 		       $('#success-reco').hide();
 		       if($('#alert-reco').css('display') == 'none')
 			   $('#alert-reco').show();
+		       if (status == 'nonsense')
+			   $('#alert-reco').html('Vous ne pouvez pas vous adresser vos propres recommandations!');
+		       if (status == 'double')
+			   $('#alert-reco').html('Vous avez déjà effectué cette recommandation');
 		   }
 	       }); 
 	}
@@ -100,6 +104,10 @@ $(document).ready(function() {
 		       $('#success-reco').hide();
 		       if($('#alert-reco').css('display') == 'none')
 			   $('#alert-reco').show();
+		       if (status == 'nonsense')
+			   $('#alert-reco').html('Vous ne pouvez pas vous adresser vos propres recommandations!');
+		       if (status == 'double')
+			   $('#alert-reco').html('Vous avez déjà effectué cette recommandation');
 		   }
 	       }); 
 	}
