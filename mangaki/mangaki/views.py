@@ -22,7 +22,7 @@ from mangaki.utils.recommendations import get_recommendations
 from markdown import markdown
 from urllib.parse import urlencode
 from itertools import groupby
-from random import shuffle
+from random import shuffle, randint
 import datetime
 import json
 
@@ -160,7 +160,7 @@ def get_scores(bundle, ranking='controversy'):
         elif ranking == 'top':
             score[work_id] = nb_likes if nb_dislikes <= 20 else 0
         elif ranking == 'random':  # Perles au hasard
-            score[work_id] = nb_likes if nb_dislikes <= 5 and nb_likes >= 3 else 0
+            score[work_id] = randint(1, 42) if nb_dislikes <= 5 and nb_likes >= 3 else 0
     return score
 
 
