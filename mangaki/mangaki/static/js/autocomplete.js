@@ -69,14 +69,40 @@ $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
     if (selection.description == undefined) { 
 	if (selection.work_id == undefined) { location.href = '/u/' + selection.username ; }
-	else { $.post('/recommend/'+ selection.work_id +'/'+ selection.id); }
+	else { 
+	       $.post('/recommend/'+ selection.work_id +'/'+ selection.id, function(status) {
+		   if (status == 'success') {
+		       $('#alert-reco').hide();
+		       if($('#success-reco').css('display') == 'none')
+			   $('#success-reco').show();
+		   }
+		   else {
+		       $('#success-reco').hide();
+		       if($('#alert-reco').css('display') == 'none')
+			   $('#alert-reco').show();
+		   }
+	       }); 
+	}
     }
     else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
     if (selection.description == undefined) { 
 	if (selection.work_id == undefined) { location.href = '/u/' + selection.username ; }
-	else { $.post('/recommend/'+ selection.work_id +'/'+ selection.id); }
+	else { 
+	       $.post('/recommend/'+ selection.work_id +'/'+ selection.id,  function(status) {
+		   if (status == 'success') {
+		       $('#alert-reco').hide();
+		       if($('#success-reco').css('display') == 'none')
+			   $('#success-reco').show();
+		   }
+		   else {
+		       $('#success-reco').hide();
+		       if($('#alert-reco').css('display') == 'none')
+			   $('#alert-reco').show();
+		   }
+	       }); 
+	}
     }
     else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
