@@ -70,7 +70,9 @@
     $("[name='reco_willsee_ok']").bootstrapSwitch();
     $("[name='reco_willsee_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
        $.post('/reco_willsee/', {reco_willsee_ok: state});
-       location.href = '/reco/?category={{ category }}&editor={{ editor }}';
+       setTimeout(function(){
+          location.reload();
+       }, 500);
     });
     </script>
 {% else %}
