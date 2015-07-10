@@ -80,6 +80,10 @@ $(document).ready(function() {
 		       $('#success-reco').hide();
 		       if($('#alert-reco').css('display') == 'none')
 			   $('#alert-reco').show();
+		       if (category == 'anime')
+			   $('#alert-reco').html('Cet utilisateur a déjà vu l\'anime que vous voulez lui recommander');
+		       else
+			   $('#alert-reco').html('Cet utilisateur a déjà lu le manga que vous voulez lui recommander');
 		       if (status == 'nonsense')
 			   $('#alert-reco').html('Vous ne pouvez pas vous adresser vos propres recommandations!');
 		       if (status == 'double')
@@ -104,6 +108,10 @@ $(document).ready(function() {
 		       $('#success-reco').hide();
 		       if($('#alert-reco').css('display') == 'none')
 			   $('#alert-reco').show();
+		       if (category == 'anime')
+			   $('#alert-reco').html('Cet utilisateur a déjà vu l\'anime que vous voulez lui recommander');
+		       else
+			   $('#alert-reco').html('Cet utilisateur a déjà lu le manga que vous voulez lui recommander');
 		       if (status == 'nonsense')
 			   $('#alert-reco').html('Vous ne pouvez pas vous adresser vos propres recommandations!');
 		       if (status == 'double')
