@@ -78,6 +78,7 @@
             {% empty %}
                 <p>(Cette liste est vide.)</p>
             {% endfor %}
+	    {% if request.user.username == username and received_recommendation_list %}<p class="row flatlist"><a class="btn btn-danger" data-target="{{ username }}" onclick="removeAllReco(this)" title="supprimer toutes les recommandations reçues"><span class="label label-danger"><span class="glyphicon glyphicon-remove"></span> Supprimer toutes les recommandations reçues</span></a></p>{% endif %}
         </div>
     {% else %}
         <div class="col-xs-4 col-xs-offset-1">
@@ -121,6 +122,11 @@ $("#import_mal").on('click', function() {
 
 function removeReco(elt) {
   $.post('/removeReco/' + $(elt).data('work') + '/' + $(elt).data('user') + '/' + $(elt).data('target'));
+  location.reload();
+}
+
+function removeAllReco(elt) {
+  $.post('/removeReco/' + $(elt).data('target'));
   location.reload();
 }
 </script>

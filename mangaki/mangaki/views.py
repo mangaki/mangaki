@@ -541,7 +541,13 @@ def remove_reco(request, work_id, username, targetname):
     work = get_object_or_404(Work, id=work_id)
     user = get_object_or_404(User, username=username)
     target = get_object_or_404(User, username=targetname)
-    Recommendation.objects.get(work=work,user=user,target_user=target).delete()
+    if request.user == user or request.user == target:
+        Recommendation.objects.get(work=work,user=user,target_user=target).delete()
+
+def remove_all_reco(request, targetname):
+    target = get_object_or_404(User, username=targetname)
+    if target == request.user:
+        Recommendation.objects.filter(target_user=target).delete()
 
 
 @login_required
