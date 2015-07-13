@@ -46,6 +46,8 @@ def get_rated_works(user):
 def update_poster_if_nsfw(obj, user):
     if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
         obj.poster = '/static/img/nsfw.jpg'  # NSFW
+    #else:
+    #    obj.poster = '/static/img/posters/'+ str(obj.id) +'.jpg'
 
 
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
@@ -214,7 +216,7 @@ class AnimeList(ListView):
         letter = self.request.GET.get('letter', '')
         bundle = get_bundle('anime', sort_mode)
         if letter:
-            bundle = Anime.objects.all()
+            bundle = Anime.objects.all().order_by('title')
             if letter == '0':  # '#'
                 bundle = bundle.exclude(title__regex=r'^[a-zA-Z]')
             else:
@@ -273,7 +275,7 @@ class MangaList(ListView):
         letter = self.request.GET.get('letter', '')
         bundle = get_bundle('manga', sort_mode)
         if letter:
-            bundle = Manga.objects.all()
+            bundle = Manga.objects.all().order_by('title')
             if letter == '0':  # '#'
                 bundle = bundle.exclude(title__regex=r'^[a-zA-Z]')
             else:
