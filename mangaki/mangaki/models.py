@@ -115,9 +115,10 @@ class Profile(models.Model):
     reco_willsee_ok = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
+    score = models.IntegerField(default=0)
 
     def get_anime_count(self):
-        return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike']).count()
+        return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike','favorite']).count()
 
     def get_avatar_url(self):
         if not self.avatar_url:
@@ -144,6 +145,49 @@ class Suggestion(models.Model):
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
 
+    def current_work_data(self):
+        include_bootstrap = '    <link rel="stylesheet" href="/static/css/bootstrap.min.css" /><link rel="stylesheet" href="/static/css/bootstrap-switch.min.css" /><link rel="stylesheet" href="/static/css/typeahead.css" /><link rel="stylesheet" href="/static/css/skin.css" /><link rel="stylesheet" href="/static/css/test.css" />'
+        title = '<h1>' + self.work.title + '</h1>'
+        poster = '<div style="background-image: url(\'' + self.work.poster + '\'); background-repeat: no-repeat; position: center; background-size: 100%; background-position: center; height: 350px; max-width: 225px; margin-left: auto; margin-right: auto"></div>'
+        synopsis = '<div class="well">' + self.work.synopsis + '</div>'
+        try:
+            self.work.manga
+        except AttributeError:
+            editor = '<div>Éditeur : ' + str(self.work.anime.editor) + '</div>'
+            origin = '<div>Origine : ' + self.work.anime.origin + '</div>'
+            genres_list = []
+            for genre in self.work.anime.genre.all():
+                genres_list.append(genre.title)
+            genres = '<div>Genres : ' + ', '.join(genres_list) + '</div>'
+            work_type = '<div>Type : ' + self.work.anime.anime_type + '</div>'
+            author = '<div>Auteur : ' + str(self.work.anime.author) + '</div>'
+            nb_episodes = '<div>Nombre d\'épisodes : ' + self.work.anime.nb_episodes + '</div>'
+            data = nb_episodes + author + editor + origin + genres + work_type
+            link = '<div><a href="/admin/mangaki/anime/' + str(self.work.id) + '/"><b>Éditer les informations</b></a></div>'
+        else:
+            editor = '<div>Éditeur : ' + str(self.work.manga.editor.title) + '</div>'
+            origin = '<div>Origine : ' + self.work.manga.origin + '</div>'
+            genres_list = []
+            for genre in self.work.manga.genre.all():
+                genres_list.append(genre.title)
+            genres = '<div>Genres : ' + ', '.join(genres_list) + '</div>'
+            work_type = '<div>Type : ' + self.work.manga.manga_type + '</div>'
+            mangaka = '<div>Dessin : ' + str(self.work.manga.mangaka) + '</div>'
+            writer = '<div>Scénario : ' + str(self.work.manga.writer) + '</div>'
+            vo_title = '<div>Titre original : ' + self.work.manga.vo_title + '</div>'
+            data = vo_title + mangaka + writer + editor + origin + genres + work_type
+            link = '<div><a href="/admin/mangaki/manga/' + str(self.work.id) + '/"><b>Éditer les informations</b></a></div>'
+        return include_bootstrap + '<div class="row"><div class="col-xs-2">' + poster + '</div><div class="col-xs-7">' + title +'<br/>' +  data + '<br/>' + synopsis + link + '</div></div>'
+    current_work_data.allow_tags = True
+
+#    def update_scores(self):
+#        if self.is_checked==True:
+#            self.user.profile.score += 5
+#            Profile.objects.filter(user=self.user).update(score=self.user.profile.score)
+
+#def suggestion_saved(sender, instance, *args, **kwargs):
+#    instance.update_scores()
+#models.signals.post_save.connect(suggestion_saved, sender=Suggestion)
 
 class Neighborship(models.Model):
     user = models.ForeignKey(User)

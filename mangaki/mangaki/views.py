@@ -49,6 +49,31 @@ def update_poster_if_nsfw(obj, user):
     #else:
     #    obj.poster = '/static/img/posters/'+ str(obj.id) +'.jpg'
 
+def update_score_while_rating(user, work, choice):
+    recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
+    for reco in recommendations_list:
+        if choice == 'like':
+            reco.user.profile.score += 1
+        if choice == 'favorite':
+            reco.user.profile.score += 5
+        if Rating.objects.filter(user=user, work=work, choice='like').count() > 0:
+            reco.user.profile.score -= 1
+        if Rating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
+            reco.user.profile.score -= 5
+        Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
+
+def update_score_while_unrating(user, work, choice):
+    recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
+    for reco in recommendations_list:
+        if choice == 'like':
+            reco.user.profile.score -= 1
+            Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
+        if choice == 'favorite':
+            reco.user.profile.score -= 5
+            Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
+
+def get_score(user):
+    return user.profile.score + 5 * Suggestion.objects.filter(user=user, is_checked=True).count()
 
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime
@@ -355,9 +380,13 @@ class UserList(ListView):
         context['params'] = {'letter': letter, 'page': page}
         context['url'] = urlencode({'letter': letter})
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(user_list.number - 2, user_list.number + 2 + 1))
+        for user in user_list:
+            user.profile.score = get_score(user)
         context['object_list'] = user_list
 
         context['trio_elm'] = User.objects.filter(username__in=['jj', 'Lily', 'Sedeto'])
+        for user in context['trio_elm']:
+            user.profile.score = get_score(user)
         return context
 
 
@@ -383,15 +412,19 @@ def get_profile(request, username):
     for reco in received_recommendations:
         try:
             reco.work.anime
-            received_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
+            if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                received_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
         except Anime.DoesNotExist:
-            received_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
+            if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                received_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
     for reco in sent_recommendations:
         try:
             reco.work.anime
-            sent_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
+            if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                sent_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
         except Anime.DoesNotExist:
-            sent_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
+            if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                sent_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
 
     for rating in rating_list:
         seen = rating.choice in ['favorite', 'like', 'neutral', 'dislike']
@@ -411,6 +444,7 @@ def get_profile(request, username):
     unseen_list = unseen_anime_list if category == 'anime' else unseen_manga_list
     return render(request, 'profile.html', {
         'username': username,
+        'score': get_score(user),
         'is_shared': is_shared,
         'category': category,
         'avatar_url': user.profile.get_avatar_url(),
@@ -449,9 +483,9 @@ def rate_work(request, work_id):
             return HttpResponse()        
         if Rating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
             Rating.objects.filter(user=request.user, work=work, choice=choice).delete()
+            update_score_while_unrating(request.user, work, choice)
             return HttpResponse('none')
-        if choice in ['favorite','like','neutral','dislike']:
-            Recommendation.objects.filter(target_user=request.user, work=work).delete()
+        update_score_while_rating(request.user, work, choice)
         Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
     return HttpResponse()
@@ -543,13 +577,16 @@ def remove_reco(request, work_id, username, targetname):
     work = get_object_or_404(Work, id=work_id)
     user = get_object_or_404(User, username=username)
     target = get_object_or_404(User, username=targetname)
-    if request.user == user or request.user == target:
+    if Rating.objects.filter(user=target, work=work, choice__in=['favorite','like','neutral','dislike']).count() == 0 and (request.user == user or request.user == target):
         Recommendation.objects.get(work=work,user=user,target_user=target).delete()
 
 def remove_all_reco(request, targetname):
     target = get_object_or_404(User, username=targetname)
     if target == request.user:
-        Recommendation.objects.filter(target_user=target).delete()
+        reco_list = Recommendation.objects.filter(target_user=target)
+        for reco in reco_list:
+            if Rating.objects.filter(user=request.user, work=reco.work, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                reco.delete()
 
 
 @login_required

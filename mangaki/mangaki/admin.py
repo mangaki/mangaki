@@ -116,6 +116,7 @@ class PageAdmin(admin.ModelAdmin):
 class SuggestionAdmin(admin.ModelAdmin):
     list_display = ('work', 'problem', 'date', 'user', 'is_checked')
     list_filter = ('problem',)
+    readonly_fields = ('current_work_data',)
     actions = ['check_suggestions','uncheck_suggestions']
     def check_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=True)
