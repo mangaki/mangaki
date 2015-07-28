@@ -116,6 +116,10 @@ $("[name='nsfw_ok']").bootstrapSwitch();
 $("[name='nsfw_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
     $.post('/nsfw/', {nsfw_ok: state});
 });
+$("[name='newsletter_ok']").bootstrapSwitch();
+$("[name='newsletter_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
+    $.post('/newsletter/', {newsletter_ok: state});
+});
 $("#import_mal").on('click', function() {
     $.post('/mal/' + $('#mal_username').val(), function(data) {
         console.log(data);
