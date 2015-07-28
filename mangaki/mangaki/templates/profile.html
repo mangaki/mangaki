@@ -23,6 +23,8 @@
             <hr />
 	    Afficher visuels pour public averti : <input type="checkbox" name="nsfw_ok" {% if user.profile.nsfw_ok %} checked{% endif %}/>
             <hr />
+	    Recevoir la newsletter : <input type="checkbox" name="newsletter_ok" {% if user.profile.newsletter_ok %} checked{% endif %}/>
+            <hr />
             <p>Importer depuis myAnimeList :</p>
             <div class="input-group">
                 <input type="text" class="form-control" id="mal_username" placeholder="Ton login" onkeydown="if(event.keyCode == 13) {$('#import_mal').click(); this.value = ''};" />
