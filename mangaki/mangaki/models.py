@@ -181,14 +181,21 @@ class Suggestion(models.Model):
         return include_bootstrap + '<div class="row"><div class="col-xs-2">' + poster + '</div><div class="col-xs-7">' + title +'<br/>' +  data + '<br/>' + synopsis + link + '</div></div>'
     current_work_data.allow_tags = True
 
-#    def update_scores(self):
-#        if self.is_checked==True:
-#            self.user.profile.score += 5
-#            Profile.objects.filter(user=self.user).update(score=self.user.profile.score)
+    def update_scores(self):
+        suggestions_score = 5 * Suggestion.objects.filter(user=self.user, is_checked=True).count()
+        recommendations_score = 0
+        reco_list = Recommendation.objects.filter(user=self.user)
+        for reco in reco_list:
+            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count()>0:
+                recommendations_score += 1
+            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count()>0:
+                recommendations_score += 5
+        score = suggestions_score + recommendations_score
+        Profile.objects.filter(user=self.user).update(score=score)
 
-#def suggestion_saved(sender, instance, *args, **kwargs):
-#    instance.update_scores()
-#models.signals.post_save.connect(suggestion_saved, sender=Suggestion)
+def suggestion_saved(sender, instance, *args, **kwargs):
+    instance.update_scores()
+models.signals.post_save.connect(suggestion_saved, sender=Suggestion)
 
 class Neighborship(models.Model):
     user = models.ForeignKey(User)

@@ -73,7 +73,7 @@ def update_score_while_unrating(user, work, choice):
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
 def get_score(user):
-    return user.profile.score + 5 * Suggestion.objects.filter(user=user, is_checked=True).count()
+    return user.profile.score #+ 5 * Suggestion.objects.filter(user=user, is_checked=True).count()
 
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime

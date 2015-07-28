@@ -120,6 +120,8 @@ class SuggestionAdmin(admin.ModelAdmin):
     actions = ['check_suggestions','uncheck_suggestions']
     def check_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=True)
+        for suggestion in queryset:
+            suggestion.save()
         if rows_updated == 1:
             message_bit = "1 suggestion"
         else:
@@ -128,6 +130,8 @@ class SuggestionAdmin(admin.ModelAdmin):
     check_suggestions.short_description = "Valider les suggestions sélectionnées"
     def uncheck_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=False)
+        for suggestion in queryset:
+            suggestion.save()
         if rows_updated == 1:
             message_bit = "1 suggestion"
         else:
