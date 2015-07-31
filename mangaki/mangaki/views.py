@@ -72,9 +72,6 @@ def update_score_while_unrating(user, work, choice):
             reco.user.profile.score -= 5
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
-def get_score(user):
-    return user.profile.score #+ 5 * Suggestion.objects.filter(user=user, is_checked=True).count()
-
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime
     form_class = SuggestionForm
@@ -380,13 +377,9 @@ class UserList(ListView):
         context['params'] = {'letter': letter, 'page': page}
         context['url'] = urlencode({'letter': letter})
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(user_list.number - 2, user_list.number + 2 + 1))
-        for user in user_list:
-            user.profile.score = get_score(user)
         context['object_list'] = user_list
 
         context['trio_elm'] = User.objects.filter(username__in=['jj', 'Lily', 'Sedeto'])
-        for user in context['trio_elm']:
-            user.profile.score = get_score(user)
         return context
 
 
@@ -444,7 +437,7 @@ def get_profile(request, username):
     unseen_list = unseen_anime_list if category == 'anime' else unseen_manga_list
     return render(request, 'profile.html', {
         'username': username,
-        'score': get_score(user),
+        'score': user.profile.score,
         'is_shared': is_shared,
         'category': category,
         'avatar_url': user.profile.get_avatar_url(),

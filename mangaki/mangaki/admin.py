@@ -124,7 +124,7 @@ class SuggestionAdmin(admin.ModelAdmin):
         for suggestion in queryset:
             if suggestion.user not in users_list:
                 users_list.append(suggestion.user)
-                suggestion.save()
+                suggestion.update_scores()
         if rows_updated == 1:
             message_bit = "1 suggestion"
         else:
@@ -137,7 +137,7 @@ class SuggestionAdmin(admin.ModelAdmin):
         for suggestion in queryset:
             if suggestion.user not in users_list:
                 users_list.append(suggestion.user)
-                suggestion.save()
+                suggestion.update_scores()
         if rows_updated == 1:
             message_bit = "1 suggestion"
         else:
