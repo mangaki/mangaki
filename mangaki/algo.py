@@ -47,7 +47,7 @@ def run():
             X[rating.user.id, inversed[rating.work.id]] = values[rating.choice]
 
     # Ranking computation
-    cp4 = datetime.now()    
+    cp4 = datetime.now()
     print(cp4 - cp3)
     U, sigma, VT = randomized_svd(X, NB_COMPONENTS, n_iter=3, random_state=42)
     XD = np.dot(np.dot(U, np.diag(sigma)), VT)

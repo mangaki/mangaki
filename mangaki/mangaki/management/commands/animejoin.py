@@ -13,12 +13,12 @@ def get_slug(name, trim=False):
     slug = name.lower()
     if trim:
         for token in pre:
-            slug = re.sub(token, pre[token], slug)    
+            slug = re.sub(token, pre[token], slug)
     for token in replacements:
         slug = re.sub(token, replacements[token], slug)
     if trim:
         for token in post:
-            slug = re.sub(token, post[token], slug)    
+            slug = re.sub(token, post[token], slug)
     return slug
 
 

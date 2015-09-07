@@ -461,7 +461,7 @@ def index(request):
     # context = {'annonce': texte}
     return render(request, 'index.html')
 
- 
+
 def about(request):
     return render(request, 'about.html')
 
@@ -475,7 +475,7 @@ def rate_work(request, work_id):
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee', 'favorite']:
-            return HttpResponse()        
+            return HttpResponse()
         if Rating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
             Rating.objects.filter(user=request.user, work=work, choice=choice).delete()
             update_score_while_unrating(request.user, work, choice)

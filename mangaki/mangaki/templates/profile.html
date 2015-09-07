@@ -48,7 +48,7 @@
     {% if not is_shared %}
         <br />
         <p class="well">Le profil de {{ username }} n'est pas public.</p>
-    {% else %} 
+    {% else %}
     {% if best_neighbors_list and category == 'neighbor' %}
         <div class="col-xs-4 col-xs-offset-1">
            <h1>Les {{ neighbor_count }} plus proches voisins de {{ username }}</h1>
@@ -62,7 +62,7 @@
                    <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
                </div>
            </div>
-           {% endfor %}  
+           {% endfor %}
         </div>
     {% else %}
     {% if category == 'recommendation' %}

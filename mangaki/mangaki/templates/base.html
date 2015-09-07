@@ -37,54 +37,54 @@
                     </a>
                 </div>
 
-                <div class="collapse navbar-collapse" id="menu-collapse">   
+                <div class="collapse navbar-collapse" id="menu-collapse">
                     <ul class="nav navbar-nav">
-                        <li class="dropdown">               
+                        <li class="dropdown">
                             <a href="/about/">
                                 C'est quoi ?
                             </a>
                         </li>
                     </ul>
                     <ul class="nav navbar-nav">
-                        <li class="dropdown">               
+                        <li class="dropdown">
                             <a href="/anime/">
                                 Anime
                             </a>
                         </li>
-                        <li class="dropdown">               
+                        <li class="dropdown">
                             <a href="/manga/">
                                 Mangas
                             </a>
                         </li>
                     {% if user.is_authenticated %}
-                        <li class="dropdown">               
+                        <li class="dropdown">
                             <a href="/u/{{ user.username }}">
                                 Mon profil
                             </a>
                         </li>
-                        <li class="dropdown">               
+                        <li class="dropdown">
                             <a href="/reco/">
                                 Recommandations
                             </a>
                         </li>
-                        <li class="dropdown">               
+                        <li class="dropdown">
                             <a href="/users/">
                                 Utilisateurs
                             </a>
                         </li>
-                        <li class="dropdown">               
+                        <li class="dropdown">
                             <a href="http://meta.mangaki.fr/session/sso" target="_blank">
                                 Forum
                             </a>
                         </li>
                     {% endif %}
-                        <li class="dropdown">               
+                        <li class="dropdown">
                             <a href="/events/">
                                 Calendrier
                             </a>
-                        </li>   
+                        </li>
                     </ul>
-                    
+
                     <ul class="nav navbar-nav navbar-right">
                     {% if not user.is_authenticated %}
                         <li><a href="/user/login"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
@@ -103,7 +103,7 @@
     <div class="container">
         {% block body %}{% endblock %}
     </div>
-    
+
     <footer>
         <nav class="navbar navbar-default navbar-fixed-bottom">
             <div class="navbar-collapse">
@@ -120,7 +120,7 @@
     <script>
         $("nav [href='{{ request.path }}']").parents("li").addClass('active');
     </script>
-</body>    
+</body>
 </html>
 
 <script>

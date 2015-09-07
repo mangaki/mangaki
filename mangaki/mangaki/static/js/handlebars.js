@@ -252,8 +252,8 @@ var __module2__ = (function(__dependency1__, __dependency2__) {
         } else {
           for(var key in context) {
             if(context.hasOwnProperty(key)) {
-              if(data) { 
-                data.key = key; 
+              if(data) {
+                data.key = key;
                 data.index = i;
                 data.first = (i === 0);
               }
@@ -693,9 +693,9 @@ var __module9__ = (function() {
 
   var $0 = $$.length - 1;
   switch (yystate) {
-  case 1: return new yy.ProgramNode($$[$0-1]); 
+  case 1: return new yy.ProgramNode($$[$0-1]);
   break;
-  case 2: return new yy.ProgramNode([]); 
+  case 2: return new yy.ProgramNode([]);
   break;
   case 3:this.$ = new yy.ProgramNode([], $$[$0-1], $$[$0]);
   break;
@@ -711,7 +711,7 @@ var __module9__ = (function() {
   break;
   case 9:this.$ = [$$[$0]];
   break;
-  case 10: $$[$0-1].push($$[$0]); this.$ = $$[$0-1]; 
+  case 10: $$[$0-1].push($$[$0]); this.$ = $$[$0-1];
   break;
   case 11:this.$ = new yy.BlockNode($$[$0-2], $$[$0-1].inverse, $$[$0-1], $$[$0]);
   break;
@@ -767,7 +767,7 @@ var __module9__ = (function() {
   break;
   case 37:this.$ = new yy.IdNode($$[$0]);
   break;
-  case 38: $$[$0-2].push({part: $$[$0], separator: $$[$0-1]}); this.$ = $$[$0-2]; 
+  case 38: $$[$0-2].push({part: $$[$0], separator: $$[$0-1]}); this.$ = $$[$0-2];
   break;
   case 39:this.$ = [{part: $$[$0]}];
   break;
@@ -1089,14 +1089,14 @@ var __module9__ = (function() {
                                        this.begin("mu");
                                      }
                                      if(yy_.yytext) return 14;
-                                   
+
   break;
   case 1:return 14;
   break;
   case 2:
                                      this.popState();
                                      return 14;
-                                   
+
   break;
   case 3:strip(0,4); this.popState(); return 15;
   break;

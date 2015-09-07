@@ -42,4 +42,4 @@ class Command(BaseCommand):
         # r = s.get('%s/reco/' % DOMAIN)
         # b = BeautifulSoup(r.text)
         # print(b)
-        
+
