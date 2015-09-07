@@ -40,6 +40,7 @@ urlpatterns = patterns('',
     url(r'^discourse/sso$', views.sso),
     url(r'^about/$', 'mangaki.views.about'),
     url(r'^events/$', 'mangaki.views.events'),
+    url(r'^unsubscribe/(?P<pk>\d+)/(?P<key>\w+)$', 'mangaki.views.unsubscribe'),
     # url(r'^lookup/$', 'mangaki.views.lookup_work'),
     url(r'^(?P<slug>[\w-]+)/$', MarkdownView.as_view()),
 )
