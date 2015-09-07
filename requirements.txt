@@ -1,11 +1,11 @@
-Django
-django-allauth
+Django==1.7.1
+django-allauth==0.18.0
 markdown
 django-bootstrap-form
 -e git+https://github.com/tindie/pydiscourse.git#egg=pydiscourse
 psycopg2
 numpy
-scipy
-scikit-learn
+#scipy
+#scikit-learn
 django-debug-toolbar
 PyYAML
