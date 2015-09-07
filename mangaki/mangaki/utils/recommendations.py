@@ -29,13 +29,12 @@ def get_recommendations(user, my_rated_works, category, editor):
     if editor == 'unspecified':
         bundle = Manga.objects.values_list('id', flat=True)  # TODO : est-ce que ça regarde ceux qui y sont tous ?
         manga_ids = set(bundle)
+    elif editor == 'otototaifu':
+        bundle = Manga.objects.filter(editor__in=['Ototo Manga', 'Taifu comics']).values_list('id', flat=True)
+        manga_ids = set(bundle)
     else:
-        if editor == 'otototaifu':
-            bundle = Manga.objects.filter(editor__in=['Ototo Manga', 'Taifu comics']).values_list('id', flat=True)
-            manga_ids = set(bundle)
-        else:
-            bundle = Manga.objects.filter(editor__icontains=editor).values_list('id', flat=True)
-            manga_ids = set(bundle)
+        bundle = Manga.objects.filter(editor__icontains=editor).values_list('id', flat=True)
+        manga_ids = set(bundle)
 
     works_by_id = {}
     for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']):

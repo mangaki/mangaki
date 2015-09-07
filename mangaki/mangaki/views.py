@@ -48,15 +48,13 @@ def get_rated_works(user):
 def update_poster_if_nsfw(obj, user):
     if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
         obj.poster = '/static/img/nsfw.jpg'  # NSFW
-    #else:
-    #    obj.poster = '/static/img/posters/'+ str(obj.id) +'.jpg'
 
 def update_score_while_rating(user, work, choice):
     recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
     for reco in recommendations_list:
         if choice == 'like':
             reco.user.profile.score += 1
-        if choice == 'favorite':
+        elif choice == 'favorite':
             reco.user.profile.score += 5
         if Rating.objects.filter(user=user, work=work, choice='like').count() > 0:
             reco.user.profile.score -= 1
@@ -70,7 +68,7 @@ def update_score_while_unrating(user, work, choice):
         if choice == 'like':
             reco.user.profile.score -= 1
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
-        if choice == 'favorite':
+        elif choice == 'favorite':
             reco.user.profile.score -= 5
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
@@ -111,8 +109,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
         if form.is_valid():
             return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+        return self.form_invalid(form)
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -156,8 +153,7 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         form = self.get_form(form_class)
         if form.is_valid():
             return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+        return self.form_invalid(form)
 
     def form_valid(self, form):
         form.instance.user = self.request.user

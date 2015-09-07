@@ -10,8 +10,7 @@ class AjaxableResponseMixin(object):
         response = super(AjaxableResponseMixin, self).form_invalid(form)
         if self.request.is_ajax():
             return JsonResponse(form.errors, status=400)
-        else:
-            return response
+        return response
 
     def form_valid(self, form):
         # We make sure to call the parent's form_valid() method because
@@ -23,5 +22,4 @@ class AjaxableResponseMixin(object):
                 'pk': self.object.pk,
             }
             return JsonResponse(data)
-        else:
-            return response
+        return response
