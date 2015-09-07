@@ -46,9 +46,6 @@ body > .container {
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0);
   box-shadow: inset 0 1px 1px rgba(0,0,0,0);}
 
-p{
-    margin:0px;
-}
 input{
 line-height: normal;
 
