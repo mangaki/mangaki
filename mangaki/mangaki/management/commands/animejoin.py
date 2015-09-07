@@ -5,6 +5,7 @@ from django.db.utils import IntegrityError, DataError
 import re
 from collections import Counter, OrderedDict
 
+
 def get_slug(name, trim=False):
     pre = OrderedDict([('l\'', '')])
     replacements = OrderedDict([('ō', 'ou'), ('ū', 'uu'), ('é', 'e'), ('è', 'e'), ('ê', 'e'), ('à', 'a'), ('â', 'a'), ('î', 'i'), ('ç', 'c'), ('λ', 'lambda'), (r'(★|☆|/)', '-'), (r'[^a-z0-9- ]', ''), (' ', '-'), (r'-+', '-'), ('^-', ''), ('-$', '')])  # Last update 08/06/2015
@@ -100,6 +101,7 @@ def run():
 class Command(BaseCommand):
     args = ''
     help = 'Join Mangaki and Manga-News anime'
+
     def handle(self, *args, **options):
         run()
         # print(get_slug('L\'Attaque des titans'))

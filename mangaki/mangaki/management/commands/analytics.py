@@ -6,14 +6,17 @@ from itertools import groupby
 from django.db import connection
 import sys
 
+
 def controversy(nb_likes, nb_dislikes):
     if nb_likes == 0 or nb_dislikes == 0:
         return 0
     return (nb_likes + nb_dislikes) ** min(float(nb_likes) / nb_dislikes, float(nb_dislikes) / nb_likes)
 
+
 class Command(BaseCommand):
     args = ''
     help = 'Analytics'
+
     def handle(self, *args, **options):
         anime_map = {}
         popular_anime = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=100)
@@ -29,11 +32,11 @@ class Command(BaseCommand):
                     nb_likes = rating['count']
                 elif rating['choice'] == 'dislike':
                     nb_dislikes = rating['count']
-            #if nb_dislikes == 0:
+            # if nb_dislikes == 0:
             """if 'Baccano' in anime_map[anime].title:
                 print(anime_map[anime].title, (nb_likes, nb_dislikes))"""
             # if nb_dislikes <= 2:
-            score[(anime, (nb_likes, nb_dislikes))] = controversy(nb_likes, nb_dislikes) # nb_likes #
+            score[(anime, (nb_likes, nb_dislikes))] = controversy(nb_likes, nb_dislikes)  # nb_likes
         print(len(score.keys()), 'anime après filtrage')
         for k, v in score.most_common(50):
             print(anime_map[k[0]].title, k[1], v, anime_map[k[0]].rating_set.count(), 'ratings')

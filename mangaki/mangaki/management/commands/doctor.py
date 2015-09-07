@@ -6,6 +6,7 @@ from mangaki.settings import BASE_DIR
 from urllib.request import urlretrieve
 import os
 
+
 def merge_anime(ids):
     chosen_id = min(ids)
     anime = Anime.objects.get(id=chosen_id)
@@ -31,9 +32,11 @@ def merge_anime(ids):
             Anime.objects.filter(id=anime_id).delete()
             print('ID %d deleted' % anime_id)
 
+
 class Command(BaseCommand):
     args = ''
     help = 'Finds duplicates'
+
     def handle(self, *args, **options):
         conflicts = set()
         for entry in Anime.objects.values('poster').annotate(Count('poster')).filter(poster__count__gte=2):  # Same poster

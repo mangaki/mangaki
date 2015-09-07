@@ -15,6 +15,7 @@ def create_if_not_exists(model, title):
     obj.save()
     return obj
 
+
 def run():
     with open('../data/manga-news/anime.csv') as f:
         next(f)

@@ -3,6 +3,7 @@ from django.db.utils import IntegrityError, DataError
 import re
 from collections import Counter
 
+
 def run():
     with open('../data/manga-news/manga.csv') as f:
         next(f)

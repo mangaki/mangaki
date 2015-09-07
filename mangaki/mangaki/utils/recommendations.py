@@ -3,6 +3,7 @@ from mangaki.models import Manga, Rating, Work
 from django.contrib.auth.models import User
 from django.db.models import Count
 
+
 def get_recommendations(user, my_rated_works, category, editor):
     values = {
         'favorite': 5,
