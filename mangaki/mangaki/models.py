@@ -119,7 +119,7 @@ class Profile(models.Model):
     score = models.IntegerField(default=0)
 
     def get_anime_count(self):
-        return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike','favorite']).count()
+        return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike', 'favorite']).count()
 
     def get_avatar_url(self):
         if not self.avatar_url:
@@ -137,11 +137,11 @@ class Suggestion(models.Model):
         ('title', 'Le titre n\'est pas le bon'),
         ('poster', 'Le poster ne convient pas'),
         ('synopsis', 'Le synopsis comporte des erreurs'),
-        ('author','L\'auteur n\'est pas le bon'),
-        ('composer','Le compositeur n\'est pas le bon'),
-        ('double','Ceci est un doublon'),
-        ('nsfw','L\'oeuvre est NSFW'),
-        ('n_nsfw','L\'oeuvre n\'est pas NSFW')
+        ('author', 'L\'auteur n\'est pas le bon'),
+        ('composer', 'Le compositeur n\'est pas le bon'),
+        ('double', 'Ceci est un doublon'),
+        ('nsfw', 'L\'oeuvre est NSFW'),
+        ('n_nsfw', 'L\'oeuvre n\'est pas NSFW')
     ))
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)

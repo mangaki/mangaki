@@ -8,7 +8,7 @@ class AnimeAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('nsfw',)
-    actions = ['make_nsfw','make_sfw']
+    actions = ['make_nsfw', 'make_sfw']
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
         if rows_updated == 1:
@@ -117,7 +117,7 @@ class SuggestionAdmin(admin.ModelAdmin):
     list_display = ('work', 'problem', 'date', 'user', 'is_checked')
     list_filter = ('problem',)
     readonly_fields = ('current_work_data',)
-    actions = ['check_suggestions','uncheck_suggestions']
+    actions = ['check_suggestions', 'uncheck_suggestions']
     def check_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=True)
         users_list = []
