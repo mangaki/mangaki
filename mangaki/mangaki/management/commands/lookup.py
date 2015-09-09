@@ -5,9 +5,11 @@ from django.db.models import Count
 from collections import Counter
 import sys
 
+
 class Command(BaseCommand):
     args = ''
     help = 'Lookup some work'
+
     def handle(self, *args, **options):
         work = Work.objects.filter(title__icontains=args[0]).annotate(Count('rating')).order_by('-rating__count')[0]
         print(work.title, work.id)

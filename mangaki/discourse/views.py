@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.conf import settings
 
+
 @login_required
 def sso(request):
     payload = request.GET.get('sso')
@@ -15,7 +16,7 @@ def sso(request):
     if None in [payload, signature]:
         return HttpResponseBadRequest('No SSO payload or signature. Please contact support if this problem persists.')
 
-    ## Validate the payload
+    # Validate the payload
 
     try:
         payload = unquote(payload)
@@ -32,7 +33,7 @@ def sso(request):
     if this_signature != signature:
         return HttpResponseBadRequest('Invalid payload. Please contact support if this problem persists.')
 
-    ## Build the return payload
+    # Build the return payload
 
     qs = parse_qs(decoded)
     params = {
@@ -46,7 +47,7 @@ def sso(request):
     h = hmac.new(key.encode('utf-8'), return_payload, digestmod=hashlib.sha256)
     query_string = urlencode({'sso': return_payload, 'sig': h.hexdigest()})
 
-    ## Redirect back to Discourse
+    # Redirect back to Discourse
 
     url = '%s/session/sso_login' % settings.DISCOURSE_BASE_URL
     return HttpResponseRedirect('%s?%s' % (url, query_string))

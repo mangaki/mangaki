@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block body %}
-    
+
 <div class="row">
     {% if not user.is_authenticated %}
     <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a></div>
-    <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/user/signup/">S'inscrire</a></div> 
+    <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/user/signup/">S'inscrire</a></div>
     <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="https://bitbucket.org/mangaki/mangaki/src" target="_blank">Voir le code</a> </div>
     {% else %}
         <div class="col-md-3 col-sm-3 margin" style=""> </div>

@@ -15,6 +15,7 @@ from secret import MAL_USER, MAL_PASS, MAL_USER_AGENT
 from django.contrib.auth.models import User
 from mangaki.models import Anime, Rating, SearchIssue, Artist
 
+
 def _encoding_translation(text):
     translations = {
         '&lt': '&lot;',

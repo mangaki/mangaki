@@ -4,11 +4,13 @@ from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
 
+
 class AnimeAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('nsfw',)
-    actions = ['make_nsfw','make_sfw']
+    actions = ['make_nsfw', 'make_sfw']
+
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
         if rows_updated == 1:
@@ -17,6 +19,7 @@ class AnimeAdmin(admin.ModelAdmin):
             message_bit = "%s animes sont" % rows_updated
         self.message_user(request, "%s désormais NSFW." % message_bit)
     make_nsfw.short_description = "Rendre NSFW les animes sélectionnés"
+
     def make_sfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=False)
         if rows_updated == 1:
@@ -117,7 +120,8 @@ class SuggestionAdmin(admin.ModelAdmin):
     list_display = ('work', 'problem', 'date', 'user', 'is_checked')
     list_filter = ('problem',)
     readonly_fields = ('current_work_data',)
-    actions = ['check_suggestions','uncheck_suggestions']
+    actions = ['check_suggestions', 'uncheck_suggestions']
+
     def check_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=True)
         users_list = []
@@ -131,6 +135,7 @@ class SuggestionAdmin(admin.ModelAdmin):
             message_bit = "%s suggestions" % rows_updated
         self.message_user(request, "La validation de %s a réussi." % message_bit)
     check_suggestions.short_description = "Valider les suggestions sélectionnées"
+
     def uncheck_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=False)
         users_list = []
@@ -149,11 +154,14 @@ class SuggestionAdmin(admin.ModelAdmin):
 class SearchIssueAdmin(admin.ModelAdmin):
     list_display = ('title', 'date', 'user')
 
+
 class AnnouncementAdmin(admin.ModelAdmin):
     exclude = ('title',)
 
+
 class RecommendationAdmin(admin.ModelAdmin):
     pass
+
 
 admin.site.register(Anime, AnimeAdmin)
 admin.site.register(Manga, MangaAdmin)

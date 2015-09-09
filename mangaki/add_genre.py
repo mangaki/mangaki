@@ -35,6 +35,7 @@ GENRE_CHOICES = (
     ("loisir", "Loisir")
 )
 
+
 def run():
     for _, genre in GENRE_CHOICES:
         Genre(title=genre).save()

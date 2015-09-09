@@ -3,9 +3,11 @@ from django.contrib.auth.models import User
 from mangaki.models import Neighborship, Rating
 from collections import Counter
 
+
 class Command(BaseCommand):
     args = ''
     help = ''
+
     def handle(self, *args, **options):
         values = {'like': 2, 'dislike': -2, 'neutral': 0.1, 'willsee': 0.5, 'wontsee': -0.5}
         for user in User.objects.all():

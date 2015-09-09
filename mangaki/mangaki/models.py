@@ -119,7 +119,7 @@ class Profile(models.Model):
     score = models.IntegerField(default=0)
 
     def get_anime_count(self):
-        return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike','favorite']).count()
+        return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike', 'favorite']).count()
 
     def get_avatar_url(self):
         if not self.avatar_url:
@@ -137,11 +137,11 @@ class Suggestion(models.Model):
         ('title', 'Le titre n\'est pas le bon'),
         ('poster', 'Le poster ne convient pas'),
         ('synopsis', 'Le synopsis comporte des erreurs'),
-        ('author','L\'auteur n\'est pas le bon'),
-        ('composer','Le compositeur n\'est pas le bon'),
-        ('double','Ceci est un doublon'),
-        ('nsfw','L\'oeuvre est NSFW'),
-        ('n_nsfw','L\'oeuvre n\'est pas NSFW')
+        ('author', 'L\'auteur n\'est pas le bon'),
+        ('composer', 'Le compositeur n\'est pas le bon'),
+        ('double', 'Ceci est un doublon'),
+        ('nsfw', 'L\'oeuvre est NSFW'),
+        ('n_nsfw', 'L\'oeuvre n\'est pas NSFW')
     ))
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
@@ -178,7 +178,7 @@ class Suggestion(models.Model):
             vo_title = '<div>Titre original : ' + self.work.manga.vo_title + '</div>'
             data = vo_title + mangaka + writer + editor + origin + genres + work_type
             link = '<div><a href="/admin/mangaki/manga/' + str(self.work.id) + '/"><b>Éditer les informations</b></a></div>'
-        return include_bootstrap + '<div class="row"><div class="col-xs-2">' + poster + '</div><div class="col-xs-7">' + title +'<br/>' +  data + '<br/>' + synopsis + link + '</div></div>'
+        return include_bootstrap + '<div class="row"><div class="col-xs-2">' + poster + '</div><div class="col-xs-7">' + title + '<br/>' + data + '<br/>' + synopsis + link + '</div></div>'
     current_work_data.allow_tags = True
 
     def update_scores(self):
@@ -186,16 +186,18 @@ class Suggestion(models.Model):
         recommendations_score = 0
         reco_list = Recommendation.objects.filter(user=self.user)
         for reco in reco_list:
-            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count()>0:
+            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count() > 0:
                 recommendations_score += 1
-            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count()>0:
+            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count() > 0:
                 recommendations_score += 5
         score = suggestions_score + recommendations_score
         Profile.objects.filter(user=self.user).update(score=score)
 
+
 def suggestion_saved(sender, instance, *args, **kwargs):
     instance.update_scores()
 models.signals.post_save.connect(suggestion_saved, sender=Suggestion)
+
 
 class Neighborship(models.Model):
     user = models.ForeignKey(User)
@@ -215,9 +217,10 @@ class SearchIssue(models.Model):
 class Announcement(models.Model):
     title = models.CharField(max_length=128)
     text = models.CharField(max_length=512)
-    
+
     def __str__(self):
         return self.title
+
 
 class Recommendation(models.Model):
     user = models.ForeignKey(User)

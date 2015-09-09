@@ -33,6 +33,7 @@ POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 
+
 def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
@@ -48,15 +49,14 @@ def get_rated_works(user):
 def update_poster_if_nsfw(obj, user):
     if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
         obj.poster = '/static/img/nsfw.jpg'  # NSFW
-    #else:
-    #    obj.poster = '/static/img/posters/'+ str(obj.id) +'.jpg'
+
 
 def update_score_while_rating(user, work, choice):
     recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
     for reco in recommendations_list:
         if choice == 'like':
             reco.user.profile.score += 1
-        if choice == 'favorite':
+        elif choice == 'favorite':
             reco.user.profile.score += 5
         if Rating.objects.filter(user=user, work=work, choice='like').count() > 0:
             reco.user.profile.score -= 1
@@ -64,15 +64,17 @@ def update_score_while_rating(user, work, choice):
             reco.user.profile.score -= 5
         Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
+
 def update_score_while_unrating(user, work, choice):
     recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
     for reco in recommendations_list:
         if choice == 'like':
             reco.user.profile.score -= 1
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
-        if choice == 'favorite':
+        elif choice == 'favorite':
             reco.user.profile.score -= 5
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
+
 
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
     model = Anime
@@ -111,8 +113,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
         if form.is_valid():
             return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+        return self.form_invalid(form)
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -156,8 +157,7 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         form = self.get_form(form_class)
         if form.is_valid():
             return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+        return self.form_invalid(form)
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -306,7 +306,6 @@ class MangaList(ListView):
                 bundle = bundle.filter(title__istartswith=letter)
         return bundle
 
-
     def get_context_data(self, **kwargs):
         my_rated_works = get_rated_works(self.request.user) if self.request.user.is_authenticated() else {}
         sort_mode = self.request.GET.get('sort', 'mosaic')
@@ -359,7 +358,6 @@ class UserList(ListView):
             else:
                 bundle = bundle.filter(username__istartswith=letter).order_by('username')
         return bundle
-
 
     def get_context_data(self, **kwargs):
         context = super(UserList, self).get_context_data(**kwargs)
@@ -461,7 +459,7 @@ def index(request):
     # context = {'annonce': texte}
     return render(request, 'index.html')
 
- 
+
 def about(request):
     return render(request, 'about.html')
 
@@ -475,7 +473,7 @@ def rate_work(request, work_id):
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee', 'favorite']:
-            return HttpResponse()        
+            return HttpResponse()
         if Rating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
             Rating.objects.filter(user=request.user, work=work, choice=choice).delete()
             update_score_while_unrating(request.user, work, choice)
@@ -486,7 +484,7 @@ def rate_work(request, work_id):
     return HttpResponse()
 
 
-def recommend_work(request, work_id,target_id):
+def recommend_work(request, work_id, target_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         target_user = get_object_or_404(User, id=target_id)
@@ -494,7 +492,7 @@ def recommend_work(request, work_id,target_id):
             return HttpResponse('nonsense')
         if Recommendation.objects.filter(user=request.user, work=work, target_user=target_user).count() > 0:
             return HttpResponse('double')
-        if not Rating.objects.filter(user=target_user, work=work, choice__in=['favorite','like','neutral','dislike']):
+        if not Rating.objects.filter(user=target_user, work=work, choice__in=['favorite', 'like', 'neutral', 'dislike']):
             Recommendation.objects.update_or_create(user=request.user, work=work, target_user=target_user)
             return HttpResponse('success')
     return HttpResponse()
@@ -506,11 +504,13 @@ def get_users(request, query=''):
         data.append({'id': user.id, 'username': user.username, 'tokens': user.username.lower().split()})
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+
 def get_user_for_recommendations(request, work_id, query=''):
     data = []
     for user in User.objects.all() if not query else User.objects.filter(username__icontains=query):
-        data.append({'id': user.id, 'username': user.username, 'work_id' : work_id, 'tokens': user.username.lower().split()})
+        data.append({'id': user.id, 'username': user.username, 'work_id': work_id, 'tokens': user.username.lower().split()})
     return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 class MarkdownView(DetailView):
     model = Page
@@ -549,7 +549,7 @@ def get_extra_manga(request, query):
 
 def get_reco_list(request, category, editor):
     # category = request.GET.get('category', 'all')
-    #editor = request.GET.get('editor', '')
+    # editor = request.GET.get('editor', '')
     reco_list = []
     my_rated_works = {}
     willsee = set()
@@ -568,12 +568,14 @@ def get_reco_list(request, category, editor):
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if work.id in willsee else 'None'})  # Does not work
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
+
 def remove_reco(request, work_id, username, targetname):
     work = get_object_or_404(Work, id=work_id)
     user = get_object_or_404(User, username=username)
     target = get_object_or_404(User, username=targetname)
-    if Rating.objects.filter(user=target, work=work, choice__in=['favorite','like','neutral','dislike']).count() == 0 and (request.user == user or request.user == target):
-        Recommendation.objects.get(work=work,user=user,target_user=target).delete()
+    if Rating.objects.filter(user=target, work=work, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0 and (request.user == user or request.user == target):
+        Recommendation.objects.get(work=work, user=user, target_user=target).delete()
+
 
 def remove_all_reco(request, targetname):
     target = get_object_or_404(User, username=targetname)
@@ -606,15 +608,18 @@ def update_nsfw(request):
         Profile.objects.filter(user=request.user).update(nsfw_ok=request.POST['nsfw_ok'] == 'true')
     return HttpResponse()
 
+
 def update_newsletter(request):
     if request.user.is_authenticated() and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(newsletter_ok=request.POST['newsletter_ok'] == 'true')
     return HttpResponse()
 
+
 def update_reco_willsee(request):
     if request.user.is_authenticated() and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
     return HttpResponse()
+
 
 def import_from_mal(request, mal_username):
     if request.method == 'POST':
@@ -626,6 +631,7 @@ def import_from_mal(request, mal_username):
 def report_nsfw(request, pk):
     Anime.objects.filter(id=pk).update(nsfw=True)
     return redirect('/anime/%s' % pk)
+
 
 @receiver(user_signed_up)
 @receiver(social_account_added)

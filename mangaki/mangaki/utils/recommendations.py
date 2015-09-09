@@ -3,6 +3,7 @@ from mangaki.models import Manga, Rating, Work
 from django.contrib.auth.models import User
 from django.db.models import Count
 
+
 def get_recommendations(user, my_rated_works, category, editor):
     values = {
         'favorite': 5,
@@ -26,16 +27,15 @@ def get_recommendations(user, my_rated_works, category, editor):
     for user_id, score in neighbors.most_common(30 if category == 'manga' else 15):
         score_of_neighbor[user_id] = score
 
-    if editor == 'unspecified': 
+    if editor == 'unspecified':
         bundle = Manga.objects.values_list('id', flat=True)  # TODO : est-ce que ça regarde ceux qui y sont tous ?
         manga_ids = set(bundle)
+    elif editor == 'otototaifu':
+        bundle = Manga.objects.filter(editor__in=['Ototo Manga', 'Taifu comics']).values_list('id', flat=True)
+        manga_ids = set(bundle)
     else:
-        if editor == 'otototaifu':
-            bundle = Manga.objects.filter(editor__in=['Ototo Manga','Taifu comics']).values_list('id', flat=True) 
-            manga_ids = set(bundle)
-        else:
-            bundle = Manga.objects.filter(editor__icontains=editor).values_list('id', flat=True) 
-            manga_ids = set(bundle)
+        bundle = Manga.objects.filter(editor__icontains=editor).values_list('id', flat=True)
+        manga_ids = set(bundle)
 
     works_by_id = {}
     for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']):

@@ -7,15 +7,19 @@ from datetime import datetime
 DEBUG = False
 DOMAIN = 'http://localhost:8000' if DEBUG else 'http://mangaki.fr'
 
+
 class Report(object):
     def __init__(self, session):
         self.f = None
         self.s = session
+
     def __enter__(self):
         self.f = open('%s.txt' % datetime.now().isoformat(), 'w')
         return self
+
     def __exit__(self, type, value, traceback):
         self.f.close()
+
     def time_page(self, url):
         print(url)
         self.f.write(url + '\n')
@@ -23,9 +27,11 @@ class Report(object):
         self.s.get('%s%s' % (DOMAIN, url))
         self.f.write('%s\n' % (datetime.now() - begin))
 
+
 class Command(BaseCommand):
     args = ''
     help = 'Time loading'
+
     def handle(self, *args, **options):
         begin = datetime.now()
         s = requests.session()
@@ -42,4 +48,3 @@ class Command(BaseCommand):
         # r = s.get('%s/reco/' % DOMAIN)
         # b = BeautifulSoup(r.text)
         # print(b)
-        

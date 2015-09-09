@@ -63,7 +63,7 @@ function displayWork(pos, work) {
     work_div.data('category', work['category']);
     work_div.data('id', work['id']);
     work_div.find('h4 a').text(work['title']);
-    work_div.find('h4 a').attr('title', work['synopsis']); 
+    work_div.find('h4 a').attr('title', work['synopsis']);
     $('[data-toggle="tooltip"]').tooltip('fixTitle');
     work_div.find('h4 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
     work_div.find('.manga-snapshot-image').hide().css('background-image', 'url(' + work['poster'] + ')').fadeIn();

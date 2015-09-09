@@ -8,7 +8,7 @@
 {% block body %}
     <h1>{% trans "Sign Up" %}</h1>
 
-<p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %} Vous êtes sur le point d'utiliser votre compte {{provider_name}} pour vous connecter à 
+<p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %} Vous êtes sur le point d'utiliser votre compte {{provider_name}} pour vous connecter à
 {{site_name}}. Pour terminer, veuillez compléter le formulaire suivant:{% endblocktrans %}</p>
 
 <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">

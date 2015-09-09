@@ -22,7 +22,7 @@ urlpatterns = patterns('',
     url(r'^removeReco/(?P<targetname>\w+)$', 'mangaki.views.remove_all_reco'),
     url(r'^users/', UserList.as_view()),
     url(r'^user/', include('allauth.urls')),
-    url(r'^u/(?P<username>.+)$', 'mangaki.views.get_profile'), # login_required?
+    url(r'^u/(?P<username>.+)$', 'mangaki.views.get_profile'),  # login_required?
     url(r'^reco/$', 'mangaki.views.get_reco'),
     url(r'^anime/$', AnimeList.as_view()),
     url(r'^anime/(?P<pk>\d+)$', AnimeDetail.as_view()),

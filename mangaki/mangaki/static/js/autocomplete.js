@@ -67,9 +67,9 @@ function loadMenuUser() {
 
 $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
-    if (selection.description == undefined) { 
+    if (selection.description == undefined) {
 	if (selection.work_id == undefined) { location.href = '/u/' + selection.username ; }
-	else { 
+	else {
 	       $.post('/recommend/'+ selection.work_id +'/'+ selection.id, function(status) {
 		   if (status == 'success') {
 		       $('#alert-reco').hide();
@@ -89,15 +89,15 @@ $(document).ready(function() {
 		       if (status == 'double')
 			   $('#alert-reco').html('Vous avez déjà effectué cette recommandation');
 		   }
-	       }); 
+	       });
 	}
     }
     else { location.href = '/' + category + '/' + selection.id; }
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
-    if (selection.description == undefined) { 
+    if (selection.description == undefined) {
 	if (selection.work_id == undefined) { location.href = '/u/' + selection.username ; }
-	else { 
+	else {
 	       $.post('/recommend/'+ selection.work_id +'/'+ selection.id,  function(status) {
 		   if (status == 'success') {
 		       $('#alert-reco').hide();
@@ -117,7 +117,7 @@ $(document).ready(function() {
 		       if (status == 'double')
 			   $('#alert-reco').html('Vous avez déjà effectué cette recommandation');
 		   }
-	       }); 
+	       });
 	}
     }
     else { location.href = '/' + category + '/' + selection.id; }
