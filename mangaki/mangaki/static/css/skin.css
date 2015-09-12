@@ -229,3 +229,23 @@ border-color: #f8d549;
 .label-favorite {
 background-color: #f8d549;
 }
+
+.thumbnail.with-caption {
+  display: inline-block;
+  background: #eee;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+.thumbnail.with-caption p {
+  margin: 0;
+  padding-top: 0.5em;
+}
+.thumbnail.with-caption small:before {
+  content: '\2014 \00A0';
+}
+.thumbnail.with-caption small {
+  width: 100%;
+  text-align: right;
+  display: inline-block;
+  color: #999;
+}
