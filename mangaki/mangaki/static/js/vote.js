@@ -1,3 +1,8 @@
+// This contains the current loaded decks for each position.
+var globalWorks = {
+    dejaVu: []
+};
+
 function getSheet(elt) {
     entity = $(elt).closest('.data'); // See work_poster
     if(entity.data('category') != 'dummy')
@@ -6,17 +11,14 @@ function getSheet(elt) {
 
 function vote(elt) {
     entity = $(elt).closest('.data');
-    console.log(entity);
-    console.log($(elt));
     work_id = entity.data('id');
     choice = $(elt).data('choice');
     pos = entity.data('pos');
     $.post('/work/' + work_id, {choice: choice}, function(rating) {
         if(rating == '')
             window.location = '/user/signup';
-        dejaVu = $('[data-id]').map(function() {return $(this).data('id');}).get();
         if(typeof(sort_mode) != 'undefined' && sort_mode == 'mosaic' && rating)
-            loadCard(pos, dejaVu);
+            loadCard(pos);
         else {
             $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
             if(rating == 'none')
@@ -56,9 +58,10 @@ function displayWork(pos, work) {
     if(work == undefined) {
         work = {'id': 0, 'category': 'dummy', 'title': 'Chargement…', 'poster': '/static/img/chiro.gif', 'synopsis': ''}
         display_votes = false;
+    } else {
+        globalWorks.dejaVu.push(work.id);
     }
     selector = ':nth-child(' + pos + ')';
-    console.log('.manga-sheet' + selector + ' .data');
     work_div = $('.manga-sheet' + selector + ' .data');
     work_div.data('category', work['category']);
     work_div.data('id', work['id']);
@@ -73,15 +76,29 @@ function displayWork(pos, work) {
         work_div.find('.manga-votes').fadeOut();
 }
 
-function loadCard(pos, dejaVu) {
-    if(dejaVu == undefined)
-        dejaVu = [];
+function actuallyLoadCard(pos) {
+    var works = globalWorks[pos];
+
+    var work = works.shift();
+    if (work === undefined)
+        return loadCard(pos);
+
+    while (globalWorks.dejaVu.indexOf(work.id) != -1) {
+        work = works.shift();
+        if (work === undefined)
+            return loadCard(pos);
+    }
+    displayWork(pos, work);
+}
+
+function loadCard(pos) {
     displayWork(pos);
-    $.getJSON('/data/card/' + category + '/' + pos + '.json?dejavu=' + dejaVu.join(','), function(work) {
-        dejaVu = $('[data-id]').map(function() {return $(this).data('id');}).get();
-        if(dejaVu.indexOf(work['id']) != -1)
-            loadCard(pos, dejaVu);
-        else
-            displayWork(pos, work);
+    if (globalWorks[pos])
+        return actuallyLoadCard(pos);
+
+    // TODO: abort in case there is no unseen card, to prevent infinite recursion.
+    return $.getJSON('/data/card/' + category + '/' + pos + '.json', function(works) {
+        globalWorks[pos] = works;
+        return actuallyLoadCard(pos);
     });
 }
