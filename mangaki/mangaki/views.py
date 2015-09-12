@@ -207,15 +207,13 @@ def get_bundle(category, sort_mode, my_rated_works={}):
         return obj.raw(work_query.format(category=category, min_ratings=1 if category == 'anime' else 0, order_by='title'))
 
 
-def pick_card(bundle, sort_mode, my_rated_works, deja_vu):
+def pick_deck(bundle, sort_mode, my_rated_works, deja_vu):
     score = get_scores(bundle, sort_mode)
     score_max = float('-inf')
     card = None
-    for work in bundle:
-        if work.id not in my_rated_works and str(work.id) not in deja_vu and score.get(work.id, 0) > score_max:
-            card = work
-            score_max = score.get(work.id, 0)
-    return card
+    works = [work for work in bundle if work.id not in my_rated_works and str(work.id) not in deja_vu]
+    works.sort(key=(lambda work: score.get(work.id, 0)), reverse=True)
+    return works[:54]
 
 
 def get_card(request, category, sort_id=1):
@@ -223,10 +221,13 @@ def get_card(request, category, sort_id=1):
     sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
     my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
     bundle = list(get_bundle(category, sort_mode, my_rated_works))
-    work = pick_card(bundle, sort_mode, my_rated_works, deja_vu)
-    update_poster_if_nsfw(work, request.user)
-    card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category, 'synopsis': work.synopsis}
-    return HttpResponse(json.dumps(card), content_type='application/json')
+    works = pick_deck(bundle, sort_mode, my_rated_works, deja_vu)
+    cards = []
+    for work in works:
+        update_poster_if_nsfw(work, request.user)
+        card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category, 'synopsis': work.synopsis}
+        cards.append(card)
+    return HttpResponse(json.dumps(cards), content_type='application/json')
 
 
 class AnimeList(ListView):
