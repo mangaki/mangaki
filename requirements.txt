@@ -9,4 +9,4 @@ numpy
 #scikit-learn
 django-debug-toolbar
 PyYAML
-bs4
+beautifulsoup4
