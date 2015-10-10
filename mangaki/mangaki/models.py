@@ -41,6 +41,7 @@ class Anime(Work):
     genre = models.ManyToManyField('Genre')
     nb_episodes = models.TextField(default='Inconnu', max_length=16)
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
+    anidb_aid = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
