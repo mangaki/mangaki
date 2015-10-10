@@ -10,3 +10,4 @@ numpy
 django-debug-toolbar
 PyYAML
 beautifulsoup4
+lxml
