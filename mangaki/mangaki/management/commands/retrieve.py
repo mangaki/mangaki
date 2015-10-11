@@ -25,9 +25,10 @@ def get_or_create_artist(name):
             contestants = Artist.objects.filter(last_name=last)
     except:
         pass
-    choice = pick_among(contestants)
-    if choice:
-        return choice
+    if contestants:
+        choice = pick_among(contestants)
+        if choice:
+            return choice
     artist = Artist(first_name=first, last_name=last)
     artist.save()
     return artist
