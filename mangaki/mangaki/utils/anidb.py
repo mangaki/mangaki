@@ -60,7 +60,9 @@ class AniDB:
     id = int(id) # why?
 
     r = self._request("anime", {'aid': id})
-    soup = BeautifulSoup(r.text, 'xml')
+    soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')  # http://stackoverflow.com/questions/31126831/beautifulsoup-with-xml-fails-to-parse-full-unicode-strings#comment50430922_31146912
+    """with open('backup.xml', 'w') as f:
+      f.write(r.text)"""
     if soup.error is not None:
       raise Exception(soup.error.string)
 
@@ -79,7 +81,7 @@ class AniDB:
       ) for title in anime.find_all('title')],
       'title': str(titles.find('title', attrs={'type': "main"}).string),
       'relatedanime': [],
-      'url': str(anime.url.string),
+      'url': str(anime.url.string) if anime.url else None,
       'creators': anime.creators,
       'description': str(anime.description.string),
       'ratings': SmartDict({

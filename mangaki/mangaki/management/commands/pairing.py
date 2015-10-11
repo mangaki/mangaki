@@ -20,8 +20,3 @@ class Command(BaseCommand):
                 break
             anime.anidb_aid = int(anidb_aid)
             anime.save()
-        """nb = Counter()
-        for rating in Rating.objects.filter(work=work):
-            nb[rating.choice] += 1
-        print(nb)
-"""

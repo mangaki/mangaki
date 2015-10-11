@@ -6,6 +6,7 @@ def get_or_create_artist(name):
     last, first = name.split()
     try:
         if Artist.objects.filter(first_name=first, last_name=last).count():
+            contestants = Artist.objects.filter(first_name=first, last_name=last)
             return Artist.objects.get(first_name=first, last_name=last)
         elif Artist.objects.filter(first_name=first).count():
             contestants = Artist.objects.filter(first_name=first)
