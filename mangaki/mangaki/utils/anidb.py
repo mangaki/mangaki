@@ -87,7 +87,7 @@ class AniDB:
       'ratings': SmartDict({
         'permanent': float(anime.ratings.permanent.string),
         'temporary': float(anime.ratings.temporary.string),
-        'review': float(anime.ratings.review.string)
+        'review': float(anime.ratings.review.string) if anime.ratings.review else ''
       }),
       'picture': "http://img7.anidb.net/pics/anime/" + str(anime.picture.string),
       'categories': [],
