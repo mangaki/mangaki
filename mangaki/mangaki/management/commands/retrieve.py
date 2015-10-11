@@ -23,6 +23,8 @@ def get_or_create_artist(name):
             contestants = Artist.objects.filter(first_name=first)
         elif Artist.objects.filter(last_name=last).count():
             contestants = Artist.objects.filter(last_name=last)
+    except:
+        pass
     choice = pick_among(contestants)
     if choice:
         return choice
