@@ -12,7 +12,7 @@ def get_or_create_artist(name):
         if Artist.objects.filter(first_name=first, last_name=last).count():
             contestants = Artist.objects.filter(first_name=first, last_name=last)
             return Artist.objects.get(first_name=first, last_name=last)
-        elif Artist.objects.filter(first_name=first).count():
+        elif first != '' and Artist.objects.filter(first_name=first).count():
             contestants = Artist.objects.filter(first_name=first)
             return Artist.objects.get(first_name=first)
         elif Artist.objects.filter(last_name=last).count():
@@ -49,7 +49,8 @@ class Command(BaseCommand):
         start = int(sys.argv[2]) if len(sys.argv) > 2 else 0  # Skipping
         i = 0
         for anime in Anime.objects.raw(work_query.format(category=category, min_ratings=6, order_by='rating_count DESC')):
-            if i < start:
+            i += 1
+            if i <= start:
                 continue
             print(i, ':', anime.title, anime.id)
             creators = a.get(anime.anidb_aid).creators
@@ -62,4 +63,3 @@ class Command(BaseCommand):
                 elif creator['type'] == 'Original Work':
                     try_replace(anime, 'author', creator.string)
                 anime.save()
-            i += 1
