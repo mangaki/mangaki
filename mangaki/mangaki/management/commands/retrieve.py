@@ -43,7 +43,7 @@ def try_replace(anime, key, artist_name):
     artist = get_or_create_artist(artist_name)
     if getattr(anime, key) == artist:
         return
-    answer = input('Remplacer %s par %s ? ' % (getattr(anime, key), artist))
+    answer = input('Remplacer %s par %s ? ' % (getattr(anime, key), artist)) if getattr(anime, key).id != 1 else 'y'
     if answer == 'y':
         setattr(anime, key, artist)
         anime.save()
