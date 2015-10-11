@@ -12,7 +12,11 @@ def pick_among(contestants):
 
 def get_or_create_artist(name):
     if ' ' in name:
-        last, first = name.split()
+        parts = name.split()
+        if len(parts) == 2:
+            last, first = parts
+        else:
+            last, first = parts[-1], ' '.join(parts[:-1])  # Diana Wynne Jones
     else:
         last, first = name, ''
     try:
