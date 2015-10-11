@@ -1,9 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.anidb import AniDB
 from mangaki.models import Anime, Artist
+import sys
 
 def get_or_create_artist(name):
-    last, first = name.split()
+    if ' ' in name:
+        last, first = name.split()
+    else:
+        last, first = name, ''
     try:
         if Artist.objects.filter(first_name=first, last_name=last).count():
             contestants = Artist.objects.filter(first_name=first, last_name=last)
@@ -42,8 +46,12 @@ class Command(BaseCommand):
         category = 'anime';
         work_query = 'SELECT mangaki_{category}.work_ptr_id, mangaki_work.id, mangaki_work.title, mangaki_work.poster, mangaki_work.nsfw, COUNT(mangaki_work.id) rating_count FROM mangaki_{category}, mangaki_work, mangaki_rating WHERE mangaki_{category}.work_ptr_id = mangaki_work.id AND mangaki_rating.work_id = mangaki_work.id AND mangaki_{category}.anidb_aid > 0 GROUP BY mangaki_work.id, mangaki_{category}.work_ptr_id HAVING COUNT(mangaki_work.id) >= {min_ratings} ORDER BY {order_by}'
         a = AniDB('mangakihttp', 1)
+        start = int(sys.argv[2]) if len(sys.argv) > 2 else 0  # Skipping
+        i = 0
         for anime in Anime.objects.raw(work_query.format(category=category, min_ratings=6, order_by='rating_count DESC')):
-            print(anime.title, anime.id)
+            if i < start:
+                continue
+            print(i, ':', anime.title, anime.id)
             creators = a.get(anime.anidb_aid).creators
             print(creators)
             for creator in creators.findAll('name'):
@@ -54,3 +62,4 @@ class Command(BaseCommand):
                 elif creator['type'] == 'Original Work':
                     try_replace(anime, 'author', creator.string)
                 anime.save()
+            i += 1
