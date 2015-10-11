@@ -3,6 +3,13 @@ from mangaki.utils.anidb import AniDB
 from mangaki.models import Anime, Artist
 import sys
 
+def pick_among(contestants):
+    for i, artist in enumerate(contestants):
+        print('%d: %s' % (i, artist))
+    answer = int(input('Which one? '))
+    if answer < len(contestants):
+        return contestants[answer]
+
 def get_or_create_artist(name):
     if ' ' in name:
         last, first = name.split()
@@ -14,16 +21,11 @@ def get_or_create_artist(name):
             return Artist.objects.get(first_name=first, last_name=last)
         elif first != '' and Artist.objects.filter(first_name=first).count():
             contestants = Artist.objects.filter(first_name=first)
-            return Artist.objects.get(first_name=first)
         elif Artist.objects.filter(last_name=last).count():
             contestants = Artist.objects.filter(last_name=last)
-            return Artist.objects.get(last_name=last)
-    except:
-        for i, artist in enumerate(contestants):
-            print('%d: %s' % (i, artist))
-        answer = int(input('Which one? '))
-        if answer < len(contestants):
-            return contestants[answer]
+    choice = pick_among(contestants)
+    if choice:
+        return choice
     artist = Artist(first_name=first, last_name=last)
     artist.save()
     return artist
