@@ -66,7 +66,7 @@ class Command(BaseCommand):
             creators = a.get(anime.anidb_aid).creators
             print(creators)
             for creator in creators.findAll('name'):
-                if creator['type'] == 'Director':
+                if creator['type'] == 'Direction':
                     try_replace(anime, 'director', creator.string)
                 elif creator['type'] == 'Music':
                     try_replace(anime, 'composer', creator.string)
