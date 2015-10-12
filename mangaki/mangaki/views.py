@@ -235,6 +235,11 @@ class AnimeList(ListView):
     context_object_name = 'anime'
 
     def get_queryset(self):
+        artist_id = self.kwargs.get('artist_id')
+        if artist_id:
+            artist = Artist.objects.get(id=artist_id)
+            bundle = artist.authored.all() | artist.directed.all() | artist.composed.all()
+            return bundle.order_by('title')
         sort_mode = self.request.GET.get('sort', 'mosaic')
         if sort_mode == 'mosaic':
             return Anime.objects.none()
@@ -250,12 +255,16 @@ class AnimeList(ListView):
 
     def get_context_data(self, **kwargs):
         my_rated_works = get_rated_works(self.request.user) if self.request.user.is_authenticated() else {}
+        artist_id = self.kwargs.get('artist_id')
         sort_mode = self.request.GET.get('sort', 'mosaic')
         flat_mode = self.request.GET.get('flat', '0')
         letter = self.request.GET.get('letter', '')
         page = int(self.request.GET.get('page', '1'))
         context = super(AnimeList, self).get_context_data(**kwargs)
         context['object_list'] = list(context['object_list'])
+        if artist_id:
+            sort_mode = 'alpha'
+            context['artist'] = Artist.objects.get(id=artist_id)
         if sort_mode == 'mosaic':
             context['object_list'] = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
         elif sort_mode == 'random':

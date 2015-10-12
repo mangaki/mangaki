@@ -13,7 +13,9 @@
         <h1>{{ object.title }}</h1>
         <p>Nombre d'épisodes : {{ object.nb_episodes }}</p>
 
-        <p>Auteur : {{ object.author }}</p>
+        <p>Réalisateur : <a href="/artist/{{ object.director.id }}">{{ object.director }}</a></p>
+        <p>Compositeur : <a href="/artist/{{ object.composer.id }}">{{ object.composer }}</a></p>
+        <p>Auteur : <a href="/artist/{{ object.author.id }}">{{ object.author }}</a></p>
         <p>Éditeur : {{ object.editor }}</p>
         <p>Origine : {{ object.origin }}</p>
         <p>Genres : {{ genres }}</p>

@@ -40,33 +40,38 @@
 </div>
 {% endif %}
 
-<b>
-<div class="collapse navbar-collapse" id="menu-collapse">
-   <ul class="nav navbar-nav">
-{% for letter in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
-     <li class="dropdown">
-     <a href="?sort=alpha&letter={{ letter|lower }}">
-         {{letter}}
-     </a>
-     </li>
-{% endfor %}
-   </ul>
-</div>
-</b>
+{% if artist %}
+  <h1>{{ artist }}</h1>
+  <hr />
+{% else %}
+  <b>
+  <div class="collapse navbar-collapse" id="menu-collapse">
+     <ul class="nav navbar-nav">
+  {% for letter in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+       <li class="dropdown">
+       <a href="?sort=alpha&amp;letter={{ letter|lower }}">
+           {{letter}}
+       </a>
+       </li>
+  {% endfor %}
+     </ul>
+  </div>
+  </b>
 
-<div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
-<div class="row">
-    <div class=" margin col-md-12 col-sm-12">
-        <ul class="nav nav-tabs">
-            <li role="presentation"{% if params.sort == 'mosaic' %} class="active"{% endif %}><a href="/anime/">Mosaïque</a></li>
-            <li role="presentation"{% if params.sort == 'popularity' %} class="active"{% endif %}><a href="/anime/?sort=popularity">Les plus populaires</a></li>
-            <li role="presentation"{% if params.sort == 'controversy' %} class="active"{% endif %}><a href="/anime/?sort=controversy">Les plus controversés</a></li>
-            <li role="presentation"{% if params.sort == 'top' %} class="active"{% endif %}><a href="/anime/?sort=top">Les plus aimés</a></li>
-            <li role="presentation"{% if params.sort == 'random' %} class="active"{% endif %}><a href="/anime/?sort=random">Perles au hasard</a></li>
-        </ul>
-    </div>
-</div>
-<br />
+  <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
+  <div class="row">
+      <div class=" margin col-md-12 col-sm-12">
+          <ul class="nav nav-tabs">
+              <li role="presentation"{% if params.sort == 'mosaic' %} class="active"{% endif %}><a href="/anime/">Mosaïque</a></li>
+              <li role="presentation"{% if params.sort == 'popularity' %} class="active"{% endif %}><a href="/anime/?sort=popularity">Les plus populaires</a></li>
+              <li role="presentation"{% if params.sort == 'controversy' %} class="active"{% endif %}><a href="/anime/?sort=controversy">Les plus controversés</a></li>
+              <li role="presentation"{% if params.sort == 'top' %} class="active"{% endif %}><a href="/anime/?sort=top">Les plus aimés</a></li>
+              <li role="presentation"{% if params.sort == 'random' %} class="active"{% endif %}><a href="/anime/?sort=random">Perles au hasard</a></li>
+          </ul>
+      </div>
+  </div>
+  <br />
+{% endif %}
 <div class="row mangas-list">
     {% for object in object_list %}
         {% include template_mode with work=object category="anime" rating=object.rating %}
