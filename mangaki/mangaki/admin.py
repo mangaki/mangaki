@@ -97,7 +97,7 @@ class OSTAdmin(admin.ModelAdmin):
 
 
 class ArtistAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ('id', 'first_name', 'last_name')
 
 
 class StudioAdmin(admin.ModelAdmin):
