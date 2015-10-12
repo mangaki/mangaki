@@ -24,5 +24,5 @@ class Command(BaseCommand):
             c[contestant] += values.get(rating.choice, 0)
         top = []
         for i, (artist, score) in enumerate(c.most_common(20)):
-            top.append(dict(rank=i + 1, name=str(artist), score=score, nb_ratings=nb_ratings[artist], nb_stars=nb_stars[artist]))
+            top.append(dict(rank=i + 1, name=str(artist), id=artist.id, score=score, nb_ratings=nb_ratings[artist], nb_stars=nb_stars[artist]))
         print(json.dumps(top))
