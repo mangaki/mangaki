@@ -93,7 +93,7 @@ $(document).ready(function() {
        });
       }
     }
-    else if(artistID != undefined) {
+    else if(typeof(artistID) != 'undefined') {
       addPairing(artistID, selection.id);
     } else
       location.href = '/' + category + '/' + selection.id;
@@ -124,7 +124,7 @@ $(document).ready(function() {
       });
     }
   }
-  else if(artistID != undefined) {
+  else if(typeof(artistID) != 'undefined') {
     addPairing(artistID, selection.id);
   } else { location.href = '/' + category + '/' + selection.id; }
   $(this).val('');
