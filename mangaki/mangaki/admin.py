@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation
+from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -163,6 +163,25 @@ class RecommendationAdmin(admin.ModelAdmin):
     pass
 
 
+class PairingAdmin(admin.ModelAdmin):
+    list_display = ('artist', 'work', 'date', 'user', 'is_checked')
+    actions = ['make_director']
+
+    def make_director(self, request, queryset):
+        rows_updated = 0
+        for pairing in queryset:
+            if Anime.objects.filter(id=pairing.work.id).update(director=pairing.artist):
+                pairing.is_checked = True
+                pairing.save()
+                rows_updated += 1
+        if rows_updated == 1:
+            message_bit = "1 réalisateur a"
+        else:
+            message_bit = "%s réalisateurs ont" % rows_updated
+        self.message_user(request, "%s été mis à jour." % message_bit)
+    make_director.short_description = "Valider les appariements sélectionnés pour réalisation"
+
+
 admin.site.register(Anime, AnimeAdmin)
 admin.site.register(Manga, MangaAdmin)
 admin.site.register(Genre, GenreAdmin)
@@ -177,3 +196,4 @@ admin.site.register(Suggestion, SuggestionAdmin)
 admin.site.register(SearchIssue, SearchIssueAdmin)
 admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(Recommendation, RecommendationAdmin)
+admin.site.register(Pairing, PairingAdmin)

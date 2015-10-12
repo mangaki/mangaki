@@ -13,7 +13,7 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -641,6 +641,14 @@ def import_from_mal(request, mal_username):
 def report_nsfw(request, pk):
     Anime.objects.filter(id=pk).update(nsfw=True)
     return redirect('/anime/%s' % pk)
+
+
+def add_pairing(request, artist_id, work_id):
+    if request.user.is_authenticated():
+        artist = get_object_or_404(Artist, id=artist_id)
+        work = get_object_or_404(Work, id=work_id)
+        Pairing(user=request.user, artist=artist, work=work).save()
+    return HttpResponse()
 
 
 @receiver(user_signed_up)

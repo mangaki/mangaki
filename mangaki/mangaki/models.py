@@ -230,3 +230,11 @@ class Recommendation(models.Model):
 
     def __str__(self):
         return '%s recommends %s to %s' % (self.user, self.work, self.target_user)
+
+
+class Pairing(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User)
+    artist = models.ForeignKey(Artist)
+    work = models.ForeignKey(Work)
+    is_checked = models.BooleanField(default=False)

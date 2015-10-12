@@ -1,43 +1,45 @@
 {% extends "base.html" %}
 
 {% block body %}
-{% if user.is_authenticated %}
-<div class="row">
-    <div class="col-md-12 col-sm-12">
-        <div class="well">
-          <p>
-            Notez quelques <em>anime</em>, via les listes ci-dessous ou la barre de recherche.<br />
-            Puis cliquez sur <a href="/reco/?category=anime">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
-          </p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-2 col-sm-12"></div>
-        <div class="col-md-8 col-sm-12">
-            <div class="margin10top">
-                <p style="text-align: center">Légende :
-                <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
-                <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
-                <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
-                <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
-                <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span>
-                <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas voir</span></p>
-                <form class="typeahead-demo {{ category }}">
-                    <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime (actuellement {{ anime_count }})…" />
-                </form>
-            </div>
-        </div>
-        <div class="col-md-2 col-sm-12"></div>
-    </div>
-</div>
-{% else %}
-<div class=" col-md-12 col-sm-12">
-  <p class="well">
-    Nouveau sur Mangaki ? <a href="/user/signup/">Inscrivez-vous</a> puis
-    <a href="/user/login/">connectez-vous</a> pour noter ces <em>anime</em>
-    et obtenir des recommandations.
-  </p>
-</div>
+{% if not artist %}
+  {% if user.is_authenticated %}
+  <div class="row">
+      <div class="col-md-12 col-sm-12">
+          <div class="well">
+            <p>
+              Notez quelques <em>anime</em>, via les listes ci-dessous ou la barre de recherche.<br />
+              Puis cliquez sur <a href="/reco/?category=anime">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
+            </p>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-md-2 col-sm-12"></div>
+          <div class="col-md-8 col-sm-12">
+              <div class="margin10top">
+                  <p style="text-align: center">Légende :
+                  <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
+                  <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
+                  <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
+                  <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+                  <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span>
+                  <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas voir</span></p>
+                  <form class="typeahead-demo {{ category }}">
+                      <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime (actuellement {{ anime_count }})…" />
+                  </form>
+              </div>
+          </div>
+          <div class="col-md-2 col-sm-12"></div>
+      </div>
+  </div>
+  {% else %}
+  <div class=" col-md-12 col-sm-12">
+    <p class="well">
+      Nouveau sur Mangaki ? <a href="/user/signup/">Inscrivez-vous</a> puis
+      <a href="/user/login/">connectez-vous</a> pour noter ces <em>anime</em>
+      et obtenir des recommandations.
+    </p>
+  </div>
+  {% endif %}
 {% endif %}
 
 {% if artist %}
@@ -72,16 +74,28 @@
   </div>
   <br />
 {% endif %}
+
 <div class="row mangas-list">
     {% for object in object_list %}
         {% include template_mode with work=object category="anime" rating=object.rating %}
     {% endfor %}
 </div>
-<div class="row margin">
-    <div class="margin col-md-12 col-sm-12">
-        <a class="btn btn-primary btn-lg" href="/reco/?category=anime" style="display: block; margin: auto">Je n'arrive plus à noter, conseillez-moi !</a>
+
+{% if user.is_authenticated %}
+  {% if artist %}
+    Signaler une œuvre manquante pour {{ artist }} ?
+    <form class="typeahead-demo {{ category }}">
+        <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime (actuellement {{ anime_count }})…" />
+    </form>
+  {% else %}
+    <div class="row margin">
+        <div class="margin col-md-12 col-sm-12">
+            <a class="btn btn-primary btn-lg" href="/reco/?category=anime" style="display: block; margin: auto">Je n'arrive plus à noter, conseillez-moi !</a>
+        </div>
     </div>
-</div>
+  {% endif %}
+{% endif %}
+
 {% if params.sort != 'mosaic' %}
 <nav style="text-align: center">
   <ul class="pagination">
@@ -111,6 +125,9 @@
 <script>
 category = 'anime';
 sort_mode = '{{ params.sort }}';
+{% if artist %}
+artistID = {{ artist.id }};
+{% endif %}
 loadMenu();
 {% if params.sort == 'mosaic' %}
 for(pos = 1; pos <= 4; pos++)
