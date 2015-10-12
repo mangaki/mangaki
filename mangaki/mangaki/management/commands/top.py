@@ -3,6 +3,7 @@ from django.db.models import Count
 from django.db import connection
 from mangaki.models import Rating, Anime
 from collections import Counter
+import json
 
 class Command(BaseCommand):
     args = ''
@@ -10,21 +11,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         category = 'composer'
         c = Counter()
-        values = {'favorite': 10, 'like': 1, 'neutral': 0.5, 'dislike': 0}
-        anime_ids = Anime.objects.filter(anidb_aid__gt=0).values_list('id', flat=True)
-        nb_ratings = {}
+        values = {'favorite': 10, 'like': 2, 'neutral': 0.5, 'dislike': -1}
+        anime_ids = Anime.objects.exclude(composer=1).values_list('id', flat=True)
+        nb_ratings = Counter()
+        nb_stars = Counter()
         for rating in Rating.objects.filter(work_id__in=anime_ids).select_related('work__anime__' + category):
             contestant = getattr(rating.work.anime, category)
-            if contestant in nb_ratings:
-                nb_ratings[contestant] += 1
-            else:
-                nb_ratings[contestant] = 1
-            try:
-                c[contestant] += values.get(rating.choice, 0)
-            except:
-                print(rating)
-        for k in c:
-            c[k] /= nb_ratings[k]
-        for i, (k, v) in enumerate(c.most_common(10)):
-            print('%d.' % (i + 1), k, v)
-        print(len(connection.queries), 'queries')
+            nb_ratings[contestant] += 1
+            if rating.choice == 'favorite':
+                nb_stars[contestant] += 1
+            c[contestant] += values.get(rating.choice, 0)
+        top = []
+        for i, (artist, score) in enumerate(c.most_common(20)):
+            top.append(dict(rank=i + 1, name=str(artist), score=score, nb_ratings=nb_ratings[artist], nb_stars=nb_stars[artist]))
+        print(json.dumps(top))
