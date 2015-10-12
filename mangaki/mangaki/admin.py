@@ -165,7 +165,7 @@ class RecommendationAdmin(admin.ModelAdmin):
 
 class PairingAdmin(admin.ModelAdmin):
     list_display = ('artist', 'work', 'date', 'user', 'is_checked')
-    actions = ['make_director']
+    actions = ['make_director', 'make_composer', 'make_author']
 
     def make_director(self, request, queryset):
         rows_updated = 0
@@ -180,6 +180,34 @@ class PairingAdmin(admin.ModelAdmin):
             message_bit = "%s réalisateurs ont" % rows_updated
         self.message_user(request, "%s été mis à jour." % message_bit)
     make_director.short_description = "Valider les appariements sélectionnés pour réalisation"
+
+    def make_composer(self, request, queryset):
+        rows_updated = 0
+        for pairing in queryset:
+            if Anime.objects.filter(id=pairing.work.id).update(composer=pairing.artist):
+                pairing.is_checked = True
+                pairing.save()
+                rows_updated += 1
+        if rows_updated == 1:
+            message_bit = "1 compositeur a"
+        else:
+            message_bit = "%s compositeurs ont" % rows_updated
+        self.message_user(request, "%s été mis à jour." % message_bit)
+    make_composer.short_description = "Valider les appariements sélectionnés pour composition"
+
+    def make_author(self, request, queryset):
+        rows_updated = 0
+        for pairing in queryset:
+            if Anime.objects.filter(id=pairing.work.id).update(director=pairing.artist):
+                pairing.is_checked = True
+                pairing.save()
+                rows_updated += 1
+        if rows_updated == 1:
+            message_bit = "1 auteur a"
+        else:
+            message_bit = "%s auteurs ont" % rows_updated
+        self.message_user(request, "%s été mis à jour." % message_bit)
+    make_author.short_description = "Valider les appariements sélectionnés pour écriture"
 
 
 admin.site.register(Anime, AnimeAdmin)
