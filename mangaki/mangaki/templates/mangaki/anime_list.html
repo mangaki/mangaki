@@ -44,6 +44,9 @@
 
 {% if artist %}
   <h1>{{ artist }}</h1>
+  {% if artist.first_name == 'Satoshi' and artist.last_name == 'Kon' %}
+    C'est son anniversaire ! Satoshi Kon est né le 12 octobre 1963.
+  {% endif %}
   <hr />
 {% else %}
   <b>
