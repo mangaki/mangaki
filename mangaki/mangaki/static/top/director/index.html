@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Mangaki</title>
+    <link rel="icon" href="/static/img/favicon.png">
+    <script src="/static/js/jquery-latest.min.js"></script>
+    <script src="/static/js/bootstrap-switch.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/handlebars.js"></script>
+    <script src="/static/js/csrf.js"></script>
+    <script src="/static/js/skin.js"></script>
+    <script src="/static/js/vote.js"></script>
+    <script src="/static/js/typeahead.bundle.js"></script>
+    <script src="/static/js/autocomplete.js"></script>
+    <script src="/static/js/tooltip.js"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/bootstrap-switch.min.css" />
+    <link rel="stylesheet" href="/static/css/typeahead.css" />
+    <link rel="stylesheet" href="/static/css/skin.css" />
+    <link rel="stylesheet" href="/static/css/test.css" />
+</head>
+
+<body>
+    <header class="navbar navbar-default navbar-fixed-top">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-collapse">
+                        <span class="sr-only">Ouvrir le menu</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">
+                        <img src="/static/img/minilogo.png" style="margin-top: -10px; margin-left: 5px" />
+                    </a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="menu-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="/about/">
+                                C'est quoi ?
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="/anime/">
+                                Anime
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="/manga/">
+                                Mangas
+                            </a>
+                        </li>
+                    
+                        <li class="dropdown">
+                            <a href="/events/">
+                                Calendrier
+                            </a>
+                        </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                    
+                        <li><a href="/user/login"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
+                        <li><a href="/user/signup"><span class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
+                    
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+
+    <div class="container">
+        
+<h1>Top 20 des réalisateurs sur Mangaki au 12/10/2015</h1>
+<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mangaki.fr/top/directors/" data-via="MangakiFR" data-lang="fr" data-size="large" data-related="MangakiFR">Tweeter</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<table class="table table-condensed table-hover">
+    <tr><th></th><th>Nom</th><th>Score</th><th>Nombre de notes</th><th>Nombre de favoris</th></tr>
+
+    <tr><td>1</td><td><a href="/artist/209">Hayao Miyazaki</a></td><td>10461.5</td><td>6547</td><td>219</td></tr>
+
+    <tr><td>2</td><td><a href="/artist/2046">Tetsuro Araki</a></td><td>6599.5</td><td>3779</td><td>191</td></tr>
+
+    <tr><td>3</td><td><a href="/artist/2347">Tatsuya Ishihara</a></td><td>3099.0</td><td>2884</td><td>47</td></tr>
+
+    <tr><td>4</td><td><a href="/artist/795">Mamoru Hosoda</a></td><td>2863.0</td><td>2121</td><td>52</td></tr>
+
+    <tr><td>5</td><td><a href="/artist/2322">Yasuhiro Irie</a></td><td>2740.0</td><td>1843</td><td>70</td></tr>
+
+    <tr><td>6</td><td><a href="/artist/2324">Tomohiko Itō</a></td><td>2559.5</td><td>1503</td><td>97</td></tr>
+
+    <tr><td>7</td><td><a href="/artist/2335">Takahiro Oomori</a></td><td>2529.5</td><td>2329</td><td>37</td></tr>
+
+    <tr><td>8</td><td><a href="/artist/509">Gorō Taniguchi</a></td><td>2275.0</td><td>1578</td><td>51</td></tr>
+
+    <tr><td>9</td><td><a href="/artist/2058">Shin&#39;ichirō Watanabe</a></td><td>2094.0</td><td>1937</td><td>34</td></tr>
+
+    <tr><td>10</td><td><a href="/artist/2333">Seiji Kishi</a></td><td>1987.0</td><td>1452</td><td>52</td></tr>
+
+    <tr><td>11</td><td><a href="/artist/2044">Tensai Okamura</a></td><td>1966.5</td><td>1564</td><td>42</td></tr>
+
+    <tr><td>12</td><td><a href="/artist/2325">Seiji Mizushima</a></td><td>1964.0</td><td>1283</td><td>41</td></tr>
+
+    <tr><td>13</td><td><a href="/artist/2036">Gen Urobuchi</a></td><td>1947.5</td><td>1779</td><td>27</td></tr>
+
+    <tr><td>14</td><td><a href="/artist/2323">Hayato Date</a></td><td>1941.5</td><td>1912</td><td>45</td></tr>
+
+    <tr><td>15</td><td><a href="/artist/2350">Tatsuyuki Nagai</a></td><td>1833.5</td><td>1461</td><td>42</td></tr>
+
+    <tr><td>16</td><td><a href="/artist/2336">Hiroyuki Imaishi</a></td><td>1824.0</td><td>1765</td><td>32</td></tr>
+
+    <tr><td>17</td><td><a href="/artist/2326">Noriyuki Abe</a></td><td>1782.0</td><td>1610</td><td>37</td></tr>
+
+    <tr><td>18</td><td><a href="/artist/2364">Ken&#39;ichi Kasai</a></td><td>1605.0</td><td>1309</td><td>28</td></tr>
+
+    <tr><td>19</td><td><a href="/artist/2332">Atsuko Ishizuka</a></td><td>1595.5</td><td>976</td><td>49</td></tr>
+
+    <tr><td>20</td><td><a href="/artist/2349">Naoto Hosoda</a></td><td>1575.0</td><td>1091</td><td>43</td></tr>
+
+</table>
+<br />
+<br />
+<br />
+
+    </div>
+
+    <footer>
+        <nav class="navbar navbar-default navbar-fixed-bottom">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/about/"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le projet</a></li>
+                    <li><a href="/faq/"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
+                    <li><a href="/cgu/"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
+                    <li><a href="https://twitter.com/mangakifr" target="_blank">@mangakifr</a></li>
+                    <li><a href="mailto:info@mangaki.fr"><span class="glyphicon glyphicon-heart"></span>&nbsp;info@mangaki.fr</a></li>
+                </ul>
+            </div>
+        </nav>
+    </footer>
+    <script>
+        $("nav [href='']").parents("li").addClass('active');
+    </script>
+</body>
+</html>
+
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-63869890-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
