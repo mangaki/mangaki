@@ -52,15 +52,23 @@ class Command(BaseCommand):
     args = ''
     help = 'Retrieve AniDB data'
 
-    def handle(self, *args, **options):
-        category = 'anime';
-        work_query = 'SELECT mangaki_{category}.work_ptr_id, mangaki_work.id, mangaki_work.title, mangaki_work.poster, mangaki_work.nsfw, COUNT(mangaki_work.id) rating_count FROM mangaki_{category}, mangaki_work, mangaki_rating WHERE mangaki_{category}.work_ptr_id = mangaki_work.id AND mangaki_rating.work_id = mangaki_work.id AND mangaki_{category}.anidb_aid > 0 GROUP BY mangaki_work.id, mangaki_{category}.work_ptr_id HAVING COUNT(mangaki_work.id) >= {min_ratings} ORDER BY {order_by}'
+    def handle(self, *args, **options):        
+        category = 'anime'
+        start = 0
+        if len(sys.argv) > 2:
+            if sys.argv[2] == 'id':
+                anime_id = sys.argv[3]
+                todo = Anime.objects.filter(id=anime_id, anidb_aid__gt=0)
+            else:
+                work_query = 'SELECT mangaki_{category}.work_ptr_id, mangaki_work.id, mangaki_work.title, mangaki_work.poster, mangaki_work.nsfw, COUNT(mangaki_work.id) rating_count FROM mangaki_{category}, mangaki_work, mangaki_rating WHERE mangaki_{category}.work_ptr_id = mangaki_work.id AND mangaki_rating.work_id = mangaki_work.id AND mangaki_{category}.anidb_aid > 0 GROUP BY mangaki_work.id, mangaki_{category}.work_ptr_id HAVING COUNT(mangaki_work.id) >= {min_ratings} ORDER BY {order_by}'
+                todo = Anime.objects.raw(work_query.format(category=category, min_ratings=6, order_by='rating_count DESC'))
+            if sys.argv[2] == 'from':
+                start = int(sys.argv[3])
         a = AniDB('mangakihttp', 1)
-        start = int(sys.argv[2]) if len(sys.argv) > 2 else 0  # Skipping
         i = 0
-        for anime in Anime.objects.raw(work_query.format(category=category, min_ratings=6, order_by='rating_count DESC')):
+        for anime in todo:
             i += 1
-            if i <= start:
+            if i < start:
                 continue
             print(i, ':', anime.title, anime.id)
             creators = a.get(anime.anidb_aid).creators
@@ -70,6 +78,6 @@ class Command(BaseCommand):
                     try_replace(anime, 'director', creator.string)
                 elif creator['type'] == 'Music':
                     try_replace(anime, 'composer', creator.string)
-                elif creator['type'] == 'Original Work':
+                elif creator['type'] == 'Original Work' or creator['type'] == 'Story Composition':
                     try_replace(anime, 'author', creator.string)
                 anime.save()
