@@ -198,7 +198,7 @@ class PairingAdmin(admin.ModelAdmin):
     def make_author(self, request, queryset):
         rows_updated = 0
         for pairing in queryset:
-            if Anime.objects.filter(id=pairing.work.id).update(director=pairing.artist):
+            if Anime.objects.filter(id=pairing.work.id).update(author=pairing.artist):
                 pairing.is_checked = True
                 pairing.save()
                 rows_updated += 1
