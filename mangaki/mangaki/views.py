@@ -454,6 +454,7 @@ def get_profile(request, username):
         'member_days': member_time.days,
         'anime_count': len(seen_anime_list),
         'manga_count': len(seen_manga_list),
+        'reco_count': len(received_recommendation_list),
         'seen_list': seen_list if is_shared else [],
         'unseen_list': unseen_list if is_shared else [],
         'received_recommendation_list': received_recommendation_list if is_shared else [],

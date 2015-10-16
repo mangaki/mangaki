@@ -46,7 +46,7 @@ class Command(BaseCommand):
             if title not in seen_titles:
                 print('=>', i, title, rating)
                 if Recommendation.objects.filter(user=svd, target_user=target_user, work__id=work_id).count() == 0:
-                    print(Recommendation(user=svd, target_user=target_user, work=Work.objects.get(id=work_id)).save())
+                    Recommendation(user=svd, target_user=target_user, work=Work.objects.get(id=work_id)).save()
                 c += 1
             elif i < 10:
                 print(i, title, rating)
