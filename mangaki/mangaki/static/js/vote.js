@@ -70,8 +70,11 @@ function displayWork(pos, work) {
     $('[data-toggle="tooltip"]').tooltip('fixTitle');
     work_div.find('h4 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
     work_div.find('.manga-snapshot-image').hide().css('background-image', 'url(' + work['poster'] + ')').fadeIn();
-    if(display_votes)
+    if(display_votes) {
         work_div.find('.manga-votes').fadeIn();
+        if(work['rating'] == 'willsee')
+            work_div.find('.manga-votes a[data-choice!=willsee]').addClass('not-chosen');
+    }
     else
         work_div.find('.manga-votes').fadeOut();
 }
