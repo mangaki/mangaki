@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, namedtuple
 from mangaki.models import Anime, Manga, Rating, Work
 from mangaki.utils.chrono import Chrono
 from django.contrib.auth.models import User
@@ -9,6 +9,8 @@ NB_NEIGHBORS = 15
 MIN_RATINGS = 3
 
 CHRONO_ENABLED = False
+
+WorkTuple = namedtuple('WorkTuple', 'id title poster nsfw')
 
 def get_recommendations(user, category, editor):
     # What if user is not authenticated? We will see soon.
@@ -44,7 +46,7 @@ def get_recommendations(user, category, editor):
     elif category == 'manga':
         kept_works = set(manga_ids)
 
-    # chrono.save('[%dQ] retrieve her %d ratings' % (len(connection.queries), len(rated_works)))
+    chrono.save('[%dQ] retrieve her %d ratings' % (len(connection.queries), len(rated_works)))
 
     values = {
         'favorite': 4,
@@ -110,7 +112,7 @@ def get_recommendations(user, category, editor):
 
     works = Work.objects.filter(id__in=rank_of.keys()).values('id', 'title', 'poster', 'nsfw')
     for work in works:
-        reco[rank_of[work['id']]][0] = work
+        reco[rank_of[work['id']]][0] = WorkTuple(**work)
 
     # print(len(connection.queries), 'queries')
     """for line in connection.queries:
