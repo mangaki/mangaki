@@ -1,12 +1,53 @@
 from collections import Counter
-from mangaki.models import Manga, Rating, Work
+from mangaki.models import Anime, Manga, Rating, Work
+from mangaki.utils.chrono import Chrono
 from django.contrib.auth.models import User
 from django.db.models import Count
+from django.db import connection
 
+NB_NEIGHBORS = 15
+MIN_RATINGS = 3
 
-def get_recommendations(user, my_rated_works, category, editor):
+CHRONO_ENABLED = False
+
+def get_recommendations(user, category, editor):
+    # What if user is not authenticated? We will see soon.
+    chrono = Chrono(CHRONO_ENABLED)
+
+    chrono.save('[%dQ] begin' % len(connection.queries))
+
+    rated_works = {}
+    for work_id, choice in Rating.objects.filter(user=user).values_list('work_id', 'choice'):
+        rated_works[work_id] = choice
+
+    willsee = set()
+    if user.profile.reco_willsee_ok:
+        banned_works = set()
+        for work_id in rated_works:
+            if rated_works[work_id] != 'willsee':
+                banned_works.add(work_id)
+            else:
+                willsee.add(work_id)
+    else:
+        banned_works = set(rated_works.keys())
+
+    mangas = Manga.objects.all()
+    if editor == 'otototaifu':
+        mangas = mangas.filter(editor__in=['Ototo Manga', 'Taifu comics'])
+    elif editor != 'unspecified':
+        mangas = mangas.filter(editor__icontains=editor)
+    manga_ids = mangas.values_list('id', flat=True)
+
+    kept_works = None
+    if category == 'anime':
+        banned_works |= set(manga_ids)
+    elif category == 'manga':
+        kept_works = set(manga_ids)
+
+    # chrono.save('[%dQ] retrieve her %d ratings' % (len(connection.queries), len(rated_works)))
+
     values = {
-        'favorite': 5,
+        'favorite': 4,
         'like': 2,
         'dislike': -2,
         'neutral': 0.1,
@@ -14,56 +55,67 @@ def get_recommendations(user, my_rated_works, category, editor):
         'wontsee': -0.5
     }
 
-    works = Counter()
     final_works = Counter()
     nb_ratings = {}
     c = 0
     neighbors = Counter()
-    for her in Rating.objects.filter(work__in=my_rated_works.keys()):
+    for user_id, work_id, choice in Rating.objects.filter(work__in=rated_works.keys()).values_list('user_id', 'work_id', 'choice'):
         c += 1
-        neighbors[her.user_id] += values[my_rated_works[her.work_id]] * values[her.choice]
+        neighbors[user_id] += values[rated_works[work_id]] * values[choice]
+
+    chrono.save('[%dQ] fill neighbors with %d ratings' % (len(connection.queries), c))
 
     score_of_neighbor = {}
-    for user_id, score in neighbors.most_common(30 if category == 'manga' else 15):
+    # print('Neighbors:')
+    # nbr = []
+    for user_id, score in neighbors.most_common(NB_NEIGHBORS):
+        # print(User.objects.get(id=user_id).username, score)
         score_of_neighbor[user_id] = score
+        # nbr.append(user_id)
+    # print(nbr)
 
-    if editor == 'unspecified':
-        bundle = Manga.objects.values_list('id', flat=True)  # TODO : est-ce que ça regarde ceux qui y sont tous ?
-        manga_ids = set(bundle)
-    elif editor == 'otototaifu':
-        bundle = Manga.objects.filter(editor__in=['Ototo Manga', 'Taifu comics']).values_list('id', flat=True)
-        manga_ids = set(bundle)
-    else:
-        bundle = Manga.objects.filter(editor__icontains=editor).values_list('id', flat=True)
-        manga_ids = set(bundle)
-
-    works_by_id = {}
-    for her in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']):
-        """if not her.work.id in works_by_id:
-            works_by_id[her.work.id] = her.work  # Adding for future retrieval"""
-        is_manga = her.work_id in manga_ids
-        if (is_manga and category == 'anime') or (not is_manga and category == 'manga'):
+    sum_ratings = Counter()
+    nb_ratings = Counter()
+    sum_scores = Counter()
+    i = 0
+    for work_id, user_id, choice in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']).values_list('work_id', 'user_id', 'choice'):
+        i += 1
+        if work_id in banned_works or (kept_works and work_id not in kept_works):
             continue
-        if her.work_id not in works:
-            works[her.work_id] = [values[her.choice], score]
-            nb_ratings[her.work_id] = 1
-        else:
-            works[her.work_id][0] += values[her.choice]
-            works[her.work_id][1] += score_of_neighbor[her.user_id]
-            nb_ratings[her.work_id] += 1
 
-    banned_works = set()
-    for work_id in my_rated_works:
-        banned_works.add(work_id)
+        sum_ratings[work_id] += values[choice]
+        nb_ratings[work_id] += 1
+        sum_scores[work_id] += score_of_neighbor[user_id]
 
-    for i, work_id in enumerate(works):
-        # Adding interesting works to the arena
-        # Temporarily, a recommendation can be issued from one single user (beware of hentai)
-        if nb_ratings[work_id] > 1 and work_id not in banned_works and works[work_id][0] > 0:
-            final_works[(work_id, work_id in manga_ids)] = (float(works[work_id][0]) / nb_ratings[work_id], works[work_id][1])
+    chrono.save('[%dQ] compute and filter all ratings from %d sources' % (len(connection.queries), i))
+
+    i = 0
+    k = 0
+    for work_id in nb_ratings:
+        # Adding interesting works to the arena (rated at least MIN_RATINGS by neighbors)
+        if nb_ratings[work_id] >= MIN_RATINGS:
+            k += 1
+            final_works[(work_id, work_id in manga_ids, work_id in willsee)] = (float(sum_ratings[work_id]) / nb_ratings[work_id], sum_scores[work_id])    
+        i += 1
+
+    chrono.save('[%dQ] rank %d %d works' % (len(connection.queries), k, i))
 
     reco = []
-    for (work_id, is_manga), _ in final_works.most_common(4):  # Retrieving top 4
-        reco.append((Work.objects.get(id=work_id), is_manga))
+    rank = 0
+    rank_of = {}
+    for (work_id, is_manga, in_willsee), _ in final_works.most_common(4):  # Retrieving top 4
+        rank_of[work_id] = rank
+        reco.append([work_id, is_manga, in_willsee])
+        rank += 1
+
+    works = Work.objects.filter(id__in=rank_of.keys()).values('id', 'title', 'poster', 'nsfw')
+    for work in works:
+        reco[rank_of[work['id']]][0] = work
+
+    # print(len(connection.queries), 'queries')
+    """for line in connection.queries:
+        print(line)"""
+
+    chrono.save('[%dQ] retrieve top 4' % len(connection.queries))
 
     return reco

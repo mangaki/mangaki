@@ -47,8 +47,11 @@ def get_rated_works(user):
 
 
 def update_poster_if_nsfw(obj, user):
-    if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
-        obj.poster = '/static/img/nsfw.jpg'  # NSFW
+    if not user.is_authenticated() or not user.profile.nsfw_ok:
+        if obj.get('nsfw'):
+            obj['poster'] = '/static/img/nsfw.jpg'
+        elif obj.getattr('nsfw'):
+            obj.poster = '/static/img/nsfw.jpg'  # NSFW
 
 
 def update_score_while_rating(user, work, choice):
@@ -559,24 +562,11 @@ def get_extra_manga(request, query):
 
 
 def get_reco_list(request, category, editor):
-    # category = request.GET.get('category', 'all')
-    # editor = request.GET.get('editor', '')
     reco_list = []
-    my_rated_works = {}
-    willsee = set()
-    if request.user.is_authenticated():
-        if request.user.profile.reco_willsee_ok:
-            for rating in Rating.objects.filter(user=request.user):
-                if rating.choice != 'willsee':
-                    my_rated_works[rating.work_id] = rating.choice
-                else:
-                    willsee.add(rating.work.id)
-        else:
-            for rating in Rating.objects.filter(user=request.user):
-                my_rated_works[rating.work_id] = rating.choice
-    for work, is_manga in get_recommendations(request.user, my_rated_works, category, editor):
+    for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
         update_poster_if_nsfw(work, request.user)
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if work.id in willsee else 'None'})  # Does not work
+        reco_list.append({'id': work['id'], 'title': work['title'], 'poster': work['poster'],
+            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 
