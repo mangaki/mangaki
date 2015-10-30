@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from mangaki.models import Rating
+from mangaki.models import Rating, Work
 from scipy.sparse import lil_matrix
 from sklearn.utils.extmath import randomized_svd
 import numpy as np
@@ -22,52 +22,54 @@ def Base64Decode(jsonDump):
         return arr.reshape(loaded[2])
     return arr
 
+class Chrono(object):
+    checkpoint = datetime.now()
+    def save(self, title):
+        now = datetime.now()
+        print(title, now - self.checkpoint)
+        self.checkpoint = now
+
 def run():
-    start = datetime.now()
     KING_ID = User.objects.get(username='jj').id
+    chrono = Chrono()
+
     anime_titles = {}
-    anime_ids = set()
-    rs = Rating.objects.all().select_related('work')
-    cp0 = datetime.now()
-    print(cp0 - start)
-    for i, rating in enumerate(rs, start=1):
-        if i % 10000 == 0:
-            print(i)
-        if rating.work.id not in anime_ids:
-            anime_ids.add(rating.work.id)
-            anime_titles[rating.work.id] = rating.work.title
-    cp1 = datetime.now()
-    print(cp1 - cp0)
-    seen_titles = set()
-    for rating in Rating.objects.filter(user__id=KING_ID).select_related('work'):
-        if rating.choice != 'willsee':
-            seen_titles.add(rating.work.title)
-    cp2 = datetime.now()
-    print(cp2 - cp1)
+    anime_ids = list(Rating.objects.values_list('work_id', flat=True).distinct())
+    for work in Work.objects.values('id', 'title'):
+        anime_titles[work['id']] = work['title']
+    print(len(anime_ids))
+
+    chrono.save('get_work_ids')
+
+    seen_works = set(Rating.objects.filter(user__id=KING_ID).exclude(choice='willsee').values_list('work_id', flat=True))
+
+    chrono.save('get_seen_works')
+
     nb_users = max(user.id for user in User.objects.all())
     nb_anime = len(anime_ids)
-    anime_ids = list(anime_ids)
     inversed = {anime_ids[i]: i for i in range(nb_anime)}
     print("Computing X: (%i×%i)" % (nb_users, nb_anime))
-    cp3 = datetime.now()
-    print(cp3 - cp2)
     print(nb_users, '×', nb_anime)
     values = {'favorite': 10, 'like': 2, 'dislike': -2, 'neutral': 0.1, 'willsee': 0.5, 'wontsee': -0.5}
-    X = lil_matrix((nb_users + 1, nb_anime + 1))
-    for rating in Rating.objects.select_related('work', 'user'):
-        if rating.work.id < nb_anime:
-            X[rating.user.id, inversed[rating.work.id]] = values[rating.choice]
+    X = lil_matrix((nb_users + 1, nb_anime))
+    i = 0
+    for user_id, work_id, choice in Rating.objects.values_list('user_id', 'work_id', 'choice'):#select_related('work', 'user'):
+        X[user_id, inversed[work_id]] = values[choice]
+    np.save('backupX', X)
+
+    chrono.save('fill matrix')
 
     # Ranking computation
-    cp4 = datetime.now()
-    print(cp4 - cp3)
     U, sigma, VT = randomized_svd(X, NB_COMPONENTS, n_iter=3, random_state=42)
     print('Formes', U.shape, sigma.shape, VT.shape)
+
+    chrono.save('factor matrix')
+
     print(sigma)
     print('mon vecteur (taille %d)' % len(U[KING_ID]), U[KING_ID])
-    """for i, line in enumerate(VT):
-        print('=> Ligne %d' % i, '(ma note : %f)' % U[KING_ID][i])
-        sorted_line = sorted((line[j], anime_titles[anime_ids[j]]) for j in range(1, nb_anime + 1) if j in anime_titles)[::-1]
+    for i, line in enumerate(VT):
+        print('=> Ligne %d' % (i + 1), '(ma note : %f)' % U[KING_ID][i])
+        sorted_line = sorted((line[j], anime_titles[anime_ids[j]]) for j in range(nb_anime))[::-1]
         top5 = sorted_line[:10]
         bottom5 = sorted_line[-10:]
         for anime in top5:
@@ -78,9 +80,12 @@ def run():
             with open('vector%d.json' % (i + 1), 'w') as f:
                 vi = X.dot(line).tolist()
                 x_norm = [np.dot(X.data[k], X.data[k]) / (nb_anime + 1) for k in range(nb_users + 1)]
-                f.write(json.dumps({'v': [v / math.sqrt(x_norm[k]) if x_norm[k] != 0 else float('inf') for k, v in enumerate(vi)]}))"""
+                f.write(json.dumps({'v': [v / math.sqrt(x_norm[k]) if x_norm[k] != 0 else float('inf') for k, v in enumerate(vi)]}))
     XD = np.dot(np.dot(U, np.diag(sigma)), VT)
     print('Forme de XD', XD.shape)
+    # print(VT.dot(VT.transpose()))
+
+    chrono.save('compute product of components')
 
     np.save('backupXD', XD)
 
@@ -89,23 +94,24 @@ def run():
     with open('backupSVD.json', 'w') as f:
         f.write(json.dumps(backup))
 
-    return
+    # return
 
-    ranking = sorted((XD[KING_ID, j], anime_titles[anime_ids[j]]) for j in range(1, nb_anime + 1) if j in anime_titles)[::-1]
+    ranking = sorted((XD[KING_ID, j], anime_ids[j], anime_titles[anime_ids[j]]) for j in range(nb_anime))[::-1]
 
     # Summarize the results of the ranking for KING_ID:
     # “=> rank, title, score”
     c = 0
-    for i, (rating, title) in enumerate(ranking, start=1):
-        if title not in seen_titles:
+    for i, (rating, work_id, title) in enumerate(ranking, start=1):
+        if work_id not in seen_works:
             print('=>', i, title, rating)
             c += 1
-        elif i < 10:
+        elif i < 20:
             print(i, title, rating)
-        if c >= 10:
+        if c >= 20:
             break
-    print(len(connection.queries))
+
+    print(len(connection.queries), 'queries')
     for line in connection.queries:
         print(line)
-    end = datetime.now()
-    print(end - start)
+
+    chrono.save('complete')
