@@ -110,7 +110,7 @@ def get_recommendations(user, category, editor):
 
     works = Work.objects.filter(id__in=rank_of.keys())
     for work in works:
-        reco[rank_of[work['id']]][0] = work
+        reco[rank_of[work.id]][0] = work
 
     # print(len(connection.queries), 'queries')
     """for line in connection.queries:
