@@ -2,26 +2,31 @@
 
 {% block body %}
 
-<div class="well" align="center">
-    <h2 style="text-align: center">Mangaki est en finale de la Student Demo Cup !</h2>
-    <a href="http://bit.ly/mangaki-demo-cup" class="btn btn-success btn-lg" target="_blank">Votez pour nous !</a></h2>
-</div>
-
 <div class="row">
-    {% if not user.is_authenticated %}
-    <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a></div>
-    <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/user/signup/">S'inscrire</a></div>
-    <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="https://bitbucket.org/mangaki/mangaki/src" target="_blank">Voir le code</a> </div>
-    {% else %}
-        <div class="col-md-3 col-sm-3 margin" style=""> </div>
-     <div class="col-md-3 col-sm-3 margin" style="">     <a class="btn btn-mangaki btn-lg" href="/anime/">C'est parti !</a></div>
-     <div class="col-md-3 col-sm-3 margin" style="">     <a class="btn btn-mangaki btn-lg" href="/u/{{ user.username }}">Importer myAnimeList</a></div>
-     <div class="col-md-3 col-sm-3 margin" style=""> </div>
-    {% endif %}
-</div>
+    <div class="col-md-6 col-sm-12">
+        Bon ben… on a gagné la Student Demo Cup.
 
-<div class="row" style="text-align: center">
-    <div class="col-md-12 col-sm-12 margin"><img src="/static/img/help.jpg" style="max-width: 100%" /></div>
+        <blockquote class="twitter-tweet" lang="fr"><p lang="fr" dir="ltr">Le prix <a href="https://twitter.com/hashtag/enterprise?src=hash">#enterprise</a> revient à <a href="https://twitter.com/MangakiFR">@MangakiFR</a> !!! Félicitation et bravo à ts les autres pr vos sujets projets <a href="https://twitter.com/hashtag/OSSPARIS15?src=hash">#OSSPARIS15</a> <a href="https://t.co/PPnd5yjx9N">pic.twitter.com/PPnd5yjx9N</a></p>&mdash; Open Source Summit (@OSS_Paris) <a href="https://twitter.com/OSS_Paris/status/667035729223131136">18 Novembre 2015</a></blockquote> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </div>
+
+    <div class="col-md-6 col-sm-12">
+        <div class="row">
+            {% if not user.is_authenticated %}
+            <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a></div>
+            <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/user/signup/">S'inscrire</a></div>
+            <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="https://bitbucket.org/mangaki/mangaki/src" target="_blank">Voir le code</a> </div>
+            {% else %}
+                <!-- <div class="col-md-3 col-sm-3 margin" style=""> </div> -->
+             <div class="col-md-6 col-sm-12 margin" style="">     <a class="btn btn-mangaki btn-lg" href="/anime/">C'est parti !</a></div>
+             <div class="col-md-6 col-sm-12 margin" style="">     <a class="btn btn-mangaki btn-lg" href="/u/{{ user.username }}">Importer myAnimeList</a></div>
+             
+            {% endif %}
+
+            <div class="row" style="text-align: center">
+                <div class="col-md-12 col-sm-12 margin"><img src="/static/img/help.jpg" style="max-width: 100%" /></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row" style="margin-top: 1em">
