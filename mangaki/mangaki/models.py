@@ -238,3 +238,9 @@ class Pairing(models.Model):
     artist = models.ForeignKey(Artist)
     work = models.ForeignKey(Work)
     is_checked = models.BooleanField(default=False)
+
+
+class Deck(models.Model):
+    category = models.CharField(max_length=32)
+    sort_mode = models.CharField(max_length=32)
+    content = models.CommaSeparatedIntegerField(max_length=42000)
