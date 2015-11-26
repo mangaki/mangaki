@@ -13,12 +13,14 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Deck
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
 from mangaki.utils.recommendations import get_recommendations
+from mangaki.utils.chrono import Chrono
 
+from collections import Counter
 from markdown import markdown
 from urllib.parse import urlencode
 from itertools import groupby
@@ -41,8 +43,9 @@ def display_queries():
 
 def get_rated_works(user):
     rated_works = {}
-    for rating in Rating.objects.filter(user=user):
-        rated_works[rating.work_id] = rating.choice
+    for work_id, choice in Rating.objects.filter(user=user).values_list('work_id', 'choice'):
+        rated_works[work_id] = choice
+    print(len(rated_works))
     return rated_works
 
 
@@ -51,12 +54,9 @@ def update_poster_if_nsfw(obj, user):
         obj.poster = '/static/img/nsfw.jpg'  # NSFW
 
 
-def update_poster_if_nsfw_in_dict(d, user):
-    if not user.is_authenticated() or not user.profile.nsfw_ok:
-        if obj.get('nsfw'):
-            obj['poster'] = '/static/img/nsfw.jpg'
-        elif obj.getattr('nsfw'):
-            obj.poster = '/static/img/nsfw.jpg'  # NSFW
+def update_poster_if_nsfw_dict(d, user):
+    if d['nsfw'] and (not user.is_authenticated() or not user.profile.nsfw_ok):
+        d['poster'] = '/static/img/nsfw.jpg'  # NSFW
 
 
 def update_score_while_rating(user, work, choice):
@@ -201,6 +201,7 @@ def get_scores(bundle, ranking='controversy'):
 def get_bundle(category, sort_mode, my_rated_works={}):
     already_rated = ', '.join(map(str, my_rated_works.keys())) if my_rated_works.keys() else '0'
     work_query = 'SELECT mangaki_{category}.work_ptr_id, mangaki_work.id, mangaki_work.title, mangaki_work.poster, mangaki_work.nsfw, COUNT(mangaki_work.id) rating_count FROM mangaki_{category}, mangaki_work, mangaki_rating WHERE mangaki_{category}.work_ptr_id = mangaki_work.id AND mangaki_rating.work_id = mangaki_work.id AND (mangaki_{category}.work_ptr_id NOT IN (' + already_rated + ')) GROUP BY mangaki_work.id, mangaki_{category}.work_ptr_id HAVING COUNT(mangaki_work.id) >= {min_ratings} ORDER BY {order_by}'
+    # work_query = 'SELECT mangaki_{category}.work_ptr_id, mangaki_work.id, mangaki_work.title, mangaki_work.poster, mangaki_work.nsfw, COUNT(mangaki_work.id) rating_count FROM mangaki_{category}, mangaki_work, mangaki_rating WHERE mangaki_{category}.work_ptr_id = mangaki_work.id AND mangaki_rating.work_id = mangaki_work.id AND (mangaki_{category}.work_ptr_id NOT IN (' + already_rated + ')) GROUP BY mangaki_work.id, mangaki_{category}.work_ptr_id HAVING COUNT(mangaki_work.id) >= {min_ratings} ORDER BY {order_by}'
     if category == 'anime':
         obj = Anime.objects
     elif category == 'manga':
@@ -215,26 +216,40 @@ def get_bundle(category, sort_mode, my_rated_works={}):
         return obj.raw(work_query.format(category=category, min_ratings=1 if category == 'anime' else 0, order_by='title'))
 
 
-def pick_deck(bundle, sort_mode, my_rated_works, deja_vu):
-    score = get_scores(bundle, sort_mode)
-    score_max = float('-inf')
-    card = None
-    works = [work for work in bundle if work.id not in my_rated_works and str(work.id) not in deja_vu]
-    works.sort(key=(lambda work: score.get(work.id, 0)), reverse=True)
+def filter_deck(deck, my_rated_works, deja_vu):
+    works = [work_id for work_id in deck if int(work_id) not in my_rated_works and work_id not in deja_vu]
     return works[:54]
 
 
 def get_card(request, category, sort_id=1):
+    chrono = Chrono(True)
     deja_vu = request.GET.get('dejavu', '').split(',')
     sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
     my_rated_works = get_rated_works(request.user) if request.user.is_authenticated() else {}
-    bundle = list(get_bundle(category, sort_mode, my_rated_works))
-    works = pick_deck(bundle, sort_mode, my_rated_works, deja_vu)
+    chrono.save('got rated works')
+    if Deck.objects.filter(category=category, sort_mode=sort_mode):
+        deck = Deck.objects.get(category=category, sort_mode=sort_mode).content.split(',')
+    else:
+        bundle = list(get_bundle(category, sort_mode, my_rated_works))
+        chrono.save('got bundle')
+        score = get_scores(bundle, sort_mode)
+        chrono.save('got scores')
+        bundle.sort(key=(lambda work: score.get(work.id, 0)), reverse=True)
+        deck = [str(work.id) for work in bundle]
+        Deck(category=category, sort_mode=sort_mode, content=','.join(deck)).save()
+    filtered_deck = filter_deck(deck, my_rated_works, deja_vu)
+    chrono.save('filter deck')
+    data = {}
+    for work_id, title, poster, synopsis, nsfw in Work.objects.filter(id__in=filtered_deck).values_list('id', 'title', 'poster', 'synopsis', 'nsfw'):
+        data[work_id] = {'title': title, 'poster': poster, 'synopsis': synopsis, 'nsfw': nsfw}
+    # display_queries()
     cards = []
-    for work in works:
-        update_poster_if_nsfw(work, request.user)
-        card = {'id': work.id, 'title': work.title, 'poster': work.poster, 'category': category, 'synopsis': work.synopsis}
+    for work_id in filtered_deck:
+        work = data[int(work_id)]
+        update_poster_if_nsfw_dict(work, request.user)
+        card = {'id': work_id, 'title': work['title'], 'poster': work['poster'], 'category': category, 'synopsis': work['synopsis']}
         cards.append(card)
+    # return render(request, 'about.html')
     return HttpResponse(json.dumps(cards), content_type='application/json')
 
 
