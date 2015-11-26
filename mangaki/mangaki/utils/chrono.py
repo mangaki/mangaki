@@ -1,10 +1,11 @@
 from datetime import datetime
 
 class Chrono(object):
-    checkpoint = datetime.now()
+    checkpoint = None
     is_enabled = True
     def __init__(self, is_enabled):
         self.is_enabled = is_enabled
+        self.checkpoint = datetime.now()
     def save(self, title):
         if self.is_enabled:
             now = datetime.now()

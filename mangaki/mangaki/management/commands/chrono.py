@@ -45,6 +45,7 @@ class Command(BaseCommand):
             report.time_page('/user/jj/')
             report.time_page('/users/')
             report.time_page('/reco/')
+            report.time_page('/data/reco/all/unspecified.json')
         # r = s.get('%s/reco/' % DOMAIN)
         # b = BeautifulSoup(r.text)
         # print(b)
