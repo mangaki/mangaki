@@ -42,10 +42,11 @@ class Command(BaseCommand):
         s.post('%s/user/login/' % DOMAIN, {'csrfmiddlewaretoken': csrf, 'login': 'jj', 'password': DUMMY, 'remember': '1'})
         with Report(s) as report:
             report.time_page('/anime/')
-            report.time_page('/user/jj/')
+            report.time_page('/u/jj')
             report.time_page('/users/')
             report.time_page('/reco/')
             report.time_page('/data/reco/all/unspecified.json')
+            report.time_page('/data/card/anime/1.json')
         # r = s.get('%s/reco/' % DOMAIN)
         # b = BeautifulSoup(r.text)
         # print(b)
