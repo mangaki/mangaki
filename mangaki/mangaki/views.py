@@ -417,45 +417,72 @@ class UserList(ListView):
 
 
 def get_profile(request, username):
+    chrono = Chrono(True)
     try:
         is_shared = Profile.objects.get(user__username=username).is_shared
     except Profile.DoesNotExist:
         Profile(user=request.user).save()  # À supprimer à terme # Tu parles, maintenant ça va être encore plus compliqué
         is_shared = True
+    # chrono.save('get profile')
     user = User.objects.get(username=username)
     category = request.GET.get('category', 'anime')
     ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
-    rating_list = sorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title))
     seen_anime_list = []
     unseen_anime_list = []
     seen_manga_list = []
     unseen_manga_list = []
+    c = 0
+    """for work_id, work_title, is_anime, choice in Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga').values_list('work_id', 'work__title', 'work__anime', 'choice'):
+        # print(work_id, work_title, is_anime, choice)
+        seen = choice in ['favorite', 'like', 'neutral', 'dislike']
+        rating = {'work': {'id': work_id, 'title': work_title}, 'choice': choice}
+        # print(rating)
+        if is_anime:
+            if seen:
+                seen_anime_list.append(rating)
+            else:
+                unseen_anime_list.append(rating)
+        else:
+            if seen:
+                seen_manga_list.append(rating)
+            else:
+                unseen_manga_list.append(rating)
+        c += 1
+        if c >= 200:
+            break"""
+    rating_list = sorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title))  # Tri par note puis nom
+    # , key=lambda x: (ordering.index(x['choice']), 1))  # Tri par note puis nom
+    # print(rating_list[:5])
+    # chrono.save('get ratings %d queries' % len(connection.queries))
 
     received_recommendation_list = []
     sent_recommendation_list = []
-    received_recommendations = Recommendation.objects.filter(target_user__username=username)
-    sent_recommendations = Recommendation.objects.filter(user__username=username)
-    for reco in received_recommendations:
-        try:
-            reco.work.anime
-            if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                received_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
-        except Anime.DoesNotExist:
-            if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                received_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
-    for reco in sent_recommendations:
-        try:
-            reco.work.anime
-            if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                sent_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
-        except Anime.DoesNotExist:
-            if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                sent_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
+    if category == 'recommendation':
+        received_recommendations = Recommendation.objects.filter(target_user__username=username)
+        sent_recommendations = Recommendation.objects.filter(user__username=username)
+        for reco in received_recommendations:
+            try:
+                reco.work.anime
+                if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                    received_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
+            except Anime.DoesNotExist:
+                if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                    received_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
+        for reco in sent_recommendations:
+            try:
+                reco.work.anime
+                if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                    sent_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
+            except Anime.DoesNotExist:
+                if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                    sent_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
+    # chrono.save('get reco %d queries' % len(connection.queries))
 
-    for rating in rating_list:
-        seen = rating.choice in ['favorite', 'like', 'neutral', 'dislike']
+    for r in rating_list:
+        seen = r.choice in ['favorite', 'like', 'neutral', 'dislike']
+        rating = r#{'work': {'id': r.work.id, 'title': r.work.title}, 'choice': r.choice}
         try:
-            rating.work.anime
+            r.work.anime
             if seen:
                 seen_anime_list.append(rating)
             else:
@@ -465,9 +492,31 @@ def get_profile(request, username):
                 seen_manga_list.append(rating)
             else:
                 unseen_manga_list.append(rating)
+    # chrono.save('categorize ratings')
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
     seen_list = seen_anime_list if category == 'anime' else seen_manga_list
     unseen_list = unseen_anime_list if category == 'anime' else unseen_manga_list
+    data = {
+        'username': username,
+        'score': user.profile.score,
+        'is_shared': is_shared,
+        'category': category,
+        'avatar_url': user.profile.get_avatar_url(),
+        'member_days': member_time.days,
+        'anime_count': len(seen_anime_list),
+        'manga_count': len(seen_manga_list),
+        'reco_count': len(received_recommendation_list),
+        'seen_list': seen_list if is_shared else [],
+        'unseen_list': unseen_list if is_shared else [],
+        'received_recommendation_list': received_recommendation_list if is_shared else [],
+        'sent_recommendation_list': sent_recommendation_list if is_shared else [],
+    }
+    for key in data:
+        try:
+            print(key, len(data[key]))
+        except:
+            print(key, '->', data[key])
+    chrono.save('get request')
     return render(request, 'profile.html', {
         'username': username,
         'score': user.profile.score,
