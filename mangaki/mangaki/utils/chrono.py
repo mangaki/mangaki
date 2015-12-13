@@ -10,5 +10,5 @@ class Chrono(object):
         if self.is_enabled:
             now = datetime.now()
             delta = now - self.checkpoint
-            print(title, '[%d ms]' % round(delta.microseconds / 1000))
+            print(title, '[%d ms]' % round(delta.total_seconds() * 1000))
             self.checkpoint = now
