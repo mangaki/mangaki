@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>Mangaki</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mangaki{% endblock %}</title>
     <link rel="icon" href="/static/img/favicon.png">
     <script src="/static/js/jquery-latest.min.js"></script>
     <script src="/static/js/bootstrap-switch.min.js"></script>
@@ -110,7 +111,7 @@
     </div>
 
     <footer>
-        <nav class="navbar navbar-default navbar-fixed-bottom">
+        <nav class="navbar navbar-default">
             <div class="navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="/about/"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le projet</a></li>
