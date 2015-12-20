@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.anidb import AniDB
 from mangaki.models import Anime, Artist
+from urllib.parse import urlparse, parse_qs
 import sys
 
 def pick_among(contestants):
@@ -58,6 +59,15 @@ class Command(BaseCommand):
         if len(sys.argv) > 2:
             if sys.argv[2] == 'id':
                 anime_id = sys.argv[3]
+                anime = Anime.objects.get(id=anime_id)
+                if anime.anidb_aid == 0:
+                    for reference in anime.reference_set.all():
+                        if reference.url.startswith('http://anidb.net'):
+                            query = urlparse(reference.url).query
+                            anidb_aid = parse_qs(query).get('aid')
+                            if anidb_aid:
+                                anime.anidb_aid = anidb_aid[0]
+                                anime.save()
                 todo = Anime.objects.filter(id=anime_id, anidb_aid__gt=0)
             else:
                 work_query = 'SELECT mangaki_{category}.work_ptr_id, mangaki_work.id, mangaki_work.title, mangaki_work.poster, mangaki_work.nsfw, COUNT(mangaki_work.id) rating_count FROM mangaki_{category}, mangaki_work, mangaki_rating WHERE mangaki_{category}.work_ptr_id = mangaki_work.id AND mangaki_rating.work_id = mangaki_work.id AND mangaki_{category}.anidb_aid > 0 GROUP BY mangaki_work.id, mangaki_{category}.work_ptr_id HAVING COUNT(mangaki_work.id) >= {min_ratings} ORDER BY {order_by}'
