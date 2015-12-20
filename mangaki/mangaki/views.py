@@ -34,6 +34,21 @@ import json
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
+REFERENCE_DOMAINS = (
+    ('http://myanimelist.net', 'myAnimeList'),
+    ('http://animeka.com', 'Animeka'),
+    ('http://vgmdb.net', 'VGMdb'),
+    ('http://anidb.net', 'AniDB')
+)
+
+RATING_COLORS = {
+    'favorite': {'normal': '#f8d549', 'highlight': '#f8d549'},
+    'like': {'normal': '#5cb85c', 'highlight': '#47a447'},
+    'neutral': {'normal': '#f0ad4e', 'highlight': '#ec971f'},
+    'dislike': {'normal': '#d9534f', 'highlight': '#c9302c'},
+    'willsee': {'normal': '#337ab7', 'highlight': '#286090'},
+    'wontsee': {'normal': '#5bc0de', 'highlight': '#31b0d5'}
+}
 
 
 def display_queries():
@@ -85,7 +100,7 @@ def update_score_while_unrating(user, work, choice):
 
 
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
-    model = Anime
+    queryset = Anime.objects.select_related('director', 'composer', 'author')
     form_class = SuggestionForm
 
     def get_success_url(self):
@@ -93,23 +108,35 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AnimeDetail, self).get_context_data(**kwargs)
-        update_poster_if_nsfw(self.object, self.request.user)
-        context['object'].source = context['object'].source.split(',')[0]
+        anime = self.object
+        update_poster_if_nsfw(anime, self.request.user)
+        context['object'].source = anime.source.split(',')[0]
 
         genres = []
-        for genre in context['object'].genre.all():
+        for genre in anime.genre.all():
             genres.append(genre.title)
         context['genres'] = ', '.join(genres)
 
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
-                if Rating.objects.filter(user=self.request.user, work=self.object, choice='favorite').count() > 0:
+                if Rating.objects.filter(user=self.request.user, work=anime, choice='favorite').count() > 0:
                     context['rating'] = 'favorite'
                 else:
-                    context['rating'] = self.object.rating_set.get(user=self.request.user).choice
+                    context['rating'] = anime.rating_set.get(user=self.request.user).choice
             except Rating.DoesNotExist:
                 pass
+
+        context['references'] = []
+        for reference in anime.reference_set.all():
+            for domain, name in REFERENCE_DOMAINS:
+                if reference.url.startswith(domain):
+                    context['references'].append((reference.url, name))
+
+        nb = Counter(Rating.objects.filter(work=anime).values_list('choice', flat=True))
+        context['stats'] = []
+        for rating in ['favorite', 'like', 'neutral', 'dislike', 'willsee', 'wontsee']:
+            context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': rating})
         return context
 
     def post(self, request, *args, **kwargs):
