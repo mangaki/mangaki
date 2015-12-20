@@ -7,37 +7,30 @@
     <div class="col-md-12"> <!--  col-md-push-3 -->
         <h1>{{ object.title }}</h1>
     </div>
-      <div class="col-sm-6 col-md-3 manga-sheet"> <!-- fluid col-sm-6 col-md-pull-3 -->
-          <div class="thumbnail data" data-category="anime" data-id="{{ object.id }}">
-              {% include "work_rating.html" with category="anime" work=object %}
-          </div>
-      </div>
-      <div class="col-sm-6 col-md-9">
-          <div>
-              <p>Nombre d'épisodes : {{ object.nb_episodes }}</p>
+    <div class="col-sm-6 col-md-3 manga-sheet"> <!-- fluid col-sm-6 col-md-pull-3 -->
+        <div class="thumbnail data" data-category="anime" data-id="{{ object.id }}">
+            {% include "work_rating.html" with category="anime" work=object %}
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <p>Nombre d'épisodes : {{ object.nb_episodes }}</p>
 
-              <p>Réalisateur : <a href="/artist/{{ object.director.id }}">{{ object.director }}</a></p>
-              <p>Compositeur : <a href="/artist/{{ object.composer.id }}">{{ object.composer }}</a></p>
-              <p>Auteur : <a href="/artist/{{ object.author.id }}">{{ object.author }}</a></p>
-              <p>Éditeur : {{ object.editor }}</p>
-              <p>Origine : {{ object.origin }}</p>
-              <p>Genres : {{ genres }}</p>
-              <p>Type : {{ object.anime_type }}</p>
-
-              <!-- <h4>Liens</h4>
-              <ul>
-                  <li>Voir la fiche sur Animeka</li>
-                  <li><a href="#">Acheter sur Kazé</a></li>
-              </ul> -->
-              <hr />
-              <!-- <a href="/anime/{{ object.id }}/nsfw" class="btn btn-danger">NSFW</a> -->
-              <!-- <h4>Actualité</h4>
-              <ul>
-                  <li><a href="#">La 2e OST est sortie !</a></li>
-                  <li><a href="#">Fiche sur myAnimeList</a></li>
-              </ul> -->
-          </div>
-      </div>
+        <p>Réalisateur : <a href="/artist/{{ object.director.id }}">{{ object.director }}</a></p>
+        <p>Compositeur : <a href="/artist/{{ object.composer.id }}">{{ object.composer }}</a></p>
+        <p>Auteur : <a href="/artist/{{ object.author.id }}">{{ object.author }}</a></p>
+        <p>Éditeur : {{ object.editor }}</p>
+        <p>Origine : {{ object.origin }}</p>
+        <p>Genres : {{ genres }}</p>
+        <p>Type : {{ object.anime_type }}</p>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <h3>Références</h3>
+        <ul>
+        {% for url, name in references %}
+            <li><a href="{{ url }}" target="_blank">Voir sur {{ name }}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
 </div>
 <br />
 {% if object.synopsis %}
