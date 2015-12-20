@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load bootstrap %}
 
+{% block title %}{{ object.title }} - Mangaki{% endblock %}
+
 {% block body %}
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 <div class="row mangas-list">
