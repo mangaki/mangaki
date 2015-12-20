@@ -144,7 +144,7 @@ class Suggestion(models.Model):
         ('nsfw', 'L\'oeuvre est NSFW'),
         ('n_nsfw', 'L\'oeuvre n\'est pas NSFW'),
         ('ref', 'Proposer une URL (myAnimeList, AniDB, Icotaku, VGMdb, etc.)')
-    ))
+    ), default='ref')
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
 
