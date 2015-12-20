@@ -134,9 +134,10 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
                     context['references'].append((reference.url, name))
 
         nb = Counter(Rating.objects.filter(work=anime).values_list('choice', flat=True))
+        labels = {'favorite': 'Ajoutés aux favoris', 'like': 'Ont aimé', 'neutral': 'Neutre', 'dislike': 'N\'ont pas aimé', 'willsee': 'Ont envie de voir', 'wontsee': 'N\'ont pas envie de voir'}
         context['stats'] = []
         for rating in ['favorite', 'like', 'neutral', 'dislike', 'willsee', 'wontsee']:
-            context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': rating})
+            context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
         return context
 
     def post(self, request, *args, **kwargs):

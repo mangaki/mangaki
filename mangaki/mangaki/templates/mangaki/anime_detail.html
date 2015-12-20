@@ -89,7 +89,7 @@ work_id='{{ object.id }}';
 loadMenuReco();
 doughnutData = [
   {% for stat in stats %}
-    {value: {{ stat.value }}, color: '{{ stat.colors.normal }}', highlight: '{{ stat.colors.highlight }}', label: '{{ stat.label }}'},
+    {value: {{ stat.value }}, color: '{{ stat.colors.normal }}', highlight: '{{ stat.colors.highlight }}', label: "{{ stat.label|safe }}"},
   {% endfor %}
 ]
 window.onload = function(){
