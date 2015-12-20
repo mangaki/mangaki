@@ -250,4 +250,4 @@ class Deck(models.Model):
 class Reference(models.Model):
     work = models.ForeignKey('Work')
     url = models.CharField(max_length=512)
-    suggestion = models.ForeignKey('Suggestion', blank=True, null=True)
+    suggestions = models.ManyToManyField('Suggestion', blank=True, null=True)

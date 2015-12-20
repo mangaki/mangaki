@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing
+from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -126,6 +126,9 @@ class SuggestionAdmin(admin.ModelAdmin):
         rows_updated = queryset.update(is_checked=True)
         users_list = []
         for suggestion in queryset:
+            if suggestion.problem == 'ref':  # Reference suggestion
+                reference, created = Reference.objects.get_or_create(work=suggestion.work, url=suggestion.message)
+                reference.suggestions.add(suggestion)
             if suggestion.user not in users_list:
                 users_list.append(suggestion.user)
                 suggestion.update_scores()
