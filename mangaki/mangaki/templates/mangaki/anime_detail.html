@@ -8,6 +8,10 @@
 {% if object.poster %}
   <meta property="og:image" content="{{ object.poster }}" />
 {% endif %}
+{% if object.synopsis %}
+  <meta property="og:description" content="{{ object.synopsis }}" />
+  <meta name="description" content="{{ object.synopsis }}" />
+{% endif %}
 {% endblock %}
 
 {% block title %}{{ object.title }} - Mangaki{% endblock %}
