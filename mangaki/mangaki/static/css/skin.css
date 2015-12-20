@@ -146,6 +146,7 @@ color: #b2B2B2;
 .mangas-list .manga-sheet .manga-snapshot .manga-snapshot-image {
     height: 321px;
     width: 225px;
+    max-width: 99%;
     background-size: cover;
     background-repeat: no-repeat!important;
 
