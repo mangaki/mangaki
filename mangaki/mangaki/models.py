@@ -142,7 +142,8 @@ class Suggestion(models.Model):
         ('composer', 'Le compositeur n\'est pas le bon'),
         ('double', 'Ceci est un doublon'),
         ('nsfw', 'L\'oeuvre est NSFW'),
-        ('n_nsfw', 'L\'oeuvre n\'est pas NSFW')
+        ('n_nsfw', 'L\'oeuvre n\'est pas NSFW'),
+        ('ref', 'Proposer une URL (myAnimeList, AniDB, Icotaku, VGMdb, etc.)')
     ))
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
@@ -244,3 +245,9 @@ class Deck(models.Model):
     category = models.CharField(max_length=32)
     sort_mode = models.CharField(max_length=32)
     content = models.CommaSeparatedIntegerField(max_length=42000)
+
+
+class Reference(models.Model):
+    work = models.ForeignKey('Work')
+    url = models.CharField(max_length=512)
+    suggestion = models.ForeignKey('Suggestion', blank=True, null=True)
