@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% load bootstrap %}
 
+{% block opengraph %}
+<meta property="og:title" content="{{ object.title }} - Mangaki" />
+<meta property="og:type" content="video.movie" />
+<meta property="og:url" content="http://mangaki.fr{% url "anime-detail" object.id %}" />
+{% if object.poster %}
+  <meta property="og:image" content="{{ object.poster }}" />
+{% endif %}
+{% endblock %}
+
 {% block title %}{{ object.title }} - Mangaki{% endblock %}
 
 {% block body %}
