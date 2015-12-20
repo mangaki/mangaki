@@ -51,7 +51,7 @@
 </div>
 <br />
 {% if object.synopsis %}
-    <div class="well">{{ object.synopsis }} (cc) <a href="http://animeka.com/animes/detail{{ object.source }}" target="_blank">Animeka</a></div>
+    <div class="well">{{ object.synopsis|safe }}</div>
 {% endif %}
 {% if user.is_authenticated %}
 <a href="http://meta.mangaki.fr/session/sso" target="_blank"><button type="button" class="btn btn-primary">En discuter sur le forum</button></a>
