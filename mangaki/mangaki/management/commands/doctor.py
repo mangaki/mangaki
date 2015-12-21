@@ -3,11 +3,13 @@ from django.db.models import Count
 from mangaki.models import Anime, Rating
 from mangaki.utils.mal import lookup_mal_api
 from mangaki.settings import BASE_DIR
-from urllib.request import urlretrieve
+from urllib.request import urlretrieve, urlopen
 import os
+from heapq import heappush, heappop
 
 
 def merge_anime(ids):
+    print('merge', ids)
     chosen_id = min(ids)
     anime = Anime.objects.get(id=chosen_id)
     if '/' in anime.source:
@@ -38,18 +40,22 @@ class Command(BaseCommand):
     help = 'Finds duplicates'
 
     def handle(self, *args, **options):
-        conflicts = set()
-        for entry in Anime.objects.values('poster').annotate(Count('poster')).filter(poster__count__gte=2):  # Same poster
-            ids = []
-            for anime in Anime.objects.filter(poster=entry['poster']):
-                ids.append(anime.id)
-            conflicts.add(tuple(sorted(ids)))
-        for entry in Anime.objects.values('title').annotate(Count('title')).filter(title__count__gte=2):  # Same title
-            ids = []
-            for anime in Anime.objects.filter(title=entry['title']):
-                ids.append(anime.id)
-            conflicts.add(tuple(sorted(ids)))
-        for ids in conflicts:
+        conflicts = []
+        entries = {
+            'poster': Anime.objects.values_list('poster').annotate(Count('poster')).filter(poster__count__gte=2),
+            'title': Anime.objects.values_list('title').annotate(Count('title')).filter(title__count__gte=2)
+        }
+        for category in entries:
+            print(len(entries[category]), category, 'conflicts')
+            for entry, _ in entries[category]:
+                ids = []
+                priority = 0
+                for anime in Anime.objects.filter(**{category: entry}):
+                    ids.append(anime.id)
+                    priority += anime.rating_set.count()
+                heappush(conflicts, (-priority, tuple(sorted(ids))))
+        while conflicts:
+            _, ids = heappop(conflicts)
             total_nb_ratings = 0
             sources = set(Anime.objects.get(id=anime_id).source for anime_id in ids)
             nb_sources = len(sources)
@@ -57,6 +63,8 @@ class Command(BaseCommand):
             for anime_id in ids:
                 anime = Anime.objects.get(id=anime_id)
                 nb_ratings = len(anime.rating_set.all())
+                """try:
+                    urlopen(anime.poster)"""
                 print('%d : %s (%s)' % (anime_id, anime.title, anime.poster))
                 print('%d l\'ont noté' % nb_ratings)
                 total_nb_ratings += nb_ratings
