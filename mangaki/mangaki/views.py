@@ -167,6 +167,7 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(MangaDetail, self).get_context_data(**kwargs)
         update_poster_if_nsfw(self.object, self.request.user)
+        print(self.object.poster)
         context['object'].source = context['object'].source.split(',')[0]
 
         genres = []
@@ -234,6 +235,8 @@ def get_bundle(category, sort_mode, my_rated_works={}):
         obj = Anime.objects
     elif category == 'manga':
         obj = Manga.objects
+    # Work.objects.in_bulk(
+    # return Work.objects.in_bulk(Deck.objects.get(category=category, sort_mode=sort_mode).content.split(','))
     if sort_mode == 'popularity':
         return obj.raw(work_query.format(category=category, min_ratings=6 if category == 'anime' else 0, order_by='rating_count DESC'))
     elif sort_mode == 'top':
@@ -257,12 +260,11 @@ def get_card(request, category, sort_id=1):
     chrono.save('got rated works')
     if Deck.objects.filter(category=category, sort_mode=sort_mode):
         deck = Deck.objects.get(category=category, sort_mode=sort_mode).content.split(',')
-    else:
-        bundle = list(get_bundle(category, sort_mode, my_rated_works))
-        chrono.save('got bundle')
-        score = get_scores(bundle, sort_mode)
-        chrono.save('got scores')
-        bundle.sort(key=(lambda work: score.get(work.id, 0)), reverse=True)
+    else:  # Temporary data
+        if category == 'anime':
+            bundle = Anime.objects.all()
+        elif category == 'manga':
+            bundle = Manga.objects.all()
         deck = [str(work.id) for work in bundle]
         Deck(category=category, sort_mode=sort_mode, content=','.join(deck)).save()
     filtered_deck = filter_deck(deck, my_rated_works, deja_vu)
@@ -286,16 +288,13 @@ class AnimeList(ListView):
     context_object_name = 'anime'
 
     def get_queryset(self):
+        bundle = Anime.objects.none()
         artist_id = self.kwargs.get('artist_id')
         if artist_id:
             artist = Artist.objects.get(id=artist_id)
             bundle = artist.authored.all() | artist.directed.all() | artist.composed.all()
             return bundle.order_by('title')
-        sort_mode = self.request.GET.get('sort', 'mosaic')
-        if sort_mode == 'mosaic':
-            return Anime.objects.none()
         letter = self.request.GET.get('letter', '')
-        bundle = get_bundle('anime', sort_mode)
         if letter:
             bundle = Anime.objects.all().order_by('title')
             if letter == '0':  # '#'
@@ -312,40 +311,45 @@ class AnimeList(ListView):
         letter = self.request.GET.get('letter', '')
         page = int(self.request.GET.get('page', '1'))
         context = super(AnimeList, self).get_context_data(**kwargs)
-        context['object_list'] = list(context['object_list'])
+
         if artist_id:
             sort_mode = 'alpha'
             context['artist'] = Artist.objects.get(id=artist_id)
         if sort_mode == 'mosaic':
+            anime_ids = []
             context['object_list'] = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
-        elif sort_mode == 'random':
-            score = get_scores(context['object_list'], sort_mode)
-            context['object_list'] = list(filter(lambda anime: score[anime.id], context['object_list']))
-            shuffle(context['object_list'])
-        elif sort_mode == 'top' or sort_mode == 'controversy':
-            score = get_scores(context['object_list'], sort_mode)
-            context['object_list'].sort(key=lambda anime: -score[anime.id])
-        paginator = Paginator(context['object_list'], TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
+        elif sort_mode in ['popularity', 'controversy', 'top', 'random']:
+            anime_ids = Deck.objects.get(category='anime', sort_mode=sort_mode).content.split(',')
+            if sort_mode == 'random':
+                shuffle(anime_ids)
+        else:
+            anime_ids = list(map(lambda obj: obj.id, context['object_list']))  # Double conversion, to fix
+
+        paginator = Paginator(anime_ids, TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
 
         try:
-            anime_list = paginator.page(page)
+            page_anime_ids = paginator.page(page)
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
-            anime_list = paginator.page(1)
+            page_anime_ids = paginator.page(1)
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
-            anime_list = paginator.page(paginator.num_pages)
+            page_anime_ids = paginator.page(paginator.num_pages)
 
         context['params'] = {'sort': sort_mode, 'letter': letter, 'page': page, 'flat': flat_mode}
         context['url'] = urlencode({'sort': sort_mode, 'letter': letter})
         context['anime_count'] = Anime.objects.count()
-        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(anime_list.number - 2, anime_list.number + 2 + 1))
+        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(page_anime_ids.number - 2, page_anime_ids.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
+
+        works = Work.objects.in_bulk(page_anime_ids)
+        anime_list = list(map(lambda work_id: works[int(work_id)], page_anime_ids))
         for obj in anime_list:
             update_poster_if_nsfw(obj, self.request.user)
             if self.request.user.is_authenticated():
                 obj.rating = my_rated_works.get(obj.id, None)  # Necessary for displaying current ratings on AnimeList
-        context['object_list'] = anime_list
+        if sort_mode != 'mosaic':
+            context['object_list'] = anime_list
         return context
 
 
@@ -354,11 +358,8 @@ class MangaList(ListView):
     context_object_name = 'manga'
 
     def get_queryset(self):
-        sort_mode = self.request.GET.get('sort', 'mosaic')
-        if sort_mode == 'mosaic':
-            return Manga.objects.none()
+        bundle = Manga.objects.none()
         letter = self.request.GET.get('letter', '')
-        bundle = get_bundle('manga', sort_mode)
         if letter:
             bundle = Manga.objects.all().order_by('title')
             if letter == '0':  # '#'
@@ -374,35 +375,43 @@ class MangaList(ListView):
         letter = self.request.GET.get('letter', '')
         page = int(self.request.GET.get('page', '1'))
         context = super(MangaList, self).get_context_data(**kwargs)
-        context['object_list'] = list(context['object_list'])
+
+        # context['object_list'] = list(context['object_list'])
         if sort_mode == 'mosaic':
+            manga_ids = []
             context['object_list'] = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
-        elif sort_mode == 'random':
-            shuffle(context['object_list'])
-        elif sort_mode == 'top' or sort_mode == 'controversy':
-            score = get_scores(context['object_list'], sort_mode)
-            context['object_list'].sort(key=lambda anime: -score[anime.id])
-        paginator = Paginator(context['object_list'], TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
+        elif sort_mode in ['popularity', 'controversy', 'top', 'random']:
+            manga_ids = Deck.objects.get(category='manga', sort_mode=sort_mode).content.split(',')
+            if sort_mode == 'random':
+                shuffle(manga_ids)
+        else:
+            manga_ids = list(map(lambda obj: obj.id, context['object_list']))  # Double conversion (and repetition), to fix  
+
+        paginator = Paginator(manga_ids, TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
 
         try:
-            manga_list = paginator.page(page)
+            page_manga_ids = paginator.page(page)
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
-            manga_list = paginator.page(1)
+            page_manga_ids = paginator.page(1)
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
-            manga_list = paginator.page(paginator.num_pages)
+            page_manga_ids = paginator.page(paginator.num_pages)
 
         context['params'] = {'sort': sort_mode, 'letter': letter, 'page': page, 'flat': flat_mode}
         context['url'] = urlencode({'sort': sort_mode, 'letter': letter})
         context['manga_count'] = Manga.objects.count()
-        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(manga_list.number - 2, manga_list.number + 2 + 1))
+        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(page_manga_ids.number - 2, page_manga_ids.number + 2 + 1))
         context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
+
+        works = Work.objects.in_bulk(page_manga_ids)
+        manga_list = list(map(lambda work_id: works[int(work_id)], page_manga_ids))
         for obj in manga_list:
             update_poster_if_nsfw(obj, self.request.user)
             if self.request.user.is_authenticated():
                 obj.rating = my_rated_works.get(obj.id, None)
-        context['object_list'] = manga_list
+        if sort_mode != 'mosaic':
+            context['object_list'] = manga_list
         return context
 
 
