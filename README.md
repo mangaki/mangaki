@@ -3,9 +3,12 @@ Mangaki
 
 Voici le manuel d'installation de Mangaki. Vous ne pouvez pas savoir comme ça fait plaisir que vous me lisiez !
 
-Si vous souhaitez contribuer, quelques pistes sont sur le [wiki](https://github.com/mangaki/mangaki/wiki).
-
 Mangaki est [sous licence AGPLv3](https://en.wikipedia.org/wiki/Affero_General_Public_License).
+
+Comment contribuer ?
+--------------------
+
+Que vous soyez simple otaku, data expert, codeur Python, passionné d'algo, data scientist ou designer, vous pouvez contribuer à Mangaki ! Quelques pistes sont sur le [wiki](https://github.com/mangaki/mangaki/wiki).
 
 Prérequis
 ---------
