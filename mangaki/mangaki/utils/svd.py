@@ -23,7 +23,7 @@ class MangakiSVD(object):
     inv_user = None
     work_titles = None
     def __init__(self):
-        self.chrono = Chrono(True)
+        self.chrono = Chrono(False)
 
     def save(self, filename):
         with open(filename, 'wb') as f:
@@ -55,7 +55,7 @@ class MangakiSVD(object):
 
         self.chrono.save('get_work_ids')
 
-        print("Computing M: (%i × %i)" % (nb_users, nb_works))
+        # print("Computing M: (%i × %i)" % (nb_users, nb_works))
         self.M = lil_matrix((nb_users, nb_works))
         """ratings_of = {}
         for (user_id, work_id), rating in zip(X, y):
@@ -68,7 +68,7 @@ class MangakiSVD(object):
 
         # Ranking computation
         self.U, self.sigma, self.VT = randomized_svd(self.M, NB_COMPONENTS, n_iter=3, random_state=42)
-        print('Formes', self.U.shape, self.sigma.shape, self.VT.shape)
+        # print('Formes', self.U.shape, self.sigma.shape, self.VT.shape)
 
         self.save('backup.pickle')
 
@@ -96,16 +96,17 @@ class MangakiSVD(object):
         self.chrono.save('get_seen_works')
 
         print('mon vecteur (taille %d)' % len(self.U[the_i]), self.U[the_i])
-        """for i, line in enumerate(VT):
-            print('=> Ligne %d' % (i + 1), '(ma note : %f)' % U[the_user_id][i])
-            sorted_line = sorted((line[j], anime_titles[anime_ids[j]]) for j in range(nb_works))[::-1]
+        print(self.sigma)
+        for i, line in enumerate(self.VT):
+            print('=> Ligne %d' % (i + 1), '(ma note : %f)' % self.U[the_i][i])
+            sorted_line = sorted((line[j], self.work_titles[work_ids[j]]) for j in range(nb_works))[::-1]
             top5 = sorted_line[:10]
             bottom5 = sorted_line[-10:]
             for anime in top5:
                 print(anime)
             for anime in bottom5:
                 print(anime)
-            if i == 0 or i == 1:  # First two vectors explaining variance
+            """if i == 0 or i == 1:  # First two vectors explaining variance
                 with open('vector%d.json' % (i + 1), 'w') as f:
                     vi = X.dot(line).tolist()
                     x_norm = [np.dot(X.data[k], X.data[k]) / (nb_works + 1) for k in range(nb_users + 1)]

@@ -42,6 +42,7 @@ class Command(BaseCommand):
         s.post('%s/user/login/' % DOMAIN, {'csrfmiddlewaretoken': csrf, 'login': 'jj', 'password': DUMMY, 'remember': '1'})
         with Report(s) as report:
             report.time_page('/anime/')
+            report.time_page('/anime/?sort=top')
             report.time_page('/u/jj')
             report.time_page('/users/')
             report.time_page('/reco/')

@@ -17,6 +17,6 @@ class Command(BaseCommand):
                 print(proposal)
             anidb_aid = input('Which one? ')
             if anidb_aid == 'q':
-                break
+                continue
             anime.anidb_aid = int(anidb_aid)
             anime.save()
