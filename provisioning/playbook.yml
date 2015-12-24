@@ -1,0 +1,55 @@
+---
+- hosts: all
+  gather_facts: yes
+  sudo: yes
+
+  vars:
+          mangaki_root: /mnt/mangaki
+          mangaki_venv: "{{mangaki_root}}/.venv"
+          mangaki_app: "{{mangaki_root}}/mangaki"
+          python_versions: [3.4]
+          postgresql_version: 9.4
+          postgresql_locale: 'fr_FR.UTF-8'
+          postgresql_databases:
+                  - name: mangaki
+                    hstore: no
+                    uuid_ossp: no
+                    citext: no
+          postgresql_users:
+                  - name: mangaki
+                    pass: mangaki
+                    encrypted: no
+          postgresql_user_privileges:
+                  - name: mangaki
+                    db: mangaki
+                    priv: "ALL"
+                    role_attr_flags: "CREATEDB"
+
+  roles:
+          - martinmicunda.common
+          - tersmitten.vim
+          - Stouts.python
+          - ANXS.postgresql
+
+  tasks:
+          - name: Ensure libxml2-dev is installed.
+            apt: name=libxml2-dev state=present
+          - name: Ensure libxslt-dev is installed.
+            apt: name=libxslt-dev state=present
+          - name: Ensure gunicorn is installed.
+            pip: name=gunicorn virtualenv={{mangaki_venv}}
+          - name: Install PostgreSQL server (libpq-dev) for psycopg2
+            apt: name=libpq-dev state=present
+          - name: Create the virtualenv of Mangaki
+            command: virtualenv {{mangaki_venv}} --no-site-packages
+                    creates={{mangaki_venv}}/bin/activate
+          - name: Install Mangaki requirements inside of the virtualenv
+            pip: virtualenv={{mangaki_venv}} requirements={{mangaki_root}}/requirements.txt
+          - name: Configure the Django web server
+            template: src=./templates/secret.j2 dest={{mangaki_app}}/secret.py
+          - name: Migrate the DB
+            django_manage: command=migrate virtualenv={{mangaki_venv}} app_path={{mangaki_app}}
+          - name: Seed the database
+            django_manage: command="loaddata {{mangaki_root}}/fixtures/seed_data.json" virtualenv={{mangaki_venv}} app_path={{mangaki_app}}
+          - name: Daemonize gunicorn
+            command: "{{ mangaki_venv }}/bin/gunicorn --name mangaki --workers 4 --bind 0.0.0.0:80 --daemon mangaki.wsgi chdir={{mangaki_app}}"
