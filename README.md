@@ -31,18 +31,19 @@ Configurer PostgreSQL
 Lancer le serveur
 -----------------
 
-    virtualenv -p `which python3` venv
+    python3 -m venv venv
     . venv/bin/activate
     pip install -r requirements.txt
     cd mangaki
-    cp secret_template.py secret.py  # À modifier
+    cp secret_template.py secret.py  # À modifier, notamment le mot de passe d'accès à la base de données
     ./manage.py migrate
+    ./manage.py loaddata ../fixtures/seed_data.json
     ./manage.py runserver
 
 Remarques utiles
 ----------------
 
-Si vous vous rendez sur la page des anime, ça chargera en boucle. C'est normal, il n'y a pas encore d'anime dans la base.
+Si vous vous rendez sur la page des manga, la troisième colonne. C'est parce que le Top Manga est vide, pour des raisons intrinsèques à [`ranking.py`](https://github.com/mangaki/mangaki/blob/master/mangaki/mangaki/management/commands/ranking.py#L9).
 
 Si vous vous inscrivez, vous obtiendrez une erreur « Connection refused ». C'est normal, votre serveur de mails n'est pas installé. Pour éviter ce comportement temporairement, vous pouvez décommenter la ligne suivante de `mangaki/settings.py` :
 
