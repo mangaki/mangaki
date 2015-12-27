@@ -3,6 +3,5 @@ venv
 secret.py
 db.sqlite3
 *.pyc
-*.json
 data/
 2015-*.txt
