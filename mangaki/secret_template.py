@@ -27,5 +27,11 @@ DATABASES = {
     }
 }
 
+ALGOLIA = {
+    'APPLICATION_ID': 'XXX',
+    'API_KEY': 'XXX'
+}
+
+
 DUMMY = 'XXX'
 HASH_PADDLE = 'XXX'
