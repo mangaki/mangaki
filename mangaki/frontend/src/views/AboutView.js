@@ -66,7 +66,7 @@ export class AboutView extends React.Component {
 
   renderContributor (data) {
     return (
-      <p><strong>{data.realname}</strong> {data.whathedoes}</p>
+      <p><strong>{data.realname}</strong>{' '}{data.whathedoes}</p>
     )
   }
 
@@ -118,17 +118,17 @@ export class AboutView extends React.Component {
 
     const romain = {
       realname: 'Romain Canon',
-      whathedoes: ' est web développeur, et participe au design du site.'
+      whathedoes: 'est web développeur, et participe au design du site.'
     }
 
     const marie = {
       realname: 'Marie-Amélie Jehanno',
-      whathedoes: ' dirige le cabinet Chromatic HR. Elle est la conseillère en marketing de Mangaki.'
+      whathedoes: 'dirige le cabinet Chromatic HR. Elle est la conseillère en marketing de Mangaki.'
     }
 
     const philippe = {
       realname: 'Philippe Mustar',
-      whathedoes: ' est professeur aux Mines de Paris, et spécialisé dans l\'entrepreneuriat. Il fait partie des conseillers de Mangaki.'
+      whathedoes: 'est professeur aux Mines de Paris, et spécialisé dans l\'entrepreneuriat. Il fait partie des conseillers de Mangaki.'
     }
 
     return (
