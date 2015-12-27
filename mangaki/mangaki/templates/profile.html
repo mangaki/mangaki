@@ -86,19 +86,12 @@
     {% else %}
         <div class="col-xs-4 col-xs-offset-1">
             <h1>{% if category == 'anime' %}<a href="/anime">Anime</a> vus{% else %}<a href="/manga">Mangas</a> lus{% endif %}</h1>
-            {% for object in seen_list %}
-                {% include "work_no_poster.html" with work=object.work class=category rating=object.choice %}
-            {% empty %}
-                <p>(Cette liste est vide.)</p>
-            {% endfor %}
+            {% include "works_no_poster.html" with works=seen_list class=category %}
         </div>
         <div class="col-xs-4 col-xs-offset-1">
             <h1>{% if category == 'anime' %}<a href="/anime">Anime</a> à voir (ou non){% else %}<a href="/manga">Mangas</a> à lire (ou pas){% endif %}</h1>
-            {% for object in unseen_list %}
-                {% include "work_no_poster.html" with work=object.work class=category rating=object.choice %}
-            {% empty %}
-                <p>(Cette liste est vide.)</p>
-            {% endfor %}
+            {% include "works_no_poster.html" with works=unseen_list class=category %}
+        </div>
         </div>
     {% endif %}
     {% endif %}
@@ -128,7 +121,8 @@ $("#import_mal").on('click', function() {
 });
 
 function removeReco(elt) {
-  $.post('/removeReco/' + $(elt).data('work') + '/' + $(elt).data('user') + '/' + $(elt).data('target'));
+  var $elt = $(elt);
+  $.post('/removeReco/' + $elt.data('work') + '/' + $elt.data('user') + '/' + $elt.data('target'));
   setTimeout(function(){
     location.reload();
   }, 500);
