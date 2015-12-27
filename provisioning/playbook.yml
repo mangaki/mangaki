@@ -2,28 +2,10 @@
 - hosts: all
   gather_facts: yes
   sudo: yes
-
-  vars:
-          mangaki_root: /mnt/mangaki
-          mangaki_venv: "{{mangaki_root}}/.venv"
-          mangaki_app: "{{mangaki_root}}/mangaki"
-          python_versions: [3.4]
-          postgresql_version: 9.4
-          postgresql_locale: 'fr_FR.UTF-8'
-          postgresql_databases:
-                  - name: mangaki
-                    hstore: no
-                    uuid_ossp: no
-                    citext: no
-          postgresql_users:
-                  - name: mangaki
-                    pass: mangaki
-                    encrypted: no
-          postgresql_user_privileges:
-                  - name: mangaki
-                    db: mangaki
-                    priv: "ALL"
-                    role_attr_flags: "CREATEDB"
+  vars_files:
+          - vars/common.yaml
+          - vars/python.yaml
+          - vars/db.yaml
 
   roles:
           - martinmicunda.common
@@ -36,10 +18,10 @@
             apt: name=libxml2-dev state=present
           - name: Ensure libxslt-dev is installed.
             apt: name=libxslt-dev state=present
-          - name: Ensure gunicorn is installed.
-            pip: name=gunicorn virtualenv={{mangaki_venv}}
           - name: Install PostgreSQL server (libpq-dev) for psycopg2
             apt: name=libpq-dev state=present
+          - name: Install pyinotify for detecting changes
+            pip: name=pyinotify state=present virtualenv={{mangaki_venv}}
           - name: Create the virtualenv of Mangaki
             command: virtualenv {{mangaki_venv}} --no-site-packages
                     creates={{mangaki_venv}}/bin/activate
@@ -51,5 +33,3 @@
             django_manage: command=migrate virtualenv={{mangaki_venv}} app_path={{mangaki_app}}
           - name: Seed the database
             django_manage: command="loaddata {{mangaki_root}}/fixtures/seed_data.json" virtualenv={{mangaki_venv}} app_path={{mangaki_app}}
-          - name: Daemonize gunicorn
-            command: "{{ mangaki_venv }}/bin/gunicorn --name mangaki --workers 4 --bind 0.0.0.0:80 --daemon mangaki.wsgi chdir={{mangaki_app}}"
