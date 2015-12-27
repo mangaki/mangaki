@@ -10,7 +10,7 @@ export default class NavbarLayout extends React.Component {
       <Navbar>
         <ul className='nav navbar-nav'>
           <NavbarItem>
-            <Link to='what'>C'est quoi ?</Link>
+            <Link to='about'>C'est quoi ?</Link>
           </NavbarItem>
           <NavbarItem>
             <Link to='anime'>Anime</Link>
