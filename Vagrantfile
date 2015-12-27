@@ -29,7 +29,7 @@ Vagrant.configure(2) do |config|
     config.vm.provider "virtualbox" do |vb|
         # The Mangaki VM !
         vb.name = "Mangaki"
-        # 1 GB seems to be okay.
+        # 1 GiB seems to be okay.
         vb.memory = "1024"
     end
 end
