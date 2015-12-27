@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 from django.conf import global_settings
 from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DEBUG, SITE_ID, DATABASES
+from secret import ALGOLIA
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
@@ -27,6 +28,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.algoliasearch',
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'mangaki',
