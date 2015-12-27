@@ -13,7 +13,7 @@ Vagrant.configure(2) do |config|
     config.vm.box = "ubuntu/trusty64"
     config.vm.box_check_update = true
 
-    config.vm.network :forwarded_port, guest: 80, host: 8080 # Mangaki web server
+    config.vm.network :forwarded_port, guest: 8000, host: 8080 # Mangaki web server
     config.vm.network "private_network", ip: "192.168.42.10"
 
     config.vm.synced_folder ".", "/mnt/mangaki"
@@ -22,7 +22,6 @@ Vagrant.configure(2) do |config|
     end
 
     config.vm.provision "ansible" do |ansible|
-        ansible.verbose = "v"
         ansible.playbook = "provisioning/playbook.yml"
         ansible.sudo = true
     end
