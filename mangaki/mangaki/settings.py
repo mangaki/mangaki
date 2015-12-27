@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from django.conf import global_settings
-from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DEBUG, DATABASES
+from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DEBUG, SITE_ID, DATABASES
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
@@ -54,15 +54,13 @@ MIDDLEWARE_CLASSES = (
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
-    'allauth.account.context_processors.account',
-    'allauth.socialaccount.context_processors.socialaccount',
 )
 
 ROOT_URLCONF = 'mangaki.urls'
 
 WSGI_APPLICATION = 'mangaki.wsgi.application'
 
-SITE_ID = 1
+# SITE_ID = 1
 
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
