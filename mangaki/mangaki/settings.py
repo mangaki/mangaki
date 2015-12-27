@@ -17,8 +17,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = ['mangaki.fr']
 
 # Application definition
@@ -52,9 +50,25 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
-    'django.core.context_processors.request',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            'templates'
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.core.context_processors.request',
+                'django.template.context_processors.static',
+                'django.template.context_processors.media',
+                'django.template.context_processors.debug',
+                'django.contrib.messages.context_processors.messages',
+                'django.contrib.auth.context_processors.auth'
+            ],
+        }
+    }
+]
 
 ROOT_URLCONF = 'mangaki.urls'
 
