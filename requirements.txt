@@ -1,5 +1,5 @@
 Django==1.9.0
-django-allauth==0.24.0
+django-allauth
 markdown
 django-bootstrap-form
 -e git+https://github.com/tindie/pydiscourse.git#egg=pydiscourse
