@@ -1,0 +1,27 @@
+.about__infos {
+  font-style: italic;
+}
+
+.about__title {
+  margin-bottom: 0.6em;
+  text-align: center;
+}
+
+.about__performer {
+  float: left;
+  margin-top: 1em;
+  margin-right: 1em;
+
+  img {
+    position: relative;
+    margin-bottom: 0.4em;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0,0,0,.2);
+  }
+}
+
+.about__logo {
+  float: left;
+  margin-top: 1em;
+  margin-right: 1em;
+}

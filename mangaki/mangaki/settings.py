@@ -30,12 +30,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'mangaki',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.twitter',
-    'bootstrapform',
+    'rest_framework',
     'debug_toolbar',
     # 'django_extensions'
 )
@@ -43,11 +38,7 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware'
 )
 
 TEMPLATES = [
@@ -70,20 +61,22 @@ TEMPLATES = [
     }
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+}
+
 ROOT_URLCONF = 'mangaki.urls'
 
 WSGI_APPLICATION = 'mangaki.wsgi.application'
 
 # SITE_ID = 1
-
-LOGIN_URL = '/user/login/'
-LOGIN_REDIRECT_URL = '/'
-ACCOUNT_EMAIL_REQUIRED = True
-
-AUTHENTICATION_BACKENDS = (
-    "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend"
-)
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # TODO only debug
 
