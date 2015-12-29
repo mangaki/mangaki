@@ -67,15 +67,6 @@ WSGI_APPLICATION = 'mangaki.wsgi.application'
 
 # SITE_ID = 1
 
-LOGIN_URL = '/user/login/'
-LOGIN_REDIRECT_URL = '/'
-ACCOUNT_EMAIL_REQUIRED = True
-
-AUTHENTICATION_BACKENDS = (
-    "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend"
-)
-
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # TODO only debug
 
 # Internationalization
