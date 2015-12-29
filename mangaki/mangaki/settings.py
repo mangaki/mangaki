@@ -30,12 +30,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'mangaki',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.twitter',
-    'bootstrapform',
+    'rest_framework',
     'debug_toolbar',
     # 'django_extensions'
 )
