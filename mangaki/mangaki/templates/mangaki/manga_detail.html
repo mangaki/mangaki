@@ -4,13 +4,15 @@
 {% block body %}
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 <div class="row mangas-list">
-    <div class="col-xs-3 manga-sheet">
-        <div class="row thumbnail data" data-category="manga" data-id="{{ object.id }}">
+    <div class="col-md-12"> <!-- col-md-push-3 -->
+        <h1>{{ object.title }}</h1>
+    </div>
+    <div class="col-sm-6 col-md-3 manga-sheet">
+        <div class="thumbnail data" data-category="manga" data-id="{{ object.id }}">
             {% include "work_rating.html" with category="manga" work=object %}
         </div>
     </div>
-    <div class="col-xs-6">
-        <h1>{{ object.title }}</h1>
+    <div class="col-sm-6 col-md-3">
         <p>Titre original : <em>{{ object.vo_title }}</em></p>
         <p>Dessin : {{ object.mangaka }}</p>
         <p>Scénario : {{ object.writer }}</p>
