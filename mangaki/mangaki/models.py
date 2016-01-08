@@ -44,7 +44,7 @@ class Anime(Work):
     anidb_aid = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.title
+        return '[%d] %s' % (self.id, self.title)
 
 
 class Manga(Work):
