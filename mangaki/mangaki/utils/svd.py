@@ -23,7 +23,7 @@ class MangakiSVD(object):
     inv_user = None
     work_titles = None
     def __init__(self):
-        self.chrono = Chrono(False)
+        self.chrono = Chrono(True)
 
     def save(self, filename):
         with open(filename, 'wb') as f:

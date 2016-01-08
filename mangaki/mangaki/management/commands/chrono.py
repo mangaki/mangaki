@@ -48,6 +48,8 @@ class Command(BaseCommand):
             report.time_page('/reco/')
             report.time_page('/data/reco/all/unspecified.json')
             report.time_page('/data/card/anime/1.json')
+            report.time_page('/u/Idam')
+            report.time_page('/u/Idam?category=manga')
         # r = s.get('%s/reco/' % DOMAIN)
         # b = BeautifulSoup(r.text)
         # print(b)
