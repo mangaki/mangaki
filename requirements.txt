@@ -1,5 +1,5 @@
-Django==1.9.0
-django-allauth
+Django==1.9.1
+django-allauth==0.24.1
 markdown
 django-bootstrap-form
 -e git+https://github.com/tindie/pydiscourse.git#egg=pydiscourse
@@ -7,7 +7,7 @@ psycopg2
 numpy
 #scipy
 #scikit-learn
-django-debug-toolbar
+django-debug-toolbar==1.4
 PyYAML
 beautifulsoup4
 lxml
