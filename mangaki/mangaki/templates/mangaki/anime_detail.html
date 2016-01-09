@@ -20,6 +20,16 @@
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 <div class="row mangas-list">
     <div class="col-md-12"> <!--  col-md-push-3 -->
+        {% if anime.event_set.all.count %}
+        <div class="well">
+          Cet anime est prévu pour les événements suivants :
+          <ul>
+          {% for event in anime.event_set.all %}
+            <li>{{ event.to_html|safe }}</li>
+          {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
         <h1>{{ object.title }}</h1>
     </div>
     <div class="col-sm-6 col-md-3 manga-sheet"> <!-- fluid col-sm-6 col-md-pull-3 -->
