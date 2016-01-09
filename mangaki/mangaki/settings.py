@@ -30,6 +30,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'mangaki',
+    'irl',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
