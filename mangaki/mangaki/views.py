@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseForbidden
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
 from django.utils.timezone import utc
 
 from django.dispatch import receiver
@@ -19,6 +20,7 @@ from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
 from mangaki.utils.recommendations import get_recommendations
 from mangaki.utils.chrono import Chrono
+from irl.models import Event
 
 from collections import Counter
 from markdown import markdown
@@ -585,7 +587,7 @@ def about(request):
 
 
 def events(request):
-    return render(request, 'events.html')
+    return render(request, 'events.html', {'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now())})
 
 
 def rate_work(request, work_id):

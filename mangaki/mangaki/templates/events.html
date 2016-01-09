@@ -2,8 +2,29 @@
 
 {% block body %}
 <div id="events">
-    <h1>Programmation anime pendant les fêtes</h1>
-    <h3>(et un peu après, aussi)</h3>
+    <h1>Studio Ghibli Party au cinéma Les Fauvettes</h1>
+    <h3>Du 6 janvier au 6 février 2015 à Paris, avenue des Gobelins</h3>
+    <hr />
+    <p>Le nouveau cinéma <a href="http://www.cinemalesfauvettes.com/cycle/studio-ghibli-party.html" target="_blank"><strong>Les Fauvettes</strong></a>, ouvert depuis le 6 novembre 2015 dans le quartier des Gobelins à Paris, vous offre une sélection de <strong>films Ghibli</strong> !</p>
+
+    <p>Le programme, non exhaustif :</p>
+    <ul>
+    {% for event in screenings %}
+        <li><a href="{% url "anime-detail" event.anime.id %}">{{ event.anime.title }}</a> le {{ event.get_date }}</li>
+    {% endfor %}
+    </ul>
+    
+    <address><strong>Cinéma Les Fauvettes</strong><br />
+    58 avenue des Gobelins, 75013 Paris</address>
+
+    <hr />
+
+    <h1>Avant-première de <a href="{% url "anime-detail" 13679 %}">Kizumonogatari</a> au Grand Rex</h1>
+    <h3>Le vendredi 29 janvier 2015 à 20 h 30</h3>
+
+    <hr />
+
+    <h1>Programmation anime TV en janvier</h1>
     <hr />
     <p>Pour l'ajouter à votre calendrier, cliquez sur le bouton <img src="/static/img/agenda.png" alt="Add to calendar" style="vertical-align: middle" /> en bas à droite.
     <a href="https://www.google.com/calendar/ical/pdel76g7580k0uemfj733qktko%40group.calendar.google.com/public/basic.ics" class="btn btn-primary">Télécharger le .ics</a></p>
