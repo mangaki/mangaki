@@ -35,10 +35,10 @@ class Event(models.Model):
         return '%s %s' % (self.event_type, self.anime.title)
 
     def get_date(self):
+        locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
         return self.date.strftime('%A %-d %B %Y à %H h %M').lower()
 
     def to_html(self):
-        locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
         date = self.get_date()
         if self.event_type == 'tv':
             return '%s <em>%s</em> le <strong>%s</strong> sur %s' % (self.get_event_type_display(), self.anime.title, date, self.channel)
