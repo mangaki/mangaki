@@ -213,6 +213,10 @@ class PairingAdmin(admin.ModelAdmin):
     make_author.short_description = "Valider les appariements sélectionnés pour écriture"
 
 
+class ReferenceAdmin(admin.ModelAdmin):
+    list_display = ['work', 'url']
+
+
 admin.site.register(Anime, AnimeAdmin)
 admin.site.register(Manga, MangaAdmin)
 admin.site.register(Genre, GenreAdmin)
@@ -228,3 +232,4 @@ admin.site.register(SearchIssue, SearchIssueAdmin)
 admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(Recommendation, RecommendationAdmin)
 admin.site.register(Pairing, PairingAdmin)
+admin.site.register(Reference, ReferenceAdmin)
