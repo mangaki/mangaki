@@ -31,49 +31,11 @@
 </div>
 
 <div class="partners row">
+	{% for partner in partners %}
     <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://www.japan-expo-paris.com" target="_blank"><img  src="/static/img/sponsors/small/JapanExpo.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://noco.tv"><img src="/static/img/sponsors/small/noco.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://www.manga-news.com" target="_blank"><img src="/static/img/sponsors/small/manganews.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://www.crunchyroll.com" target="_blank"><img src="/static/img/sponsors/small/crunchyroll.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://www.fnac.com"><img src="/static/img/sponsors/small/Fnac.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://manga.kaze.fr" target="_blank"><img src="/static/img/sponsors/small/kaze.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://www.editions-delcourt.fr" target="_blank"><img src="/static/img/sponsors/small/delcourt.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://www.mangacafe.fr/"><img src="/static/img/sponsors/small/mangaCafe.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://www.taifu-comics.com/" target="_blank"><img src="/static/img/sponsors/small/taifu.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://www.ototo.fr/"><img src="/static/img/sponsors/small/ototo.jpg" /></a>
-    </div>
-	
-    <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://www.nolife-tv.com/" target="_blank"><img src="/static/img/sponsors/small/nolife.jpg" /></a>
-    </div>
+        <a href="http://{{ partner.url }}" target="_blank" title="{{ partner.name }}"><img  src="/static/img/sponsors/small/{{ partner.image }}" /></a>
+	</div>
+	{% endfor %}
 </div>
 
 <br />

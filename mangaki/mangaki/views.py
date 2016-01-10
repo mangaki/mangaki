@@ -20,7 +20,7 @@ from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
 from mangaki.utils.recommendations import get_recommendations
 from mangaki.utils.chrono import Chrono
-from irl.models import Event
+from irl.models import Event, Partner
 
 from collections import Counter
 from markdown import markdown
@@ -579,7 +579,8 @@ def index(request):
             return redirect('/anime/')
     # texte = Announcement.objects.get(title='Flash News').text
     # context = {'annonce': texte}
-    return render(request, 'index.html')
+    partners = Partner.objects.filter()
+    return render(request, 'index.html', {'partners': partners})
 
 
 def about(request):

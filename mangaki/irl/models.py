@@ -50,3 +50,9 @@ class Event(models.Model):
 
     class Meta:
         ordering = ['date']
+
+
+class Partner(models.Model):
+    name = models.CharField(max_length=32)
+    url = models.CharField(max_length=512)
+    image = models.CharField(max_length=32, verbose_name="Fichier logo")
