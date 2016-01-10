@@ -113,27 +113,24 @@ text-align: center;
 color: #b2B2B2;
 }
 
-#partners
-{
-	text-align:center;
+.partners {
+	text-align: center;
+	margin-top: 1em;
 }
 
-#partners div
-{
+.partners div {
 	margin: 1em 0;
 	min-height: 100px;
 	display: inline-block;
 	vertical-align: middle;
 }
 
-#partners a
-{
-	line-height:100px;
-	text-align:center;
+.partners a {
+	line-height: 100px;
+	text-align: center;
 }
 
-#partners img
-{
+.partners img {
 	max-width: 100%;
 	max-height: 100px;
 	vertical-align: middle;
@@ -145,7 +142,7 @@ color: #b2B2B2;
 	-o-filter: grayscale(100%);
 }
 
-#partners img:hover
+.partners img:hover
 {
 	filter: grayscale(0%);
 	-webkit-filter: grayscale(0%);
