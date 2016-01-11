@@ -49,6 +49,10 @@ input{
 line-height: normal;
 
 }
+
+.alert {
+    color : #f2b948;
+}
 /**********
  *  CARROUSSEL  *
  **********/
