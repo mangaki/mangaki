@@ -8,7 +8,7 @@ Mangaki est [sous licence AGPLv3](https://en.wikipedia.org/wiki/Affero_General_P
 Comment contribuer ?
 --------------------
 
-Que vous soyez simple otaku, data expert, codeur Python, passionné d'algo, data scientist ou designer, vous pouvez contribuer à Mangaki ! Quelques pistes sont sur le [wiki](https://github.com/mangaki/mangaki/wiki).
+Que vous soyez simple otaku, data expert, codeur Python, passionné d'algo, data scientist ou designer, vous pouvez contribuer à Mangaki ! Quelques pistes sont sur le [wiki](https://github.com/mangaki/mangaki/wiki), mais aussi dans le fichier CONTRIBUER.md !
 
 Prérequis
 ---------
