@@ -3,6 +3,9 @@ venv
 secret.py
 db.sqlite3
 *.pyc
-*.json
+*.json!package.json
 data/
 2015-*.txt
+node_modules
+.venv
+.vagrant
