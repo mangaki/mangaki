@@ -1,0 +1,29 @@
+{
+  "name": "mangaki",
+  "version": "1.0.0",
+  "description": "Mangaki frontend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mangaki/mangaki.git"
+  },
+  "keywords": [
+    "mangaki",
+    "anime",
+    "recommandations"
+  ],
+  "author": "Jill-Jênn Vie <vie@jill-jenn.net>",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/mangaki/mangaki/issues"
+  },
+  "homepage": "https://github.com/mangaki/mangaki#readme",
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "handlebars": "^4.0.5",
+    "jquery": "^2.2.0"
+  }
+}
