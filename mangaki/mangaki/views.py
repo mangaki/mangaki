@@ -138,9 +138,13 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
         nb = Counter(Rating.objects.filter(work=anime).values_list('choice', flat=True))
         labels = {'favorite': 'Ajoutés aux favoris', 'like': 'Ont aimé', 'neutral': 'Neutre', 'dislike': 'N\'ont pas aimé', 'willsee': 'Ont envie de voir', 'wontsee': 'N\'ont pas envie de voir'}
         context['stats'] = []
-        for rating in ['favorite', 'like', 'neutral', 'dislike']:
+        seen_ratings = ['favorite', 'like', 'neutral', 'dislike']
+        for rating in seen_ratings:
             context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
-        context['willsee_ratio'] = round(float(nb['willsee']) / (nb['willsee'] + nb['wontsee']))
+        total = sum(nb.values())
+        if total > 0:
+            seen_total = sum(nb[rating] for rating in seen_ratings)
+            context['seen_percent'] = round(100 * seen_total / float(total))
         return context
 
     def post(self, request, *args, **kwargs):
