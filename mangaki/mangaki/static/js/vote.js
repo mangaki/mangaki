@@ -20,11 +20,12 @@ function vote(elt) {
         if(typeof(sort_mode) != 'undefined' && sort_mode == 'mosaic' && rating)
             loadCard(pos);
         else {
-            $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
-            if(rating == 'none')
-                $(elt).addClass('not-chosen');
-            else if(rating)
+            if (rating == 'none')
+                $(elt).siblings().filter('[data-choice!=' + rating + ']').removeClass('not-chosen');
+            else if (rating) {
+                $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
                 $(elt).removeClass('not-chosen');
+            }
         }
     });
 }
