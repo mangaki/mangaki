@@ -84,12 +84,12 @@ function actuallyLoadCard(pos) {
     var works = globalWorks[pos];
 
     var work = works.shift();
-    if (work === undefined)
+    if (!work)
         return loadCard(pos);
 
     while (globalWorks.dejaVu.indexOf(work.id) !== -1) {
         work = works.shift();
-        if (work === undefined)
+        if (!work)
             return loadCard(pos);
     }
     displayWork(pos, work);
