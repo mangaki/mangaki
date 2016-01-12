@@ -53,6 +53,9 @@
         <div style="max-width: 420px; max-height: 200px">
           <canvas id="stats" />
         </div>
+        {% if willsee_ratio %}
+            <p>{{ willsee_ratio * 100 }}% veulent le voir.</p>
+        {% endif %}
         {% if references %}
           <h3>Références</h3>
           <ul>
