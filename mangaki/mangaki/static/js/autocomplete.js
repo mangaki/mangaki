@@ -67,8 +67,8 @@ function loadMenuUser() {
 
 $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
-    if (selection.description === undefined) {
-    	if (selection.work_id === undefined)
+    if (!selection.description) {
+    	if (!selection.work_id)
         location.href = '/u/' + selection.username ;
       else {
         $.post('/recommend/'+ selection.work_id +'/'+ selection.id, function(status) {
@@ -99,8 +99,8 @@ $(document).ready(function() {
       location.href = '/' + category + '/' + selection.id;
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
-    if (selection.description === undefined) {
-     if (selection.work_id === undefined) { location.href = '/u/' + selection.username ; }
+    if (!selection.description) {
+     if (!selection.work_id) { location.href = '/u/' + selection.username ; }
      else {
       $.post('/recommend/'+ selection.work_id +'/'+ selection.id,  function(status) {
        if (status === 'success') {
