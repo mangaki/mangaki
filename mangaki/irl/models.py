@@ -39,14 +39,22 @@ class Event(models.Model):
         return self.date.strftime('%A %-d %B %Y à %H h %M').lower()
 
     def to_html(self):
-        date = self.get_date()
+        common = '{type} <em>{title}</em> le <strong>{date}</strong>'.format(
+            type=self.get_event_type_display(),
+            title=self.anime.title,
+            date=self.get_date())
         if self.event_type == 'tv':
-            return '%s <em>%s</em> le <strong>%s</strong> sur %s' % (self.get_event_type_display(), self.anime.title, date, self.channel)
-        else:
-            location = self.location
+            return common + ' sur ' + self.channel
+
+        if self.location:
             if self.link:
-                location = '<a href="%s" target="_blank">%s</a>' % (self.link, self.location)
-            return '%s <em>%s</em> le <strong>%s</strong>, %s' % (self.get_event_type_display(), self.anime.title, date, location)
+                link_tpl = ', <a href="{url}" target="_blank">{location}</a>'
+                return common + link_tpl.format(
+                    url=self.link, location=self.location)
+            else:
+                return common + ', ' + self.location
+
+        return common
 
     class Meta:
         ordering = ['date']
