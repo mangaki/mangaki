@@ -16,10 +16,10 @@
     <a data-choice='dislike' class="btn btn-danger btn-block{% if rating and rating != 'dislike' %} not-chosen{% endif %}" onclick="vote(this)" title="Je n'aime pas">
         <span class="glyphicon glyphicon-thumbs-down"></span>
     </a>
-    <a data-choice='willsee' class="btn btn-primary btn-block{% if rating and rating != 'willsee' %} not-chosen{% endif %}" onclick="vote(this)" title="Je veux voir">
+    <a data-choice='willsee' class="btn btn-primary btn-block{% if rating and rating != 'willsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if category == 'manga' %}Je veux lire{% else %}Je veux voir{% endif %}">
         <span class="glyphicon glyphicon-eye-open"></span>
     </a>
-    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote(this)" title="Je ne veux pas voir">
+    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if category == 'manga' %}Je ne veux pas lire{% else %}Je ne veux pas voir{% endif %}">
         <span class="glyphicon glyphicon-eye-close"></span>
     </a>
 </div>
