@@ -1,0 +1,4 @@
+{
+  "verbose": false,
+  "ignore": ["mangaki", "coverage", "tests", "data", "notebooks", "provisioning", "fixtures"]
+}
