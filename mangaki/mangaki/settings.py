@@ -14,6 +14,9 @@ from django.conf import global_settings
 from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DEBUG, SITE_ID, DATABASES
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+# For assets and development purpose
+WEBPACK_URL = 'http://localhost:3000'
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
