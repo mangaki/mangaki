@@ -1,0 +1,38 @@
+<a href="http://meta.mangaki.fr/session/sso" target="_blank"><button type="button" class="btn btn-primary">En discuter sur le forum</button></a>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#suggestionModal">Des idées pour améliorer cette fiche ?</button>
+
+<!-- FIXME: AUTOCOMPLETE with Algolia
+<form class="typeahead-demo {{ user.username }}">
+    <input type="text" data-username="{{ user.username }}" class="typeahead" placeholder="Conseiller cet anime à un utilisateur" />
+</form> -->
+<div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">Cet utilisateur a déjà vu l'anime que vous voulez lui recommander</div>
+<div class="alert alert-success" role="alert" id="success-reco" style="display: none">La recommandation a bien été effectuée</div>
+
+<div class="modal fade modal-suggestion-" id="suggestionModal" tabindex="-1" role="dialog" aria-labelledby="suggestionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="suggestionModalLabel">Proposer une amélioration pour {{ object.title }}</h4>
+      </div>
+      <h5 style="text-indent:2em">Bienvenue sur l’interface d’amélioration de Mangaki :</h5>
+      <ol>
+      <li>Indiquez quelle partie de la fiche est concernée par votre proposition</li>
+      <li>Écrivez-nous votre idée/solution, et envoyez !</li>
+      </ol>
+      <form id="suggestion" action="/{{ object.category }}/{{ object.id }}" method="POST">
+      {% csrf_token %}
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert" id="alert" style="display: none"></div>
+        <div class="alert alert-success" role="alert" id="success" style="display: none"></div>
+        {{ suggestion_form|bootstrap }}
+      </div>
+      </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary btn-suggest" data-category="{{ object.category }}">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
