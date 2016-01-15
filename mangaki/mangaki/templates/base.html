@@ -6,22 +6,15 @@
     {% block opengraph %}{% endblock %}
     <title>{% block title %}Mangaki{% endblock %}</title>
     <link rel="icon" href="/static/img/favicon.png">
-    <script src="/static/js/jquery-latest.min.js"></script>
+    <!-- Webpack build assets -->
+    {% load webpack_assets %}
+    <script src="{% asset_for 'vendor.js' %}"></script>
+    <link rel="stylesheet" href="{% asset_for 'skin.css' %}" />
+    <!-- Webpack build assets -->
+
     <script src="/static/js/bootstrap-switch.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/handlebars.js"></script>
-    <script src="/static/js/csrf.js"></script>
-    <script src="/static/js/skin.js"></script>
-    <script src="/static/js/vote.js"></script>
-    <script src="/static/js/typeahead.bundle.js"></script>
-    <script src="/static/js/autocomplete.js"></script>
-    <script src="/static/js/tooltip.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/static/css/bootstrap-switch.min.css" />
-    <link rel="stylesheet" href="/static/css/typeahead.css" />
-    <link rel="stylesheet" href="/static/css/skin.css" />
-    <link rel="stylesheet" href="/static/css/test.css" />
 </head>
 
 <body>
@@ -126,16 +119,17 @@
         </nav>
     </footer>
     <script>
-        $("nav [href='{{ request.path }}']").parents("li").addClass('active');
     </script>
 </body>
 </html>
 
+<script src="{% asset_for 'navbar.js' %}"></script>
+<!--
 <script>
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
-</script>
+</script>-->
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
