@@ -9,3 +9,4 @@ data/
 node_modules
 .venv
 .vagrant
+*.swp
