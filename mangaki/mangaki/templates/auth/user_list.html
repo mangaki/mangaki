@@ -20,8 +20,9 @@
 </br>
 <b>
 
-<form class="typeahead-demo {{ user.username }}">
-      <input type="text" data-username="{{ user.username }}" class="typeahead" placeholder="Rechercher un utilisateur" />
+<!-- FIXME: Autocomplete-me for real ! -->
+<form class="AUTOCOMPLETE {{ user.username }}">
+      <input type="text" data-username="{{ user.username }}" placeholder="Rechercher un utilisateur" />
 </form>
 
 <div class="collapse navbar-collapse" id="menu-collapse">
@@ -81,7 +82,4 @@
 <br />
 <br />
 <br />
-<script>
-loadMenuUser();
-</script>
 {% endblock %}
