@@ -4,7 +4,34 @@
   "description": "Mangaki frontend",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rm -rf mangaki/mangaki/static/assets/*",
+    "compile": "node -r dotenv/config --harmony bin/compile",
+    "lint": "eslint . ./",
+    "lint:fix": "npm run lint -- --fix",
+    "start": "better-npm-run start",
+    "dev": "better-npm-run dev",
+    "dev:nw": "npm run dev -- -nw",
+    "dev:no-debug": "npm run dev -- -no_debug",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:dev": "npm run test -- --watch",
+    "deploy": "better-npm-run deploy"
+  },
+  "betterScripts": {
+    "dev": {
+      "command": "nodemon -r dotenv/config bin/server",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    "deploy": {
+      "command": "npm run clean && npm run compile",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+    "start": {
+      "command": "node -r dotenv/config bin/server"
+    }
   },
   "repository": {
     "type": "git",
@@ -22,8 +49,57 @@
   },
   "homepage": "https://github.com/mangaki/mangaki#readme",
   "dependencies": {
+    "better-npm-run": "0.0.5",
     "bootstrap": "^3.3.6",
+    "bootstrap-webpack": "0.0.5",
+    "debug": "^2.2.0",
+    "dotenv": "^1.2.0",
     "handlebars": "^4.0.5",
-    "jquery": "^2.2.0"
+    "history": "^2.0.0-rc2",
+    "jquery": "^2.2.0",
+    "koa": "^2.0.0-alpha.3",
+    "koa-connect-history-api-fallback": "^0.3.0",
+    "koa-convert": "^1.2.0",
+    "koa-static": "^2.0.0",
+    "url": "^0.11.0",
+    "yargs": "^3.31.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.4.0",
+    "babel-eslint": "^5.0.0-beta6",
+    "babel-loader": "^6.2.1",
+    "babel-plugin-add-module-exports": "^0.1.3-alpha",
+    "babel-plugin-transform-runtime": "^6.4.3",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-stage-0": "^6.3.13",
+    "babel-register": "^6.4.3",
+    "babel-runtime": "^6.3.19",
+    "css-loader": "^0.23.1",
+    "cssnano": "^3.4.0",
+    "eslint": "^1.10.3",
+    "eslint-config-standard": "^4.4.0",
+    "eslint-loader": "^1.2.0",
+    "eslint-plugin-babel": "^3.0.0",
+    "eslint-plugin-standard": "^1.3.1",
+    "exports-loader": "^0.6.2",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.8.5",
+    "fs-extra": "^0.26.4",
+    "html-webpack-plugin": "^1.7.0",
+    "imports-loader": "^0.6.5",
+    "isparta-loader": "^2.0.0",
+    "json-loader": "^0.5.4",
+    "less": "^2.5.3",
+    "less-loader": "^2.2.2",
+    "node-sass": "^3.4.2",
+    "nodemon": "^1.8.1",
+    "postcss-loader": "^0.8.0",
+    "sass-loader": "^3.1.2",
+    "style-loader": "^0.13.0",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.11",
+    "webpack-dev-middleware": "^1.4.0",
+    "webpack-hot-middleware": "^2.6.0",
+    "webpack-manifest-plugin": "^0.5.0"
   }
 }
