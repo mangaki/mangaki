@@ -95,8 +95,8 @@
 
                     <ul class="nav navbar-nav navbar-right">
                     {% if not user.is_authenticated %}
-                        <li><a href="/user/login"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
-                        <li><a href="/user/signup"><span class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
+                        <li><a href="/user/login/?next={{ request.get_full_path|urlencode }}"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
+                        <li><a href="/user/signup/?next={{ request.get_full_path|urlencode }}"><span class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
                     {% else %}
                         <li><a href="#">Bienvenue, <strong>{{ user.username }}</strong> !</a></li>
                         <li><a href="/user/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Quitter</a></li>

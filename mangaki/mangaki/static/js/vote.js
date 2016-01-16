@@ -15,8 +15,14 @@ function vote(elt) {
     choice = $(elt).data('choice');
     pos = entity.data('pos');
     $.post('/work/' + work_id, {choice: choice}, function(rating) {
-        if(rating === '')
-            window.location = '/user/signup';
+        if(rating === '') {
+            // FIXME: We should take the vote into account after the
+            // user signs up or logs in.
+            var next = window.location.pathname +
+                window.location.search + window.location.hash;
+            window.location.assign(
+                '/user/signup?next=' + encodeURIComponent(next));
+        }
         if(typeof(sort_mode) !== 'undefined' && sort_mode === 'mosaic' && rating)
             loadCard(pos);
         else {

@@ -34,8 +34,8 @@
   {% else %}
   <div class=" col-md-12 col-sm-12">
     <p class="well">
-      Nouveau sur Mangaki ? <a href="/user/signup/">Inscrivez-vous</a> puis
-      <a href="/user/login/">connectez-vous</a> pour noter ces <em>anime</em>
+      Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
+      <a href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>anime</em>
       et obtenir des recommandations.
     </p>
   </div>
