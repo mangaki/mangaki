@@ -2,7 +2,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from mangaki.api import get_discourse_data
-from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES
+from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
+
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 
 class Work(models.Model):
@@ -251,3 +254,24 @@ class Reference(models.Model):
     work = models.ForeignKey('Work')
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
+
+class Top(models.Model):
+    date = models.DateField(auto_now_add=True)
+    category = models.CharField(max_length=10, choices=TOP_CATEGORY_CHOICES, unique_for_date='date')
+
+    contents = models.ManyToManyField(ContentType, through='Ranking')
+
+    def __str__(self):
+        return '{category} on {date}'.format(
+            category=self.category,
+            date=self.date)
+
+class Ranking(models.Model):
+    top = models.ForeignKey('Top', on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    score = models.FloatField()
+    nb_ratings = models.PositiveIntegerField()
+    nb_stars = models.PositiveIntegerField()
