@@ -32,3 +32,9 @@ TYPE_CHOICES = (
     ("manhwa", "Manhwa"),
     ("yonkoma", "Yonkoma")
 )
+
+TOP_CATEGORY_CHOICES = (
+    ("directors", "Réalisateurs"),
+    ("authors", "Auteurs"),
+    ("composers", "Compositeurs"),
+)

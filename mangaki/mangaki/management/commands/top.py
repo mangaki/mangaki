@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 from django.db import connection
-from mangaki.models import Rating, Anime, Artist
+from mangaki.models import Rating, Anime, Artist, Top, Ranking
 from mangaki.utils.chrono import Chrono
+from mangaki.choices import TOP_CATEGORY_CHOICES
 from collections import Counter
-import json
 
 class Command(BaseCommand):
     args = ''
@@ -31,9 +31,17 @@ class Command(BaseCommand):
         for artist_id, _ in c.most_common(20):
             artist_ids.append(artist_id)
         artist_by_id = Artist.objects.in_bulk(artist_ids)
-        top = []
-        for i, (artist_id, score) in enumerate(c.most_common(20)):
-            top.append(dict(rank=i + 1, name=str(artist_by_id[artist_id]), id=artist_id, score=score, nb_ratings=nb_ratings[artist_id], nb_stars=nb_stars[artist_id]))
+        choice = category + 's'
+        if choice not in dict(TOP_CATEGORY_CHOICES):
+            raise CommandError("Invalid top category '{}'".format(choice))
+        top = Top.objects.create(category=choice)
+        Ranking.objects.bulk_create([
+            Ranking(
+                top=top,
+                content_object=artist_by_id[artist_id],
+                score=score,
+                nb_ratings=nb_ratings[artist_id],
+                nb_stars=nb_stars[artist_id],
+            ) for (artist_id, score) in c.most_common(20)
+        ])
         chrono.save('get results')
-        # print('%d queries' % len(connection.queries))
-        print(json.dumps(top))

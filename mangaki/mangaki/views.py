@@ -4,7 +4,7 @@ from django.views.generic.edit import FormMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.utils.timezone import utc
@@ -14,7 +14,7 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Deck
+from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Deck, Top, Ranking
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -32,6 +32,7 @@ import datetime
 import hashlib
 import json
 
+from mangaki.choices import TOP_CATEGORY_CHOICES
 
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
@@ -593,6 +594,33 @@ def about(request):
 
 def events(request):
     return render(request, 'events.html', {'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now())})
+
+def top(request, category_slug):
+    categories = dict(TOP_CATEGORY_CHOICES)
+    if category_slug not in categories:
+        raise Http404
+    try:
+        top = Top.objects.filter(category=category_slug).latest('date')
+    except Top.DoesNotExist:
+        raise Http404
+    data = []
+    rankings = Ranking.objects.filter(top=top)
+    for rank, ranking in enumerate(rankings):
+        data.append({
+            'rank': rank + 1,
+            'id': ranking.object_id,
+            'name': str(ranking.content_object),
+            'score': ranking.score,
+            'nb_ratings': ranking.nb_ratings,
+            'nb_stars': ranking.nb_stars,
+        })
+    return render(request, 'top.html', {
+        'date': top.date,
+        'size': len(data),
+        'category_slug': category_slug,
+        'category': categories[category_slug].lower(),
+        'top': data,
+    })
 
 
 def rate_work(request, work_id):
