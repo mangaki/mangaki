@@ -5,14 +5,17 @@ from mangaki.models import Rating, Anime, Artist
 from mangaki.utils.chrono import Chrono
 from collections import Counter
 import json
-import sys
 
 class Command(BaseCommand):
     args = ''
     help = 'Builds top'
+
+    def add_arguments(self, parser):
+        parser.add_argument('category', nargs='+', type=str)
+
     def handle(self, *args, **options):
         chrono = Chrono(False)
-        category = sys.argv[2]
+        category = options.get('category')[0]
         c = Counter()
         values = {'favorite': 10, 'like': 2, 'neutral': 0.5, 'dislike': -1}
         nb_ratings = Counter()
