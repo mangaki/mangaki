@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference
+from mangaki.models import Anime, Manga, Genre, Track, OST, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -216,6 +216,17 @@ class PairingAdmin(admin.ModelAdmin):
 class ReferenceAdmin(admin.ModelAdmin):
     list_display = ['work', 'url']
 
+class RankingInline(admin.TabularInline):
+    model = Ranking
+
+class TopAdmin(admin.ModelAdmin):
+    inlines = [
+        RankingInline,
+    ]
+    readonly_fields = ('category', 'date',)
+
+    def has_add_permission(self, request):
+        return False
 
 admin.site.register(Anime, AnimeAdmin)
 admin.site.register(Manga, MangaAdmin)
@@ -233,3 +244,4 @@ admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(Recommendation, RecommendationAdmin)
 admin.site.register(Pairing, PairingAdmin)
 admin.site.register(Reference, ReferenceAdmin)
+admin.site.register(Top, TopAdmin)

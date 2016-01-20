@@ -262,9 +262,10 @@ class Top(models.Model):
     contents = models.ManyToManyField(ContentType, through='Ranking')
 
     def __str__(self):
-        return '{category} on {date}'.format(
+        return 'Top {category} on {date} (id={id})'.format(
             category=self.category,
-            date=self.date)
+            date=self.date,
+            id=self.id)
 
 class Ranking(models.Model):
     top = models.ForeignKey('Top', on_delete=models.CASCADE)
