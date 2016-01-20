@@ -62,10 +62,18 @@
 </div>
     <script>
     sort_mode = '';
-    $.getJSON('/data/reco/{{ category }}/{{ editor }}.json', function(data) {
-        data.forEach(function(work, i) {
-            displayWork(i + 1, work);
-        });
+    $.ajax({
+        dataType: 'json',
+        url: '/data/reco/{{ category }}/{{ editor }}.json',
+        success: function (data) {
+            data.forEach(function (work, i) {
+                displayWork(i + 1, work);
+            });
+        },
+        // FIXME: Use this to show recommendations for non-authenticated users.
+        // contentType: "application/json; charset=utf-8",
+        // type: "POST",
+        // data: JSON.stringify({ 7: 'favorite' }),
     });
     $("[name='reco_willsee_ok']").bootstrapSwitch();
     $("[name='reco_willsee_ok']").on('switchChange.bootstrapSwitch', function(event, state) {

@@ -4,7 +4,7 @@ from django.views.generic.edit import FormMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseForbidden, Http404
+from django.http import HttpResponse, HttpResponseForbidden, Http404, HttpResponseBadRequest
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.utils.timezone import utc
@@ -703,8 +703,29 @@ def get_extra_manga(request, query):
 
 
 def get_reco_list(request, category, editor):
+    rated_works = dict(Rating.objects.filter(user=request.user).values_list('work_id', 'choice'))
+    if request.is_ajax() and request.method == 'POST':
+        errors = []
+        try:
+            additional_ratings = json.loads(request.body.decode())
+            if type(additional_ratings) != dict:
+                errors.append('Ratings should be a dict')
+            else:
+                for k, v in additional_ratings.items():
+                    if v not in ['favorite', 'like', 'dislike', 'neutral', 'willsee', 'wontsee']:
+                        errors.append('Vote value is invalid')
+                    rated_works[int(k)] = v
+        except ValueError as err:
+            errors.append('Ill-formed JSON: `{}`'.format(err))
+        if len(errors) > 0:
+            return HttpResponseBadRequest(json.dumps({
+                'message': errors
+            }), content_type='application/json')
+    willsee_ok = True
+    if request.user.is_authenticated():
+        willsee_ok = request.user.profile.reco_willsee_ok
     reco_list = []
-    for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
+    for work, is_manga, in_willsee in get_recommendations(rated_works, willsee_ok, category, editor):
         update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})

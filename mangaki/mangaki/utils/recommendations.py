@@ -10,18 +10,13 @@ MIN_RATINGS = 3
 
 CHRONO_ENABLED = False
 
-def get_recommendations(user, category, editor):
-    # What if user is not authenticated? We will see soon.
+def get_recommendations(rated_works, willsee_ok, category, editor):
     chrono = Chrono(CHRONO_ENABLED)
 
     chrono.save('[%dQ] begin' % len(connection.queries))
 
-    rated_works = {}
-    for work_id, choice in Rating.objects.filter(user=user).values_list('work_id', 'choice'):
-        rated_works[work_id] = choice
-
     willsee = set()
-    if user.profile.reco_willsee_ok:
+    if willsee_ok:
         banned_works = set()
         for work_id in rated_works:
             if rated_works[work_id] != 'willsee':
@@ -95,7 +90,7 @@ def get_recommendations(user, category, editor):
         # Adding interesting works to the arena (rated at least MIN_RATINGS by neighbors)
         if nb_ratings[work_id] >= MIN_RATINGS:
             k += 1
-            final_works[(work_id, work_id in manga_ids, work_id in willsee)] = (float(sum_ratings[work_id]) / nb_ratings[work_id], sum_scores[work_id])    
+            final_works[(work_id, work_id in manga_ids, work_id in willsee)] = (float(sum_ratings[work_id]) / nb_ratings[work_id], sum_scores[work_id])
         i += 1
 
     chrono.save('[%dQ] rank %d %d works' % (len(connection.queries), k, i))
