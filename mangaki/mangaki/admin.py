@@ -218,6 +218,11 @@ class ReferenceAdmin(admin.ModelAdmin):
 
 class RankingInline(admin.TabularInline):
     model = Ranking
+    fields = ('content_type', 'object_id', 'name', 'score', 'nb_ratings', 'nb_stars',)
+    readonly_fields = ('name',)
+
+    def name(self, instance):
+        return str(instance.content_object)
 
 class TopAdmin(admin.ModelAdmin):
     inlines = [
