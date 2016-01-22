@@ -3,13 +3,13 @@
 
 {% block body %}
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
-<div class="row mangas-list">
+<div class="row">
     <div class="col-md-12"> <!-- col-md-push-3 -->
         <h1>{{ object.title }}</h1>
     </div>
     <div class="col-sm-6 col-md-3 manga-sheet">
-        <div class="thumbnail data" data-category="manga" data-id="{{ object.id }}">
-            {% include "work_rating.html" with category="manga" work=object %}
+        <div class="work-sheet data" data-category="manga" data-id="{{ object.id }}">
+            {% include "work_rating.html" with category="manga" work=object show_title=False %}
         </div>
     </div>
     <div class="col-sm-6 col-md-3">
