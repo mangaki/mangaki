@@ -158,13 +158,12 @@ color: #b2B2B2;
 .work-sheet {
     position: relative;
     margin-bottom: 20px;
-    margin-right: 10%;
     max-width: 225px;
 }
 
+/* A card in a grid, e.g. on the mosaic */
 .works-list .work-sheet {
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto 20px auto;
 }
 
 .work-snapshot {
@@ -185,6 +184,10 @@ color: #b2B2B2;
 .work-snapshot-image:before {
     content: "";
     display: block;
+    /* This is the aspect ratio for the posters. Currently, we force the width
+     * to 225px in .work-sheet above, and we want the corresponding height to
+     * be 321px, so the aspect ratio has to be 321/225 = 142.667%.
+     */
     padding-top: 142.667%;
 }
 
@@ -213,9 +216,8 @@ color: #b2B2B2;
 .work-votes {
     position: absolute;
     top: 0;
-    right: 0;
+    right: -20%;
     width: 20%;
-    margin-right: -20%;
     height: 100%;
 }
 
@@ -224,13 +226,12 @@ color: #b2B2B2;
     border-bottom-left-radius: 0;
     margin-top: 1px;
     position: relative;
-    z-index: 128;
 }
 
 .work-synopsis {
     position: absolute;
-    bottom: 0;
-    overflow: scroll;
+    bottom: -5px;
+    overflow: auto;
     line-height: 2.5ex;
     max-height: 30ex;
     background-color: #fff;
@@ -238,7 +239,6 @@ color: #b2B2B2;
     color: #000;
     box-shadow: #e3e4e6 0px -2px 2px;
     padding: 5px 1ex 0px 1ex;
-    margin-bottom: -5px;
     background: linear-gradient(to bottom, rgba(253, 253, 253, 0.8) 0%, rgb(253, 253, 253) 100%);
     display: none;
     text-align: justify;
