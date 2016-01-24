@@ -63,7 +63,7 @@ def display_queries():
 def get_rated_works(user):
     rated_works = {}
     for work_id, choice in Rating.objects.filter(user=user).values_list('work_id', 'choice'):
-        rated_works[work_id] = choice'
+        rated_works[work_id] = choice
     print(len(rated_works))
     return rated_works
 
