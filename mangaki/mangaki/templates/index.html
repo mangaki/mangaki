@@ -11,13 +11,13 @@
 
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
       <div class="work-sheet data" data-category="anime" data-id="{{ kizumonogatari.id }}">
-        {% include "work_rating.html" with category="anime" work=kizumonogatari show_title=True %}
+        {% include "work_rating.html" with category="anime" work=kizumonogatari rating=kizumonogatari_rating show_title=True %}
       </div>
     </div>
 
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
       <div class="work-sheet data" data-category="album" data-id="{{ utamonogatari.id }}">
-        {% include "work_rating.html" with category="album" work=utamonogatari show_title=True  %}
+        {% include "work_rating.html" with category="album" work=utamonogatari rating=utamonogatari_rating show_title=True  %}
       </div>
     </div>
   </div>

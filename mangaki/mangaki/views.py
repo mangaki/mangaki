@@ -54,6 +54,9 @@ RATING_COLORS = {
     'wontsee': {'normal': '#5bc0de', 'highlight': '#31b0d5'}
 }
 
+KIZU_ID = 13679
+UTA_ID = 14215
+
 
 def display_queries():
     for line in connection.queries:
@@ -666,8 +669,10 @@ def index(request):
     partners = Partner.objects.filter()
     return render(request, 'index.html', {
         'partners': partners,
-        'kizumonogatari': Anime.objects.get(pk=591), # 13679
-        'utamonogatari': Album.objects.get(pk=7683), # ???
+        'kizumonogatari': Anime.objects.get(pk=KIZU_ID),
+        'utamonogatari': Album.objects.get(pk=UTA_ID),
+        'kizumonogatari_rating': Rating.objects.get(work_id=KIZU_ID, user=request.user).choice if Rating.objects.filter(work_id=KIZU_ID, user=request.user).count() else None,
+        'utamonogatari_rating': Rating.objects.get(work_id=UTA_ID, user=request.user).choice if Rating.objects.filter(work_id=UTA_ID, user=request.user).count() else None
     })
 
 
@@ -676,8 +681,6 @@ def about(request):
 
 
 def events(request):
-    KIZU_ID = 13679
-    UTA_ID = 14215
     return render(
         request, 'events.html',
         {
