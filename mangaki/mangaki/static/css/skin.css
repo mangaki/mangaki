@@ -25,7 +25,7 @@ header nav.navbar {
  *  BODY  *
  **********/
 
-.margin { margin: 30px 0 30px 0;}
+.margin { margin: 0 0 30px 0;} 
 .margin10top { margin-top: 10px ;}
 
 /* Margin for body to prevent unused space from the header/footer nav menu. */
