@@ -69,30 +69,19 @@ class Genre(models.Model):
 
 class Track(models.Model):
     title = models.CharField(max_length=32)
-    ost = models.ForeignKey('Album')
+    album = models.ManyToManyField('Album')
 
     def __str__(self):
         return self.title
 
-
-class OST(Work):
-    def __str__(self):
-        return self.title
 
 class Album(Work):
     composer = models.ForeignKey('Artist', related_name='composer', default=1)
-    catalog_number = models.CharField(max_length=20, blank=True)
-    type_album = models.ManyToManyField('TypeAlbum')
-    vgmdb_aid = models.IntegerField(defaulf=0)
+    catalog_number = models.CharField(max_length=20)
+    vgmdb_aid = models.IntegerField()
 
     def __str__(self):
         return '[%d] %s' % (self.id, self.title)
-
-class TypeAlbum(models.Model):
-    title = models.CharField(max_length=128)
-
-    def __str__(self):
-        return self.title
 
 class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)
@@ -290,3 +279,7 @@ class Ranking(models.Model):
     score = models.FloatField()
     nb_ratings = models.PositiveIntegerField()
     nb_stars = models.PositiveIntegerField()
+
+class OST(Work):
+    def __str__(self):
+        return self.title
