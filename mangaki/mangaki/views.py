@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.timezone import utc
 
@@ -20,7 +21,7 @@ from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
 from mangaki.utils.recommendations import get_recommendations
 from mangaki.utils.chrono import Chrono
-from irl.models import Event, Partner
+from irl.models import Event, Partner, Attendee
 
 from collections import Counter
 from markdown import markdown
@@ -146,6 +147,23 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if total > 0:
             seen_total = sum(nb[rating] for rating in seen_ratings)
             context['seen_percent'] = round(100 * seen_total / float(total))
+
+        anime_events = anime.event_set.filter(date__gte=timezone.now())
+        if anime_events.count() > 0:
+            my_events = dict(self.request.user.attendee_set.filter(
+                event__in=anime_events).values_list('event_id', 'attending'))
+
+            context['events'] = [
+                {
+                    'id': event.id,
+                    'attending': my_events.get(event.id, None),
+                    'type': event.get_event_type_display(),
+                    'date': event.get_date(),
+                    'link': event.link,
+                    'location': event.location,
+                } for event in anime_events
+            ]
+            
         return context
 
     def post(self, request, *args, **kwargs):
@@ -209,6 +227,24 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         form.save()
         return super(MangaDetail, self).form_valid(form)
 
+class EventDetail(DetailView):
+    model = Event
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseForbidden()
+
+        self.object = self.get_object()
+        attending = None
+        if 'wontgo' in request.POST:
+            attending = False
+        if 'willgo' in request.POST:
+            attending = True
+        if attending is not None:
+            Attendee.objects.update_or_create(
+                event=self.object, user=request.user,
+                defaults={'attending': attending })
+        return redirect(request.GET['next']);
 
 def controversy(nb_likes, nb_dislikes):
     if nb_likes == 0 or nb_dislikes == 0:
