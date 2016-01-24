@@ -30,7 +30,7 @@ header nav.navbar {
 
 /* Margin for body to prevent unused space from the header/footer nav menu. */
 body > .container {
-    margin-top: 75px;
+    margin-top: 25px;
     margin-bottom: 75px;
 
 }
@@ -206,7 +206,7 @@ color: #b2B2B2;
 
 .work-snapshot-title {
     width: 100%;
-    height: 4em;
+    height: 4.2em;
     line-height: 4em;
     border-radius: 0 0 10px 10px;
     box-shadow: #e3e4e6 0px 2px 2px;
