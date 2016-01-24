@@ -227,11 +227,11 @@ color: #b2B2B2;
     margin-top: 1px;
     position: relative;
     /* Display the button over sibling posters, if needed */
-    z-index: 128;
+    z-index: 64;
 }
 
 .works-list .manga-sheet {
-    z-index: 64;
+    z-index: 32;
 }
 
 .work-synopsis {
