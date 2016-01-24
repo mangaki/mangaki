@@ -92,7 +92,7 @@ class TrackAdmin(admin.ModelAdmin):
     pass
 
 
-class OSTAdmin(admin.ModelAdmin):
+class AlbumAdmin(admin.ModelAdmin):
     pass
 
 
@@ -232,7 +232,6 @@ admin.site.register(Anime, AnimeAdmin)
 admin.site.register(Manga, MangaAdmin)
 admin.site.register(Genre, GenreAdmin)
 admin.site.register(Track, TrackAdmin)
-#admin.site.register(OST, OSTAdmin)
 admin.site.register(Artist, ArtistAdmin)
 admin.site.register(Studio, StudioAdmin)
 admin.site.register(Editor, EditorAdmin)
@@ -245,4 +244,4 @@ admin.site.register(Recommendation, RecommendationAdmin)
 admin.site.register(Pairing, PairingAdmin)
 admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(Top, TopAdmin)
-admin.site.register(Album)
+admin.site.register(Album, AlbumAdmin)
