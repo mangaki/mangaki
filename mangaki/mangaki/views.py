@@ -630,7 +630,12 @@ def about(request):
 
 
 def events(request):
-    return render(request, 'events.html', {'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now())})
+    return render(
+        request, 'events.html',
+        {
+            'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
+            'kizumonogatari': Anime.objects.get(pk=591), # 13679
+        })
 
 def top(request, category_slug):
     categories = dict(TOP_CATEGORY_CHOICES)

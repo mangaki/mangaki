@@ -2,6 +2,38 @@
 
 {% block body %}
 <div id="events">
+    <h1 id="concours-kizumonogatari-lien-en-partenariat-avec-wakanim">Concours Kizumonogatari (lien) en partenariat avec Wakanim</h1>
+    <h2 id="deux-albums-utamonogatari-lien-à-gagner">Deux albums Utamonogatari (lien) à gagner !</h2>
+
+    <div class="container">
+      <div class="row mangas-list">
+        <div class="col-sm-12 col-md-6">
+          <p>À l'occasion de l'avant-première de Kizumonogatari le vendredi 29 janvier 2015 à 21 h au Grand Rex, Mangaki et Wakanim vous font gagner deux OST de la série.</p>
+          <p>Pour participer, trois possibilités s'offrent à vous :</p>
+          <ul>
+            <li>RT ce tweet et suivez @MangakiFR sur Twitter</li>
+
+            <li> ajoutez Utamonogatari à votre wishlist (si vous êtes connectés, cliquez ici)</li>
+
+            <li> dites que vous participez à l&#39;avant-première (« J&#39;y vais ! ») et participez au tirage au sort.</li>
+          </ul>
+          <p>Pour plus d'informations, n'hésitez pas à nous contacter.</p>
+        </div>
+
+        <div class="col-sm-6 col-md-3 manga-sheet">
+          <div class="thumbnail data">
+            {% include "work_rating.html" with category="anime" work=kizumonogatari %}
+          </div>
+        </div>
+
+        <div class="col-sm-6 col-md-3 manga-sheet">
+          <div class="thumbnail data">
+            {% include "work_rating.html" with category="anime" work=kizumonogatari %}
+          </div>
+        </div>
+      </div>
+    </div>
+
     <h1>Studio Ghibli Party au cinéma Les Fauvettes</h1>
     <h3>Du 6 janvier au 6 février 2015 à Paris, avenue des Gobelins</h3>
     <hr />
