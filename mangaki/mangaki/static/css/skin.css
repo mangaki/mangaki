@@ -151,80 +151,107 @@ color: #b2B2B2;
 	-o-filter: grayscale(0%);
 }
 
-.mangas-list .manga-sheet .row {
-    margin-left: 0px;
-    margin-right: -15px;
+/****************
+ *  WORK CARDS  *
+ ****************/
+
+.work-sheet {
+    position: relative;
+    margin-bottom: 20px;
+    max-width: 225px;
 }
-.mangas-list .manga-sheet .row > div {
-    padding: 0;
+
+/* A card in a grid, e.g. on the mosaic */
+.works-list .work-sheet {
+    margin: 0 auto 20px auto;
 }
-.mangas-list .manga-sheet:hover .thumbnail {
-    background-color: #FFF;
-   /*margin-left: -10px;
-    padding-left: 10px;
-    margin-right: -10px;
-    padding-right: 10px;*/
-}
-/*.mangas-list .manga-sheet:hover .manga-snapshot .manga-snapshot-image {
+
+.work-snapshot {
     width: 100%;
-}*/
-.mangas-list .manga-sheet .thumbnail:not(:hover) {
-    /*background-color: #DDD;*/
-    /*border-color: #DDD;*/
+    display: block;
+}
+
+.work-snapshot-image {
+    width: 100%;
+    position: relative;
     opacity: 0.8;
 }
 
-.mangas-list .manga-sheet .manga-snapshot {
-    z-index: 64;
-}
-.mangas-list .manga-sheet .manga-snapshot .manga-snapshot-image {
-    height: 321px;
-    width: 225px;
-    max-width: 99%;
-    background-size: cover;
-    background-repeat: no-repeat!important;
-
-
+.work-sheet:hover .work-snapshot-image {
+    opacity: 1;
 }
 
-.mangas-list .manga-sheet .row .btn {
-    margin-top: 1px;
-    position: relative;
-}
-.mangas-list .manga-sheet .row .btn:hover {
-    z-index: 128;
-}
-.thumbnail {
-  display: block;
-  padding: 4px;
-  margin-bottom: 20px;
-  line-height: 1.42857143;
-  background-color: #fff;
-  border: 0px solid #ddd;
-    border-radius: 0px;
-  -webkit-transition: all .0s ease-in-out;
-  transition: all .0s ease-in-out;
-}
-@media(min-width: 768px) and (max-width: 1000px) {
-    .mangas-list .manga-sheet .row .btn {
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    }
+.work-snapshot-image:before {
+    content: "";
+    display: block;
+    /* This is the aspect ratio for the posters. Currently, we force the width
+     * to 225px in .work-sheet above, and we want the corresponding height to
+     * be 321px, so the aspect ratio has to be 321/225 = 142.667%.
+     */
+    padding-top: 142.667%;
 }
 
+.work-snapshot-image img {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
 
-
-.thumbnail .col-md-12 {
+.work-snapshot-title {
+    width: 100%;
     height: 4em;
     line-height: 4em;
+    border-radius: 0 0 10px 10px;
+    box-shadow: #e3e4e6 0px 2px 2px;
 }
 
-.manga-sheet h1 {
-    margin: 0;
+.work-snapshot-title h4 {
     vertical-align: middle;
     display: inline-block;
-    font-size: 1.3em;
-    /* height: 2em; */
+}
+
+.work-votes {
+    position: absolute;
+    top: 0;
+    right: -20%;
+    width: 20%;
+    height: 100%;
+}
+
+.work-votes .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-top: 1px;
+    position: relative;
+    /* Display the button over sibling posters, if needed */
+    z-index: 64;
+}
+
+.works-list .manga-sheet {
+    z-index: 32;
+}
+
+.work-synopsis {
+    position: absolute;
+    bottom: -5px;
+    overflow: auto;
+    line-height: 2.5ex;
+    max-height: 30ex;
+    background-color: #fff;
+    border-radius: 10px 10px 0 0;
+    color: #000;
+    box-shadow: #e3e4e6 0px -2px 2px;
+    padding: 5px 1ex 0px 1ex;
+    background: linear-gradient(to bottom, rgba(253, 253, 253, 0.8) 0%, rgb(253, 253, 253) 100%);
+    display: none;
+    text-align: justify;
+}
+
+.work-snapshot:hover .work-synopsis {
+    display: block;
 }
 
 .not-chosen {
@@ -233,10 +260,6 @@ color: #b2B2B2;
 
 .another .not-chosen {
     visibility: hidden;
-}
-
-.manga-snapshot-image, .manga-sheet h1 {
-    cursor: pointer;
 }
 
 .flatlist:hover {

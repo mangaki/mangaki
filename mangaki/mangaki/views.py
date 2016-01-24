@@ -743,7 +743,7 @@ def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
         update_poster_if_nsfw(work, request.user)
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster,
+        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 

@@ -3,12 +3,6 @@ var globalWorks = {
     dejaVu: []
 };
 
-function getSheet(elt) {
-    entity = $(elt).closest('.data'); // See work_poster
-    if(entity.data('category') !== 'dummy')
-        location.href = '/' + entity.data('category') + '/' + entity.data('id');
-}
-
 function vote(elt) {
     entity = $(elt).closest('.data');
     work_id = entity.data('id');
@@ -61,29 +55,33 @@ function suggestion(mangaki_class) {
 }
 
 function displayWork(pos, work) {
-    display_votes = true;
+    var display_votes = true;
     if(work === undefined) {
         work = {'id': 0, 'category': 'dummy', 'title': 'Chargement…', 'poster': '/static/img/chiro.gif', 'synopsis': ''}
         display_votes = false;
     } else {
         globalWorks.dejaVu.push(work.id);
     }
-    selector = ':nth-child(' + pos + ')';
-    work_div = $('.manga-sheet' + selector + ' .data');
+    var selector = ':nth-child(' + pos + ')';
+    var work_div = $('.manga-sheet' + selector + ' .data');
     work_div.data('category', work['category']);
     work_div.data('id', work['id']);
-    work_div.find('h4 a').text(work['title']);
-    work_div.find('h4 a').attr('title', work['synopsis']);
+    work_div.find('.work-snapshot-title h4').text(work['title']);
+    work_div.find('.work-synopsis').text(work['synopsis']);
     $('[data-toggle="tooltip"]').tooltip('fixTitle');
-    work_div.find('h4 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
-    work_div.find('.manga-snapshot-image').hide().css('background-image', 'url(' + work['poster'] + ')').fadeIn();
+    work_div.find('a.work-snapshot').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
+    work_div.fadeOut().promise().done(function () {
+            work_div.find('.work-votes').promise().done(function () {
+                work_div.find('.work-votes').show();
+                work_div.find('.work-snapshot-image img').attr('src', work['poster']);
+                work_div.fadeIn();
+        });
+    });
     if(display_votes) {
-        work_div.find('.manga-votes').fadeIn();
         if(work['rating'] === 'willsee')
-            work_div.find('.manga-votes a[data-choice!=willsee]').addClass('not-chosen');
-    }
-    else
-        work_div.find('.manga-votes').fadeOut();
+            work_div.find('.work-votes a[data-choice!=willsee]').addClass('not-chosen');
+    } else
+        work_div.find('.work-votes').fadeOut();
 }
 
 function actuallyLoadCard(pos) {
