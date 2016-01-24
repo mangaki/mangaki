@@ -279,7 +279,3 @@ class Ranking(models.Model):
     score = models.FloatField()
     nb_ratings = models.PositiveIntegerField()
     nb_stars = models.PositiveIntegerField()
-
-class OST(Work):
-    def __str__(self):
-        return self.title
