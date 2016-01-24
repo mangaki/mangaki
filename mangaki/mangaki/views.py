@@ -664,7 +664,11 @@ def index(request):
     # texte = Announcement.objects.get(title='Flash News').text
     # context = {'annonce': texte}
     partners = Partner.objects.filter()
-    return render(request, 'index.html', {'partners': partners})
+    return render(request, 'index.html', {
+        'partners': partners,
+        'kizumonogatari': Anime.objects.get(pk=591), # 13679
+        'utamonogatari': Album.objects.get(pk=7683), # ???
+    })
 
 
 def about(request):
