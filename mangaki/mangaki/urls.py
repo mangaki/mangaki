@@ -46,4 +46,5 @@ urlpatterns = [
     # url(r'^lookup/$', views.lookup_work'),
     url(r'^(?P<slug>[\w-]+)/$', views.MarkdownView.as_view()),
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top),
+    url(r'^event/(?P<pk>\d+)$', views.EventDetail.as_view(), name='event-detail'),
 ]

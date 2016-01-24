@@ -284,3 +284,15 @@ background-color: #f8d549;
   display: inline-block;
   color: #999;
 }
+
+/************
+ *  EVENTS  *
+ ************/
+.event:not(:first-child) {
+    margin-top: 20px;
+}
+
+.event-attending {
+    text-align: right;
+    margin-top: 5px;
+}
