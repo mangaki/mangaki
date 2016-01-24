@@ -81,7 +81,7 @@ class Album(Work):
     vgmdb_aid = models.IntegerField()
 
     def __str__(self):
-        return '[%d] %s' % (self.id, self.title)
+        return '[{id}] {title}'.format(id=self.id, title=self.title)
 
 class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)
