@@ -191,6 +191,10 @@ color: #b2B2B2;
     padding-top: 142.667%;
 }
 
+.work-snapshot-image.album-image:before {
+    padding-top: 100%;
+}
+
 .work-snapshot-image img {
     display: block;
     position: absolute;

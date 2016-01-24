@@ -3,13 +3,13 @@
 {% block body %}
 <div id="events">
     <h1 id="concours-kizumonogatari-lien-en-partenariat-avec-wakanim">Concours <a href="{% url 'anime-detail' kizumonogatari.id %}">Kizumonogatari</a> en partenariat avec <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}">Wakanim</a></h1>
-    <h2 id="deux-albums-utamonogatari-lien-à-gagner">Deux albums <a href="{% url 'album-detail' utamonogatari.id %}">Utamonogatari</a> à gagner !</h2>
+    <h2 id="deux-albums-utamonogatari-lien-à-gagner">Deux albums <a href="{% url 'album-detail' utamonogatari.id %}">Utamonogatari</a> à gagner !</h2>
 
     <div class="container">
       <div class="row">
         <div class="col-lg-6 col-md-4 col-sm-12 col-xs-12">
           <p>À l'occasion de l'avant-première de Kizumonogatari le <strong>vendredi 29 janvier 2015 à 21 h</strong> au <a href="http://legrandrex.cotecine.fr/film/111684/" target="_blank">Grand Rex</a>, <img style="margin-bottom: 4px;" height="20" src="/static/img/minilogo.png"> et <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}"><img height="20" src="/static/img/sponsors/small/{{ wakanim.image }}" alt="{{ wakanim.name }}" /></a> vous font gagner deux OST de la série.</p>
-          <p>Pour participer au tirage au sort, trois possibilités s'offrent à vous :</p>
+          <p>Pour participer au tirage au sort, trois possibilités s'offrent à vous :</p>
           <ul>
             <li>RT le tweet ci-dessous et suivez <a href="https://twitter.com/MangakiFR">@MangakiFR</a> sur Twitter</li>
 
@@ -24,13 +24,13 @@
 
         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 manga-sheet text-center">
           <div class="work-sheet data" data-category="anime" data-id="{{ kizumonogatari.id }}">
-            {% include "work_rating.html" with category="anime" work=kizumonogatari show_title=True %}
+            {% include "work_rating.html" with category="anime" work=kizumonogatari rating=kizumonogatari_rating show_title=True %}
           </div>
         </div>
 
         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 manga-sheet text-center">
           <div class="work-sheet data" data-category="album" data-id="{{ utamonogatari.id }}">
-            {% include "work_rating.html" with category="album" work=utamonogatari show_title=True  %}
+            {% include "work_rating.html" with category="album" work=utamonogatari rating=utamonogatari_rating show_title=True  %}
           </div>
         </div>
       </div>

@@ -676,13 +676,17 @@ def about(request):
 
 
 def events(request):
+    KIZU_ID = 13679
+    UTA_ID = 14215
     return render(
         request, 'events.html',
         {
             'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
-            'kizumonogatari': Anime.objects.get(pk=591), # 13679
-            'utamonogatari': Album.objects.get(pk=7683), # ???
+            'kizumonogatari': Anime.objects.get(pk=KIZU_ID),
+            'utamonogatari': Album.objects.get(pk=UTA_ID),
             'wakanim': Partner.objects.get(pk=12),
+            'kizumonogatari_rating': Rating.objects.get(work_id=KIZU_ID, user=request.user).choice if Rating.objects.filter(work_id=KIZU_ID, user=request.user).count() else None,
+            'utamonogatari_rating': Rating.objects.get(work_id=UTA_ID, user=request.user).choice if Rating.objects.filter(work_id=UTA_ID, user=request.user).count() else None
         })
 
 def top(request, category_slug):
