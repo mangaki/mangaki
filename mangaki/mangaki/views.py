@@ -63,7 +63,7 @@ def display_queries():
 def get_rated_works(user):
     rated_works = {}
     for work_id, choice in Rating.objects.filter(user=user).values_list('work_id', 'choice'):
-        rated_works[work_id] = choice
+        rated_works[work_id] = choice'
     print(len(rated_works))
     return rated_works
 
@@ -151,7 +151,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
         anime_events = anime.event_set.filter(date__gte=timezone.now())
         if anime_events.count() > 0:
             my_events = dict(self.request.user.attendee_set.filter(
-                event__in=anime_events).values_list('pk', 'attending'))
+                event__in=anime_events).values_list('event_id', 'attending'))
 
             context['events'] = [
                 {
