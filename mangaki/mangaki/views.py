@@ -15,7 +15,7 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Deck, Top, Ranking
+from mangaki.models import Work, Anime, Manga, Album, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Deck, Top, Ranking
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -226,6 +226,48 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         form.instance.user = self.request.user
         form.save()
         return super(MangaDetail, self).form_valid(form)
+
+
+class AlbumDetail(AjaxableResponseMixin, FormMixin, DetailView):
+    model = Album
+    form_class = SuggestionForm
+
+    def get_success_url(self):
+        return 'album/%d' % self.object.pk
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        update_poster_if_nsfw(self.object, self.request.user)
+        print(self.object.poster)
+        context['object'].source = context['object'].source.split(',')[0]
+
+        genres = []
+        if self.request.user.is_authenticated():
+            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
+            try:
+                if Rating.objects.filter(user=self.request.user, work=self.object, choice='favorite').count() > 0:
+                    context['rating'] = 'favorite'
+                else:
+                    context['rating'] = self.object.rating_set.get(user=self.request.user).choice
+            except Rating.DoesNotExist:
+                pass
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseForbidden()
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.save()
+        return super().form_valid(form)
+
 
 class EventDetail(DetailView):
     model = Event
@@ -635,6 +677,8 @@ def events(request):
         {
             'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
             'kizumonogatari': Anime.objects.get(pk=591), # 13679
+            'utamonogatari': Album.objects.get(pk=7683), # ???
+            'wakanim': Partner.objects.get(pk=12),
         })
 
 def top(request, category_slug):
