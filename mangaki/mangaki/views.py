@@ -641,7 +641,7 @@ def top(request, category_slug):
     except Top.DoesNotExist:
         raise Http404
     data = []
-    rankings = Ranking.objects.filter(top=top)
+    rankings = Ranking.objects.filter(top=top).prefetch_related('content_object')
     for rank, ranking in enumerate(rankings):
         data.append({
             'rank': rank + 1,
