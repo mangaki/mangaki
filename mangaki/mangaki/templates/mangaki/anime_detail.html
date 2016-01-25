@@ -81,10 +81,12 @@
           {% endfor %}
           </div>
         {% endif %}
-        <h3>Statistiques{% if seen_percent %} <small>(vu par {{ seen_percent }}&nbsp;% des membres qui l'ont noté)</small>{% endif %}</h3>
+        {% if stats %}
+        <h3>Statistiques <small>(vu par {{ seen_percent }}&nbsp;% des membres qui l'ont noté)</small></h3>
         <div style="max-width: 420px; max-height: 200px">
           <canvas id="stats" />
         </div>
+        {% endif %}
         {% if references %}
           <h3>Références</h3>
           <ul>
