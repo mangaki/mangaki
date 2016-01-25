@@ -139,13 +139,15 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
         nb = Counter(Rating.objects.filter(work=anime).values_list('choice', flat=True))
         labels = {'favorite': 'Ajoutés aux favoris', 'like': 'Ont aimé', 'neutral': 'Neutre', 'dislike': 'N\'ont pas aimé', 'willsee': 'Ont envie de voir', 'wontsee': 'N\'ont pas envie de voir'}
-        context['stats'] = []
         seen_ratings = ['favorite', 'like', 'neutral', 'dislike']
-        for rating in seen_ratings:
-            context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
         total = sum(nb.values())
         if total > 0:
+            context['stats'] = []
             seen_total = sum(nb[rating] for rating in seen_ratings)
+            for rating in labels:
+                if seen_total > 0 and rating not in seen_ratings:
+                    continue
+                context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
             context['seen_percent'] = round(100 * seen_total / float(total))
 
         anime_events = anime.event_set.filter(date__gte=timezone.now())
