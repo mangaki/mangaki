@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.twitter',
+    'allauth.socialaccount.providers.facebook',
     'bootstrapform',
     'debug_toolbar',
     # 'django_extensions'
