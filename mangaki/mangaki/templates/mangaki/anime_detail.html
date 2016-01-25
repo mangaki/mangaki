@@ -14,6 +14,18 @@
 {% endif %}
 {% endblock %}
 
+{% block twittercard %}
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@mangakifr" />
+<meta name="twitter:title" content="{{ object.title }} - Mangaki" />
+{% if object.synopsis %}
+  <meta name="twitter:description" content="{{ object.synopsis }}" />
+{% endif %}
+{% if object.poster %}
+  <meta name="twitter:image" content="{{ object.poster }}" />
+{% endif %}
+{% endblock %}
+
 {% block title %}{{ object.title }} - Mangaki{% endblock %}
 
 {% block body %}
