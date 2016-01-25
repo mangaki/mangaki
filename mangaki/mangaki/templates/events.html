@@ -15,7 +15,19 @@
 
             <li>Ajoutez <a href="{% url 'album-detail' utamonogatari.id %}">Utamonogatari</a> à vos <a href="{% url 'album-detail' utamonogatari.id %}"><span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span></a></li>
 
-            <li>Dites que vous participez à l&#39;avant-première sur <a href="{% url 'anime-detail' kizumonogatari.id %}">la page de Kizumonogatari</a></li>
+            <li>Venez à l&#39;avant-première de <a href="{% url 'anime-detail' kizumonogatari.id %}">Kizumonogatari</a>.
+              <form style="display: inline-block;" method="post" action="{% url 'event-detail' kizu_ap.id %}?next={{ request.get_full_path|urlencode }}">
+                {% csrf_token %}
+                <button type="submit"
+                        name="{% if kizu_ap.attending == True %}cancel{% else %}willgo{% endif %}"
+                        style="height: 20px;"
+                        class="btn btn-success btn-xs
+                               {% if kizu_ap.attending != True %}not-chosen
+                               {% endif %}" title="J'y vais&nbsp;!">
+                  J'y vais&nbsp;!
+                </button>
+              </form>
+            </li>
           </ul>
           <p>Pour plus d'informations, n'hésitez pas à <a href="mailto:vie@jill-jenn.net">nous contacter</a>.</p>
 

@@ -57,7 +57,7 @@ RATING_COLORS = {
 
 KIZU_ID = 13679
 UTA_ID = 14293
-
+KIZU_AP_ID = 1
 
 def display_queries():
     for line in connection.queries:
@@ -282,6 +282,8 @@ class EventDetail(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if 'next' in request.GET:
+            return redirect(request.GET['next'])
         return redirect(reverse('anime-detail', args=(self.object.anime_id,)))
 
     def post(self, request, *args, **kwargs):
@@ -716,12 +718,15 @@ def about(request):
 def events(request):
     kizu_rating = None
     uta_rating = None
+    ap_attending = None
     if request.user.is_authenticated():
         for rating in Rating.objects.filter(work_id__in=[KIZU_ID, UTA_ID], user=request.user):
             if rating.work_id == KIZU_ID:
                 kizu_rating = rating.choice
             elif rating.work_id == UTA_ID:
                 uta_rating = rating.choice
+        for attendee in Attendee.objects.filter(event_id=KIZU_AP_ID, user=request.user):
+            ap_attending = attendee.attending
     return render(
         request, 'events.html',
         {
@@ -731,6 +736,10 @@ def events(request):
             'wakanim': Partner.objects.get(pk=12),
             'kizumonogatari_rating': kizu_rating,
             'utamonogatari_rating': uta_rating,
+            'kizu_ap': {
+                'id': KIZU_AP_ID,
+                'attending': ap_attending,
+            },
         })
 
 def top(request, category_slug):
