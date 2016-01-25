@@ -168,6 +168,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
                     'date': event.get_date(),
                     'link': event.link,
                     'location': event.location,
+                    'nb_attendees': event.attendee_set.filter(attending=True).count(),
                 } for event in anime_events
             ]
             

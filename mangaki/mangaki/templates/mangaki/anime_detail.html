@@ -53,6 +53,9 @@
               {% endif %}
               {% endif %}
                 <div class="event-attending">
+                  <small style="margin-right: 1ex;">
+                  {% if event.nb_attendees == 1 %}Une personne y va.{% elif event.nb_attendees %}{{ event.nb_attendees }} personnes y vont.{% endif %}
+                  </small>
                   <div class="btn-group">
                     <button
                        type="submit"
