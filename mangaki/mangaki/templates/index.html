@@ -2,44 +2,61 @@
 
 {% block body %}
 
+<div class="row" style="text-align: center">
+    <h1>Mangaki, la recommandation d'anime et manga.</h1>
+    <h3 style="margin-bottom: 1em">Nourrissez Mangaki avec des anime, il vous en suggérera d'autres !</h3>
+</div>
 <div class="row">
-  <h1 style="margin-bottom: 0.6em; text-align: center">Mangaki, la recommandation d'anime et manga</h1>
-  <div class="col-md-6 col-sm-12">
-    <p class="col-xs-12" style="font-size: 20pt; line-height: 32px; text-align: center;">
-      Participez au <a href="/events/">jeu-concours</a> Kizumonogatari pour remporter un album Utamonogatari&nbsp;!
-    </p>
-
-    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
-      <div class="work-sheet data" data-category="anime" data-id="{{ kizumonogatari.id }}">
-        {% include "work_rating.html" with category="anime" work=kizumonogatari rating=kizumonogatari_rating show_title=True %}
-      </div>
+{% if not user.is_authenticated %}
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a>
     </div>
-
-    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
-      <div class="work-sheet data" data-category="album" data-id="{{ utamonogatari.id }}">
-        {% include "work_rating.html" with category="album" work=utamonogatari rating=utamonogatari_rating show_title=True  %}
-      </div>
-    </div>
-  </div>
-
-    <div class="col-md-6 col-sm-12">
-        <div class="row">
-            {% if not user.is_authenticated %}
-            <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a></div>
-            <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/user/signup/">S'inscrire</a></div>
-            <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki" target="_blank">Voir sur GitHub</a> </div>
-            {% else %}
-                <!-- <div class="col-md-3 col-sm-3 margin" style=""> </div> -->
-             <div class="col-md-3 col-sm-12 margin text-center">     <a class="btn btn-mangaki btn-lg" href="/anime/">C'est parti !</a></div>
-             <div class="col-md-6 col-sm-12 margin text-center">     <a class="btn btn-mangaki btn-lg" href="/u/{{ user.username }}">Import myAnimeList</a></div>
-             <div class="col-md-3 col-sm-12 margin text-center">     <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki/wiki">Contribuer</a></div>
-             
-            {% endif %}
-
-            <div class="row" style="text-align: center">
-                <div class="col-md-12 col-sm-12 margin"><img src="/static/img/help.jpg" style="max-width: 100%" /></div>
-            </div>
+    <div class="col-md-4 col-sm-12 margin">
+        <div class="ssk-block" style="width: 230px; margin: auto">
+            <a href="" class="ssk ssk-text ssk-facebook ssk-sm">Essayer via Facebook</a>
+            <a href="" class="ssk ssk-text ssk-twitter ssk-sm">Essayer via Twitter</a>
+            <a href="" class="ssk ssk-text ssk-google-plus ssk-sm">Essayer via Google</a>
         </div>
+    </div>
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <img src="/static/img/pins.png" align="left" />
+        <iframe src="https://ghbtns.com/github-btn.html?user=mangaki&repo=mangaki&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+        <iframe src="https://ghbtns.com/github-btn.html?user=mangaki&repo=mangaki&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
+    </div>
+{% else %}
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <a class="btn btn-mangaki btn-lg" href="/u/{{ user.username }}">Import myAnimeList</a>
+    </div>
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <a class="btn btn-mangaki btn-lg" href="/anime/">C'est parti !</a>
+    </div>
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki/wiki" target="_blank">Contribuer à Mangaki</a>
+    </div>
+{% endif %}
+</div>
+<div class="row">
+    <div class="col-md-6 col-sm-12">
+        <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; text-align: center;">
+          Participez au <a href="/events/">jeu-concours</a> Kizumonogatari pour remporter un album Utamonogatari&nbsp;!
+        </h2>
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
+          <div class="work-sheet data" data-category="anime" data-id="{{ kizumonogatari.id }}">
+            {% include "work_rating.html" with category="anime" work=kizumonogatari rating=kizumonogatari_rating show_title=True %}
+          </div>
+        </div>
+
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
+          <div class="work-sheet data" data-category="album" data-id="{{ utamonogatari.id }}">
+            {% include "work_rating.html" with category="album" work=utamonogatari rating=utamonogatari_rating show_title=True  %}
+          </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-12">
+        <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; margin-bottom: 1em; text-align: center;">
+          Comment ça marche ?
+        </h2>
+        <img src="/static/img/help.jpg" style="max-width: 100%" />
     </div>
 </div>
 
