@@ -1,11 +1,9 @@
 <a class="work-snapshot" href="/{{ category }}/{{ work.id }}">
-    <div class="work-snapshot-image">
+    <div class="work-snapshot-image {{ category }}-image">
         <img src="{{ work.poster }}" alt="{{ work.title }}">
 
         {% if show_title %}
-            <div class="work-synopsis">
-                {{ work.synopsis|linebreaks }}
-            </div>
+            <div class="work-synopsis">{{ work.synopsis|linebreaksbr }}</div>
         {% endif %}
     </div>
 

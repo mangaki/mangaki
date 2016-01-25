@@ -53,10 +53,13 @@
               {% endif %}
               {% endif %}
                 <div class="event-attending">
+                  <small style="margin-right: 1ex;">
+                  {% if event.nb_attendees == 1 %}Une personne y va.{% elif event.nb_attendees %}{{ event.nb_attendees }} personnes y vont.{% endif %}
+                  </small>
                   <div class="btn-group">
                     <button
-                       type="{% if event.attending != True %}submit{% else %}button{% endif %}"
-                       name="willgo"
+                       type="submit"
+                       name="{% if event.attending == True %}cancel{% else %}willgo{% endif %}"
                        class="btn btn-success btn-xs
                               {% if event.attending == False %}not-chosen
                               {% elif event.attending == True %}active
@@ -64,8 +67,8 @@
                       J'y vais&nbsp;!
                     </button>
                     <button
-                       type="{% if event.attending != False %}submit{% else %}button{% endif %}"
-                       name="wontgo"
+                       type="submit"
+                       name="{% if event.attending == False %}cancel{% else %}wontgo{% endif %}"
                        class="btn btn-warning btn-xs
                               {% if event.attending == True %}not-chosen
                               {% elif event.attending == False %}active
