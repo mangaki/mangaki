@@ -4,6 +4,7 @@ from django.views.generic.edit import FormMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
@@ -153,8 +154,10 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
         anime_events = anime.event_set.filter(date__gte=timezone.now())
         if anime_events.count() > 0:
-            my_events = dict(self.request.user.attendee_set.filter(
-                event__in=anime_events).values_list('event_id', 'attending'))
+            my_events = {}
+            if self.request.user.is_authenticated():
+                my_events = dict(self.request.user.attendee_set.filter(
+                    event__in=anime_events).values_list('event_id', 'attending'))
 
             context['events'] = [
                 {
@@ -272,13 +275,14 @@ class AlbumDetail(AjaxableResponseMixin, FormMixin, DetailView):
         return super().form_valid(form)
 
 
-class EventDetail(DetailView):
+class EventDetail(LoginRequiredMixin, DetailView):
     model = Event
 
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
-            return HttpResponseForbidden()
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return redirect(reverse('anime-detail', args=(self.object.anime_id,)))
 
+    def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         attending = None
         if 'wontgo' in request.POST:
@@ -667,12 +671,20 @@ def index(request):
     # texte = Announcement.objects.get(title='Flash News').text
     # context = {'annonce': texte}
     partners = Partner.objects.filter()
+    kizu_rating = None
+    uta_rating = None
+    if request.user.is_authenticated():
+        for rating in Rating.objects.filter(work_id__in=[KIZU_ID, UTA_ID], user=request.user):
+            if rating.work_id == KIZU_ID:
+                kizu_rating = rating.choice
+            elif rating.work_id == UTA_ID:
+                uta_rating = rating.choice
     return render(request, 'index.html', {
         'partners': partners,
         'kizumonogatari': Anime.objects.get(pk=KIZU_ID),
         'utamonogatari': Album.objects.get(pk=UTA_ID),
-        'kizumonogatari_rating': Rating.objects.get(work_id=KIZU_ID, user=request.user).choice if Rating.objects.filter(work_id=KIZU_ID, user=request.user).count() else None,
-        'utamonogatari_rating': Rating.objects.get(work_id=UTA_ID, user=request.user).choice if Rating.objects.filter(work_id=UTA_ID, user=request.user).count() else None
+        'kizumonogatari_rating': kizu_rating,
+        'utamonogatari_rating': uta_rating,
     })
 
 
@@ -681,6 +693,14 @@ def about(request):
 
 
 def events(request):
+    kizu_rating = None
+    uta_rating = None
+    if request.user.is_authenticated():
+        for rating in Rating.objects.filter(work_id__in=[KIZU_ID, UTA_ID], user=request.user):
+            if rating.work_id == KIZU_ID:
+                kizu_rating = rating.choice
+            elif rating.work_id == UTA_ID:
+                uta_rating = rating.choice
     return render(
         request, 'events.html',
         {
@@ -688,8 +708,8 @@ def events(request):
             'kizumonogatari': Anime.objects.get(pk=KIZU_ID),
             'utamonogatari': Album.objects.get(pk=UTA_ID),
             'wakanim': Partner.objects.get(pk=12),
-            'kizumonogatari_rating': Rating.objects.get(work_id=KIZU_ID, user=request.user).choice if Rating.objects.filter(work_id=KIZU_ID, user=request.user).count() else None,
-            'utamonogatari_rating': Rating.objects.get(work_id=UTA_ID, user=request.user).choice if Rating.objects.filter(work_id=UTA_ID, user=request.user).count() else None
+            'kizumonogatari_rating': kizu_rating,
+            'utamonogatari_rating': uta_rating,
         })
 
 def top(request, category_slug):
