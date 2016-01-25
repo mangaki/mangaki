@@ -1,0 +1,1 @@
+[{"model": "mangaki.anime", "pk": 13679, "fields": {"director": 1, "composer": 1, "studio": 1, "author": 1, "editor": 1, "anime_type": "film", "nb_episodes": "1", "origin": "japon", "anidb_aid": 8357, "genre": [1]}}, {"model": "mangaki.album", "pk": 14215, "fields": {"composer": 1, "catalog_number": "SVWC-70131~2", "vgmdb_aid": 55148}}]
