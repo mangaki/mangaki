@@ -293,6 +293,8 @@ class EventDetail(LoginRequiredMixin, DetailView):
             Attendee.objects.update_or_create(
                 event=self.object, user=request.user,
                 defaults={'attending': attending })
+        elif 'cancel' in request.POST:
+            Attendee.objects.filter(event=self.object, user=request.user).delete()
         return redirect(request.GET['next']);
 
 def controversy(nb_likes, nb_dislikes):
