@@ -56,7 +56,7 @@ RATING_COLORS = {
 }
 
 KIZU_ID = 13679
-UTA_ID = 14215
+UTA_ID = 14293
 
 
 def display_queries():
