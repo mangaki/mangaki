@@ -329,3 +329,21 @@ background-color: #f8d549;
     text-align: right;
     margin-top: 5px;
 }
+
+ul.checklist {
+    list-style-type: none;
+}
+
+ul.checklist li {
+    position: relative;
+}
+
+ul.checklist .list-icon {
+    position: absolute;
+    left: -20px;
+    top: 3px;
+}
+
+.list-icon-ok {
+    color: #5cb85c;
+}
