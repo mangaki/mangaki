@@ -57,7 +57,7 @@ RATING_COLORS = {
 
 KIZU_ID = 13679
 UTA_ID = 14293
-KIZU_AP_ID = 1
+KIZU_AP_ID = 9
 
 def display_queries():
     for line in connection.queries:

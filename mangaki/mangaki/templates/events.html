@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 
+{% block opengraph %}
+<meta property="og:title" content="Concours Kizumonogatari en partenariat avec Wakanim - Mangaki" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://mangaki.fr/events/" />
+<meta property="og:image" content="{{ utamonogatari.poster }}" />
+<meta property="og:description" content="Concours Mangaki &amp; Wakanim ! Deux albums Utamonogatari à gagner ! Pour participer, RT ou venez à l'AVP vendredi au Grand Rex !" />
+<meta name="description" content="Concours Mangaki &amp; Wakanim ! Deux albums Utamonogatari à gagner ! Pour participer, RT ou venez à l'AVP vendredi au Grand Rex !" />
+{% endblock %}
+
 {% block body %}
 <div id="events">
     <h1 id="concours-kizumonogatari-lien-en-partenariat-avec-wakanim">Concours <a href="{% url 'anime-detail' kizumonogatari.id %}">Kizumonogatari</a> en partenariat avec <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}">Wakanim</a></h1>
@@ -19,7 +28,7 @@
               {% else %}
               <span class="glyphicon glyphicon-chevron-right list-icon"></span>
               {% endif %}
-              Ajoutez <a href="{% url 'album-detail' utamonogatari.id %}">Utamonogatari</a> à vos <a href="{% url 'album-detail' utamonogatari.id %}"><span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span></a></li>
+              Ajoutez <a href="{% url 'album-detail' utamonogatari.id %}">Utamonogatari</a> à vos <a href="{% url 'album-detail' utamonogatari.id %}"><span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux écouter</span></a></li>
 
             <li>
               {% if kizu_ap.attending == True %}
