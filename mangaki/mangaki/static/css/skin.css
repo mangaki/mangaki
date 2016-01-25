@@ -221,6 +221,7 @@ color: #b2B2B2;
     position: absolute;
     top: 0;
     right: -20%;
+    margin-right: -2px;
     width: 20%;
     height: 100%;
 }
