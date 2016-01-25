@@ -15,6 +15,28 @@
         </p>
         {% endif %}
         <p>Inscrit depuis {{ member_days }} jours</p>
+        {% if events %}
+        {% if request.user.username == username %}
+        <h4>Mes événements</h4>
+        {% else %}
+        <h4>Ses événements</h4>
+        {% endif %}
+        <p>
+        <ul>
+          {% for event in events %}
+              <li>{{ event.type|capfirst }} <a href="{% url 'anime-detail' event.anime_id %}"><em>{{ event.title }}</em></a> le <strong>{{ event.date }}</strong>{% if event.type == 'tv' %}
+              sur {{ event.channel }}{% elif event.location %},
+              {% if event.link %}
+                  <a href="{{ event.link }}" target="_blank">{{ event.location }}</a>
+              {% else %}
+                  {{ event.location }}
+              {% endif %}
+              {% endif %}
+              </li>
+         {% endfor %}
+        </ul>
+        </p>
+        {% endif %}
     </div>
     <div class="col-xs-4">
         {% if request.user.username == username %}

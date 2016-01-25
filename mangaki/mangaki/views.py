@@ -164,6 +164,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
                     'id': event.id,
                     'attending': my_events.get(event.id, None),
                     'type': event.get_event_type_display(),
+                    'channel': event.channel,
                     'date': event.get_date(),
                     'link': event.link,
                     'location': event.location,
@@ -628,6 +629,22 @@ def get_profile(request, username):
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
     seen_list = seen_anime_list if category == 'anime' else seen_manga_list
     unseen_list = unseen_anime_list if category == 'anime' else unseen_manga_list
+
+    # Events
+    events = [
+        {
+            'id': attendee.event_id,
+            'anime_id': attendee.event.anime_id,
+            'attending': True,
+            'type': attendee.event.get_event_type_display(),
+            'channel': attendee.event.channel,
+            'date': attendee.event.get_date(),
+            'link': attendee.event.link,
+            'location': attendee.event.location,
+            'title': attendee.event.anime.title,
+        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now()).select_related('event', 'event__anime__title')
+    ]
+
     data = {
         'username': username,
         'score': user.profile.score,
@@ -663,6 +680,7 @@ def get_profile(request, username):
         'unseen_list': unseen_list if is_shared else [],
         'received_recommendation_list': received_recommendation_list if is_shared else [],
         'sent_recommendation_list': sent_recommendation_list if is_shared else [],
+        'events': events,
     })
 
 
