@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% load account socialaccount %}
+
+{% get_providers as socialaccount_providers %}
 
 <div class="row" style="text-align: center">
     <h1>Mangaki, la recommandation d'anime et manga.</h1>
@@ -12,11 +15,7 @@
         <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a>
     </div>
     <div class="col-md-4 col-sm-12 margin">
-        <div class="ssk-block" style="width: 230px; margin: auto">
-            <a href="" class="ssk ssk-text ssk-facebook ssk-sm">Essayer via Facebook</a>
-            <a href="" class="ssk ssk-text ssk-twitter ssk-sm">Essayer via Twitter</a>
-            <a href="" class="ssk ssk-text ssk-google-plus ssk-sm">Essayer via Google</a>
-        </div>
+        {% include "socialaccount/snippets/provider_list.html" with process="login" verb="try" %}
     </div>
     <div class="col-md-4 col-sm-12 text-center margin">
         <img src="/static/img/pins.png" align="left" />

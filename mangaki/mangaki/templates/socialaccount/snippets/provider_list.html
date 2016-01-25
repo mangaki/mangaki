@@ -2,7 +2,7 @@
 
 {% get_providers as socialaccount_providers %}
 
-<div class="ssk-block" style="width: 300px;">
+<div class="ssk-block" style="width: {% if verb == 'try' %}230px; margin: auto{% else %}300px;{% endif %}">
 {% for provider in socialaccount_providers %}
     {% if provider.id == "openid" %}
         {% for brand in provider.get_brands %}
@@ -15,7 +15,7 @@
         {% endfor %}
     {% endif %}
     <a title="{{provider.name}}" class="ssk ssk-text ssk-{% if provider.id == 'google' %}google-plus{% else %}{{ provider.id }}{% endif %} ssk-sm socialaccount_provider {{provider.id}}" 
-         href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">Se connecter avec {{provider.name}}</a>
+         href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">{% if verb == 'try' %}Essayer via{% else %}Se connecter avec{% endif %} {{provider.name}}</a>
 {% endfor %}
 </div>
 
