@@ -40,6 +40,17 @@ Lancer le serveur
     ./manage.py loaddata ../fixtures/seed_data.json
     ./manage.py runserver
 
+Afficher les notebooks
+----------------------
+
+    . venv/bin/activate
+    pip install ipython[notebook]
+    pip install django-extensions
+
+Puis retirez le commentaire devant `django-extensions` dans la variable `INSTALLED_APPS` du fichier `settings.py`.
+
+Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
+
 Installation facile (Vagrant)
 -----------------------------
 
