@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from mangaki.models import Anime, Artist, Studio, Editor, Genre
+from mangaki.models import Anime, Artist, Studio, Editor, Genre, Work
 from django.core import serializers
 
 
@@ -17,6 +17,6 @@ class Command(BaseCommand):
         bundle = []
         for anime_id in ids:
             anime = Anime.objects.filter(id=anime_id).select_related('director', 'composer', 'author', 'studio', 'editor').prefetch_related('genre')[0]
-            bundle.extend([anime, anime.director, anime.composer, anime.author, anime.studio, anime.editor] + list(anime.genre.all()))        
+            bundle.extend([Work.objects.get(id=anime_id), anime, anime.director, anime.composer, anime.author, anime.studio, anime.editor] + list(anime.genre.all()))        
         data = serializers.serialize('json', bundle)
         print(data)
