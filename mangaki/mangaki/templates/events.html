@@ -18,9 +18,11 @@
       <div class="row">
         <div class="col-lg-6 col-md-4 col-sm-12 col-xs-12">
           <p>À l'occasion de l'avant-première de Kizumonogatari le <strong>vendredi 29 janvier 2015 à 21 h</strong> au <a href="http://legrandrex.cotecine.fr/film/111684/" target="_blank">Grand Rex</a>, <img style="margin-bottom: 4px;" height="20" src="/static/img/minilogo.png"> et <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}"><img height="20" src="/static/img/sponsors/small/{{ wakanim.image }}" alt="{{ wakanim.name }}" /></a> vous font gagner deux OST de la série.</p>
-          <p><strong>Pour participer au tirage au sort</strong>, trois possibilités s'offrent à vous :</p>
+          <p><strong>Pour participer au tirage au sort</strong>, plusieurs possibilités s'offrent à vous :</p>
           <ul class="checklist">
-            <li><span class="glyphicon glyphicon-chevron-right list-icon"></span>RT le tweet ci-dessous et suivez <a href="https://twitter.com/MangakiFR">@MangakiFR</a> sur Twitter</li>
+            <li><span class="glyphicon glyphicon-chevron-right list-icon"></span>RT le tweet ci-dessous et suivez <a href="https://twitter.com/MangakiFR" target="_blank">@MangakiFR</a> sur Twitter</li>
+
+            <li><span class="glyphicon glyphicon-chevron-right list-icon"></span> Partagez <a href="http://fb.me/mangakifr" target="_blank">le post Facebook sur le concours</a></li>
 
             <li>
               {% if utamonogatari_rating == 'willsee' %}
@@ -74,16 +76,24 @@
     <hr />
     <p>Le nouveau cinéma <a href="http://www.cinemalesfauvettes.com/cycle/studio-ghibli-party.html" target="_blank"><strong>Les Fauvettes</strong></a>, ouvert depuis le 6 novembre 2015 dans le quartier des Gobelins à Paris, vous offre une sélection de <strong>films Ghibli</strong> !</p>
 
-    <p>Le programme, non exhaustif :</p>
-    <ul>
-    {% for event in screenings %}
-        <li><a href="{% url "anime-detail" event.anime.id %}">{{ event.anime.title }}</a> le {{ event.get_date }}</li>
-    {% endfor %}
-    </ul>
-    
     <address><strong>Cinéma Les Fauvettes</strong><br />
     58 avenue des Gobelins, 75013 Paris</address>
 
+    <h2>Liste des œuvres Ghibli diffusées</h2>
+
+    <p>Cliquez sur les fiches pour obtenir la liste des séances.</p>
+    <div class="row works-list">
+      <div align="center" class="manga-sheet">
+      {% for anime, rating in ghibli %}
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 manga-sheet text-center">
+          <div class="work-sheet data" data-category="anime" data-id="{{ anime.id }}">
+            {% include "work_rating.html" with category="anime" work=anime rating=rating show_title=True %}
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+    
     <hr />
 
     <h1>Programmation anime TV en janvier</h1>

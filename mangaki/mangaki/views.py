@@ -59,6 +59,8 @@ KIZU_ID = 13679
 UTA_ID = 14293
 KIZU_AP_ID = 9
 
+GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
+
 def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
@@ -729,10 +731,16 @@ def events(request):
                 uta_rating = rating.choice
         for attendee in Attendee.objects.filter(event_id=KIZU_AP_ID, user=request.user):
             ap_attending = attendee.attending
+    ghibli_works = Anime.objects.in_bulk(GHIBLI_IDS)
+    if request.user.is_authenticated():
+        ghibli_ratings = dict(Rating.objects.filter(user=request.user, work_id__in=GHIBLI_IDS).values_list('work_id', 'choice'))
+    else:
+        ghibli_ratings = {}
     return render(
         request, 'events.html',
         {
             'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
+            'ghibli': [(ghibli_works[work_id], ghibli_ratings.get(work_id)) for work_id in GHIBLI_IDS],
             'kizumonogatari': Anime.objects.get(pk=KIZU_ID),
             'utamonogatari': Album.objects.get(pk=UTA_ID),
             'wakanim': Partner.objects.get(pk=12),
