@@ -73,7 +73,7 @@ function displayWork(pos, work) {
     work_div.fadeOut().promise().done(function () {
             work_div.find('.work-votes').promise().done(function () {
                 work_div.find('.work-votes').show();
-                work_div.find('.work-snapshot-image img').attr('src', work['poster']);
+                work_div.find('.work-snapshot-image img').attr('src', work['poster']).attr('alt', work['title']);
                 work_div.fadeIn();
         });
     });
