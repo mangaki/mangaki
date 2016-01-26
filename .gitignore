@@ -6,3 +6,9 @@ db.sqlite3
 *.json
 data/
 2015-*.txt
+2016-*.txt
+.ipynb_checkpoints
+*.dump
+*.npy
+*.zip
+*.pickle

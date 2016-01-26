@@ -3,7 +3,7 @@
 {% block body %}
 {% if user.is_authenticated %}
 <div class="row">
-    <div class="col-md-12 col-sm-12">
+    <div class="col-md-6 col-sm-12">
         <div class="well">
           <p>
             Notez quelques mangas, via les listes ci-dessous ou la barre de recherche.<br />
@@ -11,28 +11,22 @@
           </p>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-2 col-sm-12"></div>
-        <div class="col-md-8 col-sm-12">
-            <div class="margin10top">
+    <div class="col-md-6 col-sm-12">
                 <p style="text-align: center">Légende :
                 <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
                 <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
                 <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
-                <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+                <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span><br />
                 <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux lire</span>
                 <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas lire</span></p>
                 <form class="typeahead-demo {{ category }}">
                     <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre de manga (actuellement {{ manga_count }})…" />
                 </form>
-            </div>
-        </div>
-        <div class="col-md-2 col-sm-12"></div>
     </div>
 </div>
 {% else %}
 <div class=" col-md-12 col-sm-12">
-    <p class="well"> Nouveau sur Mangaki ? <a href="/user/signup/">Inscrivez-vous</a> puis <a href="/user/login/">connectez-vous</a> pour noter ces mangas et obtenir des recommandations.</p>
+    <p class="well"> Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis <a href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces mangas et obtenir des recommandations.</p>
 </div>
 {% endif %}
 
@@ -52,7 +46,7 @@
 
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 <div class="row">
-    <div class=" margin col-md-12 col-sm-12">
+    <div class="  col-md-12 col-sm-12">
         <ul class="nav nav-tabs">
             <li role="presentation"{% if params.sort == 'mosaic' %} class="active"{% endif %}><a href="/manga/">Mosaïque</a></li>
             <li role="presentation"{% if params.sort == 'popularity' %} class="active"{% endif %}><a href="/manga/?sort=popularity">Les plus populaires</a></li>
@@ -63,13 +57,13 @@
     </div>
 </div>
 <br />
-<div class="row mangas-list">
+<div class="row works-list">
     {% for object in object_list %}
         {% include template_mode with work=object category="manga" rating=object.rating %}
     {% endfor %}
 </div>
 <div class="row margin">
-    <div class="margin col-md-12 col-sm-12">
+    <div class="col-md-12 col-sm-12">
         <a class="btn btn-primary btn-lg" href="/reco/?category=manga" style="display: block; margin: auto">Je n'arrive plus à noter, conseillez-moi !</a>
     </div>
 </div>

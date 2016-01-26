@@ -1,7 +1,74 @@
 {% extends "base.html" %}
 
+{% block opengraph %}
+<meta property="og:title" content="Concours Kizumonogatari en partenariat avec Wakanim - Mangaki" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://mangaki.fr/events/" />
+<meta property="og:image" content="{{ utamonogatari.poster }}" />
+<meta property="og:description" content="Concours Mangaki &amp; Wakanim ! Deux albums Utamonogatari à gagner ! Pour participer, RT ou venez à l'AVP vendredi au Grand Rex !" />
+<meta name="description" content="Concours Mangaki &amp; Wakanim ! Deux albums Utamonogatari à gagner ! Pour participer, RT ou venez à l'AVP vendredi au Grand Rex !" />
+{% endblock %}
+
 {% block body %}
 <div id="events">
+    <h1 id="concours-kizumonogatari-lien-en-partenariat-avec-wakanim">Concours <a href="{% url 'anime-detail' kizumonogatari.id %}">Kizumonogatari</a> en partenariat avec <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}">Wakanim</a></h1>
+    <h2 id="deux-albums-utamonogatari-lien-à-gagner">Deux albums <a href="{% url 'album-detail' utamonogatari.id %}">Utamonogatari</a> à gagner !</h2>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 col-md-4 col-sm-12 col-xs-12">
+          <p>À l'occasion de l'avant-première de Kizumonogatari le <strong>vendredi 29 janvier 2015 à 21 h</strong> au <a href="http://legrandrex.cotecine.fr/film/111684/" target="_blank">Grand Rex</a>, <img style="margin-bottom: 4px;" height="20" src="/static/img/minilogo.png"> et <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}"><img height="20" src="/static/img/sponsors/small/{{ wakanim.image }}" alt="{{ wakanim.name }}" /></a> vous font gagner deux OST de la série.</p>
+          <p><strong>Pour participer au tirage au sort</strong>, trois possibilités s'offrent à vous :</p>
+          <ul class="checklist">
+            <li><span class="glyphicon glyphicon-chevron-right list-icon"></span>RT le tweet ci-dessous et suivez <a href="https://twitter.com/MangakiFR">@MangakiFR</a> sur Twitter</li>
+
+            <li>
+              {% if utamonogatari_rating == 'willsee' %}
+              <span class="glyphicon glyphicon-ok list-icon list-icon-ok"></span>
+              {% else %}
+              <span class="glyphicon glyphicon-chevron-right list-icon"></span>
+              {% endif %}
+              Ajoutez <a href="{% url 'album-detail' utamonogatari.id %}">Utamonogatari</a> à vos <a href="{% url 'album-detail' utamonogatari.id %}"><span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux écouter</span></a></li>
+
+            <li>
+              {% if kizu_ap.attending == True %}
+              <span class="glyphicon glyphicon-ok list-icon list-icon-ok"></span>
+              {% else %}
+              <span class="glyphicon glyphicon-chevron-right list-icon"></span>
+              {% endif %}
+              Venez à l&#39;avant-première de <a href="{% url 'anime-detail' kizumonogatari.id %}">Kizumonogatari</a>.
+              <form style="display: inline-block;" method="post" action="{% url 'event-detail' kizu_ap.id %}?next={{ request.get_full_path|urlencode }}">
+                {% csrf_token %}
+                <button type="submit"
+                        name="{% if kizu_ap.attending == True %}cancel{% else %}willgo{% endif %}"
+                        style="height: 20px;"
+                        class="btn btn-success btn-xs
+                               {% if kizu_ap.attending != True %}not-chosen
+                               {% endif %}" title="J'y vais&nbsp;!">
+                  J'y vais&nbsp;!
+                </button>
+              </form>
+            </li>
+          </ul>
+          <p>Pour plus d'informations, n'hésitez pas à <a href="mailto:vie@jill-jenn.net">nous contacter</a>.</p>
+
+          <blockquote class="twitter-tweet" lang="fr"><p lang="fr" dir="ltr">[Concours] RT + follow pour gagner deux CD Utamonogatari ! Et si tu vas à l&#39;AVP de Kizu, c&#39;est bonus++ ! <a href="https://t.co/krEu6ifinG">https://t.co/krEu6ifinG</a> w/ <a href="https://twitter.com/Wakanim">@Wakanim</a></p>&mdash; Mangaki (@MangakiFR) <a href="https://twitter.com/MangakiFR/status/691616352914784256">25 Janvier 2016</a></blockquote> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+        </div>
+
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 manga-sheet text-center">
+          <div class="work-sheet data" data-category="anime" data-id="{{ kizumonogatari.id }}">
+            {% include "work_rating.html" with category="anime" work=kizumonogatari rating=kizumonogatari_rating show_title=True %}
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 manga-sheet text-center">
+          <div class="work-sheet data" data-category="album" data-id="{{ utamonogatari.id }}">
+            {% include "work_rating.html" with category="album" work=utamonogatari rating=utamonogatari_rating show_title=True  %}
+          </div>
+        </div>
+      </div>
+    </div>
+
     <h1>Studio Ghibli Party au cinéma Les Fauvettes</h1>
     <h3>Du 6 janvier au 6 février 2015 à Paris, avenue des Gobelins</h3>
     <hr />
@@ -16,11 +83,6 @@
     
     <address><strong>Cinéma Les Fauvettes</strong><br />
     58 avenue des Gobelins, 75013 Paris</address>
-
-    <hr />
-
-    <h1>Avant-première de <a href="{% url "anime-detail" 13679 %}">Kizumonogatari</a> au Grand Rex</h1>
-    <h3>Le vendredi 29 janvier 2015 à 20 h 30</h3>
 
     <hr />
 

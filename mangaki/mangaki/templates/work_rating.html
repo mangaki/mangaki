@@ -1,26 +1,36 @@
-<div class="row">
+<a class="work-snapshot" href="/{{ category }}/{{ work.id }}">
+    <div class="work-snapshot-image {{ category }}-image">
+        <img src="{{ work.poster }}" alt="{{ work.title }}">
 
-    <div class="col-md-10 col-sm-9 col-xs-8 manga-snapshot">
-        <div class="manga-snapshot-image" style="background-image: url('{{ work.poster }}')" onclick="getSheet(this)"></div>
+        {% if show_title %}
+            <div class="work-synopsis">{{ work.synopsis|linebreaksbr }}</div>
+        {% endif %}
     </div>
-        <div class="col-md-2 col-sm-3 col-xs-2 manga-votes" style="display: {% if category == 'dummy' %}none{% else %}block{% endif %}">
 
-            <a data-choice='favorite' class="btn btn-favorite btn-block a{% if rating and rating != 'favorite' %} not-chosen{% endif %}" onclick="vote(this)" title="Mettre en favori" ><span class="glyphicon glyphicon-star"></span></a>
+    {% if show_title %}
+        <div class="work-snapshot-title">
+            <h4>{{ work.title }}</h4>
+        </div>
+    {% endif %}
+</a>
 
+<div class="work-votes">
+    <a data-choice='favorite' class="btn btn-favorite btn-block a{% if rating and rating != 'favorite' %} not-chosen{% endif %}" onclick="vote(this)" title="Mettre en favori" >
+        <span class="glyphicon glyphicon-star"></span>
+    </a>
     <a data-choice='like' class="btn btn-success btn-block{% if rating and rating != 'like' %} not-chosen{% endif %}" onclick="vote(this)" title="J'aime">
-        <span class="glyphicon glyphicon-thumbs-up"></span>
+      <span class="glyphicon glyphicon-thumbs-up"></span>
     </a>
     <a data-choice='neutral' class="btn btn-warning btn-block{% if rating and rating != 'neutral' %} not-chosen{% endif %}" onclick="vote(this)" title="Neutre">
-        <span class="glyphicon glyphicon-adjust"></span>
+      <span class="glyphicon glyphicon-adjust"></span>
     </a>
     <a data-choice='dislike' class="btn btn-danger btn-block{% if rating and rating != 'dislike' %} not-chosen{% endif %}" onclick="vote(this)" title="Je n'aime pas">
-        <span class="glyphicon glyphicon-thumbs-down"></span>
+      <span class="glyphicon glyphicon-thumbs-down"></span>
     </a>
-    <a data-choice='willsee' class="btn btn-primary btn-block{% if rating and rating != 'willsee' %} not-chosen{% endif %}" onclick="vote(this)" title="Je veux voir">
-        <span class="glyphicon glyphicon-eye-open"></span>
+    <a data-choice='willsee' class="btn btn-primary btn-block{% if rating and rating != 'willsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if category == 'manga' %}Je veux lire{% else %}Je veux voir{% endif %}">
+      <span class="glyphicon glyphicon-eye-open"></span>
     </a>
-    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote(this)" title="Je ne veux pas voir">
-        <span class="glyphicon glyphicon-eye-close"></span>
+    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if category == 'manga' %}Je ne veux pas lire{% else %}Je ne veux pas voir{% endif %}">
+      <span class="glyphicon glyphicon-eye-close"></span>
     </a>
-</div>
 </div>

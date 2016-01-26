@@ -1,75 +1,70 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% load account socialaccount %}
 
+{% get_providers as socialaccount_providers %}
+
+<div class="row" style="text-align: center">
+    <h1>Mangaki, la recommandation d'anime et manga.</h1>
+    <h3 style="margin-bottom: 1em">Nourrissez Mangaki avec des anime, il vous en suggérera d'autres !</h3>
+</div>
+<div class="row">
+{% if not user.is_authenticated %}
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a>
+    </div>
+    <div class="col-md-4 col-sm-12 margin">
+        {% include "socialaccount/snippets/provider_list.html" with process="login" verb="try" %}
+    </div>
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <img src="/static/img/pins.png" align="left" />
+        <iframe src="https://ghbtns.com/github-btn.html?user=mangaki&repo=mangaki&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+        <iframe src="https://ghbtns.com/github-btn.html?user=mangaki&repo=mangaki&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
+    </div>
+{% else %}
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <a class="btn btn-mangaki btn-lg" href="/u/{{ user.username }}">Import myAnimeList</a>
+    </div>
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <a class="btn btn-mangaki btn-lg" href="/anime/">C'est parti !</a>
+    </div>
+    <div class="col-md-4 col-sm-12 text-center margin">
+        <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki/wiki" target="_blank">Contribuer à Mangaki</a>
+    </div>
+{% endif %}
+</div>
 <div class="row">
     <div class="col-md-6 col-sm-12">
-        Bon ben… on a gagné la Student Demo Cup. <a href="http://meta.mangaki.fr/t/mangaki-remporte-la-student-demo-cup-categorie-enterprise/605" target="_blank">Discutez-en sur le forum !</a>
+        <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; text-align: center;">
+          Participez au <a href="/events/">jeu-concours</a> Kizumonogatari pour remporter un album Utamonogatari&nbsp;!
+        </h2>
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
+          <div class="work-sheet data" data-category="anime" data-id="{{ kizumonogatari.id }}">
+            {% include "work_rating.html" with category="anime" work=kizumonogatari rating=kizumonogatari_rating show_title=True %}
+          </div>
+        </div>
 
-        <blockquote class="twitter-tweet" lang="fr"><p lang="fr" dir="ltr">Le prix <a href="https://twitter.com/hashtag/enterprise?src=hash">#enterprise</a> revient à <a href="https://twitter.com/MangakiFR">@MangakiFR</a> !!! Félicitation et bravo à ts les autres pr vos sujets projets <a href="https://twitter.com/hashtag/OSSPARIS15?src=hash">#OSSPARIS15</a> <a href="https://t.co/PPnd5yjx9N">pic.twitter.com/PPnd5yjx9N</a></p>&mdash; Open Source Summit (@OSS_Paris) <a href="https://twitter.com/OSS_Paris/status/667035729223131136">18 Novembre 2015</a></blockquote> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </div>
-
-    <div class="col-md-6 col-sm-12">
-        <div class="row">
-            {% if not user.is_authenticated %}
-            <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a></div>
-            <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="/user/signup/">S'inscrire</a></div>
-            <div class="col-md-4 col-sm-12 margin" style="text-align: center"> <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki" target="_blank">Voir sur GitHub</a> </div>
-            {% else %}
-                <!-- <div class="col-md-3 col-sm-3 margin" style=""> </div> -->
-             <div class="col-md-3 col-sm-12 margin text-center">     <a class="btn btn-mangaki btn-lg" href="/anime/">C'est parti !</a></div>
-             <div class="col-md-6 col-sm-12 margin text-center">     <a class="btn btn-mangaki btn-lg" href="/u/{{ user.username }}">Import myAnimeList</a></div>
-             <div class="col-md-3 col-sm-12 margin text-center">     <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki/wiki">Contribuer</a></div>
-             
-            {% endif %}
-
-            <div class="row" style="text-align: center">
-                <div class="col-md-12 col-sm-12 margin"><img src="/static/img/help.jpg" style="max-width: 100%" /></div>
-            </div>
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
+          <div class="work-sheet data" data-category="album" data-id="{{ utamonogatari.id }}">
+            {% include "work_rating.html" with category="album" work=utamonogatari rating=utamonogatari_rating show_title=True  %}
+          </div>
         </div>
     </div>
+    <div class="col-md-6 col-sm-12">
+        <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; margin-bottom: 1em; text-align: center;">
+          Comment ça marche ?
+        </h2>
+        <img src="/static/img/help.jpg" style="max-width: 100%" />
+    </div>
 </div>
 
-<div class="row" style="margin-top: 1em">
-    <div class="col-sm-12 col-md-4" style="text-align: center">
-        <a href="http://www.japan-expo-paris.com" target="_blank"><img height="150" src="/static/img/sponsors/JapanExpo.png" /></a>
-    </div>
-    <div class="col-sm-12 col-md-4" style="text-align: center">
-        <a href="http://noco.tv"><img height="90" src="/static/img/sponsors/noco.png" /></a>
-    </div>
-    <div class="col-sm-12 col-md-4" style="text-align: center; margin-top: 2em">
-        <a href="http://www.manga-news.com" target="_blank"><img src="/static/img/sponsors/manganews.png" /></a>
-    </div>
-</div>
-<div>
-    <div class="col-sm-12 col-md-4" style="text-align: center">
-        <a href="http://www.crunchyroll.com" target="_blank"><img height="100" src="/static/img/sponsors/crunchyroll.png" /></a>
-    </div>
-    <div class="col-sm-12 col-md-4" style="text-align: center">
-        <a href="http://www.fnac.com"><img height="150" src="/static/img/sponsors/Fnac.png" /></a>
-    </div>
-    <div class="col-sm-12 col-md-4" style="text-align: center; margin-top: 2em">
-        <a href="http://manga.kaze.fr" target="_blank"><img height="130" src="/static/img/sponsors/kaze.jpeg" /></a>
-    </div>
-</div>
-<div>
-    <div class="col-sm-12 col-md-4" style="text-align: center">
-        <a href="http://www.editions-delcourt.fr" target="_blank"><img height="150" src="/static/img/sponsors/delcourt.png" /></a>
-    </div>
-    <div class="col-sm-12 col-md-4" style="text-align: center">
-        <a href="http://www.mangacafe.fr/"><img height="150" src="/static/img/sponsors/mangaCafe.png" /></a>
-    </div>
-    <div class="col-sm-12 col-md-4" style="text-align: center; margin-top: 2em">
-        <a href="http://www.taifu-comics.com/" target="_blank"><img height="150" src="/static/img/sponsors/taifu.png" /></a>
-    </div>
-</div>
-<div>
-    <div class="col-sm-12 col-md-4" style="text-align: center">
-        <a href="http://www.ototo.fr/"><img height="100" src="/static/img/sponsors/ototo.png" /></a>
-    </div>
-    <div class="col-sm-12 col-md-4" style="text-align: center; margin-top: 2em">
-        <a href="http://www.nolife-tv.com/" target="_blank"><img height="130" src="/static/img/sponsors/nolife.png" /></a>
-    </div>
+<div class="partners row">
+	{% for partner in partners %}
+    <div class="col-xs-6 col-sm-4 col-md-2">
+        <a href="http://{{ partner.url }}" target="_blank" title="{{ partner.name }}"><img  src="/static/img/sponsors/small/{{ partner.image }}" /></a>
+	</div>
+	{% endfor %}
 </div>
 
 <br />

@@ -18,23 +18,13 @@
 
 {% block body %}
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
-<div class="row mangas-list">
+<div class="row">
     <div class="col-md-12"> <!--  col-md-push-3 -->
-        {% if anime.event_set.all.count %}
-        <div class="well">
-          Cet anime est prévu pour les événements suivants :
-          <ul>
-          {% for event in anime.event_set.all %}
-            <li>{{ event.to_html|safe }}</li>
-          {% endfor %}
-          </ul>
-        </div>
-        {% endif %}
         <h1>{{ object.title }}</h1>
     </div>
-    <div class="col-sm-6 col-md-3 manga-sheet"> <!-- fluid col-sm-6 col-md-pull-3 -->
-        <div class="thumbnail data" data-category="anime" data-id="{{ object.id }}">
-            {% include "work_rating.html" with category="anime" work=object %}
+    <div class="col-sm-6 col-md-4 manga-sheet"> <!-- fluid col-sm-6 col-md-pull-3 -->
+        <div class="work-sheet data" data-category="anime" data-id="{{ object.id }}">
+            {% include "work_rating.html" with category="anime" work=object show_title=False %}
         </div>
     </div>
     <div class="col-sm-6 col-md-3">
@@ -48,11 +38,55 @@
         <p>Genres : {{ genres }}</p>
         <p>Type : {{ object.anime_type }}</p>
     </div>
-    <div class="col-sm-6 col-md-6">
-        <h3>Statistiques</h3>
+    <div class="col-sm-6 col-md-5">
+        {% if events %}
+          <div class="alert alert-info">
+          {% for event in events %}
+            <form class="event" action="{% url 'event-detail' pk=event.id %}?next={{ request.get_full_path|urlencode }}" method="post">
+              {% csrf_token %}
+              {{ event.type|capfirst }} le <strong>{{ event.date }}</strong>{% if event.type == 'tv' %}
+              sur {{ event.channel }}{% elif event.location %},
+              {% if event.link %}
+                  <a href="{{ event.link }}" target="_blank">{{ event.location }}</a>
+              {% else %}
+                  {{ event.location }}
+              {% endif %}
+              {% endif %}
+                <div class="event-attending">
+                  <small style="margin-right: 1ex;">
+                  {% if event.nb_attendees == 1 %}Une personne y va.{% elif event.nb_attendees %}{{ event.nb_attendees }} personnes y vont.{% endif %}
+                  </small>
+                  <div class="btn-group">
+                    <button
+                       type="submit"
+                       name="{% if event.attending == True %}cancel{% else %}willgo{% endif %}"
+                       class="btn btn-success btn-xs
+                              {% if event.attending == False %}not-chosen
+                              {% elif event.attending == True %}active
+                              {% endif %}" title="J'y vais&nbsp;!">
+                      J'y vais&nbsp;!
+                    </button>
+                    <button
+                       type="submit"
+                       name="{% if event.attending == False %}cancel{% else %}wontgo{% endif %}"
+                       class="btn btn-warning btn-xs
+                              {% if event.attending == True %}not-chosen
+                              {% elif event.attending == False %}active
+                              {% endif %}" title="J n'y vais pas.">
+                            Je n'y vais pas.
+                    </button>
+                    </div>
+                  </div>
+                </form>
+          {% endfor %}
+          </div>
+        {% endif %}
+        {% if stats %}
+        <h3>Statistiques <small>(vu par {{ seen_percent }}&nbsp;% des membres qui l'ont noté)</small></h3>
         <div style="max-width: 420px; max-height: 200px">
           <canvas id="stats" />
         </div>
+        {% endif %}
         {% if references %}
           <h3>Références</h3>
           <ul>
@@ -69,7 +103,7 @@
 {% endif %}
 {% if user.is_authenticated %}
 <a href="http://meta.mangaki.fr/session/sso" target="_blank"><button type="button" class="btn btn-primary">En discuter sur le forum</button></a>
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#suggestionModal">Des idées pour améliorer cette fiche ?</button>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#suggestionModal">Proposer une modification</button>
 
 <form class="typeahead-demo {{ user.username }}">
     <input type="text" data-username="{{ user.username }}" class="typeahead" placeholder="Conseiller cet anime à un utilisateur" />

@@ -1,5 +1,6 @@
 from django.db import models
 from mangaki.models import Anime
+from django.contrib.auth.models import User
 import locale
 
 
@@ -12,6 +13,11 @@ class Location(models.Model):
     def __str__(self):
         return '%s, %s' % (self.title, self.city)
 
+class Attendee(models.Model):
+    event = models.ForeignKey('Event', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    attending = models.BooleanField(default=False)
 
 class Event(models.Model):
     anime = models.ForeignKey(Anime)
@@ -30,6 +36,7 @@ class Event(models.Model):
     channel = models.CharField(max_length=16, blank=True, default='')
     date = models.DateTimeField()
     link = models.URLField(blank=True, default='')
+    attendees = models.ManyToManyField(User, through=Attendee, blank=True)
 
     def __str__(self):
         return '%s %s' % (self.event_type, self.anime.title)
@@ -39,14 +46,30 @@ class Event(models.Model):
         return self.date.strftime('%A %-d %B %Y à %H h %M').lower()
 
     def to_html(self):
-        date = self.get_date()
+        common = '{type} le <strong>{date}</strong>'.format(
+            type=self.get_event_type_display().capitalize(),
+            date=self.get_date())
         if self.event_type == 'tv':
-            return '%s <em>%s</em> le <strong>%s</strong> sur %s' % (self.get_event_type_display(), self.anime.title, date, self.channel)
-        else:
-            location = self.location
+            return common + ' sur ' + self.channel
+
+        if self.location:
             if self.link:
-                location = '<a href="%s" target="_blank">%s</a>' % (self.link, self.location)
-            return '%s <em>%s</em> le <strong>%s</strong>, %s' % (self.get_event_type_display(), self.anime.title, date, location)
+                link_tpl = ', <a href="{url}" target="_blank">{location}</a>'
+                return common + link_tpl.format(
+                    url=self.link, location=self.location)
+            else:
+                return common + ', ' + str(self.location)
+
+        return common
 
     class Meta:
         ordering = ['date']
+
+
+class Partner(models.Model):
+    name = models.CharField(max_length=32)
+    url = models.CharField(max_length=512)
+    image = models.CharField(max_length=32, verbose_name="Fichier logo")
+
+    class Meta:
+        ordering = ['name'] 

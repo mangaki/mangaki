@@ -3,28 +3,29 @@ var globalWorks = {
     dejaVu: []
 };
 
-function getSheet(elt) {
-    entity = $(elt).closest('.data'); // See work_poster
-    if(entity.data('category') != 'dummy')
-        location.href = '/' + entity.data('category') + '/' + entity.data('id');
-}
-
 function vote(elt) {
     entity = $(elt).closest('.data');
     work_id = entity.data('id');
     choice = $(elt).data('choice');
     pos = entity.data('pos');
     $.post('/work/' + work_id, {choice: choice}, function(rating) {
-        if(rating == '')
-            window.location = '/user/signup';
-        if(typeof(sort_mode) != 'undefined' && sort_mode == 'mosaic' && rating)
+        if(rating === '') {
+            // FIXME: We should take the vote into account after the
+            // user signs up or logs in.
+            var next = window.location.pathname +
+                window.location.search + window.location.hash;
+            window.location.assign(
+                '/user/signup?next=' + encodeURIComponent(next));
+        }
+        if(typeof(sort_mode) !== 'undefined' && sort_mode === 'mosaic' && rating)
             loadCard(pos);
         else {
-            $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
-            if(rating == 'none')
-                $(elt).addClass('not-chosen');
-            else if(rating)
+            if (rating === 'none')
+                $(elt).siblings().filter('[data-choice!=' + rating + ']').removeClass('not-chosen');
+            else if (rating) {
+                $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
                 $(elt).removeClass('not-chosen');
+            }
         }
     });
 }
@@ -36,7 +37,7 @@ function suggestion(mangaki_class) {
         'message': $('#id_message').val()
     }).success(function(data) {
         $('#alert').hide()
-        if($('#success').css('display') == 'none')
+        if($('#success').css('display') === 'none')
             $('#success').show();
         $('#success').html('Merci d\'avoir contribué à Mangaki !');
         setTimeout(function() {
@@ -45,7 +46,7 @@ function suggestion(mangaki_class) {
         }, 1000);
     }).error(function(data) {
         $('#success').hide();
-        if($('#alert').css('display') == 'none')
+        if($('#alert').css('display') === 'none')
             $('#alert').show();
         // for(line in data.responseJSON) {
         $('#alert').text(data.responseJSON['problem']);
@@ -54,41 +55,45 @@ function suggestion(mangaki_class) {
 }
 
 function displayWork(pos, work) {
-    display_votes = true;
-    if(work == undefined) {
+    var display_votes = true;
+    if(work === undefined) {
         work = {'id': 0, 'category': 'dummy', 'title': 'Chargement…', 'poster': '/static/img/chiro.gif', 'synopsis': ''}
         display_votes = false;
     } else {
         globalWorks.dejaVu.push(work.id);
     }
-    selector = ':nth-child(' + pos + ')';
-    work_div = $('.manga-sheet' + selector + ' .data');
+    var selector = ':nth-child(' + pos + ')';
+    var work_div = $('.manga-sheet' + selector + ' .data');
     work_div.data('category', work['category']);
     work_div.data('id', work['id']);
-    work_div.find('h4 a').text(work['title']);
-    work_div.find('h4 a').attr('title', work['synopsis']);
+    work_div.find('.work-snapshot-title h4').text(work['title']);
+    work_div.find('.work-synopsis').text(work['synopsis']);
     $('[data-toggle="tooltip"]').tooltip('fixTitle');
-    work_div.find('h4 a').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
-    work_div.find('.manga-snapshot-image').hide().css('background-image', 'url(' + work['poster'] + ')').fadeIn();
+    work_div.find('a.work-snapshot').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
+    work_div.fadeOut().promise().done(function () {
+            work_div.find('.work-votes').promise().done(function () {
+                work_div.find('.work-votes').show();
+                work_div.find('.work-snapshot-image img').attr('src', work['poster']);
+                work_div.fadeIn();
+        });
+    });
     if(display_votes) {
-        work_div.find('.manga-votes').fadeIn();
-        if(work['rating'] == 'willsee')
-            work_div.find('.manga-votes a[data-choice!=willsee]').addClass('not-chosen');
-    }
-    else
-        work_div.find('.manga-votes').fadeOut();
+        if(work['rating'] === 'willsee')
+            work_div.find('.work-votes a[data-choice!=willsee]').addClass('not-chosen');
+    } else
+        work_div.find('.work-votes').fadeOut();
 }
 
 function actuallyLoadCard(pos) {
     var works = globalWorks[pos];
 
     var work = works.shift();
-    if (work === undefined)
+    if (!work)
         return loadCard(pos);
 
-    while (globalWorks.dejaVu.indexOf(work.id) != -1) {
+    while (globalWorks.dejaVu.indexOf(work.id) !== -1) {
         work = works.shift();
-        if (work === undefined)
+        if (!work)
             return loadCard(pos);
     }
     displayWork(pos, work);

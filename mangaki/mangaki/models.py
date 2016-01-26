@@ -2,7 +2,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from mangaki.api import get_discourse_data
-from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES
+from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
+
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 
 class Work(models.Model):
@@ -66,16 +69,19 @@ class Genre(models.Model):
 
 class Track(models.Model):
     title = models.CharField(max_length=32)
-    ost = models.ForeignKey('OST')
+    album = models.ManyToManyField('Album')
 
     def __str__(self):
         return self.title
 
 
-class OST(Work):
-    def __str__(self):
-        return self.title
+class Album(Work):
+    composer = models.ForeignKey('Artist', related_name='composer', default=1)
+    catalog_number = models.CharField(max_length=20)
+    vgmdb_aid = models.IntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return '[{id}] {title}'.format(id=self.id, title=self.title)
 
 class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)
@@ -251,3 +257,25 @@ class Reference(models.Model):
     work = models.ForeignKey('Work')
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
+
+class Top(models.Model):
+    date = models.DateField(auto_now_add=True)
+    category = models.CharField(max_length=10, choices=TOP_CATEGORY_CHOICES, unique_for_date='date')
+
+    contents = models.ManyToManyField(ContentType, through='Ranking')
+
+    def __str__(self):
+        return 'Top {category} on {date} (id={id})'.format(
+            category=self.category,
+            date=self.date,
+            id=self.id)
+
+class Ranking(models.Model):
+    top = models.ForeignKey('Top', on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    score = models.FloatField()
+    nb_ratings = models.PositiveIntegerField()
+    nb_stars = models.PositiveIntegerField()

@@ -4,7 +4,7 @@
 {% if not artist %}
   {% if user.is_authenticated %}
   <div class="row">
-      <div class="col-md-12 col-sm-12">
+      <div class="col-md-6 col-sm-12">
           <div class="well">
             <p>
               Notez quelques <em>anime</em>, via les listes ci-dessous ou la barre de recherche.<br />
@@ -12,30 +12,28 @@
             </p>
           </div>
       </div>
-      <div class="row">
-          <div class="col-md-2 col-sm-12"></div>
-          <div class="col-md-8 col-sm-12">
-              <div class="margin10top">
-                  <p style="text-align: center">Légende :
-                  <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
-                  <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
-                  <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
-                  <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
-                  <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span>
-                  <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas voir</span></p>
-                  <form class="typeahead-demo {{ category }}">
-                      <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime (actuellement {{ anime_count }})…" />
-                  </form>
-              </div>
-          </div>
-          <div class="col-md-2 col-sm-12"></div>
+      <!-- <div class="col-md-2 col-sm-12"></div> -->
+      <div class="col-md-6 col-sm-12">
+          
+              <p style="text-align: center">Légende :
+              <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
+              <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
+              <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
+              <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span><br />
+              <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux voir</span>
+              <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas voir</span></p>
+              <form class="typeahead-demo {{ category }}">
+                  <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime (actuellement {{ anime_count }})…" />
+              </form>
+          
       </div>
+      <!-- <div class="col-md-2 col-sm-12"></div> -->
   </div>
   {% else %}
   <div class=" col-md-12 col-sm-12">
     <p class="well">
-      Nouveau sur Mangaki ? <a href="/user/signup/">Inscrivez-vous</a> puis
-      <a href="/user/login/">connectez-vous</a> pour noter ces <em>anime</em>
+      Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
+      <a href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>anime</em>
       et obtenir des recommandations.
     </p>
   </div>
@@ -44,9 +42,6 @@
 
 {% if artist %}
   <h1>{{ artist }}</h1>
-  {% if artist.first_name == 'Satoshi' and artist.last_name == 'Kon' %}
-    C'est son anniversaire ! Satoshi Kon est né le 12 octobre 1963.
-  {% endif %}
   <hr />
 {% else %}
   <b>
@@ -65,7 +60,7 @@
 
   <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
   <div class="row">
-      <div class=" margin col-md-12 col-sm-12">
+      <div class="col-md-12 col-sm-12">
           <ul class="nav nav-tabs">
               <li role="presentation"{% if params.sort == 'mosaic' %} class="active"{% endif %}><a href="/anime/">Mosaïque</a></li>
               <li role="presentation"{% if params.sort == 'popularity' %} class="active"{% endif %}><a href="/anime/?sort=popularity">Les plus populaires</a></li>
@@ -78,7 +73,7 @@
   <br />
 {% endif %}
 
-<div class="row mangas-list">
+<div class="row works-list">
     {% for object in object_list %}
         {% include template_mode with work=object category="anime" rating=object.rating %}
     {% endfor %}
@@ -92,7 +87,7 @@
     </form>
   {% else %}
     <div class="row margin">
-        <div class="margin col-md-12 col-sm-12">
+        <div class="col-md-12 col-sm-12">
             <a class="btn btn-primary btn-lg" href="/reco/?category=anime" style="display: block; margin: auto">Je n'arrive plus à noter, conseillez-moi !</a>
         </div>
     </div>

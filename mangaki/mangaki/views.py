@@ -4,8 +4,10 @@ from django.views.generic.edit import FormMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseForbidden
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.timezone import utc
 
@@ -14,13 +16,13 @@ from django.db.models import Count
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Deck
+from mangaki.models import Work, Anime, Manga, Album, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Deck, Top, Ranking
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
 from mangaki.utils.recommendations import get_recommendations
 from mangaki.utils.chrono import Chrono
-from irl.models import Event
+from irl.models import Event, Partner, Attendee
 
 from collections import Counter
 from markdown import markdown
@@ -32,6 +34,7 @@ import datetime
 import hashlib
 import json
 
+from mangaki.choices import TOP_CATEGORY_CHOICES
 
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
@@ -52,6 +55,9 @@ RATING_COLORS = {
     'wontsee': {'normal': '#5bc0de', 'highlight': '#31b0d5'}
 }
 
+KIZU_ID = 13679
+UTA_ID = 14293
+KIZU_AP_ID = 9
 
 def display_queries():
     for line in connection.queries:
@@ -137,9 +143,37 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
         nb = Counter(Rating.objects.filter(work=anime).values_list('choice', flat=True))
         labels = {'favorite': 'Ajoutés aux favoris', 'like': 'Ont aimé', 'neutral': 'Neutre', 'dislike': 'N\'ont pas aimé', 'willsee': 'Ont envie de voir', 'wontsee': 'N\'ont pas envie de voir'}
-        context['stats'] = []
-        for rating in ['favorite', 'like', 'neutral', 'dislike', 'willsee', 'wontsee']:
-            context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
+        seen_ratings = ['favorite', 'like', 'neutral', 'dislike']
+        total = sum(nb.values())
+        if total > 0:
+            context['stats'] = []
+            seen_total = sum(nb[rating] for rating in seen_ratings)
+            for rating in labels:
+                if seen_total > 0 and rating not in seen_ratings:
+                    continue
+                context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
+            context['seen_percent'] = round(100 * seen_total / float(total))
+
+        anime_events = anime.event_set.filter(date__gte=timezone.now())
+        if anime_events.count() > 0:
+            my_events = {}
+            if self.request.user.is_authenticated():
+                my_events = dict(self.request.user.attendee_set.filter(
+                    event__in=anime_events).values_list('event_id', 'attending'))
+
+            context['events'] = [
+                {
+                    'id': event.id,
+                    'attending': my_events.get(event.id, None),
+                    'type': event.get_event_type_display(),
+                    'channel': event.channel,
+                    'date': event.get_date(),
+                    'link': event.link,
+                    'location': event.location,
+                    'nb_attendees': event.attendee_set.filter(attending=True).count(),
+                } for event in anime_events
+            ]
+            
         return context
 
     def post(self, request, *args, **kwargs):
@@ -203,6 +237,71 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         form.save()
         return super(MangaDetail, self).form_valid(form)
 
+
+class AlbumDetail(AjaxableResponseMixin, FormMixin, DetailView):
+    model = Album
+    form_class = SuggestionForm
+
+    def get_success_url(self):
+        return 'album/%d' % self.object.pk
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        update_poster_if_nsfw(self.object, self.request.user)
+        print(self.object.poster)
+        context['object'].source = context['object'].source.split(',')[0]
+
+        genres = []
+        if self.request.user.is_authenticated():
+            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
+            try:
+                if Rating.objects.filter(user=self.request.user, work=self.object, choice='favorite').count() > 0:
+                    context['rating'] = 'favorite'
+                else:
+                    context['rating'] = self.object.rating_set.get(user=self.request.user).choice
+            except Rating.DoesNotExist:
+                pass
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseForbidden()
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.save()
+        return super().form_valid(form)
+
+
+class EventDetail(LoginRequiredMixin, DetailView):
+    model = Event
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if 'next' in request.GET:
+            return redirect(request.GET['next'])
+        return redirect(reverse('anime-detail', args=(self.object.anime_id,)))
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        attending = None
+        if 'wontgo' in request.POST:
+            attending = False
+        if 'willgo' in request.POST:
+            attending = True
+        if attending is not None:
+            Attendee.objects.update_or_create(
+                event=self.object, user=request.user,
+                defaults={'attending': attending })
+        elif 'cancel' in request.POST:
+            Attendee.objects.filter(event=self.object, user=request.user).delete()
+        return redirect(request.GET['next']);
 
 def controversy(nb_likes, nb_dislikes):
     if nb_likes == 0 or nb_dislikes == 0:
@@ -535,6 +634,22 @@ def get_profile(request, username):
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
     seen_list = seen_anime_list if category == 'anime' else seen_manga_list
     unseen_list = unseen_anime_list if category == 'anime' else unseen_manga_list
+
+    # Events
+    events = [
+        {
+            'id': attendee.event_id,
+            'anime_id': attendee.event.anime_id,
+            'attending': True,
+            'type': attendee.event.get_event_type_display(),
+            'channel': attendee.event.channel,
+            'date': attendee.event.get_date(),
+            'link': attendee.event.link,
+            'location': attendee.event.location,
+            'title': attendee.event.anime.title,
+        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now()).select_related('event', 'event__anime__title')
+    ]
+
     data = {
         'username': username,
         'score': user.profile.score,
@@ -570,6 +685,7 @@ def get_profile(request, username):
         'unseen_list': unseen_list if is_shared else [],
         'received_recommendation_list': received_recommendation_list if is_shared else [],
         'sent_recommendation_list': sent_recommendation_list if is_shared else [],
+        'events': events,
     })
 
 
@@ -579,7 +695,22 @@ def index(request):
             return redirect('/anime/')
     # texte = Announcement.objects.get(title='Flash News').text
     # context = {'annonce': texte}
-    return render(request, 'index.html')
+    partners = Partner.objects.filter()
+    kizu_rating = None
+    uta_rating = None
+    if request.user.is_authenticated():
+        for rating in Rating.objects.filter(work_id__in=[KIZU_ID, UTA_ID], user=request.user):
+            if rating.work_id == KIZU_ID:
+                kizu_rating = rating.choice
+            elif rating.work_id == UTA_ID:
+                uta_rating = rating.choice
+    return render(request, 'index.html', {
+        'partners': partners,
+        'kizumonogatari': Anime.objects.get(pk=KIZU_ID),
+        'utamonogatari': Album.objects.get(pk=UTA_ID),
+        'kizumonogatari_rating': kizu_rating,
+        'utamonogatari_rating': uta_rating,
+    })
 
 
 def about(request):
@@ -587,7 +718,58 @@ def about(request):
 
 
 def events(request):
-    return render(request, 'events.html', {'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now())})
+    kizu_rating = None
+    uta_rating = None
+    ap_attending = None
+    if request.user.is_authenticated():
+        for rating in Rating.objects.filter(work_id__in=[KIZU_ID, UTA_ID], user=request.user):
+            if rating.work_id == KIZU_ID:
+                kizu_rating = rating.choice
+            elif rating.work_id == UTA_ID:
+                uta_rating = rating.choice
+        for attendee in Attendee.objects.filter(event_id=KIZU_AP_ID, user=request.user):
+            ap_attending = attendee.attending
+    return render(
+        request, 'events.html',
+        {
+            'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
+            'kizumonogatari': Anime.objects.get(pk=KIZU_ID),
+            'utamonogatari': Album.objects.get(pk=UTA_ID),
+            'wakanim': Partner.objects.get(pk=12),
+            'kizumonogatari_rating': kizu_rating,
+            'utamonogatari_rating': uta_rating,
+            'kizu_ap': {
+                'id': KIZU_AP_ID,
+                'attending': ap_attending,
+            },
+        })
+
+def top(request, category_slug):
+    categories = dict(TOP_CATEGORY_CHOICES)
+    if category_slug not in categories:
+        raise Http404
+    try:
+        top = Top.objects.filter(category=category_slug).latest('date')
+    except Top.DoesNotExist:
+        raise Http404
+    data = []
+    rankings = Ranking.objects.filter(top=top).prefetch_related('content_object')
+    for rank, ranking in enumerate(rankings):
+        data.append({
+            'rank': rank + 1,
+            'id': ranking.object_id,
+            'name': str(ranking.content_object),
+            'score': ranking.score,
+            'nb_ratings': ranking.nb_ratings,
+            'nb_stars': ranking.nb_stars,
+        })
+    return render(request, 'top.html', {
+        'date': top.date,
+        'size': len(data),
+        'category_slug': category_slug,
+        'category': categories[category_slug].lower(),
+        'top': data,
+    })
 
 
 def rate_work(request, work_id):
@@ -673,7 +855,7 @@ def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
         update_poster_if_nsfw(work, request.user)
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster,
+        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 

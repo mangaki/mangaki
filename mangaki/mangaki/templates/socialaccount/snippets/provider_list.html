@@ -1,0 +1,21 @@
+{% load socialaccount %}
+
+{% get_providers as socialaccount_providers %}
+
+<div class="ssk-block" style="width: {% if verb == 'try' %}230px; margin: auto{% else %}300px;{% endif %}">
+{% for provider in socialaccount_providers %}
+    {% if provider.id == "openid" %}
+        {% for brand in provider.get_brands %}
+            <li>
+              <a title="{{brand.name}}" 
+                 class="socialaccount_provider {{provider.id}} {{brand.id}}" 
+                 href="{% provider_login_url provider.id openid=brand.openid_url process=process %}"
+                 >{{brand.name}}</a>
+            </li>
+        {% endfor %}
+    {% endif %}
+    <a title="{{provider.name}}" class="ssk ssk-text ssk-{% if provider.id == 'google' %}google-plus{% else %}{{ provider.id }}{% endif %} ssk-sm socialaccount_provider {{provider.id}}" 
+         href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">{% if verb == 'try' %}Essayer via{% else %}Se connecter avec{% endif %} {{provider.name}}</a>
+{% endfor %}
+</div>
+
