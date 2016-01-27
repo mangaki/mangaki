@@ -1,13 +1,40 @@
 # coding=utf8
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
-from mangaki.api import get_discourse_data
-from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
-from mangaki.choices import WORK_CATEGORY_CHOICES, WORK_CATEGORY_OF_ID, ID_OF_WORK_CATEGORY
 
+from django.db.models import Sum, Case, When, Count, F, Value, Q
+from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
+from mangaki.api import get_discourse_data
+from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES, WORK_CATEGORY_CHOICES
+from mangaki.utils.ranking import controversy, TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+
+from mangaki.choices import ID_OF_WORK_CATEGORY, WORK_CATEGORY_OF_ID
+
+class WorkQuerySet(models.QuerySet):
+    def category(self, category):
+        return self.filter(category_id=ID_OF_WORK_CATEGORY[category])
+
+    # There are indexes in the database related to theses queries. Please don't
+    # change the formulaes without issuing the appropriate migrations.
+    def top(self):
+        return self.filter(
+            nb_ratings__gte=TOP_MIN_RATINGS).order_by(
+                (F('sum_ratings') / F('nb_ratings')).desc())
+
+    def popular(self):
+        return self.order_by('-nb_ratings')
+
+    def controversial(self):
+        return self.order_by('-controversy')
+
+    def random(self):
+        return self.filter(
+            nb_ratings__gte=RANDOM_MIN_RATINGS,
+            nb_dislikes__lte=RANDOM_MAX_DISLIKES,
+            nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
@@ -19,9 +46,58 @@ class Work(models.Model):
     # We use an IntegerField for this because we want an efficient index
     category_id = models.IntegerField(blank=True, choices=WORK_CATEGORY_CHOICES)
 
+    # Cache fields for the rankings
+    sum_ratings = models.FloatField(blank=True, null=False, default=0)
+    nb_ratings = models.IntegerField(blank=True, null=False, default=0)
+    nb_likes = models.IntegerField(blank=True, null=False, default=0)
+    nb_dislikes = models.IntegerField(blank=True, null=False, default=0)
+    controversy = models.FloatField(blank=True, null=False, default=0)
+
+    class Meta:
+        index_together = [
+            ['category_id', 'controversy'],
+            ['category_id', 'nb_ratings'],
+        ]
+
+    objects = WorkQuerySet.as_manager()
+
     @property
     def category(self):
         return WORK_CATEGORY_OF_ID[self.category_id]
+
+    def safe_poster(self, user):
+        if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
+            return self.poster
+        return '/static/img/nsfw.jpg'
+
+    @transaction.atomic
+    def update_ratings(self):
+        nb = self.rating_set.aggregate(
+            favorite=Count(Case(When(choice='favorite', then=1))),
+            like=Count(Case(When(choice='like', then=1))),
+            dislike=Count(Case(When(choice='dislike', then=1))),
+            neutral=Count(Case(When(choice='neutral', then=1))),
+            willsee=Count(Case(When(choice='willsee', then=1))),
+            wontsee=Count(Case(When(choice='wontsee', then=1))))
+        self.controversy = controversy(nb)
+        self.nb_likes = nb['like']
+        self.nb_dislikes = nb['dislike']
+        self.sum_ratings = (
+            5 * nb['favorite']
+            + 2.5 * nb['like']
+            - 2 * nb['dislike']
+            - 0.1 * nb['neutral']
+            + 0.5 * nb['willsee']
+            - 0.5 * nb['wontsee']
+        )
+        # All but willsee, wontsee
+        self.nb_ratings = (
+            nb['favorite']
+            + nb['like']
+            + nb['dislike']
+            + nb['neutral']
+        )
+        self.save()
 
     def __str__(self):
         return self.title
@@ -77,7 +153,6 @@ class Manga(Work):
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
     genre = models.ManyToManyField('Genre')
     manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
-
 
 class Genre(models.Model):
     title = models.CharField(max_length=17)
@@ -264,12 +339,6 @@ class Pairing(models.Model):
     artist = models.ForeignKey(Artist)
     work = models.ForeignKey(Work)
     is_checked = models.BooleanField(default=False)
-
-
-class Deck(models.Model):
-    category = models.CharField(max_length=32)
-    sort_mode = models.CharField(max_length=32)
-    content = models.CommaSeparatedIntegerField(max_length=42000)
 
 
 class Reference(models.Model):

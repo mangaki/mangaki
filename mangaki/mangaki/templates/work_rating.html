@@ -1,13 +1,13 @@
-<a class="work-snapshot" href="/{{ category }}/{{ work.id }}">
-    <div class="work-snapshot-image {{ category }}-image">
+<a class="work-snapshot" href="/{{ work.category }}/{{ work.id }}">
+    <div class="work-snapshot-image {{ work.category }}-image">
         <img src="{{ work.poster }}" alt="{{ work.title }}">
 
-        {% if show_title %}
+        {% if not simple %}
             <div class="work-synopsis">{{ work.synopsis|linebreaksbr }}</div>
         {% endif %}
     </div>
 
-    {% if show_title %}
+    {% if not simple %}
         <div class="work-snapshot-title">
             <h4>{{ work.title }}</h4>
         </div>
@@ -27,10 +27,10 @@
     <a data-choice='dislike' class="btn btn-danger btn-block{% if rating and rating != 'dislike' %} not-chosen{% endif %}" onclick="vote(this)" title="Je n'aime pas">
       <span class="glyphicon glyphicon-thumbs-down"></span>
     </a>
-    <a data-choice='willsee' class="btn btn-primary btn-block{% if rating and rating != 'willsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if category == 'manga' %}Je veux lire{% else %}Je veux voir{% endif %}">
+    <a data-choice='willsee' class="btn btn-primary btn-block{% if rating and rating != 'willsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if work.category == 'manga' %}Je veux lire{% else %}Je veux voir{% endif %}">
       <span class="glyphicon glyphicon-eye-open"></span>
     </a>
-    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if category == 'manga' %}Je ne veux pas lire{% else %}Je ne veux pas voir{% endif %}">
+    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if work.category == 'manga' %}Je ne veux pas lire{% else %}Je ne veux pas voir{% endif %}">
       <span class="glyphicon glyphicon-eye-close"></span>
     </a>
 </div>
