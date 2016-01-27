@@ -649,7 +649,7 @@ def get_profile(request, username):
             'link': attendee.event.link,
             'location': attendee.event.location,
             'title': attendee.event.anime.title,
-        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now()).select_related('event', 'event__anime__title')
+        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event', 'event__anime__title')
     ]
 
     data = {
