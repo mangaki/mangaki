@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from mangaki.api import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
+from mangaki.choices import WORK_CATEGORY_CHOICES, WORK_CATEGORY_OF_ID, ID_OF_WORK_CATEGORY
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -15,9 +16,27 @@ class Work(models.Model):
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
+    # We use an IntegerField for this because we want an efficient index
+    category_id = models.IntegerField(blank=True, choices=WORK_CATEGORY_CHOICES)
+
+    @property
+    def category(self):
+        return WORK_CATEGORY_OF_ID[self.category_id]
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if isinstance(self, Anime):
+                self.category_id = ID_OF_WORK_CATEGORY['anime']
+            elif isinstance(self, Manga):
+                self.category_id = ID_OF_WORK_CATEGORY['manga']
+            elif isinstance(self, Album):
+                self.category_id = ID_OF_WORK_CATEGORY['album']
+            else:
+                raise TypeError('Unexpected subclass of work: {}'.format(type(self)))
+        super().save(*args, **kwargs)
 
 
 class Editor(models.Model):
