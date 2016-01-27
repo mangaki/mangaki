@@ -27,7 +27,6 @@ from irl.models import Event, Partner, Attendee
 from collections import Counter
 from markdown import markdown
 from urllib.parse import urlencode
-from itertools import groupby
 from random import shuffle, randint
 from secret import HASH_PADDLE
 import datetime
@@ -304,51 +303,6 @@ class EventDetail(LoginRequiredMixin, DetailView):
         elif 'cancel' in request.POST:
             Attendee.objects.filter(event=self.object, user=request.user).delete()
         return redirect(request.GET['next']);
-
-def controversy(nb_likes, nb_dislikes):
-    if nb_likes == 0 or nb_dislikes == 0:
-        return 0
-    return (nb_likes + nb_dislikes) ** min(float(nb_likes) / nb_dislikes, float(nb_dislikes) / nb_likes)
-
-
-def get_scores(bundle, ranking='controversy'):
-    ratings = Rating.objects.filter(work__in=bundle).values('work', 'choice').annotate(count=Count('pk')).order_by('work', 'choice')
-    score = {}
-    for work_id, ratings in groupby(ratings, lambda rating: rating['work']):
-        nb_likes = nb_dislikes = 0
-        for rating in ratings:
-            if rating['choice'] == 'like':
-                nb_likes = rating['count']
-            elif rating['choice'] == 'dislike':
-                nb_dislikes = rating['count']
-        if ranking == 'controversy':
-            score[work_id] = controversy(nb_likes, nb_dislikes)
-        elif ranking == 'top':
-            score[work_id] = nb_likes if nb_dislikes <= 20 else 0
-        elif ranking == 'random':  # Perles au hasard
-            score[work_id] = randint(1, 42) if nb_dislikes <= 5 and nb_likes >= 3 else 0
-    return score
-
-
-def get_bundle(category, sort_mode, my_rated_works={}):
-    already_rated = ', '.join(map(str, my_rated_works.keys())) if my_rated_works.keys() else '0'
-    work_query = 'SELECT mangaki_{category}.work_ptr_id, mangaki_work.id, mangaki_work.title, mangaki_work.poster, mangaki_work.nsfw, COUNT(mangaki_work.id) rating_count FROM mangaki_{category}, mangaki_work, mangaki_rating WHERE mangaki_{category}.work_ptr_id = mangaki_work.id AND mangaki_rating.work_id = mangaki_work.id AND (mangaki_{category}.work_ptr_id NOT IN (' + already_rated + ')) GROUP BY mangaki_work.id, mangaki_{category}.work_ptr_id HAVING COUNT(mangaki_work.id) >= {min_ratings} ORDER BY {order_by}'
-    # work_query = 'SELECT mangaki_{category}.work_ptr_id, mangaki_work.id, mangaki_work.title, mangaki_work.poster, mangaki_work.nsfw, COUNT(mangaki_work.id) rating_count FROM mangaki_{category}, mangaki_work, mangaki_rating WHERE mangaki_{category}.work_ptr_id = mangaki_work.id AND mangaki_rating.work_id = mangaki_work.id AND (mangaki_{category}.work_ptr_id NOT IN (' + already_rated + ')) GROUP BY mangaki_work.id, mangaki_{category}.work_ptr_id HAVING COUNT(mangaki_work.id) >= {min_ratings} ORDER BY {order_by}'
-    if category == 'anime':
-        obj = Anime.objects
-    elif category == 'manga':
-        obj = Manga.objects
-    # Work.objects.in_bulk(
-    # return Work.objects.in_bulk(Deck.objects.get(category=category, sort_mode=sort_mode).content.split(','))
-    if sort_mode == 'popularity':
-        return obj.raw(work_query.format(category=category, min_ratings=6 if category == 'anime' else 0, order_by='rating_count DESC'))
-    elif sort_mode == 'top':
-        return obj.raw(work_query.format(category=category, min_ratings=100 if category == 'anime' else 1, order_by='rating_count DESC'))
-    elif sort_mode == 'controversy' or sort_mode == 'random':
-        return obj.raw(work_query.format(category=category, min_ratings=6 if category == 'anime' else 1, order_by='rating_count DESC'))
-    else:
-        return obj.raw(work_query.format(category=category, min_ratings=1 if category == 'anime' else 0, order_by='title'))
-
 
 def filter_deck(deck, my_rated_works, deja_vu):
     works = [work_id for work_id in deck if int(work_id) not in my_rated_works and work_id not in deja_vu]
