@@ -74,9 +74,17 @@
 {% endif %}
 
 <div class="row works-list">
-    {% for object in object_list %}
-        {% include template_mode with work=object category="anime" rating=object.rating %}
-    {% endfor %}
+{% for object in object_list %}
+    <div align="center" class="manga-sheet">
+    <!-- manga-sheet doit être sur le premier div -->
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 text-center">
+            <!-- Ne pas modifier la class row sinon ça casse loadCard de vote.js -->
+            <div class="work-sheet data" data-category="anime" data-id="{{ object.id }}" data-pos="{{ forloop.counter }}">
+                {% include "work_rating.html" with rating=object.rating category='anime' work=object show_title=True %}
+            </div>
+        </div>
+    </div>
+{% endfor %}
 </div>
 
 {% if user.is_authenticated %}

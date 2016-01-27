@@ -364,7 +364,6 @@ class AnimeList(ListView):
         my_rated_works = get_rated_works(self.request.user) if self.request.user.is_authenticated() else {}
         artist_id = self.kwargs.get('artist_id')
         sort_mode = self.request.GET.get('sort', 'mosaic')
-        flat_mode = self.request.GET.get('flat', '0')
         letter = self.request.GET.get('letter', '')
         page = int(self.request.GET.get('page', '1'))
         context = super(AnimeList, self).get_context_data(**kwargs)
@@ -382,7 +381,7 @@ class AnimeList(ListView):
         else:
             anime_ids = list(map(lambda obj: obj.id, context['object_list']))  # Double conversion, to fix
 
-        paginator = Paginator(anime_ids, TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
+        paginator = Paginator(anime_ids, POSTERS_PER_PAGE)
 
         try:
             page_anime_ids = paginator.page(page)
@@ -393,11 +392,10 @@ class AnimeList(ListView):
             # If page is out of range (e.g. 9999), deliver last page of results.
             page_anime_ids = paginator.page(paginator.num_pages)
 
-        context['params'] = {'sort': sort_mode, 'letter': letter, 'page': page, 'flat': flat_mode}
+        context['params'] = {'sort': sort_mode, 'letter': letter, 'page': page}
         context['url'] = urlencode({'sort': sort_mode, 'letter': letter})
         context['anime_count'] = Anime.objects.count()
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(page_anime_ids.number - 2, page_anime_ids.number + 2 + 1))
-        context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
 
         works = Work.objects.in_bulk(page_anime_ids)
         anime_list = list(map(lambda work_id: works[int(work_id)], page_anime_ids))
@@ -428,7 +426,6 @@ class MangaList(ListView):
     def get_context_data(self, **kwargs):
         my_rated_works = get_rated_works(self.request.user) if self.request.user.is_authenticated() else {}
         sort_mode = self.request.GET.get('sort', 'mosaic')
-        flat_mode = self.request.GET.get('flat', '0')
         letter = self.request.GET.get('letter', '')
         page = int(self.request.GET.get('page', '1'))
         context = super(MangaList, self).get_context_data(**kwargs)
@@ -444,7 +441,7 @@ class MangaList(ListView):
         else:
             manga_ids = list(map(lambda obj: obj.id, context['object_list']))  # Double conversion (and repetition), to fix  
 
-        paginator = Paginator(manga_ids, TITLES_PER_PAGE if flat_mode == '1' else POSTERS_PER_PAGE)
+        paginator = Paginator(manga_ids, POSTERS_PER_PAGE)
 
         try:
             page_manga_ids = paginator.page(page)
@@ -455,11 +452,10 @@ class MangaList(ListView):
             # If page is out of range (e.g. 9999), deliver last page of results.
             page_manga_ids = paginator.page(paginator.num_pages)
 
-        context['params'] = {'sort': sort_mode, 'letter': letter, 'page': page, 'flat': flat_mode}
+        context['params'] = {'sort': sort_mode, 'letter': letter, 'page': page}
         context['url'] = urlencode({'sort': sort_mode, 'letter': letter})
         context['manga_count'] = Manga.objects.count()
         context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(page_manga_ids.number - 2, page_manga_ids.number + 2 + 1))
-        context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
 
         works = Work.objects.in_bulk(page_manga_ids)
         manga_list = list(map(lambda work_id: works[int(work_id)], page_manga_ids))
