@@ -2,12 +2,6 @@
 <!-- manga-sheet doit être sur le premier div -->
     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 text-center">
         <!-- Ne pas modifier la class row sinon ça casse loadCard de vote.js -->
-        <!--
-            {% include "work_rating.html" %}
-            <div class="col-md-10 col-sm-9 col-xs-8 work-title">
-                <a class="work-link" href="/{{ category }}/{{ work.id }}" data-toggle="tooltip" data-placement="top" data-container="body" title="{{ work.synopsis }}"><h4>{{ work.title }}</h4></a>
-            </div>
-        -->
         <div class="work-sheet data" data-category="{{ category }}" data-id="{{ work.id }}" data-pos="{{ forloop.counter }}">
             {% include "work_rating.html" with category=category work=work show_title=True %}
         </div>
