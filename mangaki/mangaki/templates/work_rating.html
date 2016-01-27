@@ -9,7 +9,7 @@
 
     {% if show_title %}
         <div class="work-snapshot-title">
-            <h4>{{ work.title }}</h4>
+            <h4 title="{{ work.title }}">{{ work.title|truncatechars:50 }}</h4>
         </div>
     {% endif %}
 </a>
