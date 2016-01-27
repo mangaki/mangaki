@@ -544,7 +544,7 @@ def get_profile(request, username):
         c += 1
         if c >= 200:
             break"""
-    rating_list = sorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title))  # Tri par note puis nom
+    rating_list = sorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
     # , key=lambda x: (ordering.index(x['choice']), 1))  # Tri par note puis nom
     # print(rating_list[:5])
     # chrono.save('get ratings %d queries' % len(connection.queries))
