@@ -11,8 +11,11 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.timezone import utc
 
+
+from django.views.generic.detail import SingleObjectMixin
+
 from django.dispatch import receiver
-from django.db.models import Count
+from django.db.models import Count, Case, When, F, Value
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
@@ -65,15 +68,6 @@ GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
 def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
-
-
-def get_rated_works(user):
-    rated_works = {}
-    for work_id, choice in Rating.objects.filter(user=user).values_list('work_id', 'choice'):
-        rated_works[work_id] = choice
-    print(len(rated_works))
-    return rated_works
-
 
 def update_poster_if_nsfw(obj, user):
     if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
@@ -322,56 +316,9 @@ def get_card(request, category, sort_id=1):
 
     return HttpResponse(json.dumps(cards), content_type='application/json')
 
-
-class AnimeList(ListView):
-    template_name = 'mangaki/anime_list.html'
-    context_object_name = 'anime'
-    paginate_by = POSTERS_PER_PAGE
-
-    def get_queryset(self):
-        artist_id = self.kwargs.get('artist_id')
-        if artist_id:
-            artist = Artist.objects.get(id=artist_id)
-            bundle = artist.authored.all() | artist.directed.all() | artist.composed.all()
-            return bundle.order_by('title')
-
-        sort_mode = self.request.GET.get('sort', 'mosaic')
-
-        bundle = Work.objects.filter(category__slug='anime')
-        if sort_mode == 'top':
-            return bundle.top()
-        elif sort_mode == 'popularity':
-            return bundle.popular()
-        elif sort_mode == 'controversy':
-            return bundle.controversial()
-        elif sort_mode == 'random':
-            return bundle.random().order_by('?')[:self.paginate_by]
-        elif sort_mode == 'alpha':
-            letter = self.request.GET.get('letter', '')
-            if letter:
-                if letter == '0':  # '#'
-                    bundle = bundle.exclude(title__regex=r'^[a-zA-Z]')
-                else:
-                    bundle = bundle.filter(title__istartswith=letter)
-            return bundle.order_by('title')
-
-        return Work.objects.none()
-
+class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        artist_id = self.kwargs.get('artist_id')
-        sort_mode = self.request.GET.get('sort', 'mosaic')
-        flat_mode = self.request.GET.get('flat', '0')
-        letter = self.request.GET.get('letter', '')
-
-        if artist_id:
-            sort_mode = 'alpha'
-            context['artist'] = Artist.objects.get(id=artist_id)
-
-        context['params'] = {'sort': sort_mode, 'letter': letter, 'flat': flat_mode}
-        context['url'] = urlencode({'sort': sort_mode, 'letter': letter})
-        context['anime_count'] = Anime.objects.count()
-        context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
 
         if self.request.user.is_authenticated():
             ratings = dict(
@@ -381,74 +328,81 @@ class AnimeList(ListView):
                 .values_list('work_id', 'choice'))
         else:
             ratings = {}
-
-        for obj in context['object_list']:
-            obj.rating = ratings.get(obj.id, None)
-            obj.poster = obj.safe_poster(self.request.user)
-
-        if sort_mode == 'mosaic':
-            context['object_list'] = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+        for work in context['object_list']:
+            work.rating = ratings.get(work.id, None)
+            work.poster = work.safe_poster(self.request.user)
 
         return context
 
-
-class MangaList(ListView):
-    template_name = 'mangaki/manga_list.html'
-    context_object_name = 'manga'
+class WorkList(WorkListMixin, ListView):
     paginate_by = POSTERS_PER_PAGE
 
+    def category(self):
+        return self.kwargs.get('category', 'anime')
+
     def get_queryset(self):
+        queryset = Work.objects.filter(category__slug=self.category())
         sort_mode = self.request.GET.get('sort', 'mosaic')
 
-        bundle = Work.objects.filter(category__slug='manga')
         if sort_mode == 'top':
-            return bundle.top()
+            queryset = queryset.top()
         elif sort_mode == 'popularity':
-            return bundle.popular()
+            queryset = queryset.popular()
         elif sort_mode == 'controversy':
-            return bundle.controversial()
-        elif sort_mode == 'random':
-            return bundle.random().order_by('?')[:self.paginate_by]
+            queryset = queryset.controversial()
         elif sort_mode == 'alpha':
             letter = self.request.GET.get('letter', '')
-            if letter:
-                if letter == '0':  # '#'
-                    bundle = bundle.exclude(title__regex=r'^[a-zA-Z]')
-                else:
-                    bundle = bundle.filter(title__istartswith=letter)
-            return bundle.order_by('title')
+            if letter == '0': # '#'
+                queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
+            else:
+                queryset = queryset.filter(title__istartswith=letter)
+            queryset = queryset.order_by('title')
+        elif sort_mode == 'random':
+            queryset = queryset.random().order_by('?')[:self.paginate_by]
+        elif sort_mode == 'mosaic':
+            queryset = queryset.none()
+        else:
+            raise Http404
 
-        return Work.objects.none()
+        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug').select_related('category__slug')
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         sort_mode = self.request.GET.get('sort', 'mosaic')
-        flat_mode = self.request.GET.get('flat', '0')
-        letter = self.request.GET.get('letter', '')
-
-        context['params'] = {'sort': sort_mode, 'letter': letter, 'flat': flat_mode}
-        context['url'] = urlencode({'sort': sort_mode, 'letter': letter})
-        context['manga_count'] = Manga.objects.count()
-        context['template_mode'] = 'work_no_poster.html' if flat_mode == '1' else 'work_poster.html'
-
-        if self.request.user.is_authenticated():
-            ratings = dict(
-                Rating.objects.filter(
-                    user=self.request.user,
-                    work__in=list(context['object_list'])) \
-                .values_list('work_id', 'choice'))
-        else:
-            ratings = {}
-
-        for obj in context['object_list']:
-            obj.rating = ratings.get(obj.id, None)
-            obj.poster = obj.safe_poster(self.request.user)
+        context['sort_mode'] = sort_mode
+        context['letter'] = self.request.GET.get('letter', '')
+        context['category'] = self.category()
+        context['objects_count'] = Work.objects.filter(category__slug=self.category()).count()
 
         if sort_mode == 'mosaic':
-            context['object_list'] = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+            context['object_list'] = [
+                Work(title='Chargement…', poster='/static/img/chiro.gif')
+                for _ in range(4)
+            ]
 
         return context
 
+class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
+    template_name = 'mangaki/artist_detail.html'
+    paginate_by = POSTERS_PER_PAGE
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Artist.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return (self.object.authored.all()
+                | self.object.directed.all()
+                | self.object.composed.all()) \
+                .order_by('title')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['artist'] = self.object
+
+        return context
 
 class UserList(ListView):
     model = User
@@ -821,10 +775,7 @@ def remove_all_reco(request, targetname):
 def get_reco(request):
     category = request.GET.get('category', 'all')
     editor = request.GET.get('editor', 'unspecified')
-    reco_list = []
-    dummy = Work(title='Chargement…', poster='/static/img/chiro.gif')
-    for _ in range(4):
-        reco_list.append((dummy, 'dummy'))
+    reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
     return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
 
 
