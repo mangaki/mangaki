@@ -1,13 +1,15 @@
-// This contains the current loaded decks for each position.
+"use strict";
+
 var globalWorks = {
-    dejaVu: []
+    orphans: [],
+    dejaVu: [],
 };
 
 function vote(elt) {
-    entity = $(elt).closest('.data');
-    work_id = entity.data('id');
-    choice = $(elt).data('choice');
-    pos = entity.data('pos');
+    var entity = $(elt).closest('.data');
+    var work_id = entity.data('id');
+    var choice = $(elt).data('choice');
+    var pos = entity.data('pos');
     $.post('/work/' + work_id, {choice: choice}, function(rating) {
         if(rating === '') {
             // FIXME: We should take the vote into account after the
@@ -72,7 +74,8 @@ function displayWork(pos, work) {
     work_div.find('a.work-snapshot').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
     work_div.fadeOut().promise().done(function () {
             work_div.find('.work-votes').promise().done(function () {
-                work_div.find('.work-votes').show();
+                if (display_votes)
+                    work_div.find('.work-votes').show();
                 work_div.find('.work-snapshot-image img').attr('src', work['poster']);
                 work_div.fadeIn();
         });
@@ -84,29 +87,49 @@ function displayWork(pos, work) {
         work_div.find('.work-votes').fadeOut();
 }
 
-function actuallyLoadCard(pos) {
-    var works = globalWorks[pos];
+function filterWorks(pos) {
+    var dejaVu = globalWorks.dejaVu;
+    return globalWorks[pos] = globalWorks[pos].filter(function (work) {
+        return dejaVu.indexOf(work.id) === -1;
+    });
+}
 
-    var work = works.shift();
-    if (!work)
-        return loadCard(pos);
-
-    while (globalWorks.dejaVu.indexOf(work.id) !== -1) {
-        work = works.shift();
-        if (!work)
-            return loadCard(pos);
-    }
-    displayWork(pos, work);
+function loadCardFrom(pos, works) {
+    globalWorks.orphans = globalWorks.orphans.filter(function (pos) {
+        return globalWorks[pos].length == 0;
+    });
+    displayWork(pos, works.shift());
+    while (globalWorks.orphans.length && works.length)
+        displayWork(globalWorks.orphans.shift(), works.shift());
 }
 
 function loadCard(pos) {
     displayWork(pos);
-    if (globalWorks[pos])
-        return actuallyLoadCard(pos);
+    if (globalWorks[pos]) {
+        var works = filterWorks(pos);
+        if (works.length)
+            return loadCardFrom(pos, works);
+    }
 
-    // TODO: abort in case there is no unseen card, to prevent infinite recursion.
     return $.getJSON('/data/card/' + category + '/' + pos + '.json', function(works) {
         globalWorks[pos] = works;
-        return actuallyLoadCard(pos);
+        works = filterWorks(pos);
+
+        if (works.length)
+            return loadCardFrom(pos, works);
+
+        // Let's try our best and use another position's cards
+        for (var other = 1; other < 5; ++other) {
+            if (!globalWorks[other])
+                continue;
+
+            var works = filterWorks(other);
+            if (works.length)
+                return loadCardFrom(pos, works);
+        }
+
+        // Oh man! We'll broadcast our poor situation
+        if (globalWorks.orphans.indexOf(pos) !== -1)
+            globalWorks.orphans.push(pos);
     });
 }
