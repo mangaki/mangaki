@@ -1,16 +1,11 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 from mangaki.models import Anime, Manga, Rating
+from mangaki.utils.ranking import controversy
 from collections import Counter
 from itertools import groupby
 from django.db import connection
 import sys
-
-
-def controversy(nb_likes, nb_dislikes):
-    if nb_likes == 0 or nb_dislikes == 0:
-        return 0
-    return (nb_likes + nb_dislikes) ** min(float(nb_likes) / nb_dislikes, float(nb_dislikes) / nb_likes)
 
 
 class Command(BaseCommand):

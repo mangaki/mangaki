@@ -1,11 +1,14 @@
 # coding=utf8
 from django.db import models
 from django.contrib.auth.models import User
-from mangaki.api import get_discourse_data
-from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
-
+from django.db.models import F
+from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+
+from mangaki.api import get_discourse_data
+from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
+from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
@@ -13,6 +16,26 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+class WorkQuerySet(models.QuerySet):
+    # There are indexes in the database related to theses queries. Please don't
+    # change the formulaes without issuing the appropriate migrations.
+    def top(self):
+        return self.filter(
+            nb_ratings__gte=TOP_MIN_RATINGS).order_by(
+                (F('sum_ratings') / F('nb_ratings')).desc())
+
+    def popular(self):
+        return self.order_by('-nb_ratings')
+
+    def controversial(self):
+        return self.order_by('-controversy')
+
+    def random(self):
+        return self.filter(
+            nb_ratings__gte=RANDOM_MIN_RATINGS,
+            nb_dislikes__lte=RANDOM_MAX_DISLIKES,
+            nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
@@ -22,6 +45,26 @@ class Work(models.Model):
     date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=True, null=False)
+
+    # Cache fields for the rankings
+    sum_ratings = models.FloatField(blank=True, null=False, default=0)
+    nb_ratings = models.IntegerField(blank=True, null=False, default=0)
+    nb_likes = models.IntegerField(blank=True, null=False, default=0)
+    nb_dislikes = models.IntegerField(blank=True, null=False, default=0)
+    controversy = models.FloatField(blank=True, null=False, default=0)
+
+    class Meta:
+        index_together = [
+            ['category', 'controversy'],
+            ['category', 'nb_ratings'],
+        ]
+
+    objects = WorkQuerySet.as_manager()
+
+    def safe_poster(self, user):
+        if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
+            return self.poster
+        return '/static/img/nsfw.jpg'
 
     def __str__(self):
         return self.title
