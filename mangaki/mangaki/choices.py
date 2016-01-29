@@ -38,14 +38,3 @@ TOP_CATEGORY_CHOICES = (
     ("authors", "Auteurs"),
     ("composers", "Compositeurs"),
 )
-
-WORK_CATEGORY_CHOICES = (
-    (0, "Anime"),
-    (1, "Manga"),
-    (2, "Album"),
-)
-
-WORK_CATEGORY_OF_ID = ['anime', 'manga', 'album']
-ID_OF_WORK_CATEGORY = {
-    v: i for i, v in enumerate(WORK_CATEGORY_OF_ID)
-}
