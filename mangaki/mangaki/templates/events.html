@@ -5,53 +5,22 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://mangaki.fr/events/" />
 <meta property="og:image" content="{{ utamonogatari.poster }}" />
-<meta property="og:description" content="Concours Mangaki &amp; Wakanim ! Deux albums Utamonogatari à gagner ! Pour participer, RT ou venez à l'AVP vendredi au Grand Rex !" />
-<meta name="description" content="Concours Mangaki &amp; Wakanim ! Deux albums Utamonogatari à gagner ! Pour participer, RT ou venez à l'AVP vendredi au Grand Rex !" />
+<meta property="og:description" content="Concours Mangaki &amp; Wakanim ! Les gagnants sont @KyouyuuSuru et @Aldherrian et remportent un album Utamonogatari, bravo à eux!" />
+<meta name="description" content="Concours Mangaki &amp; Wakanim ! Les gagnants sont @KyouyuuSuru et @Aldherrian et remportent un album Utamonogatari, bravo à eux!" />
 {% endblock %}
 
 {% block body %}
 <div id="events">
-    <h1 id="concours-kizumonogatari-lien-en-partenariat-avec-wakanim">Concours <a href="{% url 'anime-detail' kizumonogatari.id %}">Kizumonogatari</a> en partenariat avec <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}">Wakanim</a></h1>
-    <h2 id="deux-albums-utamonogatari-lien-à-gagner">Deux albums <a href="{% url 'album-detail' utamonogatari.id %}">Utamonogatari</a> à gagner !</h2>
+    <h1 id="concours-kizumonogatari-lien-en-partenariat-avec-wakanim">Concours Kizumonogatari en partenariat avec <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}">Wakanim</a></h1>
+    <h2 id="deux-albums-utamonogatari-lien-à-gagner">Deux albums Utamonogatari à gagner !</h2>
 
     <div class="container">
       <div class="row">
         <div class="col-lg-6 col-md-4 col-sm-12 col-xs-12">
           <p>À l'occasion de l'avant-première de Kizumonogatari le <strong>vendredi 29 janvier 2015 à 21 h</strong> au <a href="http://legrandrex.cotecine.fr/film/111684/" target="_blank">Grand Rex</a>, <img style="margin-bottom: 4px;" height="20" src="/static/img/minilogo.png"> et <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}"><img height="20" src="/static/img/sponsors/small/{{ wakanim.image }}" alt="{{ wakanim.name }}" /></a> vous font gagner deux OST de la série.</p>
-          <p><strong>Pour participer au tirage au sort</strong>, plusieurs possibilités s'offrent à vous :</p>
-          <ul class="checklist">
-            <li><span class="glyphicon glyphicon-chevron-right list-icon"></span>RT le tweet ci-dessous et suivez <a href="https://twitter.com/MangakiFR" target="_blank">@MangakiFR</a> sur Twitter</li>
-
-            <li><span class="glyphicon glyphicon-chevron-right list-icon"></span> Partagez <a href="http://fb.me/mangakifr" target="_blank">le post Facebook sur le concours</a></li>
-
-            <li>
-              {% if utamonogatari_rating == 'willsee' %}
-              <span class="glyphicon glyphicon-ok list-icon list-icon-ok"></span>
-              {% else %}
-              <span class="glyphicon glyphicon-chevron-right list-icon"></span>
-              {% endif %}
-              Ajoutez <a href="{% url 'album-detail' utamonogatari.id %}">Utamonogatari</a> à vos <a href="{% url 'album-detail' utamonogatari.id %}"><span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux écouter</span></a></li>
-
-            <li>
-              {% if kizu_ap.attending == True %}
-              <span class="glyphicon glyphicon-ok list-icon list-icon-ok"></span>
-              {% else %}
-              <span class="glyphicon glyphicon-chevron-right list-icon"></span>
-              {% endif %}
-              Venez à l&#39;avant-première de <a href="{% url 'anime-detail' kizumonogatari.id %}">Kizumonogatari</a>.
-              <form style="display: inline-block;" method="post" action="{% url 'event-detail' kizu_ap.id %}?next={{ request.get_full_path|urlencode }}">
-                {% csrf_token %}
-                <button type="submit"
-                        name="{% if kizu_ap.attending == True %}cancel{% else %}willgo{% endif %}"
-                        style="height: 20px;"
-                        class="btn btn-success btn-xs
-                               {% if kizu_ap.attending != True %}not-chosen
-                               {% endif %}" title="J'y vais&nbsp;!">
-                  J'y vais&nbsp;!
-                </button>
-              </form>
-            </li>
-          </ul>
+          <p><strong>Le tirage au sort est terminé!</strong> Merci à tous d'avoir participé, voici les gagnants :</p>
+          <blockquote data-cards="hidden" class="twitter-tweet" lang="fr"><p lang="fr" dir="ltr">Et du coup le loot gagné grâce au concours <a href="https://twitter.com/MangakiFR">@MangakiFR</a>. Merci beaucoup à vous c&#39;est super cool ! &lt;3 <a href="https://t.co/382tVh7g9x">pic.twitter.com/382tVh7g9x</a></p>&mdash; KyouyuuSuru (@KyouyuuSuru) <a href="https://twitter.com/KyouyuuSuru/status/693206533207953409">29 Janvier 2016</a></blockquote>
+          <a href="mailto:vie@jill-jenn.net" target="_blank" class="btn btn-primary">Nous contacter</a>
           <a href="mailto:vie@jill-jenn.net" target="_blank" class="btn btn-primary">Nous contacter</a>
           <a href="http://meta.mangaki.fr/t/avant-premiere-concours-kizumonogatari-au-grand-rex/645?u=jj" target="_blank" class="btn btn-primary">En discuter sur le forum</a>
 
