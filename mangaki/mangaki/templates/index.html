@@ -5,11 +5,9 @@
 
 {% get_providers as socialaccount_providers %}
 
-<div class="row" style="text-align: center">
+<div class="row featured text-center">
     <h1>Mangaki, la recommandation d'anime et manga.</h1>
-    <h3 style="margin-bottom: 1em">Nourrissez Mangaki avec des anime, il vous en suggérera d'autres !</h3>
-</div>
-<div class="row">
+    <h3 style="margin-bottom: 1em">Notez vos séries favorites, on vous en fera découvrir d'autres !</h3>
 {% if not user.is_authenticated %}
     <div class="col-md-4 col-sm-12 text-center margin">
         <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a>
@@ -34,22 +32,13 @@
     </div>
 {% endif %}
 </div>
-<div class="row">
+<div class="row featured">
     <div class="col-md-6 col-sm-12">
         <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; text-align: center;">
-          Participez au <a href="/events/">jeu-concours</a> Kizumonogatari pour remporter un album Utamonogatari&nbsp;!
+          <a href="/events/#fauvettes">Studio Ghibli Party</a> aux Fauvettes à Paris !
         </h2>
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
-          <div class="work-sheet data" data-category="anime" data-id="{{ kizumonogatari.id }}">
-            {% include "work_rating.html" with category="anime" work=kizumonogatari rating=kizumonogatari_rating show_title=True %}
-          </div>
-        </div>
-
-        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 manga-sheet text-center">
-          <div class="work-sheet data" data-category="album" data-id="{{ utamonogatari.id }}">
-            {% include "work_rating.html" with category="album" work=utamonogatari rating=utamonogatari_rating show_title=True  %}
-          </div>
-        </div>
+        <h3 style="text-align: center"><a href="/events/#fauvettes">12 films</a> proposés jusqu'à mardi 2 février.</h3>
+        <a href="/events/#fauvettes"><img src="/static/img/ghibli.jpg" style="max-width: 100%" /></a>
     </div>
     <div class="col-md-6 col-sm-12">
         <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; margin-bottom: 1em; text-align: center;">
