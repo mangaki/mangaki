@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from django.conf import global_settings
-from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DEBUG, SITE_ID, DATABASES
+from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DEBUG, SITE_ID, DATABASES, GOOGLE_ANALYTICS_ID
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount.providers.facebook',
     'bootstrapform',
     'debug_toolbar',
+    'analytical',
     # 'django_extensions'
 )
 
@@ -109,6 +110,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = '/srv/http/mangaki/static/'
+
+# Analitycal
+
+GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 
 # Discourse
 

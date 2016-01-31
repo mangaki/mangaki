@@ -12,3 +12,4 @@ PyYAML
 beautifulsoup4
 lxml
 natsort
+django-analytical
