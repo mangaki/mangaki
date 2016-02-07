@@ -7,6 +7,12 @@ from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
+class Category(models.Model):
+    slug = models.CharField(max_length=10, db_index=True)
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
@@ -15,9 +21,22 @@ class Work(models.Model):
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
+    category = models.ForeignKey('Category', blank=True, null=False)
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if isinstance(self, Anime):
+                self.category = Category.objects.get(slug='anime')
+            elif isinstance(self, Manga):
+                self.category = Category.objects.get(slug='manga')
+            elif isinstance(self, Album):
+                self.category = Category.objects.get(slug='album')
+            else:
+                raise TypeError('Unexpected subclass of work: {}'.format(type(self)))
+        super().save(*args, **kwargs)
 
 
 class Editor(models.Model):
