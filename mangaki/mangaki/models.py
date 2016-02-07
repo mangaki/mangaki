@@ -10,13 +10,6 @@ from mangaki.api import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 
-class Category(models.Model):
-    slug = models.CharField(max_length=10, db_index=True)
-    name = models.CharField(max_length=128)
-
-    def __str__(self):
-        return self.name
-
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
     # change the formulaes without issuing the appropriate migrations.
@@ -36,6 +29,13 @@ class WorkQuerySet(models.QuerySet):
             nb_ratings__gte=RANDOM_MIN_RATINGS,
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
+
+class Category(models.Model):
+    slug = models.CharField(max_length=10, db_index=True)
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
 
 class Work(models.Model):
     title = models.CharField(max_length=128)

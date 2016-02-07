@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block opengraph %}{% endblock %}
+    {% block twittercard %}{% endblock %}
     <title>{% block title %}Mangaki{% endblock %}</title>
     <link rel="icon" href="/static/img/favicon.png">
     <link rel="apple-touch-icon" href="/static/img/touch-icon-iphone.png">
@@ -64,18 +65,8 @@
                         </li>
                     {% if user.is_authenticated %}
                         <li class="dropdown">
-                            <a href="/u/{{ user.username }}">
-                                Mon profil
-                            </a>
-                        </li>
-                        <li class="dropdown">
                             <a href="/reco/">
                                 Recommandations
-                            </a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="/users/">
-                                Utilisateurs
                             </a>
                         </li>
                         <li class="dropdown">
@@ -86,7 +77,7 @@
                     {% endif %}
                         <li class="dropdown">
                             <a href="/events/">
-                                Calendrier
+                                Événements
                             </a>
                         </li>
                         <li class="dropdown">
@@ -124,6 +115,7 @@
                     <li><a href="/cgu/"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
                     <li><a href="https://twitter.com/mangakifr" target="_blank">@mangakifr</a></li>
                     <li><a href="mailto:jjv@lri.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Contact : jjv@lri.fr</a></li>
+                    <li><a href="https://github.com/mangaki/mangaki/issues" target="_blank"><span class="glyphicon glyphicon-fire"></span>&nbsp;Signaler un bug</a></li>
                 </ul>
             </div>
         </nav>

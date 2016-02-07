@@ -1,6 +1,32 @@
 {% extends "base.html" %}
 {% load bootstrap %}
 
+{% block opengraph %}
+<meta property="og:title" content="{{ object.title }} - Mangaki" />
+<meta property="og:type" content="video.movie" />
+<meta property="og:url" content="http://mangaki.fr{% url "anime-detail" object.id %}" />
+{% if object.poster %}
+  <meta property="og:image" content="{{ object.poster }}" />
+{% endif %}
+{% if object.synopsis %}
+  <meta property="og:description" content="{{ object.synopsis }}" />
+  <meta name="description" content="{{ object.synopsis }}" />
+{% endif %}
+{% endblock %}
+
+{% block twittercard %}
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@mangakifr" />
+<meta name="twitter:title" content="{{ object.title }} - Mangaki" />
+{% if object.synopsis %}
+  <meta name="twitter:description" content="{{ object.synopsis }}" />
+{% endif %}
+{% if object.poster %}
+  <meta name="twitter:image" content="{{ object.poster }}" />
+{% endif %}
+{% endblock %}
+
+
 {% block body %}
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 <div class="row">

@@ -131,10 +131,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
-                if Rating.objects.filter(user=self.request.user, work=anime, choice='favorite').count() > 0:
-                    context['rating'] = 'favorite'
-                else:
-                    context['rating'] = anime.rating_set.get(user=self.request.user).choice
+                context['rating'] = anime.rating_set.get(user=self.request.user).choice
             except Rating.DoesNotExist:
                 pass
 
@@ -217,10 +214,7 @@ class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
-                if Rating.objects.filter(user=self.request.user, work=self.object, choice='favorite').count() > 0:
-                    context['rating'] = 'favorite'
-                else:
-                    context['rating'] = self.object.rating_set.get(user=self.request.user).choice
+                context['rating'] = self.object.rating_set.get(user=self.request.user).choice
             except Rating.DoesNotExist:
                 pass
         return context
@@ -257,10 +251,7 @@ class AlbumDetail(AjaxableResponseMixin, FormMixin, DetailView):
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
-                if Rating.objects.filter(user=self.request.user, work=self.object, choice='favorite').count() > 0:
-                    context['rating'] = 'favorite'
-                else:
-                    context['rating'] = self.object.rating_set.get(user=self.request.user).choice
+                context['rating'] = self.object.rating_set.get(user=self.request.user).choice
             except Rating.DoesNotExist:
                 pass
         return context

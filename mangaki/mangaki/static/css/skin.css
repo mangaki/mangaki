@@ -35,6 +35,11 @@ body > .container {
 
 }
 
+.featured {
+    padding-top: 2em;
+    padding-bottom: 2em;
+}
+
 .well {
   min-height: 20px;
   padding: 19px;
