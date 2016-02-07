@@ -4,7 +4,6 @@ function loadMenu() {
   pieces = new Bloodhound({
     datumTokenizer: function(d) { return Bloodhound.tokenizers.whitespace(d.title); },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    prefetch: '/data/' + category + '.json',
     remote: '/data/' + category + '.json?q=%QUERY'
   });
 
