@@ -766,30 +766,17 @@ class MarkdownView(DetailView):
         return {'html': markdown(page.markdown)}
 
 
-def get_works(request, category, query=''):
-    if category == 'anime':
-        data = []
-        for anime in Anime.objects.all() if not query else Anime.objects.filter(title__icontains=query):
-            data.append({'id': anime.id, 'description': anime.synopsis[:50] + '…', 'value': anime.title, 'tokens': anime.title.lower().split(), 'year': '' if not anime.date else anime.date.year})
-        return HttpResponse(json.dumps(data), content_type='application/json')
-    else:
-        data = []
-        for manga in Manga.objects.all() if not query else Manga.objects.filter(title__icontains=query):
-            data.append({'id': manga.id, 'description': manga.synopsis[:50] + '…', 'value': manga.title, 'tokens': manga.title.lower().split(), 'year': '' if not manga.date else manga.date.year})
-        return HttpResponse(json.dumps(data), content_type='application/json')
-    return HttpResponse()
-
-
-def get_extra_anime(request, query):
-    entries = lookup_mal_api(query)
-    retrieve_anime(entries)
-    return get_works(request, 'anime', query)
-
-
-def get_extra_manga(request, query):
-    SearchIssue(user=request.user, title=query).save()
-    return HttpResponse()
-
+def get_works(request, category):
+    query = request.GET.get('q', '')
+    data = [
+        {
+            'id': work.id,
+            'synopsis': work.synopsis[:50] + '…',
+            'title': work.title,
+            'year': '' if not work.date else work.date.year,
+        } for work in Work.objects.filter(category__slug=category, title__icontains=query).popular()[:10]
+    ]
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 def get_reco_list(request, category, editor):
     reco_list = []
