@@ -34,14 +34,24 @@ INSTALLED_APPS = (
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.twitter',
-    'allauth.socialaccount.providers.facebook',
     'bootstrapform',
-    'debug_toolbar',
     'analytical',
     # 'django_extensions'
 )
+
+# FIXME: This is not really the semantics that we want. We want a
+# development/production split, which is *not* the same as debug/nondebug, but
+# this will do for now.
+if DEBUG:
+    INSTALLED_APPS += (
+        'debug_toolbar',
+    )
+else:
+    INSTALLED_APPS += (
+        'allauth.socialaccount.providers.google',
+        'allauth.socialaccount.providers.twitter',
+        'allauth.socialaccount.providers.facebook',
+    )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
