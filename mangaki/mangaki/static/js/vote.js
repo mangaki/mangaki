@@ -64,21 +64,21 @@ function displayWork(pos, work) {
     }
     var selector = ':nth-child(' + pos + ')';
     var work_div = $('.manga-sheet' + selector + ' .data');
-    work_div.data('category', work['category']);
-    work_div.data('id', work['id']);
-    work_div.find('.work-snapshot-title h4').text(work['title']);
-    work_div.find('.work-synopsis').text(work['synopsis']);
+    work_div.data('category', work.category);
+    work_div.data('id', work.id);
+    work_div.find('.work-snapshot-title h4').text(work.title);
+    work_div.find('.work-synopsis').text(work.synopsis);
     $('[data-toggle="tooltip"]').tooltip('fixTitle');
     work_div.find('a.work-snapshot').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
     work_div.fadeOut().promise().done(function () {
             work_div.find('.work-votes').promise().done(function () {
                 work_div.find('.work-votes').show();
-                work_div.find('.work-snapshot-image img').attr('src', work['poster']);
+                work_div.find('.work-snapshot-image img').attr('src', work.poster).attr('alt', work.title);
                 work_div.fadeIn();
         });
     });
     if(display_votes) {
-        if(work['rating'] === 'willsee')
+        if(work.rating === 'willsee')
             work_div.find('.work-votes a[data-choice!=willsee]').addClass('not-chosen');
     } else
         work_div.find('.work-votes').fadeOut();

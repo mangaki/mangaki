@@ -53,7 +53,11 @@ SET
     nb_likes = nb.likes,
     nb_dislikes = nb.dislikes,
     sum_ratings = 5.*nb.favorites+2.5*nb.likes-2.*nb.dislikes-0.1*nb.neutrals+0.5*nb.willsees-0.5*nb.wontsees,
-    nb_ratings = nb.favorites + nb.likes + nb.dislikes + nb.neutrals
+    nb_ratings = nb.favorites + nb.likes + nb.dislikes + nb.neutrals,
+    controversy = CASE
+        WHEN nb.likes = 0 OR nb.dislikes = 0 THEN 0
+        ELSE (nb.likes + nb.dislikes)::float ^ LEAST(nb.likes::float / nb.dislikes::float, nb.dislikes::float / nb.likes::float)
+    END
 FROM nb WHERE nb.work_id = mangaki_work.id;
 """,
              "CREATE INDEX mangaki_work_random ON mangaki_work (category_id) WHERE nb_dislikes <= 17 AND nb_likes >= ((nb_dislikes * 3.0)) AND nb_ratings >= 28;",
