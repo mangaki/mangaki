@@ -59,9 +59,7 @@ RATING_COLORS = {
     'wontsee': {'normal': '#5bc0de', 'highlight': '#31b0d5'}
 }
 
-KIZU_ID = 13679
 UTA_ID = 14293
-KIZU_AP_ID = 9
 
 GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
 
@@ -584,20 +582,8 @@ def index(request):
     # texte = Announcement.objects.get(title='Flash News').text
     # context = {'annonce': texte}
     partners = Partner.objects.filter()
-    kizu_rating = None
-    uta_rating = None
-    if request.user.is_authenticated():
-        for rating in Rating.objects.filter(work_id__in=[KIZU_ID, UTA_ID], user=request.user):
-            if rating.work_id == KIZU_ID:
-                kizu_rating = rating.choice
-            elif rating.work_id == UTA_ID:
-                uta_rating = rating.choice
     return render(request, 'index.html', {
         'partners': partners,
-        'kizumonogatari': Anime.objects.get(pk=KIZU_ID),
-        'utamonogatari': Album.objects.get(pk=UTA_ID),
-        'kizumonogatari_rating': kizu_rating,
-        'utamonogatari_rating': uta_rating,
     })
 
 
@@ -606,36 +592,25 @@ def about(request):
 
 
 def events(request):
-    kizu_rating = None
     uta_rating = None
-    ap_attending = None
     if request.user.is_authenticated():
-        for rating in Rating.objects.filter(work_id__in=[KIZU_ID, UTA_ID], user=request.user):
-            if rating.work_id == KIZU_ID:
-                kizu_rating = rating.choice
-            elif rating.work_id == UTA_ID:
+        for rating in Rating.objects.filter(work_id=UTA_ID, user=request.user):
+            if rating.work_id == UTA_ID:
                 uta_rating = rating.choice
-        for attendee in Attendee.objects.filter(event_id=KIZU_AP_ID, user=request.user):
-            ap_attending = attendee.attending
     ghibli_works = Anime.objects.in_bulk(GHIBLI_IDS)
     if request.user.is_authenticated():
         ghibli_ratings = dict(Rating.objects.filter(user=request.user, work_id__in=GHIBLI_IDS).values_list('work_id', 'choice'))
     else:
         ghibli_ratings = {}
+    utamonogatari = Work.objects.in_bulk([UTA_ID])
     return render(
         request, 'events.html',
         {
             'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
-            'ghibli': [(ghibli_works[work_id], ghibli_ratings.get(work_id)) for work_id in GHIBLI_IDS],
-            'kizumonogatari': Anime.objects.get(pk=KIZU_ID),
-            'utamonogatari': Album.objects.get(pk=UTA_ID),
+            'ghibli': [(ghibli_works.get(work_id, None), ghibli_ratings.get(work_id, None)) for work_id in GHIBLI_IDS],
+            'utamonogatari': utamonogatari.get(UTA_ID, None),
             'wakanim': Partner.objects.get(pk=12),
-            'kizumonogatari_rating': kizu_rating,
             'utamonogatari_rating': uta_rating,
-            'kizu_ap': {
-                'id': KIZU_AP_ID,
-                'attending': ap_attending,
-            },
         })
 
 def top(request, category_slug):
