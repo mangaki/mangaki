@@ -2,10 +2,9 @@ var pieces;
 
 function loadMenu() {
   pieces = new Bloodhound({
-    datumTokenizer: function(d) { return d.tokens; },
+    datumTokenizer: function(d) { return Bloodhound.tokenizers.whitespace(d.title); },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    prefetch: '/data/' + category + '.json',
-    remote: '/data/' + category + '/%QUERY.json'
+    remote: '/data/' + category + '.json?q=%QUERY'
   });
 
   pieces.initialize();
@@ -16,8 +15,8 @@ function loadMenu() {
     templates: {
       suggestion: Handlebars.compile([
         '<p class="repo-language">{{year}}</p>',
-        '<p class="repo-name">{{value}}</p>',
-        '<p class="repo-description">{{description}}</p>'
+        '<p class="repo-name">{{title}}</p>',
+        '<p class="repo-description">{{synopsis}}</p>'
       ].join(''))
     }
   });

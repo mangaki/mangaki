@@ -11,8 +11,6 @@ urlpatterns = [
 
     url(r'^$', views.index),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works),
-    url(r'^data/anime/(?P<query>.+)\.json$', views.get_extra_anime),
-    url(r'^data/manga/(?P<query>.+)\.json$', views.get_extra_manga),
     url(r'^data/reco/(?P<category>\w+)/(?P<editor>\w+)\.json$', views.get_reco_list),
     url(r'^data/card/(?P<category>\w+)/(?P<sort_id>\d+)\.json$', views.get_card),
     url(r'^getuser/(?P<work_id>\w+)\.json$', views.get_user_for_recommendations),
