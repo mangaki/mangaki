@@ -37,7 +37,9 @@ Lancer le serveur
     cd mangaki
     cp secret_template.py secret.py  # À modifier, notamment le mot de passe d'accès à la base de données
     ./manage.py migrate
-    ./manage.py loaddata ../fixtures/seed_data.json
+    ./manage.py loaddata ../fixtures/{partners,ghibli,kizu,seed_data}.json
+    ./manage.py ranking # Compute cached ranking information. This should be done regularly.
+    ./manage.py top director # Store data for the Top20 page. This should be done regularly.
     ./manage.py runserver
 
 Afficher les notebooks
