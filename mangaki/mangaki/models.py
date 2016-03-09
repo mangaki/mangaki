@@ -309,12 +309,6 @@ class Pairing(models.Model):
     is_checked = models.BooleanField(default=False)
 
 
-class Deck(models.Model):
-    category = models.CharField(max_length=32)
-    sort_mode = models.CharField(max_length=32)
-    content = models.CommaSeparatedIntegerField(max_length=42000)
-
-
 class Reference(models.Model):
     work = models.ForeignKey('Work')
     url = models.CharField(max_length=512)

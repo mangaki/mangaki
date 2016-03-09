@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1>{{ artist }}</h1>
+<hr />
+
+{% include "works.html" with works=object_list only %}
+
+{% if user.is_authenticated %}
+Signaler une œuvre manquante pour {{ artist }} ?
+<form class="typeahead-demo {{ category }}">
+  <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime…" />
+</form>
+{% endif %}
+
+{% include "pagination.html" %}
+
+<br />
+<br />
+<br />
+<script>
+  category = 'anime';
+  artistID = {{ artist.id }};
+  loadMenu();
+</script>
+{% endblock %}
