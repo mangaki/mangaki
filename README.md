@@ -81,7 +81,13 @@ Si vous vous inscrivez, vous obtiendrez une erreur « Connection refused ». C
 
     # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-Ainsi, les mails seront affichés dans la console.
+Ainsi, les mails seront affichés dans la console (vous avez aussi [d'autres moyens](https://docs.djangoproject.com/es/1.9/topics/email/#console-backend) d'afficher les mails).
+
+Si vous obtenez des erreurs 400 lorsque vous mettez Mangaki en production (c'est-à-dire que `DEBUG = False`), faites bien attention à modifier les `ALLOWED_HOSTS` qui se trouvent dans `mangaki/settings.py` afin d'autoriser votre [FQDN](https://fr.wikipedia.org/wiki/Fully_qualified_domain_name) dedans.
+
+Pour une mise en production, veillez à faire `./manage.py collectstatic` afin d'obtenir les assets: il est possible de changer le repertoire dans `mangaki/settings.py` (la variable `STATIC_ROOT`).
+
+Mangaki a été testé et fonctionne parfaitement avec NGINX et Gunicorn.
 
 Nous contacter
 --------------
