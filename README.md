@@ -16,6 +16,8 @@ Prérequis
 - Python 3.4
 - virtualenv
 - PostgreSQL ≥ 9.3 (9.4.2 étant mieux)
+* `python3-lxml` (autrement, vous pouvez [l'installer par pip](http://stackoverflow.com/questions/6504810/how-to-install-lxml-on-ubuntu) aussi)
+* `python3-sqlparse` pour la Debug Toolbar (**inutile** en production).
 
 Si vous n'avez jamais fait de Django, je vous renvoie vers [leur super tutoriel](https://docs.djangoproject.com/en/1.8/intro/tutorial01/).
 
