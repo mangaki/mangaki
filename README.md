@@ -84,4 +84,4 @@ Ainsi, les mails seront affichés dans la console.
 Nous contacter
 --------------
 
-En cas de pépin, [créez un ticket](https://bitbucket.org/mangaki/mangaki/issues) ou contactez-moi à vie@jill-jenn.net.
+En cas de pépin, [créez un ticket](https://github.com/mangaki/mangaki/issues) ou contactez-moi à vie@jill-jenn.net.
