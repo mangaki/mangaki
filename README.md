@@ -58,7 +58,7 @@ Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lan
 Installation facile (Vagrant)
 -----------------------------
 
-Vous devez installer [Vagrant](https://www.vagrantup.com/downloads.html), puis installer les dépendences de rôles avec [ansible-galaxy](http://docs.ansible.com/ansible/galaxy.html):
+Vous devez installer [Vagrant](https://www.vagrantup.com/downloads.html), puis installer les dépendances de rôles avec [ansible-galaxy](http://docs.ansible.com/ansible/galaxy.html):
 
     vagrant up
     vagrant ssh
@@ -69,7 +69,7 @@ Vous devez installer [Vagrant](https://www.vagrantup.com/downloads.html), puis i
 
 Votre machine virtuelle tourne sous Trusty64, le repo est monté via un shared folder sur `/mnt/mangaki`.
 Il y a un virtualenv dans `/mnt/mangaki/.venv`, et le serveur devrait être lancé sur `0.0.0.0:8000`.
-Enfin, vous pouvez contacter votre version locale de Mangaki à travers `192.168.42.10:8000` et `127.0.0.1:8080` (port forwaded).
+Enfin, vous pouvez contacter votre version locale de Mangaki à travers `192.168.42.10:8000` et `127.0.0.1:8080` (port forwarded).
 
 
 Remarques utiles
