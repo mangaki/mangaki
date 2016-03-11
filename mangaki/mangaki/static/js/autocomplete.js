@@ -66,7 +66,7 @@ function loadMenuUser() {
 
 $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
-    if (!selection.description) {
+    if (!selection.synopsis) {
     	if (!selection.work_id)
         location.href = '/u/' + selection.username ;
       else {
@@ -98,7 +98,7 @@ $(document).ready(function() {
       location.href = '/' + category + '/' + selection.id;
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
-    if (!selection.description) {
+    if (!selection.synopsis) {
      if (!selection.work_id) { location.href = '/u/' + selection.username ; }
      else {
       $.post('/recommend/'+ selection.work_id +'/'+ selection.id,  function(status) {
