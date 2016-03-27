@@ -1,16 +1,17 @@
 from django.core.management.base import BaseCommand, CommandError
-from sklearn.metrics import mean_squared_error
 from sklearn import cross_validation
-from mangaki.models import Rating, Work
+from sklearn.metrics import mean_squared_error
+from sklearn.cross_validation import train_test_split
 from mangaki.utils.svd import MangakiSVD
+from mangaki.utils.pca import MangakiPCA
 from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.values import rating_values
 import numpy as np
-import matplotlib.pyplot as plt
+import random
+import pandas
+# import matplotlib.pyplot as plt
 
-PIG = 1
-TRAIN_PIG_LENGTH = 10
-
+TEST_SIZE = 50000
 
 class Experiment(object):
     X = None
@@ -20,13 +21,11 @@ class Experiment(object):
     y_pred = None
     results = {}
     algos = None
-    def __init__(self, PIG):
-        for TRAIN_PIG_LENGTH in range(10, 150, 20):
-            print(TRAIN_PIG_LENGTH)
-            self.algos = [MangakiSVD(), MangakiKNN(), MangakiKNN(30), MangakiKNN(45)]
-            self.results.setdefault('x_axis', []).append(TRAIN_PIG_LENGTH)
-            self.make_dataset(TRAIN_PIG_LENGTH)
-            self.execute()
+    def __init__(self, PIG_ID=None):
+        self.algos = [MangakiSVD(20), MangakiPCA(20), MangakiKNN(20)]
+        # self.results.setdefault('x_axis', []).append()
+        self.make_dataset(PIG_ID)
+        self.execute()
 
     def clean_dataset(self):
         self.X = []
@@ -35,22 +34,37 @@ class Experiment(object):
         self.y_test = []
         self.y_pred = []
 
-    def make_dataset(self, TRAIN_PIG_LENGTH):
+    def make_dataset(self, PIG_ID):
         self.clean_dataset()
-        c = 0
-        for user_id, work_id, choice in Rating.objects.values_list('user_id', 'work_id', 'choice').order_by('work_id'):
-            if user_id != PIG or c <= TRAIN_PIG_LENGTH:
-                self.X.append((user_id, work_id))
-                self.y.append(rating_values[choice])
-                if user_id == PIG:
-                    c += 1
-            elif choice not in ['willsee', 'wontsee']:
-                self.X_test.append((user_id, work_id))
-                self.y_test.append(rating_values[choice])
+        ratings = pandas.read_csv('data/ratings.csv', header=None).as_matrix()
+        if PIG_ID:  # Let's focus on the PIG
+            pig_ratings = {}
+            for user_id, work_id, choice in ratings:
+                if user_id == PIG_ID:
+                    pig_ratings[work_id] = rating_values[choice]
+        self.nb_users = max(ratings[:, 0]) + 1
+        self.nb_works = max(ratings[:, 1]) + 1
+        self.works = pandas.read_csv('data/works.csv', header=None).as_matrix()[:, 1]
+        train, test = train_test_split(ratings, random_state=0, test_size=TEST_SIZE)
+        if PIG_ID:
+            train = ratings
+        self.X = train[:, 0:2]
+        self.y = list(map(lambda choice: rating_values[choice], train[:, 2]))
+        self.X_test = test[:, 0:2]
+        self.y_test = list(map(lambda choice: rating_values[choice], test[:, 2]))
+        if PIG_ID:
+            self.X_test = []
+            self.y_test = []
+            for work_id in range(self.nb_works):
+                self.X_test.append((PIG_ID, work_id))
+                self.y_test.append(0 if work_id not in pig_ratings else pig_ratings[work_id])
+            self.X_test = np.asarray(self.X_test)
+            self.y_test = np.asarray(self.y_test)
 
     def execute(self):
-        for algo in self.algos:#[MangakiSVD(), MangakiKNN(), MangakiKNN(30), MangakiKNN(42)]:
+        for algo in self.algos:
             print(algo)
+            algo.set_parameters(self.nb_users, self.nb_works)
             # algo.load('backup.pickle')
             algo.fit(self.X, self.y)
             # algo.save('backup.pickle')
@@ -60,13 +74,13 @@ class Experiment(object):
             self.results.setdefault(algo.get_shortname(), []).append(rmse)
 
     def display_ranking(self):
-        work_titles = {}
-        for work_id, work_title in Work.objects.values_list('id', 'title'):
-            work_titles[work_id] = work_title
-
         for rank, i in enumerate(sorted(range(len(self.X_test)), key=lambda i: -self.y_pred[i]), start=1):
-            _, work_id = self.X_test[i]
-            print('%d. %s %f (was: %f)' % (rank, work_titles[work_id], self.y_pred[i], self.y_test[i]))
+            if rank <= 100 or rank >= 8338:
+                _, work_id = self.X_test[i]
+                if self.y_test[i]:
+                    print('%d. %s %f (was: %f)' % (rank, self.works[work_id], self.y_pred[i], self.y_test[i]))
+                else:
+                    print('%d. %s %f' % (rank, self.works[work_id], self.y_pred[i]))
 
     def display_chart(self):
         handles = []
@@ -83,6 +97,6 @@ class Command(BaseCommand):
     help = 'Compare recommendation algorithms'
 
     def handle(self, *args, **options):
-        experiment = Experiment(1)
-        # experiment.display_ranking()
-        experiment.display_chart()
+        experiment = Experiment()
+        # experiment.display_ranking()
+        # experiment.display_chart()

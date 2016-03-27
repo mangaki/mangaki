@@ -10,8 +10,8 @@ import pickle
 import json
 import math
 
-NB_COMPONENTS = 10
 TOP = 10
+
 
 class MangakiSVD(object):
     M = None
@@ -22,7 +22,9 @@ class MangakiSVD(object):
     inv_work = None
     inv_user = None
     work_titles = None
-    def __init__(self):
+    def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10):
+        self.NB_COMPONENTS = NB_COMPONENTS
+        self.NB_ITERATIONS = NB_ITERATIONS
         self.chrono = Chrono(True)
 
     def save(self, filename):
@@ -40,47 +42,38 @@ class MangakiSVD(object):
         self.inv_user = backup.inv_user
         self.work_titles = backup.work_titles
 
+    def set_parameters(self, nb_users, nb_works):
+        self.nb_users = nb_users
+        self.nb_works = nb_works
+
+    def make_matrix(self, X, y):
+        matrix = np.zeros((self.nb_users, self.nb_works), dtype=np.float64)
+        for (user, work), rating in zip(X, y):
+            matrix[user][work] = rating
+        means = np.zeros((self.nb_users,))
+        for i in range(self.nb_users):
+            means[i] = np.sum(matrix[i]) / np.sum(matrix[i] != 0)
+            if np.isnan(means[i]):
+                means[i] = 0
+            matrix[i][matrix[i] != 0] -= means[i]
+        return matrix, means
+
     def fit(self, X, y):
-        self.work_titles = {}
-        for work in Work.objects.values('id', 'title'):
-            self.work_titles[work['id']] = work['title']
-        
-        work_ids = list(Rating.objects.values_list('work_id', flat=True).distinct())
-        nb_works = len(work_ids)
-        self.inv_work = {work_ids[i]: i for i in range(nb_works)}
+        print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
+        matrix, self.means = self.make_matrix(X, y)
 
-        user_ids = list(User.objects.values_list('id', flat=True))
-        nb_users = len(user_ids)
-        self.inv_user = {user_ids[i]: i for i in range(nb_users)}
+        self.chrono.save('fill and center matrix')
 
-        self.chrono.save('get_work_ids')
-
-        # print("Computing M: (%i × %i)" % (nb_users, nb_works))
-        self.M = lil_matrix((nb_users, nb_works))
-        """ratings_of = {}
-        for (user_id, work_id), rating in zip(X, y):
-            ratings_of.setdefault(user_id, []).append(rating)"""
-        for (user_id, work_id), rating in zip(X, y):
-            self.M[self.inv_user[user_id], self.inv_work[work_id]] = rating #- np.mean(ratings_of[user_id])
-        # np.save('backupM', self.M)
-
-        self.chrono.save('fill matrix')
-
-        # Ranking computation
-        self.U, self.sigma, self.VT = randomized_svd(self.M, NB_COMPONENTS, n_iter=3, random_state=42)
-        # print('Formes', self.U.shape, self.sigma.shape, self.VT.shape)
+        self.U, self.sigma, self.VT = randomized_svd(matrix, self.NB_COMPONENTS, n_iter=self.NB_ITERATIONS, random_state=42)
+        print('Shapes', self.U.shape, self.sigma.shape, self.VT.shape)
+        self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
 
         self.save('backup.pickle')
 
         self.chrono.save('factor matrix')
 
     def predict(self, X):
-        y = []
-        for user_id, work_id in X:
-            i = self.inv_user[user_id]
-            j = self.inv_work[work_id]
-            y.append(self.U[i].dot(np.diag(self.sigma)).dot(self.VT.transpose()[j]))
-        return np.array(y)
+        return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
 
     def get_reco(self, username, sending=False):
         target_user = User.objects.get(username=username)
