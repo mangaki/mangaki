@@ -14,7 +14,7 @@
     {% endif %}
 </a>
 
-<div class="work-votes">
+<div class="work-votes"{% if not work.id %} style="display: none;"{%endif %}>
     <a data-choice='favorite' class="btn btn-favorite btn-block a{% if rating and rating != 'favorite' %} not-chosen{% endif %}" onclick="vote(this)" title="Mettre en favori" >
         <span class="glyphicon glyphicon-star"></span>
     </a>
