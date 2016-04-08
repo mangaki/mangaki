@@ -6,6 +6,7 @@ from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.pca import MangakiPCA
 from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.values import rating_values
+from collections import Counter
 import numpy as np
 import random
 import pandas
@@ -22,7 +23,7 @@ class Experiment(object):
     results = {}
     algos = None
     def __init__(self, PIG_ID=None):
-        self.algos = [MangakiSVD(20), MangakiPCA(20), MangakiKNN(20)]
+        self.algos = [MangakiSVD(20)]
         # self.results.setdefault('x_axis', []).append()
         self.make_dataset(PIG_ID)
         self.execute()
@@ -74,13 +75,20 @@ class Experiment(object):
             self.results.setdefault(algo.get_shortname(), []).append(rmse)
 
     def display_ranking(self):
+        error = Counter()
+        print(len(self.X_test))
         for rank, i in enumerate(sorted(range(len(self.X_test)), key=lambda i: -self.y_pred[i]), start=1):
-            if rank <= 100 or rank >= 8338:
+            if True or rank <= 100 or rank >= 8338 or self.X_test[i][1] == 491:
                 _, work_id = self.X_test[i]
                 if self.y_test[i]:
                     print('%d. %s %f (was: %f)' % (rank, self.works[work_id], self.y_pred[i], self.y_test[i]))
+                    error[(self.works[work_id], self.y_pred[i], self.y_test[i])] = mean_squared_error([self.y_pred[i]], [self.y_test[i]])
                 else:
                     print('%d. %s %f' % (rank, self.works[work_id], self.y_pred[i]))
+        print('Most deviated')
+        for (title, pred, true), _ in error.most_common(50):
+            if true < 0:
+                print(title, pred, true)
 
     def display_chart(self):
         handles = []
@@ -97,6 +105,6 @@ class Command(BaseCommand):
     help = 'Compare recommendation algorithms'
 
     def handle(self, *args, **options):
-        experiment = Experiment()
-        # experiment.display_ranking()
+        experiment = Experiment(1046)  # 1706
+        experiment.display_ranking()
         # experiment.display_chart()
