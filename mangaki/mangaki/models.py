@@ -26,6 +26,13 @@ class WorkQuerySet(models.QuerySet):
     def controversial(self):
         return self.order_by('-controversy')
 
+    def search(self, search_text):
+        return self.annotate(sim_score=Func(Func(F('title'), function='UNACCENT'), Value(unidecode(search_text)), function='SIMILARITY'))\
+                .annotate(unaccent_title=Func(F('title'), function='UNACCENT'))\
+                .filter(Q(unaccent_title__icontains=unidecode(search_text)) | Q(sim_score__gte=Func(function='SHOW_LIMIT'))).\
+                order_by('-sim_score')
+
+
     def random(self):
         return self.filter(
             nb_ratings__gte=RANDOM_MIN_RATINGS,
