@@ -12,6 +12,7 @@ work_fields = (
 )
 
 class WorkSerializer(serializers.HyperlinkedModelSerializer):
+    category = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Work
         fields = work_fields
