@@ -1,5 +1,4 @@
 from rest_framework import routers
-from .users import UserViewSet
 from .animes import AnimeViewSet
 from .categories import CategoryViewSet
 from .studios import StudioViewSet
@@ -8,7 +7,6 @@ from .genres import GenreViewSet
 from .artists import ArtistViewSet
 
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
 router.register(r'animes', AnimeViewSet)
 router.register(r'categories', CategoryViewSet)
 router.register(r'studios', StudioViewSet)
