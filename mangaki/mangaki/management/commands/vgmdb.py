@@ -3,38 +3,10 @@ from mangaki.utils.vgmdb import VGMdb
 from mangaki.models import Artist, Work
 from urllib.parse import urlparse, parse_qs
 
-def pick_among(contestants):
-    for i, artist in enumerate(contestants):
-        print('%d: %s' % (i, artist))
-    answer = int(input('Which one? '))
-    if answer < len(contestants):
-        return contestants[answer]
-
 def get_or_create_artist(name):
-    if ' ' in name:
-        parts = name.split()
-        if len(parts) == 2:
-            last, first = parts
-        else:
-            last, first = parts[-1], ' '.join(parts[:-1])  # Diana Wynne Jones
-    else:
-        last, first = name, ''
-    try:
-        contestants = []
-        if Artist.objects.filter(first_name=first, last_name=last).count():
-            contestants = Artist.objects.filter(first_name=first, last_name=last)
-            return Artist.objects.get(first_name=first, last_name=last)
-        elif first != '' and Artist.objects.filter(first_name=first).count():
-            contestants = Artist.objects.filter(first_name=first)
-        elif Artist.objects.filter(last_name=last).count():
-            contestants = Artist.objects.filter(last_name=last)
-    except:
-        pass
-    if contestants:
-        choice = pick_among(contestants)
-        if choice:
-            return choice
-    artist = Artist(first_name=first, last_name=last)
+    if Artist.objects.filter(name=name).count():
+        return Artist.objects.get(name=name)
+    artist = Artist(name=name)
     artist.save()
     return artist
 

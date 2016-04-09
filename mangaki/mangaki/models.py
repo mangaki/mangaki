@@ -181,11 +181,12 @@ class Album(Work):
         return '[{id}] {title}'.format(id=self.id, title=self.title)
 
 class Artist(models.Model):
-    first_name = models.CharField(max_length=32, blank=True, null=True)
-    last_name = models.CharField(max_length=32)
+    first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
+    last_name = models.CharField(max_length=32)  # No longer used
+    name = models.CharField(max_length=255)
 
     def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
+        return self.name
 
 
 class Rating(models.Model):
