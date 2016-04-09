@@ -1,21 +1,19 @@
 from rest_framework import serializers, viewsets
 from mangaki.models import Anime
 from .works import work_fields, WorkSerializer
+from .genres import GenreSerializer
+from .editors import EditorSerializer
 from .search import WorkSearchFilter
 
 class AnimeSerializer(WorkSerializer):
-    director = serializers.StringRelatedField(read_only=True)
-    composer = serializers.StringRelatedField(read_only=True)
-    studio = serializers.StringRelatedField(read_only=True)
-    author = serializers.StringRelatedField(read_only=True)
-    editor = serializers.StringRelatedField(read_only=True)
-    genre = serializers.StringRelatedField(read_only=True, many=True)
+    editor = EditorSerializer(read_only=True)
+    genres = GenreSerializer(read_only=True, many=True, source='genre')
 
     class Meta:
         model = Anime
-        fields = '__all__'
+        fields = work_fields + ('editor', 'genres', 'nb_episodes', 'origin', 'anidb_aid')
 
 class AnimeViewSet(viewsets.ModelViewSet):
-    queryset = Anime.objects.select_related('director', 'composer', 'studio', 'author', 'editor').prefetch_related('genre').order_by('work_ptr_id')
+    queryset = Anime.objects.select_related('category', 'editor').prefetch_related('genre', 'artists').order_by('work_ptr_id')
     serializer_class = AnimeSerializer
     filter_backends = (WorkSearchFilter,)
