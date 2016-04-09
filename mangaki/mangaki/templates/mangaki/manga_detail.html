@@ -40,8 +40,9 @@
     </div>
     <div class="col-sm-6 col-md-3">
         <p>Titre original : <em>{{ object.vo_title }}</em></p>
-        <p>Dessin : {{ object.mangaka }}</p>
-        <p>Scénario : {{ object.writer }}</p>
+        {% for staff in object.staff_set.all %}
+            <p>{{ staff.role.name }}&nbsp;: <a href="/artist/{{ staff.artist.id }}">{{ staff.artist }}</a></p>
+        {% endfor %}
         <p>Éditeur : {{ object.editor }}</p>
         <p>Origine : {{ object.origin }}</p>
         <p>Genres : {{ genres }}</p>

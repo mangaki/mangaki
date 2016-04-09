@@ -1,15 +1,20 @@
 # coding=utf8
-from mangaki.models import Anime, Manga, Genre, Track, Album, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking
+from mangaki.models import Anime, Manga, Genre, Track, Album, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
+from django.core.urlresolvers import reverse
 
+class StaffInline(admin.TabularInline):
+    model = Staff
+    fields = ('role', 'artist')
 
 class AnimeAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('nsfw',)
     actions = ['make_nsfw', 'make_sfw']
+    inlines = [StaffInline]
 
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
@@ -119,8 +124,10 @@ class PageAdmin(admin.ModelAdmin):
 class SuggestionAdmin(admin.ModelAdmin):
     list_display = ('work', 'problem', 'date', 'user', 'is_checked')
     list_filter = ('problem',)
-    readonly_fields = ('current_work_data',)
     actions = ['check_suggestions', 'uncheck_suggestions']
+
+    def view_on_site(self, obj):
+        return reverse('anime-detail', args=[obj.work_id])
 
     def check_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=True)
@@ -172,8 +179,10 @@ class PairingAdmin(admin.ModelAdmin):
 
     def make_director(self, request, queryset):
         rows_updated = 0
+        director = Role.objects.get(slug='director')
         for pairing in queryset:
-            if Anime.objects.filter(id=pairing.work.id).update(director=pairing.artist):
+            _, created = Staff.objects.get_or_create(work_id=pairing.work_id, artist_id=pairing.artist_id, role=director)
+            if created:
                 pairing.is_checked = True
                 pairing.save()
                 rows_updated += 1
@@ -186,8 +195,10 @@ class PairingAdmin(admin.ModelAdmin):
 
     def make_composer(self, request, queryset):
         rows_updated = 0
+        composer = Role.objects.get(slug='composer')
         for pairing in queryset:
-            if Anime.objects.filter(id=pairing.work.id).update(composer=pairing.artist):
+            _, created = Staff.objects.get_or_create(work_id=pairing.work_id, artist_id=pairing.artist_id, role=composer)
+            if created:
                 pairing.is_checked = True
                 pairing.save()
                 rows_updated += 1
@@ -200,8 +211,10 @@ class PairingAdmin(admin.ModelAdmin):
 
     def make_author(self, request, queryset):
         rows_updated = 0
+        author = Role.objects.get(slug='author')
         for pairing in queryset:
-            if Anime.objects.filter(id=pairing.work.id).update(author=pairing.artist):
+            _, created = Staff.objects.get_or_create(work_id=pairing.work_id, artist_id=pairing.artist_id, role=author)
+            if created:
                 pairing.is_checked = True
                 pairing.save()
                 rows_updated += 1
@@ -233,6 +246,10 @@ class TopAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+class RoleAdmin(admin.ModelAdmin):
+    model = Role
+    prepopulated_fields = {'slug': ('name',)}
+
 admin.site.register(Anime, AnimeAdmin)
 admin.site.register(Manga, MangaAdmin)
 admin.site.register(Genre, GenreAdmin)
@@ -250,3 +267,4 @@ admin.site.register(Pairing, PairingAdmin)
 admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(Top, TopAdmin)
 admin.site.register(Album, AlbumAdmin)
+admin.site.register(Role, RoleAdmin)

@@ -1,13 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.anidb import AniDB
-from mangaki.models import Anime, Artist
+from mangaki.models import Anime, Artist, Role, Staff
 from urllib.parse import urlparse, parse_qs
 import sys
 
-def pick_among(contestants):
+def pick_among(name, contestants):
     for i, artist in enumerate(contestants):
         print('%d: %s' % (i, artist))
-    answer = int(input('Which one? '))
+    answer = int(input('Who is {}? '.format(name)))
     if answer < len(contestants):
         return contestants[answer]
 
@@ -32,7 +32,7 @@ def get_or_create_artist(name):
     except:
         pass
     if contestants:
-        choice = pick_among(contestants)
+        choice = pick_among(name, contestants)
         if choice:
             return choice
     artist = Artist(first_name=first, last_name=last)
@@ -85,11 +85,17 @@ class Command(BaseCommand):
             print(i, ':', anime.title, anime.id)
             creators = a.get(anime.anidb_aid).creators
             print(creators)
+            staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
             for creator in creators.findAll('name'):
+                artist = get_or_create_artist(creator.string)
                 if creator['type'] == 'Direction':
-                    try_replace(anime, 'director', creator.string)
+                    staff_id = 'director'
                 elif creator['type'] == 'Music':
-                    try_replace(anime, 'composer', creator.string)
+                    staff_id = 'composer'
                 elif creator['type'] == 'Original Work' or creator['type'] == 'Story Composition':
-                    try_replace(anime, 'author', creator.string)
+                    staff_id = 'author'
+                else:
+                    staff_id = None
+                if staff_id is not None:
+                    Staff.objects.get_or_create(work=anime, role_id=staff_map[staff_id], artist=artist)
                 anime.save()

@@ -19,7 +19,7 @@ from django.db.models import Count, Case, When, F, Value
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Album, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking
+from mangaki.models import Work, Anime, Manga, Album, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -104,7 +104,7 @@ def update_score_while_unrating(user, work, choice):
 
 
 class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
-    queryset = Anime.objects.select_related('director', 'composer', 'author')
+    queryset = Anime.objects.prefetch_related('staff_set__role', 'staff_set__artist')
     form_class = SuggestionForm
 
     def get_success_url(self):
@@ -187,7 +187,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
 
 
 class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
-    model = Manga
+    queryset = Manga.objects.prefetch_related('staff_set__role', 'staff_set__artist')
     form_class = SuggestionForm
 
     def get_success_url(self):
@@ -392,10 +392,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return (self.object.authored.all()
-                | self.object.directed.all()
-                | self.object.composed.all()) \
-                .order_by('title')
+        return Work.objects.filter(id__in=Staff.objects.filter(artist=self.object).values('work_id')).order_by('title')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

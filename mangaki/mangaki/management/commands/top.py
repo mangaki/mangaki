@@ -20,7 +20,7 @@ class Command(BaseCommand):
         values = {'favorite': 10, 'like': 2, 'neutral': 0.5, 'dislike': -1}
         nb_ratings = Counter()
         nb_stars = Counter()
-        for choice, contestant_id in Rating.objects.values_list('choice', 'work__anime__' + category):
+        for choice, contestant_id in Rating.objects.filter(work__staff__role__slug=category).values_list('choice', 'work__staff__artist'):
             if contestant_id and contestant_id > 1:  # Artiste non inconnu
                 nb_ratings[contestant_id] += 1
                 if choice == 'favorite':
