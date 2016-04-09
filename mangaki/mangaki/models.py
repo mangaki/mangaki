@@ -188,6 +188,10 @@ class Artist(models.Model):
     def __str__(self):
         return self.name
 
+class ArtistSpelling(models.Model):
+    was = models.CharField(max_length=255)
+    true_name = models.CharField(max_length=255)
+
 
 class Rating(models.Model):
     user = models.ForeignKey(User)

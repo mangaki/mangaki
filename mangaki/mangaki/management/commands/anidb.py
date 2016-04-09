@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.anidb import AniDB
-from mangaki.models import Artist, Role, Staff, Work
+from mangaki.models import Artist, Role, Staff, Work, ArtistSpelling
 from django.db.models import Count
 from urllib.parse import urlparse, parse_qs
 import sys
@@ -9,8 +9,12 @@ import sys
 def get_or_create_artist(name):
     if Artist.objects.filter(name=name).count():
         return Artist.objects.get(name=name)
-    artist = Artist(name=name)
-    artist.save()
+    elif ArtistSpelling.objects.filter(was=name).count():
+        return Artist.objects.get(name=ArtistSpelling.objects.get(was=name).true_name)
+    true_name = input('I don\'t now %s (yet). Link to another artist? Type their name: ' % name)
+    artist = Artist.objects.get_or_create(name=true_name)
+    print(artist)
+    ArtistSpelling(was=name, true_name=true_name).save()
     return artist
 
 
