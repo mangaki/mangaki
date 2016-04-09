@@ -4,7 +4,7 @@ from mangaki.models import Artist
 class ArtistSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Artist
-        fields = ('first_name', 'last_name')
+        fields = ('url', 'first_name', 'last_name')
 
 class ArtistViewSet(viewsets.ModelViewSet):
     queryset = Artist.objects.all()

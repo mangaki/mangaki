@@ -4,7 +4,7 @@ from mangaki.models import Studio
 class StudioSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Studio
-        fields = ('name')
+        fields = ('name',)
 
 class StudioViewSet(viewsets.ModelViewSet):
     queryset = Studio.objects.all()
