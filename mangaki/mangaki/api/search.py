@@ -1,5 +1,5 @@
 from rest_framework import filters
-from django.db.models import Func, F, Value
+from django.db.models import Func, F, Value, Q
 
 class WorkSearchFilter(filters.BaseFilterBackend):
     """
@@ -11,7 +11,7 @@ class WorkSearchFilter(filters.BaseFilterBackend):
         if search_text is not None:
             return queryset.\
                     annotate(sim_score=Func(F('title'), Value(search_text), function='SIMILARITY')).\
-                    filter(sim_score__gte=Func(function='SHOW_LIMIT')).\
+                    filter(Q(title__icontains=search_text) | Q(sim_score__gte=Func(function='SHOW_LIMIT'))).\
                     order_by('-sim_score')
         else:
             return queryset
