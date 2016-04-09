@@ -164,7 +164,7 @@ class Rating(models.Model):
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
     ))
-    date = models.DateField(auto_now=True, auto_now_add=True);
+    date = models.DateField(auto_now=True)
 
     def __str__(self):
         return '%s %s %s' % (self.user, self.choice, self.work)
