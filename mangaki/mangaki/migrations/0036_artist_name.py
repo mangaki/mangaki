@@ -11,6 +11,7 @@ def combine_names(apps, schema_editor):
         artist.name = "%s %s" % (artist.first_name, artist.last_name)
         artist.save()
 
+
 class Migration(migrations.Migration):
 
     dependencies = [

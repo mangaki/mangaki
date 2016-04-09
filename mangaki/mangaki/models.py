@@ -189,8 +189,8 @@ class Artist(models.Model):
         return self.name
 
 class ArtistSpelling(models.Model):
-    was = models.CharField(max_length=255)
-    true_name = models.CharField(max_length=255)
+    was = models.CharField(max_length=255, db_index=True)
+    artist = models.ForeignKey('Artist')
 
 
 class Rating(models.Model):

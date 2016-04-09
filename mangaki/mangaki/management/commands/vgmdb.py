@@ -5,15 +5,17 @@ from urllib.parse import urlparse, parse_qs
 
 
 def get_or_create_artist(name):
-    if Artist.objects.filter(name=name).count():
+    try:
         return Artist.objects.get(name=name)
-    elif ArtistSpelling.objects.filter(was=name).count():
-        return Artist.objects.get(name=ArtistSpelling.objects.get(was=name).true_name)
-    true_name = input('I don\'t now %s (yet). Link to another artist? Type their name: ' % name)
-    artist = Artist.objects.get_or_create(name=true_name)
-    print(artist)
-    ArtistSpelling(was=name, true_name=true_name).save()
-    return artist
+    except Artist.DoesNotExist:
+        try:
+            return Artist.objects.get(name=ArtistSpelling.objects.get(was=name).artist)
+        except ArtistSpelling.DoesNotExist:
+            # FIXME consider trigram search to find similar artists in Artist, ArtistSpelling
+            true_name = input('I don\'t now %s (yet). Link to another artist? Type their name: ' % name)
+            artist, _ = Artist.objects.get_or_create(name=true_name)
+            ArtistSpelling(was=name, artist=artist).save()
+            return artist
 
 
 def try_replace(anime, key, artist_name):
