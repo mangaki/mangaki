@@ -6,7 +6,7 @@ from datetime import datetime
 
 class Command(BaseCommand):
     args = ''
-    help = ''
+    help = 'Creates a bunch of events.'
 
     def handle(self, *args, **options):
         anime_ids = {'ARRIETTY, LE PETIT MONDE DES CHAPARDEURS': 2591,
@@ -31,4 +31,4 @@ class Command(BaseCommand):
                 
                 anime = Anime.objects.get(id=anime_ids[title])
                 
-                Event(date=date, anime=anime, location=fauvettes, event_type="screening", language='vostfr' if language == 'VOST' else 'vf').save()
+                # Event(date=date, anime=anime, location=fauvettes, event_type="screening", language='vostfr' if language == 'VOST' else 'vf').save()
