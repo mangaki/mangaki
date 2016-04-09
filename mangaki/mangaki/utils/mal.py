@@ -44,7 +44,7 @@ def retrieve_anime(entries):
                 anime_date = entry['start_date'].replace('-00', '-01')
             else:
                 anime_date = entry['start_date']
-            Anime.objects.create(director=unknown, composer=unknown, title=title, source='http://myanimelist.net/anime/' + entry['id'], poster=entry['image'], date=anime_date)
+            Anime.objects.create(title=title, source='http://myanimelist.net/anime/' + entry['id'], poster=entry['image'], date=anime_date)
 
 
 def lookup_mal_api(query):

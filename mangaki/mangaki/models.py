@@ -45,6 +45,7 @@ class Work(models.Model):
     date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=True, null=False)
+    artists = models.ManyToManyField('Artist', through='Staff', blank=True)
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -81,6 +82,20 @@ class Work(models.Model):
                 raise TypeError('Unexpected subclass of work: {}'.format(type(self)))
         super().save(*args, **kwargs)
 
+class Role(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return '{} /{}/'.format(self.name, self.slug)
+
+class Staff(models.Model):
+    work = models.ForeignKey('Work')
+    artist = models.ForeignKey('Artist')
+    role = models.ForeignKey('Role')
+
+    class Meta:
+        unique_together = ('work', 'artist', 'role')
 
 class Editor(models.Model):
     title = models.CharField(max_length=33)
@@ -215,41 +230,6 @@ class Suggestion(models.Model):
     ), default='ref')
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
-
-    def current_work_data(self):
-        include_bootstrap = '    <link rel="stylesheet" href="/static/css/bootstrap.min.css" /><link rel="stylesheet" href="/static/css/bootstrap-switch.min.css" /><link rel="stylesheet" href="/static/css/typeahead.css" /><link rel="stylesheet" href="/static/css/skin.css" /><link rel="stylesheet" href="/static/css/test.css" />'
-        title = '<h1>' + self.work.title + '</h1>'
-        poster = '<div style="background-image: url(\'' + self.work.poster + '\'); background-repeat: no-repeat; position: center; background-size: 100%; background-position: center; height: 350px; max-width: 225px; margin-left: auto; margin-right: auto"></div>'
-        synopsis = '<div class="well">' + self.work.synopsis + '</div>'
-        try:
-            self.work.manga
-        except AttributeError:
-            editor = '<div>Éditeur : ' + str(self.work.anime.editor) + '</div>'
-            origin = '<div>Origine : ' + self.work.anime.origin + '</div>'
-            genres_list = []
-            for genre in self.work.anime.genre.all():
-                genres_list.append(genre.title)
-            genres = '<div>Genres : ' + ', '.join(genres_list) + '</div>'
-            work_type = '<div>Type : ' + self.work.anime.anime_type + '</div>'
-            author = '<div>Auteur : ' + str(self.work.anime.author) + '</div>'
-            nb_episodes = '<div>Nombre d\'épisodes : ' + self.work.anime.nb_episodes + '</div>'
-            data = nb_episodes + author + editor + origin + genres + work_type
-            link = '<div><a href="/admin/mangaki/anime/' + str(self.work.id) + '/"><b>Éditer les informations</b></a></div>'
-        else:
-            editor = '<div>Éditeur : ' + str(self.work.manga.editor.title) + '</div>'
-            origin = '<div>Origine : ' + self.work.manga.origin + '</div>'
-            genres_list = []
-            for genre in self.work.manga.genre.all():
-                genres_list.append(genre.title)
-            genres = '<div>Genres : ' + ', '.join(genres_list) + '</div>'
-            work_type = '<div>Type : ' + self.work.manga.manga_type + '</div>'
-            mangaka = '<div>Dessin : ' + str(self.work.manga.mangaka) + '</div>'
-            writer = '<div>Scénario : ' + str(self.work.manga.writer) + '</div>'
-            vo_title = '<div>Titre original : ' + self.work.manga.vo_title + '</div>'
-            data = vo_title + mangaka + writer + editor + origin + genres + work_type
-            link = '<div><a href="/admin/mangaki/manga/' + str(self.work.id) + '/"><b>Éditer les informations</b></a></div>'
-        return include_bootstrap + '<div class="row"><div class="col-xs-2">' + poster + '</div><div class="col-xs-7">' + title + '<br/>' + data + '<br/>' + synopsis + link + '</div></div>'
-    current_work_data.allow_tags = True
 
     def update_scores(self):
         suggestions_score = 5 * Suggestion.objects.filter(user=self.user, is_checked=True).count()
