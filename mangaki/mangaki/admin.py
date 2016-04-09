@@ -5,9 +5,11 @@ from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
 
+
 class StaffInline(admin.TabularInline):
     model = Staff
     fields = ('role', 'artist')
+
 
 class AnimeAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
@@ -67,13 +69,14 @@ class MangaAdmin(admin.ModelAdmin):
             for obj in queryset:
                 if obj.id != chosen_id:
                     for rating in Rating.objects.filter(work=obj).select_related('user'):
-                        # S'il n'a pas déjà voté pour l'autre
+                        #  S'il n'a pas déjà voté pour l'autre
                         if Rating.objects.filter(user=rating.user, work__id=chosen_id).count() == 0:
                             rating.work_id = chosen_id
                             rating.save()
                         else:
                             rating.delete()
-                    self.message_user(request, "%s a bien été supprimé." % obj.title)
+                    self.message_user(
+                        request, "%s a bien été supprimé." % obj.title)
                     obj.delete()
             return None
         deletable_objects = []
@@ -134,7 +137,8 @@ class SuggestionAdmin(admin.ModelAdmin):
         users_list = []
         for suggestion in queryset:
             if suggestion.problem == 'ref':  # Reference suggestion
-                reference, created = Reference.objects.get_or_create(work=suggestion.work, url=suggestion.message)
+                reference, created = Reference.objects.get_or_create(
+                    work=suggestion.work, url=suggestion.message)
                 reference.suggestions.add(suggestion)
             if suggestion.user not in users_list:
                 users_list.append(suggestion.user)
@@ -143,7 +147,8 @@ class SuggestionAdmin(admin.ModelAdmin):
             message_bit = "1 suggestion"
         else:
             message_bit = "%s suggestions" % rows_updated
-        self.message_user(request, "La validation de %s a réussi." % message_bit)
+        self.message_user(
+            request, "La validation de %s a réussi." % message_bit)
     check_suggestions.short_description = "Valider les suggestions sélectionnées"
 
     def uncheck_suggestions(self, request, queryset):
@@ -157,7 +162,8 @@ class SuggestionAdmin(admin.ModelAdmin):
             message_bit = "1 suggestion"
         else:
             message_bit = "%s suggestions" % rows_updated
-        self.message_user(request, "L'invalidation de %s a réussi." % message_bit)
+        self.message_user(
+            request, "L'invalidation de %s a réussi." % message_bit)
     uncheck_suggestions.short_description = "Invalider les suggestions sélectionnées"
 
 
@@ -181,7 +187,8 @@ class PairingAdmin(admin.ModelAdmin):
         rows_updated = 0
         director = Role.objects.get(slug='director')
         for pairing in queryset:
-            _, created = Staff.objects.get_or_create(work_id=pairing.work_id, artist_id=pairing.artist_id, role=director)
+            _, created = Staff.objects.get_or_create(
+                work_id=pairing.work_id, artist_id=pairing.artist_id, role=director)
             if created:
                 pairing.is_checked = True
                 pairing.save()
@@ -197,7 +204,8 @@ class PairingAdmin(admin.ModelAdmin):
         rows_updated = 0
         composer = Role.objects.get(slug='composer')
         for pairing in queryset:
-            _, created = Staff.objects.get_or_create(work_id=pairing.work_id, artist_id=pairing.artist_id, role=composer)
+            _, created = Staff.objects.get_or_create(
+                work_id=pairing.work_id, artist_id=pairing.artist_id, role=composer)
             if created:
                 pairing.is_checked = True
                 pairing.save()
@@ -213,7 +221,8 @@ class PairingAdmin(admin.ModelAdmin):
         rows_updated = 0
         author = Role.objects.get(slug='author')
         for pairing in queryset:
-            _, created = Staff.objects.get_or_create(work_id=pairing.work_id, artist_id=pairing.artist_id, role=author)
+            _, created = Staff.objects.get_or_create(
+                work_id=pairing.work_id, artist_id=pairing.artist_id, role=author)
             if created:
                 pairing.is_checked = True
                 pairing.save()
@@ -229,13 +238,16 @@ class PairingAdmin(admin.ModelAdmin):
 class ReferenceAdmin(admin.ModelAdmin):
     list_display = ['work', 'url']
 
+
 class RankingInline(admin.TabularInline):
     model = Ranking
-    fields = ('content_type', 'object_id', 'name', 'score', 'nb_ratings', 'nb_stars',)
+    fields = ('content_type', 'object_id', 'name',
+              'score', 'nb_ratings', 'nb_stars',)
     readonly_fields = ('name',)
 
     def name(self, instance):
         return str(instance.content_object)
+
 
 class TopAdmin(admin.ModelAdmin):
     inlines = [
@@ -245,6 +257,7 @@ class TopAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
 
 class RoleAdmin(admin.ModelAdmin):
     model = Role
