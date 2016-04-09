@@ -220,7 +220,7 @@ class Profile(models.Model):
     def get_avatar_url(self):
         if not self.avatar_url:
             avatar_url =\
-                    get_discourse_data(self.user.email)['avatar'].format(size=150)
+                get_discourse_data(self.user.email)['avatar'].format(size=150)
             self.avatar_url = avatar_url
             self.save()
         return self.avatar_url
