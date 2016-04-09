@@ -47,7 +47,8 @@ REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
     ('http://animeka.com', 'Animeka'),
     ('http://vgmdb.net', 'VGMdb'),
-    ('http://anidb.net', 'AniDB')
+    ('http://anidb.net', 'AniDB'),
+    ('https://anidb.net', 'AniDB')
 )
 
 RATING_COLORS = {

@@ -64,7 +64,7 @@ class Command(BaseCommand):
             anime = Anime.objects.get(id=anime_id)
             if anime.anidb_aid == 0:
                 for reference in anime.reference_set.all():
-                    if reference.url.startswith('http://anidb.net'):
+                    if reference.url.startswith('http://anidb.net') or reference.url.startswith('https://anidb.net'):
                         query = urlparse(reference.url).query
                         anidb_aid = parse_qs(query).get('aid')
                         if anidb_aid:
