@@ -3,7 +3,7 @@ from mangaki.models import Anime
 from .works import work_fields, WorkSerializer
 from .search import WorkSearchFilter
 
-class AnimeSerializer(serializers.HyperlinkedModelSerializer):
+class AnimeSerializer(WorkSerializer):
     director = serializers.StringRelatedField(read_only=True)
     composer = serializers.StringRelatedField(read_only=True)
     studio = serializers.StringRelatedField(read_only=True)
