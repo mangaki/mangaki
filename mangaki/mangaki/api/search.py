@@ -9,9 +9,6 @@ class WorkSearchFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         search_text = request.GET.get('search', None)
         if search_text is not None:
-            return queryset.\
-                    annotate(sim_score=Func(F('title'), Value(search_text), function='SIMILARITY')).\
-                    filter(Q(title__icontains=search_text) | Q(sim_score__gte=Func(function='SHOW_LIMIT'))).\
-                    order_by('-sim_score')
+            return queryset.search(search_text)
         else:
             return queryset

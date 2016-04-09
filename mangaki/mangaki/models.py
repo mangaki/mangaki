@@ -1,7 +1,7 @@
 # coding=utf8
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import F
+from django.db.models import F, Q, Func, Value
 from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -9,6 +9,8 @@ from django.contrib.contenttypes.models import ContentType
 from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+
+from unidecode import unidecode
 
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
