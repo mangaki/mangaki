@@ -3,12 +3,14 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from discourse import views as discourse_views
 from mangaki import views
+from mangaki import api
 
 urlpatterns = [
     # Examples:
     # url(r'^$', views.home, name='home'),
     # url(r'^blog/', include('blog.urls')),
 
+    url(r'^api/', include(api.router.urls)),
     url(r'^$', views.index),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works),
     url(r'^data/reco/(?P<category>\w+)/(?P<editor>\w+)\.json$', views.get_reco_list),
