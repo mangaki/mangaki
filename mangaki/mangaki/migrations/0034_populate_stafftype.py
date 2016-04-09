@@ -15,7 +15,7 @@ def create_stafftype(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mangaki', '0032_stafftype'),
+        ('mangaki', '0033_stafftype'),
     ]
 
     operations = [
