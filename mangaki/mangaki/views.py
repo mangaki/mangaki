@@ -294,8 +294,6 @@ class WorkList(WorkListMixin, ListView):
             raise Http404
 
         if search_text is not None:
-            print (search_text)
-            print (sort_mode)
             queryset = queryset.search(search_text)
 
         queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug').select_related('category__slug')
