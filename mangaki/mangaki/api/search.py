@@ -1,5 +1,4 @@
 from rest_framework import filters
-from django.db.models import Func, F, Value, Q
 
 class WorkSearchFilter(filters.BaseFilterBackend):
     """
