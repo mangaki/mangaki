@@ -46,6 +46,7 @@ class Work(models.Model):
     synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=True, null=False)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
+    genre = models.ManyToManyField('Genre')
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -115,7 +116,6 @@ class Anime(Work):
     studio = models.ForeignKey('Studio', default=1)
     editor = models.ForeignKey('Editor', default=1)
     anime_type = models.TextField(max_length=42, default='')
-    genre = models.ManyToManyField('Genre')
     nb_episodes = models.TextField(default='Inconnu', max_length=16)
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
     anidb_aid = models.IntegerField(default=0)
@@ -124,6 +124,7 @@ class Anime(Work):
     deprecated_director = models.ForeignKey('Artist', related_name='directed', default=1)
     deprecated_author = models.ForeignKey('Artist', related_name='authored', default=1)
     deprecated_composer = models.ForeignKey('Artist', related_name='composed', default=1)
+    deprecated_genre = models.ManyToManyField('Genre')
 
     def __str__(self):
         return '[%d] %s' % (self.id, self.title)
@@ -133,12 +134,12 @@ class Manga(Work):
     vo_title = models.CharField(max_length=128)
     editor = models.CharField(max_length=32)
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
-    genre = models.ManyToManyField('Genre')
     manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
 
     # Deprecated fields
     deprecated_mangaka = models.ForeignKey('Artist', related_name='drew')
     deprecated_writer = models.ForeignKey('Artist', related_name='wrote')
+    deprecated_genre = models.ManyToManyField('Genre')
 
 
 class Genre(models.Model):
