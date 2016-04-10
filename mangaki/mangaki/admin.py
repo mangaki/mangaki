@@ -56,6 +56,7 @@ class MangaAdmin(admin.ModelAdmin):
         'deprecated_genre',
         'deprecated_origin',
         'deprecated_vo_title',
+        'deprecated_manga_type',
     )
 
     def make_nsfw(self, request, queryset):

@@ -53,6 +53,7 @@ class Work(models.Model):
     nb_episodes = models.TextField(default='Inconnu', max_length=16)
     anime_type = models.TextField(max_length=42, default='')
     vo_title = models.CharField(max_length=128, default='')
+    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -138,7 +139,6 @@ class Anime(Work):
 
 class Manga(Work):
     editor = models.CharField(max_length=32)
-    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
 
     # Deprecated fields
     deprecated_mangaka = models.ForeignKey('Artist', related_name='drew')
@@ -146,6 +146,7 @@ class Manga(Work):
     deprecated_genre = models.ManyToManyField('Genre')
     deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
     deprecated_vo_title = models.CharField(max_length=128)
+    deprecated_manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
 
 
 class Genre(models.Model):
