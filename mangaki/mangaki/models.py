@@ -55,6 +55,7 @@ class Work(models.Model):
     vo_title = models.CharField(max_length=128, default='')
     manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
     catalog_number = models.CharField(max_length=20, blank=True)
+    anidb_aid = models.IntegerField(default=0, blank=True)
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -123,7 +124,6 @@ class Studio(models.Model):
 class Anime(Work):
     studio = models.ForeignKey('Studio', default=1)
     editor = models.ForeignKey('Editor', default=1)
-    anidb_aid = models.IntegerField(default=0)
 
     # Deprecated fields
     deprecated_director = models.ForeignKey('Artist', related_name='directed', default=1)
@@ -133,6 +133,7 @@ class Anime(Work):
     deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
     deprecated_nb_episodes = models.TextField(default='Inconnu', max_length=16)
     deprecated_anime_type = models.TextField(max_length=42, default='')
+    deprecated_anidb_aid = models.IntegerField(default=0)
 
     def __str__(self):
         return '[%d] %s' % (self.id, self.title)
