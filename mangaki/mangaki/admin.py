@@ -15,6 +15,7 @@ class AnimeAdmin(admin.ModelAdmin):
     list_filter = ('nsfw',)
     actions = ['make_nsfw', 'make_sfw']
     inlines = [StaffInline]
+    readonly_fields = ('director', 'composer', 'author')
 
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
@@ -40,6 +41,8 @@ class MangaAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('nsfw',)
     actions = ['make_nsfw', 'make_sfw', 'merge']
+    inlines = [StaffInline]
+    readonly_fields = ('mangaka', 'writer')
 
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
