@@ -33,9 +33,9 @@ def get_recommendations(user, category, editor):
 
     mangas = Manga.objects.all()
     if editor == 'otototaifu':
-        mangas = mangas.filter(editor__in=['Ototo Manga', 'Taifu comics'])
+        mangas = mangas.filter(editor__title__in=['Ototo Manga', 'Taifu comics'])
     elif editor != 'unspecified':
-        mangas = mangas.filter(editor__icontains=editor)
+        mangas = mangas.filter(editor__title__icontains=editor)
     manga_ids = mangas.values_list('id', flat=True)
 
     kept_works = None

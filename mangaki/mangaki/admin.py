@@ -24,6 +24,7 @@ class AnimeAdmin(admin.ModelAdmin):
         'deprecated_nb_episodes',
         'deprecated_anime_type',
         'deprecated_anidb_aid',
+        'deprecated_editor',
     )
 
     def make_nsfw(self, request, queryset):
@@ -58,6 +59,7 @@ class MangaAdmin(admin.ModelAdmin):
         'deprecated_origin',
         'deprecated_vo_title',
         'deprecated_manga_type',
+        'deprecated_editor',
     )
 
     def make_nsfw(self, request, queryset):
