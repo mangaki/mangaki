@@ -55,7 +55,7 @@
 
     <ul>
     {% for event in screenings %}
-      <li><a href="{% url "anime-detail" event.anime.id %}">{{ event.anime.title }}</a> le {{ event.get_date }}</li>
+      <li><a href="{{ event.anime.get_absolute_url }}">{{ event.anime.title }}</a> le {{ event.get_date }}</li>
     {% endfor %}
     </ul>
 
