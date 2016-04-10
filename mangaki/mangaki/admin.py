@@ -118,7 +118,11 @@ class TrackAdmin(admin.ModelAdmin):
 
 class AlbumAdmin(admin.ModelAdmin):
     inlines = [StaffInline]
-    readonly_fields = ('deprecated_composer', 'deprecated_catalog_number',)
+    readonly_fields = (
+        'deprecated_composer',
+        'deprecated_catalog_number',
+        'deprecated_vgmdb_aid',
+    )
 
 
 class ArtistAdmin(admin.ModelAdmin):

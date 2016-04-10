@@ -56,6 +56,7 @@ class Work(models.Model):
     manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
     catalog_number = models.CharField(max_length=20, blank=True)
     anidb_aid = models.IntegerField(default=0, blank=True)
+    vgmdb_aid = models.IntegerField(blank=True, null=True)
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -167,11 +168,10 @@ class Track(models.Model):
 
 
 class Album(Work):
-    vgmdb_aid = models.IntegerField(blank=True, null=True)
-
     # Deprecated fields
     deprecated_composer = models.ForeignKey('Artist', related_name='composer', default=1)
     deprecated_catalog_number = models.CharField(max_length=20)
+    deprecated_vgmdb_aid = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return '[{id}] {title}'.format(id=self.id, title=self.title)
