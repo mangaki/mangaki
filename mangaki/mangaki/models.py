@@ -58,6 +58,7 @@ class Work(models.Model):
     anidb_aid = models.IntegerField(default=0, blank=True)
     vgmdb_aid = models.IntegerField(blank=True, null=True)
     editor = models.ForeignKey('Editor', default=1)
+    studio = models.ForeignKey('Studio', default=1)
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -124,8 +125,6 @@ class Studio(models.Model):
 
 
 class Anime(Work):
-    studio = models.ForeignKey('Studio', default=1)
-
     # Deprecated fields
     deprecated_director = models.ForeignKey('Artist', related_name='directed', default=1)
     deprecated_author = models.ForeignKey('Artist', related_name='authored', default=1)
@@ -136,6 +135,7 @@ class Anime(Work):
     deprecated_anime_type = models.TextField(max_length=42, default='')
     deprecated_anidb_aid = models.IntegerField(default=0)
     deprecated_editor = models.ForeignKey('Editor', default=1)
+    deprecated_studio = models.ForeignKey('Studio', default=1)
 
     def __str__(self):
         return '[%d] %s' % (self.id, self.title)
