@@ -22,6 +22,7 @@ class AnimeAdmin(admin.ModelAdmin):
         'deprecated_genre',
         'deprecated_origin',
         'deprecated_nb_episodes',
+        'deprecated_anime_type',
     )
 
     def make_nsfw(self, request, queryset):
