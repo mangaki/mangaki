@@ -165,9 +165,11 @@ class Track(models.Model):
 
 
 class Album(Work):
-    composer = models.ForeignKey('Artist', related_name='composer', default=1)
     catalog_number = models.CharField(max_length=20)
     vgmdb_aid = models.IntegerField(blank=True, null=True)
+
+    # Deprecated fields
+    deprecated_composer = models.ForeignKey('Artist', related_name='composer', default=1)
 
     def __str__(self):
         return '[{id}] {title}'.format(id=self.id, title=self.title)
