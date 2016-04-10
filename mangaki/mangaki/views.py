@@ -103,38 +103,41 @@ def update_score_while_unrating(user, work, choice):
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
 
-class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
-    queryset = Anime.objects.prefetch_related('staff_set__role', 'staff_set__artist')
+class WorkDetail(AjaxableResponseMixin, FormMixin, DetailView):
     form_class = SuggestionForm
 
     def get_success_url(self):
-        return 'anime/%d' % self.object.pk
+        return self.object.get_absolute_url()
+
+    def get_queryset(self):
+        queryset = Work.objects.prefetch_related('staff_set__role', 'staff_set__artist', 'category')
+        category = self.kwargs.get('category', None)
+        if category is not None:
+            queryset = queryset.filter(category__slug=category)
+        return queryset
 
     def get_context_data(self, **kwargs):
-        context = super(AnimeDetail, self).get_context_data(**kwargs)
-        anime = self.object
-        update_poster_if_nsfw(anime, self.request.user)
-        context['object'].source = anime.source.split(',')[0]
+        context = super().get_context_data(**kwargs)
+        update_poster_if_nsfw(self.object, self.request.user)
+        self.object.source = self.object.source.split(',')[0]
 
-        genres = []
-        for genre in anime.genre.all():
-            genres.append(genre.title)
+        genres = [genre.title for genre in self.object.genre.all()]
         context['genres'] = ', '.join(genres)
 
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
-                context['rating'] = anime.rating_set.get(user=self.request.user).choice
+                context['rating'] = self.object.rating_set.get(user=self.request.user).choice
             except Rating.DoesNotExist:
                 pass
 
         context['references'] = []
-        for reference in anime.reference_set.all():
+        for reference in self.object.reference_set.all():
             for domain, name in REFERENCE_DOMAINS:
                 if reference.url.startswith(domain):
                     context['references'].append((reference.url, name))
 
-        nb = Counter(Rating.objects.filter(work=anime).values_list('choice', flat=True))
+        nb = Counter(Rating.objects.filter(work=self.object).values_list('choice', flat=True))
         labels = {'favorite': 'Ajoutés aux favoris', 'like': 'Ont aimé', 'neutral': 'Neutre', 'dislike': 'N\'ont pas aimé', 'willsee': 'Ont envie de voir', 'wontsee': 'N\'ont pas envie de voir'}
         seen_ratings = ['favorite', 'like', 'neutral', 'dislike']
         total = sum(nb.values())
@@ -147,26 +150,27 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
                 context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
             context['seen_percent'] = round(100 * seen_total / float(total))
 
-        anime_events = anime.event_set.filter(date__gte=timezone.now())
-        if anime_events.count() > 0:
-            my_events = {}
-            if self.request.user.is_authenticated():
-                my_events = dict(self.request.user.attendee_set.filter(
-                    event__in=anime_events).values_list('event_id', 'attending'))
+        if self.object.category.slug == 'anime':
+            events = self.object.anime.event_set.filter(date__gte=timezone.now())
+            if events.count() > 0:
+                my_events = {}
+                if self.request.user.is_authenticated():
+                    my_events = dict(self.request.user.attendee_set.filter(
+                        event__in=events).values_list('event_id', 'attending'))
 
-            context['events'] = [
-                {
-                    'id': event.id,
-                    'attending': my_events.get(event.id, None),
-                    'type': event.get_event_type_display(),
-                    'channel': event.channel,
-                    'date': event.get_date(),
-                    'link': event.link,
-                    'location': event.location,
-                    'nb_attendees': event.attendee_set.filter(attending=True).count(),
-                } for event in anime_events
-            ]
-            
+                context['events'] = [
+                    {
+                        'id': event.id,
+                        'attending': my_events.get(event.id, None),
+                        'type': event.get_event_type_display(),
+                        'channel': event.channel,
+                        'date': event.get_date(),
+                        'link': event.link,
+                        'location': event.location,
+                        'nb_attendees': event.attendee_set.filter(attending=True).count(),
+                    } for event in events
+                ]
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -176,85 +180,6 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        form.save()
-        return super(AnimeDetail, self).form_valid(form)
-
-
-class MangaDetail(AjaxableResponseMixin, FormMixin, DetailView):
-    queryset = Manga.objects.prefetch_related('staff_set__role', 'staff_set__artist')
-    form_class = SuggestionForm
-
-    def get_success_url(self):
-        return 'manga/%d' % self.object.pk
-
-    def get_context_data(self, **kwargs):
-        context = super(MangaDetail, self).get_context_data(**kwargs)
-        update_poster_if_nsfw(self.object, self.request.user)
-        print(self.object.poster)
-        context['object'].source = context['object'].source.split(',')[0]
-
-        genres = []
-        for genre in context['object'].genre.all():
-            genres.append(genre.title)
-        context['genres'] = ', '.join(genres)
-
-        if self.request.user.is_authenticated():
-            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
-            try:
-                context['rating'] = self.object.rating_set.get(user=self.request.user).choice
-            except Rating.DoesNotExist:
-                pass
-        return context
-
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
-            return HttpResponseForbidden()
-        self.object = self.get_object()
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        form.save()
-        return super(MangaDetail, self).form_valid(form)
-
-
-class AlbumDetail(AjaxableResponseMixin, FormMixin, DetailView):
-    model = Album
-    form_class = SuggestionForm
-
-    def get_success_url(self):
-        return 'album/%d' % self.object.pk
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        update_poster_if_nsfw(self.object, self.request.user)
-        context['object'].source = context['object'].source.split(',')[0]
-
-        genres = []
-        if self.request.user.is_authenticated():
-            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
-            try:
-                context['rating'] = self.object.rating_set.get(user=self.request.user).choice
-            except Rating.DoesNotExist:
-                pass
-        return context
-
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
-            return HttpResponseForbidden()
-        self.object = self.get_object()
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
         if form.is_valid():
             return self.form_valid(form)
         return self.form_invalid(form)
@@ -264,7 +189,6 @@ class AlbumDetail(AjaxableResponseMixin, FormMixin, DetailView):
         form.save()
         return super().form_valid(form)
 
-
 class EventDetail(LoginRequiredMixin, DetailView):
     model = Event
 
@@ -272,7 +196,7 @@ class EventDetail(LoginRequiredMixin, DetailView):
         self.object = self.get_object()
         if 'next' in request.GET:
             return redirect(request.GET['next'])
-        return redirect(reverse('anime-detail', args=(self.object.anime_id,)))
+        return redirect(self.object.get_absolute_url())
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
