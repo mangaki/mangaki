@@ -1,0 +1,16 @@
+---
+
+- name: Ensure vim is installed at the latest version
+  apt: name=vim state=latest update_cache=yes
+
+- name: Ensure git is installed at the latest version
+  apt: name=git state=latest
+
+- name: Ensure sudo is installed
+  apt: name=sudo state=present
+
+- name: Ensure the repository is checked
+  git: repo={{mangaki_git_repository | mandatory}} dest={{mangaki_repo | mandatory}} accept_hostkey=True
+
+- name: Ensure that the fr_FR locale is generated
+  locale_gen: name=fr_FR.UTF-8 state=present
