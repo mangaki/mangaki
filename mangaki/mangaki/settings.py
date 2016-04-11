@@ -8,6 +8,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
+# flake8: noqa
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from django.conf import global_settings
@@ -98,7 +99,8 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend"
 )
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # TODO only debug
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# TODO: only debug
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

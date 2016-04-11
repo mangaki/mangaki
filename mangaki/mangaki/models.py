@@ -2,7 +2,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import F
-from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
@@ -10,9 +9,11 @@ from mangaki.api import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 
+
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
     # change the formulaes without issuing the appropriate migrations.
+
     def top(self):
         return self.filter(
             nb_ratings__gte=TOP_MIN_RATINGS).order_by(
@@ -30,12 +31,14 @@ class WorkQuerySet(models.QuerySet):
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
 
+
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
     name = models.CharField(max_length=128)
 
     def __str__(self):
         return self.name
+
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
@@ -79,8 +82,10 @@ class Work(models.Model):
             elif isinstance(self, Album):
                 self.category = Category.objects.get(slug='album')
             else:
-                raise TypeError('Unexpected subclass of work: {}'.format(type(self)))
+                raise TypeError(
+                    'Unexpected subclass of work: {}'.format(type(self)))
         super().save(*args, **kwargs)
+
 
 class Role(models.Model):
     name = models.CharField(max_length=255)
@@ -89,6 +94,7 @@ class Role(models.Model):
     def __str__(self):
         return '{} /{}/'.format(self.name, self.slug)
 
+
 class Staff(models.Model):
     work = models.ForeignKey('Work')
     artist = models.ForeignKey('Artist')
@@ -96,6 +102,7 @@ class Staff(models.Model):
 
     class Meta:
         unique_together = ('work', 'artist', 'role')
+
 
 class Editor(models.Model):
     title = models.CharField(max_length=33)
@@ -117,7 +124,8 @@ class Anime(Work):
     anime_type = models.TextField(max_length=42, default='')
     genre = models.ManyToManyField('Genre')
     nb_episodes = models.TextField(default='Inconnu', max_length=16)
-    origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
+    origin = models.CharField(
+        max_length=10, choices=ORIGIN_CHOICES, default='')
     anidb_aid = models.IntegerField(default=0)
 
     # Deprecated fields
@@ -134,7 +142,8 @@ class Manga(Work):
     editor = models.CharField(max_length=32)
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
     genre = models.ManyToManyField('Genre')
-    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
+    manga_type = models.TextField(
+        max_length=16, choices=TYPE_CHOICES, blank=True)
 
     # Deprecated fields
     deprecated_mangaka = models.ForeignKey('Artist', related_name='drew')
@@ -163,6 +172,7 @@ class Album(Work):
 
     def __str__(self):
         return '[{id}] {title}'.format(id=self.id, title=self.title)
+
 
 class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)
@@ -203,8 +213,10 @@ class Profile(models.Model):
     nsfw_ok = models.BooleanField(default=False)
     newsletter_ok = models.BooleanField(default=True)
     reco_willsee_ok = models.BooleanField(default=False)
-    avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
-    mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
+    avatar_url = models.CharField(
+        max_length=128, default='', blank=True, null=True)
+    mal_username = models.CharField(
+        max_length=64, default='', blank=True, null=True)
     score = models.IntegerField(default=0)
 
     def get_anime_count(self):
@@ -212,7 +224,8 @@ class Profile(models.Model):
 
     def get_avatar_url(self):
         if not self.avatar_url:
-            avatar_url = get_discourse_data(self.user.email)['avatar'].format(size=150)
+            avatar_url =\
+                get_discourse_data(self.user.email)['avatar'].format(size=150)
             self.avatar_url = avatar_url
             self.save()
         return self.avatar_url
@@ -237,7 +250,8 @@ class Suggestion(models.Model):
     is_checked = models.BooleanField(default=False)
 
     def update_scores(self):
-        suggestions_score = 5 * Suggestion.objects.filter(user=self.user, is_checked=True).count()
+        suggestions_score = 5 * \
+            Suggestion.objects.filter(user=self.user, is_checked=True).count()
         recommendations_score = 0
         reco_list = Recommendation.objects.filter(user=self.user)
         for reco in reco_list:
@@ -299,9 +313,11 @@ class Reference(models.Model):
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
 
+
 class Top(models.Model):
     date = models.DateField(auto_now_add=True)
-    category = models.CharField(max_length=10, choices=TOP_CATEGORY_CHOICES, unique_for_date='date')
+    category = models.CharField(
+        max_length=10, choices=TOP_CATEGORY_CHOICES, unique_for_date='date')
 
     contents = models.ManyToManyField(ContentType, through='Ranking')
 
@@ -310,6 +326,7 @@ class Top(models.Model):
             category=self.category,
             date=self.date,
             id=self.id)
+
 
 class Ranking(models.Model):
     top = models.ForeignKey('Top', on_delete=models.CASCADE)

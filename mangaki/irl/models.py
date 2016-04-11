@@ -13,11 +13,13 @@ class Location(models.Model):
     def __str__(self):
         return '%s, %s' % (self.title, self.city)
 
+
 class Attendee(models.Model):
     event = models.ForeignKey('Event', on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     attending = models.BooleanField(default=False)
+
 
 class Event(models.Model):
     anime = models.ForeignKey(Anime)
@@ -72,4 +74,4 @@ class Partner(models.Model):
     image = models.CharField(max_length=32, verbose_name="Fichier logo")
 
     class Meta:
-        ordering = ['name'] 
+        ordering = ['name']

@@ -15,14 +15,13 @@ from django.utils.timezone import utc
 from django.views.generic.detail import SingleObjectMixin
 
 from django.dispatch import receiver
-from django.db.models import Count, Case, When, F, Value
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Album, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff
+from mangaki.models import Work, Anime, Manga, Album, Rating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
-from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
+from mangaki.utils.mal import import_mal
 from mangaki.utils.recommendations import get_recommendations
 from mangaki.utils.chrono import Chrono
 from irl.models import Event, Partner, Attendee
@@ -30,7 +29,6 @@ from irl.models import Event, Partner, Attendee
 from collections import Counter
 from markdown import markdown
 from urllib.parse import urlencode
-from random import shuffle, randint
 from secret import HASH_PADDLE
 import datetime
 import hashlib
@@ -64,9 +62,11 @@ UTA_ID = 14293
 
 GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
 
+
 def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
+
 
 def update_poster_if_nsfw(obj, user):
     if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
@@ -166,7 +166,7 @@ class AnimeDetail(AjaxableResponseMixin, FormMixin, DetailView):
                     'nb_attendees': event.attendee_set.filter(attending=True).count(),
                 } for event in anime_events
             ]
-            
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -240,7 +240,6 @@ class AlbumDetail(AjaxableResponseMixin, FormMixin, DetailView):
         update_poster_if_nsfw(self.object, self.request.user)
         context['object'].source = context['object'].source.split(',')[0]
 
-        genres = []
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
@@ -284,15 +283,13 @@ class EventDetail(LoginRequiredMixin, DetailView):
         if attending is not None:
             Attendee.objects.update_or_create(
                 event=self.object, user=request.user,
-                defaults={'attending': attending })
+                defaults={'attending': attending})
         elif 'cancel' in request.POST:
             Attendee.objects.filter(event=self.object, user=request.user).delete()
-        return redirect(request.GET['next']);
+        return redirect(request.GET['next'])
 
 
 def get_card(request, category, sort_id=1):
-    chrono = Chrono(True)
-    deja_vu = request.GET.get('dejavu', '').split(',')
     sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
     queryset = Work.objects.filter(category__slug=category)
     if sort_mode == 'popularity':
@@ -315,6 +312,7 @@ def get_card(request, category, sort_id=1):
 
     return HttpResponse(json.dumps(cards), content_type='application/json')
 
+
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -323,7 +321,7 @@ class WorkListMixin:
             ratings = dict(
                 Rating.objects.filter(
                     user=self.request.user,
-                    work__in=list(context['object_list'])) \
+                    work__in=list(context['object_list']))
                 .values_list('work_id', 'choice'))
         else:
             ratings = {}
@@ -332,6 +330,7 @@ class WorkListMixin:
             work.poster = work.safe_poster(self.request.user)
 
         return context
+
 
 class WorkList(WorkListMixin, ListView):
     paginate_by = POSTERS_PER_PAGE
@@ -351,7 +350,7 @@ class WorkList(WorkListMixin, ListView):
             queryset = queryset.controversial()
         elif sort_mode == 'alpha':
             letter = self.request.GET.get('letter', '')
-            if letter == '0': # '#'
+            if letter == '0':  # le '0' représente le bouton '#' dans l'UI
                 queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
             else:
                 queryset = queryset.filter(title__istartswith=letter)
@@ -383,6 +382,7 @@ class WorkList(WorkListMixin, ListView):
 
         return context
 
+
 class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
     template_name = 'mangaki/artist_detail.html'
     paginate_by = POSTERS_PER_PAGE
@@ -399,6 +399,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
         context['artist'] = self.object
 
         return context
+
 
 class UserList(ListView):
     model = User
@@ -453,25 +454,6 @@ def get_profile(request, username):
     unseen_anime_list = []
     seen_manga_list = []
     unseen_manga_list = []
-    c = 0
-    """for work_id, work_title, is_anime, choice in Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga').values_list('work_id', 'work__title', 'work__anime', 'choice'):
-        # print(work_id, work_title, is_anime, choice)
-        seen = choice in ['favorite', 'like', 'neutral', 'dislike']
-        rating = {'work': {'id': work_id, 'title': work_title}, 'choice': choice}
-        # print(rating)
-        if is_anime:
-            if seen:
-                seen_anime_list.append(rating)
-            else:
-                unseen_anime_list.append(rating)
-        else:
-            if seen:
-                seen_manga_list.append(rating)
-            else:
-                unseen_manga_list.append(rating)
-        c += 1
-        if c >= 200:
-            break"""
     rating_list = natsorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
     # , key=lambda x: (ordering.index(x['choice']), 1))  # Tri par note puis nom
     # print(rating_list[:5])
@@ -498,11 +480,10 @@ def get_profile(request, username):
             except Anime.DoesNotExist:
                 if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
                     sent_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
-    # chrono.save('get reco %d queries' % len(connection.queries))
 
     for r in rating_list:
         seen = r.choice in ['favorite', 'like', 'neutral', 'dislike']
-        rating = r#{'work': {'id': r.work.id, 'title': r.work.title}, 'choice': r.choice}
+        rating = r  # {'work': {'id': r.work.id, 'title': r.work.title}, 'choice': r.choice}
         try:
             r.work.anime
             if seen:
@@ -514,7 +495,6 @@ def get_profile(request, username):
                 seen_manga_list.append(rating)
             else:
                 unseen_manga_list.append(rating)
-    # chrono.save('categorize ratings')
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
     seen_list = seen_anime_list if category == 'anime' else seen_manga_list
     unseen_list = unseen_anime_list if category == 'anime' else unseen_manga_list
@@ -611,6 +591,7 @@ def events(request):
             'utamonogatari_rating': uta_rating,
         })
 
+
 def top(request, category_slug):
     categories = dict(TOP_CATEGORY_CHOICES)
     if category_slug not in categories:
@@ -705,12 +686,19 @@ def get_works(request, category):
     ]
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+
 def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
         update_poster_if_nsfw(work, request.user)
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
-            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
+        reco_list.append({
+            'id': work.id,
+            'title': work.title,
+            'poster': work.poster,
+            'synopsis': work.synopsis,
+            'category': 'manga' if is_manga else 'anime',
+            'rating': 'willsee' if in_willsee else 'None'
+        })
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 
