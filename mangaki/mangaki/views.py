@@ -363,7 +363,7 @@ class WorkList(WorkListMixin, ListView):
         else:
             raise Http404
 
-        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug').select_related('category__slug')
+        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug', 'category__name').select_related('category')
 
         return queryset
 
