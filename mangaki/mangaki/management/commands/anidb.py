@@ -10,14 +10,16 @@ def get_or_create_artist(name):
     try:
         return Artist.objects.get(name=name)
     except Artist.DoesNotExist:
-        try:
-            return Artist.objects.get(name=ArtistSpelling.objects.get(was=name).artist)
-        except ArtistSpelling.DoesNotExist:
-            # FIXME consider trigram search to find similar artists in Artist, ArtistSpelling
-            true_name = input('I don\'t now %s (yet). Link to another artist? Type their name: ' % name)
-            artist, _ = Artist.objects.get_or_create(name=true_name)
-            ArtistSpelling(was=name, artist=artist).save()
-            return artist
+        pass
+    try:
+        return ArtistSpelling.objects.get(was=name).artist
+    except ArtistSpelling.DoesNotExist:
+        pass
+    # FIXME consider trigram search to find similar artists in Artist, ArtistSpelling
+    true_name = input('I don\'t now %s (yet). Link to another artist? Type their name: ' % name)
+    artist, _ = Artist.objects.get_or_create(name=true_name)
+    ArtistSpelling(was=name, artist=artist).save()
+    return artist
 
 
 class Command(BaseCommand):
