@@ -3,8 +3,8 @@ from irl.models import Location, Event, Partner
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['anime', 'event_type', 'date', 'location', 'language']
-    raw_id_fields = ['anime']
+    list_display = ['work', 'event_type', 'date', 'location', 'language']
+    raw_id_fields = ['work']
 
 
 class PartnerAdmin(admin.ModelAdmin):

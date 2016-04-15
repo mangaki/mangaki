@@ -1,5 +1,5 @@
 from django.db import models
-from mangaki.models import Anime
+from mangaki.models import Work
 from django.contrib.auth.models import User
 import locale
 
@@ -20,7 +20,7 @@ class Attendee(models.Model):
     attending = models.BooleanField(default=False)
 
 class Event(models.Model):
-    anime = models.ForeignKey(Anime)
+    work = models.ForeignKey(Work)
     location = models.ForeignKey('Location', blank=True, null=True)
     event_type = models.CharField(max_length=9, choices=(
         ('premiere', 'avant-première'),
@@ -39,7 +39,7 @@ class Event(models.Model):
     attendees = models.ManyToManyField(User, through=Attendee, blank=True)
 
     def __str__(self):
-        return '%s %s' % (self.event_type, self.anime.title)
+        return '%s %s' % (self.event_type, self.work.title)
 
     def get_date(self):
         locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')

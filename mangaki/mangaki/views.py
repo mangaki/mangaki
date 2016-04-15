@@ -372,7 +372,7 @@ def get_profile(request, username):
     category = request.GET.get('category', 'anime')
     ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
     c = 0
-    rating_list = natsorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
+    rating_list = natsorted(Rating.objects.filter(user__username=username).select_related('work'), key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
     # , key=lambda x: (ordering.index(x['choice']), 1))  # Tri par note puis nom
     # print(rating_list[:5])
     # chrono.save('get ratings %d queries' % len(connection.queries))
@@ -404,15 +404,15 @@ def get_profile(request, username):
     events = [
         {
             'id': attendee.event_id,
-            'anime_id': attendee.event.anime_id,
+            'work_id': attendee.event.work_id,
             'attending': True,
             'type': attendee.event.get_event_type_display(),
             'channel': attendee.event.channel,
             'date': attendee.event.get_date(),
             'link': attendee.event.link,
             'location': attendee.event.location,
-            'title': attendee.event.anime.title,
-        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event', 'event__anime__title')
+            'title': attendee.event.work.title,
+        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event', 'event__work__title')
     ]
 
     data = {
