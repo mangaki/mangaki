@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Anime, Manga, Genre, Track, Album, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
+from mangaki.models import Work, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -9,81 +9,40 @@ class StaffInline(admin.TabularInline):
     model = Staff
     fields = ('role', 'artist')
 
-class AnimeAdmin(admin.ModelAdmin):
+class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
-    list_filter = ('nsfw',)
-    actions = ['make_nsfw', 'make_sfw']
-    inlines = [StaffInline]
-    readonly_fields = (
-        'deprecated_director',
-        'deprecated_composer',
-        'deprecated_author',
-        'deprecated_genre',
-        'deprecated_origin',
-        'deprecated_nb_episodes',
-        'deprecated_anime_type',
-        'deprecated_anidb_aid',
-        'deprecated_editor',
-        'deprecated_studio',
-    )
-
-    def make_nsfw(self, request, queryset):
-        rows_updated = queryset.update(nsfw=True)
-        if rows_updated == 1:
-            message_bit = "1 anime est"
-        else:
-            message_bit = "%s animes sont" % rows_updated
-        self.message_user(request, "%s désormais NSFW." % message_bit)
-    make_nsfw.short_description = "Rendre NSFW les animes sélectionnés"
-
-    def make_sfw(self, request, queryset):
-        rows_updated = queryset.update(nsfw=False)
-        if rows_updated == 1:
-            message_bit = "1 anime n'est"
-        else:
-            message_bit = "%s animes ne sont" % rows_updated
-        self.message_user(request, "%s désormais plus NSFW." % message_bit)
-    make_sfw.short_description = "Rendre SFW les animes sélectionnés"
-
-
-class MangaAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'title')
-    list_display = ('id', 'title', 'nsfw')
-    list_filter = ('nsfw',)
+    list_filter = ('category', 'nsfw',)
     actions = ['make_nsfw', 'make_sfw', 'merge']
     inlines = [StaffInline]
     readonly_fields = (
-        'deprecated_mangaka',
-        'deprecated_writer',
-        'deprecated_genre',
-        'deprecated_origin',
-        'deprecated_vo_title',
-        'deprecated_manga_type',
-        'deprecated_editor',
+        'sum_ratings',
+        'nb_ratings',
+        'nb_likes',
+        'nb_dislikes',
+        'controversy',
     )
 
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
         if rows_updated == 1:
-            message_bit = "1 manga est"
+            message_bit = "1 œuvre est"
         else:
-            message_bit = "%s mangas sont" % rows_updated
+            message_bit = "%s œuvres sont" % rows_updated
         self.message_user(request, "%s désormais NSFW." % message_bit)
-    make_nsfw.short_description = "Rendre NSFW les mangas sélectionnés"
+    make_nsfw.short_description = "Rendre NSFW les œuvres sélectionnées"
 
     def make_sfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=False)
         if rows_updated == 1:
-            message_bit = "1 manga n'est"
+            message_bit = "1 œuvre n'est"
         else:
-            message_bit = "%s mangas ne sont" % rows_updated
+            message_bit = "%s œuvres ne sont" % rows_updated
         self.message_user(request, "%s désormais plus NSFW." % message_bit)
-    make_sfw.short_description = "Rendre SFW les mangas sélectionnés"
+    make_sfw.short_description = "Rendre SFW les œuvres sélectionnées"
 
     def merge(self, request, queryset):
         queryset = queryset.order_by('id')
-        opts = self.model._meta
         if request.POST.get('post'):
             chosen_id = int(request.POST.get('chosen_id'))
             for obj in queryset:
@@ -103,12 +62,12 @@ class MangaAdmin(admin.ModelAdmin):
             deletable_objects.append(Rating.objects.filter(work=obj)[:10])
         context = {
             'queryset': queryset,
-            'opts': opts,
+            'opts': self.model._meta,
             'deletable_objects': deletable_objects,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
         }
         return TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
-    merge.short_description = "Fusionner les mangas sélectionnés"
+    merge.short_description = "Fusionner les œuvres sélectionnées"
 
 
 class GenreAdmin(admin.ModelAdmin):
@@ -117,16 +76,6 @@ class GenreAdmin(admin.ModelAdmin):
 
 class TrackAdmin(admin.ModelAdmin):
     pass
-
-
-class AlbumAdmin(admin.ModelAdmin):
-    inlines = [StaffInline]
-    readonly_fields = (
-        'deprecated_composer',
-        'deprecated_catalog_number',
-        'deprecated_vgmdb_aid',
-    )
-
 
 class ArtistAdmin(admin.ModelAdmin):
     search_fields = ('id', 'first_name', 'last_name')
@@ -277,8 +226,7 @@ class RoleAdmin(admin.ModelAdmin):
     model = Role
     prepopulated_fields = {'slug': ('name',)}
 
-admin.site.register(Anime, AnimeAdmin)
-admin.site.register(Manga, MangaAdmin)
+admin.site.register(Work, WorkAdmin)
 admin.site.register(Genre, GenreAdmin)
 admin.site.register(Track, TrackAdmin)
 admin.site.register(Artist, ArtistAdmin)
@@ -293,5 +241,4 @@ admin.site.register(Recommendation, RecommendationAdmin)
 admin.site.register(Pairing, PairingAdmin)
 admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(Top, TopAdmin)
-admin.site.register(Album, AlbumAdmin)
 admin.site.register(Role, RoleAdmin)
