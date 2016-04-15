@@ -19,7 +19,7 @@ from django.db.models import Count, Case, When, F, Value
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Anime, Manga, Album, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff
+from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -373,29 +373,7 @@ def get_profile(request, username):
     user = User.objects.get(username=username)
     category = request.GET.get('category', 'anime')
     ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
-    seen_anime_list = []
-    unseen_anime_list = []
-    seen_manga_list = []
-    unseen_manga_list = []
     c = 0
-    """for work_id, work_title, is_anime, choice in Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga').values_list('work_id', 'work__title', 'work__anime', 'choice'):
-        # print(work_id, work_title, is_anime, choice)
-        seen = choice in ['favorite', 'like', 'neutral', 'dislike']
-        rating = {'work': {'id': work_id, 'title': work_title}, 'choice': choice}
-        # print(rating)
-        if is_anime:
-            if seen:
-                seen_anime_list.append(rating)
-            else:
-                unseen_anime_list.append(rating)
-        else:
-            if seen:
-                seen_manga_list.append(rating)
-            else:
-                unseen_manga_list.append(rating)
-        c += 1
-        if c >= 200:
-            break"""
     rating_list = natsorted(Rating.objects.filter(user__username=username).select_related('work', 'work__anime', 'work__manga'), key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
     # , key=lambda x: (ordering.index(x['choice']), 1))  # Tri par note puis nom
     # print(rating_list[:5])
@@ -407,41 +385,22 @@ def get_profile(request, username):
         received_recommendations = Recommendation.objects.filter(target_user__username=username)
         sent_recommendations = Recommendation.objects.filter(user__username=username)
         for reco in received_recommendations:
-            try:
-                reco.work.anime
-                if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                    received_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
-            except Anime.DoesNotExist:
-                if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                    received_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
+            if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                received_recommendation_list.append({'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
         for reco in sent_recommendations:
-            try:
-                reco.work.anime
-                if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                    sent_recommendation_list.append({'category': 'anime', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
-            except Anime.DoesNotExist:
-                if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                    sent_recommendation_list.append({'category': 'manga', 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
+            if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                sent_recommendation_list.append({'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
     # chrono.save('get reco %d queries' % len(connection.queries))
 
+    seen_lists = {'anime': [], 'manga': [], 'album': 0}
+    unseen_lists = {'anime': [], 'manga': [], 'album': []}
     for r in rating_list:
-        seen = r.choice in ['favorite', 'like', 'neutral', 'dislike']
-        rating = r#{'work': {'id': r.work.id, 'title': r.work.title}, 'choice': r.choice}
-        try:
-            r.work.anime
-            if seen:
-                seen_anime_list.append(rating)
-            else:
-                unseen_anime_list.append(rating)
-        except Anime.DoesNotExist:
-            if seen:
-                seen_manga_list.append(rating)
-            else:
-                unseen_manga_list.append(rating)
+        if r.choice in ['favorite', 'like', 'neutral', 'dislike']:
+            seen_lists[r.work.category.slug].append(r)
+        else:
+            unseen_list[r.work.category.slug].append(r)
     # chrono.save('categorize ratings')
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
-    seen_list = seen_anime_list if category == 'anime' else seen_manga_list
-    unseen_list = unseen_anime_list if category == 'anime' else unseen_manga_list
 
     # Events
     events = [
@@ -465,13 +424,14 @@ def get_profile(request, username):
         'category': category,
         'avatar_url': user.profile.get_avatar_url(),
         'member_days': member_time.days,
-        'anime_count': len(seen_anime_list),
-        'manga_count': len(seen_manga_list),
+        'anime_count': len(seen_lists['anime']),
+        'manga_count': len(seen_lists['manga']),
         'reco_count': len(received_recommendation_list),
-        'seen_list': seen_list if is_shared else [],
-        'unseen_list': unseen_list if is_shared else [],
+        'seen_list': seen_lists.get(category, []) if is_shared else [],
+        'unseen_list': unseen_lists.get(category, []) if is_shared else [],
         'received_recommendation_list': received_recommendation_list if is_shared else [],
         'sent_recommendation_list': sent_recommendation_list if is_shared else [],
+        'events': events,
     }
     for key in data:
         try:
@@ -479,22 +439,7 @@ def get_profile(request, username):
         except:
             print(key, '->', data[key])
     chrono.save('get request')
-    return render(request, 'profile.html', {
-        'username': username,
-        'score': user.profile.score,
-        'is_shared': is_shared,
-        'category': category,
-        'avatar_url': user.profile.get_avatar_url(),
-        'member_days': member_time.days,
-        'anime_count': len(seen_anime_list),
-        'manga_count': len(seen_manga_list),
-        'reco_count': len(received_recommendation_list),
-        'seen_list': seen_list if is_shared else [],
-        'unseen_list': unseen_list if is_shared else [],
-        'received_recommendation_list': received_recommendation_list if is_shared else [],
-        'sent_recommendation_list': sent_recommendation_list if is_shared else [],
-        'events': events,
-    })
+    return render(request, 'profile.html', data)
 
 
 def index(request):
@@ -519,7 +464,7 @@ def events(request):
         for rating in Rating.objects.filter(work_id=UTA_ID, user=request.user):
             if rating.work_id == UTA_ID:
                 uta_rating = rating.choice
-    ghibli_works = Anime.objects.in_bulk(GHIBLI_IDS)
+    ghibli_works = Work.objects.in_bulk(GHIBLI_IDS)
     if request.user.is_authenticated():
         ghibli_ratings = dict(Rating.objects.filter(user=request.user, work_id__in=GHIBLI_IDS).values_list('work_id', 'choice'))
     else:
@@ -695,8 +640,13 @@ def import_from_mal(request, mal_username):
 
 
 def report_nsfw(request, pk):
-    Anime.objects.filter(id=pk).update(nsfw=True)
-    return redirect('/anime/%s' % pk)
+    try:
+        work = Work.objects.get(id=pk)
+        work.nsfw = True
+        work.save()
+        return redirect(work.get_absolute_url())
+    except Work.DoesNotExist:
+        return redirect('/')
 
 
 def add_pairing(request, artist_id, work_id):
