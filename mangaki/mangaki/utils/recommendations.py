@@ -1,5 +1,5 @@
 from collections import Counter
-from mangaki.models import Anime, Manga, Rating, Work
+from mangaki.models import Rating, Work
 from mangaki.utils.chrono import Chrono
 from django.contrib.auth.models import User
 from django.db.models import Count
@@ -31,7 +31,7 @@ def get_recommendations(user, category, editor):
     else:
         banned_works = set(rated_works.keys())
 
-    mangas = Manga.objects.all()
+    mangas = Work.objects.filter(category__slug='manga')
     if editor == 'otototaifu':
         mangas = mangas.filter(editor__title__in=['Ototo Manga', 'Taifu comics'])
     elif editor != 'unspecified':

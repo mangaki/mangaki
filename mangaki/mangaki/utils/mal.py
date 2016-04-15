@@ -13,7 +13,7 @@ from random import randint
 from secret import MAL_USER, MAL_PASS, MAL_USER_AGENT
 
 from django.contrib.auth.models import User
-from mangaki.models import Anime, Rating, SearchIssue, Artist
+from mangaki.models import Work, Rating, SearchIssue, Artist, Category
 
 
 def _encoding_translation(text):
@@ -33,8 +33,9 @@ def random_ip():
 
 def retrieve_anime(entries):
     unknown = Artist.objects.get(id=1)
+    anime_cat = Category.objects.get(slug='anime')
     for entry in entries:
-        if Anime.objects.filter(poster=entry['image']).count() == 0:  # SCANDALE
+        if Work.objects.filter(category=anime_cat, poster=entry['image']).count() == 0:  # SCANDALE
             title = entry['english'] if entry['english'] else entry['title']
             if '0000' in entry['start_date']:
                 anime_date = None
@@ -44,7 +45,7 @@ def retrieve_anime(entries):
                 anime_date = entry['start_date'].replace('-00', '-01')
             else:
                 anime_date = entry['start_date']
-            Anime.objects.create(title=title, source='http://myanimelist.net/anime/' + entry['id'], poster=entry['image'], date=anime_date)
+            Work.objects.create(category=anime_cat, title=title, source='http://myanimelist.net/anime/' + entry['id'], poster=entry['image'], date=anime_date)
 
 
 def lookup_mal_api(query):
@@ -120,17 +121,18 @@ def import_mal(mal_username, mangaki_username):
             score = int(entry.find('my_score').text)
             mal_id = entry.find('series_animedb_id').text
             try:
-                if Anime.objects.filter(title=title).count():
-                    anime = Anime.objects.get(title=title)
-                elif Anime.objects.filter(poster=poster).count() == 1:
-                    anime = Anime.objects.get(poster=poster)
-                elif Anime.objects.filter(poster=poster).count() >= 2:
-                    print('multiposters')
-                    raise Exception  # Report
-                else:
-                    entries = lookup_mal_api(title)
-                    retrieve_anime(entries)
-                    anime = Anime.objects.get(poster=poster)
+                try:
+                    anime = Work.objects.filter(category__slug='anime').get(title=title)
+                except Work.DoesNotExist:
+                    if Work.objects.filter(category__slug='anime', poster=poster).count() == 1:
+                        anime = Work.objects.get(poster=poster)
+                    elif Work.objects.filter(category__slug='anime', poster=poster).count() >= 2:
+                        print('multiposters')
+                        raise Exception  # Report
+                    else:
+                        entries = lookup_mal_api(title)
+                        retrieve_anime(entries)
+                        anime = Work.objects.filter(category__slug='anime').get(poster=poster)
                 if anime:
                     if not Rating.objects.filter(user=user, work=anime).count():
                         if 7 <= score <= 10:
