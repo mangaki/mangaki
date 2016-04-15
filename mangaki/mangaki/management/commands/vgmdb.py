@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.vgmdb import VGMdb
-from mangaki.models import Anime, Artist, Album
+from mangaki.models import Artist, Work
 from urllib.parse import urlparse, parse_qs
 
 def pick_among(contestants):
@@ -59,7 +59,7 @@ class Command(BaseCommand):
         category = 'anime'
 
         album_id = options.get('id')[0]
-        album = Album.objects.get(id=album_id)
+        album = Work.objects.filter(category__slug='album').get(id=album_id)
         if album.vgmdb_aid:
             vgmdb = VGMdb()
             print(album.title, album.id)

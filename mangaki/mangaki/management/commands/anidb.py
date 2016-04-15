@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.anidb import AniDB
-from mangaki.models import Anime, Artist, Role, Staff, Work
+from mangaki.models import Artist, Role, Staff, Work
 from django.db.models import Count
 from urllib.parse import urlparse, parse_qs
 import sys
@@ -62,7 +62,7 @@ class Command(BaseCommand):
         start = 0
         if options.get('id'):
             anime_id = options.get('id')[0]
-            anime = Anime.objects.get(id=anime_id)
+            anime = Work.objects.filter(category__slug='anime').get(id=anime_id)
             if anime.anidb_aid == 0:
                 for reference in anime.reference_set.all():
                     if reference.url.startswith('http://anidb.net') or reference.url.startswith('https://anidb.net'):
@@ -71,7 +71,7 @@ class Command(BaseCommand):
                         if anidb_aid:
                             anime.anidb_aid = anidb_aid[0]
                             anime.save()
-            todo = Anime.objects.filter(id=anime_id, anidb_aid__gt=0)
+            todo = Work.objects.filter(category__slug='anime', id=anime_id, anidb_aid__gt=0)
         else:
             todo = Work.objects\
                 .only('pk', 'title', 'poster', 'nsfw')\
