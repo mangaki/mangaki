@@ -14,7 +14,6 @@ class Command(BaseCommand):
                 .annotate(rating_count=Count('rating'))\
                 .filter(anidb_aid=0, category__slug='anime', rating_count__gte=6)\
                 .order_by('-rating_count')
-        print(q.query)
         a = AniDB('mangakihttp', 1)
         for anime in q:
             print(anime.title, anime.id)
