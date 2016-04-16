@@ -149,7 +149,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, DetailView):
                 context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
             context['seen_percent'] = round(100 * seen_total / float(total))
 
-        events = self.object.work.event_set.filter(date__gte=timezone.now())
+        events = self.object.event_set.filter(date__gte=timezone.now())
         if events.count() > 0:
             my_events = {}
             if self.request.user.is_authenticated():
