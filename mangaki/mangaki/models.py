@@ -185,6 +185,9 @@ class Rating(models.Model):
     ))
     date = models.DateField(auto_now=True)
 
+    class Meta:
+        unique_together = ('user', 'work')
+
     def __str__(self):
         return '%s %s %s' % (self.user, self.choice, self.work)
 
