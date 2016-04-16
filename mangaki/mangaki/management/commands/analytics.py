@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
-from mangaki.models import Anime, Manga, Rating
+from mangaki.models import Work, Rating
 from mangaki.utils.ranking import controversy
 from collections import Counter
 from itertools import groupby
@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         anime_map = {}
-        popular_anime = Anime.objects.annotate(Count('rating')).filter(rating__count__gte=100)
+        popular_anime = Work.objects.filter(category__slug='anime').annotate(Count('rating')).filter(rating__count__gte=100)
         for anime in popular_anime:
             anime_map[anime.id] = anime
         ratings = Rating.objects.filter(work__in=popular_anime).values('work', 'choice').annotate(count=Count('pk')).order_by('work', 'choice')

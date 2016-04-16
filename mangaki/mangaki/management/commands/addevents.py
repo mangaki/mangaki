@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from irl.models import Event, Location
-from mangaki.models import Anime
+from mangaki.models import Work
 
 from datetime import datetime
 
@@ -29,6 +29,6 @@ class Command(BaseCommand):
                 date = datetime.strptime(date, "%Y-%m-%d %H:%M")
                 fauvettes = Location.objects.get(id=1)
                 
-                anime = Anime.objects.get(id=anime_ids[title])
+                anime = Work.objects.get(id=anime_ids[title])
                 
                 # Event(date=date, anime=anime, location=fauvettes, event_type="screening", language='vostfr' if language == 'VOST' else 'vf').save()
