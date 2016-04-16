@@ -12,7 +12,7 @@ def get_or_create_artist(name):
     except Artist.DoesNotExist:
         pass
     try:
-        return ArtistSpelling.objects.get(was=name).artist
+        return ArtistSpelling.objects.select_related('artist').get(was=name).artist
     except ArtistSpelling.DoesNotExist:
         pass
     # FIXME consider trigram search to find similar artists in Artist, ArtistSpelling
