@@ -78,7 +78,7 @@ class TrackAdmin(admin.ModelAdmin):
     pass
 
 class ArtistAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'first_name', 'last_name')
+    search_fields = ('id', 'name')
 
 
 class StudioAdmin(admin.ModelAdmin):
