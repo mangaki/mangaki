@@ -15,7 +15,18 @@ class AnimeAdmin(admin.ModelAdmin):
     list_filter = ('nsfw',)
     actions = ['make_nsfw', 'make_sfw']
     inlines = [StaffInline]
-    readonly_fields = ('deprecated_director', 'deprecated_composer', 'deprecated_author')
+    readonly_fields = (
+        'deprecated_director',
+        'deprecated_composer',
+        'deprecated_author',
+        'deprecated_genre',
+        'deprecated_origin',
+        'deprecated_nb_episodes',
+        'deprecated_anime_type',
+        'deprecated_anidb_aid',
+        'deprecated_editor',
+        'deprecated_studio',
+    )
 
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
@@ -42,7 +53,15 @@ class MangaAdmin(admin.ModelAdmin):
     list_filter = ('nsfw',)
     actions = ['make_nsfw', 'make_sfw', 'merge']
     inlines = [StaffInline]
-    readonly_fields = ('deprecated_mangaka', 'deprecated_writer')
+    readonly_fields = (
+        'deprecated_mangaka',
+        'deprecated_writer',
+        'deprecated_genre',
+        'deprecated_origin',
+        'deprecated_vo_title',
+        'deprecated_manga_type',
+        'deprecated_editor',
+    )
 
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
@@ -101,7 +120,12 @@ class TrackAdmin(admin.ModelAdmin):
 
 
 class AlbumAdmin(admin.ModelAdmin):
-    pass
+    inlines = [StaffInline]
+    readonly_fields = (
+        'deprecated_composer',
+        'deprecated_catalog_number',
+        'deprecated_vgmdb_aid',
+    )
 
 
 class ArtistAdmin(admin.ModelAdmin):

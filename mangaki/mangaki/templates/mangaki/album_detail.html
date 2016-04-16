@@ -13,7 +13,9 @@
         </div>
     </div>
     <div class="col-sm-6 col-md-3">
-      <p>Compositeur : <a href="/artist/{{ object.composer.id }}">{{ object.composer }}</a></p>
+      {% for staff in object.staff_set.all %}
+          <p>{{ staff.role.name }}&nbsp;: <a href="/artist/{{ staff.artist.id }}">{{ staff.artist }}</a></p>
+      {% endfor %}
       <p>Code catalogue : {{ object.catalog_number }}</p>
       {% if object.vgmdb_aid %}
       <p><a href="http://vgmdb.net/album/{{ object.vgmdb_aid }}">Retrouvez cet album sur VGMdb</a></p>

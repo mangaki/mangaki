@@ -47,6 +47,19 @@ class Work(models.Model):
     category = models.ForeignKey('Category', blank=True, null=False)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
 
+    # Some of these fields do not make sense for some categories of works.
+    genre = models.ManyToManyField('Genre')
+    origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='', blank=True)
+    nb_episodes = models.TextField(default='Inconnu', max_length=16)
+    anime_type = models.TextField(max_length=42, default='')
+    vo_title = models.CharField(max_length=128, default='')
+    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
+    catalog_number = models.CharField(max_length=20, blank=True)
+    anidb_aid = models.IntegerField(default=0, blank=True)
+    vgmdb_aid = models.IntegerField(blank=True, null=True)
+    editor = models.ForeignKey('Editor', default=1)
+    studio = models.ForeignKey('Studio', default=1)
+
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
     nb_ratings = models.IntegerField(blank=True, null=False, default=0)
@@ -98,7 +111,7 @@ class Staff(models.Model):
         unique_together = ('work', 'artist', 'role')
 
 class Editor(models.Model):
-    title = models.CharField(max_length=33)
+    title = models.CharField(max_length=33, db_index=True)
 
     def __str__(self):
         return self.title
@@ -112,33 +125,31 @@ class Studio(models.Model):
 
 
 class Anime(Work):
-    studio = models.ForeignKey('Studio', default=1)
-    editor = models.ForeignKey('Editor', default=1)
-    anime_type = models.TextField(max_length=42, default='')
-    genre = models.ManyToManyField('Genre')
-    nb_episodes = models.TextField(default='Inconnu', max_length=16)
-    origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
-    anidb_aid = models.IntegerField(default=0)
-
     # Deprecated fields
     deprecated_director = models.ForeignKey('Artist', related_name='directed', default=1)
     deprecated_author = models.ForeignKey('Artist', related_name='authored', default=1)
     deprecated_composer = models.ForeignKey('Artist', related_name='composed', default=1)
+    deprecated_genre = models.ManyToManyField('Genre')
+    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
+    deprecated_nb_episodes = models.TextField(default='Inconnu', max_length=16)
+    deprecated_anime_type = models.TextField(max_length=42, default='')
+    deprecated_anidb_aid = models.IntegerField(default=0)
+    deprecated_editor = models.ForeignKey('Editor', default=1)
+    deprecated_studio = models.ForeignKey('Studio', default=1)
 
     def __str__(self):
         return '[%d] %s' % (self.id, self.title)
 
 
 class Manga(Work):
-    vo_title = models.CharField(max_length=128)
-    editor = models.CharField(max_length=32)
-    origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
-    genre = models.ManyToManyField('Genre')
-    manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
-
     # Deprecated fields
     deprecated_mangaka = models.ForeignKey('Artist', related_name='drew')
     deprecated_writer = models.ForeignKey('Artist', related_name='wrote')
+    deprecated_genre = models.ManyToManyField('Genre')
+    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
+    deprecated_vo_title = models.CharField(max_length=128)
+    deprecated_manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
+    deprecated_editor = models.CharField(max_length=32)
 
 
 class Genre(models.Model):
@@ -157,9 +168,10 @@ class Track(models.Model):
 
 
 class Album(Work):
-    composer = models.ForeignKey('Artist', related_name='composer', default=1)
-    catalog_number = models.CharField(max_length=20)
-    vgmdb_aid = models.IntegerField(blank=True, null=True)
+    # Deprecated fields
+    deprecated_composer = models.ForeignKey('Artist', related_name='composer', default=1)
+    deprecated_catalog_number = models.CharField(max_length=20)
+    deprecated_vgmdb_aid = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return '[{id}] {title}'.format(id=self.id, title=self.title)
