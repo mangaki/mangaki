@@ -127,8 +127,7 @@ def import_mal(mal_username, mangaki_username):
                     if Work.objects.filter(category__slug='anime', poster=poster).count() == 1:
                         anime = Work.objects.get(poster=poster)
                     elif Work.objects.filter(category__slug='anime', poster=poster).count() >= 2:
-                        print('multiposters')
-                        raise Exception  # Report
+                        raise Exception('Integrity violation: found two or more works with the same poster, do you come from the past?')
                     else:
                         entries = lookup_mal_api(title)
                         retrieve_anime(entries)
