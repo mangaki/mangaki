@@ -121,8 +121,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, DetailView):
         update_poster_if_nsfw(self.object, self.request.user)
         self.object.source = self.object.source.split(',')[0]
 
-        genres = [genre.title for genre in self.object.genre.all()]
-        context['genres'] = ', '.join(genres)
+        context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
 
         if self.request.user.is_authenticated():
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
