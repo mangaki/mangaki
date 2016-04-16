@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from secret import MAL_USER, MAL_PASS
-from mangaki.models import Anime
+from mangaki.models import Work
 import xml.etree.ElementTree as ET
 import requests
 import html
@@ -17,7 +17,7 @@ class Command(BaseCommand):
     help = 'Fetches anime posters'
 
     def handle(self, *args, **options):
-        for anime in Anime.objects.filter(poster=''):
+        for anime in Work.objects.filter(category__slug='anime', poster=''):
             try:
                 anime.poster = poster(anime.title)
                 anime.save()

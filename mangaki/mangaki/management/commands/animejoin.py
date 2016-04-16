@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from mangaki.models import Artist, Anime, Genre
+from mangaki.models import Artist, Work, Genre
 from django.db.models import Count
 from django.db.utils import IntegrityError, DataError
 import re
@@ -36,7 +36,7 @@ def run():
         hipsters = Counter()
         mangaki_slugs = set()
         db_slugs = []
-        for anime in Anime.objects.all():
+        for anime in Work.objects.filter(category__slug='anime'):
             mangaki_slugs.add(get_slug(anime.title))
         for i, line in enumerate(f):
             # print(len(line.split(';;')))
@@ -50,7 +50,7 @@ def run():
         for line in f:
             ignored_ids.append(int(line.split('::')[0]))
 
-    todo = list(Anime.objects.filter(synopsis='').exclude(id__in=ignored_ids)
+    todo = list(Work.objects.filter(category__slug='anime', synopsis='').exclude(id__in=ignored_ids)
                      .annotate(Count('rating')).order_by('-rating__count')[:10])[::-1]
     while todo:
         anime = todo.pop()
