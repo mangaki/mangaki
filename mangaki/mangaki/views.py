@@ -149,26 +149,25 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, DetailView):
                 context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
             context['seen_percent'] = round(100 * seen_total / float(total))
 
-        if self.object.category.slug == 'anime':
-            events = self.object.anime.event_set.filter(date__gte=timezone.now())
-            if events.count() > 0:
-                my_events = {}
-                if self.request.user.is_authenticated():
-                    my_events = dict(self.request.user.attendee_set.filter(
-                        event__in=events).values_list('event_id', 'attending'))
+        events = self.object.work.event_set.filter(date__gte=timezone.now())
+        if events.count() > 0:
+            my_events = {}
+            if self.request.user.is_authenticated():
+                my_events = dict(self.request.user.attendee_set.filter(
+                    event__in=events).values_list('event_id', 'attending'))
 
-                context['events'] = [
-                    {
-                        'id': event.id,
-                        'attending': my_events.get(event.id, None),
-                        'type': event.get_event_type_display(),
-                        'channel': event.channel,
-                        'date': event.get_date(),
-                        'link': event.link,
-                        'location': event.location,
-                        'nb_attendees': event.attendee_set.filter(attending=True).count(),
-                    } for event in events
-                ]
+            context['events'] = [
+                {
+                    'id': event.id,
+                    'attending': my_events.get(event.id, None),
+                    'type': event.get_event_type_display(),
+                    'channel': event.channel,
+                    'date': event.get_date(),
+                    'link': event.link,
+                    'location': event.location,
+                    'nb_attendees': event.attendee_set.filter(attending=True).count(),
+                } for event in events
+            ]
 
         return context
 
