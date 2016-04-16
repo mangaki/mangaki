@@ -5,6 +5,7 @@ from django.db.models import F
 from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
 
 from mangaki.api import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
@@ -76,7 +77,6 @@ class Work(models.Model):
     objects = WorkQuerySet.as_manager()
 
     def get_absolute_url(self):
-        from django.core.urlresolvers import reverse
         return reverse('{}-detail'.format(self.category.slug), args=[str(self.id)])
 
     def safe_poster(self, user):
