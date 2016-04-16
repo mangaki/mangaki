@@ -154,7 +154,7 @@ class SuggestionAdmin(admin.ModelAdmin):
     actions = ['check_suggestions', 'uncheck_suggestions']
 
     def view_on_site(self, obj):
-        return reverse('anime-detail', args=[obj.work_id])
+        return obj.work.get_absolute_url()
 
     def check_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=True)
