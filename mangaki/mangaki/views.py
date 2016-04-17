@@ -263,7 +263,8 @@ class WorkList(WorkListMixin, ListView):
 
     def get_queryset(self):
         queryset = Work.objects.filter(category__slug=self.category())
-        sort_mode = self.request.GET.get('sort', 'mosaic')
+        sort_mode = self.request.GET.get('sort', 'popularity')
+        search_text = self.request.GET.get('search', None)
 
         if sort_mode == 'top':
             queryset = queryset.top()
@@ -285,13 +286,16 @@ class WorkList(WorkListMixin, ListView):
         else:
             raise Http404
 
+        if search_text is not None:
+            queryset = queryset.search(search_text)
+
         queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug').select_related('category__slug')
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        sort_mode = self.request.GET.get('sort', 'mosaic')
+        sort_mode = self.request.GET.get('sort', 'popularity')
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category()

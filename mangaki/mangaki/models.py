@@ -1,15 +1,17 @@
 # coding=utf8
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import F
+from django.db.models import F, Q, Func, Value
 from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 
-from mangaki.api import get_discourse_data
+from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+
+from unidecode import unidecode
 
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
@@ -24,6 +26,13 @@ class WorkQuerySet(models.QuerySet):
 
     def controversial(self):
         return self.order_by('-controversy')
+
+    def search(self, search_text):
+        return self.annotate(sim_score=Func(Func(F('title'), function='UNACCENT'), Value(unidecode(search_text)), function='SIMILARITY'))\
+                .annotate(unaccent_title=Func(F('title'), function='UNACCENT'))\
+                .filter(Q(unaccent_title__icontains=unidecode(search_text)) | Q(sim_score__gte=Func(function='SHOW_LIMIT'))).\
+                order_by('-sim_score')
+
 
     def random(self):
         return self.filter(
@@ -40,7 +49,7 @@ class Category(models.Model):
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
-    source = models.CharField(max_length=1044, blank=True)
+    source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
     poster = models.CharField(max_length=128)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
