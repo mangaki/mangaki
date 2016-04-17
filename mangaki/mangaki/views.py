@@ -602,7 +602,10 @@ def remove_all_reco(request, targetname):
 def get_reco(request):
     category = request.GET.get('category', 'all')
     editor = request.GET.get('editor', 'unspecified')
-    reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+    if request.user.rating_set.exists():
+        reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+    else:
+        reco_list = []
     return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
 
 
