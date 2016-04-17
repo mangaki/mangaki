@@ -27,7 +27,7 @@ from mangaki.utils.recommendations import get_recommendations
 from mangaki.utils.chrono import Chrono
 from irl.models import Event, Partner, Attendee
 
-from collections import Counter
+from collections import Counter, OrderedDict
 from markdown import markdown
 from urllib.parse import urlencode
 from random import shuffle, randint
@@ -137,16 +137,23 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, DetailView):
                     context['references'].append((reference.url, name))
 
         nb = Counter(Rating.objects.filter(work=self.object).values_list('choice', flat=True))
-        labels = {'favorite': 'Ajoutés aux favoris', 'like': 'Ont aimé', 'neutral': 'Neutre', 'dislike': 'N\'ont pas aimé', 'willsee': 'Ont envie de voir', 'wontsee': 'N\'ont pas envie de voir'}
-        seen_ratings = ['favorite', 'like', 'neutral', 'dislike']
+        labels = OrderedDict([
+            ('favorite', 'Ajoutés aux favoris'),
+            ('like',     'Ont aimé'),
+            ('neutral',  'Neutre'),
+            ('dislike',  'N\'ont pas aimé'),
+            ('willsee',  'Ont envie de voir'),
+            ('wontsee',  'N\'ont pas envie de voir'),
+        ])
+        seen_ratings = {'favorite', 'like', 'neutral', 'dislike'}
         total = sum(nb.values())
         if total > 0:
             context['stats'] = []
             seen_total = sum(nb[rating] for rating in seen_ratings)
-            for rating in labels:
+            for rating, label in labels.items():
                 if seen_total > 0 and rating not in seen_ratings:
                     continue
-                context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': labels[rating]})
+                context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': label})
             context['seen_percent'] = round(100 * seen_total / float(total))
 
         events = self.object.event_set.filter(date__gte=timezone.now())
