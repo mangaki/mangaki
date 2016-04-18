@@ -216,7 +216,7 @@ def get_card(request, category, sort_id=1):
     chrono = Chrono(True)
     deja_vu = request.GET.get('dejavu', '').split(',')
     sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
-    queryset = Work.objects.filter(category__slug=category)
+    queryset = Work.objects.by_category(category)
     if sort_mode == 'popularity':
         queryset = queryset.popular()
     elif sort_mode == 'controversy':
@@ -228,9 +228,11 @@ def get_card(request, category, sort_id=1):
     if request.user.is_authenticated():
         rated_works = Rating.objects.filter(user=request.user).values('work_id')
         queryset = queryset.exclude(id__in=rated_works)
-    queryset = queryset[:54]
+
+    queryset = queryset.only('id', 'title', 'poster', 'nsfw', 'synopsis')[:54]
     cards = []
-    for work in queryset.values('id', 'title', 'poster', 'synopsis', 'nsfw'):
+
+    for work in queryset.values('id', 'title', 'poster', 'nsfw', 'synopsis'):
         update_poster_if_nsfw_dict(work, request.user)
         work['category'] = category
         cards.append(work)
@@ -262,7 +264,7 @@ class WorkList(WorkListMixin, ListView):
         return self.kwargs.get('category', 'anime')
 
     def get_queryset(self):
-        queryset = Work.objects.filter(category__slug=self.category())
+        queryset = Work.objects.by_category(self.category())
         sort_mode = self.request.GET.get('sort', 'mosaic')
 
         if sort_mode == 'top':
@@ -285,9 +287,7 @@ class WorkList(WorkListMixin, ListView):
         else:
             raise Http404
 
-        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug').select_related('category__slug')
-
-        return queryset
+        return queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -31,6 +31,12 @@ class WorkQuerySet(models.QuerySet):
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
 
+    def by_category(self, category):
+        return self.filter(
+                category__slug=category)\
+                .select_related('category__slug')
+
+
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
     name = models.CharField(max_length=128)
