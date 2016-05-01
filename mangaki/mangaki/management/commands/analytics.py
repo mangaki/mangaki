@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         anime_map = {}
-        popular_anime = Work.objects.filter(category__slug='anime').annotate(Count('rating')).filter(rating__count__gte=100)
+        popular_anime = Work.objects.filter(category='anime').annotate(Count('rating')).filter(rating__count__gte=100)
         for anime in popular_anime:
             anime_map[anime.id] = anime
         ratings = Rating.objects.filter(work__in=popular_anime).values('work', 'choice').annotate(count=Count('pk')).order_by('work', 'choice')

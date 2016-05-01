@@ -12,7 +12,7 @@ class Command(BaseCommand):
         q = Work.objects\
                 .only('pk', 'title', 'poster', 'nsfw')\
                 .annotate(rating_count=Count('rating'))\
-                .filter(anidb_aid=0, category__slug='anime', rating_count__gte=6)\
+                .filter(anidb_aid=0, category='anime', rating_count__gte=6)\
                 .order_by('-rating_count')
         a = AniDB('mangakihttp', 1)
         for anime in q:

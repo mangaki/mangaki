@@ -38,10 +38,8 @@ class Command(BaseCommand):
         parser.add_argument('id', nargs='+', type=int)
 
     def handle(self, *args, **options):        
-        category = 'anime'
-
         album_id = options.get('id')[0]
-        album = Work.objects.filter(category__slug='album').get(id=album_id)
+        album = Work.objects.filter(category='album').get(id=album_id)
         if album.vgmdb_aid:
             vgmdb = VGMdb()
             print(album.title, album.id)

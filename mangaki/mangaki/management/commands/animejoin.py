@@ -36,7 +36,7 @@ def run():
         hipsters = Counter()
         mangaki_slugs = set()
         db_slugs = []
-        for anime in Work.objects.filter(category__slug='anime'):
+        for anime in Work.objects.filter(category='anime'):
             mangaki_slugs.add(get_slug(anime.title))
         for i, line in enumerate(f):
             # print(len(line.split(';;')))
@@ -50,7 +50,7 @@ def run():
         for line in f:
             ignored_ids.append(int(line.split('::')[0]))
 
-    todo = list(Work.objects.filter(category__slug='anime', synopsis='').exclude(id__in=ignored_ids)
+    todo = list(Work.objects.filter(category='anime', synopsis='').exclude(id__in=ignored_ids)
                      .annotate(Count('rating')).order_by('-rating__count')[:10])[::-1]
     while todo:
         anime = todo.pop()

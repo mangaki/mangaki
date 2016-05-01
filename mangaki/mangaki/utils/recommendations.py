@@ -31,7 +31,7 @@ def get_recommendations(user, category, editor):
     else:
         banned_works = set(rated_works.keys())
 
-    mangas = Work.objects.filter(category__slug='manga')
+    mangas = Work.objects.filter(category='manga')
     if editor == 'otototaifu':
         mangas = mangas.filter(editor__title__in=['Ototo Manga', 'Taifu comics'])
     elif editor != 'unspecified':

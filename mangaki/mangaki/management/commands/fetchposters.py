@@ -17,7 +17,7 @@ class Command(BaseCommand):
     help = 'Fetches anime posters'
 
     def handle(self, *args, **options):
-        for anime in Work.objects.filter(category__slug='anime', poster=''):
+        for anime in Work.objects.filter(category='anime', poster=''):
             try:
                 anime.poster = poster(anime.title)
                 anime.save()

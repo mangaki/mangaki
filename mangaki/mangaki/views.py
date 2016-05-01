@@ -110,10 +110,10 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, DetailView):
         return self.object.get_absolute_url()
 
     def get_queryset(self):
-        queryset = Work.objects.prefetch_related('staff_set__role', 'staff_set__artist', 'category')
+        queryset = Work.objects.prefetch_related('staff_set__role', 'staff_set__artist')
         category = self.kwargs.get('category', None)
         if category is not None:
-            queryset = queryset.filter(category__slug=category)
+            queryset = queryset.filter(category=category)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -223,7 +223,7 @@ def get_card(request, category, sort_id=1):
     chrono = Chrono(True)
     deja_vu = request.GET.get('dejavu', '').split(',')
     sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
-    queryset = Work.objects.filter(category__slug=category)
+    queryset = Work.objects.filter(category=category)
     if sort_mode == 'popularity':
         queryset = queryset.popular()
     elif sort_mode == 'controversy':
@@ -280,7 +280,7 @@ class WorkList(WorkListMixin, ListView):
             return sort
 
     def get_queryset(self):
-        queryset = Work.objects.filter(category__slug=self.category())
+        queryset = Work.objects.filter(category=self.category())
         sort_mode = self.sort_mode()
         search_text = self.search()
 
@@ -307,7 +307,7 @@ class WorkList(WorkListMixin, ListView):
         if search_text is not None:
             queryset = queryset.search(search_text)
 
-        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug').select_related('category__slug')
+        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category')
 
         return queryset
 
@@ -320,7 +320,7 @@ class WorkList(WorkListMixin, ListView):
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category()
-        context['objects_count'] = Work.objects.filter(category__slug=self.category()).count()
+        context['objects_count'] = Work.objects.filter(category=self.category()).count()
 
         if sort_mode == 'mosaic':
             context['object_list'] = [
@@ -593,7 +593,7 @@ def get_works(request, category):
             'synopsis': work.synopsis[:50] + '…',
             'title': work.title,
             'year': '' if not work.date else work.date.year,
-        } for work in Work.objects.filter(category__slug=category, title__icontains=query).popular()[:10]
+        } for work in Work.objects.filter(category=category, title__icontains=query).popular()[:10]
     ]
     return HttpResponse(json.dumps(data), content_type='application/json')
 

@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 
 from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
+from mangaki.fields import CategoryField
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 
 @CharField.register_lookup
@@ -62,13 +63,6 @@ class WorkQuerySet(models.QuerySet):
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
 
-class Category(models.Model):
-    slug = models.CharField(max_length=10, db_index=True)
-    name = models.CharField(max_length=128)
-
-    def __str__(self):
-        return self.name
-
 class Work(models.Model):
     title = models.CharField(max_length=128)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
@@ -76,7 +70,7 @@ class Work(models.Model):
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
-    category = models.ForeignKey('Category', blank=False, null=False)
+    category = CategoryField(blank=False, null=False)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
 
     # Some of these fields do not make sense for some categories of works.
@@ -119,13 +113,13 @@ class Work(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        if not self.pk:
+        if not self.pk and not hasattr(self, 'category'):
             if isinstance(self, Anime):
-                self.category = Category.objects.get(slug='anime')
+                self.category = 'anime'
             elif isinstance(self, Manga):
-                self.category = Category.objects.get(slug='manga')
+                self.category = 'manga'
             elif isinstance(self, Album):
-                self.category = Category.objects.get(slug='album')
+                self.category = 'album'
             else:
                 raise TypeError('Unexpected subclass of work: {}'.format(type(self)))
         super().save(*args, **kwargs)
