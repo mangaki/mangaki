@@ -36,7 +36,6 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'bootstrapform',
     'analytical',
-    'rest_framework'
     # 'django_extensions'
 )
 
@@ -98,13 +97,6 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend"
 )
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
-    'PAGE_SIZE': 10
-}
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # TODO only debug
 
