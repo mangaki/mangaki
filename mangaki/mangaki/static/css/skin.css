@@ -352,3 +352,20 @@ ul.checklist .list-icon {
 .list-icon-ok {
     color: #5cb85c;
 }
+
+
+/**
+ * SEARCH INPUT
+ *
+ ** */
+
+/** Base class **/
+.search-input {
+    width: 100%;
+    border: 1px solid #eee;
+    padding: 10px;
+    font-size: 1.15em;
+}
+
+/** Anime **/
+/** Manga **/
