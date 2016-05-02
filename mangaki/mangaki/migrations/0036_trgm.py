@@ -15,12 +15,15 @@ class Migration(migrations.Migration):
         migrations.RunSQL("""
         CREATE EXTENSION IF NOT EXISTS pg_trgm;
         CREATE EXTENSION IF NOT EXISTS unaccent;
-        CREATE INDEX mangaki_search_work_upper ON mangaki_work USING gin(UPPER(UNACCENT(title)) gin_trgm_ops);
-        CREATE INDEX mangaki_search_work       ON mangaki_work USING gin(UNACCENT(title)        gin_trgm_ops);
+        CREATE OR REPLACE FUNCTION F_UNACCENT(text) RETURNS text AS
+        $func$
+        SELECT public.unaccent('public.unaccent', $1)
+        $func$ LANGUAGE sql IMMUTABLE;
+        CREATE INDEX mangaki_search_work_upper ON mangaki_work USING gist(UPPER(F_UNACCENT(title)) gist_trgm_ops);
         """,
         """
         DROP INDEX mangaki_search_work_upper;
-        DROP INDEX mangaki_search_work;
+        DROP FUNCTION F_UNACCENT(text);
         """
         ),
     ]
