@@ -32,11 +32,8 @@
         {% endif %}
       </span>
   </p>
-  <form method="GET">
-        <input type="search" name="search" />
-    </form>
-    <form class="typeahead-demo {{ category }}">
-      <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre {% if category == 'manga' %}de manga{% else %}d'{{ category }}{% endif %} (actuellement {{ objects_count }})…" />
+    <form method="GET">
+        <input class="search-input {{category}}" placeholder="Entrez un titre d'{{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" />
     </form>
   </div>
 </div>
