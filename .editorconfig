@@ -3,3 +3,7 @@ root = true
 [Vagrantfile]
 indent_size = 4
 indent_style = space
+
+[*.css]
+indent_size = 4
+indent_style = space
