@@ -272,8 +272,12 @@ class WorkList(WorkListMixin, ListView):
         return self.request.GET.get('search', None)
 
     def sort_mode(self):
-        default = 'top' if self.search() is None else 'popularity'
-        return self.request.GET.get('sort', default)
+        default = 'mosaic'
+        sort = self.request.GET.get('sort', default)
+        if self.search() is not None and sort == default:
+            return 'popularity' # Mosaic cannot be searched through because it is random. We enforce the popularity as the second default when searching.
+        else:
+            return sort
 
     def get_queryset(self):
         queryset = Work.objects.filter(category__slug=self.category())
