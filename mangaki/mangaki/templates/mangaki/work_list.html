@@ -33,7 +33,7 @@
       </span>
   </p>
     <form method="GET">
-        <input class="search-input {{category}}" placeholder="Entrez un titre d'{{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" />
+        <input class="search-input {{category}}" placeholder="Entrez un titre d'{{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
     </form>
   </div>
 </div>
