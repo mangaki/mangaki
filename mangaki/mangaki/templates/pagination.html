@@ -3,19 +3,19 @@
   <ul class="pagination">
     {% if page_obj.has_previous %}
     <li>
-        <a href="?{% if sort_mode %}sort={{ sort_mode }}&amp;{% endif %}{% if letter %}letter={{ letter }}&amp;{% endif %}page={{ page_obj.previous_page_number }}&amp;{% if search %}search={{search}}&amp;{% endif %}" aria-label="Previous">
+        <a href="?{% if sort_mode %}sort={{ sort_mode }}{% endif %}{% if letter %}&amp;letter={{ letter }}{% endif %}&amp;page={{ page_obj.previous_page_number }}{% if search %}&amp;search={{search}}{% endif %}" aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
       </a>
     </li>
     {% endif %}
     {% for page in paginator.page_range %}
     {% if page >= page_obj.number|add:-3 and page <= page_obj.number|add:3 %}
-    <li><a href="?{% if sort_mode %}sort={{ sort_mode }}&amp;{% endif %}{% if letter %}letter={{ letter }}&amp;{% endif %}page={{ page }}&amp;{% if search %}search={{search}}&amp;{% endif %}">{% if page_obj.number == page %}<strong>{{ page }}</strong>{% else %}{{ page }}{% endif %}</a></li>
+    <li><a href="?{% if sort_mode %}sort={{ sort_mode }}{% endif %}{% if letter %}&amp;letter={{ letter }}{% endif %}&amp;page={{ page }}{% if search %}&amp;search={{search}}{% endif %}">{% if page_obj.number == page %}<strong>{{ page }}</strong>{% else %}{{ page }}{% endif %}</a></li>
     {% endif %}
     {% endfor %}
     {% if page_obj.has_next %}
     <li>
-        <a href="?{% if sort_mode %}sort={{ sort_mode }}&amp;{% endif %}{% if letter %}letter={{ letter }}&amp;{% endif %}page={{ page_obj.next_page_number }}&amp;{% if search %}search={{search}}&amp;{% endif %}" aria-label="Next">
+        <a href="?{% if sort_mode %}sort={{ sort_mode }}{% endif %}{% if letter %}&amp;letter={{ letter }}{% endif %}&amp;page={{ page_obj.next_page_number }}{% if search %}&amp;search={{search}}{% endif %}" aria-label="Next">
         <span aria-hidden="true">&raquo;</span>
       </a>
     </li>
