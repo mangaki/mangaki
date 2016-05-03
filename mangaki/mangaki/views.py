@@ -271,11 +271,14 @@ class WorkList(WorkListMixin, ListView):
     def search(self):
         return self.request.GET.get('search', None)
 
+    def sort_mode(self):
+        default = 'top' if self.search() is None else 'popularity'
+        return self.request.GET.get('sort', default)
 
     def get_queryset(self):
         queryset = Work.objects.filter(category__slug=self.category())
-        sort_mode = self.request.GET.get('sort', 'popularity')
-        search_text = self.request.GET.get('search', None)
+        sort_mode = self.sort_mode()
+        search_text = self.search()
 
         if sort_mode == 'top':
             queryset = queryset.top()
@@ -306,8 +309,8 @@ class WorkList(WorkListMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        sort_mode = self.request.GET.get('sort', 'popularity')
         search_text = self.search()
+        sort_mode = self.sort_mode()
 
         context['search'] = search_text
         context['sort_mode'] = sort_mode
