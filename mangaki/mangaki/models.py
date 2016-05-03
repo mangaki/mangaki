@@ -11,8 +11,6 @@ from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 
-from unidecode import unidecode
-
 @CharField.register_lookup
 class SearchLookup(Lookup):
     """Helper class for searching text in a query. This shadows the builtin
