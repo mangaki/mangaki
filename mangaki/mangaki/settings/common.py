@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DATABASES
-BASE_DIR = os.path.dirname(os.path.dirname(__file__)) # Base path of the project.
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Application definition
 INSTALLED_APPS = (
@@ -22,11 +22,11 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'mangaki', # Mangaki main application
     'irl', # Mangaki IRL application for events
-    'allauth', # Authentication helper
+    'allauth',
     'allauth.account', 
     'allauth.socialaccount',
-    'bootstrapform', # Bootstrap form helper
-    'analytical', # Google Analytics helper (analytics service)
+    'bootstrapform',
+    'analytical',
 )
 
 MIDDLEWARE_CLASSES = (

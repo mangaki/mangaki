@@ -10,9 +10,6 @@ from .common import *
 # Dev!
 DEBUG = True
 
-# In development, all hosts are cool!
-ALLOWED_HOSTS = []
-
 # Development-specific apps
 INSTALLED_APPS += (
     'debug_toolbar',
