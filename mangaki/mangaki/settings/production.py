@@ -14,7 +14,6 @@ INSTALLED_APPS += (
     'allauth.socialaccount.providers.google', # Google Provider
     'allauth.socialaccount.providers.twitter', # Twitter Provider
     'allauth.socialaccount.providers.facebook', # Facebook Provider
-    'analytical', # Google Analytics helper (analytics service)
 )
 
 

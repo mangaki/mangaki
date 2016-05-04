@@ -1,8 +1,8 @@
-{% load google_analytics %}
-{% load cookielaw_tags %}
+{% load analytical %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    {% analytical_head_top %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block opengraph %}{% endblock %}
@@ -29,9 +29,11 @@
     <link rel="stylesheet" href="/static/css/test.css" />
     <!-- Social Share Kit CSS -->
     <link rel="stylesheet" href="/static/css/social-share-kit.css" />
+    {% analytical_head_bottom %}
 </head>
 
 <body>
+    {% analytical_body_top %}
     {% cookielaw_banner %}
     <header class="navbar navbar-default">
         <nav class="navbar navbar-default" role="navigation">
@@ -134,6 +136,6 @@
           $('[data-toggle="tooltip"]').tooltip()
         })
     </script>
-    {% google_analytics %}
+    {% analytical_body_bottom %}
     </body>
 </html>
