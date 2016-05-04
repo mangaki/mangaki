@@ -268,9 +268,21 @@ class WorkList(WorkListMixin, ListView):
     def category(self):
         return self.kwargs.get('category', 'anime')
 
+    def search(self):
+        return self.request.GET.get('search', None)
+
+    def sort_mode(self):
+        default = 'mosaic'
+        sort = self.request.GET.get('sort', default)
+        if self.search() is not None and sort == default:
+            return 'popularity' # Mosaic cannot be searched through because it is random. We enforce the popularity as the second default when searching.
+        else:
+            return sort
+
     def get_queryset(self):
         queryset = Work.objects.filter(category__slug=self.category())
-        sort_mode = self.request.GET.get('sort', 'mosaic')
+        sort_mode = self.sort_mode()
+        search_text = self.search()
 
         if sort_mode == 'top':
             queryset = queryset.top()
@@ -292,13 +304,19 @@ class WorkList(WorkListMixin, ListView):
         else:
             raise Http404
 
+        if search_text is not None:
+            queryset = queryset.search(search_text)
+
         queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug').select_related('category__slug')
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        sort_mode = self.request.GET.get('sort', 'mosaic')
+        search_text = self.search()
+        sort_mode = self.sort_mode()
+
+        context['search'] = search_text
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category()

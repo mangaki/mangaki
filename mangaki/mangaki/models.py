@@ -1,15 +1,38 @@
 # coding=utf8
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import F
+from django.db.models import F, Q, Func, Value, Lookup, CharField
 from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 
-from mangaki.api import get_discourse_data
+from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+
+@CharField.register_lookup
+class SearchLookup(Lookup):
+    """Helper class for searching text in a query. This shadows the builtin
+    __search django lookup, but we don't care because it doesn't work for
+    PostgreSQL anyways."""
+
+    lookup_name = 'search'
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = lhs_params + rhs_params + lhs_params + rhs_params
+        return "(UPPER(F_UNACCENT(%s)) LIKE '%%%%' || UPPER(F_UNACCENT(%s)) || '%%%%' OR UPPER(F_UNACCENT(%s)) %%%% UPPER(F_UNACCENT(%s)))" % (lhs, rhs, lhs, rhs), params
+
+class SearchSimilarity(Func):
+    """Helper class for computing the search similarity ignoring case and
+    accents"""
+
+    function = 'SIMILARITY'
+
+    def __init__(self, lhs, rhs):
+        super().__init__(Func(Func(lhs, function='F_UNACCENT'), function='UPPER'), Func(Func(rhs, function='F_UNACCENT'), function='UPPER'))
 
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
@@ -24,6 +47,14 @@ class WorkQuerySet(models.QuerySet):
 
     def controversial(self):
         return self.order_by('-controversy')
+
+    def search(self, search_text):
+        # We want to search when the title contains the query or when the
+        # similarity between the title and the query is low; we also want to
+        # show the relevant results first.
+        return self.filter(title__search=search_text).\
+            order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
+
 
     def random(self):
         return self.filter(
@@ -40,7 +71,7 @@ class Category(models.Model):
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
-    source = models.CharField(max_length=1044, blank=True)
+    source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
     poster = models.CharField(max_length=128)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)

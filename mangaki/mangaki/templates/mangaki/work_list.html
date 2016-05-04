@@ -31,9 +31,10 @@
         Je ne veux pas voir
         {% endif %}
       </span>
-    </p>
-    <form class="typeahead-demo {{ category }}">
-      <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre {% if category == 'manga' %}de manga{% else %}d'{{ category }}{% endif %} (actuellement {{ objects_count }})…" />
+  </p>
+    <form method="GET">
+        <input class="search-input {{category}}" placeholder="Entrez un titre d'{{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
+        <input type="hidden" name="sort" value="{{ sort_mode }}" />
     </form>
   </div>
 </div>
