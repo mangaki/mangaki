@@ -1,8 +1,10 @@
 """
-Common Django settings for Mangaki project.
-All settings can be overriden following the current environment.
+Django settings for mangaki project.
 
-(look APP_SETTINGS to load a different environment)
+For more information on this file, see
+https://docs.djangoproject.com/en/1.9/topics/settings/
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
@@ -70,7 +72,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
+# https://docs.djangoproject.com/en/1.9/topics/i18n/
 LANGUAGE_CODE = 'fr-FR'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -78,6 +80,6 @@ USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = '/srv/http/mangaki/static/'
