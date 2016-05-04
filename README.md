@@ -78,7 +78,7 @@ Remarques utiles
 
 Si vous vous rendez sur la page des mangas, la troisième colonne chargera en boucle. C'est parce que le Top Manga est vide, pour des raisons intrinsèques à [`ranking.py`](https://github.com/mangaki/mangaki/blob/master/mangaki/mangaki/management/commands/ranking.py#L9).
 
-Lors d'une mise en production, il est plus sage d'utiliser la configuration: `mangaki.settings.production` comme il suit: `DJANGO_SETTINGS_MODULE=mangaki.settings.production` avant de lancer votre conteneur WSGI.
+Lors d'une mise en production, il est plus sage d'écrire `from .prod import *` dans le fichier `mangaki/settings/__init__.py` avant de lancer votre conteneur WSGI.
 
 Si vous vous inscrivez, vous obtiendrez une erreur « Connection refused ». C'est normal, votre serveur de mails n'est pas installé. Pour éviter ce comportement temporairement, vous pouvez ajouter la ligne suivante dans votre configuration (`mangaki/settings/`) :
 
