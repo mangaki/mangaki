@@ -39,7 +39,7 @@ Lancer le serveur
     . venv/bin/activate
     pip install -r requirements.txt
     cd mangaki
-    cp secret_template.py secret.py  # À modifier, notamment le mot de passe d'accès à la base de données
+    cp mangaki/settings/secret_template.py mangaki/settings/secret.py  # À modifier, notamment le mot de passe d'accès à la base de données
     echo "from .dev import *" > mangaki/settings/__init__.py # À ajuster, selon votre cas (production) avec DJANGO_SETTINGS_MODULE si nécessaire.
     ./manage.py migrate
     ./manage.py loaddata ../fixtures/{partners,ghibli,kizu,seed_data}.json

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from secret import MAL_USER, MAL_PASS
+from mangaki.settings.secret import MAL_USER, MAL_PASS
 from mangaki.models import Work
 import xml.etree.ElementTree as ET
 import requests

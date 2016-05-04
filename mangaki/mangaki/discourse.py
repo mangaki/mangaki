@@ -1,5 +1,5 @@
 from pydiscourse.client import DiscourseClient
-from secret import DISCOURSE_API_USERNAME, DISCOURSE_API_KEY
+from mangaki.settings.secret import DISCOURSE_API_USERNAME, DISCOURSE_API_KEY
 import datetime
 
 def get_discourse_data(email):
