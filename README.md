@@ -40,6 +40,7 @@ Lancer le serveur
     pip install -r requirements.txt
     cd mangaki
     cp secret_template.py secret.py  # À modifier, notamment le mot de passe d'accès à la base de données
+    echo "from .dev import *" > mangaki/settings/__init__.py # À ajuster, selon votre cas (production) avec DJANGO_SETTINGS_MODULE si nécessaire.
     ./manage.py migrate
     ./manage.py loaddata ../fixtures/{partners,ghibli,kizu,seed_data}.json
     ./manage.py ranking # Compute cached ranking information. This should be done regularly.
@@ -52,8 +53,6 @@ Afficher les notebooks
     . venv/bin/activate
     pip install ipython[notebook]
     pip install django-extensions
-
-Puis retirez le commentaire devant `django-extensions` dans la variable `INSTALLED_APPS` du fichier `settings.py`.
 
 Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
 
@@ -79,13 +78,15 @@ Remarques utiles
 
 Si vous vous rendez sur la page des mangas, la troisième colonne chargera en boucle. C'est parce que le Top Manga est vide, pour des raisons intrinsèques à [`ranking.py`](https://github.com/mangaki/mangaki/blob/master/mangaki/mangaki/management/commands/ranking.py#L9).
 
-Si vous vous inscrivez, vous obtiendrez une erreur « Connection refused ». C'est normal, votre serveur de mails n'est pas installé. Pour éviter ce comportement temporairement, vous pouvez décommenter la ligne suivante de `mangaki/settings.py` :
+Lors d'une mise en production, il est plus sage d'utiliser la configuration: `mangaki.settings.production` comme il suit: `DJANGO_SETTINGS_MODULE=mangaki.settings.production` avant de lancer votre conteneur WSGI.
 
-    # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+Si vous vous inscrivez, vous obtiendrez une erreur « Connection refused ». C'est normal, votre serveur de mails n'est pas installé. Pour éviter ce comportement temporairement, vous pouvez ajouter la ligne suivante dans votre configuration (`mangaki/settings/`) :
+
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 Ainsi, les mails seront affichés dans la console (vous avez aussi [d'autres moyens](https://docs.djangoproject.com/es/1.9/topics/email/#console-backend) d'afficher les mails).
 
-Si vous obtenez des erreurs 400 lorsque vous mettez Mangaki en production (c'est-à-dire que `DEBUG = False`), faites bien attention à modifier les `ALLOWED_HOSTS` qui se trouvent dans `mangaki/settings.py` afin d'autoriser votre [FQDN](https://fr.wikipedia.org/wiki/Fully_qualified_domain_name) dedans.
+Si vous obtenez des erreurs 400 lorsque vous mettez Mangaki en production (c'est-à-dire que `DEBUG = False`), faites bien attention à modifier les `ALLOWED_HOSTS` qui se trouvent dans votre configuration (`mangaki/settings/`) afin d'autoriser votre [FQDN](https://fr.wikipedia.org/wiki/Fully_qualified_domain_name) dedans.
 
 Pour une mise en production, veillez à faire `./manage.py collectstatic` afin d'obtenir les assets: il est possible de changer le repertoire dans `mangaki/settings.py` (la variable `STATIC_ROOT`).
 
