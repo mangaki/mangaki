@@ -80,12 +80,6 @@ Si vous vous rendez sur la page des mangas, la troisième colonne chargera en bo
 
 Lors d'une mise en production, il est plus sage d'écrire `from .prod import *` dans le fichier `mangaki/settings/__init__.py` avant de lancer votre conteneur WSGI.
 
-Si vous vous inscrivez, vous obtiendrez une erreur « Connection refused ». C'est normal, votre serveur de mails n'est pas installé. Pour éviter ce comportement temporairement, vous pouvez ajouter la ligne suivante dans votre configuration (`mangaki/settings/`) :
-
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-Ainsi, les mails seront affichés dans la console (vous avez aussi [d'autres moyens](https://docs.djangoproject.com/es/1.9/topics/email/#console-backend) d'afficher les mails).
-
 Si vous obtenez des erreurs 400 lorsque vous mettez Mangaki en production (c'est-à-dire que `DEBUG = False`), faites bien attention à modifier les `ALLOWED_HOSTS` qui se trouvent dans votre configuration (`mangaki/settings/`) afin d'autoriser votre [FQDN](https://fr.wikipedia.org/wiki/Fully_qualified_domain_name) dedans.
 
 Pour une mise en production, veillez à faire `./manage.py collectstatic` afin d'obtenir les assets: il est possible de changer le repertoire dans `mangaki/settings.py` (la variable `STATIC_ROOT`).
