@@ -29,6 +29,8 @@ Configurer PostgreSQL
     psql mangaki
     # alter user django with password 'XXX';
     # grant all privileges on database mangaki to django;
+    # create extension if not exists pg_trgm;
+    # create extension if not exists unaccent;
 
 Lancer le serveur
 -----------------
