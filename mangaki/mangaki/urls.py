@@ -44,7 +44,6 @@ urlpatterns = [
     url(r'^discourse/sso$', discourse_views.sso),
     url(r'^about/$', views.about),
     url(r'^events/$', views.events),
-    url(r'^unsubscribe/(?P<pk>\d+)/(?P<key>\w+)$', views.unsubscribe),
     # url(r'^lookup/$', views.lookup_work'),
     url(r'^(?P<slug>[\w-]+)/$', views.MarkdownView.as_view()),
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top),
