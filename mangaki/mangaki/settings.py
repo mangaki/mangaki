@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'bootstrapform',
     'analytical',
+    'cookielaw',
     # 'django_extensions'
 )
 

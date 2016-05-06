@@ -13,3 +13,4 @@ beautifulsoup4
 lxml
 natsort
 django-analytical
+django-cookie-law
