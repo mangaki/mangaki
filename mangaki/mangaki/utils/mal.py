@@ -9,11 +9,15 @@ import html
 import re
 from functools import reduce
 from random import randint
+from collections import namedtuple
 
 from django.conf import settings
 
 from django.contrib.auth.models import User
 from mangaki.models import Work, Rating, SearchIssue, Artist, Category
+
+
+MALEntry = namedtuple('MALEntry', 'title poster')
 
 
 def _encoding_translation(text):
@@ -150,3 +154,24 @@ def import_mal(mal_username, mangaki_username):
                 SearchIssue(user=user, title=title, poster=poster, mal_id=mal_id, score=score).save()
                 fails.append(title)
     return nb_added, fails
+
+class MAL:
+    def __init__(self):
+        self.SEARCH_URL = 'http://myanimelist.net/api/anime/search.xml'
+        self.HEADERS = {
+            'X-Real-IP': random_ip(),
+            'User-Agent': 'Mozilla/5.0 (X11; Linux i686 on x86_64; rv:36.0) Gecko/20100101 Firefox/36.0'
+        }
+        self.entry = None
+
+    def search(self, query):
+        r = requests.get(self.SEARCH_URL,
+            params={'q': query},
+            headers=self.HEADERS,
+            auth=(MAL_USER, MAL_PASS))
+        html_code = html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'&\1;', r.text))
+        xml = re.sub(r'&([^alg])', r'&amp;\1', _encoding_translation(html_code))
+        self.entry = ET.fromstring(xml).find('entry')
+
+    def get_poster(self):
+        return self.entry.find('image').text
