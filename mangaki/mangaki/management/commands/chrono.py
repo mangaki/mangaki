@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from bs4 import BeautifulSoup
-from secret import DUMMY
+from mangaki.settings.secret import DUMMY
 import requests
 from datetime import datetime
 

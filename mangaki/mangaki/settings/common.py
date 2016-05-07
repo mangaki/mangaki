@@ -2,25 +2,16 @@
 Django settings for mangaki project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.7/topics/settings/
-
+https://docs.djangoproject.com/en/1.9/topics/settings/
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.7/ref/settings/
+https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from django.conf import global_settings
-from secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DEBUG, SITE_ID, DATABASES, GOOGLE_ANALYTICS_PROPERTY_ID
+from .secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DATABASES
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
-
-ALLOWED_HOSTS = ['mangaki.fr']
-
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -29,30 +20,15 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'mangaki',
-    'irl',
+    'mangaki', # Mangaki main application
+    'irl', # Mangaki IRL application for events
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'bootstrapform',
     'analytical',
     'cookielaw',
-    # 'django_extensions'
 )
-
-# FIXME: This is not really the semantics that we want. We want a
-# development/production split, which is *not* the same as debug/nondebug, but
-# this will do for now.
-if DEBUG:
-    INSTALLED_APPS += (
-        'debug_toolbar',
-    )
-else:
-    INSTALLED_APPS += (
-        'allauth.socialaccount.providers.google',
-        'allauth.socialaccount.providers.twitter',
-        'allauth.socialaccount.providers.facebook',
-    )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -85,10 +61,7 @@ TEMPLATES = [
 ]
 
 ROOT_URLCONF = 'mangaki.urls'
-
 WSGI_APPLICATION = 'mangaki.wsgi.application'
-
-# SITE_ID = 1
 
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -99,29 +72,14 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend"
 )
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # TODO only debug
-
 # Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
-
+# https://docs.djangoproject.com/en/1.9/topics/i18n/
 LANGUAGE_CODE = 'fr-FR'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
-
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
-
-STATIC_ROOT = '/srv/http/mangaki/static/'
-
-# Discourse
-
-DISCOURSE_BASE_URL = 'http://meta.mangaki.fr'

@@ -10,7 +10,7 @@ import re
 from functools import reduce
 from random import randint
 
-from secret import MAL_USER, MAL_PASS, MAL_USER_AGENT
+from mangaki.settings.secret import MAL_USER, MAL_PASS, MAL_USER_AGENT
 
 from django.contrib.auth.models import User
 from mangaki.models import Work, Rating, SearchIssue, Artist, Category
