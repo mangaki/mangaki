@@ -1,15 +1,17 @@
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import DetailView, SingleObjectTemplateResponseMixin
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormMixin
+from django.views.generic import View
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseForbidden, Http404
+from django.http import HttpResponse, HttpResponseForbidden, Http404, HttpResponsePermanentRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.timezone import utc
+from django.utils.functional import cached_property
 
 
 from django.views.generic.detail import SingleObjectMixin
@@ -19,7 +21,7 @@ from django.db.models import Count, Case, When, F, Value
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff
+from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -102,19 +104,20 @@ def update_score_while_unrating(user, work, choice):
             reco.user.profile.score -= 5
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
-
-class WorkDetail(AjaxableResponseMixin, FormMixin, DetailView):
+class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
     form_class = SuggestionForm
+    queryset = Work.objects.select_related('category').prefetch_related('staff_set__role', 'staff_set__artist')
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.category.slug != self.kwargs.get('category'):
+            return HttpResponsePermanentRedirect(self.object.get_absolute_url())
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
-
-    def get_queryset(self):
-        queryset = Work.objects.prefetch_related('staff_set__role', 'staff_set__artist', 'category')
-        category = self.kwargs.get('category', None)
-        if category is not None:
-            queryset = queryset.filter(category__slug=category)
-        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -265,8 +268,9 @@ class WorkListMixin:
 class WorkList(WorkListMixin, ListView):
     paginate_by = POSTERS_PER_PAGE
 
+    @cached_property
     def category(self):
-        return self.kwargs.get('category', 'anime')
+        return get_object_or_404(Category, slug=self.kwargs.get('category'))
 
     def search(self):
         return self.request.GET.get('search', None)
@@ -280,7 +284,7 @@ class WorkList(WorkListMixin, ListView):
             return sort
 
     def get_queryset(self):
-        queryset = Work.objects.filter(category__slug=self.category())
+        queryset = self.category.work_set.all()
         sort_mode = self.sort_mode()
         search_text = self.search()
 
@@ -307,7 +311,7 @@ class WorkList(WorkListMixin, ListView):
         if search_text is not None:
             queryset = queryset.search(search_text)
 
-        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug').select_related('category__slug')
+        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug')
 
         return queryset
 
@@ -319,8 +323,8 @@ class WorkList(WorkListMixin, ListView):
         context['search'] = search_text
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
-        context['category'] = self.category()
-        context['objects_count'] = Work.objects.filter(category__slug=self.category()).count()
+        context['category'] = self.category.slug
+        context['objects_count'] = self.category.work_set.count()
 
         if sort_mode == 'mosaic':
             context['object_list'] = [
@@ -405,8 +409,8 @@ def get_profile(request, username):
     received_recommendation_list = []
     sent_recommendation_list = []
     if category == 'recommendation':
-        received_recommendations = Recommendation.objects.filter(target_user__username=username)
-        sent_recommendations = Recommendation.objects.filter(user__username=username)
+        received_recommendations = Recommendation.objects.filter(target_user__username=username).select_related('work', 'work__category')
+        sent_recommendations = Recommendation.objects.filter(user__username=username).select_related('work', 'work__category')
         for reco in received_recommendations:
             if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
                 received_recommendation_list.append({'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
@@ -581,8 +585,7 @@ class MarkdownView(DetailView):
     template_name = 'static.html'
 
     def get_context_data(self, **kwargs):
-        page = super(MarkdownView, self).get_object()
-        return {'html': markdown(page.markdown)}
+        return {'html': markdown(self.object.markdown)}
 
 
 def get_works(request, category):
@@ -593,7 +596,7 @@ def get_works(request, category):
             'synopsis': work.synopsis[:50] + '…',
             'title': work.title,
             'year': '' if not work.date else work.date.year,
-        } for work in Work.objects.filter(category__slug=category, title__icontains=query).popular()[:10]
+        } for work in Work.objects.filter(category__slug=category).search(query).popular()[:10]
     ]
     return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -663,16 +666,6 @@ def import_from_mal(request, mal_username):
         nb_added, fails = import_mal(mal_username, request.user.username)
         return HttpResponse('%d added; %d fails: %s' % (nb_added, len(fails), '\n'.join(fails)))
     return HttpResponse()
-
-
-def report_nsfw(request, pk):
-    try:
-        work = Work.objects.get(id=pk)
-        work.nsfw = True
-        work.save()
-        return redirect(work.get_absolute_url())
-    except Work.DoesNotExist:
-        return redirect('/')
 
 
 def add_pairing(request, artist_id, work_id):
