@@ -17,7 +17,7 @@ from django.utils.functional import cached_property
 from django.views.generic.detail import SingleObjectMixin
 
 from django.dispatch import receiver
-from django.db.models import Count, Case, When, F, Value
+from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
@@ -158,8 +158,14 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
                 context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': label})
             context['seen_percent'] = round(100 * seen_total / float(total))
 
-        events = self.object.event_set.filter(date__gte=timezone.now())
-        if events.count() > 0:
+        events = self.object.event_set\
+            .filter(date__gte=timezone.now())\
+            .annotate(nb_attendees=Sum(Case(
+                When(attendee__attending=True, then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            )))
+        if len(events) > 0:
             my_events = {}
             if self.request.user.is_authenticated():
                 my_events = dict(self.request.user.attendee_set.filter(
@@ -174,7 +180,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
                     'date': event.get_date(),
                     'link': event.link,
                     'location': event.location,
-                    'nb_attendees': event.attendee_set.filter(attending=True).count(),
+                    'nb_attendees': event.nb_attendees,
                 } for event in events
             ]
 
@@ -203,7 +209,7 @@ class EventDetail(LoginRequiredMixin, DetailView):
         self.object = self.get_object()
         if 'next' in request.GET:
             return redirect(request.GET['next'])
-        return redirect(self.object.get_absolute_url())
+        return redirect(self.object.work.get_absolute_url())
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
