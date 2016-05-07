@@ -34,7 +34,7 @@ class Command(BaseCommand):
         start = 0
         if options.get('id'):
             anime_id = options.get('id')[0]
-            anime = Work.objects.filter(category__slug='anime').get(id=anime_id)
+            anime = Work.objects.filter(category='anime').get(id=anime_id)
             if anime.anidb_aid == 0:
                 for reference in anime.reference_set.all():
                     if reference.url.startswith('http://anidb.net') or reference.url.startswith('https://anidb.net'):
@@ -43,12 +43,12 @@ class Command(BaseCommand):
                         if anidb_aid:
                             anime.anidb_aid = anidb_aid[0]
                             anime.save()
-            todo = Work.objects.filter(category__slug='anime', id=anime_id, anidb_aid__gt=0)
+            todo = Work.objects.filter(category='anime', id=anime_id, anidb_aid__gt=0)
         else:
             todo = Work.objects\
                 .only('pk', 'title', 'poster', 'nsfw')\
                 .annotate(rating_count=Count('rating'))\
-                .filter(category__slug=category, rating_count__gte=6)\
+                .filter(category=category, rating_count__gte=6)\
                 .exclude(anidb_aid=0)\
                 .order_by('-rating_count')
         a = AniDB('mangakihttp', 1)

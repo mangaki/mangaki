@@ -42,15 +42,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         conflicts = []
         entries = {
-            'poster': Work.objects.filter(category__slug='anime').values_list('poster').annotate(Count('poster')).filter(poster__count__gte=2),
-            'title': Work.objects.filter(category__slug='anime').values_list('title').annotate(Count('title')).filter(title__count__gte=2)
+            'poster': Work.objects.filter(category='anime').values_list('poster').annotate(Count('poster')).filter(poster__count__gte=2),
+            'title': Work.objects.filter(category='anime').values_list('title').annotate(Count('title')).filter(title__count__gte=2)
         }
         for category in entries:
             print(len(entries[category]), category, 'conflicts')
             for entry, _ in entries[category]:
                 ids = []
                 priority = 0
-                for anime in Work.objects.filter(category__slug='anime', **{category: entry}):
+                for anime in Work.objects.filter(category='anime', **{category: entry}):
                     ids.append(anime.id)
                     priority += anime.rating_set.count()
                 heappush(conflicts, (-priority, tuple(sorted(ids))))
