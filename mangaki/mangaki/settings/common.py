@@ -27,6 +27,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'bootstrapform',
     'analytical',
+    'cookielaw',
 )
 
 MIDDLEWARE_CLASSES = (
