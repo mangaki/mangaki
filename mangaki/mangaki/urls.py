@@ -36,7 +36,6 @@ urlpatterns = [
     url(r'^faq/$', views.MarkdownView.as_view(), kwargs={'slug': 'faq'}),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}),
     url(r'^events/$', views.events),
-    url(r'^unsubscribe/(?P<pk>\d+)/(?P<key>\w+)$', views.unsubscribe),
     # url(r'^lookup/$', views.lookup_work'),
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top),
     url(r'^event/(?P<pk>\d+)$', views.EventDetail.as_view(), name='event-detail'),

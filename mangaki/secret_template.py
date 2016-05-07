@@ -28,7 +28,6 @@ DATABASES = {
 }
 
 DUMMY = 'XXX'
-HASH_PADDLE = 'XXX'
 
 SITE_ID = 1
 

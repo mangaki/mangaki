@@ -33,7 +33,6 @@ from collections import Counter, OrderedDict
 from markdown import markdown
 from urllib.parse import urlencode
 from random import shuffle, randint
-from secret import HASH_PADDLE
 import datetime
 import hashlib
 import json
@@ -681,11 +680,3 @@ def add_pairing(request, artist_id, work_id):
 def register_profile(sender, **kwargs):
     user = kwargs['user']
     Profile(user=user).save()
-
-
-def unsubscribe(request, pk, key):
-    user = User.objects.get(id=pk)
-    if user and hashlib.md5(bytes(user.username + HASH_PADDLE, 'utf-8')).hexdigest() == key:
-        Profile.objects.filter(user=user).update(newsletter_ok=False)
-        return HttpResponse('Vous êtes bien désinscrit. À bientôt sur <a href="http://mangaki.fr">http://mangaki.fr</a> :)')
-    return HttpResponse()
