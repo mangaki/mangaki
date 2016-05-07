@@ -108,7 +108,7 @@ class Work(models.Model):
     objects = WorkQuerySet.as_manager()
 
     def get_absolute_url(self):
-        return reverse('work-detail', args=[self.category.slug, str(self.id)])
+        return reverse('{}-detail'.format(self.category.slug), args=[str(self.id)])
 
     def safe_poster(self, user):
         if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):

@@ -24,7 +24,7 @@
         <p>
         <ul>
           {% for event in events %}
-              <li>{{ event.type|capfirst }} <a href="{% url 'work-detail' 'anime' event.work_id %}"><em>{{ event.title }}</em></a> le <strong>{{ event.date }}</strong>{% if event.type == 'tv' %}
+              <li>{{ event.type|capfirst }} <a href="{% url 'anime-detail' event.work_id %}"><em>{{ event.title }}</em></a> le <strong>{{ event.date }}</strong>{% if event.type == 'tv' %}
               sur {{ event.channel }}{% elif event.location %},
               {% if event.link %}
                   <a href="{{ event.link }}" target="_blank">{{ event.location }}</a>

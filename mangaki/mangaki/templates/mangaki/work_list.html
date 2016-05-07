@@ -53,7 +53,7 @@
     <ul class="nav navbar-nav">
       {% for letter in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
       <li class="dropdown">
-        <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={{ letter }}">
+        <a href="{% url category|add:'-list' %}?sort=alpha&amp;letter={{ letter }}">
           {{letter}}
         </a>
       </li>
@@ -67,15 +67,15 @@
   <div class="col-md-12 col-sm-12">
     <ul class="nav nav-tabs">
       <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}">Mosaïque</a></li>
+        <a href="{% url category|add:'-list' %}">Mosaïque</a></li>
       <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}?sort=popularity">Les plus populaires</a></li>
+        <a href="{% url category|add:'-list' %}?sort=popularity">Les plus populaires</a></li>
       <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}?sort=controversy">Les plus controversés</a></li>
+        <a href="{% url category|add:'-list' %}?sort=controversy">Les plus controversés</a></li>
       <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}?sort=top">Les plus aimés</a></li>
+        <a href="{% url category|add:'-list' %}?sort=top">Les plus aimés</a></li>
       <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
+        <a href="{% url category|add:'-list' %}?sort=random">Perles au hasard</a></li>
     </ul>
   </div>
 </div>

@@ -121,18 +121,17 @@ def import_mal(mal_username, mangaki_username):
             score = int(entry.find('my_score').text)
             mal_id = entry.find('series_animedb_id').text
             try:
-                animes = Work.objects.filter(category__slug='anime')
                 try:
-                    anime = animes.get(title=title)
+                    anime = Work.objects.filter(category__slug='anime').get(title=title)
                 except Work.DoesNotExist:
-                    if animes.filter(poster=poster).count() == 1:
+                    if Work.objects.filter(category__slug='anime', poster=poster).count() == 1:
                         anime = Work.objects.get(poster=poster)
-                    elif animes.filter(poster=poster).count() >= 2:
+                    elif Work.objects.filter(category__slug='anime', poster=poster).count() >= 2:
                         raise Exception('Integrity violation: found two or more works with the same poster, do you come from the past?')
                     else:
                         entries = lookup_mal_api(title)
                         retrieve_anime(entries)
-                        anime = animes.get(poster=poster)
+                        anime = Work.objects.filter(category__slug='anime').get(poster=poster)
                 if anime:
                     if not Rating.objects.filter(user=user, work=anime).count():
                         if 7 <= score <= 10:
