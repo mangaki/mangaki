@@ -51,11 +51,11 @@ class MangakiSVD(object):
         for (user, work), rating in zip(X, y):
             matrix[user][work] = rating
         means = np.zeros((self.nb_users,))
-        for i in range(self.nb_users):
+        """for i in range(self.nb_users):
             means[i] = np.sum(matrix[i]) / np.sum(matrix[i] != 0)
             if np.isnan(means[i]):
                 means[i] = 0
-            matrix[i][matrix[i] != 0] -= means[i]
+            matrix[i][matrix[i] != 0] -= means[i]"""
         return matrix, means
 
     def fit(self, X, y):
@@ -73,7 +73,7 @@ class MangakiSVD(object):
         self.chrono.save('factor matrix')
 
     def predict(self, X):
-        return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
+        return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)]# + self.means[X[:, 0].astype(np.int64)]
 
     def get_reco(self, username, sending=False):
         target_user = User.objects.get(username=username)
