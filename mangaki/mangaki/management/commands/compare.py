@@ -5,6 +5,7 @@ from sklearn.cross_validation import train_test_split
 from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.pca import MangakiPCA
 from mangaki.utils.knn import MangakiKNN
+from mangaki.utils.als import MangakiALS
 from mangaki.utils.values import rating_values
 from collections import Counter
 import numpy as np
@@ -23,7 +24,7 @@ class Experiment(object):
     results = {}
     algos = None
     def __init__(self, PIG_ID=None):
-        self.algos = [MangakiSVD(20)]
+        self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN()]
         # self.results.setdefault('x_axis', []).append()
         self.make_dataset(PIG_ID)
         self.execute()
@@ -105,6 +106,6 @@ class Command(BaseCommand):
     help = 'Compare recommendation algorithms'
 
     def handle(self, *args, **options):
-        experiment = Experiment(1046)  # 1706
-        experiment.display_ranking()
+        experiment = Experiment()  # 1706
+        #experiment.display_ranking()
         # experiment.display_chart()
