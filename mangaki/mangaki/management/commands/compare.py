@@ -24,7 +24,7 @@ class Experiment(object):
     results = {}
     algos = None
     def __init__(self, PIG_ID=None):
-        self.algos = [MangakiALS(), MangakiSVD(20), MangakiKNN()]
+        self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN()]
         # self.results.setdefault('x_axis', []).append()
         self.make_dataset(PIG_ID)
         self.execute()
@@ -106,6 +106,6 @@ class Command(BaseCommand):
     help = 'Compare recommendation algorithms'
 
     def handle(self, *args, **options):
-        experiment = Experiment(1046)  # 1706
+        experiment = Experiment()  # 1706
         #experiment.display_ranking()
         # experiment.display_chart()

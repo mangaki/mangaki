@@ -16,7 +16,7 @@ class MangakiALS(object):
     M = None
     U = None
     VT = None
-    def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10, LAMBDA=10):
+    def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10, LAMBDA=0.1):
         self.NB_COMPONENTS = NB_COMPONENTS
         self.NB_ITERATIONS = NB_ITERATIONS
         self.LAMBDA = LAMBDA
@@ -58,26 +58,28 @@ class MangakiALS(object):
     def fit_work(self, work, matrixT):
         Ri = np.array(list(matrixT[work].values()), ndmin=2).T
         Ui = self.U[list(matrixT[work].keys()),:].T
-        Gi = self.LAMBDA * len(matrixT[work]) * np.eye(self.NB_COMPONENTS)
+        Gi = self.LAMBDA  * len(matrixT[work]) * np.eye(self.NB_COMPONENTS)
         self.VT[:,[work]] = np.linalg.solve(Ui.dot(Ui.T) + Gi, Ui.dot(Ri))
 
     def svd(self, matrix, random_state):
-        # Init
-        np.random.seed(random_state);
-        self.U = np.random.rand(self.nb_users, self.NB_COMPONENTS)
-        self.VT = np.random.rand(self.NB_COMPONENTS, self.nb_works)
         # Preprocessings
         matrixT = defaultdict(dict)
         for user in matrix:
             for work in matrix[user]:
                 matrixT[work][user] = matrix[user][work]
+        # Init
+        self.U = np.random.rand(self.nb_users, self.NB_COMPONENTS)
+        self.VT = np.random.rand(self.NB_COMPONENTS, self.nb_works)
         # ALS
         for i in range(self.NB_ITERATIONS):
-            print('Step {}'.format(i))
+            #print('Step {}'.format(i))
             for user in matrix:
                 self.fit_user(user, matrix)
             for work in matrixT:
                 self.fit_work(work, matrixT)
+
+        #print('Latent factors of user 0:', self.U[0])
+        #print('Latent factors of work 0:', self.VT[:,0])
 
     def fit(self, X, y):
         print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
