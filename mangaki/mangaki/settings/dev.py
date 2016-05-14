@@ -10,7 +10,6 @@ from .common import *
 # Dev!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
 # Development-specific apps
 INSTALLED_APPS += (
     'debug_toolbar',
