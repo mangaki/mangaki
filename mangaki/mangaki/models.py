@@ -377,10 +377,10 @@ class Ranking(models.Model):
     nb_stars = models.PositiveIntegerField()
 
 class ErrorTrope(models.Model):
-    error = models.CharField(verbose_name='Type d\'erreur.', max_length=3, choices=(
+    error = models.CharField(verbose_name='Type d\'erreur', max_length=3, choices=(
     ('404', '404'),
     ('403', '403'),
     ('500', '500'),
     ))
-    trope = models.CharField(verbose_name='Citation.', max_length=280)
-    trope_author = models.CharField(verbose_name='Personnage à l\'origine de la citation.', max_length=80)
+    trope = models.CharField(verbose_name='Citation', max_length=280)
+    trope_author = models.CharField(verbose_name='Personnage à l\'origine de la citation', max_length=80)
