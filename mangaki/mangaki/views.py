@@ -186,13 +186,6 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 
         return context
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.kwargs.get('category', None) != self.object.category.slug:
-            return redirect(self.object.get_absolute_url())
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
-
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             return HttpResponseForbidden()
