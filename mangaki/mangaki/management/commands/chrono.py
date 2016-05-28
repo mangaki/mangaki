@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from bs4 import BeautifulSoup
-from mangaki.settings.secret import DUMMY
+from django.conf import settings
 import requests
 from datetime import datetime
 
@@ -39,7 +39,7 @@ class Command(BaseCommand):
         b = BeautifulSoup(r.text)
         csrf = b.find('input', {'name': 'csrfmiddlewaretoken'})['value']
         print(csrf)
-        s.post('%s/user/login/' % DOMAIN, {'csrfmiddlewaretoken': csrf, 'login': 'jj', 'password': DUMMY, 'remember': '1'})
+        s.post('%s/user/login/' % DOMAIN, {'csrfmiddlewaretoken': csrf, 'login': 'jj', 'password': settings.DUMMY, 'remember': '1'})
         with Report(s) as report:
             report.time_page('/anime/')
             report.time_page('/anime/?sort=top')

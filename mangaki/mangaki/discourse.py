@@ -1,9 +1,9 @@
 from pydiscourse.client import DiscourseClient
-from mangaki.settings.secret import DISCOURSE_API_USERNAME, DISCOURSE_API_KEY
+from django.conf import settings
 import datetime
 
 def get_discourse_data(email):
-    client = DiscourseClient('http://meta.mangaki.fr', api_username=DISCOURSE_API_USERNAME, api_key=DISCOURSE_API_KEY)
+    client = DiscourseClient('http://meta.mangaki.fr', api_username=settings.DISCOURSE_API_USERNAME, api_key=settings.DISCOURSE_API_KEY)
     try:
         users = client._get('/admin/users/list/active.json?show_emails=true')
         for user in users:

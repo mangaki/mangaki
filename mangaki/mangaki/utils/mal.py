@@ -10,7 +10,7 @@ import re
 from functools import reduce
 from random import randint
 
-from mangaki.settings.secret import MAL_USER, MAL_PASS, MAL_USER_AGENT
+from django.conf import settings
 
 from django.contrib.auth.models import User
 from mangaki.models import Work, Rating, SearchIssue, Artist, Category
@@ -56,11 +56,11 @@ def lookup_mal_api(query):
     SEARCH_URL = 'http://myanimelist.net/api/anime/search.xml'
     HEADERS = {
         'X-Real-IP': random_ip(),
-        'User-Agent': MAL_USER_AGENT
+        'User-Agent': settings.MAL_USER_AGENT
     }
 
     r = requests.get(SEARCH_URL, params={'q': query}, headers=HEADERS,
-                     auth=(MAL_USER, MAL_PASS))
+                     auth=(settings.MAL_USER, settings.MAL_PASS))
     html_code = html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'&\1;', r.text))
     xml = re.sub(r'&([^alg])', r'&amp;\1', _encoding_translation(html_code))
 
@@ -92,7 +92,7 @@ def poster_url(query):
     r = requests.get(SEARCH_URL,
                      params={'q': query},
                      headers=HEADERS,
-                     auth=(MAL_USER, MAL_PASS))
+                     auth=(settings.MAL_USER, settings.MAL_PASS))
 
     html_code = html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'&\1;', r.text))
     xml = re.sub(r'&([^alg])', r'&amp;\1', _encoding_translation(html_code))
@@ -107,7 +107,7 @@ def import_mal(mal_username, mangaki_username):
     MAL_URL = 'http://myanimelist.net/malappinfo.php?u=%s&status=all&type=anime' % mal_username
     HEADERS = {
         'X-Real-IP': random_ip(),
-        'User-Agent': MAL_USER_AGENT
+        'User-Agent': settings.MAL_USER_AGENT
     }
     r = requests.get(MAL_URL, headers=HEADERS)
     xml = ET.fromstring(r.text)
