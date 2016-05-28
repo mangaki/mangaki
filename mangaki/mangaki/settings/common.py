@@ -8,7 +8,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
-from .secret import SECRET_KEY, DISCOURSE_SSO_SECRET, DATABASES
+from .secret import *
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Application definition
