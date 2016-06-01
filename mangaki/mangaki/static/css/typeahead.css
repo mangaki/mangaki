@@ -302,16 +302,6 @@ p {
   font-size: 12px;
 }
 
-/* narrow screens */
-/* -------------- */
-
-@media all and (max-width: 600px) {
-  .typeahead-demo,
-  .links-examples {
-    display: none;
-  }
-}
-
 /* Rounded avatars */
 .performer img {
   margin-bottom: 0.4em;
