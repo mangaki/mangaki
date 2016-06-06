@@ -1,5 +1,0 @@
----
-mangaki_root: /mnt/mangaki
-mangaki_venv: "{{mangaki_root}}/.venv"
-mangaki_app: "{{mangaki_root}}/mangaki"
-mangaki_static: "{{mangaki_app}}/mangaki/static"
