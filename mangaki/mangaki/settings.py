@@ -64,7 +64,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 # Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -127,7 +127,7 @@ STATIC_ROOT = config.get('deployment', 'STATIC_ROOT', fallback=os.path.join(BASE
 
 # External services
 if config.has_section('discourse'):
-    DISCOURSE_BASE_URL = config.get('discourse', 'DISCOURSE_BASE_URL', fallback='http://meta.mangaki.fr')
+    DISCOURSE_BASE_URL = config.get('discourse', 'DISCOURSE_BASE_URL')
     DISCOURSE_SSO_SECRET = config.get('secrets', 'DISCOURSE_SSO_SECRET')
     DISCOURSE_API_USERNAME = config.get('discourse', 'DISCOURSE_API_USERNAME')
     DISCOURSE_API_KEY = config.get('secrets', 'DISCOURSE_API_KEY')

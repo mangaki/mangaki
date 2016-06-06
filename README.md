@@ -66,7 +66,7 @@ l'application. Pour une installation de développement, il suffit de faire :
     DB_PASSWORD = ${DB_PASSWORD}
 
     [email]
-    EMAIL_BACKEND = django.core.mail.backens.console.EmailBackend
+    EMAIL_BACKEND = django.core.mail.backends.console.EmailBackend
     EOF
 
 Si vous souhaitez mettre en production une instance de Mangaki, le fichier de
