@@ -45,7 +45,12 @@ INSTALLED_APPS = (
 if DEBUG:
     INSTALLED_APPS += (
         'debug_toolbar',
+        'django_extensions',
     )
+
+    NOTEBOOK_ARGUMENTS = [
+        '--ip=0.0.0.0',
+    ]
 
 if config.has_section('allauth'):
     INSTALLED_APPS += tuple(
