@@ -332,3 +332,22 @@ class Ranking(models.Model):
     score = models.FloatField()
     nb_ratings = models.PositiveIntegerField()
     nb_stars = models.PositiveIntegerField()
+
+
+class FAQTheme(models.Model):
+    text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField('Date de publication')
+
+    def __str__(self):
+        return self.text
+
+
+class FAQEntry(models.Model):
+    theme = models.ForeignKey(FAQTheme, on_delete=models.CASCADE)
+    question = models.CharField(max_length=200)
+    answer = models.TextField()
+    pub_date = models.DateTimeField('Date de publication')
+    is_active = models.BooleanField(default=True) 
+
+    def __str__(self):
+        return self.question
