@@ -15,4 +15,8 @@ Vagrant.configure(2) do |config|
     config.vm.network "private_network", ip: "10.99.42.10"
 
     config.vm.provision :shell, path: "provisioning/bootstrap.sh"
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.name = "Mangaki"
+    end
 end
