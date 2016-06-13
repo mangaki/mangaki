@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+
+
+{% block body %}
+{% load account socialaccount %}
+
+{% get_providers as socialaccount_providers %}
+
+<div class="row featured text-center">
+   
+<link rel="stylesheet" type="text/css" href="{% static 'css/appfaq.css' %}" />
+
+<h1>FAQ</h1> 
+
+{% for t in latest_theme_list %}
+
+<div class="faq">
+	<h4> {{ t.theme }}</h4>
+</div>
+
+		<div id="accordion">
+			<ul>
+			{% for faqentry in t.faqentry_set.all %}
+			{% if faqentry.is_active %}
+					<li>
+						<a href="#{{ faqentry.id }}">{{ faqentry.question }}</a>
+						<div id="{{ faqentry.id }}" class="accordion"> <i>{{ faqentry.answer }}</i></div>
+					</li>
+			{% endif %}
+			{% endfor %}
+			</ul>
+		</div>
+
+{% endfor %}
+
+
+<br />
+<br />
+<br />
+{% endblock %}
+

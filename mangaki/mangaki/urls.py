@@ -33,7 +33,6 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^discourse/sso$', discourse_views.sso),
     url(r'^about/$', views.about),
-    url(r'^faq/$', views.MarkdownView.as_view(), kwargs={'slug': 'faq'}),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}),
     url(r'^events/$', views.events),
     # url(r'^lookup/$', views.lookup_work'),
@@ -41,4 +40,9 @@ urlpatterns = [
     url(r'^event/(?P<pk>\d+)$', views.EventDetail.as_view(), name='event-detail'),
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
+
+    #FAQ
+    #url(r'^faq/$', views.MarkdownView.as_view(), kwargs={'slug': 'faq'}),
+    url(r'^essai', views.faq_index),
+    #url(r'^$/(?P<theme_id>[0-9]+)/$', views.faq_detail),
 ]

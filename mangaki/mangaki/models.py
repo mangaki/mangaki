@@ -334,16 +334,16 @@ class Ranking(models.Model):
     nb_stars = models.PositiveIntegerField()
 
 
-class FAQTheme(models.Model):
-    text = models.CharField(max_length=200)
+class Faqtheme(models.Model):
+    theme = models.CharField(max_length=200)
     pub_date = models.DateTimeField('Date de publication')
 
     def __str__(self):
-        return self.text
+        return self.theme
 
 
-class FAQEntry(models.Model):
-    theme = models.ForeignKey(FAQTheme, on_delete=models.CASCADE)
+class Faqentry(models.Model):
+    theme = models.ForeignKey(Faqtheme, on_delete=models.CASCADE)
     question = models.CharField(max_length=200)
     answer = models.TextField()
     pub_date = models.DateTimeField('Date de publication')
