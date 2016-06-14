@@ -691,7 +691,7 @@ def register_profile(sender, **kwargs):
 def faq_index(request):
     latest_theme_list = FaqTheme.objects.order_by('-pub_date')[:]
     context = {
-        #'themes': [[entry for entry in theme.faqentry.filter(is_active=True)] for theme in latest_theme_list]
+        ##'themes': [[entry for entry in theme.faqentry.filter(is_active=True)] for theme in latest_theme_list]
         'latest_theme_list': latest_theme_list,
     }
     return render(request,'faq/faq_index.html', context)
