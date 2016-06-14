@@ -334,7 +334,7 @@ class Ranking(models.Model):
     nb_stars = models.PositiveIntegerField()
 
 
-class Faqtheme(models.Model):
+class FaqTheme(models.Model):
     theme = models.CharField(max_length=200)
     pub_date = models.DateTimeField('Date de publication')
 
@@ -342,8 +342,8 @@ class Faqtheme(models.Model):
         return self.theme
 
 
-class Faqentry(models.Model):
-    theme = models.ForeignKey(Faqtheme, on_delete=models.CASCADE)
+class FaqEntry(models.Model):
+    theme = models.ForeignKey(FaqTheme, on_delete=models.CASCADE)
     question = models.CharField(max_length=200)
     answer = models.TextField()
     pub_date = models.DateTimeField('Date de publication')

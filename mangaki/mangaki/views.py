@@ -21,7 +21,7 @@ from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, Faqtheme, Faqentry
+from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FaqTheme, FaqEntry
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -688,19 +688,12 @@ def register_profile(sender, **kwargs):
     Profile(user=user).save()
 
 
-#FAQ
 def faq_index(request):
-    latest_theme_list = Faqtheme.objects.order_by('-pub_date')[:]
+    latest_theme_list = FaqTheme.objects.order_by('-pub_date')[:]
     context = {
-        'latest_theme_list': latest_theme_list,
+        'themes': [[entry for entry in theme.faqentry.filter(is_active=True)] for theme in latest_theme_list]
+        #'latest_theme_list': latest_theme_list,
     }
-    return render(request,'faq/faq_detail.html', context)
+    return render(request,'faq/faq_index.html', context)
 
 
-def faq_detail(request, faqtheme_id):
-    t=Faqtheme.objects.get(pk=theme_id)
-    return t.theme_id
-
-
-#def faq_results(request,faqentry_id):
-#   return HttpResponse("Vous regardez actuellement la question-réponse %s." % faqentry_id)
