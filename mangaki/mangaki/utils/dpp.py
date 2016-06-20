@@ -59,7 +59,7 @@ def compare:
 	pass
 #fit, milliers de sample
 
-# integrer avec la page d'accueil qui propose des nouveaux animes
+# integrer avec la page d'accueil qui propose des nouveaux animes : voir views, il faudra changer random
 
 
 
