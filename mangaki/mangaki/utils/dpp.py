@@ -2,14 +2,21 @@
 #importer sample_k
 #fit, predict : voir knn, svd
 #€voir get_reco de svd pr intégration au site
-#retrouver fichier jaccard .....
+
 from scipy.sparse import csc_matrix
 from scipy.spatial.distance import pdist, squareform
 from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.values import rating_values
+from mangaki.models import Rating
 import pandas, random
 import numpy as np
 
+#depuis BDD, un truc du type (voir models + ex ds knn.py)
+ """
+for user_id, work_id, choice in Rating.objects.values_list('user_id', 'work_id', 'choice'):
+                X.append((user_id, work_id))
+                y.append(rating_values[choice])
+"""
 
 #TODO : et si on veut le faire depuis la BDD ? Récupérer directement ou remettre dans un csv sous la forme de ratings .csv 
 ratings = pandas.read_csv('../data/ratings.csv', header=None).as_matrix()	
@@ -36,7 +43,7 @@ récupérer une matrice users*items avec les 1er nb_ratings de ratings.csv
 		col = ratings[:,1]
 		data = np.array([rating_values[rating] for rating in ratings[:,2]])
 		creux = csc_matrix((data, (row, col)), shape=(nb_users, nb_items))
-		creuse=creux.toarray()
+		creuse = creux.toarray()
 		return creuse     
 
 
@@ -46,18 +53,10 @@ récupérer une matrice users*items avec les 1er nb_ratings de ratings.csv
 def cosine_similarity(matrix): # matrix: dimension nb_users x dimension nb_works
     return 1 - squareform(pdist(matrix, metric='cosine'))
 
-#pb
-#trèèèèèèèèèèès lent, version de base
+
 
 def jaccard_similarity(matrix):
-	pass
-
-
-
-
-
-
-
+	return 1 - squareform(pdist(matrix, metric='jaccard'))
 
 class MangakiUniform(object):
 	
@@ -82,12 +81,12 @@ class MangakiDPP(object):
 	#similarity_fn=jaccard ou coisine
     def fit(self, matrix, all_dataset=False): #obtention de la matrice de similarité
         
-        if self.similarity_fn=cosine_similarity :
-        	mat=cosine_similarity(matrix)
-        #else :
-        #	mat=jaccard_similarity(matrix)
+        if self.similarity_fn = cosine_similarity :
+        	mat = cosine_similarity(matrix)
+        else :
+        	mat = jaccard_similarity(matrix)
 
-        self.mat_fix = mat
+        return self.mat_fix = mat
     
     #thanks to mehdidc on github
       # tirer au hasard des points
@@ -142,8 +141,8 @@ class MangakiDPP(object):
 #(pdist(svd.VT[:,sampled_items].T)).sum()
 
 """
-distance_sample=[]
-distance_uniform=[]
+distance_sample = []
+distance_uniform = []
 et ds la boucle : 
 distance_sample.append((pdist(svd.VT[:,sampled_items].T)).sum())
 distance_uniform.append((pdist(svd.VT[:,uniform_items].T)).sum())
@@ -155,8 +154,8 @@ puis comparaison entre les deux listes d'une manière ou d'une autre
 
 #diamètre d'ordre r : (ici 1 pr l'instant) 
 """
-n=len(sampled_items)
-coefficient_sample=2/(n*(n-1))*(pdist(svd.VT[:,sampled_items].T).sum())
+n = len(sampled_items)
+coefficient_sample = 2/(n*(n-1))*(pdist(svd.VT[:,sampled_items].T).sum())
 """
 
 
@@ -167,38 +166,25 @@ def compare(option, nb_points, nb_iterations):
 	matrix = get_matrix(true, 10, 100)
 	uniform = MangakiUniform(nb_points)
 	dpp = MangakiDDP(similarity_fn='cosine', matrix)
-	dpp.fit(matrix)
+	similarity = dpp.fit(matrix)
 	indicateur = 0
 	pb = 0
 	while indicateur != nb_iterations:
     
-	try:
-		sampled_items = dpp.sample_k(items, similarity, 10)
+		try:
+			sampled_items = dpp.sample_k(items, similarity, 10)
         
 
-	except np.linalg.linalg.LinAlgError as err:
-		pb = 1
-	if pb==0:
-		indicateur = indicateur+1
+		except np.linalg.linalg.LinAlgError as err:
+			pb = 1
+		if pb==0:
+			indicateur = indicateur+1
         # cas où tt se passe bien, bloc où l'on exécute la comparaison
-        uniform_items = uniform.sample_k(items, similarity, 10)
+        	uniform_items = uniform.sample_k(items, similarity, 10)
 
-	else : 
-		pb = 0
+		else : 
+			pb = 0
 
-
-
-
-
-
-	#fit 
-	if option == somme_pdistance :
-		for i in range(1000):
-
-	else if option == det_pdistance :
-		return 
-	else : #diamètre d'ordre 1
-		return
 
 
 
