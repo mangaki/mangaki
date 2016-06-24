@@ -24,8 +24,8 @@ for user_id, work_id, choice in Rating.objects.values_list('user_id', 'work_id',
 	X.append([user_id, work_id])
 	Y.append(rating_values[choice])
 X=np.asarray(X)
-nb_users = np.asarray(X)[:,0].max()+1
-nb_items = np.asarray(X)[:,1].max()+1
+nb_users = X[:,0].max()+1
+nb_items = X[:,1].max()+1
 items = range(0,nb_items)
 
 
@@ -200,3 +200,9 @@ def compare(type_get_matrix, nb_points, nb_iterations, nb_ratings):
 			results_sample_dpp.append([det_dpp, diam_dpp]) #à compléter : det et diamètre d'ordre r
 		else :
 			pb = 0
+
+
+
+
+
+
