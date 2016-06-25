@@ -11,7 +11,7 @@ import os
 import configparser
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-config = configparser.ConfigParser(allow_no_value=True)
+config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
 config.read(os.path.join(BASE_DIR, 'settings.ini'))
 
 DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
