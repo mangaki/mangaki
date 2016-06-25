@@ -1,0 +1,6 @@
+[program:{{ application_name }}]
+command = {{ virtualenv_path }}/bin/gunicorn mangaki.wsgi:application
+directory = {{ root_path }}/{{ application_name }}/mangaki
+user = {{ web_user }}
+autostart = true
+autorestart = true

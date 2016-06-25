@@ -1,0 +1,36 @@
+[secrets]
+SECRET_KEY = {{ secret_key }}
+DB_PASSWORD = {{ db_password }}
+MAL_PASS = {{ mal_password }}
+DISCOURSE_SSO_SECRET = {{ discourse_sso_secret }}
+DISCOURSE_API_KEY = {{ discourse_api_key }}
+
+[deployment]
+SITE_ID = 1
+STATIC_ROOT = {{ static_root }}
+
+[hosts]
+{% for host in app_hosts %}
+{{ host }}
+{% endfor %}
+
+[pgsql]
+DB_HOST = {{ db_host }}
+DB_NAME = {{ db_name }}
+DB_USER = {{ db_user }}
+
+[email]
+EMAIL_BACKEND = django.core.mail.backends.smtp.EmailBackend
+
+[discourse]
+DISCOURSE_BASE_URL = http://meta.mangaki.fr
+DISCOURSE_API_USERNAME = {{ discourse_api_username }}
+
+[mal]
+MAL_USER = {{ mal_user }}
+MAL_USER_AGENT = {{ mal_user_agent }}
+
+[allauth]
+{% for auth_provider in auth_providers %}
+{{ auth_provider }}
+{% endfor %}

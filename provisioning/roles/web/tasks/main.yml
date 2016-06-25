@@ -1,0 +1,72 @@
+---
+- include: create_users.yml
+  become: true
+  become_user: root
+
+- include: install_packages.yml
+  become: true
+  become_user: root
+  tags: packages
+
+- include: setup_supervisor.yml
+  become: true
+  become_user: root
+  tags: deploy
+
+- include: setup_git.yml
+  become: true
+  become_user: "{{ web_user }}"
+  tags: deploy
+
+- name: Install pip requirements
+  become: true
+  become_user: "{{ web_user }}"
+  pip:
+    requirements: "{{ requirements_file }}"
+    virtualenv: "{{ virtualenv_path }}"
+    virtualenv_site_packages: true # we use the system lxml package due to heavy build requirements
+    virtualenv_python: python3
+  tags: packages
+
+- name: Install gunicorn
+  become: true
+  become_user: "{{ web_user }}"
+  pip: virtualenv={{ virtualenv_path }} name=gunicorn
+  tags: packages,deploy
+
+- name: Copy settings.ini
+  become: true
+  become_user: "{{ web_user }}"
+  template:
+    src: settings.ini.j2
+    dest: "{{ git_dest }}/mangaki/settings.ini"
+    mode: 0600
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    backup: true
+
+- name: Initialize database
+  become: true
+  become_user: "{{ web_user }}"
+  django_manage:
+    command: "migrate"
+    app_path: "{{ git_dest }}/mangaki"
+    virtualenv: "{{ virtualenv_path }}"
+
+- name: Create static root
+  become: true
+  become_user: root
+  file:
+    path: "{{ static_root }}"
+    state: directory
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    mode: 0755
+
+- name: Collect static files
+  become: True
+  become_user: "{{ web_user }}"
+  django_manage:
+    command: "collectstatic"
+    app_path: "{{ git_dest }}/mangaki"
+    virtualenv: "{{ virtualenv_path }}"

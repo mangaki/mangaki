@@ -1,0 +1,18 @@
+---
+
+- name: Ensure apt-cache is up-to-date
+  apt: update_cache=true
+  tags: packages
+
+- name: Install base packages
+  apt: name={{ item }} state=present
+  with_items:
+    - git
+    - libpq-dev
+    - libxml2-dev
+    - libxslt-dev
+    - python3-dev
+    - python3-lxml
+    - python3-pip
+    - python-virtualenv
+  tags: packages

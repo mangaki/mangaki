@@ -1,0 +1,13 @@
+---
+- name: Ensure supervisor is installed
+  apt: name=supervisor update_cache=true state=present
+  tags: packages
+
+- name: Create the supervisor config file
+  template:
+    src: supervisor.conf.j2
+    dest: /etc/supervisor/conf.d/{{ application_name }}.conf
+    mode: 0600
+    backup: true
+  notify:
+    - restart supervisor

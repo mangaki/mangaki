@@ -1,0 +1,14 @@
+---
+application_name: "mangaki"
+
+db_user: "django"
+db_name: "mangaki"
+db_host: "127.0.0.1"
+
+app_hosts:
+  - beta.mangaki.fr
+
+app_servers:
+  - 127.0.0.1:8000
+
+static_root: "/srv/mangaki/"
