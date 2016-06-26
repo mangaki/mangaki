@@ -300,7 +300,7 @@ class WorkList(WorkListMixin, ListView):
         elif sort_mode == 'controversy':
             queryset = queryset.controversial()
         elif sort_mode == 'alpha':
-            letter = self.request.GET.get('letter', '')
+            letter = self.request.GET.get('letter', '0')
             if letter == '0': # '#'
                 queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
             else:
