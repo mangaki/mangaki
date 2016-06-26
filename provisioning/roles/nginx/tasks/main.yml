@@ -12,6 +12,7 @@
   become: true
   become_user: root
 
+
 - name: Create the nginx configuration
   become: true
   become_user: root

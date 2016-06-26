@@ -12,7 +12,7 @@ server {
 
 # Let's encrypt
     location /.well-known/acme-challenge/ {
-        alias /var/www/challenges/;
+        alias {{ acme_wellknown }};
         try_files $uri =404;
     }
 

@@ -12,3 +12,5 @@ app_servers:
   - 127.0.0.1:8000
 
 static_root: "/srv/mangaki/"
+
+acme_wellknown: "/var/www/challenges/"

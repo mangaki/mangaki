@@ -8,4 +8,5 @@
     - base
     - db
     - web
+    - letsencrypt
     - nginx

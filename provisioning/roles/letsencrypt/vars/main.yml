@@ -1,0 +1,3 @@
+---
+ssl_certificate: "{{ letsencrypt_sh_root }}/certs/{{ app_hosts.0 }}/fullchain.pem"
+ssl_certificate_key: "{{ letsencrypt_sh_root }}/certs/{{ app_hosts.0 }}/privkey.pem"

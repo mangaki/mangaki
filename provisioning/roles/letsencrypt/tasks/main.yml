@@ -1,0 +1,50 @@
+---
+- block:
+  - name: create letsencrypt group
+    group: name=letsencrypt state=present
+
+  - name: create letsencrypt user
+    user: name=letsencrypt group=letsencrypt state=present
+
+  become: true
+  become_user: root
+
+- name: ensure letsencrypt.sh dependencies are installed
+  become: true
+  become_user: root
+  apt: name={{ item }} update_cache=true state=latest
+  with_items:
+    - openssl
+    - curl
+  tags: packages
+
+- name: install letsencrypt.sh
+  become: true
+  become_user: letsencrypt
+  git: repo=https://github.com/lukas2511/letsencrypt.sh.git dest={{ letsencrypt_sh_root }}
+
+- name: setup acme wellknown directory
+  file:
+    path: "{{ acme_wellknown }}"
+    state: directory
+    owner: letsencrypt
+    group: letsencrypt
+    mode: 0755
+
+- name: configure letsencrypt.sh
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ letsencrypt_sh_root }}/{{ item }}"
+    mode: 0600
+    owner: "letsencrypt"
+    group: "letsencrypt"
+  with_items:
+    - config
+    - domains.txt
+
+
+- name: generate certificates
+  command: "{{ letsencrypt_sh_root }}/letsencrypt.sh -c"
+  run_once: true
+  become: true
+  become_user: letsencrypt

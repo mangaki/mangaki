@@ -1,0 +1,7 @@
+---
+- name: ensure basic packages are installed
+  become: true
+  become_user: root
+  apt: name={{ item }} update_cache=true state=latest
+  with_items:
+    - sudo
