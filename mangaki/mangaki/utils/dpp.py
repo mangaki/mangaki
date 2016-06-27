@@ -150,47 +150,7 @@ n = len(sampled_items)
 coefficient_sample = 2/(n*(n-1))*(pdist(svd.VT[:,sampled_items].T).sum())
 """
 
-
-
-
-def compare(type_get_matrix, nb_points, nb_iterations, nb_ratings):
-	results_uniform, results_sample_dpp=[], []
-	if type_get_matrix=='svd':
-
-		matrix = get_matrix_svd(10, nb_ratings)
-	else :
-		matrix = get_matrix_csc(10, nb_ratings)
-	uniform = MangakiUniform(nb_points)
-	dpp = MangakiDDP(10)#nb_points ne sert à rien 
-	similarity1=similarity(matrix,'cosine')
-	indicateur = 0
-	pb = 0
-	while indicateur != nb_iterations:
-    
-		try:
-			sampled_items = dpp.sample_k(items, similarity, nb_points)
-        
-
-		except np.linalg.linalg.LinAlgError as err:
-			pb = 1
-		if pb==0:
-			indicateur = indicateur+1
-        # cas où tt se passe bien, bloc où l'on exécute la comparaison
-			uniform_items = uniform.sample_k(similarity)
-        	
-			det_uni=np.linalg.det(squareform(pdist(svd.VT[:,uniform_items].T, metric='cosine')))
-			det_dpp=np.linalg.det(squareform(pdist(svd.VT[:,sampled_items].T, metric='cosine')))
-        	
-			diam_uni = 2/(nb_points*(nb_points-1))*(pdist(svd.VT[:,uniform_items].T).sum())
-			diam_dpp = 2/(nb_points*(nb_points-1))*(pdist(svd.VT[:,sampled_items].T).sum())
-
-			results_uniform.append([det_uni, diam_uni]) #à compléter : det et diamètre d'ordre r
-			results_sample_dpp.append([det_dpp, diam_dpp]) #à compléter : det et diamètre d'ordre r
-		else :
-			pb = 0
-
-
-def compare2(nb_points, nb_iterations):
+def compare(nb_points, nb_iterations):
 	results_uniform, results_sample_dpp=[], []
 	sim=SimilarityMatrix()
     #par ex ici csv
