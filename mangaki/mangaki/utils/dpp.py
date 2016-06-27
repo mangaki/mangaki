@@ -1,5 +1,4 @@
-#remettre le all_dataset
-from scipy.sparse import csc_matrix
+from sklearn.utils.extmath import randomized_svd
 from scipy.spatial.distance import pdist, squareform
 from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.values import rating_values
@@ -7,61 +6,50 @@ from mangaki.models import Rating
 import pandas, random
 import numpy as np
 
-#source : from 'csv' or 'database' ?
-
-#from csv
-"""
-ratings = pandas.read_csv('../data/ratings.csv', header=None).as_matrix()	
-nb_users = ratings[:,0].max()+1
-nb_items = ratings[:,1].max()+1
-items = range(0,nb_items)
-
-"""
-
-#from database
-X, Y = [], []
-for user_id, work_id, choice in Rating.objects.values_list('user_id', 'work_id', 'choice'):
-	X.append([user_id, work_id])
-	Y.append(rating_values[choice])
-X=np.asarray(X)
-nb_users = X[:,0].max()+1
-nb_items = X[:,1].max()+1
-items = range(0,nb_items)
-
-
-
-#2 fonctions donnant une matrice de départ user*item
-"""
-récupérer une matrice users*items avec les 1er nb_ratings de ratings.csv
--soit SVD ayant pour rang rank	
--soit matrice creuse ayant pour coeff les ratings (creuse[i][j]=rating de l'utilisateur i pour l'oeuvre j)
-"""
-def get_matrix_svd(rank, nb_ratings):
-	Xpr = X[:nb_ratings,0:2]
-	Ypr = Y[:nb_ratings]
-	svd = MangakiSVD(rank) 
-	svd.set_parameters(nb_users,nb_items)
-	svd.fit(Xpr,Ypr)
-	return svd.VT
+class SimilarityMatrix(object):
+	
+#option à rajouter : nb_ratins, nb_user ou nb_items ? 
+	#option : database' or 'csv'
+	def make_matrix(self, option_data):
+		user_set, item_set=set(), set()
+		if option_data=='database':
+			content=Rating.objects.values_list('user_id', 'work_id', 'choice')
+			
+			#user_items=[(content[i][0], content[i][1]) for i in range(len(content))]
+			for user_id, item_id in Rating.objects.values_list('user_id', 'work_id'):
+				user_set.add(user_id)
+				item_set.add(item_id) 
+		elif option_data=='csv':
+			content = pandas.read_csv('../data/ratings.csv', header=None).as_matrix()
+			for user_id, item_id in content[:,0:2]:
+				user_set.add(user_id)
+				item_set.add(item_id) 
+		else:
+			return "Erreur : les options sont 'database' ou 'csv'"           
+        
+		user_dict= {v:k for k,v in enumerate(user_set)}
+		item_dict= {v:k for k,v in enumerate(item_set)}
+		matrix = np.zeros((len(user_set), len(item_set)), dtype=np.float64)
+		for user_id, item_id, choice in content:
+			matrix[user_dict[user_id], item_dict[item_id]] = rating_values[choice]
+		self.user_dict = user_dict
+		self.item_dict = item_dict
+		self.user_set=user_set
+		self.item_set=item_set
+		self.matrix = matrix
 
 
+	def make_svd_matrix(matrix):
+		self.U, self.sigma, self.VT = randomized_svd(matrix,10, 10, random_state=42)
 
-def get_matrix_csc(nb_ratings): 
-		row = X[:nb_ratings,0]
-		col = X[:nb_ratings,1]
-		data = np.array(Y[:nb_ratings])
-		creux = csc_matrix((data, (row, col)), shape=(nb_users, nb_items))
-		creuse = creux.toarray()
-		return creuse     
+    #option='cosine', voir fonctions de dpp.py
+	def make_similarity_matrix(self, option):
+		return 1 - squareform(pdist(self.matrix.T, metric=option))
+
+	#def __str__(self):
+	#	return ''
 
 
-#2 fonctions calculant des matrices de similarité
-
-#prendre en argument une metric car pas très intéressant car déjà tt fait en Python
-
-#option = 'cosine' pr 'jaccard'
-def similarity(matrix, option): # matrix: dimension nb_users x dimension nb_works
-    return 1 - squareform(pdist(matrix.T, metric=option))
 	
 class MangakiUniform(object):
 	
@@ -69,8 +57,8 @@ class MangakiUniform(object):
 		self.nb_points = nb_points
 
 
-	def sample_k(self,matrix_similarity):
-		uniform_items = list(range(matrix_similarity.shape[0]))
+	def sample_k(self,items, matrix_similarity):
+		uniform_items = items
 		random.shuffle(uniform_items)
 		return uniform_items[:self.nb_points]
     	
@@ -202,7 +190,39 @@ def compare(type_get_matrix, nb_points, nb_iterations, nb_ratings):
 			pb = 0
 
 
+def compare2(nb_points, nb_iterations):
+	results_uniform, results_sample_dpp=[], []
+	sim=SimilarityMatrix()
+    #par ex ici csv
+	sim.make_matrix('csv')
+	similarity=sim.make_similarity_matrix('cosine')
+	uniform = MangakiUniform(nb_points)
+	dpp = MangakiDPP(10)#nb_points ne sert à rien 
+	indicateur = 0
+	pb = 0
+	while indicateur != nb_iterations:
+    
+		try:
+			sampled_items = dpp.sample_k(list(a.user_set), similarity, nb_points)
+        
 
+		except np.linalg.linalg.LinAlgError as err:
+			pb = 1
+		if pb==0:
+			indicateur = indicateur+1
+        # cas où tt se passe bien, bloc où l'on exécute la comparaison
+			uniform_items = uniform.sample_k(list(a.user_set),similarity)
+        	
+			det_uni=np.linalg.det(squareform(pdist(sim.matrix[:,uniform_items].T, metric='cosine')))
+			det_dpp=np.linalg.det(squareform(pdist(sim.matrix[:,sampled_items].T, metric='cosine')))
+        	
+			diam_uni = 2/(nb_points*(nb_points-1))*(pdist(sim.matrix[:,uniform_items].T).sum())
+			diam_dpp = 2/(nb_points*(nb_points-1))*(pdist(sim.matrix[:,sampled_items].T).sum())
 
+			results_uniform.append([det_uni, diam_uni]) #à compléter : det et diamètre d'ordre r
+			results_sample_dpp.append([det_dpp, diam_dpp]) #à compléter : det et diamètre d'ordre r
+		else :
+			pb = 0
+	print ("%s \n %s" %(results_uniform, results_sample_dpp))
 
 
