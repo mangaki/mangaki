@@ -1,41 +1,34 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
-
-
 {% block body %}
 
-<h4 style="color:#000000">
 <div class="row featured text-center">
 
 <h1>FAQ</h1> 
 
 {% for t in latest_theme_list %}
-<br />
-<br />
-
 
 <div>
-	<h4> <strong> {{ t.theme }} </strong> </h4>
+	<h2>  {{ t.theme }}  </h2>
 <br />
 </div>
 
 		<div >
 			
-			{% for faqentry in t.faqentry_set.all %}
-			{% if faqentry.is_active %}
+			{% for entry in themes %}
+			
 					
-			<div>  {{ faqentry.question }} </div>
-			<i>{{ faqentry.answer }}</i>
+			<h4>{{ entry }} </h4>
+			<p>{{ entry.answer }}</p>
 			<br/>
 			<br/>
-			{% endif %}
+			
 			{% endfor %}
 			
 		</div>
 
 {% endfor %}
-
 
 <br />
 <br />

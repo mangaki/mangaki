@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Work, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff, FaqTheme, FaqEntry
+from mangaki.models import Work, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff, FAQTheme, FAQEntry
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -242,5 +242,5 @@ admin.site.register(Pairing, PairingAdmin)
 admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(Top, TopAdmin)
 admin.site.register(Role, RoleAdmin)
-admin.site.register(FaqTheme)
-admin.site.register(FaqEntry)
+admin.site.register(FAQTheme)
+admin.site.register(FAQEntry)
