@@ -19,7 +19,7 @@ DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
 SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 
 if config.has_section('hosts'):
-    ALLOWED_HOSTS = config.options('hosts')
+    ALLOWED_HOSTS = config.get('hosts', 'ALLOWED_HOSTS')
 
 SITE_ID = config.getint('deployment', 'SITE_ID', fallback=1)
 
