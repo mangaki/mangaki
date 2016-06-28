@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 import configparser
+import json
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
@@ -19,7 +20,7 @@ DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
 SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 
 if config.has_section('hosts'):
-    ALLOWED_HOSTS = config.get('hosts', 'ALLOWED_HOSTS')
+    ALLOWED_HOSTS = [host.strip() for host in config.get('hosts', 'ALLOWED_HOSTS').split(',')]
 
 SITE_ID = config.getint('deployment', 'SITE_ID', fallback=1)
 
