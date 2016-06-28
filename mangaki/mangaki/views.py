@@ -430,7 +430,7 @@ def get_profile(request, username):
         if r.choice in ['favorite', 'like', 'neutral', 'dislike']:
             seen_lists[r.work.category.slug].append(r)
         else:
-            unseen_list[r.work.category.slug].append(r)
+            unseen_lists[r.work.category.slug].append(r)
     # chrono.save('categorize ratings')
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
 
