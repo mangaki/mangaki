@@ -22,7 +22,7 @@
     </div>
 {% else %}
     <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="/u/{{ user.username }}">Import myAnimeList</a>
+        <a class="btn btn-mangaki btn-lg" href="{% url 'import-mal' user.username %}">Import myAnimeList</a>
     </div>
     <div class="col-md-4 col-sm-12 text-center margin">
         <a class="btn btn-mangaki btn-lg" href="/anime/">C'est parti !</a>

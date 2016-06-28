@@ -20,8 +20,8 @@ urlpatterns = [
     url(r'^removeReco/(?P<targetname>\w+)$', views.remove_all_reco),
     url(r'^users/', views.UserList.as_view()),
     url(r'^user/', include('allauth.urls')),
-    url(r'^u/(?P<username>.+)$', views.get_profile),  # login_required?
-    url(r'^reco/$', views.get_reco, name='recommendations'),
+    url(r'^u/(?P<username>.+)$', views.get_profile, name='import-mal'),  # login_required?
+    url(r'^reco/$', views.get_reco),
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing),
     url(r'^vote/(?P<work_id>\d+)$', views.rate_work),
