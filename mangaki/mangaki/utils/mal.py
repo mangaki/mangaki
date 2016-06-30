@@ -17,9 +17,6 @@ from django.contrib.auth.models import User
 from mangaki.models import Work, Rating, SearchIssue, Artist, Category
 
 
-MALEntry = namedtuple('MALEntry', 'title poster')
-
-
 def _encoding_translation(text):
     translations = {
         '&lt': '&lot;',
