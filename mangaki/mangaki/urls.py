@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.conf.urls.static import static
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf import settings
 from discourse import views as discourse_views
 from mangaki import views
 
@@ -41,4 +43,4 @@ urlpatterns = [
     url(r'^event/(?P<pk>\d+)$', views.EventDetail.as_view(), name='event-detail'),
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

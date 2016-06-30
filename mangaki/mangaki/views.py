@@ -69,12 +69,9 @@ def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
 
-def update_poster_if_nsfw(obj, user):
-    if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
-        obj.poster = '/static/img/nsfw.jpg'  # NSFW
-
 
 def update_poster_if_nsfw_dict(d, user):
+    d['poster'] = '/media/posters/%d.jpg' % d['id']
     if d['nsfw'] and (not user.is_authenticated() or not user.profile.nsfw_ok):
         d['poster'] = '/static/img/nsfw.jpg'  # NSFW
 
@@ -120,7 +117,6 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        update_poster_if_nsfw(self.object, self.request.user)
         self.object.source = self.object.source.split(',')[0]
 
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
@@ -608,7 +604,6 @@ def get_works(request, category):
 def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
-        update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
