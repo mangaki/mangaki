@@ -70,12 +70,6 @@ def display_queries():
         print(line['sql'][:100], line['time'])
 
 
-def update_poster_if_nsfw_dict(d, user):
-    d['poster'] = '/media/posters/%d.jpg' % d['id']
-    if d['nsfw'] and (not user.is_authenticated() or not user.profile.nsfw_ok):
-        d['poster'] = '/static/img/nsfw.jpg'  # NSFW
-
-
 def update_score_while_rating(user, work, choice):
     recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
     for reco in recommendations_list:
@@ -242,7 +236,7 @@ def get_card(request, category, sort_id=1):
     queryset = queryset[:54]
     cards = []
     for work in queryset.values('id', 'title', 'poster', 'synopsis', 'nsfw'):
-        update_poster_if_nsfw_dict(work, request.user)
+        work['poster'] = work.safe_poster(request.user)
         work['category'] = category
         cards.append(work)
 

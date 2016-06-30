@@ -1,17 +1,10 @@
 {% load staticfiles %}
 {% load static %}
+{% load posters %}
 
 <a class="work-snapshot" href="/{{ work.category.slug }}/{{ work.id }}">
     <div class="work-snapshot-image {{ work.category.slug }}-image">
-        {% if work.nsfw %}
-            {% if not request.user.is_authenticated or request.user.profile.nsfw_ok %}
-                <img src="{% get_media_prefix %}posters/{{ work.id }}.jpg" alt="{{ work.title }}">
-            {% else %}
-                <img src="{% static 'img/nsfw.jpg' %}" alt="{{ work.title }}">
-            {% endif %}
-        {% else %}
-            <img src="{% get_media_prefix %}posters/{{ work.id }}.jpg" alt="{{ work.title }}">
-        {% endif %}
+        <img src="{% poster_url work %}" alt="{{ work.title }}">
 
         {% if not simple %}
             <div class="work-synopsis">{{ work.synopsis|linebreaksbr }}</div>

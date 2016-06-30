@@ -10,6 +10,8 @@ from django.core.urlresolvers import reverse
 from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+from mangaki.settings import MEDIA_URL, STATIC_URL
+
 
 @CharField.register_lookup
 class SearchLookup(Lookup):
@@ -111,9 +113,11 @@ class Work(models.Model):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
     def safe_poster(self, user):
+        if self.id is None:
+            return '{}/{}'.format(MEDIA_URL, 'img/chiro.gif')
         if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
-            return self.poster
-        return '/static/img/nsfw.jpg'
+            return '{}/posters/{}.jpg'.format(MEDIA_URL, self.id)
+        return '{}/{}'.format(STATIC_URL, 'img/nsfw.jpg')
 
     def __str__(self):
         return self.title
