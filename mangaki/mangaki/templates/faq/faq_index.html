@@ -7,16 +7,16 @@
 
 <h1>FAQ</h1> 
 
-{% for  indice in information %}
+{% for  theme in themes %}
 
 <div>
-	<h2>  {{ indice.0 }}  </h2>
+	<h2>  {{ theme.0 }}  </h2>
 <br />
 </div>
 
 		<div >
 			{% if  indice|length != 1 %}
-				{% for i in range(1,indice|length-1) %}
+				{% for i in (indice|length-1)|get_range %}
 			
 					
 				<h4>{{ indice.i.0 }} </h4>

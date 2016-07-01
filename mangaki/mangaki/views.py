@@ -540,6 +540,7 @@ def top(request, category_slug):
     })
 
 
+
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -699,7 +700,7 @@ def faq_index(request):
     
 
 
-
+""""
     latest_theme_list = FAQTheme.objects.order_by('-pub_date')
     title = FAQTheme.objects.values_list('theme',flat=True).order_by('-pub_date')
     information=[[]for i in range(len(latest_theme_list))]
@@ -708,6 +709,23 @@ def faq_index(request):
         information[i].append(title[i])
         for question_answer in themes[i]:
             information[i].append(question_answer)
+""""
+    
+
+    latest_theme_list = FAQTheme.objects.order_by('-pub_date')
+
+    title = FAQTheme.objects.values_list('theme',flat=True).order_by('-pub_date')
+
+    information=[ [] for i in range(len(latest_theme_list))]
+
+    themes = [[[entry.question, entry.answer] for entry in theme.entry.filter(is_active=True)] for theme in latest_theme_list]
+
+    for i in range(0,len(themes)):
+
+        themes[i].insert(0, title[i])
+
+
+
     context = {
         'information': information,
     }
