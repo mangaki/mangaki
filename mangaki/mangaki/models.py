@@ -114,10 +114,10 @@ class Work(models.Model):
 
     def safe_poster(self, user):
         if self.id is None:
-            return '{}/{}'.format(MEDIA_URL, 'img/chiro.gif')
+            return '{}{}'.format(MEDIA_URL, 'img/chiro.gif')
         if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
-            return '{}/posters/{}.jpg'.format(MEDIA_URL, self.id)
-        return '{}/{}'.format(STATIC_URL, 'img/nsfw.jpg')
+            return '{}posters/{}.jpg'.format(MEDIA_URL, self.id)
+        return '{}{}'.format(STATIC_URL, 'img/nsfw.jpg')
 
     def __str__(self):
         return self.title
