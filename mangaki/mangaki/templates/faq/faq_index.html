@@ -7,24 +7,24 @@
 
 <h1>FAQ</h1> 
 
-{% for t in latest_theme_list %}
+{% for  indice in information %}
 
 <div>
-	<h2>  {{ t.theme }}  </h2>
+	<h2>  {{ indice.0 }}  </h2>
 <br />
 </div>
 
 		<div >
-			
-			{% for entry in themes %}
+			{% if  indice|length != 1 %}
+				{% for i in range(1,indice|length-1) %}
 			
 					
-			<h4>{{ entry.question }} </h4>
-			<p>{{ entry.answer }}</p>
-			<br/>
-			<br/>
+				<h4>{{ indice.i.0 }} </h4>
+				<p>{{ indice.i.1 }}</p>
+				<br/>
+				<br/>
 			
-			{% endfor %}
+				{% endfor %}
 			
 		</div>
 

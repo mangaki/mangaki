@@ -343,7 +343,7 @@ class FAQTheme(models.Model):
 
 
 class FAQEntry(models.Model):
-    theme = models.ForeignKey(FAQTheme, on_delete=models.CASCADE, related_name='thème')
+    theme = models.ForeignKey(FAQTheme, on_delete=models.CASCADE, related_name="entry")
     question = models.CharField(max_length=200)
     answer = models.TextField()
     pub_date = models.DateTimeField('Date de publication')
