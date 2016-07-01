@@ -22,7 +22,7 @@ from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
 from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
-from mangaki.mixins import AjaxableResponseMixin
+from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
 from mangaki.utils.recommendations import get_recommendations
@@ -217,30 +217,45 @@ class EventDetail(LoginRequiredMixin, DetailView):
         return redirect(request.GET['next']);
 
 
-def get_card(request, category, sort_id=1):
-    chrono = Chrono(True)
-    deja_vu = request.GET.get('dejavu', '').split(',')
-    sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
-    queryset = Work.objects.filter(category__slug=category)
-    if sort_mode == 'popularity':
-        queryset = queryset.popular()
-    elif sort_mode == 'controversy':
-        queryset = queryset.controversial()
-    elif sort_mode == 'top':
-        queryset = queryset.top()
-    else:
-        queryset = queryset.random().order_by('?')
-    if request.user.is_authenticated():
-        rated_works = Rating.objects.filter(user=request.user).values('work_id')
-        queryset = queryset.exclude(id__in=rated_works)
-    queryset = queryset[:54]
-    cards = []
-    for work in queryset.values('id', 'title', 'poster', 'synopsis', 'nsfw'):
-        work['poster'] = work.safe_poster(request.user)
-        work['category'] = category
-        cards.append(work)
+class CardList(JSONResponseMixin, ListView):
+    model = Work
 
-    return HttpResponse(json.dumps(cards), content_type='application/json')
+    def get_queryset(self):
+        category = self.kwargs.get('category')
+        sort_id = self.kwargs.pop('sort_id')
+        deja_vu = self.request.GET.get('dejavu', '').split(',')
+        sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
+        queryset = Work.objects.filter(category__slug=category)
+        if sort_mode == 'popularity':
+            queryset = queryset.popular()
+        elif sort_mode == 'controversy':
+            queryset = queryset.controversial()
+        elif sort_mode == 'top':
+            queryset = queryset.top()
+        else:
+            queryset = queryset.random().order_by('?')
+        if self.request.user.is_authenticated():
+            rated_works = Rating.objects.filter(user=self.request.user).values('work_id')
+            queryset = queryset.exclude(id__in=rated_works)
+        return queryset[:54]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cards = []
+        for work in context['object_list']:
+            cards.append({
+                'id': work.id,
+                'category': work.category.slug,
+                'title': work.title,
+                'poster': work.safe_poster(self.request.user),
+                'synopsis': work.synopsis,
+                'nsfw': work.nsfw
+            })
+        return {'cards': cards}
+
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_to_json_response(context, **response_kwargs)
+
 
 class WorkListMixin:
     def get_context_data(self, **kwargs):
