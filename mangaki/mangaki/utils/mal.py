@@ -9,7 +9,6 @@ import html
 import re
 from functools import reduce
 from random import randint
-from collections import namedtuple
 
 from django.conf import settings
 
