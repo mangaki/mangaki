@@ -93,6 +93,15 @@ Afficher les notebooks
 
 Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
 
+
+Lancer les tests
+----------------
+
+    . venv/bin/activate
+    ./manage/manage.py test
+
+Ceci va lancer les [doctests](https://docs.python.org/3.5/library/doctest.html) et les tests unitaires contenus dans chaque application avec un dossier `tests`.
+
 Installation facile (Vagrant)
 -----------------------------
 
