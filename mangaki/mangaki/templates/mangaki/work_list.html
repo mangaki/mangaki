@@ -7,7 +7,7 @@
     <div class="well">
       <p>
         Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche.<br />
-        Puis cliquez sur <a href="/reco/?category={{ category }}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
+        Puis cliquez sur <a href="{% url 'reco' %}?category={{ category }}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
       </p>
     </div>
   </div>
@@ -86,7 +86,7 @@
 {% if user.is_authenticated %}
 <div class="row margin">
   <div class="col-md-12 col-sm-12">
-    <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
+    <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
   </div>
 </div>
 {% endif %}

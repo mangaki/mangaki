@@ -10,7 +10,7 @@
     <h3 style="margin-bottom: 1em">Notez vos séries favorites, on vous en fera découvrir d'autres !</h3>
 {% if not user.is_authenticated %}
     <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a>
+        <a class="btn btn-mangaki btn-lg" href="{% url 'about' %}">En savoir plus</a>
     </div>
     <div class="col-md-4 col-sm-12 margin">
         {% include "socialaccount/snippets/provider_list.html" with process="login" verb="try" %}
@@ -25,7 +25,7 @@
         <a class="btn btn-mangaki btn-lg" href="{% url 'import-mal' user.username %}">Import myAnimeList</a>
     </div>
     <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="/anime/">C'est parti !</a>
+        <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">C'est parti !</a>
     </div>
     <div class="col-md-4 col-sm-12 text-center margin">
         <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki/wiki" target="_blank">Contribuer à Mangaki</a>
