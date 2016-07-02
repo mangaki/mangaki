@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 from mangaki.models import Work, Rating
 from mangaki.utils.mal import lookup_mal_api
-from mangaki.settings import BASE_DIR
+from django.conf import settings
 from urllib.request import urlretrieve, urlopen
 import os
 from heapq import heappush, heappop
@@ -19,7 +19,7 @@ def merge_anime(ids):
         if old_poster != new_poster:
             answer = input('Change poster as well? [y/n] ')
             if answer == 'y':
-                urlretrieve(old_poster, os.path.join(BASE_DIR, 'mangaki/static/img/old/mal-%s.jpg' % mal_id))
+                urlretrieve(old_poster, os.path.join(settings.BASE_DIR, 'mangaki/static/img/old/mal-%s.jpg' % mal_id))
                 anime.poster = new_poster
                 anime.save()
     for anime_id in ids:

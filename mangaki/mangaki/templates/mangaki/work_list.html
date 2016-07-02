@@ -1,92 +1,89 @@
 {% extends "base.html" %}
 
 {% block body %}
+<div class="col-xs-12">
+  <p class="alert alert-info">
 {% if user.is_authenticated %}
-<div class="row">
-  <div class="col-md-6 col-sm-12">
-    <div class="well">
-      <p>
-        Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche.<br />
-        Puis cliquez sur <a href="/reco/?category={{ category }}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em> !
-      </p>
-    </div>
-  </div>
-  <div class="col-md-6 col-sm-12">
-    <p style="text-align: center">Légende :
-      <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
-      <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
-      <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
-      <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span><br />
-      <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span>
-        {% if category == 'manga' %}
-        Je veux lire
-        {% else %}
-        Je veux voir
-        {% endif %}
-      </span>
-      <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span>
-        {% if category == 'manga' %}
-        Je ne veux pas lire
-        {% else %}
-        Je ne veux pas voir
-        {% endif %}
-      </span>
-  </p>
-    <form method="GET">
-        <input class="search-input {{category}}" placeholder="Entrez un titre d'{{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
-        <input type="hidden" name="sort" value="{{ sort_mode }}" />
-    </form>
-  </div>
-</div>
+    Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'recommendations' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
 {% else %}
-<div class=" col-md-12 col-sm-12">
-  <p class="well">
     Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
-    <a href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
+    <a class="alert-link" href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
     et obtenir des recommandations.
+{% endif %}
   </p>
 </div>
-{% endif %}
 
-<b>
-  <div class="collapse navbar-collapse" id="menu-collapse">
-    <ul class="nav navbar-nav">
-      {% for letter in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
-      <li class="dropdown">
-        <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={{ letter }}">
-          {{letter}}
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-</b>
-
-<div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
-<div class="row">
-  <div class="col-md-12 col-sm-12">
-    <ul class="nav nav-tabs">
-      <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}">Mosaïque</a></li>
-      <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}?sort=popularity">Les plus populaires</a></li>
-      <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}?sort=controversy">Les plus controversés</a></li>
-      <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}?sort=top">Les plus aimés</a></li>
-      <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
-        <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
-    </ul>
-  </div>
+<div class="col-xs-12">
+  <ul class="nav nav-tabs">
+    <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}">Mosaïque</a></li>
+    <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=popularity">Les plus populaires</a></li>
+    <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=controversy">Les plus controversés</a></li>
+    <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=top">Les plus aimés</a></li>
+    <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
+    <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
+  </ul>
 </div>
-<br />
+<div class="col-xs-12" style="margin: 10px 0; text-align: center">
+{% if sort_mode == 'alpha' %}
+<ul class="pagination pagination-sm" style="margin: 0">
+  {% for letter_ in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+    <li role="presentation"
+      {% if letter_ == letter %}class="active"{% endif %}
+      {% if letter_ == '#' and letter == '0'%}class="active"{% endif %}>
+      <a
+	 href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter_ == '#' %}0{% else %}{{ letter_ }}{% endif %}">
+	{{letter_}}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' %}
+  <form method="GET">
+    <div class="input-group">
+      <input class="search-input form-control {{category}}" placeholder="Entrez un titre d'{{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
+      <span class="input-group-btn">
+	<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+      </span>
+    </div>
+    <span class="help-block" style="float: right">Astuce&nbsp;: Vous pouvez appuyer sur la touche "Entrée" de votre clavier pour lancer la recherche</span>
+  </form>
+{% endif %}
+</div>
+  
+<div class="col-xs-12 text-center" style="padding: 10px 0">
+    <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
+    <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
+    <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
+    <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+    <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> {% spaceless %}
+      {% if category == 'manga' %}
+      Je veux lire
+      {% else %}
+      Je veux voir
+      {% endif %}
+    {% endspaceless %}</span>
+
+    <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> {% spaceless %}
+      {% if category == 'manga' %}
+      Je ne veux pas lire
+      {% else %}
+      Je ne veux pas voir
+      {% endif %}
+    {% endspaceless %}</span>
+</div>
 
 {% include "works.html" with works=object_list only %}
 
 {% if user.is_authenticated %}
 <div class="row margin">
   <div class="col-md-12 col-sm-12">
-    <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, conseillez-moi !</a>
+    <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
   </div>
 </div>
 {% endif %}

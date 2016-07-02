@@ -19,40 +19,76 @@ Prérequis
 * `python3-lxml` (autrement, vous pouvez [l'installer par pip](http://stackoverflow.com/questions/6504810/how-to-install-lxml-on-ubuntu) aussi)
 * `python3-sqlparse` pour la Debug Toolbar (**inutile** en production).
 
-Si vous n'avez jamais fait de Django, je vous renvoie vers [leur super tutoriel](https://docs.djangoproject.com/en/1.8/intro/tutorial01/).
+Si vous n'avez jamais fait de Django, je vous renvoie vers [leur super tutoriel](https://docs.djangoproject.com/en/1.9/intro/tutorial01/).
 
 Configurer PostgreSQL
 ---------------------
 
-    createuser django
-    createdb mangaki
-    psql mangaki
-    # alter user django with password 'XXX';
-    # grant all privileges on database mangaki to django;
-    # create extension if not exists pg_trgm;
-    # create extension if not exists unaccent;
+Vous aurez besoin de l'utilitaire `pwgen` pour générer un mot de passe
+aléatoire lors de la configuration.
 
-Lancer le serveur
------------------
+    sudo -u postgres -H createdb mangaki
+    sudo -u postgres -H createuser django
+    export DB_PASSWORD=$(pwgen -s -c 30 1)
+    sudo -u postgres -H DB_PASSWORD=$DB_PASSWORD psql -c \
+      "alter user django with password '$DB_PASSWORD'; \
+      grant all privileges on database mangaki to django"; \
+      create extension if not exists pg_trgm; \
+      create extension if not exists unaccent"
 
+Configurer un environnement virtuel
+-----------------------------------
+
+Il est fortement recommandé d'installer les dépendances de Mangaki dans un
+environnement virtuel, ce qui est fait par les commandes ci-dessous.
+    
     python3 -m venv venv
     . venv/bin/activate
     pip install -r requirements.txt
+    pip install -r requirements-dev.txt # Si installation d'une instance de développement
+
+Pour activer l'environnement virtuel dans le futur, il faudra faire
+
+    . venv/bin/activate
+
+Configurer Mangaki
+------------------
+
+Pour configurer Mangaki, il faut créer un fichier `settings.ini` à la racine de
+l'application. Pour une installation de développement, il suffit de faire :
+
+    cat > mangaki/settings.ini <<EOF
+    [debug]
+    DEBUG = True
+
+    [secrets]
+    SECRET_KEY = $(pwgen -s -c 60 1)
+    DB_PASSWORD = ${DB_PASSWORD}
+
+    [email]
+    EMAIL_BACKEND = django.core.mail.backends.console.EmailBackend
+    EOF
+
+Si vous souhaitez mettre en production une instance de Mangaki, le fichier de
+configuration est un peu plus complexe - regardez dans `mangaki/settings.py`
+pour un aperçu des options utiles.
+
+Remplir la base de données
+--------------------------
+    
     cd mangaki
-    cp mangaki/settings/secret_template.py mangaki/settings/secret.py  # À modifier, notamment le mot de passe d'accès à la base de données
-    echo "from .dev import *" > mangaki/settings/__init__.py # À ajuster, selon votre cas (production) avec DJANGO_SETTINGS_MODULE si nécessaire.
     ./manage.py migrate
     ./manage.py loaddata ../fixtures/{partners,ghibli,kizu,seed_data}.json
     ./manage.py ranking # Compute cached ranking information. This should be done regularly.
     ./manage.py top director # Store data for the Top20 page. This should be done regularly.
-    ./manage.py runserver
+
+Voilà ! Vous avez une installation de Mangaki fonctionnelle.
 
 Afficher les notebooks
 ----------------------
 
     . venv/bin/activate
     pip install ipython[notebook]
-    pip install django-extensions
 
 Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
 

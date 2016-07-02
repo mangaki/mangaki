@@ -145,6 +145,12 @@ class Staff(models.Model):
     class Meta:
         unique_together = ('work', 'artist', 'role')
 
+    def __str__(self):
+        return "{}, {} de {}" .format(
+            self.artist.name,
+            self.role.name.lower(),
+            self.work.title)
+
 class Editor(models.Model):
     title = models.CharField(max_length=33, db_index=True)
 

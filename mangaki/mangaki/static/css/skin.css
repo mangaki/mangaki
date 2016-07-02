@@ -84,13 +84,8 @@ padding: 25px 25px;
 font-size: 20px;
 line-height: 1.33;
 border-radius: 5px;
-
-
+white-space: normal;
 }
-
-
-
-
 
 /************
  *  FOOTER  *
@@ -362,8 +357,6 @@ ul.checklist .list-icon {
 /** Base class **/
 .search-input {
     width: 100%;
-    border: 1px solid #eee;
-    padding: 10px;
     font-size: 1.15em;
 }
 

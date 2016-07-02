@@ -13,8 +13,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL("""
-        CREATE EXTENSION IF NOT EXISTS pg_trgm;
-        CREATE EXTENSION IF NOT EXISTS unaccent;
         CREATE OR REPLACE FUNCTION F_UNACCENT(text) RETURNS text AS
         $func$
         SELECT public.unaccent('public.unaccent', $1)

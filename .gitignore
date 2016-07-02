@@ -11,3 +11,4 @@ data/
 *.npy
 *.zip
 *.pickle
+/.vagrant
