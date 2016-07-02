@@ -82,8 +82,7 @@ class WorkTest(TestCase):
 
     def test_work_creation(self):
         """
-        You cannot create a work without a category, the Work.save function will throw:
-        TypeError('Unexpected subclass of work: {}'.format(type(self))
+        Work cannot be created without a category, the `Work.save` method will throw a TypeError.
         """
 
         with self.assertRaises(TypeError):
