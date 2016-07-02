@@ -16,14 +16,14 @@ class WorkTest(TestCase):
         return Album.objects.create(**kwargs)
 
     def setUp(self):
-        self.create_anime(title='STEINS;GATE',
+        self.anime = self.create_anime(title='STEINS;GATE',
             source='Ryan',
             poster='ryan.png',
             nb_episodes=26, # + 1 with the alternate beta episode.
             anime_type='Seinen'
         )
 
-        self.create_anime(title='Dakara boku ga H wa dekinai.',
+        self.nsfw_anime = self.create_anime(title='Dakara boku ga H wa dekinai.',
             source='Not Ryan',
             poster='dakara.png',
             nsfw=True,
@@ -32,13 +32,13 @@ class WorkTest(TestCase):
         )
 
 
-        self.create_manga(title='Medaka Box',
+        self.manga = self.create_manga(title='Medaka Box',
             source='Ryan',
             poster='zenkichi.png',
             manga_type='Shonen'
         )
 
-        self.create_album(title='Bungou Stray Dogs Original Soundtrack',
+        self.album = self.create_album(title='Bungou Stray Dogs Original Soundtrack',
             source='Ryan',
             poster='atsuchi_and_dazai.png',
             vgmdb_aid=58065
@@ -54,7 +54,7 @@ class WorkTest(TestCase):
 
 
     def test_anime_creation(self):
-        w = Anime.objects.first()
+        w = self.anime
 
         self.assertIsInstance(w, Anime)
         self.assertEqual(w.get_absolute_url(), '/anime/{}'.format(w.id))
@@ -63,7 +63,7 @@ class WorkTest(TestCase):
         self.assertEqual(str(w), '[{}] {}'.format(w.id, w.title))
 
     def test_manga_creation(self):
-        w = Manga.objects.first()
+        w = self.manga
 
         self.assertIsInstance(w, Manga)
         self.assertEqual(w.get_absolute_url(), '/manga/{}'.format(w.id))
@@ -72,7 +72,7 @@ class WorkTest(TestCase):
         self.assertEqual(str(w), w.title) # This seems incoherent with animes. Why special __str__ only for Anime subclasses?
 
     def test_album_creation(self):
-        w = Album.objects.first()
+        w = self.album
 
         self.assertIsInstance(w, Album)
         self.assertEqual(w.get_absolute_url(), '/album/{}'.format(w.id))
