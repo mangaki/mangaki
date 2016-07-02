@@ -16,14 +16,14 @@
       <div>
       Filtrer par éditeur :
       <select name="editorURL" onChange="document.location.href=document.editor_choice.editorURL.options[document.editor_choice.editorURL.selectedIndex].value">
-        <option value="/reco/?category={{ category }}" {% if editor == '' %} selected {% endif %}>Tous</option>
-        <option value="/reco/?category=manga&editor=Taifu" {% if editor == 'Taifu' %} selected {% endif %}> Taifu Comics</option>
-        <option value="/reco/?category=manga&editor=Ototo" {% if editor == 'Ototo' %} selected {% endif %}>Ototo Manga</option>
-        <!--<option value="/reco/?category=manga&editor=otototaifu" {% if editor == 'otototaifu' %} selected {% endif %}>Ototo/Taifu</a>-->
-        <option value="/reco/?category=manga&editor=delcourt" {% if editor == 'delcourt' %} selected {% endif %}>Delcourt</option>
-        <option value="/reco/?category=manga&editor=tonkam" {% if editor == 'tonkam' %} selected {% endif %}>Tonkam</option>
-        <option value="/reco/?category=manga&editor=soleil" {% if editor == 'soleil' %} selected {% endif %}>Soleil</option>
-        <option value="/reco/?category=manga&editor=kaze" {% if editor == 'kaze' %} selected {% endif %}>Kaze</option>
+        <option value="{% url 'reco' %}?category={{ category }}" {% if editor == '' %} selected {% endif %}>Tous</option>
+        <option value="{% url 'reco' %}?category=manga&editor=Taifu" {% if editor == 'Taifu' %} selected {% endif %}> Taifu Comics</option>
+        <option value="{% url 'reco' %}?category=manga&editor=Ototo" {% if editor == 'Ototo' %} selected {% endif %}>Ototo Manga</option>
+        <!--<option value="{% url 'reco' %}?category=manga&editor=otototaifu" {% if editor == 'otototaifu' %} selected {% endif %}>Ototo/Taifu</a>-->
+        <option value="{% url 'reco' %}?category=manga&editor=delcourt" {% if editor == 'delcourt' %} selected {% endif %}>Delcourt</option>
+        <option value="{% url 'reco' %}?category=manga&editor=tonkam" {% if editor == 'tonkam' %} selected {% endif %}>Tonkam</option>
+        <option value="{% url 'reco' %}?category=manga&editor=soleil" {% if editor == 'soleil' %} selected {% endif %}>Soleil</option>
+        <option value="{% url 'reco' %}?category=manga&editor=kaze" {% if editor == 'kaze' %} selected {% endif %}>Kaze</option>
       </select>
       </div>
     </form>
@@ -44,16 +44,16 @@
 <br />
 
     <ul class="nav nav-tabs">
-        <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="/reco/">Tout</a></li>
-        <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="/reco/?category=anime"><em>Anime</em> seulement</a></li>
-        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="/reco/?category=manga">Manga seulement</a></li>
+        <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="{% url 'reco' %}">Tout</a></li>
+        <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'reco' %}?category=anime"><em>Anime</em> seulement</a></li>
+        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'reco' %}?category=manga">Manga seulement</a></li>
     </ul>
     <br />
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 {% include "works.html" with works=reco_list only %}
 <div class="row margin">
     <div class="col-xs-12">
-        <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}&editor={{ editor }}" style="display: block; margin: auto">Je veux d'autres recommandations&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
+        <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}&editor={{ editor }}" style="display: block; margin: auto">Je veux d'autres recommandations&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
     </div>
 </div>
     <script>
@@ -72,6 +72,6 @@
     });
     </script>
 {% else %}
-    <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/anime/">noté un <em>anime</em></a> !</p>
+    <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="{% url 'work-list' 'anime' %}">noté un <em>anime</em></a> !</p>
 {% endif %}
 {% endblock %}

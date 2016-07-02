@@ -59,11 +59,11 @@
 </div>
 
 <ul class="nav nav-tabs">
-    <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="/u/{{ username }}">Liste d'<em>anime</em> de {{ username }} <span class="badge alert-info">{{ anime_count }}</span></a></li>
-    <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="/u/{{ username }}?category=manga">Liste de mangas de {{ username }} <span class="badge alert-info">{{ manga_count }}</span></a></li>
-    <li role="presentation"{% if category == 'recommendation' %} class="active"{% endif %}><a href="/u/{{ username }}?category=recommendation">Liste de recommandations de {{ username }} <span class="badge alert-info">{{ reco_count }}</span></a></li>
+    <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'profile' username %}">Liste d'<em>anime</em> de {{ username }} <span class="badge alert-info">{{ anime_count }}</span></a></li>
+    <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'profile' username %}?category=manga">Liste de mangas de {{ username }} <span class="badge alert-info">{{ manga_count }}</span></a></li>
+    <li role="presentation"{% if category == 'recommendation' %} class="active"{% endif %}><a href="{% url 'profile' username %}?category=recommendation">Liste de recommandations de {{ username }} <span class="badge alert-info">{{ reco_count }}</span></a></li>
     {% if best_neighbors_list %}
-    <li role="presentation"{% if category == 'neighbor' %} class="active"{% endif %}><a href="/u/{{ username }}?category=neighbor">Les {{ neighbor_count }} plus proches voisins de {{ username }}</a></li>
+    <li role="presentation"{% if category == 'neighbor' %} class="active"{% endif %}><a href="{% url 'profile' username %}?category=neighbor">Les {{ neighbor_count }} plus proches voisins de {{ username }}</a></li>
     {% endif %}
 </ul>
 <div class="row mangas-list{% if request.user.username != username %} another{% endif %}">
@@ -80,7 +80,7 @@
                    <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
                </div>
                <div class="col-xs-7">
-                   <h4><a href="/u/{{ user.username }}">{{ user.username }}</a></h4>
+                   <h4><a href="{% url 'profile' user.username %}">{{ user.username }}</a></h4>
                    <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
                </div>
            </div>
@@ -91,7 +91,7 @@
         <div class="col-xs-4 col-xs-offset-1">
             <h1>Recommandations envoyées</h1>
             {% for object in sent_recommendation_list %}
-                <p class="row flatlist"><a href="/{{ object.category }}/{{ object.id }}">{{ object.title }}</a> a été conseillé à <a href="/u/{{ object.username }}">{{ object.username }}</a> {% if request.user.username == username %}<a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}" data-target="{{ object.username }}" data-user="{{ username }}" onclick="removeReco(this)" title="supprimer la recommandation"><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
+                <p class="row flatlist"><a href="{% url 'work-detail' object.category object.id %}">{{ object.title }}</a> a été conseillé à <a href="{% url 'profile' object.username %}">{{ object.username }}</a> {% if request.user.username == username %}<a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}" data-target="{{ object.username }}" data-user="{{ username }}" onclick="removeReco(this)" title="supprimer la recommandation"><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
             {% empty %}
                 <p>(Cette liste est vide.)</p>
             {% endfor %}
@@ -99,7 +99,7 @@
         <div class="col-xs-4 col-xs-offset-1">
             <h1>Recommandations reçues</h1>
             {% for object in received_recommendation_list %}
-                <p class="row flatlist"><a href="/{{ object.category }}/{{ object.id }}">{{ object.title }}</a> vous a été conseillé par <a href="/u/{{ object.username }}">{{ object.username }}</a> {% if request.user.username == username %}<a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}" data-target="{{ username }}" data-user="{{ object.username }}" onclick="removeReco(this)" title="supprimer la recommandation"><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
+                <p class="row flatlist"><a href="{% url 'work.detail' object.category object.id %}">{{ object.title }}</a> vous a été conseillé par <a href="{% url 'profile' object.username %}">{{ object.username }}</a> {% if request.user.username == username %}<a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}" data-target="{{ username }}" data-user="{{ object.username }}" onclick="removeReco(this)" title="supprimer la recommandation"><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
             {% empty %}
                 <p>(Cette liste est vide.)</p>
             {% endfor %}
@@ -107,11 +107,11 @@
         </div>
     {% else %}
         <div class="col-xs-4 col-xs-offset-1">
-            <h1>{% if category == 'anime' %}<a href="/anime">Anime</a> vus{% else %}<a href="/manga">Mangas</a> lus{% endif %}</h1>
+            <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a> vus{% else %}<a href="{% url 'work-list' 'manga' %}">Mangas</a> lus{% endif %}</h1>
             {% include "works_no_poster.html" with works=seen_list class=category %}
         </div>
         <div class="col-xs-4 col-xs-offset-1">
-            <h1>{% if category == 'anime' %}<a href="/anime">Anime</a> à voir (ou non){% else %}<a href="/manga">Mangas</a> à lire (ou pas){% endif %}</h1>
+            <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a> à voir (ou non){% else %}<a href="{% url 'work-list' 'manga' %}">Mangas</a> à lire (ou pas){% endif %}</h1>
             {% include "works_no_poster.html" with works=unseen_list class=category %}
         </div>
         </div>

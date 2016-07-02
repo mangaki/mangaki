@@ -4,7 +4,7 @@
 <div class="col-xs-12">
   <p class="alert alert-info">
 {% if user.is_authenticated %}
-    Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'recommendations' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
+    Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
 {% else %}
     Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
     <a class="alert-link" href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
@@ -83,7 +83,7 @@
 {% if user.is_authenticated %}
 <div class="row margin">
   <div class="col-md-12 col-sm-12">
-    <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
+    <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
   </div>
 </div>
 {% endif %}
