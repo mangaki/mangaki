@@ -1,5 +1,5 @@
 from django.test import TestCase
-from mangaki.models import Work, Anime, Manga, Album
+from mangaki.models import Work, Category
 from django.contrib.auth.models import User, AnonymousUser
 
 from mangaki.factories import create_user_with_profile
@@ -7,13 +7,16 @@ from mangaki.factories import create_user_with_profile
 class WorkTest(TestCase):
 
     def create_anime(self, **kwargs):
-        return Anime.objects.create(**kwargs)
+        anime = Category.objects.get(slug='anime')
+        return Work.objects.create(**kwargs, category=anime)
 
     def create_manga(self, **kwargs):
-        return Manga.objects.create(**kwargs)
+        manga = Category.objects.get(slug='manga')
+        return Work.objects.create(**kwargs, category=manga)
 
     def create_album(self, **kwargs):
-        return Album.objects.create(**kwargs)
+        album = Category.objects.get(slug='album')
+        return Work.objects.create(**kwargs, category=album)
 
     def setUp(self):
         self.anime = self.create_anime(title='STEINS;GATE',
@@ -48,7 +51,7 @@ class WorkTest(TestCase):
             'nsfw_ok': False
         })
 
-        self.fake_user_with_nsfw = create_user_with_profile(username='Raito_Bezarius', profile={
+        self.fake_user_with_nsfw = create_user_with_profile(username='Raito_Bezarius_NSFW', profile={
             'nsfw_ok': True
         })
 
@@ -56,29 +59,29 @@ class WorkTest(TestCase):
     def test_anime_creation(self):
         w = self.anime
 
-        self.assertIsInstance(w, Anime)
+        self.assertIsInstance(w, Work)
         self.assertEqual(w.get_absolute_url(), '/anime/{}'.format(w.id))
         self.assertEqual(str(w.category), 'Anime')
         self.assertEqual(w.category.slug, 'anime')
-        self.assertEqual(str(w), '[{}] {}'.format(w.id, w.title))
+        self.assertEqual(str(w), w.title)
 
     def test_manga_creation(self):
         w = self.manga
 
-        self.assertIsInstance(w, Manga)
+        self.assertIsInstance(w, Work)
         self.assertEqual(w.get_absolute_url(), '/manga/{}'.format(w.id))
         self.assertEqual(str(w.category), 'Manga')
         self.assertEqual(w.category.slug, 'manga')
-        self.assertEqual(str(w), w.title) # This seems incoherent with animes. Why special __str__ only for Anime subclasses?
+        self.assertEqual(str(w), w.title)
 
     def test_album_creation(self):
         w = self.album
 
-        self.assertIsInstance(w, Album)
+        self.assertIsInstance(w, Work)
         self.assertEqual(w.get_absolute_url(), '/album/{}'.format(w.id))
         self.assertEqual(str(w.category), 'Album')
         self.assertEqual(w.category.slug, 'album')
-        self.assertEqual(str(w), '[{}] {}'.format(w.id, w.title))
+        self.assertEqual(str(w), w.title)
 
     def test_work_creation(self):
         """
@@ -101,4 +104,3 @@ class WorkTest(TestCase):
         self.assertIn('nsfw', w.safe_poster(AnonymousUser()))
         self.assertIn('nsfw', w.safe_poster(self.fake_user))
         self.assertIn('dakara.png', w.safe_poster(self.fake_user_with_nsfw))
-

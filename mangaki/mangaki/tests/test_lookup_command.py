@@ -2,13 +2,15 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.utils.six import StringIO
 
-from mangaki.models import Anime
+from mangaki.models import Work, Category
 
 class LookupTest(TestCase):
     def setUp(self):
-        Anime.objects.create(
-                title='Steins;Gate',
-                source='Ryan'
+        anime = Category.objects.get(slug='anime')
+        Work.objects.create(
+            title='Steins;Gate',
+            source='Ryan',
+            category=anime
         )
 
     def test_lookup_steins_gate(self):
