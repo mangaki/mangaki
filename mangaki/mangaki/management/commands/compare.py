@@ -11,7 +11,6 @@ from collections import Counter
 import numpy as np
 import random
 import csv
-# import matplotlib.pyplot as plt
 
 TEST_SIZE = 50000
 
