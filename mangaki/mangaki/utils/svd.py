@@ -52,7 +52,7 @@ class MangakiSVD(object):
             matrix[user][work] = rating
         means = np.zeros((self.nb_users,))
         for i in range(self.nb_users):
-            means[i] = np.sum(matrix[i]) / np.sum(matrix[i] != 0)
+            means[i] = np.nanmean(matrix[i])
             if np.isnan(means[i]):
                 means[i] = 0
             matrix[i][matrix[i] != 0] -= means[i]
