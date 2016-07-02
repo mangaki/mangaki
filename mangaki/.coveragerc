@@ -1,0 +1,14 @@
+[run]
+include = mangaki/*
+timid = True
+
+[report]
+exclude_lines = 
+ pragma: no cover
+
+omit =
+ */migrations/*
+ mangaki/tools/*
+
+show_missing = True
+skip_covered = True
