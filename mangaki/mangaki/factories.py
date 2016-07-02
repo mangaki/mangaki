@@ -25,3 +25,11 @@ class UserFactory(DjangoModelFactory):
 
 def create_user(**kwargs):
     return UserFactory.build(**kwargs)
+
+def create_user_with_profile(**kwargs):
+    profile = kwargs.pop('profile')
+    user = create_user(**kwargs)
+    for key, value in profile.items():
+        setattr(user.profile, key, value)
+
+    return user

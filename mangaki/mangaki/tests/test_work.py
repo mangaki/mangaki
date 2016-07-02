@@ -2,7 +2,7 @@ from django.test import TestCase
 from mangaki.models import Work, Anime, Manga, Album
 from django.contrib.auth.models import User, AnonymousUser
 
-from mangaki.factories import create_user
+from mangaki.factories import create_user_with_profile
 
 class WorkTest(TestCase):
 
@@ -43,6 +43,15 @@ class WorkTest(TestCase):
             poster='atsuchi_and_dazai.png',
             vgmdb_aid=58065
         )
+
+        self.fake_user = create_user_with_profile(username='Raito_Bezarius', profile={
+            'nsfw_ok': False
+        })
+
+        self.fake_user_with_nsfw = create_user_with_profile(username='Raito_Bezarius', profile={
+            'nsfw_ok': True
+        })
+
 
     def test_anime_creation(self):
         w = Anime.objects.first()
