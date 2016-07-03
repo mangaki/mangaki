@@ -6,6 +6,8 @@ from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.pca import MangakiPCA
 from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.als import MangakiALS
+from mangaki.utils.nmf import MangakiNMF
+from mangaki.utils.zero import MangakiZero
 from mangaki.utils.values import rating_values
 from collections import Counter
 import numpy as np
@@ -14,6 +16,7 @@ import pandas
 # import matplotlib.pyplot as plt
 
 TEST_SIZE = 50000
+
 
 class Experiment(object):
     X = None
@@ -24,7 +27,7 @@ class Experiment(object):
     results = {}
     algos = None
     def __init__(self, PIG_ID=None):
-        self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN()]
+        self.algos = [MangakiNMF(30), MangakiALS(20), MangakiSVD(20), MangakiZero()]
         # self.results.setdefault('x_axis', []).append()
         self.make_dataset(PIG_ID)
         self.execute()
