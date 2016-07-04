@@ -6,9 +6,8 @@
 {% if user.is_authenticated %}
     Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
 {% else %}
-    Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
-    <a class="alert-link" href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
-    et obtenir des recommandations.
+    Nouveau sur Mangaki ? <a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
+    <a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
 {% endif %}
   </p>
 </div>
