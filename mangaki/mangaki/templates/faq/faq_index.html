@@ -5,28 +5,30 @@
 
 <div class="row featured text-center">
 
+
 <h1>FAQ</h1> 
 
-{% for  theme in themes %}
 
-<div>
-	<h2>  {{ theme.0 }}  </h2>
-<br />
-</div>
+{% for info in information %}
 
-		<div >
-			{% if  indice|length != 1 %}
-				{% for i in (indice|length-1)|get_range %}
+    
+	<h2>  {{ info.0 }}  </h2>  
+    
+    <br />
+
+
+					
+				{% for question_answer in info.1%}
 			
 					
-				<h4>{{ indice.i.0 }} </h4>
-				<p>{{ indice.i.1 }}</p>
+				<h4>{{ question_answer.0 }} </h4>
+				<p>{{ question_answer.1 }}</p>
 				<br/>
 				<br/>
 			
 				{% endfor %}
 			
-		</div>
+		
 
 {% endfor %}
 

@@ -700,34 +700,25 @@ def faq_index(request):
     
 
 
-""""
-    latest_theme_list = FAQTheme.objects.order_by('-pub_date')
-    title = FAQTheme.objects.values_list('theme',flat=True).order_by('-pub_date')
-    information=[[]for i in range(len(latest_theme_list))]
-    themes = [[[entry.question, entry.answer] for entry in theme.entry.filter(is_active=True)] for theme in latest_theme_list]
-    for i in range(0, len(latest_theme_list)):
-        information[i].append(title[i])
-        for question_answer in themes[i]:
-            information[i].append(question_answer)
-""""
     
 
     latest_theme_list = FAQTheme.objects.order_by('-pub_date')
 
     title = FAQTheme.objects.values_list('theme',flat=True).order_by('-pub_date')
+    #title=[faqtheme.theme for faqtheme in latest_theme_list]
 
-    information=[ [] for i in range(len(latest_theme_list))]
+    
 
-    themes = [[[entry.question, entry.answer] for entry in theme.entry.filter(is_active=True)] for theme in latest_theme_list]
+    question_answer = [[[entry.question, entry.answer] for entry in faqtheme.entry.filter(is_active=True)] for faqtheme in latest_theme_list]
 
-    for i in range(0,len(themes)):
 
-        themes[i].insert(0, title[i])
+
+    all_information= zip(title, question_answer)
 
 
 
     context = {
-        'information': information,
+        'information': all_information,
     }
     return render(request,'faq/faq_index.html', context)
 
