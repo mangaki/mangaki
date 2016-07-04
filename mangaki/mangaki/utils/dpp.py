@@ -13,13 +13,13 @@ def diameter(r, points):
 
 def diameter_0(points):
     r = 1
-    premier = diameter(r, points)
-    deuxième = diameter(r / 2, points)
-    while premier - deuxième > 0.01 * deuxième:
-        premier = diameter(r, points)
+    first = diameter(r, points)
+    second = diameter(r / 2, points)
+    while first - second > 0.01 * second:
+        first = diameter(r, points)
         r = r / 2
-        deuxième = diameter(r, points)
-    return deuxième
+        second = diameter(r, points)
+    return second
 
 
 class SimilarityMatrix(object):
