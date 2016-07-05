@@ -230,7 +230,7 @@ class EventDetail(LoginRequiredMixin, DetailView):
 def get_card(request, category, sort_id=1):
     chrono = Chrono(True)
     deja_vu = request.GET.get('dejavu', '').split(',')
-    sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
+    sort_mode = ['popularity', 'controversy', 'top', 'random', 'dpp'][int(sort_id) - 1]
     queryset = Work.objects.filter(category__slug=category)
     if sort_mode == 'popularity':
         queryset = queryset.popular()
@@ -238,6 +238,8 @@ def get_card(request, category, sort_id=1):
         queryset = queryset.controversial()
     elif sort_mode == 'top':
         queryset = queryset.top()
+    elif sort_mode == 'dpp':
+        queryset = queryset.dpp()
     else:
         queryset = queryset.random().order_by('?')
     if request.user.is_authenticated():
@@ -308,6 +310,8 @@ class WorkList(WorkListMixin, ListView):
             queryset = queryset.order_by('title')
         elif sort_mode == 'random':
             queryset = queryset.random().order_by('?')[:self.paginate_by]
+        elif sort_mode == 'dpp':
+            queryset = queryset.dpp()
         elif sort_mode == 'mosaic':
             queryset = queryset.none()
         else:
@@ -431,7 +435,7 @@ def get_profile(request, username):
             seen_lists[r.work.category.slug].append(r)
         else:
             unseen_lists[r.work.category.slug].append(r)
-    # chrono.save('categorize ratings')
+    # chrono.save('categorize ratings')
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
 
     # Events
@@ -540,6 +544,7 @@ def top(request, category_slug):
     })
 
 
+
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -555,6 +560,20 @@ def rate_work(request, work_id):
         return HttpResponse(choice)
     return HttpResponse()
 
+def dpp_work(request, work_id):
+    if request.user.is_authenticated() and request.method == 'POST':
+        work = get_object_or_404(Work, id=work_id)
+        choice = request.POST.get('choice', '')
+        if choice not in ['like', 'dislike', 'wontsee']:
+            return HttpResponse()
+        if ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
+            ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).delete()
+            update_score_while_unrating(request.user, work, choice)
+            return HttpResponse('none')
+        update_score_while_rating(request.user, work, choice)
+        ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
+        return HttpResponse(choice)
+    return HttpResponse()
 
 def recommend_work(request, work_id, target_id):
     if request.user.is_authenticated() and request.method == 'POST':
@@ -631,6 +650,7 @@ def remove_all_reco(request, targetname):
                 reco.delete()
 
 
+#à regarder
 @login_required
 def get_reco(request):
     category = request.GET.get('category', 'all')
@@ -686,3 +706,4 @@ def add_pairing(request, artist_id, work_id):
 def register_profile(sender, **kwargs):
     user = kwargs['user']
     Profile(user=user).save()
+

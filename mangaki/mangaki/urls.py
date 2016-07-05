@@ -9,6 +9,7 @@ urlpatterns = [
     # url(r'^$', views.home, name='home'),
     # url(r'^blog/', include('blog.urls')),
 
+    #url(r'^dpp/(?P<work_id>\d+)$', views.dpp_work),
     url(r'^$', views.index),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works),
     url(r'^data/reco/(?P<category>\w+)/(?P<editor>\w+)\.json$', views.get_reco_list),
@@ -33,7 +34,6 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^discourse/sso$', discourse_views.sso),
     url(r'^about/$', views.about),
-    url(r'^faq/$', views.MarkdownView.as_view(), kwargs={'slug': 'faq'}),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}),
     url(r'^events/$', views.events),
     # url(r'^lookup/$', views.lookup_work'),
