@@ -12,7 +12,7 @@ class BuildMatrix(object):
         if fname is None:
             content = Rating.objects.values_list('user_id',
                                                  'work_id',
-                                                 'rating')
+                                                 'choice')
             for user_id, item_id, rating in content:
                 user_list.append(user_id)
                 item_list.append(item_id)

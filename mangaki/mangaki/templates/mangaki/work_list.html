@@ -26,7 +26,7 @@
     <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=top">Les plus aimés</a></li>
     <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=random">Prles au hasard</a></li>
+      <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
     <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
   </ul>

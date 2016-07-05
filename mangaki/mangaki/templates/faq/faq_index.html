@@ -9,16 +9,16 @@
 <h1>FAQ</h1> 
 
 
-{% for info in information %}
+{% for title, value in information.items  %}
 
-    
-	<h2>  {{ info.0 }}  </h2>  
-    
+
+	<h2>{{ title }}  </h2> 
+ 
     <br />
 
 
 					
-				{% for question_answer in info.1%}
+				{% for question_answer in value%}
 			
 					
 				<h4>{{ question_answer.0 }} </h4>
@@ -31,10 +31,12 @@
 		
 
 {% endfor %}
+</div>
 
 <br />
 <br />
 <br />
+
 {% endblock %}
 
 

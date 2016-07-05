@@ -709,31 +709,9 @@ def register_profile(sender, **kwargs):
 
 
 def faq_index(request):
-    #latest_theme_list = FAQTheme.objects.values_list('theme', flat=True).order_by('-pub_date')
-
-    #latest_theme_list = FAQTheme.objects.order_by('-pub_date')
-    #themes = [[entry for entry in theme.thème.filter(is_active=True)] for theme in latest_theme_list]
-    #question = [[entry.question for entry in theme.thème.filter(is_active=True)] for theme in latest_theme_list]
-    #answer =  [[entry.answer for entry in theme.thème.filter(is_active=True)] for theme in latest_theme_list]
-    #information= FAQTheme.objects.values_list('theme', flat=True).order_by('-pub_date')
-    
-    #TODO : le faire avec un dict
-
-
-    
-
     latest_theme_list = FAQTheme.objects.order_by('-pub_date')
+    all_information={faqtheme.theme : [(entry.question, entry.answer) for entry in faqtheme.entry.filter(is_active=True) ] for faqtheme in latest_theme_list}
 
-    title = FAQTheme.objects.values_list('theme',flat=True).order_by('-pub_date')
-    #title=[faqtheme.theme for faqtheme in latest_theme_list]
-
-    
-
-    question_answer = [[[entry.question, entry.answer] for entry in faqtheme.entry.filter(is_active=True)] for faqtheme in latest_theme_list]
-
-
-
-    all_information= zip(title, question_answer)
 
 
 
