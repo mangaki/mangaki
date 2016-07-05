@@ -1,7 +1,7 @@
 from sklearn.utils.extmath import randomized_svd
 from scipy.spatial.distance import pdist, squareform
 from numpy.random import choice
-from mangaki.utils.buildmatrix import RatingsMatrix
+from mangaki.utils.ratingsmatrix import RatingsMatrix
 import numpy as np
 
 
@@ -131,7 +131,7 @@ def compare(similarity, algos, nb_points, nb_iterations=20):
 
 if __name__ == '__main__':
     build_matrix = RatingsMatrix()
-    matrix = build_matrix.build_matrix(fname='/home/voisin/Bureau/ratings.csv')
+    matrix = build_matrix.build_matrix()
     similarity = SimilarityMatrix(matrix, nb_components_svd=70)
     items = list(build_matrix.item_dict.values())
     uniform = MangakiUniform(items)

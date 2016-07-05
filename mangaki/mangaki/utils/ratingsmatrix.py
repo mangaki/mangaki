@@ -1,6 +1,6 @@
 from scipy.sparse import csc_matrix
 from mangaki.utils.values import rating_values
-from mangaki.models import Rating
+#from mangaki.models import Rating
 import pandas
 
 

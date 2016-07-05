@@ -10,7 +10,8 @@ from django.core.urlresolvers import reverse
 from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
-#from mangaki.utils.dpp import *
+#from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
+
 
 from sklearn.utils.extmath import randomized_svd
 from scipy.spatial.distance import pdist, squareform
@@ -24,8 +25,8 @@ import pandas
 
 
 class RatingsMatrix():
-
-    def build_matrix(self, fname=None):
+    #à changer
+    def build_matrix(self, fname=None, category=None):
         user_list, item_list, data = [], [], []
 
         if fname is None:
@@ -33,9 +34,10 @@ class RatingsMatrix():
                                                  'work_id',
                                                  'choice')
             for user_id, item_id, rating in content:
-                user_list.append(user_id)
-                item_list.append(item_id)
-                data.append(rating_values[rating])
+                    if Category.objects.filter(work=item_id)[0].slug == category):
+                        user_list.append(user_id)
+                        item_list.append(item_id)
+                        data.append(rating_values[rating])
         else:
             content = pandas.read_csv(fname,
                                       header=None).as_matrix()
@@ -228,14 +230,14 @@ class WorkQuerySet(models.QuerySet):
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
-    def dpp(self):
+    def dpp(self,category, nb_points):
 
-        build_matrix = RatingsMatrix()
+        build_matrix = RatingsMatrix(category)
         matrix = build_matrix.build_matrix()
         similarity = SimilarityMatrix(matrix, nb_components_svd=70)
         items = list(build_matrix.item_dict.values())
         dpp = MangakiDPP(items, similarity.similarity_matrix)
-        liste = dpp.sample_k(10)
+        liste = dpp.sample_k(nb_points)
         return self.filter(id__in=liste)
 
     def random(self):
