@@ -4,7 +4,7 @@ from mangaki.models import Rating
 import pandas
 
 
-class BuildMatrix(object):
+class RatingsMatrix():
 
     def build_matrix(self, fname=None):
         user_list, item_list, data = [], [], []

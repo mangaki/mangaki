@@ -1,7 +1,7 @@
 from sklearn.utils.extmath import randomized_svd
 from scipy.spatial.distance import pdist, squareform
 from numpy.random import choice
-from mangaki.utils.buildmatrix import BuildMatrix
+from mangaki.utils.buildmatrix import RatingsMatrix
 import numpy as np
 
 
@@ -22,7 +22,7 @@ def diameter_0(points):
     return second
 
 
-class SimilarityMatrix(object):
+class SimilarityMatrix():
 
     def __init__(self, matrix, nb_components_svd=10,
                  fname=None, algo='svd', metric='cosine'):
@@ -42,7 +42,7 @@ class SimilarityMatrix(object):
         return 1 - squareform(pdist(self.matrix.T, metric=metric))
 
 
-class MangakiUniform(object):
+class MangakiUniform():
 
     def __init__(self, items):
         self.items = items
@@ -51,7 +51,7 @@ class MangakiUniform(object):
         return choice(self.items, nb_points).tolist()
 
 
-class MangakiDPP(object):
+class MangakiDPP():
 
     def __init__(self, items, similarity_matrix):
         self.items = items
@@ -130,7 +130,7 @@ def compare(similarity, algos, nb_points, nb_iterations=20):
 
 
 if __name__ == '__main__':
-    build_matrix = BuildMatrix()
+    build_matrix = RatingsMatrix()
     matrix = build_matrix.build_matrix(fname='/home/voisin/Bureau/ratings.csv')
     similarity = SimilarityMatrix(matrix, nb_components_svd=70)
     items = list(build_matrix.item_dict.values())

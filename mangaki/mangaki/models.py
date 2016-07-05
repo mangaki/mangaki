@@ -23,7 +23,7 @@ from mangaki.utils.values import rating_values
 import pandas
 
 
-class BuildMatrix(object):
+class RatingsMatrix():
 
     def build_matrix(self, fname=None):
         user_list, item_list, data = [], [], []
@@ -75,7 +75,7 @@ def diameter_0(points):
     return second
 
 
-class SimilarityMatrix(object):
+class SimilarityMatrix():
 
     def __init__(self, matrix, nb_components_svd=10,
                  fname=None, algo='svd', metric='cosine'):
@@ -95,7 +95,7 @@ class SimilarityMatrix(object):
         return 1 - squareform(pdist(self.matrix.T, metric=metric))
 
 
-class MangakiUniform(object):
+class MangakiUniform():
 
     def __init__(self, items):
         self.items = items
@@ -104,7 +104,7 @@ class MangakiUniform(object):
         return choice(self.items, nb_points).tolist()
 
 
-class MangakiDPP(object):
+class MangakiDPP():
 
     def __init__(self, items, similarity_matrix):
         self.items = items
@@ -230,7 +230,7 @@ class WorkQuerySet(models.QuerySet):
 
     def dpp(self):
 
-        build_matrix = BuildMatrix()
+        build_matrix = RatingsMatrix()
         matrix = build_matrix.build_matrix()
         similarity = SimilarityMatrix(matrix, nb_components_svd=70)
         items = list(build_matrix.item_dict.values())
