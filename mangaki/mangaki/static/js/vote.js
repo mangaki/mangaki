@@ -9,7 +9,7 @@ function vote(elt) {
     var entity = $(elt).closest('.data');
     var work_id = entity.data('id');
     var choice = $(elt).data('choice');
-    //var pos = entity.data('pos');
+    var pos = entity.data('pos');
     $.post('/vote/' + work_id, {choice: choice}, function(rating) {
         if(rating === '') {
             // FIXME: We should take the vote into account after the
@@ -31,35 +31,6 @@ function vote(elt) {
         }
     });
 }
-
-
-function vote_dpp(elt) {
-    var entity = $(elt).closest('.data');
-    var work_id = entity.data('id');
-    var choice = $(elt).data('choice');
-    //var pos = entity.data('pos');
-    $.post('/vote/' + work_id, {choice: choice}, function(rating) {
-        if(rating === '') {
-            // FIXME: We should take the vote into account after the
-            // user signs up or logs in.
-            var next = window.location.pathname +
-                window.location.search + window.location.hash;
-            window.location.assign(
-                '/user/signup?next=' + encodeURIComponent(next));
-        }
-        if(typeof(sort_mode) !== 'undefined' && sort_mode === 'mosaic' && rating)
-            loadCard(pos);
-        else {
-            if (rating === 'none')
-                $(elt).siblings().filter('[data-choice!=' + rating + ']').removeClass('not-chosen');
-            else if (rating) {
-                $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
-                $(elt).removeClass('not-chosen');
-            }
-        }
-    });
-}
-
 
 
 function suggestion(mangaki_class) {

@@ -17,8 +17,6 @@
   <ul class="nav nav-tabs">
     <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}">Mosaïque</a></li>
-    <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=dpp">DPP</a></li>
     <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=popularity">Les plus populaires</a></li>
     <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
