@@ -23,18 +23,23 @@ from mangaki.utils.values import rating_values
 
 import pandas
 
-
 class RatingsMatrix():
     #à changer
-    def build_matrix(self, fname=None, category=None):
+    def build_matrix(self, category=None, fname=None):
+        liste=list(Category.objects.get(slug='anime').work_set.all())
+        liste=[liste[i].id for i in range(len(liste))]
+
+        
         user_list, item_list, data = [], [], []
 
         if fname is None:
+            
             content = Rating.objects.values_list('user_id',
                                                  'work_id',
-                                                 'choice')
+                                                 'choice').filter(work_id__in=liste)
+            
             for user_id, item_id, rating in content:
-                    if Category.objects.filter(work=item_id)[0].slug == category):
+                    
                         user_list.append(user_id)
                         item_list.append(item_id)
                         data.append(rating_values[rating])
@@ -232,7 +237,7 @@ class WorkQuerySet(models.QuerySet):
 
     def dpp(self,category, nb_points):
 
-        build_matrix = RatingsMatrix(category)
+        build_matrix = RatingsMatrix()
         matrix = build_matrix.build_matrix()
         similarity = SimilarityMatrix(matrix, nb_components_svd=70)
         items = list(build_matrix.item_dict.values())
@@ -486,9 +491,9 @@ class Suggestion(models.Model):
         recommendations_score = 0
         reco_list = Recommendation.objects.filter(user=self.user)
         for reco in reco_list:
-            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count() > 0:
+            if StartColdRating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count() > 0:
                 recommendations_score += 1
-            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count() > 0:
+            if StartColdRating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count() > 0:
                 recommendations_score += 5
         score = suggestions_score + recommendations_score
         Profile.objects.filter(user=self.user).update(score=score)
@@ -567,14 +572,14 @@ class Ranking(models.Model):
     nb_stars = models.PositiveIntegerField()
 
 
-class ColdStartRating(models.Model):
-    user = models.ForeignKey(User)
+class StartColdRating(models.Model):
+    user = models.ForeignKey(User, related_name='startcoldrating')
     work = models.ForeignKey(Work)
     choice = models.CharField(max_length=8, choices=(
         ('like', 'J\'aime'),
         ('dislike', 'Je n\'aime pas'),
         #('neutral', 'Neutre'),
-        ('dontknow', 'Je ne connais pas')
+        ('wontsee', 'Je ne connais pas')
     ))
     date = models.DateField(auto_now=True)
 
@@ -583,3 +588,4 @@ class ColdStartRating(models.Model):
 
     def __str__(self):
         return '%s %s %s' % (self.user, self.choice, self.work)
+

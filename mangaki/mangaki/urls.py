@@ -25,7 +25,9 @@ urlpatterns = [
     url(r'^reco/$', views.get_reco, name='recommendations'),
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing),
+    url(r'^dpp/(?P<work_id>\d+)$', views.dpp_work),
     url(r'^vote/(?P<work_id>\d+)$', views.rate_work),
+    
     url(r'^shared/$', views.update_shared),
     url(r'^nsfw/$', views.update_nsfw),
     url(r'^newsletter/$', views.update_newsletter),

@@ -21,7 +21,7 @@ from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
+from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -86,9 +86,9 @@ def update_score_while_rating(user, work, choice):
             reco.user.profile.score += 1
         elif choice == 'favorite':
             reco.user.profile.score += 5
-        if Rating.objects.filter(user=user, work=work, choice='like').count() > 0:
+        if StartColdRating.objects.filter(user=user, work=work, choice='like').count() > 0:
             reco.user.profile.score -= 1
-        if Rating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
+        if StartColdRating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
             reco.user.profile.score -= 5
         Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
@@ -239,7 +239,7 @@ def get_card(request, category, sort_id=1):
     elif sort_mode == 'top':
         queryset = queryset.top()
     elif sort_mode == 'dpp':
-        queryset = queryset.dpp()
+        queryset = queryset.dpp(category,20)
     else:
         queryset = queryset.random().order_by('?')
     if request.user.is_authenticated():
@@ -309,9 +309,9 @@ class WorkList(WorkListMixin, ListView):
                 queryset = queryset.filter(title__istartswith=letter)
             queryset = queryset.order_by('title')
         elif sort_mode == 'random':
-            queryset = queryset.random().order_by('?')[:self.paginate_by]
+            queryset = queryset.random().order_by('?')[20] #même nbre que ds dpp
         elif sort_mode == 'dpp':
-            queryset = queryset.dpp()[:20]
+            queryset = queryset.dpp('anime',20)
         elif sort_mode == 'mosaic':
             queryset = queryset.none()
         else:
@@ -564,7 +564,7 @@ def dpp_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
-        if choice not in ['like', 'dislike', 'wontsee']:
+        if choice not in ['like', 'dislike', 'dontknow']:
             return HttpResponse()
         if ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
             ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).delete()
@@ -624,6 +624,7 @@ def get_works(request, category):
     ]
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+#à voir
 def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
@@ -632,7 +633,7 @@ def get_reco_list(request, category, editor):
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
-
+#ColdStartRating
 def remove_reco(request, work_id, username, targetname):
     work = get_object_or_404(Work, id=work_id)
     user = get_object_or_404(User, username=username)
@@ -640,7 +641,7 @@ def remove_reco(request, work_id, username, targetname):
     if Rating.objects.filter(user=target, work=work, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0 and (request.user == user or request.user == target):
         Recommendation.objects.get(work=work, user=user, target_user=target).delete()
 
-
+#ColdStartRating
 def remove_all_reco(request, targetname):
     target = get_object_or_404(User, username=targetname)
     if target == request.user:
@@ -655,10 +656,7 @@ def remove_all_reco(request, targetname):
 def get_reco(request):
     category = request.GET.get('category', 'all')
     editor = request.GET.get('editor', 'unspecified')
-    if request.user.rating_set.exists():
-        reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
-    else:
-        reco_list = []
+    reco_list = get_reco_list(request, category, editor)
     return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
 
 

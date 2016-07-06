@@ -16,7 +16,7 @@
 
 <div class="work-votes"{% if not work.id %} style="display: none;"{%endif %}>
     
-    <a data-choice='like' class="btn btn-success btn-block{% if rating and rating != 'like' %} not-chosen{% endif %}" onclick="vote(this)" title="J'aime">
+    <a data-choice='like' class="btn btn-success btn-block{% if rating and rating != 'like' %} not-chosen{% endif %}" onclick="vote_dpp(this)" title="J'aime">
       <span class="glyphicon glyphicon-thumbs-up"></span>
     </a>
    <!--
@@ -24,11 +24,11 @@
       <span class="glyphicon glyphicon-adjust"></span>
     </a>
     -->
-    <a data-choice='dislike' class="btn btn-danger btn-block{% if rating and rating != 'dislike' %} not-chosen{% endif %}" onclick="vote(this)" title="Je n'aime pas">
+    <a data-choice='dislike' class="btn btn-danger btn-block{% if rating and rating != 'dislike' %} not-chosen{% endif %}" onclick="vote_dpp(this)" title="Je n'aime pas">
       <span class="glyphicon glyphicon-thumbs-down"></span>
     </a>
     
-    <a data-choice='dontknow' class="btn btn-info btn-block{% if rating and rating != 'dontknow' %} not-chosen{% endif %}" onclick="vote(this)" title="Je ne connais pas">
+    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'dontknow' %} not-chosen{% endif %}" onclick="vote_dpp(this)" title="Je ne connais pas">
       <span class="glyphicon glyphicon-eye-close"></span>
     </a>
 </div>

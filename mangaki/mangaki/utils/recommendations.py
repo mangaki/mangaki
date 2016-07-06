@@ -1,5 +1,5 @@
 from collections import Counter
-from mangaki.models import Rating, Work
+from mangaki.models import Rating, Work, ColdStartRating
 from mangaki.utils.chrono import Chrono
 from django.contrib.auth.models import User
 from django.db.models import Count
@@ -17,7 +17,7 @@ def get_recommendations(user, category, editor):
     chrono.save('[%dQ] begin' % len(connection.queries))
 
     rated_works = {}
-    for work_id, choice in Rating.objects.filter(user=user).values_list('work_id', 'choice'):
+    for work_id, choice in ColdStartRating.objects.filter(user=user).values_list('work_id', 'choice'):
         rated_works[work_id] = choice
 
     willsee = set()
@@ -59,7 +59,7 @@ def get_recommendations(user, category, editor):
     nb_ratings = {}
     c = 0
     neighbors = Counter()
-    for user_id, work_id, choice in Rating.objects.filter(work__in=rated_works.keys()).values_list('user_id', 'work_id', 'choice'):
+    for user_id, work_id, choice in ColdStartRating.objects.filter(work__in=rated_works.keys()).values_list('user_id', 'work_id', 'choice'):
         c += 1
         neighbors[user_id] += values[rated_works[work_id]] * values[choice]
 
@@ -78,7 +78,7 @@ def get_recommendations(user, category, editor):
     nb_ratings = Counter()
     sum_scores = Counter()
     i = 0
-    for work_id, user_id, choice in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']).values_list('work_id', 'user_id', 'choice'):
+    for work_id, user_id, choice in ColdStartRating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']).values_list('work_id', 'user_id', 'choice'):
         i += 1
         if work_id in banned_works or (kept_works and work_id not in kept_works):
             continue
