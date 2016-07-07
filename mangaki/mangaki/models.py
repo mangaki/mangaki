@@ -11,7 +11,7 @@ from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 #from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
-
+#from mangaki.utils.ratingsmatrix import RatingsMatrix
 
 from sklearn.utils.extmath import randomized_svd
 from scipy.spatial.distance import pdist, squareform
@@ -24,25 +24,18 @@ from mangaki.utils.values import rating_values
 import pandas
 
 class RatingsMatrix():
-    #à changer
-    def build_matrix(self, category=None, fname=None):
-        liste=list(Category.objects.get(slug='anime').work_set.all())
-        liste=[liste[i].id for i in range(len(liste))]
 
-        
+    def build_matrix(self, fname=None):
         user_list, item_list, data = [], [], []
 
         if fname is None:
-            
             content = Rating.objects.values_list('user_id',
                                                  'work_id',
-                                                 'choice').filter(work_id__in=liste)
-            
+                                                 'choice')
             for user_id, item_id, rating in content:
-                    
-                        user_list.append(user_id)
-                        item_list.append(item_id)
-                        data.append(rating_values[rating])
+                user_list.append(user_id)
+                item_list.append(item_id)
+                data.append(rating_values[rating])
         else:
             content = pandas.read_csv(fname,
                                       header=None).as_matrix()
@@ -55,6 +48,8 @@ class RatingsMatrix():
         item_set = set(item_list)
         user_dict = {v: k for k, v in enumerate(user_set)}
         item_dict = {v: k for k, v in enumerate(item_set)}
+        user_dict_inv = {k: v for k, v in enumerate(user_set)}
+        item_dict_inv = {k: v for k, v in enumerate(item_set)}
         row = [user_dict[v] for v in user_list]
         col = [item_dict[v] for v in item_list]
         matrix = csc_matrix((data, (row, col)), shape=(
@@ -63,6 +58,8 @@ class RatingsMatrix():
         self.user_set = user_set
         self.item_dict = item_dict
         self.user_dict = user_dict
+        self.item_dict_inv = item_dict_inv
+        self.user_dict_inv = user_dict_inv
         return matrix
 
 def diameter(r, points):
@@ -189,8 +186,6 @@ def compare(similarity, algos, nb_points, nb_iterations=20):
     return resultats
 
 
-
-
 @CharField.register_lookup
 class SearchLookup(Lookup):
     """Helper class for searching text in a query. This shadows the builtin
@@ -235,15 +230,17 @@ class WorkQuerySet(models.QuerySet):
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
-    def dpp(self,category, nb_points):
+    def dpp(self, nb_points):
 
         build_matrix = RatingsMatrix()
         matrix = build_matrix.build_matrix()
         similarity = SimilarityMatrix(matrix, nb_components_svd=70)
-        items = list(build_matrix.item_dict.values())
+        list_item_id_in_category = self.values_list('pk', flat=True)
+        items = [build_matrix.item_dict[item] for item in build_matrix.item_set if item in list_item_id_in_category]
         dpp = MangakiDPP(items, similarity.similarity_matrix)
         liste = dpp.sample_k(nb_points)
-        return self.filter(id__in=liste)
+        liste2 = [build_matrix.item_dict_inv[element] for element in liste]
+        return self.filter(id__in=liste2)
 
     def random(self):
         return self.filter(
@@ -491,9 +488,9 @@ class Suggestion(models.Model):
         recommendations_score = 0
         reco_list = Recommendation.objects.filter(user=self.user)
         for reco in reco_list:
-            if StartColdRating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count() > 0:
+            if ColdStartRating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count() > 0:
                 recommendations_score += 1
-            if StartColdRating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count() > 0:
+            if ColdStartRating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count() > 0:
                 recommendations_score += 5
         score = suggestions_score + recommendations_score
         Profile.objects.filter(user=self.user).update(score=score)
@@ -572,8 +569,8 @@ class Ranking(models.Model):
     nb_stars = models.PositiveIntegerField()
 
 
-class StartColdRating(models.Model):
-    user = models.ForeignKey(User, related_name='startcoldrating')
+class ColdStartRating(models.Model):
+    user = models.ForeignKey(User, related_name='ColdStartRating')
     work = models.ForeignKey(Work)
     choice = models.CharField(max_length=8, choices=(
         ('like', 'J\'aime'),

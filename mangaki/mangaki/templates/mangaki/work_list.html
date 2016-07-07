@@ -4,7 +4,7 @@
 <div class="col-xs-12">
   <p class="alert alert-info">
 {% if user.is_authenticated %}
-    Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'recommendations' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
+    aNotez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'recommendations' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
 {% else %}
     Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
     <a class="alert-link" href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
@@ -16,19 +16,19 @@
 <div class="col-xs-12">
   <ul class="nav nav-tabs">
     <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}">Mosaïque</a></li>
+      <a href="{% url 'work-list' dpp category %}">Mosaïque</a></li>
     <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=dpp">DPP</a></li>
+      <a href="{% url 'work-list' dpp category %}?sort=dpp">DPP</a></li>
     <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=popularity">Les plus populaires</a></li>
+      <a href="{% url 'work-list' dpp category %}?sort=popularity">Les plus populaires</a></li>
     <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=controversy">Les plus controversés</a></li>
+      <a href="{% url 'work-list' dpp category %}?sort=controversy">Les plus controversés</a></li>
     <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=top">Les plus aimés</a></li>
+      <a href="{% url 'work-list' dpp category %}?sort=top">Les plus aimés</a></li>
     <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
+      <a href="{% url 'work-list' dpp category %}?sort=random">Perles au hasard</a></li>
     <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
+      <a href="{% url 'work-list' dpp category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
   </ul>
 </div>
 <div class="col-xs-12" style="margin: 10px 0; text-align: center">
@@ -39,7 +39,7 @@
       {% if letter_ == letter %}class="active"{% endif %}
       {% if letter_ == '#' and letter == '0'%}class="active"{% endif %}>
       <a
-	 href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter_ == '#' %}0{% else %}{{ letter_ }}{% endif %}">
+	 href="{% url 'work-list' dpp category %}?sort=alpha&amp;letter={% if letter_ == '#' %}0{% else %}{{ letter_ }}{% endif %}">
 	{{letter_}}
       </a>
     </li>
@@ -69,7 +69,7 @@
       {% else %}
       Je veux voir
       {% endif %}
-    {% endspaceless %}</span>
+    {% endspaceless %}</span>F
 
     <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> {% spaceless %}
       {% if category == 'manga' %}
@@ -79,10 +79,12 @@
       {% endif %}
     {% endspaceless %}</span>
 </div>
-
-{% include "works.html" with works=object_list only %}
-
+{% if category == 'dpp' %}
+{% include "works.html" with works=object_list is_dpp=True %}
+{% else %}
+{% include "works.html" with works=object_list is_dpp=False %}
 {% if user.is_authenticated %}
+{% endif %}
 <div class="row margin">
   <div class="col-md-12 col-sm-12">
     <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>

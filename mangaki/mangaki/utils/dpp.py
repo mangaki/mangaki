@@ -133,7 +133,7 @@ if __name__ == '__main__':
     build_matrix = RatingsMatrix()
     matrix = build_matrix.build_matrix()
     similarity = SimilarityMatrix(matrix, nb_components_svd=70)
-    items = list(build_matrix.item_dict.values())
+    items = list(build_matrix.item_dict.keys())
     uniform = MangakiUniform(items)
     dpp = MangakiDPP(items, similarity.similarity_matrix)
     algos = [uniform, dpp]

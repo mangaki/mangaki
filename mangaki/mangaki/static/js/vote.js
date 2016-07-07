@@ -37,7 +37,7 @@ function vote_dpp(elt) {
     var work_id = entity.data('id');
     var choice = $(elt).data('choice');
     var pos = entity.data('pos');
-    $.post('/dpp/' + work_id, {choice: choice}, function(rating) {
+    $.post('/vote_dpp/' + work_id, {choice: choice}, function(rating) {
         if(rating === '') {
             // FIXME: We should take the vote into account after the
             // user signs up or logs in.

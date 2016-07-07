@@ -86,9 +86,9 @@ def update_score_while_rating(user, work, choice):
             reco.user.profile.score += 1
         elif choice == 'favorite':
             reco.user.profile.score += 5
-        if StartColdRating.objects.filter(user=user, work=work, choice='like').count() > 0:
+        if ColdStartRating.objects.filter(user=user, work=work, choice='like').count() > 0:
             reco.user.profile.score -= 1
-        if StartColdRating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
+        if ColdStartRating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
             reco.user.profile.score -= 5
         Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
@@ -274,7 +274,7 @@ class WorkListMixin:
 
 class WorkList(WorkListMixin, ListView):
     paginate_by = POSTERS_PER_PAGE
-
+    
     @cached_property
     def category(self):
         return get_object_or_404(Category, slug=self.kwargs.get('category'))
@@ -289,6 +289,11 @@ class WorkList(WorkListMixin, ListView):
             return 'popularity' # Mosaic cannot be searched through because it is random. We enforce the popularity as the second default when searching.
         else:
             return sort
+
+    def is_dpp(self):
+        
+        dpp = self.kwargs.get('dpp')
+        return dpp
 
     def get_queryset(self):
         queryset = self.category.work_set.all()
@@ -311,7 +316,7 @@ class WorkList(WorkListMixin, ListView):
         elif sort_mode == 'random':
             queryset = queryset.random().order_by('?')[20] #même nbre que ds dpp
         elif sort_mode == 'dpp':
-            queryset = queryset.dpp('anime',20)
+            queryset = queryset.dpp(20)
         elif sort_mode == 'mosaic':
             queryset = queryset.none()
         else:
@@ -564,7 +569,7 @@ def dpp_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
-        if choice not in ['like', 'dislike', 'dontknow']:
+        if choice not in ['like', 'dislike', 'wontsee']:
             return HttpResponse()
         if ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
             ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).delete()
@@ -631,7 +636,8 @@ def get_reco_list(request, category, editor):
         update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
-    return HttpResponse(json.dumps(reco_list), content_type='application/json')
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
+    #HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 #ColdStartRating
 def remove_reco(request, work_id, username, targetname):
@@ -705,3 +711,6 @@ def register_profile(sender, **kwargs):
     user = kwargs['user']
     Profile(user=user).save()
 
+#def dpp_view(request):
+#    is_dpp = True
+#    return render(request, 'work_list.html')
