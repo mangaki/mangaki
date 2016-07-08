@@ -21,7 +21,7 @@ from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
+from mangaki.models import Work, Rating, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -86,9 +86,9 @@ def update_score_while_rating(user, work, choice):
             reco.user.profile.score += 1
         elif choice == 'favorite':
             reco.user.profile.score += 5
-        if ColdStartRating.objects.filter(user=user, work=work, choice='like').count() > 0:
+        if Rating.objects.filter(user=user, work=work, choice='like').count() > 0:
             reco.user.profile.score -= 1
-        if ColdStartRating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
+        if Rating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
             reco.user.profile.score -= 5
         Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
@@ -639,7 +639,7 @@ def get_reco_list(request, category, editor):
     #return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
     HttpResponse(json.dumps(reco_list), content_type='application/json')
 
-#ColdStartRating
+#Rating
 def remove_reco(request, work_id, username, targetname):
     work = get_object_or_404(Work, id=work_id)
     user = get_object_or_404(User, username=username)
@@ -647,7 +647,7 @@ def remove_reco(request, work_id, username, targetname):
     if Rating.objects.filter(user=target, work=work, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0 and (request.user == user or request.user == target):
         Recommendation.objects.get(work=work, user=user, target_user=target).delete()
 
-#ColdStartRating
+#Rating
 def remove_all_reco(request, targetname):
     target = get_object_or_404(User, username=targetname)
     if target == request.user:

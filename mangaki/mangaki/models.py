@@ -488,9 +488,9 @@ class Suggestion(models.Model):
         recommendations_score = 0
         reco_list = Recommendation.objects.filter(user=self.user)
         for reco in reco_list:
-            if ColdStartRating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count() > 0:
+            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count() > 0:
                 recommendations_score += 1
-            if ColdStartRating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count() > 0:
+            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count() > 0:
                 recommendations_score += 5
         score = suggestions_score + recommendations_score
         Profile.objects.filter(user=self.user).update(score=score)

@@ -1,5 +1,5 @@
 from collections import Counter
-from mangaki.models import Rating, Work, ColdStartRating
+from mangaki.models import Rating, Work
 from mangaki.utils.chrono import Chrono
 from django.contrib.auth.models import User
 from django.db.models import Count
