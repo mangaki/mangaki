@@ -274,7 +274,7 @@ class WorkListMixin:
 
 class WorkList(WorkListMixin, ListView):
     paginate_by = POSTERS_PER_PAGE
-    
+
     @cached_property
     def category(self):
         return get_object_or_404(Category, slug=self.kwargs.get('category'))
@@ -291,8 +291,7 @@ class WorkList(WorkListMixin, ListView):
             return sort
 
     def is_dpp(self):
-        
-        dpp = self.kwargs.get('dpp')
+        dpp = self.kwargs.get('dpp',False)
         return dpp
 
     def get_queryset(self):
@@ -314,8 +313,8 @@ class WorkList(WorkListMixin, ListView):
                 queryset = queryset.filter(title__istartswith=letter)
             queryset = queryset.order_by('title')
         elif sort_mode == 'random':
-            queryset = queryset.random().order_by('?')[20] #même nbre que ds dpp
-        elif sort_mode == 'dpp':
+            queryset = queryset.random().order_by('?')[:self.paginate_by] #même nbre que ds dpp
+        elif sort_mode == 'dpp_sample':
             queryset = queryset.dpp(20)
         elif sort_mode == 'mosaic':
             queryset = queryset.none()
@@ -339,6 +338,7 @@ class WorkList(WorkListMixin, ListView):
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
         context['objects_count'] = self.category.work_set.count()
+        context['is_dpp'] = self.is_dpp
 
         if sort_mode == 'mosaic':
             context['object_list'] = [
@@ -347,6 +347,8 @@ class WorkList(WorkListMixin, ListView):
             ]
 
         return context
+
+
 
 class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
     template_name = 'mangaki/artist_detail.html'
@@ -548,8 +550,6 @@ def top(request, category_slug):
         'top': data,
     })
 
-
-
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -636,8 +636,8 @@ def get_reco_list(request, category, editor):
         update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
-    #HttpResponse(json.dumps(reco_list), content_type='application/json')
+    #return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
+    HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 #ColdStartRating
 def remove_reco(request, work_id, username, targetname):
@@ -710,7 +710,13 @@ def add_pairing(request, artist_id, work_id):
 def register_profile(sender, **kwargs):
     user = kwargs['user']
     Profile(user=user).save()
+"""
+def dpp_view_manga(request):
+    context: 'category': 'manga'
+    return render(request, 'work_list.html')
 
-#def dpp_view(request):
-#    is_dpp = True
-#    return render(request, 'work_list.html')
+def dpp_view_anime(request):
+    category = 
+    context:
+    return render(request, 'work_list.html')
+"""

@@ -570,7 +570,7 @@ class Ranking(models.Model):
 
 
 class ColdStartRating(models.Model):
-    user = models.ForeignKey(User, related_name='ColdStartRating')
+    user = models.ForeignKey(User, related_name='coldstartrating')
     work = models.ForeignKey(Work)
     choice = models.CharField(max_length=8, choices=(
         ('like', 'J\'aime'),
