@@ -691,14 +691,8 @@ def register_profile(sender, **kwargs):
 
 def faq_index(request):
     latest_theme_list = FAQTheme.objects.order_by('-pub_date')
-    all_information={faqtheme.theme : [(entry.question, entry.answer) for entry in faqtheme.entry.filter(is_active=True) ] for faqtheme in latest_theme_list}
-    #all_information={faqtheme.theme : {('question':entry.question, 'answer':entry.answer) for entry in faqtheme.entry.filter(is_active=True)} for faqtheme in latest_theme_list}
-
-
-
+    all_information = {faqtheme.theme: [(entry.question, entry.answer) for entry in faqtheme.entry.filter(is_active=True)] for faqtheme in latest_theme_list}
     context = {
         'information': all_information,
     }
-    return render(request,'faq/faq_index.html', context)
-
-
+    return render(request, 'faq/faq_index.html', context)

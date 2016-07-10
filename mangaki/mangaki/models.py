@@ -348,7 +348,7 @@ class Ranking(models.Model):
 class FAQTheme(models.Model):
     theme = models.CharField(max_length=200)
     pub_date = models.DateTimeField('Date de publication')
-    
+
     def __str__(self):
         return self.theme
 
@@ -358,8 +358,7 @@ class FAQEntry(models.Model):
     question = models.CharField(max_length=200)
     answer = models.TextField()
     pub_date = models.DateTimeField('Date de publication')
-    is_active = models.BooleanField(default=True) 
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.question 
-
+        return self.question
