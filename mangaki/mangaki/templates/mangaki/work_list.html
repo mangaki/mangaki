@@ -16,8 +16,8 @@
 <div class="col-xs-12">
   <ul class="nav nav-tabs">
     
-    <li role="presentation"{% if sort_mode == 'dpp_sample' %} class="active"{% endif %}>
-      <a href="{% url 'dpp-works' category %}?sort=dpp_sample">DPP</a></li>
+    <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}>
+      <a href="{% url 'dpp-works' category %}?sort=dpp">DPP</a></li>
     
     <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}">Mosaïque</a></li>

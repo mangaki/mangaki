@@ -314,7 +314,7 @@ class WorkList(WorkListMixin, ListView):
             queryset = queryset.order_by('title')
         elif sort_mode == 'random':
             queryset = queryset.random().order_by('?')[:self.paginate_by] #même nbre que ds dpp
-        elif sort_mode == 'dpp_sample':
+        elif sort_mode == 'dpp':
             queryset = queryset.dpp(20)
         elif sort_mode == 'mosaic':
             queryset = queryset.none()
