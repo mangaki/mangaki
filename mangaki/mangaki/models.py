@@ -360,6 +360,7 @@ class Reference(models.Model):
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
 
+
 class Top(models.Model):
     date = models.DateField(auto_now_add=True)
     category = models.CharField(max_length=10, choices=TOP_CATEGORY_CHOICES, unique_for_date='date')
@@ -372,6 +373,7 @@ class Top(models.Model):
             date=self.date,
             id=self.id)
 
+
 class Ranking(models.Model):
     top = models.ForeignKey('Top', on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -381,3 +383,13 @@ class Ranking(models.Model):
     score = models.FloatField()
     nb_ratings = models.PositiveIntegerField()
     nb_stars = models.PositiveIntegerField()
+
+
+class ErrorTrope(models.Model):
+    origin = models.ForeignKey('Work', on_delete=models.CASCADE)
+    quote = models.CharField(max_length=200)
+    author = models.CharField(max_length=200)
+    attached_error = models.CharField(max_length=3, choices=(
+        ('404', '404'),
+        ('403', '403'),
+        ('500', '500')))

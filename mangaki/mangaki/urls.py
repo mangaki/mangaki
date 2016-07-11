@@ -4,6 +4,8 @@ from django.contrib import admin
 from discourse import views as discourse_views
 from mangaki import views
 
+handler404 = 'mangaki.views.error_404'
+
 urlpatterns = [
     # Examples:
     # url(r'^$', views.home, name='home'),
