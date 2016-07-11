@@ -36,7 +36,6 @@ from random import shuffle, randint
 import datetime
 import hashlib
 import json
-import random
 
 from mangaki.choices import TOP_CATEGORY_CHOICES
 
