@@ -21,11 +21,11 @@ from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
+from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
-from mangaki.utils.recommendations import get_recommendations
+from mangaki.utils.recommendations import get_recommendations, get_recommendations_dpp
 from mangaki.utils.chrono import Chrono
 from irl.models import Event, Partner, Attendee
 
@@ -92,7 +92,18 @@ def update_score_while_rating(user, work, choice):
             reco.user.profile.score -= 5
         Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
-
+def update_score_while_rating_dpp(user, work, choice):
+    recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
+    for reco in recommendations_list:
+        if choice == 'like':
+            reco.user.profile.score += 1
+        elif choice == 'favorite':
+            reco.user.profile.score += 5
+        if ColdStartRating.objects.filter(user=user, work=work, choice='like').count() > 0:
+            reco.user.profile.score -= 1
+        if ColdStartRating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
+            reco.user.profile.score -= 5
+        Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 def update_score_while_unrating(user, work, choice):
     recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
     for reco in recommendations_list:
@@ -230,7 +241,7 @@ class EventDetail(LoginRequiredMixin, DetailView):
 def get_card(request, category, sort_id=1):
     chrono = Chrono(True)
     deja_vu = request.GET.get('dejavu', '').split(',')
-    sort_mode = ['popularity', 'controversy', 'top', 'random', 'dpp'][int(sort_id) - 1]
+    sort_mode = ['popularity', 'controversy', 'top', 'dpp'][int(sort_id) - 1]
     queryset = Work.objects.filter(category__slug=category)
     if sort_mode == 'popularity':
         queryset = queryset.popular()
@@ -238,10 +249,8 @@ def get_card(request, category, sort_id=1):
         queryset = queryset.controversial()
     elif sort_mode == 'top':
         queryset = queryset.top()
-    elif sort_mode == 'dpp':
-        queryset = queryset.dpp(category,20)
     else:
-        queryset = queryset.random().order_by('?')
+        queryset = queryset.dpp(10)
     if request.user.is_authenticated():
         rated_works = Rating.objects.filter(user=request.user).values('work_id')
         queryset = queryset.exclude(id__in=rated_works)
@@ -315,7 +324,7 @@ class WorkList(WorkListMixin, ListView):
         elif sort_mode == 'random':
             queryset = queryset.random().order_by('?')[:self.paginate_by] #même nbre que ds dpp
         elif sort_mode == 'dpp':
-            queryset = queryset.dpp(20)
+            queryset = queryset.dpp(10)
         elif sort_mode == 'mosaic':
             queryset = queryset.none()
         else:
@@ -569,13 +578,13 @@ def dpp_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
-        if choice not in ['like', 'dislike', 'wontsee']:
+        if choice not in ['like', 'dislike', 'dontknow']:
             return HttpResponse()
         if ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
             ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).delete()
             update_score_while_unrating(request.user, work, choice)
             return HttpResponse('none')
-        update_score_while_rating(request.user, work, choice)
+        update_score_while_rating_dpp(request.user, work, choice)
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
     return HttpResponse()
@@ -637,8 +646,16 @@ def get_reco_list(request, category, editor):
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
     #return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
-    HttpResponse(json.dumps(reco_list), content_type='application/json')
+    return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
+def get_reco_list_dpp(request, category, editor):
+    reco_list_dpp = []
+    for work, is_manga, in_willsee in get_recommendations_dpp(request.user, category, editor):
+        update_poster_if_nsfw(work, request.user)
+        reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
+            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
+    #return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
+    return HttpResponse(json.dumps(reco_list_dpp), content_type='application/json')
 #Rating
 def remove_reco(request, work_id, username, targetname):
     work = get_object_or_404(Work, id=work_id)
@@ -662,8 +679,29 @@ def remove_all_reco(request, targetname):
 def get_reco(request):
     category = request.GET.get('category', 'all')
     editor = request.GET.get('editor', 'unspecified')
+    if request.user.rating_set.exists():
+        reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+    else:
+        reco_list = []
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
+
+"""
+def get_reco(request):
+    category = request.GET.get('category', 'all')
+    editor = request.GET.get('editor', 'unspecified')
     reco_list = get_reco_list(request, category, editor)
     return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
+"""
+
+@login_required
+def get_reco_dpp(request):
+    category = request.GET.get('category', 'all')
+    editor = request.GET.get('editor', 'unspecified')
+    if request.user.coldstartrating.exists():
+        reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+    else:
+        reco_list = []
+    return render(request, 'mangaki/reco_list_dpp.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
 
 
 def update_shared(request):

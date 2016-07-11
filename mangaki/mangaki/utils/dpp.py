@@ -4,7 +4,6 @@ from numpy.random import choice
 from mangaki.utils.ratingsmatrix import RatingsMatrix
 import numpy as np
 
-
 def diameter(r, points):
     nb_points = points.shape[0]
     return ((2 / (nb_points * (nb_points - 1)) *
@@ -133,7 +132,7 @@ if __name__ == '__main__':
     build_matrix = RatingsMatrix()
     matrix = build_matrix.build_matrix()
     similarity = SimilarityMatrix(matrix, nb_components_svd=70)
-    items = list(build_matrix.item_dict.values())
+    items = list(build_matrix.item_dict.keys())
     uniform = MangakiUniform(items)
     dpp = MangakiDPP(items, similarity.similarity_matrix)
     algos = [uniform, dpp]

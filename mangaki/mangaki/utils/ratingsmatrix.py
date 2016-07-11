@@ -1,21 +1,19 @@
 from scipy.sparse import csc_matrix
-from mangaki.models import Rating
 from mangaki.utils.values import rating_values
 import pandas
 
 
 class RatingsMatrix():
     
-    def __init__(self, fname=None):
-       self.fname=fname
+    def __init__(self, qs=None, fname=None):
+       self.fname = fname
+       self.qs = qs
 
     def build_matrix(self):
         user_list, item_list, data = [], [], []
 
         if self.fname is None:
-            content = Rating.objects.values_list('user_id',
-                                                 'work_id',
-                                                 'choice')
+            content = self.qs
             for user_id, item_id, rating in content:
                 user_list.append(user_id)
                 item_list.append(item_id)

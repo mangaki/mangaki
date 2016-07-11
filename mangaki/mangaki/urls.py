@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^$', views.index),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works),
     url(r'^data/reco/(?P<category>\w+)/(?P<editor>\w+)\.json$', views.get_reco_list),
+    url(r'^data/reco_dpp/(?P<category>\w+)/(?P<editor>\w+)\.json$', views.get_reco_list_dpp),
     url(r'^data/card/(?P<category>\w+)/(?P<sort_id>\d+)\.json$', views.get_card),
     url(r'^getuser/(?P<work_id>\w+)\.json$', views.get_user_for_recommendations),
     url(r'^getuser\.json$', views.get_users),
@@ -23,6 +24,7 @@ urlpatterns = [
     url(r'^user/', include('allauth.urls')),
     url(r'^u/(?P<username>.+)$', views.get_profile),  # login_required?
     url(r'^reco/$', views.get_reco, name='recommendations'),
+    url(r'^reco_dpp/$', views.get_reco_dpp),
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing),
     url(r'^vote_dpp/(?P<work_id>\d+)$', views.dpp_work),
@@ -45,6 +47,7 @@ urlpatterns = [
 
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
+    url(r'^dpp/$', views.WorkList.as_view(), name='dpp-works-all', kwargs={'dpp': True}),
     url(r'^dpp/(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='dpp-works', kwargs={'dpp': True})
     
     
