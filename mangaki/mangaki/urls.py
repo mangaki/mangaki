@@ -9,6 +9,7 @@ urlpatterns = [
     # url(r'^$', views.home, name='home'),
     # url(r'^blog/', include('blog.urls')),
 
+    
     url(r'^$', views.index),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works),
     url(r'^data/reco/(?P<category>\w+)/(?P<editor>\w+)\.json$', views.get_reco_list),
@@ -24,7 +25,10 @@ urlpatterns = [
     url(r'^reco/$', views.get_reco, name='recommendations'),
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing),
+    url(r'^vote_dpp/(?P<work_id>\d+)$', views.dpp_work),
+    #url(r'^dpp/$', views.dpp_view),
     url(r'^vote/(?P<work_id>\d+)$', views.rate_work),
+    
     url(r'^shared/$', views.update_shared),
     url(r'^nsfw/$', views.update_nsfw),
     url(r'^newsletter/$', views.update_newsletter),
@@ -33,12 +37,16 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^discourse/sso$', discourse_views.sso),
     url(r'^about/$', views.about),
-    url(r'^faq/$', views.MarkdownView.as_view(), kwargs={'slug': 'faq'}),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}),
     url(r'^events/$', views.events),
     # url(r'^lookup/$', views.lookup_work'),
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top),
     url(r'^event/(?P<pk>\d+)$', views.EventDetail.as_view(), name='event-detail'),
+
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
+    url(r'^dpp/$', views.WorkList.as_view(), name='dpp-works-all', kwargs={'dpp': True}),
+    url(r'^dpp/(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='dpp-works', kwargs={'dpp': True})
+    
+    
 ]

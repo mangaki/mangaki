@@ -5,8 +5,13 @@
         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 text-center">
             <!-- Ne pas modifier la class row sinon ça casse loadCard de vote.js -->
             <div class="work-sheet data" data-category="{{ work.category }}" data-id="{{ work.id }}" data-pos="{{ forloop.counter }}">
-                {% include "work_rating.html" with rating=work.rating %}
+                {% if dpp == True %}
+                    {% include "work_dpp.html" with rating=work.rating %}
+                {% else %}
+                    {% include "work_rating.html" with rating=work.rating %}
+                {% endif %}
             </div>
+            
         </div>
     </div>
 {% endfor %}
