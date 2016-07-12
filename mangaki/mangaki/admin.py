@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Work, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
+from mangaki.models import Work, WorkTitle, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -18,7 +18,7 @@ class WorkAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('category', 'nsfw',)
     actions = ['make_nsfw', 'make_sfw', 'merge']
-    inlines = [StaffInline]
+    inlines = [StaffInline, WorkTitleInline]
     readonly_fields = (
         'sum_ratings',
         'nb_ratings',

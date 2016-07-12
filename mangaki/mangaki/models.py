@@ -52,6 +52,9 @@ class WorkQuerySet(models.QuerySet):
         # We want to search when the title contains the query or when the
         # similarity between the title and the query is low; we also want to
         # show the relevant results first.
+        for title in object.worktitle_set.all :
+          self.filter(title__search=search_text).\
+          order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
@@ -120,7 +123,7 @@ class Work(models.Model):
 
 
 class WorkTitle (models.Model) :
-    work = modelsForeignKey('Work')
+    work = models.ForeignKey('Work')
     title = models.CharField(max_length=128, blank=True, db_index=True)#taille à modifier pê
     language = models.CharField(max_length=50, blank=True, db_index=True) #taille à modifier
 
