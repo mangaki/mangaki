@@ -10,9 +10,6 @@ from django.core.urlresolvers import reverse
 from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
-from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
-from mangaki.utils.ratingsmatrix import RatingsMatrix
-
 
 @CharField.register_lookup
 class SearchLookup(Lookup):
@@ -58,31 +55,7 @@ class WorkQuerySet(models.QuerySet):
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
-    def dpp(self, nb_points):
-        build_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
-                                                                 'work_id',
-                                                                 'choice'))
-        matrix = build_matrix.build_matrix()
-        similarity = SimilarityMatrix(matrix, nb_components_svd=70)
-        list_item_id_in_category = self.values_list('pk', flat=True)
-        items = [build_matrix.item_dict[item] for item in build_matrix.item_set if item in list_item_id_in_category]
-        dpp = MangakiDPP(items, similarity.similarity_matrix)
-        liste = dpp.sample_k(nb_points)
-        liste2 = [build_matrix.item_dict_inv[element] for element in liste]
-        return self.filter(id__in=liste2)
-        """
-        build_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
-                                                                 'work_id',
-                                                                 'choice'))
-        matrix = build_matrix.build_matrix()
-        similarity = SimilarityMatrix(matrix, nb_components_svd=70)
-        list_item_id_in_category = self.values_list('pk', flat=True)
-        items = [build_matrix.item_dict[item] for item in build_matrix.item_set if item in list_item_id_in_category]
-        dpp = MangakiDPP(items, similarity.similarity_matrix)
-        liste = dpp.sample_k(nb_points)
-        liste2 = [build_matrix.item_dict_inv[element] for element in liste]
-        return self.filter(id__in=liste2)
-"""
+
     def random(self):
         return self.filter(
             nb_ratings__gte=RANDOM_MIN_RATINGS,
@@ -145,18 +118,6 @@ class Work(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            if isinstance(self, Anime):
-                self.category = Category.objects.get(slug='anime')
-            elif isinstance(self, Manga):
-                self.category = Category.objects.get(slug='manga')
-            elif isinstance(self, Album):
-                self.category = Category.objects.get(slug='album')
-            else:
-                raise TypeError('Unexpected subclass of work: {}'.format(type(self)))
-        super().save(*args, **kwargs)
-
 class Role(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
@@ -192,34 +153,6 @@ class Studio(models.Model):
         return self.title
 
 
-class Anime(Work):
-    # Deprecated fields
-    deprecated_director = models.ForeignKey('Artist', related_name='directed', default=1)
-    deprecated_author = models.ForeignKey('Artist', related_name='authored', default=1)
-    deprecated_composer = models.ForeignKey('Artist', related_name='composed', default=1)
-    deprecated_genre = models.ManyToManyField('Genre')
-    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
-    deprecated_nb_episodes = models.TextField(default='Inconnu', max_length=16)
-    deprecated_anime_type = models.TextField(max_length=42, default='')
-    deprecated_anidb_aid = models.IntegerField(default=0)
-    deprecated_editor = models.ForeignKey('Editor', default=1)
-    deprecated_studio = models.ForeignKey('Studio', default=1)
-
-    def __str__(self):
-        return '[%d] %s' % (self.id, self.title)
-
-
-class Manga(Work):
-    # Deprecated fields
-    deprecated_mangaka = models.ForeignKey('Artist', related_name='drew')
-    deprecated_writer = models.ForeignKey('Artist', related_name='wrote')
-    deprecated_genre = models.ManyToManyField('Genre')
-    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
-    deprecated_vo_title = models.CharField(max_length=128)
-    deprecated_manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
-    deprecated_editor = models.CharField(max_length=32)
-
-
 class Genre(models.Model):
     title = models.CharField(max_length=17)
 
@@ -229,20 +162,11 @@ class Genre(models.Model):
 
 class Track(models.Model):
     title = models.CharField(max_length=32)
-    album = models.ManyToManyField('Album')
+    album = models.ManyToManyField('Work')
 
     def __str__(self):
         return self.title
 
-
-class Album(Work):
-    # Deprecated fields
-    deprecated_composer = models.ForeignKey('Artist', related_name='composer', default=1)
-    deprecated_catalog_number = models.CharField(max_length=20)
-    deprecated_vgmdb_aid = models.IntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return '[{id}] {title}'.format(id=self.id, title=self.title)
 
 class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
@@ -408,21 +332,3 @@ class Ranking(models.Model):
     score = models.FloatField()
     nb_ratings = models.PositiveIntegerField()
     nb_stars = models.PositiveIntegerField()
-
-
-class ColdStartRating(models.Model):
-    user = models.ForeignKey(User, related_name='coldstartrating')
-    work = models.ForeignKey(Work)
-    choice = models.CharField(max_length=8, choices=(
-        ('like', 'J\'aime'),
-        ('dislike', 'Je n\'aime pas'),
-        #('neutral', 'Neutre'),
-        ('dontknow', 'Je ne connais pas')
-    ))
-    date = models.DateField(auto_now=True)
-
-    class Meta:
-        unique_together = ('user', 'work')
-
-    def __str__(self):
-        return '%s %s %s' % (self.user, self.choice, self.work)

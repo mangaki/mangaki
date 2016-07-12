@@ -15,17 +15,6 @@
 
 <div class="col-xs-12">
   <ul class="nav nav-tabs">
-    {% if is_dpp == True %}
-    <!-- 
-    <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="/dpp/">Tout</a></li>
-    <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}">Mosaïque</a></li> -->
-    <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'dpp-works' category %}?sort=dpp"><em>Anime</em> seulement</a></li>
-    
-
-    <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' category %}?sort=dpp"><em>Manga</em> seulement</a></li>
-    
-    {%elif is_dpp == False %}
     <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}">Mosaïque</a></li>
     <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
@@ -38,12 +27,8 @@
       <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
     <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
-      {% endif %}
   </ul>
 </div>
-
-
-
 <div class="col-xs-12" style="margin: 10px 0; text-align: center">
 {% if sort_mode == 'alpha' %}
 <ul class="pagination pagination-sm" style="margin: 0">
@@ -70,15 +55,7 @@
   </form>
 {% endif %}
 </div>
-
-{% if is_dpp == True %}
-<div class="col-xs-12 text-center" style="padding: 10px 0">
-    
-    <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
-    <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
-    <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne  connais pas</span>
-</div>
-{%elif is_dpp == False %}
+  
 <div class="col-xs-12 text-center" style="padding: 10px 0">
     <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
     <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
@@ -100,12 +77,10 @@
       {% endif %}
     {% endspaceless %}</span>
 </div>
-{% endif %}
 
-{% include "works.html" with works=object_list dpp=is_dpp %}
+{% include "works.html" with works=object_list only %}
 
 {% if user.is_authenticated %}
-
 <div class="row margin">
   <div class="col-md-12 col-sm-12">
     <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
@@ -118,19 +93,13 @@
 <br />
 <br />
 <br />
-
-{% if is_dpp == False %}
-
 <script>
-
 category = '{{ category }}';
 sort_mode = '{{ sort_mode }}';
 loadMenu();
 {% if sort_mode == 'mosaic' %}
 for(pos = 1; pos <= 4; pos++)
     loadCard(pos);
-{% endif %}
-
 {% endif %}
 </script>
 {% endblock %}
