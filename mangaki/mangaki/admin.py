@@ -9,6 +9,10 @@ class StaffInline(admin.TabularInline):
     model = Staff
     fields = ('role', 'artist')
 
+class WorkTitleInline(admin.TabularInline):
+    model = WorkTitle
+    fields = ('title', 'language')
+
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')

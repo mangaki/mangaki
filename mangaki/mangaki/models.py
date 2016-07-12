@@ -118,6 +118,12 @@ class Work(models.Model):
     def __str__(self):
         return self.title
 
+
+class WorkTitle (models.Model) :
+    work = modelsForeignKey('Work')
+    title = models.CharField(max_length=128, blank=True, db_index=True)#taille à modifier pê
+    language = models.CharField(max_length=50, blank=True, db_index=True) #taille à modifier
+
 class Role(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
