@@ -12,17 +12,6 @@ from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 
 
-from sklearn.utils.extmath import randomized_svd
-from scipy.spatial.distance import pdist, squareform
-from numpy.random import choice
-
-import numpy as np
-from scipy.sparse import csc_matrix
-from mangaki.utils.values import rating_values
-
-import pandas
-
-
 @CharField.register_lookup
 class SearchLookup(Lookup):
     """Helper class for searching text in a query. This shadows the builtin
@@ -37,6 +26,7 @@ class SearchLookup(Lookup):
         params = lhs_params + rhs_params + lhs_params + rhs_params
         return "(UPPER(F_UNACCENT(%s)) LIKE '%%%%' || UPPER(F_UNACCENT(%s)) || '%%%%' OR UPPER(F_UNACCENT(%s)) %%%% UPPER(F_UNACCENT(%s)))" % (lhs, rhs, lhs, rhs), params
 
+
 class SearchSimilarity(Func):
     """Helper class for computing the search similarity ignoring case and
     accents"""
@@ -45,6 +35,7 @@ class SearchSimilarity(Func):
 
     def __init__(self, lhs, rhs):
         super().__init__(Func(Func(lhs, function='F_UNACCENT'), function='UPPER'), Func(Func(rhs, function='F_UNACCENT'), function='UPPER'))
+
 
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
@@ -73,12 +64,14 @@ class WorkQuerySet(models.QuerySet):
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
 
+
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
     name = models.CharField(max_length=128)
 
     def __str__(self):
         return self.name
+
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
@@ -129,12 +122,14 @@ class Work(models.Model):
     def __str__(self):
         return self.title
 
+
 class Role(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
 
     def __str__(self):
         return '{} /{}/'.format(self.name, self.slug)
+
 
 class Staff(models.Model):
     work = models.ForeignKey('Work')
@@ -149,6 +144,7 @@ class Staff(models.Model):
             self.artist.name,
             self.role.name.lower(),
             self.work.title)
+
 
 class Editor(models.Model):
     title = models.CharField(max_length=33, db_index=True)
@@ -179,6 +175,7 @@ class Track(models.Model):
         return self.title
 
 
+
 class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
     last_name = models.CharField(max_length=32)  # No longer used
@@ -186,6 +183,7 @@ class Artist(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class ArtistSpelling(models.Model):
     was = models.CharField(max_length=255, db_index=True)
@@ -322,6 +320,7 @@ class Reference(models.Model):
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
 
+
 class Top(models.Model):
     date = models.DateField(auto_now_add=True)
     category = models.CharField(max_length=10, choices=TOP_CATEGORY_CHOICES, unique_for_date='date')
@@ -333,6 +332,7 @@ class Top(models.Model):
             category=self.category,
             date=self.date,
             id=self.id)
+
 
 class Ranking(models.Model):
     top = models.ForeignKey('Top', on_delete=models.CASCADE)

@@ -32,7 +32,6 @@ function vote(elt) {
     });
 }
 
-
 function suggestion(mangaki_class) {
     $.post('/' + mangaki_class + '/' + $('#id_work').val(), {
         'work': $('#id_work').val(),
