@@ -4,7 +4,11 @@
 <div class="col-xs-12">
   <p class="alert alert-info">
 {% if user.is_authenticated %}
+    {% if is_dpp %}
+    Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco_dpp' %}">Apprenons à mieux vous connaître</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
+    {% else %}
     Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'recommendations' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
+    {% endif %}
 {% else %}
     Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
     <a class="alert-link" href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
@@ -15,17 +19,13 @@
 
 <div class="col-xs-12">
   <ul class="nav nav-tabs">
-    {% if is_dpp == True %}
-    <!-- 
-    <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="/dpp/">Tout</a></li>
-    <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}">Mosaïque</a></li> -->
+    {% if is_dpp %}
+
     <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'dpp-works' category %}?sort=dpp"><em>Anime</em> seulement</a></li>
     
-
     <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' category %}?sort=dpp"><em>Manga</em> seulement</a></li>
     
-    {%elif is_dpp == False %}
+    {% else %}
     <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}">Mosaïque</a></li>
     <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
@@ -71,14 +71,14 @@
 {% endif %}
 </div>
 
-{% if is_dpp == True %}
+{% if is_dpp %}
 <div class="col-xs-12 text-center" style="padding: 10px 0">
     
     <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
     <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
     <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne  connais pas</span>
 </div>
-{%elif is_dpp == False %}
+{% else %}
 <div class="col-xs-12 text-center" style="padding: 10px 0">
     <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
     <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
@@ -119,7 +119,7 @@
 <br />
 <br />
 
-{% if is_dpp == False %}
+{% if not is_dpp %}
 
 <script>
 

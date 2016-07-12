@@ -12,21 +12,6 @@
             d'autres.
 
     Inclure la liste des "À voir" dans les recommandations : <input type="checkbox" name="reco_willsee_ok" {% if user.profile.reco_willsee_ok %} checked{% endif %}/>
-    <form name="editor_choice">
-      <div>
-      Filtrer par éditeur :
-      <select name="editorURL" onChange="document.location.href=document.editor_choice.editorURL.options[document.editor_choice.editorURL.selectedIndex].value">
-        <option value="/reco/?category={{ category }}" {% if editor == '' %} selected {% endif %}>Tous</option>
-        <option value="/reco/?category=manga&editor=Taifu" {% if editor == 'Taifu' %} selected {% endif %}> Taifu Comics</option>
-        <option value="/reco/?category=manga&editor=Ototo" {% if editor == 'Ototo' %} selected {% endif %}>Ototo Manga</option>
-        <!--<option value="/reco/?category=manga&editor=otototaifu" {% if editor == 'otototaifu' %} selected {% endif %}>Ototo/Taifu</a>-->
-        <option value="/reco/?category=manga&editor=delcourt" {% if editor == 'delcourt' %} selected {% endif %}>Delcourt</option>
-        <option value="/reco/?category=manga&editor=tonkam" {% if editor == 'tonkam' %} selected {% endif %}>Tonkam</option>
-        <option value="/reco/?category=manga&editor=soleil" {% if editor == 'soleil' %} selected {% endif %}>Soleil</option>
-        <option value="/reco/?category=manga&editor=kaze" {% if editor == 'kaze' %} selected {% endif %}>Kaze</option>
-      </select>
-      </div>
-    </form>
         </p>
     </div>
 </div>
@@ -53,7 +38,7 @@
 {% include "works.html" with works=reco_list only %}
 <div class="row margin">
     <div class="col-xs-12">
-        <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}&editor={{ editor }}" style="display: block; margin: auto">Je veux d'autres recommandations&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
+        <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}&editor={{ editor }}" style="display: block; margin: auto">Pose-moi d'autres questions&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
     </div>
 </div>
     <script>

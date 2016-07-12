@@ -62,27 +62,14 @@ class WorkQuerySet(models.QuerySet):
         build_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
                                                                  'work_id',
                                                                  'choice'))
-        matrix = build_matrix.build_matrix()
-        similarity = SimilarityMatrix(matrix, nb_components_svd=70)
+        similarity = SimilarityMatrix(build_matrix.matrix, nb_components_svd=70)
         list_item_id_in_category = self.values_list('pk', flat=True)
         items = [build_matrix.item_dict[item] for item in build_matrix.item_set if item in list_item_id_in_category]
         dpp = MangakiDPP(items, similarity.similarity_matrix)
         liste = dpp.sample_k(nb_points)
         liste2 = [build_matrix.item_dict_inv[element] for element in liste]
         return self.filter(id__in=liste2)
-        """
-        build_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
-                                                                 'work_id',
-                                                                 'choice'))
-        matrix = build_matrix.build_matrix()
-        similarity = SimilarityMatrix(matrix, nb_components_svd=70)
-        list_item_id_in_category = self.values_list('pk', flat=True)
-        items = [build_matrix.item_dict[item] for item in build_matrix.item_set if item in list_item_id_in_category]
-        dpp = MangakiDPP(items, similarity.similarity_matrix)
-        liste = dpp.sample_k(nb_points)
-        liste2 = [build_matrix.item_dict_inv[element] for element in liste]
-        return self.filter(id__in=liste2)
-"""
+        
     def random(self):
         return self.filter(
             nb_ratings__gte=RANDOM_MIN_RATINGS,
@@ -415,7 +402,6 @@ class ColdStartRating(models.Model):
     choice = models.CharField(max_length=8, choices=(
         ('like', 'J\'aime'),
         ('dislike', 'Je n\'aime pas'),
-        #('neutral', 'Neutre'),
         ('dontknow', 'Je ne connais pas')
     ))
     date = models.DateField(auto_now=True)

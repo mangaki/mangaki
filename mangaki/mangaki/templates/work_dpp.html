@@ -19,11 +19,7 @@
     <a data-choice='like' class="btn btn-success btn-block{% if rating and rating != 'like' %} not-chosen{% endif %}" onclick="vote_dpp(this)" title="J'aime">
       <span class="glyphicon glyphicon-thumbs-up"></span>
     </a>
-   <!--
-    <a data-choice='neutral' class="btn btn-warning btn-block{% if rating and rating != 'neutral' %} not-chosen{% endif %}" onclick="vote(this)" title="Neutre">
-      <span class="glyphicon glyphicon-adjust"></span>
-    </a>
-    -->
+  
     <a data-choice='dislike' class="btn btn-danger btn-block{% if rating and rating != 'dislike' %} not-chosen{% endif %}" onclick="vote_dpp(this)" title="Je n'aime pas">
       <span class="glyphicon glyphicon-thumbs-down"></span>
     </a>

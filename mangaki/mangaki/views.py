@@ -25,7 +25,7 @@ from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist,
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
-from mangaki.utils.recommendations import get_recommendations, get_recommendations_dpp
+from mangaki.utils.recommendations import get_recommendations
 from mangaki.utils.chrono import Chrono
 from irl.models import Event, Partner, Attendee
 
@@ -92,18 +92,6 @@ def update_score_while_rating(user, work, choice):
             reco.user.profile.score -= 5
         Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
-def update_score_while_rating_dpp(user, work, choice):
-    recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
-    for reco in recommendations_list:
-        if choice == 'like':
-            reco.user.profile.score += 1
-        elif choice == 'favorite':
-            reco.user.profile.score += 5
-        if ColdStartRating.objects.filter(user=user, work=work, choice='like').count() > 0:
-            reco.user.profile.score -= 1
-        if ColdStartRating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
-            reco.user.profile.score -= 5
-        Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 def update_score_while_unrating(user, work, choice):
     recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
     for reco in recommendations_list:
@@ -322,7 +310,7 @@ class WorkList(WorkListMixin, ListView):
                 queryset = queryset.filter(title__istartswith=letter)
             queryset = queryset.order_by('title')
         elif sort_mode == 'random':
-            queryset = queryset.random().order_by('?')[:self.paginate_by] #même nbre que ds dpp
+            queryset = queryset.random().order_by('?')[:self.paginate_by] 
         elif sort_mode == 'dpp':
             queryset = queryset.dpp(10)
         elif sort_mode == 'mosaic':
@@ -584,7 +572,7 @@ def dpp_work(request, work_id):
             ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).delete()
             update_score_while_unrating(request.user, work, choice)
             return HttpResponse('none')
-        update_score_while_rating_dpp(request.user, work, choice)
+        update_score_while_rating(request.user, work, choice)
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
     return HttpResponse()
@@ -641,7 +629,7 @@ def get_works(request, category):
 #à voir
 def get_reco_list(request, category, editor):
     reco_list = []
-    for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
+    for work, is_manga, in_willsee in get_recommendations(request.user, category, editor, dpp=False):
         update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
@@ -650,7 +638,7 @@ def get_reco_list(request, category, editor):
 
 def get_reco_list_dpp(request, category, editor):
     reco_list_dpp = []
-    for work, is_manga, in_willsee in get_recommendations_dpp(request.user, category, editor):
+    for work, is_manga, in_willsee in get_recommendations(request.user, category, editor, dpp=True):
         update_poster_if_nsfw(work, request.user)
         reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})

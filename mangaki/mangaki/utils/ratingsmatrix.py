@@ -6,26 +6,23 @@ import pandas
 class RatingsMatrix():
     
     def __init__(self, qs=None, fname=None):
-       self.fname = fname
-       self.qs = qs
-
-    def build_matrix(self):
         user_list, item_list, data = [], [], []
-
-        if self.fname is None:
-            content = self.qs
-            for user_id, item_id, rating in content:
-                user_list.append(user_id)
-                item_list.append(item_id)
-                data.append(rating_values[rating])
+        if fname is None:
+            if qs is None:
+                raise ValueError('one of fname or qs must be non None')
+            else:
+                content = qs
+                for user_id, item_id, rating in content:
+                    user_list.append(user_id)
+                    item_list.append(item_id)
+                    data.append(rating_values[rating])
         else:
-            content = pandas.read_csv(self.fname,
+            content = pandas.read_csv(fname,
                                       header=None).as_matrix()
             for user_id, item_id, rating in content:
                 user_list.append(user_id)
                 item_list.append(item_id)
                 data.append(rating_values[rating])
-
         user_set = set(user_list)
         item_set = set(item_list)
         user_dict = {v: k for k, v in enumerate(user_set)}
@@ -42,4 +39,4 @@ class RatingsMatrix():
         self.user_dict = user_dict
         self.item_dict_inv = item_dict_inv
         self.user_dict_inv = user_dict_inv
-        return matrix
+        self.matrix = matrix
