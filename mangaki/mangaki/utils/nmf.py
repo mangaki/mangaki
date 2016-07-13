@@ -4,6 +4,40 @@ from scipy.sparse import lil_matrix
 import numpy as np
 import pandas
 
+PIG_ID = 1124#1407 # QCTX=1434  JJ=1407  SebNL=1124
+
+explanation = {
+    0: 'FATE, URBAN FANTASY',
+    1: 'MANGA SHONEN',
+    2: 'CYBERPUNK',
+    3: 'HAREM, ROMANTIC COMEDY',
+    4: 'MECHA',
+    5: 'GHIBLI',
+    6: 'KYOANI, BEAUTIFUL ANIMATION',
+    7: 'ANOTHER WORLD, HORROR',
+    8: 'SURVIVAL',
+    9: 'TOWARDS THE SKY',
+    10: 'SEINEN',
+    11: '(bruit)',
+    12: '(bruit)',
+    13: 'BEAUX GOSSES',
+    14: 'MANGA SHONEN',
+    15: '(bruit)',
+    16: 'REFRESHING SLICE-OF-LIFE',
+    17: 'URASAWA',
+    18: 'SHAFT + KARA NO KYOUKAI',
+    19: 'CONAN',
+    20: 'SHONEN MOVIES',
+    21: 'SHONEN ATMOSPHERIQUES',
+    22: 'CLAMP ET AL.',
+    23: 'POPULAIRES',
+    24: 'APPRENTISSAGE (basket, manga, magie)',
+    25: 'HÉROÏNE FORTE',
+    26: 'FUJOSHI',
+    27: 'URBAN FANTASY',
+    29: 'SHONEN 90s',
+}
+
 
 class MangakiNMF(object):
     M = None
@@ -42,10 +76,12 @@ class MangakiNMF(object):
 
     def display_components(self):
         for i in range(self.NB_COMPONENTS):
-            print('# Component %d:' % i, )
-            for _, title in sorted((-self.H[i][j], self.works[j]) for j in range(self.nb_works))[:10]:
-                print(title)
-            print()
+            if self.W[PIG_ID][i]:
+                percentage = round(self.W[PIG_ID][i] * 100 / self.W[PIG_ID].sum(), 1)
+                print('# Composante %d : %s (%.1f %%)' % (i, explanation.get(i), percentage))
+                """for _, title in sorted((-self.H[i][j], self.works[j]) for j in range(self.nb_works))[:10]:
+                    print(title)
+                print()"""
 
     def __str__(self):
         return '[NMF]'
