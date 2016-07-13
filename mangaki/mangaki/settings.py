@@ -133,8 +133,6 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = config.get('deployment', 'STATIC_ROOT', fallback=os.path.join(BASE_DIR, 'static'))
 MEDIA_ROOT = config.get('deployment', 'MEDIA_ROOT', fallback=os.path.join(BASE_DIR, 'media'))
 
-STATIC_ROOT = config.get('deployment', 'STATIC_ROOT', fallback=os.path.join(BASE_DIR, 'static'))
-
 # External services
 if config.has_section('discourse'):
     DISCOURSE_BASE_URL = config.get('discourse', 'DISCOURSE_BASE_URL')
