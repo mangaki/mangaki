@@ -698,8 +698,8 @@ def register_profile(sender, **kwargs):
 
 
 def faq_index(request):
-    latest_theme_list = FAQTheme.objects.order_by('-pub_date')
-    all_information = {faqtheme.theme: [(entry.question, entry.answer) for entry in faqtheme.entry.filter(is_active=True)] for faqtheme in latest_theme_list}
+    latest_theme_list = FAQTheme.objects.order_by('id') #les ranger par ordre d'arrivée (voit pas la diff avec pub_date :/ ou fixer soit-même un ordre ? 
+    all_information = {faqtheme.theme: [(entry.question, entry.answer) for entry in faqtheme.entries.filter(is_active=True)] for faqtheme in latest_theme_list}
     context = {
         'information': all_information,
     }
