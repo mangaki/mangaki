@@ -6,12 +6,11 @@
 <div class=" col-md-12 col-sm-12">
     <div class="well">
         <p>
-            Voici quatre recommandations qui devraient vous
+            Voici quatre recommandations, suite à votre utilisation de l'onglet "DPP", qui devraient vous
             plaire.<br />
             Notez-les puis rechargez la page pour en faire apparaître
             d'autres.
 
-    Inclure la liste des "À voir" dans les recommandations : <input type="checkbox" name="reco_willsee_ok" {% if user.profile.reco_willsee_ok %} checked{% endif %}/>
         </p>
     </div>
 </div>
@@ -56,7 +55,5 @@
        }, 500);
     });
     </script>
-{% else %}
-    <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/anime/">noté un <em>anime</em></a> !</p>
-{% endif %}
+    <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/anime/">noté une oeuvre de <em>DPP</em></a> !</p>
 {% endblock %}

@@ -59,15 +59,15 @@ class WorkQuerySet(models.QuerySet):
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
     def dpp(self, nb_points):
-        build_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
+        ratings_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
                                                                  'work_id',
                                                                  'choice'))
-        similarity = SimilarityMatrix(build_matrix.matrix, nb_components_svd=70)
+        similarity = SimilarityMatrix(ratings_matrix.matrix, nb_components_svd=70)
         list_item_id_in_category = self.values_list('pk', flat=True)
-        items = [build_matrix.item_dict[item] for item in build_matrix.item_set if item in list_item_id_in_category]
+        items = [ratings_matrix.item_dict[item] for item in ratings_matrix.item_set if item in list_item_id_in_category]
         dpp = MangakiDPP(items, similarity.similarity_matrix)
         liste = dpp.sample_k(nb_points)
-        liste2 = [build_matrix.item_dict_inv[element] for element in liste]
+        liste2 = [ratings_matrix.item_dict_inv[element] for element in liste]
         return self.filter(id__in=liste2)
         
     def random(self):

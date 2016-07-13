@@ -346,7 +346,6 @@ class WorkList(WorkListMixin, ListView):
         return context
 
 
-
 class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
     template_name = 'mangaki/artist_detail.html'
     paginate_by = POSTERS_PER_PAGE
@@ -626,15 +625,15 @@ def get_works(request, category):
     ]
     return HttpResponse(json.dumps(data), content_type='application/json')
 
-#à voir
+
 def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor, dpp=False):
         update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
-    #return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
+
 
 def get_reco_list_dpp(request, category, editor):
     reco_list_dpp = []
@@ -642,9 +641,9 @@ def get_reco_list_dpp(request, category, editor):
         update_poster_if_nsfw(work, request.user)
         reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
-    #return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
     return HttpResponse(json.dumps(reco_list_dpp), content_type='application/json')
-#Rating
+
+
 def remove_reco(request, work_id, username, targetname):
     work = get_object_or_404(Work, id=work_id)
     user = get_object_or_404(User, username=username)
@@ -652,7 +651,7 @@ def remove_reco(request, work_id, username, targetname):
     if Rating.objects.filter(user=target, work=work, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0 and (request.user == user or request.user == target):
         Recommendation.objects.get(work=work, user=user, target_user=target).delete()
 
-#Rating
+
 def remove_all_reco(request, targetname):
     target = get_object_or_404(User, username=targetname)
     if target == request.user:
@@ -684,12 +683,11 @@ def get_reco(request):
 @login_required
 def get_reco_dpp(request):
     category = request.GET.get('category', 'all')
-    editor = request.GET.get('editor', 'unspecified')
     if request.user.coldstartrating.exists():
         reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
     else:
         reco_list = []
-    return render(request, 'mangaki/reco_list_dpp.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
+    return render(request, 'mangaki/reco_list_dpp.html', {'reco_list': reco_list, 'category': category})
 
 
 def update_shared(request):
@@ -736,13 +734,4 @@ def add_pairing(request, artist_id, work_id):
 def register_profile(sender, **kwargs):
     user = kwargs['user']
     Profile(user=user).save()
-"""
-def dpp_view_manga(request):
-    context: 'category': 'manga'
-    return render(request, 'work_list.html')
 
-def dpp_view_anime(request):
-    category = 
-    context:
-    return render(request, 'work_list.html')
-"""
