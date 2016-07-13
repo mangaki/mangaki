@@ -59,7 +59,11 @@ class Command(BaseCommand):
                 continue
             print(i, ':', anime.title, anime.id)
             creators = a.get(anime.anidb_aid).creators
+            worktitles = a.get(anime.anidb_aid).worktitles
+            
             print(creators)
+            print(worktitles)
+            #WorkTitle.objects.get_or_create(work='', title='', language='fr')
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
             for creator in creators.findAll('name'):
                 artist = get_or_create_artist(creator.string)
