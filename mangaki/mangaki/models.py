@@ -127,6 +127,10 @@ class WorkTitle (models.Model) :
     title = models.CharField(max_length=128, blank=True, db_index=True)#taille à modifier pê
     language = models.CharField(max_length=50, blank=True, db_index=True) #taille à modifier
 
+    def __str__(self):
+        return ("%s" %self.title)
+
+
 class Role(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)

@@ -34,6 +34,7 @@
     <div class="col-md-12"> <!-- col-md-push-3 -->
         <h1>{{ object.title }}</h1>
         <!-- au début ici ou vers la fin -->
+        <!-- ajouter un if si jamais contenu vide ? -->
         <p> Titres alternatifs :
         {% for title in object.worktitle_set.all %}
           <p>&nbsp;&nbsp;&nbsp;{{title.language}} : {{title.title}} </p>
