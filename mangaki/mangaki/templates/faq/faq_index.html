@@ -3,28 +3,34 @@
 
 {% block body %}
 
-<div class="row featured text-center">
-<h1>FAQ</h1>
+<div class="row featured">
+<h1 class="text-center">FAQ</h1>
 
-{% for title, value in information.items %}
-
-    <h2 class="text-center">{{ title }}</h2>
-
-    <br />
-                {% for question_answer in value %}
-
-                    <h4>{{ question_answer.0 }}</h4>
-                    <p>{{ question_answer.1 }}</p>
-                    <br/>
-                    <br/>
-
-                {% endfor %}
-
+{% for theme in information  %}
+    <h2>{{ theme.0 }}</h2>
+    <div class="panel-group">
+    {% for question_answer in theme.1 %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a role="button"
+                       data-toggle="collapse"
+                       href="#question-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                        {{ question_answer.0 }}
+                    </a>
+                </h4>
+            </div>
+            <div 
+                id="question-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                class="panel-collapse collapse">
+                <div class="panel-body">
+                    {{ question_answer.1 }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
 {% endfor %}
 </div>
-
-<br />
-<br />
-<br />
 
 {% endblock %}

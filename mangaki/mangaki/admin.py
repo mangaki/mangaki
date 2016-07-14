@@ -9,6 +9,12 @@ class StaffInline(admin.TabularInline):
     model = Staff
     fields = ('role', 'artist')
 
+
+class FAQAdmin(admin.ModelAdmin):
+    search_fields = ('order','theme')
+    list_display = ('order', 'theme')
+
+
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
@@ -242,5 +248,5 @@ admin.site.register(Pairing, PairingAdmin)
 admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(Top, TopAdmin)
 admin.site.register(Role, RoleAdmin)
-admin.site.register(FAQTheme)
+admin.site.register(FAQTheme, FAQAdmin)
 admin.site.register(FAQEntry)
