@@ -42,7 +42,7 @@
 </div>
     <script>
     sort_mode = '';
-    $.getJSON('/data/reco_dpp/{{ category }}/{{ editor }}.json', function(data) {
+    $.getJSON('/data/reco_dpp/{{ category }}.json', function(data) {
         data.forEach(function(work, i) {
             displayWork(i + 1, work);
         });
@@ -55,5 +55,8 @@
        }, 500);
     });
     </script>
-    <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/anime/">noté une oeuvre de <em>DPP</em></a> !</p>
+{% else %}
+    <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/dpp/anime">noté une oeuvre de <em>DPP</em></a> !</p>
+}
+{% endif %}
 {% endblock %}

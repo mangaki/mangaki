@@ -11,7 +11,7 @@ MIN_RATINGS = 3
 
 CHRONO_ENABLED = False
 
-def get_recommendations(user, category, editor, dpp):
+def get_recommendations(user, category, dpp, editor=[]):
     # What if user is not authenticated? We will see soon.
     chrono = Chrono(CHRONO_ENABLED)
 
