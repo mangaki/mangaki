@@ -5,13 +5,14 @@ from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
 
+
 class StaffInline(admin.TabularInline):
     model = Staff
     fields = ('role', 'artist')
 
 
 class FAQAdmin(admin.ModelAdmin):
-    search_fields = ('order','theme')
+    search_fields = ('order', 'theme')
     list_display = ('order', 'theme')
 
 
@@ -82,6 +83,7 @@ class GenreAdmin(admin.ModelAdmin):
 
 class TrackAdmin(admin.ModelAdmin):
     pass
+
 
 class ArtistAdmin(admin.ModelAdmin):
     search_fields = ('id', 'name')
@@ -211,6 +213,7 @@ class PairingAdmin(admin.ModelAdmin):
 class ReferenceAdmin(admin.ModelAdmin):
     list_display = ['work', 'url']
 
+
 class RankingInline(admin.TabularInline):
     model = Ranking
     fields = ('content_type', 'object_id', 'name', 'score', 'nb_ratings', 'nb_stars',)
@@ -218,6 +221,7 @@ class RankingInline(admin.TabularInline):
 
     def name(self, instance):
         return str(instance.content_object)
+
 
 class TopAdmin(admin.ModelAdmin):
     inlines = [
@@ -227,6 +231,7 @@ class TopAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
 
 class RoleAdmin(admin.ModelAdmin):
     model = Role
