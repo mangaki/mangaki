@@ -80,6 +80,7 @@ class AniDB:
         title['type'] if 'type' in title else "unknown"
       ) for title in anime.find_all('title')],
       'title': str(titles.find('title', attrs={'type': "main"}).string),
+      #official
       'worktitles' : [str(titles.find('title', attrs={'xml:lang': "fr"}).string),str(titles.find('title', attrs={'xml:lang': "en"}).string), str(titles.find('title', attrs={'xml:lang': "ja"}).string)],
       'relatedanime': [],
       'url': str(anime.url.string) if anime.url else None,
