@@ -390,6 +390,7 @@ class ErrorTrope(models.Model):
     quote = models.CharField(max_length=200)
     author = models.CharField(max_length=200)
     attached_error = models.CharField(max_length=3, choices=(
+        ('400', '400')
         ('404', '404'),
         ('403', '403'),
         ('500', '500')))
