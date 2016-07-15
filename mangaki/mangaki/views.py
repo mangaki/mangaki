@@ -21,7 +21,7 @@ from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
+from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, Error_Trope
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -36,6 +36,7 @@ from random import shuffle, randint
 import datetime
 import hashlib
 import json
+import random
 
 from mangaki.choices import TOP_CATEGORY_CHOICES
 
@@ -629,6 +630,12 @@ def remove_all_reco(request, targetname):
         for reco in reco_list:
             if Rating.objects.filter(user=request.user, work=reco.work, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
                 reco.delete()
+
+
+def error_404(request, exception):
+    trope_id = random.randint(0, ErrorTrope.objects.filter(attached_error='404').length - 1)
+    trope = ErrorTrope.objects.filter(attached_error='404')[trope_id]
+    return render(request, '404.html', {'trope': trope, 'work': trope.origin})
 
 
 @login_required

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<h1>Erreur 404</h1>
+
+"{{ trope.quote }}" - {{ trope.author }}
+
+Source: <a link="{% url 'work-detail' work.id %}">{{ work.title }}</a>
+
+({{ exception }})
+
+{% endblock %}
