@@ -1,9 +1,21 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.anidb import AniDB
-from mangaki.models import Artist, Role, Staff, Work, ArtistSpelling
+from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling
 from django.db.models import Count
 from urllib.parse import urlparse, parse_qs
 import sys
+
+"""
+vérifier :
+-existence de fr, en, ja tjrs
+-existence de category
+
+comment ranger les tags, lesquels prendre ?
+
+ajouter : 
+save de tags
+
+"""
 
 
 def get_or_create_artist(name):
@@ -53,16 +65,23 @@ class Command(BaseCommand):
                 .order_by('-rating_count')
         a = AniDB('mangakihttp', 1)
         i = 0
+        #all_worktitles = []
         for anime in todo:
             i += 1
             if i < start:
                 continue
             print(i, ':', anime.title, anime.id)
-            creators = a.get(anime.anidb_aid).creators
-            worktitles = a.get(anime.anidb_aid).worktitles
-            
+            #creators = a.get(anime.anidb_aid).creators
+            #worktitles = a.get(anime.anidb_aid).worktitles
+            #tags = a.get(anime.anidb_aid).tags
+
+            """
             print(creators)
             print(worktitles)
+            """
+            print(tags)
+            #all_worktitles.append(worktitles)
+            """
             WorkTitle.objects.get_or_create(work=anime, title=worktitles[0], language='fr')
             WorkTitle.objects.get_or_create(work=anime, title=worktitles[1], language='en')
             WorkTitle.objects.get_or_create(work=anime, title=worktitles[2], language='ja')
@@ -80,3 +99,4 @@ class Command(BaseCommand):
                 if staff_id is not None:
                     Staff.objects.get_or_create(work=anime, role_id=staff_map[staff_id], artist=artist)
                 anime.save()
+            """

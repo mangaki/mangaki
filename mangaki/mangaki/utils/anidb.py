@@ -68,6 +68,7 @@ class AniDB:
 
     anime = soup.anime
     titles = anime.titles
+    tags = anime.tags
 
     a = Anime({
       'id': id,
@@ -93,7 +94,9 @@ class AniDB:
       }),
       'picture': "http://img7.anidb.net/pics/anime/" + str(anime.picture.string),
       'categories': [],
-      'tags': [],
+      
+      'is_hentai' : anime.category.get("hentai")
+      'tags': [genre.string for genre in anime.find_all('name') if genre.parent.name == "tag"],
       'characters': [],
       'episodes': [],
     })
