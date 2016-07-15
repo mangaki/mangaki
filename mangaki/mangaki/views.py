@@ -36,7 +36,7 @@ from random import shuffle, randint
 import datetime
 import hashlib
 import json
-import randint
+import random
 
 from mangaki.choices import TOP_CATEGORY_CHOICES
 
@@ -633,8 +633,8 @@ def remove_all_reco(request, targetname):
 
 
 def error_404(request, exception):
-    tropeid = random.randint(0, ErrorTrope.objects.filter(attached_error='404').length -1)
-    trope = ErrorTrope.objects.filter(attached_error='404')[tropeid]
+    trope_id = random.randint(0, ErrorTrope.objects.filter(attached_error='404').length - 1)
+    trope = ErrorTrope.objects.filter(attached_error='404')[trope_id]
     return render(request, '404.html', {'trope': trope, 'work': trope.origin})
 
 
