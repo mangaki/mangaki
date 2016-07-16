@@ -12,8 +12,9 @@ class StaffInline(admin.TabularInline):
 
 
 class FAQAdmin(admin.ModelAdmin):
-    search_fields = ('order', 'theme')
-    list_display = ('order', 'theme')
+    ordering = ('order', )
+    search_fields = ('theme', )
+    list_display = ('theme', 'order')
 
 
 class WorkAdmin(admin.ModelAdmin):

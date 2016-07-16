@@ -698,7 +698,7 @@ def register_profile(sender, **kwargs):
 
 
 def faq_index(request):
-    latest_theme_list = FAQTheme.objects.order_by('order') 
+    latest_theme_list = FAQTheme.objects.order_by('order')
     all_information = [[faqtheme.theme, [(entry.question, entry.answer) for entry in faqtheme.entries.filter(is_active=True).order_by('-pub_date')]] for faqtheme in latest_theme_list]
     context = {
         'information': all_information,
