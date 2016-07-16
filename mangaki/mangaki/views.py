@@ -229,7 +229,7 @@ class EventDetail(LoginRequiredMixin, DetailView):
 def get_card(request, category, sort_id=1):
     chrono = Chrono(True)
     deja_vu = request.GET.get('dejavu', '').split(',')
-    sort_mode = ['popularity', 'controversy', 'top'][int(sort_id) - 1]
+    sort_mode = ['popularity', 'controversy', 'top', 'dpp'][int(sort_id) - 1]
     queryset = Work.objects.filter(category__slug=category)
     if sort_mode == 'popularity':
         queryset = queryset.popular()
