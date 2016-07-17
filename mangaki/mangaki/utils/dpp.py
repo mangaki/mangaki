@@ -4,6 +4,7 @@ from numpy.random import choice
 from mangaki.utils.ratingsmatrix import RatingsMatrix
 import numpy as np
 
+
 def diameter(r, points):
     nb_points = points.shape[0]
     return ((2 / (nb_points * (nb_points - 1)) *

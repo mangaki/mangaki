@@ -4,7 +4,7 @@ import pandas
 
 
 class RatingsMatrix():
-    
+
     def __init__(self, qs=None, fname=None):
         user_list, item_list, data = [], [], []
         if fname is None:

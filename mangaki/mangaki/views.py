@@ -65,9 +65,11 @@ UTA_ID = 14293
 
 GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
 
+
 def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
+
 
 def update_poster_if_nsfw(obj, user):
     if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
@@ -92,6 +94,7 @@ def update_score_while_rating(user, work, choice):
             reco.user.profile.score -= 5
         Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
+
 def update_score_while_unrating(user, work, choice):
     recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
     for reco in recommendations_list:
@@ -101,6 +104,7 @@ def update_score_while_unrating(user, work, choice):
         elif choice == 'favorite':
             reco.user.profile.score -= 5
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
+
 
 class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
     form_class = SuggestionForm
@@ -201,6 +205,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         form.save()
         return super().form_valid(form)
 
+
 class EventDetail(LoginRequiredMixin, DetailView):
     model = Event
 
@@ -220,10 +225,10 @@ class EventDetail(LoginRequiredMixin, DetailView):
         if attending is not None:
             Attendee.objects.update_or_create(
                 event=self.object, user=request.user,
-                defaults={'attending': attending })
+                defaults={'attending': attending})
         elif 'cancel' in request.POST:
             Attendee.objects.filter(event=self.object, user=request.user).delete()
-        return redirect(request.GET['next']);
+        return redirect(request.GET['next'])
 
 
 def get_card(request, category, sort_id=1):
@@ -251,6 +256,7 @@ def get_card(request, category, sort_id=1):
 
     return HttpResponse(json.dumps(cards), content_type='application/json')
 
+
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -268,6 +274,7 @@ class WorkListMixin:
             work.poster = work.safe_poster(self.request.user)
 
         return context
+
 
 class WorkList(WorkListMixin, ListView):
     paginate_by = POSTERS_PER_PAGE
@@ -288,7 +295,7 @@ class WorkList(WorkListMixin, ListView):
             return sort
 
     def is_dpp(self):
-        dpp = self.kwargs.get('dpp',False)
+        dpp = self.kwargs.get('dpp', False)
         return dpp
 
     def get_queryset(self):
@@ -310,7 +317,7 @@ class WorkList(WorkListMixin, ListView):
                 queryset = queryset.filter(title__istartswith=letter)
             queryset = queryset.order_by('title')
         elif sort_mode == 'random':
-            queryset = queryset.random().order_by('?')[:self.paginate_by] 
+            queryset = queryset.random().order_by('?')[:self.paginate_by]
         elif sort_mode == 'dpp':
             queryset = queryset.dpp(10)
         elif sort_mode == 'mosaic':
@@ -362,6 +369,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
         context['artist'] = self.object
 
         return context
+
 
 class UserList(ListView):
     model = User
@@ -519,6 +527,7 @@ def events(request):
             'utamonogatari_rating': uta_rating,
         })
 
+
 def top(request, category_slug):
     categories = dict(TOP_CATEGORY_CHOICES)
     if category_slug not in categories:
@@ -546,6 +555,7 @@ def top(request, category_slug):
         'top': data,
     })
 
+
 def rate_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -561,6 +571,7 @@ def rate_work(request, work_id):
         return HttpResponse(choice)
     return HttpResponse()
 
+
 def dpp_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -575,6 +586,7 @@ def dpp_work(request, work_id):
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
     return HttpResponse()
+
 
 def recommend_work(request, work_id, target_id):
     if request.user.is_authenticated() and request.method == 'POST':
@@ -628,7 +640,7 @@ def get_works(request, category):
 
 def get_reco_list(request, category, editor):
     reco_list = []
-    for work, is_manga, in_willsee in get_recommendations(request.user, category, dpp=False, editor=editor):
+    for work, is_manga, in_willsee in get_recommendations(request.user, category, editor=editor):
         update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
@@ -661,7 +673,6 @@ def remove_all_reco(request, targetname):
                 reco.delete()
 
 
-#à regarder
 @login_required
 def get_reco(request):
     category = request.GET.get('category', 'all')
@@ -672,21 +683,11 @@ def get_reco(request):
         reco_list = []
     return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
 
-"""
-def get_reco(request):
-    category = request.GET.get('category', 'all')
-    editor = request.GET.get('editor', 'unspecified')
-    reco_list = get_reco_list(request, category, editor)
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
-"""
 
 @login_required
 def get_reco_dpp(request):
     category = request.GET.get('category', 'all')
-    if request.user.coldstartrating.exists():
-        reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
-    else:
-        reco_list = []
+    reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
     return render(request, 'mangaki/reco_list_dpp.html', {'reco_list': reco_list, 'category': category})
 
 
@@ -734,4 +735,3 @@ def add_pairing(request, artist_id, work_id):
 def register_profile(sender, **kwargs):
     user = kwargs['user']
     Profile(user=user).save()
-
