@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^discourse/sso$', discourse_views.sso),
     url(r'^about/$', views.about),
-    url(r'^faq/$', views.MarkdownView.as_view(), kwargs={'slug': 'faq'}),
+    url(r'^faq/$', views.faq_index),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}),
     url(r'^events/$', views.events),
     # url(r'^lookup/$', views.lookup_work'),
