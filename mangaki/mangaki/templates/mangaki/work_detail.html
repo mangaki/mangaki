@@ -33,14 +33,14 @@
 <div class="row">
     <div class="col-md-12"> <!-- col-md-push-3 -->
         <h1>{{ object.title }}</h1>
-        <!-- au début ici ou vers la fin -->
-        <!-- ajouter un if si jamais contenu vide ? -->
-        <p> Titres alternatifs :
-        {% for title in object.worktitle_set.all %}
-          <p>&nbsp;&nbsp;&nbsp;{{title.language}} : {{title.title}} </p>
+        {% if object.worktitle_set.count != 0 %}
+            <p> Titres alternatifs :
+            {% for title in object.worktitle_set.all %}
+            <p>&nbsp;&nbsp;&nbsp;{{title.language}} : {{title.title}} </p>
         
-        {% endfor %}
-        </p>  
+            {% endfor %}
+            </p>
+        {% endif %}  
     </div>
     <div class="col-sm-6 col-md-4 manga-sheet">
         <div class="work-sheet data" data-category="{{ object.category.slug }}" data-id="{{ object.id }}">
@@ -143,13 +143,6 @@
       {% endif %}
     </div>
 {% endif %}
-
-<p> Titres alternatifs :
-        {% for title in object.worktitle_set.all %}
-          <p>&nbsp;&nbsp;&nbsp;{{title.language}} : {{title.title}} </p>
-        
-        {% endfor %}
-</p>
 
 {% if user.is_authenticated %}
 <a href="http://meta.mangaki.fr/session/sso" target="_blank"><button type="button" class="btn btn-primary">En discuter sur le forum</button></a>

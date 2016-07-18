@@ -84,6 +84,7 @@ class Work(models.Model):
 
     # Some of these fields do not make sense for some categories of works.
     genre = models.ManyToManyField('Genre')
+    tags = models.ManyToManyField('Tags')
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='', blank=True)
     nb_episodes = models.TextField(default='Inconnu', max_length=16, blank=True)
     anime_type = models.TextField(max_length=42, blank=True)
@@ -172,6 +173,22 @@ class Genre(models.Model):
     def __str__(self):
         return self.title
 
+class Tags(models.Model):
+    title = models.CharField(max_length=50)
+    weight = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
+"""
+pas besoin au final, category n'existe plus ou presque plus .....
+#héritage : revoir
+class Categories_anidb(Tags):
+    weight = models.IntegerField(default=0)
+
+class Tags_anidb(Tags):
+    approval = models.IntegerField(default=0)
+"""
 
 class Track(models.Model):
     title = models.CharField(max_length=32)

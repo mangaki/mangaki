@@ -68,10 +68,14 @@ class AniDB:
 
     anime = soup.anime
     titles = anime.titles
-    tags = anime.tags
-
+    
     a = Anime({
+      'anime':anime,
+      'tag': anime.tags,
       'id': id,
+      'worktitles' : [(title.string, 'en') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="en")] + [(title.string, 'fr') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="fr")] + [(title.string, 'ja') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="x-jat")],
+      
+      
       'type': str(anime.type.string),
       'episodecount': int(anime.episodecount.string),
       'startdate': datetime(*list(map(int, anime.startdate.string.split("-")))),
@@ -81,8 +85,11 @@ class AniDB:
         title['type'] if 'type' in title else "unknown"
       ) for title in anime.find_all('title')],
       'title': str(titles.find('title', attrs={'type': "main"}).string),
-      #official
-      'worktitles' : [str(titles.find('title', attrs={'xml:lang': "fr"}).string),str(titles.find('title', attrs={'xml:lang': "en"}).string), str(titles.find('title', attrs={'xml:lang': "ja"}).string)],
+      
+      
+
+      
+      
       'relatedanime': [],
       'url': str(anime.url.string) if anime.url else None,
       'creators': anime.creators,
@@ -93,12 +100,15 @@ class AniDB:
         'review': float(anime.ratings.review.string) if anime.ratings.review else ''
       }),
       'picture': "http://img7.anidb.net/pics/anime/" + str(anime.picture.string),
-      'categories': [],
-      
-      'is_hentai' : anime.category.get("hentai")
-      'tags': [genre.string for genre in anime.find_all('name') if genre.parent.name == "tag"],
+      'categories': [(genre.string, genre.parent['weight']) for genre in anime.find_all('name') if genre.parent.name=="category"] if anime.categories != None else None ,
+   
+      #à refaire avec tag 18+ restricted
+      'is_hentai' : anime.category.get("hentai")  if anime.categories != None else "unknown" ,
+      'tags':[(genre.string, genre.parent.get("weight")) for genre in anime.find_all('name') if genre.parent.name=="tag"] ,
+       
       'characters': [],
       'episodes': [],
+
     })
 
     self._cache[id] = a

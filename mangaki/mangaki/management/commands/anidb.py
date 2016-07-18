@@ -7,13 +7,13 @@ import sys
 
 """
 vérifier :
--existence de fr, en, ja tjrs
--existence de category
+-existence de fr, en, ja tjrs OK
+-existence de category OK
 
-comment ranger les tags, lesquels prendre ?
+comment ranger les tags, lesquels prendre ? voir slack
 
 ajouter : 
-save de tags
+save de tags TODO
 
 """
 
@@ -64,28 +64,56 @@ class Command(BaseCommand):
                 .exclude(anidb_aid=0)\
                 .order_by('-rating_count')
         a = AniDB('mangakihttp', 1)
+
         i = 0
         #all_worktitles = []
+        
         for anime in todo:
             i += 1
             if i < start:
                 continue
             print(i, ':', anime.title, anime.id)
+            """
+            anime=a.get(anime.anidb_aid).anime
+            anime=str(anime)
+            #tag = a.get(anime.anidb_aid).tag
+            #tag = str(tag)
+            
+            my_file = open("/home/voisin/anidb.xml", "r+")
+            
+            my_file.write(anime)
+            my_file.close()
+            """
+
+        
             #creators = a.get(anime.anidb_aid).creators
             #worktitles = a.get(anime.anidb_aid).worktitles
-            #tags = a.get(anime.anidb_aid).tags
+            #is_hentai = a.get(anime.anidb_aid).is_hentai
+            #categories = a.get(anime.anidb_aid).categories
+            tags = a.get(anime.anidb_aid).tags
+            #print(worktitles)
+            #print(is_hentai)
+            #print(categories)
+            #if is_hentai == "true" :
+            #    anime.nsfw = True
 
             """
             print(creators)
             print(worktitles)
             """
-            print(tags)
+            #print(tags)
             #all_worktitles.append(worktitles)
+
             """
-            WorkTitle.objects.get_or_create(work=anime, title=worktitles[0], language='fr')
-            WorkTitle.objects.get_or_create(work=anime, title=worktitles[1], language='en')
-            WorkTitle.objects.get_or_create(work=anime, title=worktitles[2], language='ja')
+            for i in range(len(worktitles)):
+                WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][1])
+            """
+
+            #anime.save()
+
+            """
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
+            
             for creator in creators.findAll('name'):
                 artist = get_or_create_artist(creator.string)
                 if creator['type'] == 'Direction':
