@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% if user.is_superuser %}
 <div class="col-xs-12">
   <p class="alert alert-info">
 {% if user.is_authenticated %}
     {% if is_dpp %}
+    
     Notez quelques <em>{{ category }}s</em>, via uniquement les listes ci-dessous &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco_dpp' %}">Découvrir</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
+    
     {% else %}
     Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'recommendations' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
     {% endif %}
@@ -16,7 +19,7 @@
 {% endif %}
   </p>
 </div>
-
+{% endif %}
 <div class="col-xs-12">
   <ul class="nav nav-tabs">
     {% if is_dpp %}
