@@ -84,7 +84,7 @@ class Work(models.Model):
 
     # Some of these fields do not make sense for some categories of works.
     genre = models.ManyToManyField('Genre')
-    tags = models.ManyToManyField('Tags')
+    tags = models.ManyToManyField('Tag')
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='', blank=True)
     nb_episodes = models.TextField(default='Inconnu', max_length=16, blank=True)
     anime_type = models.TextField(max_length=42, blank=True)
@@ -122,11 +122,12 @@ class Work(models.Model):
     def __str__(self):
         return self.title
 
-
+#choice
 class WorkTitle (models.Model) :
     work = models.ForeignKey('Work')
     title = models.CharField(max_length=128, blank=True, db_index=True)#taille à modifier pê
     language = models.CharField(max_length=50, blank=True, db_index=True) #taille à modifier
+    specific_type = models.CharField(max_length=10, blank=True, db_index=True) #taille
 
     def __str__(self):
         return ("%s" %self.title)
@@ -173,22 +174,13 @@ class Genre(models.Model):
     def __str__(self):
         return self.title
 
-class Tags(models.Model):
+class Tag(models.Model):
     title = models.CharField(max_length=50)
     weight = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.title
+        return self.title + " " +str(self.weight)
 
-"""
-pas besoin au final, category n'existe plus ou presque plus .....
-#héritage : revoir
-class Categories_anidb(Tags):
-    weight = models.IntegerField(default=0)
-
-class Tags_anidb(Tags):
-    approval = models.IntegerField(default=0)
-"""
 
 class Track(models.Model):
     title = models.CharField(max_length=32)
@@ -202,6 +194,7 @@ class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
     last_name = models.CharField(max_length=32)  # No longer used
     name = models.CharField(max_length=255)
+    creator_id = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name

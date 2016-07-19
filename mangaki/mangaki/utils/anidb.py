@@ -70,10 +70,12 @@ class AniDB:
     titles = anime.titles
     
     a = Anime({
-      'anime':anime,
-      'tag': anime.tags,
+      #'anime':anime,
+      #'tag': anime.tags,
       'id': id,
-      'worktitles' : [(title.string, 'en') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="en")] + [(title.string, 'fr') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="fr")] + [(title.string, 'ja') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="x-jat")],
+
+      #dico
+      'worktitles' : [(title.string, title['type'], 'en') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="en")] + [(title.string, title['type'], 'fr') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="fr")] + [(title.string, title['type'], 'ja') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="x-jat")],
       
       
       'type': str(anime.type.string),

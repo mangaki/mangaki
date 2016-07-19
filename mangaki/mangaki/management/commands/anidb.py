@@ -87,11 +87,11 @@ class Command(BaseCommand):
 
         
             #creators = a.get(anime.anidb_aid).creators
-            #worktitles = a.get(anime.anidb_aid).worktitles
+            worktitles = a.get(anime.anidb_aid).worktitles
             #is_hentai = a.get(anime.anidb_aid).is_hentai
             #categories = a.get(anime.anidb_aid).categories
-            tags = a.get(anime.anidb_aid).tags
-            #print(worktitles)
+            #tags = a.get(anime.anidb_aid).tags
+            print(worktitles)
             #print(is_hentai)
             #print(categories)
             #if is_hentai == "true" :
@@ -104,13 +104,13 @@ class Command(BaseCommand):
             #print(tags)
             #all_worktitles.append(worktitles)
 
-            """
+            
             for i in range(len(worktitles)):
-                WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][1])
-            """
+                WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
+            
 
-            #anime.save()
-
+            anime.save()
+            
             """
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
             

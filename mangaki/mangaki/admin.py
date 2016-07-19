@@ -1,9 +1,27 @@
 # coding=utf8
-from mangaki.models import Work, WorkTitle, Genre, Track, Tags, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
+from mangaki.models import Work, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
+from django.conf.urls import patterns
+
+
+class TagAdmin(admin.ModelAdmin):
+    
+
+    def get_urls(self):
+        urls = super(TagAdmin, self).get_urls()
+        my_urls = patterns('',
+            (r'^my_view/$', self.admin_site.admin_view(self.my_view))
+        )
+        return my_urls + urls
+    
+    def my_view(self, request):
+         #return HttpResponse("Hello!")
+         
+        context=dict()
+        return TemplateResponse(request, "test.html", context)
 
 class StaffInline(admin.TabularInline):
     model = Staff
@@ -11,7 +29,7 @@ class StaffInline(admin.TabularInline):
 
 class WorkTitleInline(admin.TabularInline):
     model = WorkTitle
-    fields = ('title', 'language')
+    fields = ('title', 'language', 'specific_type')
 
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
@@ -246,4 +264,4 @@ admin.site.register(Pairing, PairingAdmin)
 admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(Top, TopAdmin)
 admin.site.register(Role, RoleAdmin)
-admin.site.register(Tags)
+admin.site.register(Tag, TagAdmin)
