@@ -19,11 +19,15 @@ function vote(elt) {
             window.location.assign(
                 '/user/signup?next=' + encodeURIComponent(next));
         }
-        if (rating === 'none')
-            $(elt).siblings().filter('[data-choice!=' + rating + ']').removeClass('not-chosen');
-        else if (rating) {
-            $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
-            $(elt).removeClass('not-chosen');
+        if(typeof(sort_mode) !== 'undefined' && sort_mode === 'mosaic' && rating)
+            loadCard(pos);
+        else {
+            if (rating === 'none')
+                $(elt).siblings().filter('[data-choice!=' + rating + ']').removeClass('not-chosen');
+            else if (rating) {
+                $(elt).siblings().filter('[data-choice!=' + rating + ']').addClass('not-chosen');
+                $(elt).removeClass('not-chosen');
+            }
         }
     });
 }

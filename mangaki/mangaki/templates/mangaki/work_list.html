@@ -6,9 +6,9 @@
   <p class="alert alert-info">
 {% if user.is_authenticated %}
     {% if is_dpp %}
-    
+    {% if user.is_superuser %}
     Notez quelques <em>{{ category }}s</em>, via uniquement les listes ci-dessous &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco_dpp' %}">Découvrir</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
-    
+    {% endif %}
     {% else %}
     Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'recommendations' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
     {% endif %}
@@ -24,7 +24,7 @@
   <ul class="nav nav-tabs">
     {% if is_dpp %}
 
-    <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'dpp-works' category %}?sort=dpp"><em>Anime</em> seulement</a></li>
+    <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}?sort=dpp"><em>Anime</em> seulement</a></li>
     
     <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'manga' %}?sort=dpp"><em>Manga</em> seulement</a></li>
     
@@ -112,7 +112,7 @@
 <div class="row margin">
   <div class="col-md-12 col-sm-12">
     {% if is_dpp %}
-    <a class="btn btn-primary btn-lg" href="/reco_dpp/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
+    <a class="btn btn-primary btn-lg" href="/dpp/{{ category }}/?sort=dpp" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">montrez-moi de nouvelles oeuvres&nbsp;!</a>
     {% else %}
     <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
     {% endif %}

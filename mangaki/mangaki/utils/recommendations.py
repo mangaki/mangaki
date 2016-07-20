@@ -12,7 +12,7 @@ MIN_RATINGS = 3
 CHRONO_ENABLED = False
 
 
-def get_recommendations(user, category, dpp=False, editor=[]):
+def get_recommendations(user, category, editor='unspecified', dpp=False):
     # What if user is not authenticated? We will see soon.
     chrono = Chrono(CHRONO_ENABLED)
 
@@ -45,7 +45,7 @@ def get_recommendations(user, category, dpp=False, editor=[]):
 
     if editor == 'otototaifu':
         mangas = mangas.filter(editor__title__in=['Ototo Manga', 'Taifu comics'])
-    elif editor != 'unspecified' and editor != []:
+    elif editor != 'unspecified':
         mangas = mangas.filter(editor__title__icontains=editor)
     manga_ids = mangas.values_list('id', flat=True)
 
