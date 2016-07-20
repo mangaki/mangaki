@@ -126,8 +126,19 @@ class Work(models.Model):
 class WorkTitle (models.Model) :
     work = models.ForeignKey('Work')
     title = models.CharField(max_length=128, blank=True, db_index=True)#taille à modifier pê
-    language = models.CharField(max_length=50, blank=True, db_index=True) #taille à modifier
-    specific_type = models.CharField(max_length=10, blank=True, db_index=True) #taille
+    language = models.CharField(max_length=5, choices=(
+                                      ('fr', "fr"),
+                                      ('x-jat', 'ja'),
+                                      ('en', 'en')),
+                                      blank=True,
+                                       db_index=True) 
+    #language = models.CharField(max_length=50, blank=True, db_index=True)
+    worktitle_type = models.CharField(max_length=9, choices=(
+                                      ('main', 'principal'),
+                                      ('official', 'officiel'),
+                                      ('synonym', 'synonyme')),
+                                      blank=True,
+                                       db_index=True) 
 
     def __str__(self):
         return ("%s" %self.title)
@@ -194,7 +205,7 @@ class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
     last_name = models.CharField(max_length=32)  # No longer used
     name = models.CharField(max_length=255)
-    creator_id = models.IntegerField(default=0)
+    anidb_creator_id = models.IntegerField(null=True, unique=True)
 
     def __str__(self):
         return self.name
