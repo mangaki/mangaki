@@ -66,7 +66,9 @@ class WorkQuerySet(models.QuerySet):
                                                                  'choice'))
         similarity = SimilarityMatrix(ratings_matrix.matrix, nb_components_svd=70)
         list_item_id_in_category = self.values_list('pk', flat=True)
-        items = [ratings_matrix.item_dict[item] for item in ratings_matrix.item_set if item in list_item_id_in_category]
+        list_item_id_popular = self.order_by('-nb_ratings')[:10].values_list('pk', flat=True)
+        items = [ratings_matrix.item_dict[item] for item in ratings_matrix.item_set if (item in list_item_id_in_category and 
+            item in list_item_id_popular)]
         dpp = MangakiDPP(items, similarity.similarity_matrix)
         liste = dpp.sample_k(nb_points)
         liste2 = [ratings_matrix.item_dict_inv[element] for element in liste]
