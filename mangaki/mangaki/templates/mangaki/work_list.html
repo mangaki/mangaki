@@ -20,7 +20,7 @@
   <ul class="nav nav-tabs">
     {% if is_dpp %}
 
-    <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}?sort=dpp"><em>Anime</em> seulement</a></li>
+    <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}"><em>Anime</em> seulement</a></li>
     
     <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'manga' %}?sort=dpp"><em>Manga</em> seulement</a></li>
     

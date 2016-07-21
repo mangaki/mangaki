@@ -295,7 +295,7 @@ class WorkList(WorkListMixin, ListView):
             return sort
 
     def is_dpp(self):
-        dpp = self.kwargs.get('dpp', False)
+        dpp = self.kwargs.get('dpp')
         return dpp
 
     def get_queryset(self):
