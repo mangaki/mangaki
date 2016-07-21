@@ -84,7 +84,7 @@ class Work(models.Model):
 
     # Some of these fields do not make sense for some categories of works.
     genre = models.ManyToManyField('Genre')
-    tags = models.ManyToManyField('Tag')
+    tags = models.ManyToManyField('Tag', through="TaggedWork")
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='', blank=True)
     nb_episodes = models.TextField(default='Inconnu', max_length=16, blank=True)
     anime_type = models.TextField(max_length=42, blank=True)
@@ -133,16 +133,30 @@ class WorkTitle (models.Model) :
                                       blank=True,
                                        db_index=True) 
     #language = models.CharField(max_length=50, blank=True, db_index=True)
-    worktitle_type = models.CharField(max_length=9, choices=(
-                                      ('main', 'principal'),
-                                      ('official', 'officiel'),
-                                      ('synonym', 'synonyme')),
-                                      blank=True,
-                                       db_index=True) 
+    type = models.CharField(max_length=9, choices=(
+                            ('main', 'principal'),
+                            ('official', 'officiel'),
+                            ('synonym', 'synonyme')),
+                            blank=True,
+                            db_index=True) 
 
     def __str__(self):
         return ("%s" %self.title)
 
+class Language(models.Model):
+    worktitle = models.ForeignKey('Work')
+    anidb_language = models.CharField(max_length=5, choices=(
+                                      ('fr', "Fr"),
+                                      ('x-jat', 'X-jat'),
+                                      ('en', 'En')),
+                                      blank=True,
+                                       db_index=True) 
+    mangaki_language = models.CharField(max_length=5, choices=(
+                                      ('fr', "Fr"),
+                                      ('ja', 'Ja'),
+                                      ('en', 'En')),
+                                      blank=True,
+                                       db_index=True) 
 
 class Role(models.Model):
     name = models.CharField(max_length=255)
@@ -190,7 +204,18 @@ class Tag(models.Model):
     weight = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.title + " " +str(self.weight)
+        return self.title 
+
+class TaggedWork(models.Model):
+    work = models.ForeignKey('Work') 
+    tag = models.ForeignKey('Tag')
+    #weight = models.IntegerField(default=0)
+
+    class Meta : 
+        unique_together = ('work', 'tag')
+
+    def __str__(self):
+        return "%s %s %s" % (self.work, self.tag, self.weight)
 
 
 class Track(models.Model):

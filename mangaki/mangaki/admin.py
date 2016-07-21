@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Work, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
+from mangaki.models import Work, WorkTitle, Language, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -29,7 +29,7 @@ class StaffInline(admin.TabularInline):
 
 class WorkTitleInline(admin.TabularInline):
     model = WorkTitle
-    fields = ('title', 'language', 'worktitle_type')
+    fields = ('title', 'language', 'type')
 
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
