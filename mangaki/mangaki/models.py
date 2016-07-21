@@ -126,12 +126,9 @@ class Work(models.Model):
 class WorkTitle (models.Model) :
     work = models.ForeignKey('Work')
     title = models.CharField(max_length=128, blank=True, db_index=True)#taille à modifier pê
-    language = models.CharField(max_length=5, choices=(
-                                      ('fr', "fr"),
-                                      ('x-jat', 'ja'),
-                                      ('en', 'en')),
-                                      blank=True,
-                                       db_index=True) 
+    language = models.ForeignKey('Language')
+    #language = models.CharField(max_length=5, choices=(('fr', "fr"),('x-jat', 'ja'),('en', 'en')),blank=True,db_index=True) 
+    
     #language = models.CharField(max_length=50, blank=True, db_index=True)
     type = models.CharField(max_length=9, choices=(
                             ('main', 'principal'),
@@ -144,7 +141,8 @@ class WorkTitle (models.Model) :
         return ("%s" %self.title)
 
 class Language(models.Model):
-    worktitle = models.ForeignKey('Work')
+    #worktitle = models.ForeignKey('WorkTitle')
+    
     anidb_language = models.CharField(max_length=5, choices=(
                                       ('fr', "Fr"),
                                       ('x-jat', 'X-jat'),
@@ -157,6 +155,7 @@ class Language(models.Model):
                                       ('en', 'En')),
                                       blank=True,
                                        db_index=True) 
+    
 
 class Role(models.Model):
     name = models.CharField(max_length=255)
@@ -201,7 +200,7 @@ class Genre(models.Model):
 
 class Tag(models.Model):
     title = models.CharField(max_length=50)
-    weight = models.IntegerField(default=0)
+    #weight = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title 
@@ -209,7 +208,7 @@ class Tag(models.Model):
 class TaggedWork(models.Model):
     work = models.ForeignKey('Work') 
     tag = models.ForeignKey('Tag')
-    #weight = models.IntegerField(default=0)
+    weight = models.IntegerField(default=0)
 
     class Meta : 
         unique_together = ('work', 'tag')

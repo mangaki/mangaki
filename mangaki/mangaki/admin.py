@@ -29,7 +29,7 @@ class StaffInline(admin.TabularInline):
 
 class WorkTitleInline(admin.TabularInline):
     model = WorkTitle
-    fields = ('title', 'language', 'type')
+    fields = ('title', 'type')
 
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
