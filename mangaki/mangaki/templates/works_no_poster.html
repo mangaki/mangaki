@@ -1,7 +1,7 @@
 {% for object in works %}
   {% with work=object.work rating=object.choice %}
     <div class="row flatlist data" data-category="{{ category }}" data-id="{{ work.id }}">
-        <a href="/{{ category }}/{{ work.id }}">{{ work.title }}</a>
+        <a href="{% url 'work-detail' category work.id %}">{{ work.title }}</a>
         <div id="votes_{{ work.id }}" style="float: right">
             <span data-choice='favorite' onclick="vote(this)" class="btn btn-favorite btn-xs a{% if rating and rating != 'favorite' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-star"></span></span>
             <span data-choice='like' onclick="vote(this)" class="btn btn-success btn-xs{% if rating and rating != 'like' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-thumbs-up"></span></span>

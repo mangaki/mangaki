@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
+
 <div class="row">
     <div class="col-xs-2">
         <img src="{{ avatar_url }}" alt="Avatar de {{ username }}" id="avatar" />
@@ -125,18 +126,18 @@
 <script>
 $("[name='is_shared']").bootstrapSwitch();
 $("[name='is_shared']").on('switchChange.bootstrapSwitch', function(event, state) {
-    $.post('/shared/', {is_shared: state});
+    $.post(Urls['shared'](), {is_shared: state});
 });
 $("[name='nsfw_ok']").bootstrapSwitch();
 $("[name='nsfw_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
-    $.post('/nsfw/', {nsfw_ok: state});
+    $.post(Urls['nsfw'](), {nsfw_ok: state});
 });
 $("[name='newsletter_ok']").bootstrapSwitch();
 $("[name='newsletter_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
-    $.post('/newsletter/', {newsletter_ok: state});
+    $.post(Urls['newsletter'](), {newsletter_ok: state});
 });
 $("#import_mal").on('click', function() {
-    $.post('/mal/' + $('#mal_username').val(), function(data) {
+    $.post(Urls['import-mal']($('#mal_username').val()), function(data) {
         console.log(data);
         location.reload();
     });
@@ -144,17 +145,19 @@ $("#import_mal").on('click', function() {
 
 function removeReco(elt) {
   var $elt = $(elt);
-  $.post('/removeReco/' + $elt.data('work') + '/' + $elt.data('user') + '/' + $elt.data('target'));
+  $.post(Urls['remove-reco']($elt.data('work'), $elt.data('user'), $elt.data('target')));
   setTimeout(function(){
     location.reload();
   }, 500);
 }
 
 function removeAllReco(elt) {
-  $.post('/removeReco/' + $(elt).data('target'));
+  $.post(Urls['remove-all-reco']($(elt).data('target')));
   setTimeout(function(){
     location.reload();
   }, 1000);
 }
 </script>
+
+<script src="{% url 'js_reverse' %}" type="text/javascript"></script>
 {% endblock %}
