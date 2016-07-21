@@ -141,20 +141,14 @@ class WorkTitle (models.Model) :
         return ("%s" %self.title)
 
 class Language(models.Model):
-    #worktitle = models.ForeignKey('WorkTitle')
     
-    anidb_language = models.CharField(max_length=5, choices=(
-                                      ('fr', "Fr"),
-                                      ('x-jat', 'X-jat'),
-                                      ('en', 'En')),
+    anidb_language = models.CharField(max_length=5,
                                       blank=True,
-                                       db_index=True) 
-    mangaki_language = models.CharField(max_length=5, choices=(
-                                      ('fr', "Fr"),
-                                      ('ja', 'Ja'),
-                                      ('en', 'En')),
-                                      blank=True,
-                                       db_index=True) 
+                                      db_index=True) 
+    iso639 = models.CharField(max_length=2,
+                            unique=True,
+                            db_index=True)
+
     
 
 class Role(models.Model):
