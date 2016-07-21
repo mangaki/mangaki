@@ -89,4 +89,4 @@ However, there are still some styles that the linter cannot pick up. If you are 
 
 ## Licence
 
-By contributing to Mangaki, you agree that your contributions will be licensed under its AGPLv3 licence.
+By contributing to Mangaki, you agree that your contributions will be licensed under its AGPLv3 license.
