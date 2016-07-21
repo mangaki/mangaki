@@ -6,15 +6,7 @@ from urllib.parse import urlparse, parse_qs
 import sys
 
 """
-vérifier :
--existence de fr, en, ja tjrs OK
--existence de category OK
-
-comment ranger les tags, lesquels prendre ? voir slack
-
-ajouter : 
-save de tags TODO
-
+Essayer sur des animes ayant sûrement des tags similaires ou alors en save 1 ds un fichier puis modifier
 """
 
 
@@ -87,11 +79,11 @@ class Command(BaseCommand):
 
         
             #creators = a.get(anime.anidb_aid).creators
-            worktitles = a.get(anime.anidb_aid).worktitles
+            #worktitles = a.get(anime.anidb_aid).worktitles
             #is_hentai = a.get(anime.anidb_aid).is_hentai
             #categories = a.get(anime.anidb_aid).categories
-            #tags = a.get(anime.anidb_aid).tags
-            print(worktitles)
+            tags = a.get(anime.anidb_aid).tags
+            #print(worktitles)
             #print(is_hentai)
             #print(categories)
             #if is_hentai == "true" :
@@ -101,16 +93,20 @@ class Command(BaseCommand):
             print(creators)
             print(worktitles)
             """
-            #print(tags)
+            print(tags)
             #all_worktitles.append(worktitles)
 
             
-            for i in range(len(worktitles)):
-                WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
+            #for i in range(len(worktitles)):
+            #    WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
             
 
-            anime.save()
+            #anime.save()
             
+            for tag in tags:
+                
+
+
             """
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
             

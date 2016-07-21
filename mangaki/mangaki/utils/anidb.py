@@ -106,7 +106,7 @@ class AniDB:
    
       #à refaire avec tag 18+ restricted
       'is_hentai' : anime.category.get("hentai")  if anime.categories != None else "unknown" ,
-      'tags':[(genre.string, genre.parent.get("weight")) for genre in anime.find_all('name') if genre.parent.name=="tag"] ,
+      'tags':[(genre.string, genre.parent.get("weight")) for genre in anime.tags.find_all('name') if genre.parent.name=="tag"] ,
        
       'characters': [],
       'episodes': [],
