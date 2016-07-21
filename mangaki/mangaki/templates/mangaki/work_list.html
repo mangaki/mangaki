@@ -1,25 +1,21 @@
 {% extends "base.html" %}
 
 {% block body %}
-{% if user.is_superuser %}
+
+{% if not is_dpp %}
 <div class="col-xs-12">
   <p class="alert alert-info">
-{% if user.is_authenticated %}
-    {% if is_dpp %}
-    {% if user.is_superuser %}
-    Notez quelques <em>{{ category }}s</em>, via uniquement les listes ci-dessous &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco_dpp' %}">Découvrir</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
-    {% endif %}
-    {% else %}
+    {% if user.is_authenticated %}
     Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'recommendations' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
-    {% endif %}
-{% else %}
+    {% else %}
     Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
     <a class="alert-link" href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
     et obtenir des recommandations.
-{% endif %}
+    {% endif %}
   </p>
 </div>
 {% endif %}
+
 <div class="col-xs-12">
   <ul class="nav nav-tabs">
     {% if is_dpp %}
