@@ -287,6 +287,7 @@ class WorkList(WorkListMixin, ListView):
         return self.request.GET.get('search', None)
 
     def sort_mode(self):
+        
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
         if self.search() is not None and sort == default:
@@ -299,34 +300,38 @@ class WorkList(WorkListMixin, ListView):
         return dpp
 
     def get_queryset(self):
-        queryset = self.category.work_set.all()
-        sort_mode = self.sort_mode()
         search_text = self.search()
-
-        if sort_mode == 'top':
-            queryset = queryset.top()
-        elif sort_mode == 'popularity':
-            queryset = queryset.popular()
-        elif sort_mode == 'controversy':
-            queryset = queryset.controversial()
-        elif sort_mode == 'alpha':
-            letter = self.request.GET.get('letter', '0')
-            if letter == '0': # '#'
-                queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
-            else:
-                queryset = queryset.filter(title__istartswith=letter)
-            queryset = queryset.order_by('title')
-        elif sort_mode == 'random':
-            queryset = queryset.random().order_by('?')[:self.paginate_by]
-        elif sort_mode == 'dpp':
-            queryset = queryset.dpp(10)
-        elif sort_mode == 'mosaic':
-            queryset = queryset.none()
+        if self.is_dpp():
+            queryset = self.category.work_set.all().dpp(10)
         else:
-            raise Http404
+            queryset = self.category.work_set.all()
+            sort_mode = self.sort_mode()
+            
 
-        if search_text is not None:
-            queryset = queryset.search(search_text)
+            if sort_mode == 'top':
+                queryset = queryset.top()
+            elif sort_mode == 'popularity':
+                queryset = queryset.popular()
+            elif sort_mode == 'controversy':
+                queryset = queryset.controversial()
+            elif sort_mode == 'alpha':
+                letter = self.request.GET.get('letter', '0')
+                if letter == '0': # '#'
+                    queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
+                else:
+                    queryset = queryset.filter(title__istartswith=letter)
+                queryset = queryset.order_by('title')
+            elif sort_mode == 'random':
+                queryset = queryset.random().order_by('?')[:self.paginate_by]
+            elif sort_mode == 'dpp':
+                queryset = queryset.dpp(10)
+            elif sort_mode == 'mosaic':
+                queryset = queryset.none()
+            else:
+                raise Http404
+
+            if search_text is not None:
+                 queryset = queryset.search(search_text)
 
         queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug')
 
@@ -336,19 +341,24 @@ class WorkList(WorkListMixin, ListView):
         context = super().get_context_data(**kwargs)
         search_text = self.search()
         sort_mode = self.sort_mode()
+        is_dpp = self.is_dpp
 
         context['search'] = search_text
+        
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
         context['objects_count'] = self.category.work_set.count()
-        context['is_dpp'] = self.is_dpp
-
+        context['is_dpp'] = is_dpp
+        
+        #is_dpp
         if sort_mode == 'mosaic':
             context['object_list'] = [
                 Work(title='Chargement…', poster='/static/img/chiro.gif')
                 for _ in range(4)
-            ]
+                ]
+        
+
 
         return context
 
