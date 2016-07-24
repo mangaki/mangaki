@@ -1,5 +1,5 @@
 # coding=utf8
-from mangaki.models import Work, WorkTitle, Language, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
+from mangaki.models import Work, TaggedWork, WorkTitle, Language, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
@@ -9,7 +9,6 @@ from django.conf.urls import patterns
 
 class TagAdmin(admin.ModelAdmin):
     
-
     def get_urls(self):
         urls = super(TagAdmin, self).get_urls()
         my_urls = patterns('',
@@ -22,6 +21,10 @@ class TagAdmin(admin.ModelAdmin):
          
         context=dict()
         return TemplateResponse(request, "test.html", context)
+
+class TaggedWorkInline(admin.TabularInline):
+    model = TaggedWork
+    fields = ('work', 'tag', 'weight')
 
 class StaffInline(admin.TabularInline):
     model = Staff
@@ -36,7 +39,7 @@ class WorkAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('category', 'nsfw',)
     actions = ['make_nsfw', 'make_sfw', 'merge']
-    inlines = [StaffInline, WorkTitleInline]
+    inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
         'nb_ratings',
@@ -265,3 +268,5 @@ admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(Top, TopAdmin)
 admin.site.register(Role, RoleAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(TaggedWork)
+
