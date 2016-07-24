@@ -8,7 +8,9 @@ from django.conf.urls import patterns
 
 
 class TagAdmin(admin.ModelAdmin):
-    
+    list_display = ('title', 'nb_works_linked', )
+    readonly_fields = ('nb_works_linked',)
+
     def get_urls(self):
         urls = super(TagAdmin, self).get_urls()
         my_urls = patterns('',
@@ -21,6 +23,9 @@ class TagAdmin(admin.ModelAdmin):
          
         context=dict()
         return TemplateResponse(request, "test.html", context)
+
+class TaggedWorkAdmin(admin.ModelAdmin):
+    search_fields = ('work', 'tag')
 
 class TaggedWorkInline(admin.TabularInline):
     model = TaggedWork
@@ -268,5 +273,5 @@ admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(Top, TopAdmin)
 admin.site.register(Role, RoleAdmin)
 admin.site.register(Tag, TagAdmin)
-admin.site.register(TaggedWork)
+admin.site.register(TaggedWork, TaggedWorkAdmin)
 

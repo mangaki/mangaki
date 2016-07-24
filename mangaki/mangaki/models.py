@@ -193,11 +193,17 @@ class Genre(models.Model):
         return self.title
 
 class Tag(models.Model):
-    title = models.CharField(max_length=50)
+    title = models.TextField(unique = True)
     #weight = models.IntegerField(default=0)
+    nb_works_linked = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title 
+
+    #def nb_works_linked(self):
+    #    return TaggedWork.objects.filter(tag=self).count()
+
+    
 
 class TaggedWork(models.Model):
     work = models.ForeignKey('Work') 

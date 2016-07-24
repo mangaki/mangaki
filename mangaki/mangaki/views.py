@@ -21,7 +21,7 @@ from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
+from mangaki.models import Work, Rating, Page, TaggedWork, Tag, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -68,6 +68,11 @@ GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
 def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
+
+def update_nb_works_linked_all_tags():
+    for tag in Tag.objects.all():
+        nb = TaggedWork.objects.filter(tag=tag).count()
+        Tag.objects.filter(title=tag.title).update(nb_works_linked=nb)
 
 def update_poster_if_nsfw(obj, user):
     if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):

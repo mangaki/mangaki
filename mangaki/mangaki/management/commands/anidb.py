@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.anidb import AniDB
-from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling
+from mangaki.models import Artist, Tag, TaggedWork, Role, Staff, Work, WorkTitle, ArtistSpelling
 from django.db.models import Count
 from urllib.parse import urlparse, parse_qs
 import sys
@@ -65,13 +65,14 @@ class Command(BaseCommand):
             if i < start:
                 continue
             print(i, ':', anime.title, anime.id)
-            """
-            anime=a.get(anime.anidb_aid).anime
-            anime=str(anime)
+            
+            #anime=a.get(anime.anidb_aid).anime
+            #anime=str(anime)
             #tag = a.get(anime.anidb_aid).tag
             #tag = str(tag)
-            
-            my_file = open("/home/voisin/anidb.xml", "r+")
+            #print(tag)
+            """
+            my_file = open("/home/voisin/anidb2.xml", "r+")
             
             my_file.write(anime)
             my_file.close()
@@ -82,7 +83,15 @@ class Command(BaseCommand):
             #worktitles = a.get(anime.anidb_aid).worktitles
             #is_hentai = a.get(anime.anidb_aid).is_hentai
             #categories = a.get(anime.anidb_aid).categories
-            tags = a.get(anime.anidb_aid).tags
+
+
+            
+            anidb_tags_list = a.get(anime.anidb_aid).tags
+            #print(anidb_tags_list)
+            anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
+            
+
+
             #print(worktitles)
             #print(is_hentai)
             #print(categories)
@@ -93,7 +102,7 @@ class Command(BaseCommand):
             print(creators)
             print(worktitles)
             """
-            print(tags)
+            #print(tags)
             #all_worktitles.append(worktitles)
 
             
@@ -103,8 +112,68 @@ class Command(BaseCommand):
 
             #anime.save()
             
-            for tag in tags:
-                
+            
+            tag_work = TaggedWork.objects.filter(work=anime)
+            current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
+            deleted_tags_keys = current_tags.keys()-anidb_tags.keys()
+            deleted_tags = dict((key, current_tags[key])for key in deleted_tags_keys)
+            added_tags_keys = anidb_tags.keys() - current_tags.keys()
+            added_tags = dict((key, anidb_tags[key])for key in added_tags_keys)
+
+            remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
+            remaining_tags = dict((key, current_tags[key])for key in remaining_tags_keys)
+            updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} #si différents
+
+            kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
+
+
+
+
+            print(anime.title+":")
+            if deleted_tags != {} :
+                print("\n\tLes tags enlevés sont :")
+                for tag, weight in deleted_tags.items():
+                     print('\t\t{}: {} '.format(tag, weight))
+
+            if added_tags != {} :
+                print("\n\tLes tags totalement nouveaux sont :")
+                for tag, weight in added_tags.items():
+                    print('\t\t{}: {} '.format(tag, weight))
+    
+            if updated_tags != {} :
+                print("\n\tLes tags modifiés sont :")
+                for tag, weight in updated_tags.items():
+                    print('\t\t{}: {} -> {}'.format(tag, weight[0], weight[1]))  
+  
+            if kept_tags != {} :
+                print("\n\tLes tags non modifiés/restés identiques sont :")
+                for tag, weight in kept_tags.items():
+                    print('\t\t{}: {} '.format(tag, weight))  
+
+    
+
+            choice  = input("Voulez-vous réaliser ces changements [y/n] : ")
+            if choice == 'n':
+                print("\nOk, aucun changement ne va être fait")
+            elif choice =='y' :
+    #création
+    #rétrospectivement, directement le faire avec le bon dict devrait marcher comme pr la suppression
+                for  title, weight in added_tags.items():
+                    current_tag = Tag.objects.update_or_create(title=title)[0]
+                    TaggedWork(tag=current_tag, work=anime, weight=weight).save()
+                for title, weight in updated_tags.items():
+                    current_tag = Tag.objects.filter(title=title)[0]
+                    tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
+                    tag_work.delete()
+        #TaggedWork(tag=current_tag, work=current_work, weight=weight[0]).delete()
+                    TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
+        
+    #suppression
+    #parcourir le dico old_tag
+                for title, weight in deleted_tags.items() :
+                    current_tag = Tag.objects.get(title=title)
+                    TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
+        
 
 
             """
