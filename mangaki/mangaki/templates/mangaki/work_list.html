@@ -103,12 +103,13 @@
 
 {% include "works.html" with works=object_list is_dpp=is_dpp %}
 
+
 {% if user.is_authenticated %}
 
 <div class="row margin">
   <div class="col-md-12 col-sm-12">
     {% if is_dpp %}
-    <a class="btn btn-primary btn-lg" href="/dpp/{{ category }}/?sort=dpp" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">montrez-moi de nouvelles oeuvres&nbsp;!</a>
+    <a class="btn btn-primary btn-lg" href="/dpp/{{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">montrez-moi de nouvelles oeuvres&nbsp;!</a>
     {% else %}
     <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
     {% endif %}
@@ -134,6 +135,7 @@ for(pos = 1; pos <= 4; pos++)
     loadCard(pos);
 {% endif %}
 
-{% endif %}
+
 </script>
+{% endif %}
 {% endblock %}

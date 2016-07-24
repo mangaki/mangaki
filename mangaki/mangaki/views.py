@@ -341,7 +341,7 @@ class WorkList(WorkListMixin, ListView):
         context = super().get_context_data(**kwargs)
         search_text = self.search()
         sort_mode = self.sort_mode()
-        is_dpp = self.is_dpp
+        is_dpp = self.is_dpp()
 
         context['search'] = search_text
         
@@ -351,14 +351,11 @@ class WorkList(WorkListMixin, ListView):
         context['objects_count'] = self.category.work_set.count()
         context['is_dpp'] = is_dpp
         
-        #is_dpp
-        if sort_mode == 'mosaic':
+        if sort_mode == 'mosaic' and not is_dpp :
             context['object_list'] = [
                 Work(title='Chargement…', poster='/static/img/chiro.gif')
                 for _ in range(4)
                 ]
-        
-
 
         return context
 
