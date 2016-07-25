@@ -300,34 +300,32 @@ class WorkList(WorkListMixin, ListView):
 
     def get_queryset(self):
         search_text = self.search()
+        queryset = self.category.work_set.all()
+        sort_mode = self.sort_mode()
         if self.is_dpp():
             queryset = self.category.work_set.all().dpp(10)
-        else:
-            queryset = self.category.work_set.all()
-            sort_mode = self.sort_mode()
-
-            if sort_mode == 'top':
-                queryset = queryset.top()
-            elif sort_mode == 'popularity':
-                queryset = queryset.popular()
-            elif sort_mode == 'controversy':
-                queryset = queryset.controversial()
-            elif sort_mode == 'alpha':
-                letter = self.request.GET.get('letter', '0')
-                if letter == '0': # '#'
-                    queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
-                else:
-                    queryset = queryset.filter(title__istartswith=letter)
-                queryset = queryset.order_by('title')
-            elif sort_mode == 'random':
-                queryset = queryset.random().order_by('?')[:self.paginate_by]
-            elif sort_mode == 'mosaic':
-                queryset = queryset.none()
+        elif sort_mode == 'top':
+            queryset = queryset.top()
+        elif sort_mode == 'popularity':
+            queryset = queryset.popular()
+        elif sort_mode == 'controversy':
+            queryset = queryset.controversial()
+        elif sort_mode == 'alpha':
+            letter = self.request.GET.get('letter', '0')
+            if letter == '0': # '#'
+                queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
             else:
-                raise Http404
+                queryset = queryset.filter(title__istartswith=letter)
+            queryset = queryset.order_by('title')
+        elif sort_mode == 'random':
+            queryset = queryset.random().order_by('?')[:self.paginate_by]
+        elif sort_mode == 'mosaic':
+            queryset = queryset.none()
+        else:
+            raise Http404
 
-            if search_text is not None:
-                queryset = queryset.search(search_text)
+        if search_text is not None:
+            queryset = queryset.search(search_text)
 
         queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug')
 
@@ -579,7 +577,7 @@ def dpp_work(request, work_id):
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'dislike', 'dontknow']:
-            return HttpResponse()
+            raise SuspiciousOperation("Attempted access denied. There are only 3 ratings here : like, dislike and dontknow")
         update_score_while_rating(request.user, work, choice)
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
@@ -638,7 +636,7 @@ def get_works(request, category):
 
 def get_reco_list(request, category, editor):
     reco_list = []
-    for work, is_manga, in_willsee in get_recommendations(request.user, category, editor=editor):
+    for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
         update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
