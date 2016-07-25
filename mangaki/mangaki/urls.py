@@ -46,8 +46,6 @@ urlpatterns = [
 
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
-    #url(r'^dpp/$', views.WorkList.as_view(), name='dpp-works-all', kwargs={'dpp': True}),
-    #revoir as_view  
     url(r'^dpp/(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='dpp-works', kwargs={'dpp': True})
 
 

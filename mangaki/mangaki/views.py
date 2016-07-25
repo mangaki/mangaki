@@ -323,8 +323,6 @@ class WorkList(WorkListMixin, ListView):
                 queryset = queryset.order_by('title')
             elif sort_mode == 'random':
                 queryset = queryset.random().order_by('?')[:self.paginate_by]
-            elif sort_mode == 'dpp':
-                queryset = queryset.dpp(10)
             elif sort_mode == 'mosaic':
                 queryset = queryset.none()
             else:
@@ -578,21 +576,17 @@ def rate_work(request, work_id):
         return HttpResponse(choice)
     return HttpResponse()
 
-#revoir ici
+
 def dpp_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'dislike', 'dontknow']:
             return HttpResponse()
-        if ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
-            ColdStartRating.objects.filter(user=request.user, work=work, choice=choice).delete()
-            update_score_while_unrating(request.user, work, choice)
-            return HttpResponse('none')
         update_score_while_rating(request.user, work, choice)
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
-    return HttpResponse()
+    raise SuspiciousOperation("Attempted access to '%s' denied. You must be logged" % name)
 
 
 def recommend_work(request, work_id, target_id):
