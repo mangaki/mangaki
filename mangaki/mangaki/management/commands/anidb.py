@@ -73,12 +73,12 @@ class Command(BaseCommand):
             """
 
             #creators = a.get(anime.anidb_aid).creators
-            worktitles = a.get(anime.anidb_aid).worktitles
-            print(worktitles)
-            """
+            #worktitles = a.get(anime.anidb_aid).worktitles
+            #print(worktitles)
+            
             anidb_tags_list = a.get(anime.anidb_aid).tags
             anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
-            """
+            
 
             #for i in range(len(worktitles)):
             #    WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
@@ -86,7 +86,7 @@ class Command(BaseCommand):
 
             #anime.save()
             
-            """  
+              
             tag_work = TaggedWork.objects.filter(work=anime)
             current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
             deleted_tags_keys = current_tags.keys()-anidb_tags.keys()
@@ -140,7 +140,7 @@ class Command(BaseCommand):
                 for title, weight in deleted_tags.items() :
                     current_tag = Tag.objects.get(title=title)
                     TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
-            """
+            
 
 
             """
