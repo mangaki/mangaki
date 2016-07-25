@@ -7,12 +7,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden, Http404, HttpResponsePermanentRedirect
+from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.timezone import utc
 from django.utils.functional import cached_property
-
 
 from django.views.generic.detail import SingleObjectMixin
 
@@ -287,7 +287,6 @@ class WorkList(WorkListMixin, ListView):
         return self.request.GET.get('search', None)
 
     def sort_mode(self):
-        
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
         if self.search() is not None and sort == default:
@@ -306,7 +305,6 @@ class WorkList(WorkListMixin, ListView):
         else:
             queryset = self.category.work_set.all()
             sort_mode = self.sort_mode()
-            
 
             if sort_mode == 'top':
                 queryset = queryset.top()
@@ -329,7 +327,7 @@ class WorkList(WorkListMixin, ListView):
                 raise Http404
 
             if search_text is not None:
-                 queryset = queryset.search(search_text)
+                queryset = queryset.search(search_text)
 
         queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug')
 
@@ -342,14 +340,13 @@ class WorkList(WorkListMixin, ListView):
         is_dpp = self.is_dpp()
 
         context['search'] = search_text
-        
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
         context['objects_count'] = self.category.work_set.count()
         context['is_dpp'] = is_dpp
-        
-        if sort_mode == 'mosaic' and not is_dpp :
+
+        if sort_mode == 'mosaic' and not is_dpp:
             context['object_list'] = [
                 Work(title='Chargement…', poster='/static/img/chiro.gif')
                 for _ in range(4)
@@ -586,7 +583,7 @@ def dpp_work(request, work_id):
         update_score_while_rating(request.user, work, choice)
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
-    raise SuspiciousOperation("Attempted access to '%s' denied. You must be logged" % name)
+    raise SuspiciousOperation("Attempted access denied. You must be logged")
 
 
 def recommend_work(request, work_id, target_id):

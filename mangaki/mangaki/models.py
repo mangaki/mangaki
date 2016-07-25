@@ -62,10 +62,10 @@ class WorkQuerySet(models.QuerySet):
 
     def dpp(self, nb_points):
         ratings_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
-                                                                 'work_id',
-                                                                 'choice'))
+                                                                  'work_id',
+                                                                  'choice'))
         similarity = SimilarityMatrix(ratings_matrix.matrix, nb_components_svd=70)
-        list_item_id_popular = self.popular()[1500:2000].values_list('pk', flat=True)
+        list_item_id_popular = self.popular()[:1000].values_list('pk', flat=True)
         items = [ratings_matrix.item_dict[item] for item in ratings_matrix.item_set if item in list_item_id_popular]
         dpp = MangakiDPP(items, similarity.similarity_matrix)
         liste = dpp.sample_k(nb_points)
