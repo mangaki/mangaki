@@ -1,4 +1,25 @@
 {% extends "admin/base_site.html" %}
+{% load staticfiles %}
+
 {% block content %}
-<p> Test </p>
+
+{{title}}
+
+
+    <p>Les tags enlevés sont:</p>
+    {% for tag, weight in deleted_tags %}:
+        <p> {{tag}} : {{weight}} </p>
+    {% endfor %}
+
+    <p>Les ts nouveaux tags sont:</p>
+    {% for tag, weight in added_tags %}
+        <p> {{tag}} :  {{weight}} </p>
+    {% endfor %}
+
+<link rel="stylesheet" type="text/css" href="/home/voisin/mangaki/venv/lib/python3.4/site-packages/django/contrib/admin/static/admin/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/home/voisin/mangaki/venv/lib/python3.4/site-packages/django/contrib/admin//static/admin/css/forms.css" />
+    <p class="deletelink-box"><a href="/admin" class="deletelink">Supprimer</a></p>
+    <div class="submit-row">
+<input type="submit" value="Enregistrer" class="default" name="_save" />
+</div>
 {% endblock %}

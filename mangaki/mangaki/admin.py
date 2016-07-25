@@ -6,6 +6,13 @@ from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
 from django.conf.urls import patterns
 
+from django.core.management.base import BaseCommand, CommandError
+from mangaki.utils.anidb import AniDB
+from mangaki.models import Artist, Tag, TaggedWork, Role, Staff, Work, WorkTitle, ArtistSpelling
+from django.db.models import Count
+from urllib.parse import urlparse, parse_qs
+import sys
+
 
 class TagAdmin(admin.ModelAdmin):
     list_display = ('title', 'nb_works_linked', )
@@ -20,8 +27,41 @@ class TagAdmin(admin.ModelAdmin):
     
     def my_view(self, request):
          #return HttpResponse("Hello!")
-         
-        context=dict()
+        category='anime'
+        todo = Work.objects.only('pk', 'title', 'poster', 'nsfw').annotate(rating_count=Count('rating')).filter(category__slug=category, rating_count__gte=6).exclude(anidb_aid=0).order_by('-rating_count')
+        anime = todo[1]
+
+
+        a = AniDB('mangakihttp', 1)
+
+        anidb_tags_list = a.get(anime.anidb_aid).tags
+            
+        anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
+            
+            
+        tag_work = TaggedWork.objects.filter(work=anime)
+        current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
+        deleted_tags_keys = current_tags.keys()-anidb_tags.keys()
+        deleted_tags = dict((key, current_tags[key])for key in deleted_tags_keys)
+        added_tags_keys = anidb_tags.keys() - current_tags.keys()
+        added_tags = dict((key, anidb_tags[key])for key in added_tags_keys)
+
+        remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
+        remaining_tags = dict((key, current_tags[key])for key in remaining_tags_keys)
+        updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} #si différents
+
+        kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
+
+
+
+
+        context = {
+        'title' : anime.title,
+        'deleted_tags': deleted_tags.items(),
+        'added_tags' : added_tags.items(),
+        'updated_tags': deleted_tags.items(),
+        'kept_tags': deleted_tags.items()
+        }
         return TemplateResponse(request, "test.html", context)
 
 class TaggedWorkAdmin(admin.ModelAdmin):
