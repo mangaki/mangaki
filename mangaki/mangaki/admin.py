@@ -21,10 +21,26 @@ class TagAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(TagAdmin, self).get_urls()
         my_urls = patterns('',
-            (r'^my_view/$', self.admin_site.admin_view(self.my_view))
+            (r'^my_view/$', self.admin_site.admin_view(self.my_view_2))
         )
         return my_urls + urls
     
+    """
+    def change_tags_via_anidb(self, request, queryset): #update tags via anidb ? 
+        queryset = queryset.order_by('id')
+        if request.POST.get('post'):
+            chosen_id = int(request.POST.get('chosen_id'))
+            
+        context = {
+            'queryset': queryset,
+            'opts': self.model._meta,
+            'deletable_objects': deletable_objects,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+        }
+        return TemplateResponse(request, 'admin/update_tags.html', context)
+    change_tags_via_anidb.short_description = "Mettre à jour les tags des oeuvres sélectionnées"
+    """
+
     def my_view(self, request):
          #return HttpResponse("Hello!")
         category='anime'
@@ -64,6 +80,15 @@ class TagAdmin(admin.ModelAdmin):
         }
         return TemplateResponse(request, "test.html", context)
 
+    def my_view_2(self, request):
+        if request.POST.get('post'):
+            chosen_id = int(request.POST.get('chosen_id'))
+            current_work = Work.objects.filter(id=chosen_id)
+            current_work.update(nb_episodes=66)
+        context = dict()
+        return TemplateResponse(request, "test2.html", context)
+
+
 class TaggedWorkAdmin(admin.ModelAdmin):
     search_fields = ('work', 'tag')
 
@@ -83,7 +108,7 @@ class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('category', 'nsfw',)
-    actions = ['make_nsfw', 'make_sfw', 'merge']
+    actions = ['make_nsfw', 'make_sfw', 'merge', 'my_view_3', 'change_tags_via_anidb', 'anidb']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
@@ -101,6 +126,88 @@ class WorkAdmin(admin.ModelAdmin):
             message_bit = "%s œuvres sont" % rows_updated
         self.message_user(request, "%s désormais NSFW." % message_bit)
     make_nsfw.short_description = "Rendre NSFW les œuvres sélectionnées"
+
+
+    """
+    def change_tags_via_anidb(self, request, queryset): #update tags via anidb ? 
+        for obj in queryset:
+            do_something_with(obj)
+        if request.POST.get('post'):
+            chosen_id = int(request.POST.get('chosen_id'))
+            
+        context = {
+            'queryset': queryset,
+            'opts': self.model._meta,
+            'deletable_objects': deletable_objects,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+        }
+        return TemplateResponse(request, 'home/voisin/mangaki/mangaki/templates/update_tags.html', context)
+    change_tags_via_anidb.short_description = "Mettre à jour les tags des oeuvres sélectionnées"
+    """
+
+    def anidb(self, request, queryset):
+        """
+        category='anime'
+        todo = Work.objects.only('pk', 'title', 'poster', 'nsfw').annotate(rating_count=Count('rating')).filter(category__slug=category, rating_count__gte=6).exclude(anidb_aid=0).order_by('-rating_count')
+        anime = todo[1]
+        """
+        anime = queryset[0]
+        a = AniDB('mangakihttp', 1)
+
+        anidb_tags_list = a.get(anime.anidb_aid).tags
+        anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
+            
+            
+        tag_work = TaggedWork.objects.filter(work=anime)
+        current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
+
+        deleted_tags_keys = current_tags.keys()-anidb_tags.keys()
+        deleted_tags = dict((key, current_tags[key])for key in deleted_tags_keys)
+
+        added_tags_keys = anidb_tags.keys() - current_tags.keys()
+        added_tags = dict((key, anidb_tags[key])for key in added_tags_keys)
+
+        remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
+        remaining_tags = dict((key, current_tags[key])for key in remaining_tags_keys)
+        
+        updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} 
+        kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
+
+        if request.method== 'POST':
+
+            for  title, weight in added_tags.items():
+                current_tag = Tag.objects.update_or_create(title=title)[0]
+                TaggedWork(tag=current_tag, work=anime, weight=weight).save()
+
+            for title, weight in updated_tags.items():
+                current_tag = Tag.objects.filter(title=title)[0]
+                tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
+                tag_work.delete()
+                TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
+    
+            for title, weight in deleted_tags.items() :
+                current_tag = Tag.objects.get(title=title)
+                TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
+
+
+        context = {
+        'title' : anime.title,
+        'deleted_tags': deleted_tags.items(),
+        'added_tags' : added_tags.items(),
+        'updated_tags': deleted_tags.items(),
+        'kept_tags': deleted_tags.items()
+        }
+        return TemplateResponse(request, "test.html", context)
+    anidb.short_description = "anidb" 
+
+    def my_view_3(self, request, queryset):
+        if request.method== 'POST':
+            for obj in queryset:
+                current_work = Work.objects.filter(id=obj.id)
+                current_work.update(nb_episodes=77)
+        context = dict()
+        return TemplateResponse(request, 'test2.html', context)    
+    my_view_3.short_description = "bla"
 
     def make_sfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=False)
