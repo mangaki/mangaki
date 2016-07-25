@@ -68,16 +68,15 @@ class AniDB:
 
     anime = soup.anime
     titles = anime.titles
-    
-    a = Anime({
-      #'anime':anime,
-      #'tag': anime.tags,
-      'id': id,
+    mapping = {'fr':'fr', 'en': 'en', 'x-jat': 'ja'}
 
-      #dico
-      'worktitles' : [(title.string, title['type'], 'en') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="en")] + [(title.string, title['type'], 'fr') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="fr")] + [(title.string, title['type'], 'ja') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="x-jat")],
+    a = Anime({
+      'id': id,
       
-      
+      'worktitles' : [(title.string, mapping[title['xml:lang']])
+                      for title in titles.find_all('title')
+                      if title['type'] != 'short' and title['xml:lang'] in mapping],
+      #'worktitles' : [(title.string, title['type'], 'en') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="en")] + [(title.string, title['type'], 'fr') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="fr")] + [(title.string, title['type'], 'ja') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="x-jat")],
       'type': str(anime.type.string),
       'episodecount': int(anime.episodecount.string),
       'startdate': datetime(*list(map(int, anime.startdate.string.split("-")))),
@@ -87,11 +86,6 @@ class AniDB:
         title['type'] if 'type' in title else "unknown"
       ) for title in anime.find_all('title')],
       'title': str(titles.find('title', attrs={'type': "main"}).string),
-      
-      
-
-      
-      
       'relatedanime': [],
       'url': str(anime.url.string) if anime.url else None,
       'creators': anime.creators,
@@ -102,12 +96,11 @@ class AniDB:
         'review': float(anime.ratings.review.string) if anime.ratings.review else ''
       }),
       'picture': "http://img7.anidb.net/pics/anime/" + str(anime.picture.string),
-      'categories': [(genre.string, genre.parent['weight']) for genre in anime.find_all('name') if genre.parent.name=="category"] if anime.categories != None else None ,
-   
-      #à refaire avec tag 18+ restricted
-      'is_hentai' : anime.category.get("hentai")  if anime.categories != None else "unknown" ,
+
+      #categories n'existe (presque ?) plus
+      #'categories': [(genre.string, genre.parent['weight']) for genre in anime.find_all('name') if genre.parent.name=="category"] if anime.categories != None else None ,
+      #'is_hentai' : anime.category.get("hentai")  if anime.categories != None else "unknown" ,
       'tags':[(genre.string, genre.parent.get("weight")) for genre in anime.tags.find_all('name') if genre.parent.name=="tag"] ,
-       
       'characters': [],
       'episodes': [],
 

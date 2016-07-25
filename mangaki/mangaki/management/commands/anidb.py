@@ -58,19 +58,13 @@ class Command(BaseCommand):
         a = AniDB('mangakihttp', 1)
 
         i = 0
-        #all_worktitles = []
+        
         
         for anime in todo:
             i += 1
             if i < start:
                 continue
             print(i, ':', anime.title, anime.id)
-            
-            #anime=a.get(anime.anidb_aid).anime
-            #anime=str(anime)
-            #tag = a.get(anime.anidb_aid).tag
-            #tag = str(tag)
-            #print(tag)
             """
             my_file = open("/home/voisin/anidb2.xml", "r+")
             
@@ -78,41 +72,21 @@ class Command(BaseCommand):
             my_file.close()
             """
 
-        
             #creators = a.get(anime.anidb_aid).creators
-            #worktitles = a.get(anime.anidb_aid).worktitles
-            #is_hentai = a.get(anime.anidb_aid).is_hentai
-            #categories = a.get(anime.anidb_aid).categories
-
-
-            
-            anidb_tags_list = a.get(anime.anidb_aid).tags
-            #print(anidb_tags_list)
-            anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
-            
-
-
-            #print(worktitles)
-            #print(is_hentai)
-            #print(categories)
-            #if is_hentai == "true" :
-            #    anime.nsfw = True
-
-            """
-            print(creators)
+            worktitles = a.get(anime.anidb_aid).worktitles
             print(worktitles)
             """
-            #print(tags)
-            #all_worktitles.append(worktitles)
+            anidb_tags_list = a.get(anime.anidb_aid).tags
+            anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
+            """
 
-            
             #for i in range(len(worktitles)):
             #    WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
             
 
             #anime.save()
             
-            
+            """  
             tag_work = TaggedWork.objects.filter(work=anime)
             current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
             deleted_tags_keys = current_tags.keys()-anidb_tags.keys()
@@ -125,9 +99,6 @@ class Command(BaseCommand):
             updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} #si différents
 
             kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
-
-
-
 
             print(anime.title+":")
             if deleted_tags != {} :
@@ -156,8 +127,7 @@ class Command(BaseCommand):
             if choice == 'n':
                 print("\nOk, aucun changement ne va être fait")
             elif choice =='y' :
-    #création
-    #rétrospectivement, directement le faire avec le bon dict devrait marcher comme pr la suppression
+    
                 for  title, weight in added_tags.items():
                     current_tag = Tag.objects.update_or_create(title=title)[0]
                     TaggedWork(tag=current_tag, work=anime, weight=weight).save()
@@ -165,15 +135,12 @@ class Command(BaseCommand):
                     current_tag = Tag.objects.filter(title=title)[0]
                     tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
                     tag_work.delete()
-        #TaggedWork(tag=current_tag, work=current_work, weight=weight[0]).delete()
                     TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
         
-    #suppression
-    #parcourir le dico old_tag
                 for title, weight in deleted_tags.items() :
                     current_tag = Tag.objects.get(title=title)
                     TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
-        
+            """
 
 
             """

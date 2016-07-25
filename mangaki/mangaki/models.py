@@ -122,14 +122,11 @@ class Work(models.Model):
     def __str__(self):
         return self.title
 
-#choice
+
 class WorkTitle (models.Model) :
     work = models.ForeignKey('Work')
-    title = models.CharField(max_length=128, blank=True, db_index=True)#taille à modifier pê
+    title = models.CharField(max_length=128, blank=True, db_index=True)
     language = models.ForeignKey('Language')
-    #language = models.CharField(max_length=5, choices=(('fr', "fr"),('x-jat', 'ja'),('en', 'en')),blank=True,db_index=True) 
-    
-    #language = models.CharField(max_length=50, blank=True, db_index=True)
     type = models.CharField(max_length=9, choices=(
                             ('main', 'principal'),
                             ('official', 'officiel'),
@@ -194,16 +191,11 @@ class Genre(models.Model):
 
 class Tag(models.Model):
     title = models.TextField(unique = True)
-    #weight = models.IntegerField(default=0)
     nb_works_linked = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title 
 
-    #def nb_works_linked(self):
-    #    return TaggedWork.objects.filter(tag=self).count()
-
-    
 
 class TaggedWork(models.Model):
     work = models.ForeignKey('Work') 
