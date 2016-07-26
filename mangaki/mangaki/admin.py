@@ -156,48 +156,26 @@ class WorkAdmin(admin.ModelAdmin):
         """
         all_information=[]
         for anime in queryset :
-            a = AniDB('mangakihttp', 1)
-
-            anidb_tags_list = a.get(anime.anidb_aid).tags
-            anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
-            
-            
-            tag_work = TaggedWork.objects.filter(work=anime)
-            current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
-
-            deleted_tags_keys = current_tags.keys()-anidb_tags.keys()
-            deleted_tags = dict((key, current_tags[key])for key in deleted_tags_keys)
-
-            added_tags_keys = anidb_tags.keys() - current_tags.keys()
-            added_tags = dict((key, anidb_tags[key])for key in added_tags_keys)
-
-            remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
-            remaining_tags = dict((key, current_tags[key])for key in remaining_tags_keys)
+            deleted_tags, added_tags, updated_tags, kept_tags = anime.retrieve_tags()
+            all_information.append([anime.id, anime.title, deleted_tags, added_tags, updated_tags, kept_tags])
         
-            updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} 
-            kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
-        
-            all_information.append([anime.id, anime.title, deleted_tags.items(), added_tags.items(), updated_tags.items(), kept_tags.items()])
-        
-
-
         if request.POST.get("post"):
             
             chosen_ids = request.POST.getlist('checks')
             for anime_id in chosen_ids:
 
                 anime = Work.objects.get(id=anime_id)
-                for  title, weight in added_tags.items():
+                for  title, weight in added_tags:
                     current_tag = Tag.objects.update_or_create(title=title)[0]
                     TaggedWork(tag=current_tag, work=anime, weight=weight).save()
 
-                for title, weight in updated_tags.items():
+                for title, weight in updated_tags : 
                     current_tag = Tag.objects.filter(title=title)[0]
                     tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
                     tag_work.delete()
                     TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
     
-                for title, weight in deleted_tags.items() :
+                for title, weight in deleted_tags :
                     current_tag = Tag.objects.get(title=title)
                     TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
         

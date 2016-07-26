@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+from mangaki.utils.anidb import AniDB
 
 @CharField.register_lookup
 class SearchLookup(Lookup):
@@ -118,6 +119,30 @@ class Work(models.Model):
         if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
             return self.poster
         return '/static/img/nsfw.jpg'
+
+    def retrieve_tags(self):
+        a = AniDB('mangakihttp', 1)
+
+        anidb_tags_list = a.get(self.anidb_aid).tags
+        anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
+            
+            
+        tag_work = TaggedWork.objects.filter(work=self)
+        current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
+
+        deleted_tags_keys = current_tags.keys()-anidb_tags.keys()
+        deleted_tags = dict((key, current_tags[key])for key in deleted_tags_keys)
+
+        added_tags_keys = anidb_tags.keys() - current_tags.keys()
+        added_tags = dict((key, anidb_tags[key])for key in added_tags_keys)
+
+        remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
+        remaining_tags = dict((key, current_tags[key])for key in remaining_tags_keys)
+        
+        updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} 
+        kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
+
+        return deleted_tags.items(), added_tags.items(), updated_tags.items(), kept_tags.items()
 
     def __str__(self):
         return self.title
