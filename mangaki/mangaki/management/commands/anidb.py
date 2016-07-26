@@ -119,7 +119,7 @@ class Command(BaseCommand):
             if kept_tags != {} :
                 print("\n\tLes tags non modifiés/restés identiques sont :")
                 for tag, weight in kept_tags.items():
-                    print('\t\t{}: {} '.format(tag, weight))  
+                    print('\t\t{}: {} '.format(tag, weight))
 
     
 

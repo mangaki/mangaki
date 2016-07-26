@@ -100,7 +100,7 @@ class AniDB:
       #categories n'existe (presque ?) plus
       #'categories': [(genre.string, genre.parent['weight']) for genre in anime.find_all('name') if genre.parent.name=="category"] if anime.categories != None else None ,
       #'is_hentai' : anime.category.get("hentai")  if anime.categories != None else "unknown" ,
-      'tags':[(genre.string, genre.parent.get("weight")) for genre in anime.tags.find_all('name') if genre.parent.name=="tag"] ,
+      'tags':[(genre.string, genre.parent.get("weight")) for genre in anime.tags.find_all('name') if (genre.parent.name=="tag" and genre.parent.get("weight") != '0')] ,
       'characters': [],
       'episodes': [],
 

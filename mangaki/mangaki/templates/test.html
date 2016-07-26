@@ -1,23 +1,78 @@
 {% extends "admin/base_site.html" %}
-{% load staticfiles %} <!-- sert à quoi -->
+{% load staticfiles %} 
 
 {% block content %}
 
-{{title}}
 
 
+
+{% for obj in all_information %}
+
+{{obj.1}}
+    
     <p>Les tags enlevés sont:</p>
-    {% for tag, weight in deleted_tags %}:
-        <p> {{tag}} : {{weight}} </p>
+    {% for tag, weight in obj.2 %}
+        <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
     {% endfor %}
 
-    <p>Les ts nouveaux tags sont:</p>
-    {% for tag, weight in added_tags %}
-        <p> {{tag}} :  {{weight}} </p>
+    <p></p>
+    
+    <p>Les tous nouveaux tags sont:</p>
+    {% for tag, weight in obj.3 %}
+        <p> &nbsp;&nbsp;&nbsp; {{tag}} :  {{weight}} </p>
     {% endfor %}
 
+    <p></p>
+    
+    <p>Les tags modifiés sont :</p>
+    {% for tag, weight in obj.4 %}            
+        <p> &nbsp;&nbsp;&nbsp; {tag} : {{weight.0}} -> {{weight.1}} </p>
+    {% endfor %}
+
+    <p></p>
+
+    <p>Les tags non modifiés/restés identiques sont:</p>
+    {% for tag, weight in obj.5 %}
+        <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
+    {% endfor %}
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+{% endfor %}
 
 <form action="" method="post">{% csrf_token %}
-<input type="submit" value="OK" />
+<ul>
+{% for obj in all_information %}
+<li><label><input type="checkbox" name="checks" value="{{ obj.0}}" /> {{ obj.1 }} </label></li>
+
+{% endfor %}
+</ul>
+
+{% for obj in all_information %}
+<input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.0 }}" />
+{% endfor %}
+
+<input type="hidden" name="action" value="anidb" />
+<input type="hidden" name="post" value="yes" />
+<input type="submit" value="yes" />
+</div>
 </form>
+
+
+
+<!--
+<form action="" method="post">{% csrf_token %}
+<input type="hidden" name="action" value="anidb" />
+<input type="text"  name="choice" value="1" /> 
+
+<input type="submit"  name="OK" value="OK" />
+</form>
+-->
 {% endblock %}
