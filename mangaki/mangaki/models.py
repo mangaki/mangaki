@@ -130,7 +130,7 @@ class Work(models.Model):
         tag_work = TaggedWork.objects.filter(work=self)
         current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
 
-        deleted_tags_keys = current_tags.keys()-anidb_tags.keys()
+        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
         deleted_tags = dict((key, current_tags[key])for key in deleted_tags_keys)
 
         added_tags_keys = anidb_tags.keys() - current_tags.keys()
@@ -142,7 +142,7 @@ class Work(models.Model):
         updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} 
         kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
 
-        return deleted_tags.items(), added_tags.items(), updated_tags.items(), kept_tags.items()
+        return deleted_tags, added_tags, updated_tags, kept_tags
 
     def __str__(self):
         return self.title

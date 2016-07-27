@@ -55,7 +55,7 @@ class Command(BaseCommand):
                 .filter(category__slug=category, rating_count__gte=6)\
                 .exclude(anidb_aid=0)\
                 .order_by('-rating_count')
-        a = AniDB('mangakihttp', 1)
+        
 
         i = 0
         
@@ -76,8 +76,7 @@ class Command(BaseCommand):
             #worktitles = a.get(anime.anidb_aid).worktitles
             #print(worktitles)
             
-            anidb_tags_list = a.get(anime.anidb_aid).tags
-            anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
+            
             
 
             #for i in range(len(worktitles)):
@@ -85,38 +84,25 @@ class Command(BaseCommand):
             
 
             #anime.save()
-            
-              
-            tag_work = TaggedWork.objects.filter(work=anime)
-            current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
-            deleted_tags_keys = current_tags.keys()-anidb_tags.keys()
-            deleted_tags = dict((key, current_tags[key])for key in deleted_tags_keys)
-            added_tags_keys = anidb_tags.keys() - current_tags.keys()
-            added_tags = dict((key, anidb_tags[key])for key in added_tags_keys)
-
-            remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
-            remaining_tags = dict((key, current_tags[key])for key in remaining_tags_keys)
-            updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} #si différents
-
-            kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
-
+            deleted_tags, added_tags, updated_tags, kept_tags = anime.retrieve_tags()
+           
             print(anime.title+":")
             if deleted_tags != {} :
                 print("\n\tLes tags enlevés sont :")
                 for tag, weight in deleted_tags.items():
                      print('\t\t{}: {} '.format(tag, weight))
 
-            if added_tags != {} :
+            if added_tags != {}:
                 print("\n\tLes tags totalement nouveaux sont :")
                 for tag, weight in added_tags.items():
                     print('\t\t{}: {} '.format(tag, weight))
     
-            if updated_tags != {} :
+            if updated_tags != {}:
                 print("\n\tLes tags modifiés sont :")
                 for tag, weight in updated_tags.items():
                     print('\t\t{}: {} -> {}'.format(tag, weight[0], weight[1]))  
   
-            if kept_tags != {} :
+            if kept_tags != {}:
                 print("\n\tLes tags non modifiés/restés identiques sont :")
                 for tag, weight in kept_tags.items():
                     print('\t\t{}: {} '.format(tag, weight))
@@ -131,13 +117,13 @@ class Command(BaseCommand):
                 for  title, weight in added_tags.items():
                     current_tag = Tag.objects.update_or_create(title=title)[0]
                     TaggedWork(tag=current_tag, work=anime, weight=weight).save()
-                for title, weight in updated_tags.items():
+                for title, weight in updated_tags:
                     current_tag = Tag.objects.filter(title=title)[0]
                     tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
                     tag_work.delete()
                     TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
         
-                for title, weight in deleted_tags.items() :
+                for title, weight in deleted_tags.items():
                     current_tag = Tag.objects.get(title=title)
                     TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
             

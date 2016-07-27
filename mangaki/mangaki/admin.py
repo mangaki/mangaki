@@ -157,7 +157,7 @@ class WorkAdmin(admin.ModelAdmin):
         all_information=[]
         for anime in queryset :
             deleted_tags, added_tags, updated_tags, kept_tags = anime.retrieve_tags()
-            all_information.append([anime.id, anime.title, deleted_tags, added_tags, updated_tags, kept_tags])
+            all_information.append([anime.id, anime.title, deleted_tags.items(), added_tags.items(), updated_tags.items(), kept_tags.items()]) #ou bien deleted_tags=[deleted_tags_obj1, ....]
         
         if request.POST.get("post"):
             
@@ -165,17 +165,17 @@ class WorkAdmin(admin.ModelAdmin):
             for anime_id in chosen_ids:
 
                 anime = Work.objects.get(id=anime_id)
-                for  title, weight in added_tags:
+                for  title, weight in added_tags.items():
                     current_tag = Tag.objects.update_or_create(title=title)[0]
                     TaggedWork(tag=current_tag, work=anime, weight=weight).save()
 
-                for title, weight in updated_tags : 
+                for title, weight in updated_tags.items() : 
                     current_tag = Tag.objects.filter(title=title)[0]
                     tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
                     tag_work.delete()
                     TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
     
-                for title, weight in deleted_tags :
+                for title, weight in deleted_tags.items() :
                     current_tag = Tag.objects.get(title=title)
                     TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
         
