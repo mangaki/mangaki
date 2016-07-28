@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-
 from datetime import datetime
+#from mangaki.models import Language
 
 BASE_URL = "http://api.anidb.net:9001/httpapi"
 SEARCH_URL = "http://anisearch.outrance.pl/"
@@ -68,15 +68,14 @@ class AniDB:
 
     anime = soup.anime
     titles = anime.titles
-    mapping = {'fr':'fr', 'en': 'en', 'x-jat': 'ja'}
-
+    languages = {'fr':'fr', 'en': 'en', 'x-jat': 'ja'}
+    #languages = {language.anidb_language : language.iso639 for language in Language.objects.all()}
     a = Anime({
       'id': id,
       
-      'worktitles' : [(title.string, mapping[title['xml:lang']])
+      'worktitles' : [(title.string, languages[title['xml:lang']])
                       for title in titles.find_all('title')
-                      if title['type'] != 'short' and title['xml:lang'] in mapping],
-      #'worktitles' : [(title.string, title['type'], 'en') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="en")] + [(title.string, title['type'], 'fr') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="fr")] + [(title.string, title['type'], 'ja') for title in anime.find_all('title') if (title.parent.name=="titles" and title['type'] != "short" and title['xml:lang']=="x-jat")],
+                      if title['type'] != 'short' and title['xml:lang'] in languages],
       'type': str(anime.type.string),
       'episodecount': int(anime.episodecount.string),
       'startdate': datetime(*list(map(int, anime.startdate.string.split("-")))),
@@ -96,7 +95,6 @@ class AniDB:
         'review': float(anime.ratings.review.string) if anime.ratings.review else ''
       }),
       'picture': "http://img7.anidb.net/pics/anime/" + str(anime.picture.string),
-
       #categories n'existe (presque ?) plus
       #'categories': [(genre.string, genre.parent['weight']) for genre in anime.find_all('name') if genre.parent.name=="category"] if anime.categories != None else None ,
       #'is_hentai' : anime.category.get("hentai")  if anime.categories != None else "unknown" ,

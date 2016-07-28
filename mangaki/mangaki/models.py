@@ -93,6 +93,7 @@ class Work(models.Model):
     manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
     catalog_number = models.CharField(max_length=20, blank=True)
     anidb_aid = models.IntegerField(default=0, blank=True)
+    have_anidb_aid = models.BooleanField(default=False)
     vgmdb_aid = models.IntegerField(blank=True, null=True)
     editor = models.ForeignKey('Editor', default=1)
     studio = models.ForeignKey('Studio', default=1)
@@ -142,7 +143,9 @@ class Work(models.Model):
         updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} 
         kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
 
-        return deleted_tags, added_tags, updated_tags, kept_tags
+        retrieve_tags = {"deleted_tags" : deleted_tags, "added_tags" : added_tags, "updated_tags" : updated_tags, "kept_tags" : kept_tags}
+
+        return retrieve_tags
 
     def __str__(self):
         return self.title
@@ -171,7 +174,8 @@ class Language(models.Model):
                             unique=True,
                             db_index=True)
 
-    
+    def __str__(self):
+        return "%s : %s" %(self.anidb_language, self.iso639)
 
 class Role(models.Model):
     name = models.CharField(max_length=255)

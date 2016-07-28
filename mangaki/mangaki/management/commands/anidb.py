@@ -5,10 +5,6 @@ from django.db.models import Count
 from urllib.parse import urlparse, parse_qs
 import sys
 
-"""
-Essayer sur des animes ayant sûrement des tags similaires ou alors en save 1 ds un fichier puis modifier
-"""
-
 
 def get_or_create_artist(name):
     try:
@@ -65,26 +61,18 @@ class Command(BaseCommand):
             if i < start:
                 continue
             print(i, ':', anime.title, anime.id)
-            """
-            my_file = open("/home/voisin/anidb2.xml", "r+")
             
-            my_file.write(anime)
-            my_file.close()
-            """
-
-            #creators = a.get(anime.anidb_aid).creators
-            #worktitles = a.get(anime.anidb_aid).worktitles
-            #print(worktitles)
+            creators = a.get(anime.anidb_aid).creators
+            worktitles = a.get(anime.anidb_aid).worktitles
             
+            for i in range(len(worktitles)):
+                WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
             
-            
-
-            #for i in range(len(worktitles)):
-            #    WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
-            
-
-            #anime.save()
-            deleted_tags, added_tags, updated_tags, kept_tags = anime.retrieve_tags()
+            retrieve_tags = anime.retrieve_tags()
+            deleted_tags = retrieve_tags["deleted_tags"]
+            added_tags = retrieve_tags["added_tags"]
+            updated_tags = retrieve_tags["updated_tags"]
+            kept_tags = retrieve_tags["kept_tags"]
            
             print(anime.title+":")
             if deleted_tags != {} :
@@ -129,7 +117,7 @@ class Command(BaseCommand):
             
 
 
-            """
+            
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
             
             for creator in creators.findAll('name'):
@@ -145,4 +133,4 @@ class Command(BaseCommand):
                 if staff_id is not None:
                     Staff.objects.get_or_create(work=anime, role_id=staff_map[staff_id], artist=artist)
                 anime.save()
-            """
+            
