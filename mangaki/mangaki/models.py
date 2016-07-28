@@ -14,6 +14,7 @@ from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
 from mangaki.utils.ratingsmatrix import RatingsMatrix
 
 
+
 @CharField.register_lookup
 class SearchLookup(Lookup):
     """Helper class for searching text in a query. This shadows the builtin
@@ -136,17 +137,6 @@ class Work(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            if isinstance(self, Anime):
-                self.category = Category.objects.get(slug='anime')
-            elif isinstance(self, Manga):
-                self.category = Category.objects.get(slug='manga')
-            elif isinstance(self, Album):
-                self.category = Category.objects.get(slug='album')
-            else:
-                raise TypeError('Unexpected subclass of work: {}'.format(type(self)))
-        super().save(*args, **kwargs)
 
 
 class Role(models.Model):
@@ -186,34 +176,6 @@ class Studio(models.Model):
         return self.title
 
 
-class Anime(Work):
-    # Deprecated fields
-    deprecated_director = models.ForeignKey('Artist', related_name='directed', default=1)
-    deprecated_author = models.ForeignKey('Artist', related_name='authored', default=1)
-    deprecated_composer = models.ForeignKey('Artist', related_name='composed', default=1)
-    deprecated_genre = models.ManyToManyField('Genre')
-    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
-    deprecated_nb_episodes = models.TextField(default='Inconnu', max_length=16)
-    deprecated_anime_type = models.TextField(max_length=42, default='')
-    deprecated_anidb_aid = models.IntegerField(default=0)
-    deprecated_editor = models.ForeignKey('Editor', default=1)
-    deprecated_studio = models.ForeignKey('Studio', default=1)
-
-    def __str__(self):
-        return '[%d] %s' % (self.id, self.title)
-
-
-class Manga(Work):
-    # Deprecated fields
-    deprecated_mangaka = models.ForeignKey('Artist', related_name='drew')
-    deprecated_writer = models.ForeignKey('Artist', related_name='wrote')
-    deprecated_genre = models.ManyToManyField('Genre')
-    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
-    deprecated_vo_title = models.CharField(max_length=128)
-    deprecated_manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
-    deprecated_editor = models.CharField(max_length=32)
-
-
 class Genre(models.Model):
     title = models.CharField(max_length=17)
 
@@ -223,20 +185,12 @@ class Genre(models.Model):
 
 class Track(models.Model):
     title = models.CharField(max_length=32)
-    album = models.ManyToManyField('Album')
+    album = models.ManyToManyField('Work')
 
     def __str__(self):
         return self.title
 
 
-class Album(Work):
-    # Deprecated fields
-    deprecated_composer = models.ForeignKey('Artist', related_name='composer', default=1)
-    deprecated_catalog_number = models.CharField(max_length=20)
-    deprecated_vgmdb_aid = models.IntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return '[{id}] {title}'.format(id=self.id, title=self.title)
 
 
 class Artist(models.Model):
@@ -423,3 +377,22 @@ class ColdStartRating(models.Model):
 
     def __str__(self):
         return '%s %s %s' % (self.user, self.choice, self.work)
+
+
+class FAQTheme(models.Model):
+    order = models.IntegerField(unique=True)
+    theme = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.theme
+
+
+class FAQEntry(models.Model):
+    theme = models.ForeignKey(FAQTheme, on_delete=models.CASCADE, related_name="entries")
+    question = models.CharField(max_length=200)
+    answer = models.TextField()
+    pub_date = models.DateTimeField('Date de publication', auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.question
