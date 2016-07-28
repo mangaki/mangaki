@@ -3,36 +3,36 @@
 
 {% block content %}
 
+{{all_information}}
 
 
+{% for key, value in all_information %}
 
-{% for obj in all_information %}
-
-{{obj.1}}
+{{value.0}}
     
     <p>Les tags enlevés sont:</p>
-    {% for tag, weight in obj.2 %}
+    {% for tag, weight in value.1 %}
         <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
     {% endfor %}
 
     <p></p>
     
     <p>Les tous nouveaux tags sont:</p>
-    {% for tag, weight in obj.3 %}
+    {% for tag, weight in value.2 %}
         <p> &nbsp;&nbsp;&nbsp; {{tag}} :  {{weight}} </p>
     {% endfor %}
 
     <p></p>
     
     <p>Les tags modifiés sont :</p>
-    {% for tag, weight in obj.4 %}            
+    {% for tag, weight in value.3 %}            
         <p> &nbsp;&nbsp;&nbsp; {tag} : {{weight.0}} -> {{weight.1}} </p>
     {% endfor %}
 
     <p></p>
 
     <p>Les tags non modifiés/restés identiques sont:</p>
-    {% for tag, weight in obj.5 %}
+    {% for tag, weight in value.4 %}
         <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
     {% endfor %}
 
@@ -49,14 +49,14 @@
 
 <form action="" method="post">{% csrf_token %}
 <ul>
-{% for obj in all_information %}
-<li><label><input type="checkbox" name="checks" value="{{ obj.0}}" /> {{ obj.1 }} </label></li>
+{% for key, value in all_information %}
+<li><label><input type="checkbox" name="checks" value="{{ key }}" /> {{ value.0 }} </label></li>
 
 {% endfor %}
 </ul>
 
-{% for obj in all_information %}
-<input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.0 }}" />
+{% for key, value in all_information %}
+<input type="hidden" name="{{ action_checkbox_name }}" value="{{ key }}" />
 {% endfor %}
 
 <input type="hidden" name="action" value="anidb" />
@@ -71,7 +71,6 @@
 <form action="" method="post">{% csrf_token %}
 <input type="hidden" name="action" value="anidb" />
 <input type="text"  name="choice" value="1" /> 
-
 <input type="submit"  name="OK" value="OK" />
 </form>
 -->

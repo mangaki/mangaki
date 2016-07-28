@@ -59,49 +59,55 @@ class WorkAdmin(admin.ModelAdmin):
     #update_tags_via_anidb
     def anidb(self, request, queryset):
         
-        for anime in queryset :
-            if anime.category.slug != 'anime':
-                self.message_user(request, "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les animes " %anime.title)
-                self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
-            elif anime.anidb_aid == 0 :
-                self.message_user(request, "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" %anime.title)
-                self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
-
-            return None
-
-        all_information=[]
-        for anime in queryset :
-            retrieve_tags = anime.retrieve_tags()
-            deleted_tags = retrieve_tags["deleted_tags"]
-            added_tags = retrieve_tags["added_tags"]
-            updated_tags = retrieve_tags["updated_tags"]
-            kept_tags = retrieve_tags["kept_tags"]
-            all_information.append([anime.id, anime.title, deleted_tags.items(), added_tags.items(), updated_tags.items(), kept_tags.items()]) #ou bien deleted_tags=[deleted_tags_obj1, ....]
-        
         if request.POST.get("post"):
             
             chosen_ids = request.POST.getlist('checks')
             for anime_id in chosen_ids:
+                anime = Work.objects.get(id=anime_id)
+                retrieve_tags = anime.retrieve_tags()
+                deleted_tags = retrieve_tags["deleted_tags"]
+                added_tags = retrieve_tags["added_tags"]
+                updated_tags = retrieve_tags["updated_tags"]
 
                 anime = Work.objects.get(id=anime_id)
                 for  title, weight in added_tags.items():
                     current_tag = Tag.objects.update_or_create(title=title)[0]
                     TaggedWork(tag=current_tag, work=anime, weight=weight).save()
 
-                for title, weight in updated_tags.items() : 
+                for title, weight in updated_tags.items(): 
                     current_tag = Tag.objects.filter(title=title)[0]
                     tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
                     tag_work.delete()
                     TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
     
-                for title, weight in deleted_tags.items() :
+                for title, weight in deleted_tags.items():
                     current_tag = Tag.objects.get(title=title)
                     TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
             self.message_user(request, "Modifications sur les tags faites")
             return None
         
+        for anime in queryset :
+            if anime.category.slug != 'anime':
+                self.message_user(request, "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les animes " %anime.title)
+                self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
+                return None
+            elif anime.anidb_aid == 0 :
+                self.message_user(request, "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" %anime.title)
+                self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
+                return None
+            
+
+        all_information={}
+        for anime in queryset :
+            retrieve_tags = anime.retrieve_tags()
+            deleted_tags = retrieve_tags["deleted_tags"]
+            added_tags = retrieve_tags["added_tags"]
+            updated_tags = retrieve_tags["updated_tags"]
+            kept_tags = retrieve_tags["kept_tags"]
+            all_information[anime.id] = [anime.title, deleted_tags.items(), added_tags.items(), updated_tags.items(), kept_tags.items()] #ou bien deleted_tags=[deleted_tags_obj1, ....]
+
         context = {
-        'all_information' : all_information,
+        'all_information' : all_information.items(),
         'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
         }
         return TemplateResponse(request, "test.html", context)
@@ -319,4 +325,3 @@ admin.site.register(Top, TopAdmin)
 admin.site.register(Role, RoleAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(TaggedWork, TaggedWorkAdmin)
-
