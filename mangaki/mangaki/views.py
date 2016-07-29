@@ -69,19 +69,12 @@ def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
 
-def update_works_having_anidb_aid():
-    for work in Work.objects.all():
-        if work.anidb_aid != 0:
-            work.have_anidb_aid = True
-            work.save()
-        else :
-            work.have_anidb_aid = False
-            work.save()
-
+"""
 def update_nb_works_linked_all_tags():
     for tag in Tag.objects.all():
         nb = TaggedWork.objects.filter(tag=tag).count()
         Tag.objects.filter(title=tag.title).update(nb_works_linked=nb)
+"""
 
 def update_poster_if_nsfw(obj, user):
     if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):

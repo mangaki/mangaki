@@ -29,7 +29,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('id', nargs='*', type=int)
 
-    def handle(self, *args, **options):        
+    def handle(self, *args, **options):
+
         category = 'anime'
         start = 0
         if options.get('id'):
@@ -52,7 +53,7 @@ class Command(BaseCommand):
                 .exclude(anidb_aid=0)\
                 .order_by('-rating_count')
         
-
+        a = AniDB('mangakihttp', 1)
         i = 0
         
         
@@ -68,7 +69,7 @@ class Command(BaseCommand):
             for i in range(len(worktitles)):
                 WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
             
-            retrieve_tags = anime.retrieve_tags()
+            retrieve_tags = anime.retrieve_tags(a)
             deleted_tags = retrieve_tags["deleted_tags"]
             added_tags = retrieve_tags["added_tags"]
             updated_tags = retrieve_tags["updated_tags"]

@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
-from mangaki.utils.anidb import AniDB
+
 
 @CharField.register_lookup
 class SearchLookup(Lookup):
@@ -53,9 +53,6 @@ class WorkQuerySet(models.QuerySet):
         # We want to search when the title contains the query or when the
         # similarity between the title and the query is low; we also want to
         # show the relevant results first.
-        for title in object.worktitle_set.all :
-          self.filter(title__search=search_text).\
-          order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
@@ -93,7 +90,6 @@ class Work(models.Model):
     manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
     catalog_number = models.CharField(max_length=20, blank=True)
     anidb_aid = models.IntegerField(default=0, blank=True)
-    have_anidb_aid = models.BooleanField(default=False)
     vgmdb_aid = models.IntegerField(blank=True, null=True)
     editor = models.ForeignKey('Editor', default=1)
     studio = models.ForeignKey('Studio', default=1)
@@ -115,18 +111,10 @@ class Work(models.Model):
 
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
-
-    def safe_poster(self, user):
-        if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
-            return self.poster
-        return '/static/img/nsfw.jpg'
-
-    def retrieve_tags(self):
-        a = AniDB('mangakihttp', 1)
-
-        anidb_tags_list = a.get(self.anidb_aid).tags
+    
+    def retrieve_tags(self, anidb):
+        anidb_tags_list = anidb.get(self.anidb_aid).tags
         anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
-            
             
         tag_work = TaggedWork.objects.filter(work=self)
         current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
@@ -146,6 +134,11 @@ class Work(models.Model):
         retrieve_tags = {"deleted_tags" : deleted_tags, "added_tags" : added_tags, "updated_tags" : updated_tags, "kept_tags" : kept_tags}
 
         return retrieve_tags
+
+    def safe_poster(self, user):
+        if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
+            return self.poster
+        return '/static/img/nsfw.jpg'
 
     def __str__(self):
         return self.title
@@ -218,9 +211,10 @@ class Genre(models.Model):
     def __str__(self):
         return self.title
 
+
 class Tag(models.Model):
     title = models.TextField(unique = True)
-    nb_works_linked = models.IntegerField(default=0)
+    #nb_works_linked = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title 

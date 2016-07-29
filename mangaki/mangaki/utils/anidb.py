@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-#from mangaki.models import Language
+from mangaki.models import Language
 
 BASE_URL = "http://api.anidb.net:9001/httpapi"
 SEARCH_URL = "http://anisearch.outrance.pl/"
@@ -12,6 +12,8 @@ try:
 except:
   pass
   # str = str
+
+
 
 class AniDB:
   def __init__(self, client_id, client_ver=0):
@@ -68,8 +70,8 @@ class AniDB:
 
     anime = soup.anime
     titles = anime.titles
-    languages = {'fr':'fr', 'en': 'en', 'x-jat': 'ja'}
-    #languages = {language.anidb_language : language.iso639 for language in Language.objects.all()}
+    
+    languages = {language.anidb_language : language.iso639 for language in Language.objects.all()}
     a = Anime({
       'id': id,
       

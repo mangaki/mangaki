@@ -13,30 +13,58 @@ from django.db.models import Count
 from urllib.parse import urlparse, parse_qs
 import sys
 
-
+#TODO : A FINIR
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('title', 'nb_works_linked', )
-    readonly_fields = ('nb_works_linked',)
+    list_display = ("title", )
+    readonly_fields = ("nb_works_linked",)
+    
+    def queryset(self, request):
+        qs = super(TagAdmin, self).queryset(request)
+        return qs.annotate(works_linked=Count('work'))
+
+    def nb_works_linked(self, obj):
+      return obj.works_linked
+    nb_works_linked.short_description = 'Fixture Count'
+    nb_works_linked.admin_order_field = 'title'
+
 
 class TaggedWorkAdmin(admin.ModelAdmin):
     search_fields = ('work', 'tag')
+
 
 class TaggedWorkInline(admin.TabularInline):
     model = TaggedWork
     fields = ('work', 'tag', 'weight')
 
+
 class StaffInline(admin.TabularInline):
     model = Staff
     fields = ('role', 'artist')
+
 
 class WorkTitleInline(admin.TabularInline):
     model = WorkTitle
     fields = ('title', 'language','type')
 
+
+class AniDBaidListFilter(admin.SimpleListFilter):
+    title = (' having an AniDB aid')
+    parameter_name = 'having an AniDB aid'
+
+    def lookups(self, request, model_admin):
+        return (('True', ('Oui')), ('False', ('Non')))
+
+    def queryset(self, request, queryset):
+        if self.value() == 'False':
+            return queryset.filter(anidb_aid=0)
+        else :
+            return queryset.exclude(anidb_aid =0)
+
+
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
-    list_filter = ('category', 'nsfw', 'have_anidb_aid', )
+    list_filter = ('category', 'nsfw', AniDBaidListFilter, )
     actions = ['make_nsfw', 'make_sfw', 'merge', 'anidb']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
@@ -64,34 +92,34 @@ class WorkAdmin(admin.ModelAdmin):
             chosen_ids = request.POST.getlist('checks')
             for anime_id in chosen_ids:
                 anime = Work.objects.get(id=anime_id)
-                retrieve_tags = anime.retrieve_tags()
+                a = AniDB('mangakihttp', 1)
+                retrieve_tags = anime.retrieve_tags(a)
                 deleted_tags = retrieve_tags["deleted_tags"]
                 added_tags = retrieve_tags["added_tags"]
                 updated_tags = retrieve_tags["updated_tags"]
 
-                anime = Work.objects.get(id=anime_id)
                 for  title, weight in added_tags.items():
-                    current_tag = Tag.objects.update_or_create(title=title)[0]
+                    current_tag = Tag.objects.get_or_create(title=title)[0]
                     TaggedWork(tag=current_tag, work=anime, weight=weight).save()
 
-                for title, weight in updated_tags.items(): 
-                    current_tag = Tag.objects.filter(title=title)[0]
-                    tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
-                    tag_work.delete()
-                    TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
-    
-                for title, weight in deleted_tags.items():
-                    current_tag = Tag.objects.get(title=title)
-                    TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
+                
+                tags = Tag.objects.filter(title__in=updated_tags.keys())
+                for tag in tags:
+                    tagged_work = anime.taggedwork_set.objects.get(tag=tag)
+                    tagged_work.weight = updated_tags[tag.title]
+                    tagged_work.save()
+                
+                TaggedWork.objects.filter(work=anime, tag__title__in=deleted_tags.keys()).delete()
+                
             self.message_user(request, "Modifications sur les tags faites")
             return None
         
-        for anime in queryset :
+        for anime in queryset.select_related("category"):
             if anime.category.slug != 'anime':
                 self.message_user(request, "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les animes " %anime.title)
                 self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
                 return None
-            elif anime.anidb_aid == 0 :
+            elif not anime.anidb_aid:
                 self.message_user(request, "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" %anime.title)
                 self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
                 return None
@@ -99,7 +127,8 @@ class WorkAdmin(admin.ModelAdmin):
 
         all_information={}
         for anime in queryset :
-            retrieve_tags = anime.retrieve_tags()
+            a = AniDB('mangakihttp', 1)
+            retrieve_tags = anime.retrieve_tags(a)
             deleted_tags = retrieve_tags["deleted_tags"]
             added_tags = retrieve_tags["added_tags"]
             updated_tags = retrieve_tags["updated_tags"]

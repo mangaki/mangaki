@@ -3,9 +3,6 @@
 
 {% block content %}
 
-{{all_information}}
-
-
 {% for key, value in all_information %}
 
 {{value.0}}
@@ -26,7 +23,7 @@
     
     <p>Les tags modifiés sont :</p>
     {% for tag, weight in value.3 %}            
-        <p> &nbsp;&nbsp;&nbsp; {tag} : {{weight.0}} -> {{weight.1}} </p>
+        <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight.0}} -> {{weight.1}} </p>
     {% endfor %}
 
     <p></p>
