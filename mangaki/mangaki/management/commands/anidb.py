@@ -52,58 +52,55 @@ class Command(BaseCommand):
                 .filter(category__slug=category, rating_count__gte=6)\
                 .exclude(anidb_aid=0)\
                 .order_by('-rating_count')
-        
+
         a = AniDB('mangakihttp', 1)
         i = 0
-        
-        
+
         for anime in todo:
             i += 1
             if i < start:
                 continue
             print(i, ':', anime.title, anime.id)
-            
+
             creators = a.get(anime.anidb_aid).creators
             worktitles = a.get(anime.anidb_aid).worktitles
-            
+
             for i in range(len(worktitles)):
                 WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
-            
+
             retrieve_tags = anime.retrieve_tags(a)
             deleted_tags = retrieve_tags["deleted_tags"]
             added_tags = retrieve_tags["added_tags"]
             updated_tags = retrieve_tags["updated_tags"]
             kept_tags = retrieve_tags["kept_tags"]
-           
+
             print(anime.title+":")
-            if deleted_tags != {} :
+            if deleted_tags != {}:
                 print("\n\tLes tags enlevés sont :")
                 for tag, weight in deleted_tags.items():
-                     print('\t\t{}: {} '.format(tag, weight))
+                    print('\t\t{}: {} '.format(tag, weight))
 
             if added_tags != {}:
                 print("\n\tLes tags totalement nouveaux sont :")
                 for tag, weight in added_tags.items():
                     print('\t\t{}: {} '.format(tag, weight))
-    
+
             if updated_tags != {}:
                 print("\n\tLes tags modifiés sont :")
                 for tag, weight in updated_tags.items():
-                    print('\t\t{}: {} -> {}'.format(tag, weight[0], weight[1]))  
-  
+                    print('\t\t{}: {} -> {}'.format(tag, weight[0], weight[1]))
+
             if kept_tags != {}:
                 print("\n\tLes tags non modifiés/restés identiques sont :")
                 for tag, weight in kept_tags.items():
                     print('\t\t{}: {} '.format(tag, weight))
 
-    
-
-            choice  = input("Voulez-vous réaliser ces changements [y/n] : ")
+            choice = input("Voulez-vous réaliser ces changements [y/n] : ")
             if choice == 'n':
                 print("\nOk, aucun changement ne va être fait")
-            elif choice =='y' :
-    
-                for  title, weight in added_tags.items():
+            elif choice == 'y':
+
+                for title, weight in added_tags.items():
                     current_tag = Tag.objects.update_or_create(title=title)[0]
                     TaggedWork(tag=current_tag, work=anime, weight=weight).save()
                 for title, weight in updated_tags:
@@ -111,16 +108,13 @@ class Command(BaseCommand):
                     tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
                     tag_work.delete()
                     TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
-        
+
                 for title, weight in deleted_tags.items():
                     current_tag = Tag.objects.get(title=title)
                     TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
-            
 
-
-            
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
-            
+
             for creator in creators.findAll('name'):
                 artist = get_or_create_artist(creator.string)
                 if creator['type'] == 'Direction':
@@ -134,4 +128,3 @@ class Command(BaseCommand):
                 if staff_id is not None:
                     Staff.objects.get_or_create(work=anime, role_id=staff_map[staff_id], artist=artist)
                 anime.save()
-            

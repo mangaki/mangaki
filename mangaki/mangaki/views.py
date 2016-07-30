@@ -65,16 +65,11 @@ UTA_ID = 14293
 
 GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
 
+
 def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
 
-"""
-def update_nb_works_linked_all_tags():
-    for tag in Tag.objects.all():
-        nb = TaggedWork.objects.filter(tag=tag).count()
-        Tag.objects.filter(title=tag.title).update(nb_works_linked=nb)
-"""
 
 def update_poster_if_nsfw(obj, user):
     if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
@@ -109,6 +104,7 @@ def update_score_while_unrating(user, work, choice):
         elif choice == 'favorite':
             reco.user.profile.score -= 5
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
+
 
 class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
     form_class = SuggestionForm
@@ -209,6 +205,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         form.save()
         return super().form_valid(form)
 
+
 class EventDetail(LoginRequiredMixin, DetailView):
     model = Event
 
@@ -228,10 +225,10 @@ class EventDetail(LoginRequiredMixin, DetailView):
         if attending is not None:
             Attendee.objects.update_or_create(
                 event=self.object, user=request.user,
-                defaults={'attending': attending })
+                defaults={'attending': attending})
         elif 'cancel' in request.POST:
             Attendee.objects.filter(event=self.object, user=request.user).delete()
-        return redirect(request.GET['next']);
+        return redirect(request.GET['next'])
 
 
 def get_card(request, category, sort_id=1):
@@ -259,6 +256,7 @@ def get_card(request, category, sort_id=1):
 
     return HttpResponse(json.dumps(cards), content_type='application/json')
 
+
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -276,6 +274,7 @@ class WorkListMixin:
             work.poster = work.safe_poster(self.request.user)
 
         return context
+
 
 class WorkList(WorkListMixin, ListView):
     paginate_by = POSTERS_PER_PAGE
@@ -346,6 +345,7 @@ class WorkList(WorkListMixin, ListView):
 
         return context
 
+
 class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
     template_name = 'mangaki/artist_detail.html'
     paginate_by = POSTERS_PER_PAGE
@@ -362,6 +362,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
         context['artist'] = self.object
 
         return context
+
 
 class UserList(ListView):
     model = User
@@ -519,6 +520,7 @@ def events(request):
             'utamonogatari_rating': uta_rating,
         })
 
+
 def top(request, category_slug):
     categories = dict(TOP_CATEGORY_CHOICES)
     if category_slug not in categories:
@@ -611,6 +613,7 @@ def get_works(request, category):
         } for work in Work.objects.filter(category__slug=category).search(query).popular()[:10]
     ]
     return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 def get_reco_list(request, category, editor):
     reco_list = []

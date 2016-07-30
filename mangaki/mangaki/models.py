@@ -26,6 +26,7 @@ class SearchLookup(Lookup):
         params = lhs_params + rhs_params + lhs_params + rhs_params
         return "(UPPER(F_UNACCENT(%s)) LIKE '%%%%' || UPPER(F_UNACCENT(%s)) || '%%%%' OR UPPER(F_UNACCENT(%s)) %%%% UPPER(F_UNACCENT(%s)))" % (lhs, rhs, lhs, rhs), params
 
+
 class SearchSimilarity(Func):
     """Helper class for computing the search similarity ignoring case and
     accents"""
@@ -34,6 +35,7 @@ class SearchSimilarity(Func):
 
     def __init__(self, lhs, rhs):
         super().__init__(Func(Func(lhs, function='F_UNACCENT'), function='UPPER'), Func(Func(rhs, function='F_UNACCENT'), function='UPPER'))
+
 
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
@@ -56,12 +58,12 @@ class WorkQuerySet(models.QuerySet):
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
-
     def random(self):
         return self.filter(
             nb_ratings__gte=RANDOM_MIN_RATINGS,
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
+
 
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
@@ -69,6 +71,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
@@ -111,13 +114,13 @@ class Work(models.Model):
 
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
-    
+
     def retrieve_tags(self, anidb):
         anidb_tags_list = anidb.get(self.anidb_aid).tags
         anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
-            
+
         tag_work = TaggedWork.objects.filter(work=self)
-        current_tags = {tagwork.tag.title : tagwork.weight for tagwork in tag_work}
+        current_tags = {tagwork.tag.title: tagwork.weight for tagwork in tag_work}
 
         deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
         deleted_tags = dict((key, current_tags[key])for key in deleted_tags_keys)
@@ -127,11 +130,11 @@ class Work(models.Model):
 
         remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
         remaining_tags = dict((key, current_tags[key])for key in remaining_tags_keys)
-        
-        updated_tags = {title : (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]} 
-        kept_tags = {title : current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
 
-        retrieve_tags = {"deleted_tags" : deleted_tags, "added_tags" : added_tags, "updated_tags" : updated_tags, "kept_tags" : kept_tags}
+        updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
+        kept_tags = {title: current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
+
+        retrieve_tags = {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
 
         return retrieve_tags
 
@@ -144,7 +147,7 @@ class Work(models.Model):
         return self.title
 
 
-class WorkTitle (models.Model) :
+class WorkTitle (models.Model):
     work = models.ForeignKey('Work')
     title = models.CharField(max_length=128, blank=True, db_index=True)
     language = models.ForeignKey('Language')
@@ -153,22 +156,23 @@ class WorkTitle (models.Model) :
                             ('official', 'officiel'),
                             ('synonym', 'synonyme')),
                             blank=True,
-                            db_index=True) 
+                            db_index=True)
 
     def __str__(self):
-        return ("%s" %self.title)
+        return ("%s" % self.title)
+
 
 class Language(models.Model):
-    
     anidb_language = models.CharField(max_length=5,
                                       blank=True,
-                                      db_index=True) 
+                                      db_index=True)
     iso639 = models.CharField(max_length=2,
                             unique=True,
                             db_index=True)
 
     def __str__(self):
-        return "%s : %s" %(self.anidb_language, self.iso639)
+        return "%s : %s" % (self.anidb_language, self.iso639)
+
 
 class Role(models.Model):
     name = models.CharField(max_length=255)
@@ -176,6 +180,7 @@ class Role(models.Model):
 
     def __str__(self):
         return '{} /{}/'.format(self.name, self.slug)
+
 
 class Staff(models.Model):
     work = models.ForeignKey('Work')
@@ -190,6 +195,7 @@ class Staff(models.Model):
             self.artist.name,
             self.role.name.lower(),
             self.work.title)
+
 
 class Editor(models.Model):
     title = models.CharField(max_length=33, db_index=True)
@@ -214,18 +220,17 @@ class Genre(models.Model):
 
 class Tag(models.Model):
     title = models.TextField(unique = True)
-    #nb_works_linked = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.title 
+        return self.title
 
 
 class TaggedWork(models.Model):
-    work = models.ForeignKey('Work') 
+    work = models.ForeignKey('Work')
     tag = models.ForeignKey('Tag')
     weight = models.IntegerField(default=0)
 
-    class Meta : 
+    class Meta:
         unique_together = ('work', 'tag')
 
     def __str__(self):
@@ -248,6 +253,7 @@ class Artist(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class ArtistSpelling(models.Model):
     was = models.CharField(max_length=255, db_index=True)
@@ -384,6 +390,7 @@ class Reference(models.Model):
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
 
+
 class Top(models.Model):
     date = models.DateField(auto_now_add=True)
     category = models.CharField(max_length=10, choices=TOP_CATEGORY_CHOICES, unique_for_date='date')
@@ -395,6 +402,7 @@ class Top(models.Model):
             category=self.category,
             date=self.date,
             id=self.id)
+
 
 class Ranking(models.Model):
     top = models.ForeignKey('Top', on_delete=models.CASCADE)

@@ -1,31 +1,26 @@
 # coding=utf8
-from mangaki.models import Work, TaggedWork, WorkTitle, Language, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
-from django.conf.urls import patterns
-
-from django.core.management.base import BaseCommand, CommandError
-from mangaki.utils.anidb import AniDB
-from mangaki.models import Artist, Tag, TaggedWork, Role, Staff, Work, WorkTitle, ArtistSpelling
 from django.db.models import Count
-from urllib.parse import urlparse, parse_qs
-import sys
+
+from mangaki.models import Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
+from mangaki.utils.anidb import AniDB
 
 
 class TagAdmin(admin.ModelAdmin):
     list_display = ("title", )
     readonly_fields = ("nb_works_linked",)
-    
+
     def get_queryset(self, request):
         qs = super(TagAdmin, self).get_queryset(request)
         return qs.annotate(works_linked=Count('work'))
 
     def nb_works_linked(self, obj):
-      return obj.works_linked
+        return obj.works_linked
     nb_works_linked.short_description = 'Number of works linked'
-    
+
 
 class TaggedWorkAdmin(admin.ModelAdmin):
     search_fields = ('work', 'tag')
@@ -43,7 +38,7 @@ class StaffInline(admin.TabularInline):
 
 class WorkTitleInline(admin.TabularInline):
     model = WorkTitle
-    fields = ('title', 'language','type')
+    fields = ('title', 'language', 'type')
 
 
 class AniDBaidListFilter(admin.SimpleListFilter):
@@ -56,15 +51,15 @@ class AniDBaidListFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'False':
             return queryset.filter(anidb_aid=0)
-        else :
-            return queryset.exclude(anidb_aid =0)
+        else:
+            return queryset.exclude(anidb_aid=0)
 
 
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter, )
-    actions = ['make_nsfw', 'make_sfw', 'merge', 'anidb']
+    actions = ['make_nsfw', 'make_sfw', 'merge', 'update_tags_via_anidb']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
@@ -83,11 +78,8 @@ class WorkAdmin(admin.ModelAdmin):
         self.message_user(request, "%s désormais NSFW." % message_bit)
     make_nsfw.short_description = "Rendre NSFW les œuvres sélectionnées"
 
-    #update_tags_via_anidb
-    def anidb(self, request, queryset):
-        
+    def update_tags_via_anidb(self, request, queryset):
         if request.POST.get("post"):
-            
             chosen_ids = request.POST.getlist('checks')
             for anime_id in chosen_ids:
                 anime = Work.objects.get(id=anime_id)
@@ -97,49 +89,47 @@ class WorkAdmin(admin.ModelAdmin):
                 added_tags = retrieve_tags["added_tags"]
                 updated_tags = retrieve_tags["updated_tags"]
 
-                for  title, weight in added_tags.items():
+                for title, weight in added_tags.items():
                     current_tag = Tag.objects.get_or_create(title=title)[0]
                     TaggedWork(tag=current_tag, work=anime, weight=weight).save()
 
-                
                 tags = Tag.objects.filter(title__in=updated_tags.keys())
                 for tag in tags:
                     tagged_work = anime.taggedwork_set.objects.get(tag=tag)
                     tagged_work.weight = updated_tags[tag.title]
                     tagged_work.save()
-                
+
                 TaggedWork.objects.filter(work=anime, tag__title__in=deleted_tags.keys()).delete()
-                
+
             self.message_user(request, "Modifications sur les tags faites")
             return None
-        
+
         for anime in queryset.select_related("category"):
             if anime.category.slug != 'anime':
-                self.message_user(request, "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les animes " %anime.title)
+                self.message_user(request, "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les animes " % anime.title)
                 self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
                 return None
             elif not anime.anidb_aid:
-                self.message_user(request, "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" %anime.title)
+                self.message_user(request, "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" % anime.title)
                 self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
                 return None
-            
 
-        all_information={}
-        for anime in queryset :
+        all_information = {}
+        for anime in queryset:
             a = AniDB('mangakihttp', 1)
             retrieve_tags = anime.retrieve_tags(a)
             deleted_tags = retrieve_tags["deleted_tags"]
             added_tags = retrieve_tags["added_tags"]
             updated_tags = retrieve_tags["updated_tags"]
             kept_tags = retrieve_tags["kept_tags"]
-            all_information[anime.id] = [anime.title, deleted_tags.items(), added_tags.items(), updated_tags.items(), kept_tags.items()] #ou bien deleted_tags=[deleted_tags_obj1, ....]
+            all_information[anime.id] = [anime.title, deleted_tags.items(), added_tags.items(), updated_tags.items(), kept_tags.items()]
 
         context = {
-        'all_information' : all_information.items(),
-        'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-        }
-        return TemplateResponse(request, "test.html", context)
-    anidb.short_description = "Mise à jour des tags des oeuvres sélectionnées" 
+                   'all_information': all_information.items(),
+                   'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+                  }
+        return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
+    update_tags_via_anidb.short_description = "Mise à jour des tags des oeuvres sélectionnées"
 
     def make_sfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=False)
@@ -185,6 +175,7 @@ class GenreAdmin(admin.ModelAdmin):
 
 class TrackAdmin(admin.ModelAdmin):
     pass
+
 
 class ArtistAdmin(admin.ModelAdmin):
     search_fields = ('id', 'name')
@@ -314,6 +305,7 @@ class PairingAdmin(admin.ModelAdmin):
 class ReferenceAdmin(admin.ModelAdmin):
     list_display = ['work', 'url']
 
+
 class RankingInline(admin.TabularInline):
     model = Ranking
     fields = ('content_type', 'object_id', 'name', 'score', 'nb_ratings', 'nb_stars',)
@@ -321,6 +313,7 @@ class RankingInline(admin.TabularInline):
 
     def name(self, instance):
         return str(instance.content_object)
+
 
 class TopAdmin(admin.ModelAdmin):
     inlines = [
@@ -330,6 +323,7 @@ class TopAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
 
 class RoleAdmin(admin.ModelAdmin):
     model = Role
