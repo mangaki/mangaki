@@ -2,7 +2,6 @@
 venv
 db.sqlite3
 *.pyc
-*.json
 data/
 2015-*.txt
 2016-*.txt
@@ -12,3 +11,5 @@ data/
 *.zip
 *.pickle
 /.vagrant
+node_modules
+fixtures/*.json
