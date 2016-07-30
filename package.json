@@ -1,0 +1,27 @@
+{
+  "name": "mangaki",
+  "version": "0.2.0",
+  "description": "Mangaki project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mangaki/mangaki.git"
+  },
+  "keywords": [
+    "mangaki"
+  ],
+  "author": "Mangaki Team",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/mangaki/mangaki/issues"
+  },
+  "homepage": "https://github.com/mangaki/mangaki#readme",
+  "devDependencies": {
+    "eslint": "^3.0.1",
+    "eslint-config-standard": "^5.3.1",
+    "eslint-plugin-standard": "^1.3.2"
+  }
+}
