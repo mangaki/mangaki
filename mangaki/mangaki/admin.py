@@ -78,6 +78,7 @@ class WorkAdmin(admin.ModelAdmin):
         self.message_user(request, "%s désormais NSFW." % message_bit)
     make_nsfw.short_description = "Rendre NSFW les œuvres sélectionnées"
 
+    #FIX ME : tout refaire avec un Form Django / redo it with a Django Form
     def update_tags_via_anidb(self, request, queryset):
         if request.POST.get("post"):
             chosen_ids = request.POST.getlist('checks')
