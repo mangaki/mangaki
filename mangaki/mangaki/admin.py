@@ -13,20 +13,19 @@ from django.db.models import Count
 from urllib.parse import urlparse, parse_qs
 import sys
 
-#TODO : A FINIR
+
 class TagAdmin(admin.ModelAdmin):
     list_display = ("title", )
     readonly_fields = ("nb_works_linked",)
     
-    def queryset(self, request):
-        qs = super(TagAdmin, self).queryset(request)
+    def get_queryset(self, request):
+        qs = super(TagAdmin, self).get_queryset(request)
         return qs.annotate(works_linked=Count('work'))
 
     def nb_works_linked(self, obj):
       return obj.works_linked
-    nb_works_linked.short_description = 'Fixture Count'
-    nb_works_linked.admin_order_field = 'title'
-
+    nb_works_linked.short_description = 'Number of works linked'
+    
 
 class TaggedWorkAdmin(admin.ModelAdmin):
     search_fields = ('work', 'tag')
