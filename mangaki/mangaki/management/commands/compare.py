@@ -6,14 +6,19 @@ from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.pca import MangakiPCA
 from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.als import MangakiALS
+from mangaki.utils.nmf import MangakiNMF
+from mangaki.utils.zero import MangakiZero
 from mangaki.utils.values import rating_values
+from mangaki.settings import BASE_DIR
 from collections import Counter
+import os.path
 import numpy as np
 import random
 import pandas
 # import matplotlib.pyplot as plt
 
 TEST_SIZE = 50000
+
 
 class Experiment(object):
     X = None
@@ -24,7 +29,7 @@ class Experiment(object):
     results = {}
     algos = None
     def __init__(self, PIG_ID=None):
-        self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN()]
+        self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN(20), MangakiZero()]
         # self.results.setdefault('x_axis', []).append()
         self.make_dataset(PIG_ID)
         self.execute()
@@ -38,7 +43,7 @@ class Experiment(object):
 
     def make_dataset(self, PIG_ID):
         self.clean_dataset()
-        ratings = pandas.read_csv('data/ratings.csv', header=None).as_matrix()
+        ratings = pandas.read_csv(os.path.join(BASE_DIR, '../data/ratings.csv'), header=None).as_matrix()
         if PIG_ID:  # Let's focus on the PIG
             pig_ratings = {}
             for user_id, work_id, choice in ratings:
@@ -46,7 +51,7 @@ class Experiment(object):
                     pig_ratings[work_id] = rating_values[choice]
         self.nb_users = max(ratings[:, 0]) + 1
         self.nb_works = max(ratings[:, 1]) + 1
-        self.works = pandas.read_csv('data/works.csv', header=None).as_matrix()[:, 1]
+        self.works = pandas.read_csv(os.path.join(BASE_DIR, '../data/works.csv'), header=None).as_matrix()[:, 1]
         train, test = train_test_split(ratings, random_state=0, test_size=TEST_SIZE)
         if PIG_ID:
             train = ratings

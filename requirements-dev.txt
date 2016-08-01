@@ -3,3 +3,4 @@ django-extensions
 scipy
 pandas
 scikit-learn
+flake8

@@ -21,7 +21,7 @@ from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Page, TaggedWork, Tag, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
+from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -253,7 +253,6 @@ def get_card(request, category, sort_id=1):
         update_poster_if_nsfw_dict(work, request.user)
         work['category'] = category
         cards.append(work)
-
     return HttpResponse(json.dumps(cards), content_type='application/json')
 
 
@@ -696,3 +695,12 @@ def add_pairing(request, artist_id, work_id):
 def register_profile(sender, **kwargs):
     user = kwargs['user']
     Profile(user=user).save()
+
+
+def faq_index(request):
+    latest_theme_list = FAQTheme.objects.order_by('order')
+    all_information = [[faqtheme.theme, [(entry.question, entry.answer) for entry in faqtheme.entries.filter(is_active=True).order_by('-pub_date')]] for faqtheme in latest_theme_list]
+    context = {
+        'information': all_information,
+    }
+    return render(request, 'faq/faq_index.html', context)

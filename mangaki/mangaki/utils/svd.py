@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from mangaki.models import Rating, Work, Recommendation
 from mangaki.utils.chrono import Chrono
 from mangaki.utils.values import rating_values
-from scipy.sparse import lil_matrix
 from sklearn.utils.extmath import randomized_svd
 import numpy as np
 from django.db import connection
