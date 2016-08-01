@@ -14,7 +14,7 @@ class TagAdmin(admin.ModelAdmin):
     readonly_fields = ("nb_works_linked",)
 
     def get_queryset(self, request):
-        qs = super(TagAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         return qs.annotate(works_linked=Count('work'))
 
     def nb_works_linked(self, obj):

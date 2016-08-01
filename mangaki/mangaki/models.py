@@ -126,10 +126,10 @@ class Work(models.Model):
         deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
 
         added_tags_keys = anidb_tags.keys() - current_tags.keys()
-        added_tags = dict((key, anidb_tags[key])for key in added_tags_keys)
+        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
 
         remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
-        remaining_tags = dict((key, current_tags[key])for key in remaining_tags_keys)
+        remaining_tags = {key: current_tags[key] for key in remaining_tags_keys}
 
         updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
         kept_tags = {title: current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
@@ -140,8 +140,8 @@ class Work(models.Model):
 
     def update_tags(self, deleted_tags, added_tags, updated_tags):
         for title, weight in added_tags.items():
-                    current_tag = Tag.objects.get_or_create(title=title)[0]
-                    TaggedWork(tag=current_tag, work=self, weight=weight).save()
+            current_tag = Tag.objects.get_or_create(title=title)[0]
+            TaggedWork(tag=current_tag, work=self, weight=weight).save()
 
         tags = Tag.objects.filter(title__in=updated_tags.keys())
         for tag in tags:

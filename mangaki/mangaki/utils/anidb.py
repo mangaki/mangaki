@@ -96,9 +96,6 @@ class AniDB:
           'review': float(anime.ratings.review.string) if anime.ratings.review else ''
           }),
         'picture': "http://img7.anidb.net/pics/anime/" + str(anime.picture.string),
-        #categories n'existe (presque ?) plus
-        #'categories': [(genre.string, genre.parent['weight']) for genre in anime.find_all('name') if genre.parent.name=="category"] if anime.categories != None else None ,
-        #'is_hentai' : anime.category.get("hentai")  if anime.categories != None else "unknown" ,
         'tags': [(genre.string, genre.parent.get("weight")) for genre in anime.tags.find_all('name') if (genre.parent.name == "tag" and genre.parent.get("weight") != '0')],
         'characters': [],
         'episodes': [],
