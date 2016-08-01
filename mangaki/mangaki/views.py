@@ -304,7 +304,7 @@ class WorkList(WorkListMixin, ListView):
         queryset = self.category.work_set.all()
         sort_mode = self.sort_mode()
         if self.is_dpp():
-            queryset = self.category.work_set.all().dpp(10)
+            queryset = self.category.work_set.exclude(coldstartrating__user=self.request.user).dpp(10)
         elif sort_mode == 'top':
             queryset = queryset.top()
         elif sort_mode == 'popularity':
@@ -579,7 +579,6 @@ def dpp_work(request, work_id):
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'dislike', 'dontknow']:
             raise SuspiciousOperation("Attempted access denied. There are only 3 ratings here : like, dislike and dontknow")
-        update_score_while_rating(request.user, work, choice)
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
     raise SuspiciousOperation("Attempted access denied. You must be logged")
