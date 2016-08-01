@@ -117,13 +117,13 @@ class Work(models.Model):
 
     def retrieve_tags(self, anidb):
         anidb_tags_list = anidb.get(self.anidb_aid).tags
-        anidb_tags = dict((tag[0], int(tag[1])) for tag in anidb_tags_list)
+        anidb_tags = {title: int(weight) for title, weight in anidb_tags_list}
 
         tag_work = TaggedWork.objects.filter(work=self)
         current_tags = {tagwork.tag.title: tagwork.weight for tagwork in tag_work}
 
         deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
-        deleted_tags = dict((key, current_tags[key])for key in deleted_tags_keys)
+        deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
 
         added_tags_keys = anidb_tags.keys() - current_tags.keys()
         added_tags = dict((key, anidb_tags[key])for key in added_tags_keys)

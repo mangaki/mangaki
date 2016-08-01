@@ -19,7 +19,7 @@ class TagAdmin(admin.ModelAdmin):
 
     def nb_works_linked(self, obj):
         return obj.works_linked
-    nb_works_linked.short_description = 'Number of works linked'
+    nb_works_linked.short_description = 'Nombre d\'oeuvres liées au tag'
 
 
 class TaggedWorkAdmin(admin.ModelAdmin):
@@ -42,14 +42,14 @@ class WorkTitleInline(admin.TabularInline):
 
 
 class AniDBaidListFilter(admin.SimpleListFilter):
-    title = (' having an AniDB aid')
-    parameter_name = 'having an AniDB aid'
+    title = (' a un AniDB aid')
+    parameter_name = 'a un AniDB aid'
 
     def lookups(self, request, model_admin):
-        return (('True', ('Oui')), ('False', ('Non')))
+        return (('Vrai', ('Oui')), ('Faux', ('Non')))
 
     def queryset(self, request, queryset):
-        if self.value() == 'False':
+        if self.value() == 'Faux':
             return queryset.filter(anidb_aid=0)
         else:
             return queryset.exclude(anidb_aid=0)
@@ -78,7 +78,7 @@ class WorkAdmin(admin.ModelAdmin):
         self.message_user(request, "%s désormais NSFW." % message_bit)
     make_nsfw.short_description = "Rendre NSFW les œuvres sélectionnées"
 
-    #FIX ME : tout refaire avec un Form Django / redo it with a Django Form
+    # FIXME : https://github.com/mangaki/mangaki/issues/205
     def update_tags_via_anidb(self, request, queryset):
         if request.POST.get("post"):
             chosen_ids = request.POST.getlist('checks')

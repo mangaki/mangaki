@@ -75,22 +75,22 @@ class Command(BaseCommand):
             kept_tags = retrieve_tags["kept_tags"]
 
             print(anime.title+":")
-            if deleted_tags != {}:
+            if deleted_tags:
                 print("\n\tLes tags enlevés sont :")
                 for tag, weight in deleted_tags.items():
                     print('\t\t{}: {} '.format(tag, weight))
 
-            if added_tags != {}:
+            if added_tags:
                 print("\n\tLes tags totalement nouveaux sont :")
                 for tag, weight in added_tags.items():
                     print('\t\t{}: {} '.format(tag, weight))
 
-            if updated_tags != {}:
+            if updated_tags:
                 print("\n\tLes tags modifiés sont :")
                 for tag, weight in updated_tags.items():
                     print('\t\t{}: {} -> {}'.format(tag, weight[0], weight[1]))
 
-            if kept_tags != {}:
+            if kept_tags:
                 print("\n\tLes tags non modifiés/restés identiques sont :")
                 for tag, weight in kept_tags.items():
                     print('\t\t{}: {} '.format(tag, weight))
