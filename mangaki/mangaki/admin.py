@@ -51,8 +51,10 @@ class AniDBaidListFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'Faux':
             return queryset.filter(anidb_aid=0)
-        else:
+        elif self.value() == 'Vrai':
             return queryset.exclude(anidb_aid=0)
+        else:
+            return queryset
 
 
 class FAQAdmin(admin.ModelAdmin):
