@@ -138,6 +138,19 @@ class Work(models.Model):
 
         return retrieve_tags
 
+    def update_tags(self, deleted_tags, added_tags, updated_tags):
+        for title, weight in added_tags.items():
+                    current_tag = Tag.objects.get_or_create(title=title)[0]
+                    TaggedWork(tag=current_tag, work=self, weight=weight).save()
+
+        tags = Tag.objects.filter(title__in=updated_tags.keys())
+        for tag in tags:
+            tagged_work = self.taggedwork_set.objects.get(tag=tag)
+            tagged_work.weight = updated_tags[tag.title]
+            tagged_work.save()
+
+        TaggedWork.objects.filter(work=self, tag__title__in=deleted_tags.keys()).delete()
+
     def safe_poster(self, user):
         if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
             return self.poster

@@ -5,31 +5,31 @@
 
 {% for key, value in all_information %}
 
-{{value.0}}
+{{value.title}}
     
     <p>Les tags enlevés sont:</p>
-    {% for tag, weight in value.1 %}
+    {% for tag, weight in value.deleted_tags %}
         <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
     {% endfor %}
 
     <p></p>
     
     <p>Les tous nouveaux tags sont:</p>
-    {% for tag, weight in value.2 %}
+    {% for tag, weight in value.added_tags %}
         <p> &nbsp;&nbsp;&nbsp; {{tag}} :  {{weight}} </p>
     {% endfor %}
 
     <p></p>
     
     <p>Les tags modifiés sont :</p>
-    {% for tag, weight in value.3 %}            
+    {% for tag, weight in value.updated_tags %}            
         <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight.0}} -> {{weight.1}} </p>
     {% endfor %}
 
     <p></p>
 
     <p>Les tags non modifiés/restés identiques sont:</p>
-    {% for tag, weight in value.4 %}
+    {% for tag, weight in value.kept_tags %}
         <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
     {% endfor %}
 
@@ -47,7 +47,7 @@
 <form action="" method="post">{% csrf_token %}
 <ul>
 {% for key, value in all_information %}
-<li><label><input type="checkbox" name="checks" value="{{ key }}" /> {{ value.0 }} </label></li>
+<li><label><input type="checkbox" name="checks" value="{{ key }}" /> {{ value.title }} </label></li>
 
 {% endfor %}
 </ul>
@@ -58,7 +58,7 @@
 
 <input type="hidden" name="action" value="update_tags_via_anidb" />
 <input type="hidden" name="post" value="yes" />
-<input type="submit" value="yes" />
+<input type="submit" value="faire les modifications sur les oeuvres sélectionnées" />
 </div>
 </form>
 

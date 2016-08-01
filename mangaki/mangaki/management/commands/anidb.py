@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.anidb import AniDB
-from mangaki.models import Artist, Tag, TaggedWork, Role, Staff, Work, WorkTitle, ArtistSpelling
+from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling
 from django.db.models import Count
 from urllib.parse import urlparse, parse_qs
 import sys
@@ -99,19 +99,7 @@ class Command(BaseCommand):
             if choice == 'n':
                 print("\nOk, aucun changement ne va être fait")
             elif choice == 'y':
-
-                for title, weight in added_tags.items():
-                    current_tag = Tag.objects.update_or_create(title=title)[0]
-                    TaggedWork(tag=current_tag, work=anime, weight=weight).save()
-                for title, weight in updated_tags:
-                    current_tag = Tag.objects.filter(title=title)[0]
-                    tag_work = TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight[0])
-                    tag_work.delete()
-                    TaggedWork(tag=current_tag, work=anime, weight=weight[1]).save()
-
-                for title, weight in deleted_tags.items():
-                    current_tag = Tag.objects.get(title=title)
-                    TaggedWork.objects.get(tag=current_tag, work=anime, weight=weight).delete()
+                anime.update_tags(deleted_tags, added_tags, updated_tags)
 
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
 

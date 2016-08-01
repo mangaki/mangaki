@@ -42,8 +42,8 @@ class WorkTitleInline(admin.TabularInline):
 
 
 class AniDBaidListFilter(admin.SimpleListFilter):
-    title = (' a un AniDB aid')
-    parameter_name = 'a un AniDB aid'
+    title = ('AniDB aid')
+    parameter_name = 'AniDB aid'
 
     def lookups(self, request, model_admin):
         return (('Vrai', ('Oui')), ('Faux', ('Non')))
@@ -90,17 +90,7 @@ class WorkAdmin(admin.ModelAdmin):
                 added_tags = retrieve_tags["added_tags"]
                 updated_tags = retrieve_tags["updated_tags"]
 
-                for title, weight in added_tags.items():
-                    current_tag = Tag.objects.get_or_create(title=title)[0]
-                    TaggedWork(tag=current_tag, work=anime, weight=weight).save()
-
-                tags = Tag.objects.filter(title__in=updated_tags.keys())
-                for tag in tags:
-                    tagged_work = anime.taggedwork_set.objects.get(tag=tag)
-                    tagged_work.weight = updated_tags[tag.title]
-                    tagged_work.save()
-
-                TaggedWork.objects.filter(work=anime, tag__title__in=deleted_tags.keys()).delete()
+                anime.update_tags(deleted_tags, added_tags, updated_tags)
 
             self.message_user(request, "Modifications sur les tags faites")
             return None
@@ -123,7 +113,7 @@ class WorkAdmin(admin.ModelAdmin):
             added_tags = retrieve_tags["added_tags"]
             updated_tags = retrieve_tags["updated_tags"]
             kept_tags = retrieve_tags["kept_tags"]
-            all_information[anime.id] = [anime.title, deleted_tags.items(), added_tags.items(), updated_tags.items(), kept_tags.items()]
+            all_information[anime.id] = {'title': anime.title, 'deleted_tags': deleted_tags.items(), 'added_tags': added_tags.items(), 'updated_tags': updated_tags.items(), "kept_tags": kept_tags.items()}
 
         context = {
                    'all_information': all_information.items(),
