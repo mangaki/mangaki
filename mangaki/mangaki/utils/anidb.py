@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from mangaki.models import Language
 
+extract_date = lambda s: datetime(*list(map(int, s.split('-'))))
+
 BASE_URL = "http://api.anidb.net:9001/httpapi"
 SEARCH_URL = "http://anisearch.outrance.pl/"
 PROTOCOL_VERSION = 1
@@ -62,8 +64,7 @@ class AniDB:
 
         r = self._request("anime", {'aid': id})
         soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')  # http://stackoverflow.com/questions/31126831/beautifulsoup-with-xml-fails-to-parse-full-unicode-strings#comment50430922_31146912
-        """with open('backup.xml', 'w') as f:
-           f.write(r.text)"""
+        
         if soup.error is not None:
             raise Exception(soup.error.string)
 
@@ -79,8 +80,8 @@ class AniDB:
                         if title['type'] != 'short' and title['xml:lang'] in languages],
         'type': str(anime.type.string),
         'episodecount': int(anime.episodecount.string),
-        'startdate': datetime(*list(map(int, anime.startdate.string.split("-")))),
-        'enddate': datetime(*list(map(int, anime.enddate.string.split("-")))),
+        'startdate': extract_date(anime.startdate.string),
+        'enddate': extract_date(anime.enddate.string),
         'titles': [(
           str(title.string),
           title['type'] if 'type' in title else "unknown"

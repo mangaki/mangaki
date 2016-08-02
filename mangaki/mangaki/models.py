@@ -134,9 +134,7 @@ class Work(models.Model):
         updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
         kept_tags = {title: current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
 
-        retrieve_tags = {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
-
-        return retrieve_tags
+        return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
 
     def update_tags(self, deleted_tags, added_tags, updated_tags):
         for title, weight in added_tags.items():
