@@ -164,10 +164,16 @@ class MAL:
         r = requests.get(self.SEARCH_URL,
             params={'q': query},
             headers=self.HEADERS,
-            auth=(MAL_USER, MAL_PASS))
+            auth=(settings.MAL_USER, settings.MAL_PASS))
         html_code = html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'&\1;', r.text))
         xml = re.sub(r'&([^alg])', r'&amp;\1', _encoding_translation(html_code))
-        self.entry = ET.fromstring(xml).find('entry')
+        try:
+            self.entry = ET.fromstring(xml).find('entry')
+        except ET.ParseError:
+            pass
 
     def get_poster(self):
-        return self.entry.find('image').text
+        if self.entry:
+            return self.entry.find('image').text
+        else:
+            return ''

@@ -1,9 +1,11 @@
-# coding=utf8
-from mangaki.models import Work, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
+
+from mangaki.models import Work, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff
+from mangaki.utils.db import refresh_poster
+
 
 class StaffInline(admin.TabularInline):
     model = Staff
@@ -13,7 +15,7 @@ class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('category', 'nsfw',)
-    actions = ['make_nsfw', 'make_sfw', 'merge']
+    actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work']
     inlines = [StaffInline]
     readonly_fields = (
         'sum_ratings',
@@ -68,6 +70,17 @@ class WorkAdmin(admin.ModelAdmin):
         }
         return TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
     merge.short_description = "Fusionner les œuvres sélectionnées"
+
+    def refresh_work(self, request, queryset):
+        found = []
+        for obj in queryset:
+            if refresh_poster(obj):
+                found.append(str(obj.id))
+        if found:
+            self.message_user(request, "Des posters ont été trouvés pour les ID suivants : %s." % ', '.join(found))
+        else:
+            self.message_user(request, "Aucun poster n'a été trouvé, essayez de changer le titre ?")
+    refresh_work.short_description = "Mettre à jour la fiche (poster, etc.)"
 
 
 class GenreAdmin(admin.ModelAdmin):
