@@ -43,6 +43,7 @@ from mangaki.choices import TOP_CATEGORY_CHOICES
 
 from natsort import natsorted
 
+NB_POINTS_DPP = 10
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
@@ -245,7 +246,7 @@ def get_card(request, category, sort_id=1):
     elif sort_mode == 'top':
         queryset = queryset.top()
     else:
-        queryset = queryset.dpp(10)
+        queryset = queryset.dpp(NB_POINTS_DPP)
     if request.user.is_authenticated():
         rated_works = Rating.objects.filter(user=request.user).values('work_id')
         queryset = queryset.exclude(id__in=rated_works)

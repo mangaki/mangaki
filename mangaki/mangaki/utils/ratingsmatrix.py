@@ -3,7 +3,7 @@ from mangaki.utils.values import rating_values
 import pandas
 
 
-class RatingsMatrix():
+class RatingsMatrix:
 
     def __init__(self, qs=None, fname=None):
         user_list, item_list, data = [], [], []
@@ -27,8 +27,8 @@ class RatingsMatrix():
         item_set = set(item_list)
         user_dict = {v: k for k, v in enumerate(user_set)}
         item_dict = {v: k for k, v in enumerate(item_set)}
-        user_dict_inv = {k: v for k, v in enumerate(user_set)}
-        item_dict_inv = {k: v for k, v in enumerate(item_set)}
+        user_dict_inv = dict(enumerate(user_set))
+        item_dict_inv = dict(enumerate(item_set))
         row = [user_dict[v] for v in user_list]
         col = [item_dict[v] for v in item_list]
         matrix = csc_matrix((data, (row, col)), shape=(

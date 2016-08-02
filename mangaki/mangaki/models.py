@@ -13,6 +13,7 @@ from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MA
 from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
 from mangaki.utils.ratingsmatrix import RatingsMatrix
 
+NB_POPULAR_WORKS = 1000
 
 
 @CharField.register_lookup
@@ -62,16 +63,19 @@ class WorkQuerySet(models.QuerySet):
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
     def dpp(self, nb_points):
+        """
+        sample "nb_points" popular works which are far from each other (using DPP)
+        """
         ratings_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
                                                                   'work_id',
                                                                   'choice'))
         similarity = SimilarityMatrix(ratings_matrix.matrix, nb_components_svd=70)
-        list_item_id_popular = self.popular()[:1000].values_list('pk', flat=True)
-        items = [ratings_matrix.item_dict[item] for item in ratings_matrix.item_set if item in list_item_id_popular]
+        set_item_id_popular = set(self.popular()[:NB_POPULAR_WORKS].values_list('pk', flat=True))
+        items = [ratings_matrix.item_dict[item] for item in ratings_matrix.item_set if item in set_item_id_popular]
         dpp = MangakiDPP(items, similarity.similarity_matrix)
-        liste = dpp.sample_k(nb_points)
-        liste2 = [ratings_matrix.item_dict_inv[element] for element in liste]
-        return self.filter(id__in=liste2)
+        liste_dpp = dpp.sample_k(nb_points)
+        liste_dpp_work_ids = [ratings_matrix.item_dict_inv[element] for element in liste_dpp]
+        return self.filter(id__in=liste_dpp_work_ids)
 
     def random(self):
         return self.filter(
@@ -138,7 +142,6 @@ class Work(models.Model):
         return self.title
 
 
-
 class Role(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
@@ -189,8 +192,6 @@ class Track(models.Model):
 
     def __str__(self):
         return self.title
-
-
 
 
 class Artist(models.Model):
@@ -363,7 +364,7 @@ class Ranking(models.Model):
 
 
 class ColdStartRating(models.Model):
-    user = models.ForeignKey(User, related_name='coldstartrating')
+    user = models.ForeignKey(User, related_name='cold_start_rating')
     work = models.ForeignKey(Work)
     choice = models.CharField(max_length=8, choices=(
         ('like', 'J\'aime'),

@@ -1,8 +1,9 @@
 from sklearn.utils.extmath import randomized_svd
 from scipy.spatial.distance import pdist, squareform
 from numpy.random import choice
-from mangaki.utils.ratingsmatrix import RatingsMatrix
 import numpy as np
+
+MAX_ITER_SAMPLE_DPP = 10
 
 
 def diameter(r, points):
@@ -15,14 +16,14 @@ def diameter_0(points):
     r = 1
     first = diameter(r, points)
     second = diameter(r / 2, points)
-    while first - second > 0.01 * second:
+    while (first - second) > (0.01 * second):
         first = diameter(r, points)
         r = r / 2
         second = diameter(r, points)
     return second
 
 
-class SimilarityMatrix():
+class SimilarityMatrix:
 
     def __init__(self, matrix, nb_components_svd=10,
                  fname=None, algo='svd', metric='cosine'):
@@ -42,7 +43,7 @@ class SimilarityMatrix():
         return 1 - squareform(pdist(self.matrix.T, metric=metric))
 
 
-class MangakiUniform():
+class MangakiUniform:
 
     def __init__(self, items):
         self.items = items
@@ -51,15 +52,14 @@ class MangakiUniform():
         return choice(self.items, nb_points).tolist()
 
 
-class MangakiDPP():
+class MangakiDPP:
 
     def __init__(self, items, similarity_matrix):
         self.items = items
         self.similarity_matrix = similarity_matrix
 
     def sample_k(self, *args, **kwargs):
-        MAX_ITER = 10
-        for i in range(MAX_ITER):
+        for i in range(MAX_ITER_SAMPLE_DPP):
             try:
                 return self._sample_k(*args, **kwargs)
             except np.linalg.linalg.LinAlgError as e:
@@ -73,7 +73,7 @@ class MangakiDPP():
         by the similarity matrix L. The algorithm
         is iterative and runs for max_nb_iterations.
         The algorithm used is from
-        (Fast Determinantal Point Process Sampling withw
+        (Fast Determinantal Point Process Sampling with
         Application to Clustering, Byungkon Kang, NIPS 2013)
         """
         items = self.items
@@ -127,13 +127,3 @@ def compare(similarity, algos, nb_points, nb_iterations=20):
     resultats /= nb_iterations
 
     return resultats
-
-
-if __name__ == '__main__':
-    build_matrix = RatingsMatrix(fname='/home/voisin/mangaki/data/ratings.csv')
-    similarity = SimilarityMatrix(build_matrix.matrix, nb_components_svd=70)
-    items = list(build_matrix.item_dict.keys())
-    uniform = MangakiUniform(items)
-    dpp = MangakiDPP(items, similarity.similarity_matrix)
-    algos = [uniform, dpp]
-    results = compare(similarity, algos, 20)
