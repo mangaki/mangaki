@@ -44,11 +44,5 @@ class JSONResponseMixin(object):
         """
         Returns an object that will be serialized as JSON by json.dumps().
         """
-        """context_dict = {}
-        for key in context:
-            if isinstance(context[key], QuerySet):
-                context_dict[key] = context[key].values()
-            else:
-                print(key, type(context[key]))"""
         print(context.keys())
         return context
