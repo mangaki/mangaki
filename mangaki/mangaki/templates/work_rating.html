@@ -1,4 +1,8 @@
-<a class="work-snapshot" href="/{{ work.category.slug }}/{{ work.id }}">
+{% if work.id == NONE %}
+<a class="work-snapshot" href="#">
+{% else %}
+<a class="work-snapshot" href="{% url 'work-detail' work.category.slug work.id %}">
+{% endif %}
     <div class="work-snapshot-image {{ work.category.slug }}-image">
         <img src="{{ work.poster }}" alt="{{ work.title }}">
 
@@ -34,3 +38,6 @@
       <span class="glyphicon glyphicon-eye-close"></span>
     </a>
 </div>
+
+
+<script src="{% url 'js_reverse' %}" type="text/javascript"></script>

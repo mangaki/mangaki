@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'bootstrapform',
     'analytical',
     'cookielaw',
+    'django_js_reverse',
 )
 
 if DEBUG:
@@ -144,3 +145,5 @@ if config.has_section('mal'):
     MAL_USER_AGENT = config.get('mal', 'MAL_USER_AGENT')
 
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
+
+JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'

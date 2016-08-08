@@ -5,7 +5,7 @@ function loadMenureco() {
     datumTokenizer: function(d) { return d.tokens; },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     // prefetch: '/recommend/' + work_id + '/' + target_id + '.json',
-    remote: '/recommend/' + work_id + '/' + target_id + '/%QUERY.json'
+    remote: Urls['reco-work'](work_id, target_id).replace('.json','/%QUERY.json')
   });
 
   pieces.initialize();
@@ -23,10 +23,10 @@ function loadMenureco() {
 
 $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
-    location.href = '/u/' + selection.username ;
+    location.href = Urls['profile'](selection.username) ;
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
-    location.href = '/u/' + selection.username ;
+    location.href = Urls['profile'](selection.username) ;
     $(this).val('');
   }).on('change', function(object, datum) {
     pieces.clearPrefetchCache();
@@ -42,7 +42,7 @@ function lookup(query, category) {
     promise = pieces.initialize(true);
     promise.done(function() {console.log('win')}).fail(function() {console.log('fail')});
     // vote({id: id});
-    location.href = '/' + category + '/' + id;
+    location.href = Urls['work-detail'](category, id);
   })
 }
 

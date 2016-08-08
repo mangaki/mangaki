@@ -26,7 +26,7 @@
       <div class="col-lg-9 col-md-8 col-sm-6 col-xs-12">
         <p>À l'occasion de l'avant-première de Kizumonogatari le <strong>vendredi 29 janvier 2015 à 21 h</strong> au Grand Rex, <img style="margin-bottom: 4px;" height="20" src="/static/img/minilogo.png"> et <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}"><img height="20" src="/static/img/sponsors/small/{{ wakanim.image }}" alt="{{ wakanim.name }}" /></a> ont fait gagner deux OST de la série.</p>
 
-        <p><strong>Le tirage au sort est terminé !</strong> Merci à tous d'avoir participé, les gagnants sont <a href="/u/KyouyuuSuru">KyouyuuSuru</a> et <a href="/u/Aldherrian">Aldherrian</a> !</p>
+        <p><strong>Le tirage au sort est terminé !</strong> Merci à tous d'avoir participé, les gagnants sont <a href="{% url 'profile' 'KyouyuuSuru' %}">KyouyuuSuru</a> et <a href="{% url 'profile' 'Aldherrian' %}">Aldherrian</a> !</p>
 
         <a href="mailto:vie@jill-jenn.net" target="_blank" class="btn btn-primary">Nous contacter</a>
         <a href="http://meta.mangaki.fr/t/avant-premiere-concours-kizumonogatari-au-grand-rex/645?u=jj" target="_blank" class="btn btn-primary">En discuter sur le forum</a>
@@ -90,15 +90,15 @@
     <hr />
 
     <h3>Palmarès</h3>
-    <p>Le gagnant est <strong><a href="/u/linkmauve">linkmauve</a></strong>, pour la contribution suivante :<br />
+    <p>Le gagnant est <strong><a href="{% url 'profile' 'linkmauve' %}">linkmauve</a></strong>, pour la contribution suivante :<br />
     <em><a href="https://bitbucket.org/mangaki/mangaki/pull-requests/4/load-other-recommendations-when-a-refresh" target="_blank">Afficher d'autres recommandations lorsqu'un rechargement de la page est demandé</a></em>.
     <div class="thumbnail with-caption">
         <img src="/static/img/sponsors/linkmauve.jpg" width="600" />
         <div class="caption">
-            <small><a href="/u/jj">JJ</a> &amp; <a href="/u/linkmauve">linkmauve</a> au <a href="https://london.hackspace.org.uk" target="_blank">London Hackerspace</a>, samedi 12 septembre 2015.</small>
+            <small><a href="{% url 'profile' 'jj' %}">JJ</a> &amp; <a href="{% url 'profile' 'linkmauve' %}">linkmauve</a> au <a href="https://london.hackspace.org.uk" target="_blank">London Hackerspace</a>, samedi 12 septembre 2015.</small>
         </div>
     </div>
-    <p>Mention spéciale pour <strong><a href="/u/RaitoBezarius">RaitoBezarius</a></strong> qui a envoyé « <em>ATTENDS LA FIN DU CONCOURS C'EST CE SOIR ?</em> », douze heures avant la deadline, et a quand même participé.</p>
+    <p>Mention spéciale pour <strong><a href="{% url 'profile' 'RaitoBezarius' %}">RaitoBezarius</a></strong> qui a envoyé « <em>ATTENDS LA FIN DU CONCOURS C'EST CE SOIR ?</em> », douze heures avant la deadline, et a quand même participé.</p>
 
     <h3>Toutes les contributions</h3>
     <ul>

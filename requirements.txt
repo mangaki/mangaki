@@ -11,3 +11,4 @@ lxml
 natsort
 django-analytical
 django-cookie-law
+django-js-reverse
