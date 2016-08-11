@@ -14,13 +14,12 @@ database:
                create extension if not exists unaccent"
     - cp .circle_mangaki_settings.ini mangaki/settings.ini
     - python mangaki/manage.py migrate
-    - python mangaki/manage.py loaddata fixtures/seed_big_data.json
     - python mangaki/manage.py ranking
     - python mangaki/manage.py top director
 test:
   pre:
     - python mangaki/manage.py collectstatic --no-input
   override:
-    - python mangaki/manage.py test --with-coverage
+    - cd mangaki && python manage.py test --with-coverage
   post:
     - bash <(curl -s https://codecov.io/bash)
