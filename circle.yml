@@ -4,6 +4,9 @@ machine:
     Europe/Paris
   python:
     version: 3.5.1
+dependencies:
+  post:
+    - pip install -r requirements-dev.txt
 database:
   override:
     - psql -c "create extension if not exists pg_trgm;
