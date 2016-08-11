@@ -20,6 +20,6 @@ test:
   pre:
     - python mangaki/manage.py collectstatic --no-input
   override:
-    - cd mangaki && python manage.py test --with-coverage
+    - cd mangaki && coverage run python manage.py test --with-coverage --cover-inclusive
   post:
     - bash <(curl -s https://codecov.io/bash)
