@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from mangaki.utils.values import rating_values
-from collections import Counter
+from collections import Counter, defaultdict
 from math import sqrt
 import numpy as np
 from scipy.sparse import lil_matrix
@@ -99,19 +99,14 @@ class MangakiKNN(object):
             for user_id, work_id, choice in Rating.objects.values_list('user_id', 'work_id', 'choice'):
                 X.append((user_id, work_id))
                 y.append(rating_values[choice])
-        self.ratings = {}
-        self.sum_ratings = {}
-        self.nb_ratings = {}
+        self.ratings = defaultdict(dict)
+        self.sum_ratings = defaultdict(lambda: 0)
+        self.nb_ratings = defaultdict(lambda: 0)
         self.M = lil_matrix((self.nb_users, self.nb_works))
         for (user_id, work_id), rating in zip(X, y):
-            if not user_id in self.ratings:
-                self.ratings[user_id] = {}
-            if not work_id in self.nb_ratings:
-                self.nb_ratings[work_id] = 1
-                self.sum_ratings[work_id] = rating
             self.ratings[user_id][work_id] = rating
             self.nb_ratings[work_id] += 1
-            self.sum_ratings[work_id] = rating
+            self.sum_ratings[work_id] += rating
             self.M[user_id, work_id] = rating
         for work_id in self.nb_ratings:
             self.mean_score[work_id] = self.sum_ratings[work_id] / self.nb_ratings[work_id]
