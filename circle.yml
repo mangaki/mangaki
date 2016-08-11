@@ -23,6 +23,6 @@ test:
     - cd mangaki && coverage run ./manage.py testing
       --with-coverage
       --with-xunit
-      --cover-inclusive
+      --cover-package=mangaki,irl,discourse
   post:
     - bash <(curl -s https://codecov.io/bash)

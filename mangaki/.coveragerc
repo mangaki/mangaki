@@ -1,10 +1,12 @@
 [run]
-include = mangaki/*
-timid = True
+include = mangaki/*, irl/*, discourse/*
+plugins = 
+  django_coverage_plugin
 
 [report]
 exclude_lines = 
  pragma: no cover
+ def __repr__
 
 omit =
  */migrations/*
