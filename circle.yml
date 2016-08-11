@@ -6,7 +6,7 @@ machine:
     version: 3.5.1
 database:
   override:
-    - psql -c "create extension if not exists pg_trgm; \
+    - psql -c "create extension if not exists pg_trgm;
                create extension if not exists unaccent"
     - cat > mangaki/settings.ini <<EOF
       [debug]
