@@ -7,6 +7,7 @@ machine:
 dependencies:
   post:
     - pip install -r requirements-dev.txt
+    - pip install -r requirements-testing.txt
 database:
   override:
     - psql -c "create extension if not exists pg_trgm;
@@ -20,6 +21,6 @@ test:
   pre:
     - python mangaki/manage.py collectstatic --no-input
   override:
-    - python mangaki/manage.py test
+    - python mangaki/manage.py test --with-coverage
   post:
     - bash <(curl -s https://codecov.io/bash)
