@@ -23,6 +23,7 @@ test:
     - cd mangaki && coverage run ./manage.py test
       --with-coverage
       --with-xunit
+      --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml
       --cover-package=mangaki,irl,discourse
   post:
     - bash <(curl -s https://codecov.io/bash)
