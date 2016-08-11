@@ -1,0 +1,36 @@
+---
+machine:
+  timezone:
+    Europe/Paris
+  python:
+    version: 3.5.1
+database:
+  override:
+    - psql -c "create extension if not exists pg_trgm; \
+               create extension if not exists unaccent"
+    - cat > mangaki/settings.ini <<EOF
+      [debug]
+      DEBUG = True
+
+      [secrets]
+      SECRET_KEY = "test"
+      DB_PASSWORD = ""
+
+      [pgsql]
+      DB_NAME = "circle_test"
+      DB_USER = "ubuntu"
+
+      [email]
+      EMAIL_BACKEND = django.core.mail.backends.dummy.EmailBackend
+      EOF
+    - python mangaki/manage.py migrate
+    - python mangaki/manage.py loaddata fixtures/seed_big_data.json
+    - python mangaki/manage.py ranking
+    - python mangaki/manage.py top director
+test:
+  pre:
+    - python mangaki/manage.py collectstatic --no-input
+  override:
+    - python mangaki/manage.py test
+  post:
+    - bash <(curl -s https://codecov.io/bash)
