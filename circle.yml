@@ -20,7 +20,7 @@ test:
   pre:
     - python mangaki/manage.py collectstatic --no-input
   override:
-    - cd mangaki && coverage run ./manage.py test
+    - coverage run ./mangaki/manage.py test
       --with-coverage
       --with-xunit
       --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml
