@@ -8,6 +8,8 @@ git_dest: "{{ user_root_path }}/{{ application_name }}"
 requirements_file: "{{ git_dest }}/requirements.txt"
 virtualenv_path: "{{ user_root_path }}/{{ application_name }}_env"
 
+email_port: 25
+
 command_to_compute_ranking: "{{ virtualenv_path }}/bin/python {{ git_dest }}/{{ application_name }}/manage.py ranking"
 command_to_compute_top_directors: "{{ virtualenv_path }}/bin/python {{ git_dest }}/{{ application_name }}/manage.py top director"
 
