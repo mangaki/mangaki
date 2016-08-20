@@ -1,10 +1,13 @@
 ---
 - block:
-  - name: create letsencrypt group
-    group: name=letsencrypt state=present
+    - name: create letsencrypt group
+      group: name=letsencrypt state=present
 
-  - name: create letsencrypt user
-    user: name=letsencrypt group=letsencrypt state=present
+    - name: create letsencrypt user
+      user: name=letsencrypt group=letsencrypt state=present
+
+    - name: grant rights on {{ letsencrypt_sh_root }}
+      file: path={{ letsencrypt_sh_root }} owner=letsencrypt group=letsencrypt mode="u=rwx,g=rwx,o-rwx" state=directory
 
   become: true
   become_user: root
@@ -48,3 +51,13 @@
   run_once: true
   become: true
   become_user: letsencrypt
+
+- name: set up timer to renew certificates
+  template:
+    src: regenerate-certificates.timer.j2
+    dest: /etc/systemd/system/regenerate-certificates.timer
+    mode: 0600
+    backup: true
+
+- name: Ensure that the renewing timer is enabled
+  systemd: name=regenerate-certificates.timer enabled=yes daemon_reload=yes

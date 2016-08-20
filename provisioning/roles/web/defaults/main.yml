@@ -1,11 +1,14 @@
 ---
 web_user: "{{ application_name }}"
 web_group: "{{ application_name }}"
-root_path: "/home/{{ web_user }}"
+user_root_path: "/home/{{ web_user }}"
 git_repo: "https://github.com/mangaki/mangaki.git"
 git_branch: "master"
-git_dest: "{{ root_path }}/{{ application_name }}"
+git_dest: "{{ user_root_path }}/{{ application_name }}"
 requirements_file: "{{ git_dest }}/requirements.txt"
-virtualenv_path: "{{ root_path }}/{{ application_name }}_env"
+virtualenv_path: "{{ user_root_path }}/{{ application_name }}_env"
+
+command_to_compute_ranking: "{{ virtualenv_path }}/bin/python {{ git_dest }}/{{ application_name }}/manage.py ranking"
+command_to_compute_top_directors: "{{ virtualenv_path }}/bin/python {{ git_dest }}/{{ application_name }}/manage.py top director"
 
 auth_providers: []

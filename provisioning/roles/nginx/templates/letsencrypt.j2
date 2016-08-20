@@ -1,0 +1,15 @@
+# Initial configuration for Let's Encrypt.
+# You should not use this configuration as the definitive one.
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name {{ app_hosts|join(' ') }};
+
+    # Let's encrypt
+    location /.well-known/acme-challenge/ {
+        alias {{ acme_wellknown }};
+        try_files $uri =404;
+    }
+}

@@ -5,31 +5,31 @@
   apt: name={{ item }} update_cache=true state=latest
   with_items:
     - postgresql
-    - postgresql-contrib # for unaccent and pg_trgm extensions
-    - python-psycopg2 # for ansible management
+    - postgresql-contrib  # for unaccent and pg_trgm extensions
+    - python-psycopg2     # for ansible management
   tags: packages
 
 - name: Ensure PostgreSQL is running
   service: name=postgresql state=started enabled=yes
 
 - block:
-  - name: Ensure PostgreSQL database exists
-    postgresql_db: name={{ db_name }} state=present
+    - name: Ensure PostgreSQL database exists
+      postgresql_db: name={{ db_name }} state=present
 
-  - name: Ensure PostgreSQL user exists and has correct rights
-    postgresql_user:
-      name: "{{ db_user }}"
-      db: "{{ db_name }}"
-      password: "{{ db_password }}"
-      role_attr_flags: NOSUPERUSER,NOCREATEDB
-      priv: ALL
-      state: present
+    - name: Ensure PostgreSQL user exists and has correct rights
+      postgresql_user:
+        name: "{{ db_user }}"
+        db: "{{ db_name }}"
+        password: "{{ db_password }}"
+        role_attr_flags: NOSUPERUSER,NOCREATEDB
+        priv: ALL
+        state: present
 
-  - name: Ensure required PostgreSQL extensions are enabled
-    postgresql_ext: name={{ item }} db={{ db_name }} state=present
-    with_items:
-      - pg_trgm
-      - unaccent
+    - name: Ensure required PostgreSQL extensions are enabled
+      postgresql_ext: name={{ item }} db={{ db_name }} state=present
+      with_items:
+        - pg_trgm
+        - unaccent
 
   become: true
   become_user: postgres

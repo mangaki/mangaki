@@ -5,19 +5,12 @@
   apt: name=nginx update_cache=true state=latest
   tags: packages
 
-- name: Generate dhparams
-  command: /usr/bin/openssl dhparam -out {{ ssl_dhparam }} 2048
-  args:
-    creates: '{{ ssl_dhparam }}'
-  become: true
-  become_user: root
 
-
-- name: Create the nginx configuration
+- name: Create the (initial) nginx configuration for Let's Encrypt
   become: true
   become_user: root
   template:
-    src: "mangaki.j2"
+    src: "letsencrypt.j2"
     dest: /etc/nginx/sites-available/{{ application_name }}
     backup: yes
   notify: reload nginx

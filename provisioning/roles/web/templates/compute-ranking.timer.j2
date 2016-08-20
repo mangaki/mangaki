@@ -1,0 +1,12 @@
+[Unit]
+Description=Compute ranking daily
+After=postgresql
+Type=oneshot
+ExecStart={{ command_to_compute_ranking }}
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1d
+
+[Install]
+WantedBy=timers.target

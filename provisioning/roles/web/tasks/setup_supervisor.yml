@@ -10,4 +10,4 @@
     mode: 0600
     backup: true
   notify:
-    - restart supervisor
+    - reload supervisor
