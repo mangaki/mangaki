@@ -579,7 +579,7 @@ def dpp_work(request, work_id):
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'dislike', 'dontknow']:
-            raise SuspiciousOperation("Attempted access denied. There are only 3 ratings here : like, dislike and dontknow")
+            raise SuspiciousOperation("Attempted access denied. There are only 3 ratings here: like, dislike and dontknow")
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
     raise SuspiciousOperation("Attempted access denied. You must be logged")
