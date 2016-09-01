@@ -23,20 +23,14 @@ class RatingsMatrix:
                 user_list.append(user_id)
                 item_list.append(item_id)
                 data.append(rating_values[rating])
-        user_set = set(user_list)
-        item_set = set(item_list)
-        user_dict = {v: k for k, v in enumerate(user_set)}
-        item_dict = {v: k for k, v in enumerate(item_set)}
-        user_dict_inv = dict(enumerate(user_set))
-        item_dict_inv = dict(enumerate(item_set))
-        row = [user_dict[v] for v in user_list]
-        col = [item_dict[v] for v in item_list]
+        self.user_set = set(user_list)
+        self.item_set = set(item_list)
+        self.user_dict = {v: k for k, v in enumerate(self.user_set)}
+        self.item_dict = {v: k for k, v in enumerate(self.item_set)}
+        self.user_dict_inv = dict(enumerate(self.user_set))
+        self.item_dict_inv = dict(enumerate(self.item_set))
+        row = [self.user_dict[v] for v in user_list]
+        col = [self.item_dict[v] for v in item_list]
         matrix = csc_matrix((data, (row, col)), shape=(
-            len(user_set), len(item_set)))
-        self.item_set = item_set
-        self.user_set = user_set
-        self.item_dict = item_dict
-        self.user_dict = user_dict
-        self.item_dict_inv = item_dict_inv
-        self.user_dict_inv = user_dict_inv
+            len(self.user_set), len(self.item_set)))
         self.matrix = matrix
