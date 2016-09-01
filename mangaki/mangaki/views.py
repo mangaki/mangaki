@@ -582,7 +582,7 @@ def dpp_work(request, work_id):
             raise SuspiciousOperation("Attempted access denied. There are only 3 ratings here: like, dislike and dontknow")
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
-    raise SuspiciousOperation("Attempted access denied. You must be logged")
+    raise SuspiciousOperation("Attempted access denied. You are not logged in or it is currently a GET request")
 
 
 def recommend_work(request, work_id, target_id):
