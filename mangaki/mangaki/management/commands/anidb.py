@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from mangaki.utils.anidb import AniDB
-from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling
+from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling, Language
 from django.db.models import Count
 from urllib.parse import urlparse, parse_qs
 import sys
@@ -65,9 +65,9 @@ class Command(BaseCommand):
             creators = a.get(anime.anidb_aid).creators
             worktitles = a.get(anime.anidb_aid).worktitles
 
-            for i in range(len(worktitles)):
-                WorkTitle.objects.get_or_create(work=anime, title=worktitles[i][0], language=worktitles[i][2], specific_type=worktitles[i][1])
-
+            for worktitle in worktitles:
+                language = Language.objects.get(iso639=worktitle[2])
+                WorkTitle.objects.get_or_create(work=anime, title=worktitle[0], language=language, type=worktitle[1])
             retrieve_tags = anime.retrieve_tags(a)
             deleted_tags = retrieve_tags["deleted_tags"]
             added_tags = retrieve_tags["added_tags"]
