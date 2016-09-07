@@ -143,8 +143,8 @@ class Work(models.Model):
 
         tags = Tag.objects.filter(title__in=updated_tags.keys())
         for tag in tags:
-            tagged_work = self.taggedwork_set.objects.get(tag=tag)
-            tagged_work.weight = updated_tags[tag.title]
+            tagged_work = self.taggedwork_set.get(tag=tag)
+            tagged_work.weight = updated_tags[tag.title][1]
             tagged_work.save()
 
         TaggedWork.objects.filter(work=self, tag__title__in=deleted_tags.keys()).delete()
