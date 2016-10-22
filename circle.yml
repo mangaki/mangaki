@@ -4,11 +4,14 @@ machine:
     Europe/Paris
   python:
     version: 3.5.1
-dependencies:
   pre:
     - sudo apt-get update
     - sudo apt-get install -y python3-numpy python3-lxml python3-psycopg2
+    - if [ ! -e '/home/ubuntu/virtualenvs/venv-3.5.1' ]; then mkdir -p '/home/ubuntu/virtualenvs'; pushd '/home/ubuntu/virtualenvs'; virtualenv --system-site-package venv-3.5.1; popd; fi
+dependencies:
   post:
+    - pip install wheel
+    - pip wheel numpy scipy pandas
     - pip install -r requirements-dev.txt
     - pip install -r requirements-testing.txt
 database:
