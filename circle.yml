@@ -6,6 +6,7 @@ machine:
     version: 3.5.1
 dependencies:
   pre:
+    - sudo apt-get update
     - sudo apt-get install -y python3-numpy python3-lxml python3-psycopg2
   post:
     - pip install -r requirements-dev.txt
