@@ -88,9 +88,9 @@ class WorkTest(TestCase):
     def test_work_safe_poster_for_non_nsfw(self):
         w = self.anime
 
-        self.assertIn('ryan.png', w.safe_poster(AnonymousUser()))
-        self.assertIn('ryan.png', w.safe_poster(self.fake_user))
-        self.assertIn('ryan.png', w.safe_poster(self.fake_user_with_nsfw))
+        self.assertIn(w.poster, w.safe_poster(AnonymousUser()))
+        self.assertIn(w.poster, w.safe_poster(self.fake_user))
+        self.assertIn(w.poster, w.safe_poster(self.fake_user_with_nsfw))
 
     def test_work_safe_poster_for_nsfw(self):
         w = self.nsfw_anime
