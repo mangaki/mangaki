@@ -61,27 +61,21 @@ class WorkTest(TestCase):
 
         self.assertIsInstance(w, Work)
         self.assertEqual(w.get_absolute_url(), '/anime/{}'.format(w.id))
-        self.assertEqual(str(w.category), 'Anime')
         self.assertEqual(w.category.slug, 'anime')
-        self.assertEqual(str(w), w.title)
 
     def test_manga_creation(self):
         w = self.manga
 
         self.assertIsInstance(w, Work)
         self.assertEqual(w.get_absolute_url(), '/manga/{}'.format(w.id))
-        self.assertEqual(str(w.category), 'Manga')
         self.assertEqual(w.category.slug, 'manga')
-        self.assertEqual(str(w), w.title)
 
     def test_album_creation(self):
         w = self.album
 
         self.assertIsInstance(w, Work)
         self.assertEqual(w.get_absolute_url(), '/album/{}'.format(w.id))
-        self.assertEqual(str(w.category), 'Album')
         self.assertEqual(w.category.slug, 'album')
-        self.assertEqual(str(w), w.title)
 
     def test_work_creation(self):
         """
