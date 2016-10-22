@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'bootstrapform',
     'analytical',
     'cookielaw',
+    'django_js_reverse',
 )
 
 if DEBUG:
@@ -68,6 +69,11 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+if DEBUG:
+    MIDDLEWARE_CLASSES += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
@@ -146,3 +152,5 @@ if config.has_section('mal'):
     MAL_USER_AGENT = config.get('mal', 'MAL_USER_AGENT')
 
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
+
+JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'

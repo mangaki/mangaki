@@ -1,6 +1,8 @@
 Mangaki
 =======
 
+[![Dependency Status](https://dependencyci.com/github/mangaki/mangaki/badge)](https://dependencyci.com/github/mangaki/mangaki)
+
 Voici le manuel d'installation de Mangaki. Vous ne pouvez pas savoir comme ça fait plaisir que vous me lisiez !
 
 Mangaki est [sous licence AGPLv3](https://en.wikipedia.org/wiki/Affero_General_Public_License).
@@ -8,7 +10,7 @@ Mangaki est [sous licence AGPLv3](https://en.wikipedia.org/wiki/Affero_General_P
 Comment contribuer ?
 --------------------
 
-Que vous soyez simple otaku, data expert, codeur Python, passionné d'algo, data scientist ou designer, vous pouvez contribuer à Mangaki ! Quelques pistes sont sur le [wiki](https://github.com/mangaki/mangaki/wiki).
+Que vous soyez simple otaku, data expert, codeur Python, passionné d'algo, data scientist ou designer, vous pouvez contribuer à Mangaki ! Quelques pistes sont sur le [wiki](https://github.com/mangaki/mangaki/wiki), mais aussi dans le fichier [CONTRIBUTING.md](./CONTRIBUTING.md) !
 
 Prérequis
 ---------
@@ -30,9 +32,9 @@ aléatoire lors de la configuration.
     sudo -u postgres -H createdb mangaki
     sudo -u postgres -H createuser django
     export DB_PASSWORD=$(pwgen -s -c 30 1)
-    sudo -u postgres -H DB_PASSWORD=$DB_PASSWORD psql -c \
+    sudo -u postgres -H DB_PASSWORD=$DB_PASSWORD psql -d mangaki -c \
       "alter user django with password '$DB_PASSWORD'; \
-      grant all privileges on database mangaki to django"; \
+      grant all privileges on database mangaki to django; \
       create extension if not exists pg_trgm; \
       create extension if not exists unaccent"
 
@@ -42,7 +44,7 @@ Configurer un environnement virtuel
 Il est fortement recommandé d'installer les dépendances de Mangaki dans un
 environnement virtuel, ce qui est fait par les commandes ci-dessous.
     
-    python3 -m venv venv
+    python3 -m venv venv --system-site-packages
     . venv/bin/activate
     pip install -r requirements.txt
     pip install -r requirements-dev.txt # Si installation d'une instance de développement
@@ -78,7 +80,7 @@ Remplir la base de données
     
     cd mangaki
     ./manage.py migrate
-    ./manage.py loaddata ../fixtures/{partners,ghibli,kizu,seed_data}.json
+    ./manage.py loaddata ../fixtures/{partners,seed_data}.json
     ./manage.py ranking # Compute cached ranking information. This should be done regularly.
     ./manage.py top director # Store data for the Top20 page. This should be done regularly.
 

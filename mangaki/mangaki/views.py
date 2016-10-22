@@ -21,8 +21,9 @@ from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category
+from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
+from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
 from mangaki.utils.recommendations import get_recommendations
@@ -65,6 +66,7 @@ UTA_ID = 14293
 
 GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
 
+
 def display_queries():
     for line in connection.queries:
         print(line['sql'][:100], line['time'])
@@ -93,6 +95,7 @@ def update_score_while_unrating(user, work, choice):
         elif choice == 'favorite':
             reco.user.profile.score -= 5
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
+
 
 class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
     form_class = SuggestionForm
@@ -192,6 +195,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         form.save()
         return super().form_valid(form)
 
+
 class EventDetail(LoginRequiredMixin, DetailView):
     model = Event
 
@@ -211,10 +215,10 @@ class EventDetail(LoginRequiredMixin, DetailView):
         if attending is not None:
             Attendee.objects.update_or_create(
                 event=self.object, user=request.user,
-                defaults={'attending': attending })
+                defaults={'attending': attending})
         elif 'cancel' in request.POST:
             Attendee.objects.filter(event=self.object, user=request.user).delete()
-        return redirect(request.GET['next']);
+        return redirect(request.GET['next'])
 
 
 class CardList(JSONResponseMixin, ListView):
@@ -274,6 +278,7 @@ class WorkListMixin:
             work.poster = work.safe_poster(self.request.user)
 
         return context
+
 
 class WorkList(WorkListMixin, ListView):
     paginate_by = POSTERS_PER_PAGE
@@ -344,6 +349,7 @@ class WorkList(WorkListMixin, ListView):
 
         return context
 
+
 class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
     template_name = 'mangaki/artist_detail.html'
     paginate_by = POSTERS_PER_PAGE
@@ -360,6 +366,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
         context['artist'] = self.object
 
         return context
+
 
 class UserList(ListView):
     model = User
@@ -517,6 +524,7 @@ def events(request):
             'utamonogatari_rating': uta_rating,
         })
 
+
 def top(request, category_slug):
     categories = dict(TOP_CATEGORY_CHOICES)
     if category_slug not in categories:
@@ -610,6 +618,7 @@ def get_works(request, category):
     ]
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+
 def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
@@ -690,3 +699,12 @@ def add_pairing(request, artist_id, work_id):
 def register_profile(sender, **kwargs):
     user = kwargs['user']
     Profile(user=user).save()
+
+
+def faq_index(request):
+    latest_theme_list = FAQTheme.objects.order_by('order')
+    all_information = [[faqtheme.theme, [(entry.question, entry.answer) for entry in faqtheme.entries.filter(is_active=True).order_by('-pub_date')]] for faqtheme in latest_theme_list]
+    context = {
+        'information': all_information,
+    }
+    return render(request, 'faq/faq_index.html', context)

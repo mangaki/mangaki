@@ -15,6 +15,7 @@ from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MA
 from mangaki.settings import MEDIA_URL, STATIC_URL, MEDIA_ROOT
 
 
+
 @CharField.register_lookup
 class SearchLookup(Lookup):
     """Helper class for searching text in a query. This shadows the builtin
@@ -29,6 +30,7 @@ class SearchLookup(Lookup):
         params = lhs_params + rhs_params + lhs_params + rhs_params
         return "(UPPER(F_UNACCENT(%s)) LIKE '%%%%' || UPPER(F_UNACCENT(%s)) || '%%%%' OR UPPER(F_UNACCENT(%s)) %%%% UPPER(F_UNACCENT(%s)))" % (lhs, rhs, lhs, rhs), params
 
+
 class SearchSimilarity(Func):
     """Helper class for computing the search similarity ignoring case and
     accents"""
@@ -37,6 +39,7 @@ class SearchSimilarity(Func):
 
     def __init__(self, lhs, rhs):
         super().__init__(Func(Func(lhs, function='F_UNACCENT'), function='UPPER'), Func(Func(rhs, function='F_UNACCENT'), function='UPPER'))
+
 
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
@@ -59,12 +62,12 @@ class WorkQuerySet(models.QuerySet):
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
-
     def random(self):
         return self.filter(
             nb_ratings__gte=RANDOM_MIN_RATINGS,
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
+
 
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
@@ -72,6 +75,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Work(models.Model):
     title = models.CharField(max_length=128)
@@ -130,17 +134,6 @@ class Work(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            if isinstance(self, Anime):
-                self.category = Category.objects.get(slug='anime')
-            elif isinstance(self, Manga):
-                self.category = Category.objects.get(slug='manga')
-            elif isinstance(self, Album):
-                self.category = Category.objects.get(slug='album')
-            else:
-                raise TypeError('Unexpected subclass of work: {}'.format(type(self)))
-        super().save(*args, **kwargs)
 
 class Role(models.Model):
     name = models.CharField(max_length=255)
@@ -148,6 +141,7 @@ class Role(models.Model):
 
     def __str__(self):
         return '{} /{}/'.format(self.name, self.slug)
+
 
 class Staff(models.Model):
     work = models.ForeignKey('Work')
@@ -163,6 +157,7 @@ class Staff(models.Model):
             self.role.name.lower(),
             self.work.title)
 
+
 class Editor(models.Model):
     title = models.CharField(max_length=33, db_index=True)
 
@@ -177,34 +172,6 @@ class Studio(models.Model):
         return self.title
 
 
-class Anime(Work):
-    # Deprecated fields
-    deprecated_director = models.ForeignKey('Artist', related_name='directed', default=1)
-    deprecated_author = models.ForeignKey('Artist', related_name='authored', default=1)
-    deprecated_composer = models.ForeignKey('Artist', related_name='composed', default=1)
-    deprecated_genre = models.ManyToManyField('Genre')
-    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
-    deprecated_nb_episodes = models.TextField(default='Inconnu', max_length=16)
-    deprecated_anime_type = models.TextField(max_length=42, default='')
-    deprecated_anidb_aid = models.IntegerField(default=0)
-    deprecated_editor = models.ForeignKey('Editor', default=1)
-    deprecated_studio = models.ForeignKey('Studio', default=1)
-
-    def __str__(self):
-        return '[%d] %s' % (self.id, self.title)
-
-
-class Manga(Work):
-    # Deprecated fields
-    deprecated_mangaka = models.ForeignKey('Artist', related_name='drew')
-    deprecated_writer = models.ForeignKey('Artist', related_name='wrote')
-    deprecated_genre = models.ManyToManyField('Genre')
-    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
-    deprecated_vo_title = models.CharField(max_length=128)
-    deprecated_manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
-    deprecated_editor = models.CharField(max_length=32)
-
-
 class Genre(models.Model):
     title = models.CharField(max_length=17)
 
@@ -214,20 +181,12 @@ class Genre(models.Model):
 
 class Track(models.Model):
     title = models.CharField(max_length=32)
-    album = models.ManyToManyField('Album')
+    album = models.ManyToManyField('Work')
 
     def __str__(self):
         return self.title
 
 
-class Album(Work):
-    # Deprecated fields
-    deprecated_composer = models.ForeignKey('Artist', related_name='composer', default=1)
-    deprecated_catalog_number = models.CharField(max_length=20)
-    deprecated_vgmdb_aid = models.IntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return '[{id}] {title}'.format(id=self.id, title=self.title)
 
 class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
@@ -236,6 +195,7 @@ class Artist(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class ArtistSpelling(models.Model):
     was = models.CharField(max_length=255, db_index=True)
@@ -372,6 +332,7 @@ class Reference(models.Model):
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
 
+
 class Top(models.Model):
     date = models.DateField(auto_now_add=True)
     category = models.CharField(max_length=10, choices=TOP_CATEGORY_CHOICES, unique_for_date='date')
@@ -384,6 +345,7 @@ class Top(models.Model):
             date=self.date,
             id=self.id)
 
+
 class Ranking(models.Model):
     top = models.ForeignKey('Top', on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -393,3 +355,22 @@ class Ranking(models.Model):
     score = models.FloatField()
     nb_ratings = models.PositiveIntegerField()
     nb_stars = models.PositiveIntegerField()
+
+
+class FAQTheme(models.Model):
+    order = models.IntegerField(unique=True)
+    theme = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.theme
+
+
+class FAQEntry(models.Model):
+    theme = models.ForeignKey(FAQTheme, on_delete=models.CASCADE, related_name="entries")
+    question = models.CharField(max_length=200)
+    answer = models.TextField()
+    pub_date = models.DateTimeField('Date de publication', auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.question

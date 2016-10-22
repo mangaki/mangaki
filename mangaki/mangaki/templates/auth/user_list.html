@@ -10,7 +10,7 @@
             <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
         </div>
         <div class="col-xs-3">
-            <h3><a href="/u/{{ user.username }}">{{ user.username }}</a></h3>
+            <h3><a href="{% url 'profile' user.username %}">{{ user.username }}</a></h3>
 	    <p><b>score : {{ user.profile.score }} pts</b></p>
             <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
         </div>
@@ -44,7 +44,7 @@
             <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
         </div>
         <div class="col-xs-2">
-            <h3><a href="/u/{{ user.username }}">{{ user.username }}</a></h3>
+            <h3><a href="{% url 'profile' user.username %}">{{ user.username }}</a></h3>
 	    <p><b>score : {{ user.profile.score }} pts</b></p>
             <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
         </div>
