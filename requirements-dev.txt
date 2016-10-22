@@ -2,6 +2,5 @@ django-debug-toolbar
 django-extensions
 django-nose
 scipy
-pandas
 scikit-learn
 flake8

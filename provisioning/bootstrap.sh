@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Installation de paquets
-apt-get update && apt-get install -y python3-dev python3-pip postgresql python3-sqlparse pwgen git libpq-dev python3-numpy python3-scipy python3-pandas postgresql-contrib
+apt-get update && apt-get install -y python3-dev python3-pip postgresql python3-sqlparse pwgen git libpq-dev python3-numpy python3-scipy postgresql-contrib
 
 # Configuration de postgresql
 sudo -u postgres -H createdb mangaki
