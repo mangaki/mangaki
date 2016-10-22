@@ -1,5 +1,3 @@
-# coding: utf8
-
 ORIGIN_CHOICES = (
     ("japon", "Japon"),
     ("coree", "Coree"),
