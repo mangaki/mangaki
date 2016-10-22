@@ -5,8 +5,9 @@ machine:
   python:
     version: 3.5.1
 dependencies:
+  pre:
+    - sudo apt-get install -y python3-numpy python3-pandas python3-lxml python3-psycopg2
   post:
-    - sudo apt-get install -y python3-numpy python3-pandas
     - pip install -r requirements-dev.txt
     - pip install -r requirements-testing.txt
 database:
