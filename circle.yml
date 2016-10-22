@@ -12,6 +12,7 @@ machine:
 dependencies:
   pre:
     - rm -rf '/home/ubuntu/virtualenvs/venv-3.5.1'; pushd '/home/ubuntu/virtualenvs'; virtualenv -p python3.5 --system-site-package venv-3.5.1; popd
+    - pip install -U pip
   post:
     - pip install -r requirements-dev.txt
     - pip install -r requirements-testing.txt
