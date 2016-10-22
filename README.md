@@ -18,7 +18,6 @@ Prérequis
 - Python 3.4
 - virtualenv
 - PostgreSQL ≥ 9.3 (9.4.2 étant mieux)
-* `python3-lxml` (autrement, vous pouvez [l'installer par pip](http://stackoverflow.com/questions/6504810/how-to-install-lxml-on-ubuntu) aussi)
 * `python3-sqlparse` pour la Debug Toolbar (**inutile** en production).
 
 Si vous n'avez jamais fait de Django, je vous renvoie vers [leur super tutoriel](https://docs.djangoproject.com/en/1.9/intro/tutorial01/).
@@ -93,6 +92,21 @@ Afficher les notebooks
     pip install ipython[notebook]
 
 Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
+
+
+Lancer les tests
+----------------
+
+    . venv/bin/activate
+    ./mangaki/manage.py test
+
+Ceci va lancer les [doctests](https://docs.python.org/3.5/library/doctest.html) et les tests unitaires contenus dans chaque application avec un dossier `tests`.
+
+Pour calculer la couverture de test, il faut plutôt faire:
+
+    coverage run ./mangaki/manage.py test --with-coverage --cover-package=mangaki,irl,discourse --cover-html
+
+Ainsi, vous aurez un dossier `cover` qui contiendra les informations de couverture en HTML.
 
 Installation facile (Vagrant)
 -----------------------------

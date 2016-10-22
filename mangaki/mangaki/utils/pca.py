@@ -14,6 +14,7 @@ class MangakiPCA(object):
     def __init__(self, NB_COMPONENTS=10):
         self.NB_COMPONENTS = NB_COMPONENTS
         self.chrono = Chrono(True)
+        self.VT = None
 
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users
@@ -35,6 +36,8 @@ class MangakiPCA(object):
         pca = PCA(n_components=self.NB_COMPONENTS)
         matrix, self.means = self.make_matrix(X, y)
         pca.fit(matrix)
+        self.components_ = pca.components_
+        self.VT = pca.components_
         self.M = pca.transform(matrix).dot(np.diag(np.sqrt(pca.explained_variance_ / self.nb_users))).dot(pca.components_)
 
     def predict(self, X):

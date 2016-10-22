@@ -7,7 +7,6 @@ psycopg2
 numpy
 PyYAML
 beautifulsoup4
-lxml
 natsort
 django-analytical
 django-cookie-law
