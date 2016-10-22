@@ -7,9 +7,13 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 
+import os.path
+
 from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+from django.conf import settings
+
 
 
 @CharField.register_lookup
@@ -114,10 +118,18 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
+    def get_poster_path(self):
+        return '{}/posters/{:d}.jpg'.format(settings.MEDIA_ROOT, self.id)
+
     def safe_poster(self, user):
+        if self.id is None:
+            return '{}{}'.format(settings.MEDIA_URL, 'img/chiro.gif')
         if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
-            return self.poster
-        return '/static/img/nsfw.jpg'
+            return '{}posters/{}.jpg'.format(settings.MEDIA_URL, self.id)
+        return '{}{}'.format(settings.STATIC_URL, 'img/nsfw.jpg')
+
+    def has_poster_on_disk(self):
+        return os.path.isfile(self.get_poster_path())
 
     def __str__(self):
         return self.title

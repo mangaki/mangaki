@@ -1,9 +1,10 @@
-# coding=utf8
 from mangaki.models import Work, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff, FAQTheme, FAQEntry
+from mangaki.utils.db import get_potential_posters, retrieve_poster
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
+
 
 
 class StaffInline(admin.TabularInline):
@@ -21,7 +22,7 @@ class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('category', 'nsfw',)
-    actions = ['make_nsfw', 'make_sfw', 'merge']
+    actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work']
     inlines = [StaffInline]
     readonly_fields = (
         'sum_ratings',
@@ -76,6 +77,31 @@ class WorkAdmin(admin.ModelAdmin):
         }
         return TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
     merge.short_description = "Fusionner les œuvres sélectionnées"
+
+    def refresh_work(self, request, queryset):
+        if request.POST.get('confirm'):  # Confirmed
+            downloaded_titles = []
+            for obj in queryset:
+                if obj.category.slug == 'anime':
+                    title = retrieve_poster(obj, request.POST.get('chosen_poster_%d' % obj.id))
+                    if title:
+                        downloaded_titles.append(title)
+            if downloaded_titles:
+                self.message_user(request, "Des posters ont été trouvés pour les anime suivants : %s." % ', '.join(downloaded_titles))
+            else:
+                self.message_user(request, "Aucun poster n'a été trouvé, essayez de changer le titre.")
+            return None
+        bundle = []
+        for work in queryset:
+            bundle.append((work.id, work.title, get_potential_posters(work)))
+        context = {
+            'queryset': queryset,
+            'bundle': bundle,
+            'opts': self.model._meta,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+        }
+        return TemplateResponse(request, 'admin/refresh_poster_confirmation.html', context)
+    refresh_work.short_description = "Mettre à jour la fiche de l'anime (poster)"
 
 
 class GenreAdmin(admin.ModelAdmin):

@@ -47,8 +47,9 @@ class AniDB:
     for anime in animetitles.find_all('anime'):
       results.append(Anime({
         'id': int(anime['aid']),
-        'title': str(anime.find('title', attrs={'type': "official"}).string)
-      }, partial=True, updater=lambda: self.get(anime['id'])))
+        'title': str(anime.find('title', attrs={'type': "official"}).string),
+        'picture': "http://img7.anidb.net/pics/anime/" + str(anime.find('picture').string),
+      }, partial=True, updater=lambda: self.get(anime.id)))
 
     return results
 

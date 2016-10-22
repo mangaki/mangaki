@@ -22,6 +22,7 @@ from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
 from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
+from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
@@ -71,16 +72,6 @@ def display_queries():
         print(line['sql'][:100], line['time'])
 
 
-def update_poster_if_nsfw(obj, user):
-    if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
-        obj.poster = '/static/img/nsfw.jpg'  # NSFW
-
-
-def update_poster_if_nsfw_dict(d, user):
-    if d['nsfw'] and (not user.is_authenticated() or not user.profile.nsfw_ok):
-        d['poster'] = '/static/img/nsfw.jpg'  # NSFW
-
-
 def update_score_while_rating(user, work, choice):
     recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
     for reco in recommendations_list:
@@ -123,7 +114,6 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        update_poster_if_nsfw(self.object, self.request.user)
         self.object.source = self.object.source.split(',')[0]
 
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
@@ -231,29 +221,46 @@ class EventDetail(LoginRequiredMixin, DetailView):
         return redirect(request.GET['next'])
 
 
-def get_card(request, category, sort_id=1):
-    chrono = Chrono(True)
-    deja_vu = request.GET.get('dejavu', '').split(',')
-    sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
-    queryset = Work.objects.filter(category__slug=category)
-    if sort_mode == 'popularity':
-        queryset = queryset.popular()
-    elif sort_mode == 'controversy':
-        queryset = queryset.controversial()
-    elif sort_mode == 'top':
-        queryset = queryset.top()
-    else:
-        queryset = queryset.random().order_by('?')
-    if request.user.is_authenticated():
-        rated_works = Rating.objects.filter(user=request.user).values('work_id')
-        queryset = queryset.exclude(id__in=rated_works)
-    queryset = queryset[:54]
-    cards = []
-    for work in queryset.values('id', 'title', 'poster', 'synopsis', 'nsfw'):
-        update_poster_if_nsfw_dict(work, request.user)
-        work['category'] = category
-        cards.append(work)
-    return HttpResponse(json.dumps(cards), content_type='application/json')
+class CardList(JSONResponseMixin, ListView):
+    model = Work
+
+    def get_queryset(self):
+        category = self.kwargs.get('category')
+        sort_id = self.kwargs.pop('sort_id')
+        if sort_id < 1 or sort_id > 4:
+            sort_id = 1
+        deja_vu = self.request.GET.get('dejavu', '').split(',')
+        sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
+        queryset = Category.objects.get(slug=category).work_set.all()
+        if sort_mode == 'popularity':
+            queryset = queryset.popular()
+        elif sort_mode == 'controversy':
+            queryset = queryset.controversial()
+        elif sort_mode == 'top':
+            queryset = queryset.top()
+        else:
+            queryset = queryset.random().order_by('?')
+        if self.request.user.is_authenticated():
+            rated_works = self.request.user.rating_set.values('work_id')
+            queryset = queryset.exclude(id__in=rated_works)
+        return queryset[:POSTERS_PER_PAGE]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cards = []
+        for work in context['object_list']:
+            cards.append({
+                'id': work.id,
+                'category': work.category.slug,
+                'title': work.title,
+                'poster': work.safe_poster(self.request.user),
+                'synopsis': work.synopsis,
+                'nsfw': work.nsfw
+            })
+        return {'cards': cards}
+
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_to_json_response(context, **response_kwargs)
 
 
 class WorkListMixin:
@@ -617,7 +624,6 @@ def get_works(request, category):
 def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
-        update_poster_if_nsfw(work, request.user)
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')

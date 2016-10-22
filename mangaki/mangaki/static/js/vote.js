@@ -111,7 +111,8 @@ function loadCard(pos) {
             return loadCardFrom(pos, works);
     }
 
-    return $.getJSON(Urls['get-card'](category, pos), function(works) {
+    return $.getJSON(Urls['get-card'](category, pos), function(json) {
+        works = json['cards'];
         globalWorks[pos] = works;
         works = filterWorks(pos);
 

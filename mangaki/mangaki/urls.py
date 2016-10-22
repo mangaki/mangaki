@@ -1,9 +1,12 @@
 from django.contrib.auth.decorators import login_required
+from django.conf.urls.static import static
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf import settings
 from django_js_reverse.views import urls_js
 from discourse import views as discourse_views
 from mangaki import views
+from mangaki.settings import DEBUG
 
 urlpatterns = [
     # Examples:
@@ -15,7 +18,7 @@ urlpatterns = [
     url(r'^$', views.index, name='home'),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works, name='get-work'),
     url(r'^data/reco/(?P<category>\w+)/(?P<editor>\w+)\.json$', views.get_reco_list, name='get-reco-list'),
-    url(r'^data/card/(?P<category>\w+)/(?P<sort_id>\d+)\.json$', views.get_card, name='get-card'),
+    url(r'^data/card/(?P<category>\w+)/(?P<sort_id>\d+)\.json$', views.CardList.as_view(), name='get-card'),
     url(r'^getuser/(?P<work_id>\w+)\.json$', views.get_user_for_recommendations, name='get-user-for-reco'),
     url(r'^getuser\.json$', views.get_users, name='get-user'),
     url(r'^recommend/(?P<work_id>\w+)/(?P<target_id>\w+)$', views.recommend_work, name='reco-work'),
@@ -45,3 +48,6 @@ urlpatterns = [
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
 ]
+
+if DEBUG:  # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
