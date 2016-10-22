@@ -110,6 +110,7 @@ class SuggestionAdmin(admin.ModelAdmin):
     list_display = ('work', 'problem', 'date', 'user', 'is_checked')
     list_filter = ('problem',)
     actions = ['check_suggestions', 'uncheck_suggestions']
+    raw_id_fields = ('work',)
 
     def view_on_site(self, obj):
         return obj.work.get_absolute_url()
