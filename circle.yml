@@ -6,6 +6,7 @@ machine:
     version: 3.5.1
 dependencies:
   post:
+    - sudo apt-get install -y python3-numpy python3-pandas
     - pip install -r requirements-dev.txt
     - pip install -r requirements-testing.txt
 database:
