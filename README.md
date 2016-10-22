@@ -93,6 +93,21 @@ Afficher les notebooks
 
 Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
 
+
+Lancer les tests
+----------------
+
+    . venv/bin/activate
+    ./mangaki/manage.py test
+
+Ceci va lancer les [doctests](https://docs.python.org/3.5/library/doctest.html) et les tests unitaires contenus dans chaque application avec un dossier `tests`.
+
+Pour calculer la couverture de test, il faut plutôt faire:
+
+    coverage run ./mangaki/manage.py test --with-coverage --cover-package=mangaki,irl,discourse --cover-html
+
+Ainsi, vous aurez un dossier `cover` qui contiendra les informations de couverture en HTML.
+
 Installation facile (Vagrant)
 -----------------------------
 

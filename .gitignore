@@ -14,3 +14,4 @@ data/
 node_modules
 fixtures/*.json
 restore.sh
+*.coverage

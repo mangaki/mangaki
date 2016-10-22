@@ -48,7 +48,15 @@ if DEBUG:
     INSTALLED_APPS += (
         'debug_toolbar',
         'django_extensions',
+        'django_nose',
     )
+
+
+    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+    NOSE_ARGS = [
+        '--with-doctest'
+    ]
 
     NOTEBOOK_ARGUMENTS = [
         '--ip=0.0.0.0',
@@ -97,6 +105,7 @@ TEMPLATES = [
         ],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
                 'django.core.context_processors.request',
                 'django.template.context_processors.static',
