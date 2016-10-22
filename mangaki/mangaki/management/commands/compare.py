@@ -14,7 +14,7 @@ from collections import Counter
 import os.path
 import numpy as np
 import random
-import pandas
+import csv
 # import matplotlib.pyplot as plt
 
 TEST_SIZE = 50000
@@ -43,7 +43,9 @@ class Experiment(object):
 
     def make_dataset(self, PIG_ID):
         self.clean_dataset()
-        ratings = pandas.read_csv(os.path.join(settings.BASE_DIR, '../data/ratings.csv'), header=None).as_matrix()
+        with open(os.path.join(settings.BASE_DIR, '../data/ratings.csv')) as f:
+            ratings = [tuple(bytes(x, 'UTF-8') for x in line) for line in csv.reader(f)]
+        ratings = numpy.array(ratings, 'i4, i4, S8')
         if PIG_ID:  # Let's focus on the PIG
             pig_ratings = {}
             for user_id, work_id, choice in ratings:
@@ -51,7 +53,8 @@ class Experiment(object):
                     pig_ratings[work_id] = rating_values[choice]  # just choice for Movielens
         self.nb_users = max(ratings[:, 0]) + 1
         self.nb_works = max(ratings[:, 1]) + 1
-        self.works = pandas.read_csv(os.path.join(settings.BASE_DIR, '../data/works.csv'), header=None).as_matrix()[:, 1]
+        with open(os.path.join(settings.BASE_DIR, '../data/works.csv')) as f:
+            self.works = [x for _, x in csv.reader(f)]
         train, test = train_test_split(ratings, random_state=0, test_size=TEST_SIZE)
         if PIG_ID:
             train = ratings
