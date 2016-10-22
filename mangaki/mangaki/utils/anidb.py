@@ -45,7 +45,6 @@ class AniDB:
     results = []
     animetitles = BeautifulSoup(r.text, 'xml').animetitles
     for anime in animetitles.find_all('anime'):
-      print(anime)
       results.append(Anime({
         'id': int(anime['aid']),
         'title': str(anime.find('title', attrs={'type': "official"}).string),

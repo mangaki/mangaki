@@ -12,7 +12,7 @@ import os.path
 from mangaki.discourse import get_discourse_data
 from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
-from mangaki.settings import MEDIA_URL, STATIC_URL, MEDIA_ROOT
+from django.conf import settings
 
 
 
@@ -119,14 +119,14 @@ class Work(models.Model):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
     def get_poster_path(self):
-        return '{}/posters/{}.jpg'.format(MEDIA_ROOT, self.id)
+        return '{}/posters/{:d}.jpg'.format(settings.MEDIA_ROOT, self.id)
 
     def safe_poster(self, user):
         if self.id is None:
-            return '{}{}'.format(MEDIA_URL, 'img/chiro.gif')
+            return '{}{}'.format(settings.MEDIA_URL, 'img/chiro.gif')
         if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
-            return '{}posters/{}.jpg'.format(MEDIA_URL, self.id)
-        return '{}{}'.format(STATIC_URL, 'img/nsfw.jpg')
+            return '{}posters/{}.jpg'.format(settings.MEDIA_URL, self.id)
+        return '{}{}'.format(settings.STATIC_URL, 'img/nsfw.jpg')
 
     def has_poster_on_disk(self):
         return os.path.isfile(self.get_poster_path())

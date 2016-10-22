@@ -44,5 +44,4 @@ class JSONResponseMixin(object):
         """
         Returns an object that will be serialized as JSON by json.dumps().
         """
-        print(context.keys())
         return context

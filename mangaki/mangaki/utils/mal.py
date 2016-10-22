@@ -167,7 +167,6 @@ class MAL:
             auth=(settings.MAL_USER, settings.MAL_PASS))
         html_code = html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'&\1;', r.text))
         xml = re.sub(r'&([^alg])', r'&amp;\1', _encoding_translation(html_code))
-        print(xml)
         try:
             self.entry = ET.fromstring(xml).find('entry')
         except ET.ParseError as e:

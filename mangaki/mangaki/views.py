@@ -227,9 +227,11 @@ class CardList(JSONResponseMixin, ListView):
     def get_queryset(self):
         category = self.kwargs.get('category')
         sort_id = self.kwargs.pop('sort_id')
+        if sort_id < 1 or sort_id > 4:
+            sort_id = 1
         deja_vu = self.request.GET.get('dejavu', '').split(',')
         sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
-        queryset = Work.objects.filter(category__slug=category)
+        queryset = Category.objects.get(slug=category).work_set.all()
         if sort_mode == 'popularity':
             queryset = queryset.popular()
         elif sort_mode == 'controversy':
@@ -239,9 +241,9 @@ class CardList(JSONResponseMixin, ListView):
         else:
             queryset = queryset.random().order_by('?')
         if self.request.user.is_authenticated():
-            rated_works = Rating.objects.filter(user=self.request.user).values('work_id')
+            rated_works = self.request.user.rating_set.values('work_id')
             queryset = queryset.exclude(id__in=rated_works)
-        return queryset[:54]
+        return queryset[:POSTERS_PER_PAGE]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

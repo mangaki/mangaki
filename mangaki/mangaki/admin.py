@@ -82,7 +82,7 @@ class WorkAdmin(admin.ModelAdmin):
         if request.POST.get('confirm'):  # Confirmed
             downloaded_titles = []
             for obj in queryset:
-                if obj.category.slug == 'anime':# and refresh_poster(obj):
+                if obj.category.slug == 'anime':
                     title = retrieve_poster(obj, request.POST.get('chosen_poster_%d' % obj.id))
                     if title:
                         downloaded_titles.append(title)
