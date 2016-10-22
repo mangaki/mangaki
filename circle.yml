@@ -2,12 +2,14 @@
 machine:
   timezone:
     Europe/Paris
-  python:
-    version: 3.5.1
   pre:
+    - wget https://s3.amazonaws.com/circle-downloads/circle-pyenv-python-3.5.1_1.0_amd64.deb
+    - sudo dpkg -i circle-pyenv-python-3.5.1_1.0_amd64.deb
     - sudo apt-get update
     - sudo apt-get install -y python3-numpy python3-lxml python3-psycopg2
     - if [ ! -e '/home/ubuntu/virtualenvs/venv-3.5.1' ]; then mkdir -p '/home/ubuntu/virtualenvs'; pushd '/home/ubuntu/virtualenvs'; virtualenv --system-site-package venv-3.5.1; popd; fi
+  python:
+    version: 3.5.1
 dependencies:
   post:
     - pip install wheel
