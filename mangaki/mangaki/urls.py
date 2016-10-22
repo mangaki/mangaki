@@ -2,11 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.conf.urls.static import static
 from django.conf.urls import include, url
 from django.contrib import admin
-<<<<<<< HEAD
 from django.conf import settings
-=======
 from django_js_reverse.views import urls_js
->>>>>>> master
 from discourse import views as discourse_views
 from mangaki import views
 from mangaki.settings import DEBUG
