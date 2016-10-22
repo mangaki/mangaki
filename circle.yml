@@ -7,10 +7,11 @@ machine:
     - sudo dpkg -i circle-pyenv-python-3.5.1_1.0_amd64.deb
     - sudo apt-get update
     - sudo apt-get install -y python3-numpy python3-lxml python3-psycopg2
-    - if [ ! -e '/home/ubuntu/virtualenvs/venv-3.5.1' ]; then mkdir -p '/home/ubuntu/virtualenvs'; pushd '/home/ubuntu/virtualenvs'; virtualenv --system-site-package venv-3.5.1; popd; fi
   python:
     version: 3.5.1
 dependencies:
+  pre:
+    - if [ ! -e '/home/ubuntu/virtualenvs/venv-3.5.1' ]; then mkdir -p '/home/ubuntu/virtualenvs'; pushd '/home/ubuntu/virtualenvs'; virtualenv -p python3.5 --system-site-package venv-3.5.1; popd; fi
   post:
     - pip install wheel
     - pip wheel numpy scipy pandas
