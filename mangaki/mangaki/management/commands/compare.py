@@ -44,8 +44,8 @@ class Experiment(object):
     def make_dataset(self, PIG_ID):
         self.clean_dataset()
         with open(os.path.join(settings.BASE_DIR, '../data/ratings.csv')) as f:
-            ratings = [tuple(bytes(x, 'UTF-8') for x in line) for line in csv.reader(f)]
-        ratings = np.array(ratings, 'i4, i4, S8')
+            ratings = [[int(line[0]), int(line[1]), line[2]] for line in csv.reader(f)]
+        ratings = np.array(ratings, dtype=np.object)
         if PIG_ID:  # Let's focus on the PIG
             pig_ratings = {}
             for user_id, work_id, choice in ratings:
