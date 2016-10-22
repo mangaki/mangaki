@@ -13,3 +13,4 @@ data/
 /.vagrant
 node_modules
 fixtures/*.json
+restore.sh
