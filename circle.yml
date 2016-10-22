@@ -12,9 +12,9 @@ machine:
 dependencies:
   pre:
     - if [ ! -e '/home/ubuntu/virtualenvs/venv-3.5.1' ]; then mkdir -p '/home/ubuntu/virtualenvs'; pushd '/home/ubuntu/virtualenvs'; virtualenv -p python3.5 --system-site-package venv-3.5.1; popd; fi
-  post:
     - pip install wheel
     - pip wheel numpy scipy pandas
+  post:
     - pip install -r requirements-dev.txt
     - pip install -r requirements-testing.txt
 database:
