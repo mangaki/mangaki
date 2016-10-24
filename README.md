@@ -91,20 +91,20 @@ Afficher les notebooks
     . venv/bin/activate
     pip install ipython[notebook]
 
-Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
+Ensuite, vous pourrez faire `./manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
 
 
 Lancer les tests
 ----------------
 
     . venv/bin/activate
-    ./mangaki/manage.py test
+    ./manage.py test
 
 Ceci va lancer les [doctests](https://docs.python.org/3.5/library/doctest.html) et les tests unitaires contenus dans chaque application avec un dossier `tests`.
 
 Pour calculer la couverture de test, il faut plutôt faire:
 
-    coverage run ./mangaki/manage.py test --with-coverage --cover-package=mangaki,irl,discourse --cover-html
+    coverage run ./manage.py test --with-coverage --cover-package=mangaki,irl,discourse --cover-html
 
 Ainsi, vous aurez un dossier `cover` qui contiendra les informations de couverture en HTML.
 
@@ -117,7 +117,6 @@ Vous devez installer [Vagrant](https://www.vagrantup.com/downloads.html), puis i
     vagrant ssh
     cd /mnt/mangaki
     . .venv/bin/activate
-    cd mangaki
     ./manage.py runserver 0.0.0.0:8000
 
 Votre machine virtuelle tourne sous Trusty64, le repo est monté via un shared folder sur `/mnt/mangaki`.
