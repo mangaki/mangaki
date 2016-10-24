@@ -1,3 +1,4 @@
+{% load js_reverse %}
 {% extends "base.html" %}
 
 {% block body %}
@@ -72,7 +73,9 @@
     });
     </script>
 
-    <script src="{% url 'js_reverse' %}" type="text/javascript"></script>
+    <script type='text/javascript' charset='utf-8'>
+        {% js_reverse_inline %}
+    </script>
 {% else %}
     <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="{% url 'work-list' 'anime' %}">noté un <em>anime</em></a> !</p>
 {% endif %}
