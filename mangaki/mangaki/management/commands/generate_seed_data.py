@@ -1,30 +1,66 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from mangaki.models import *
-from irl.models import *
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.models import Session
 from collections import Counter
 from django.db import connection, connections
 from django.utils import timezone
+from io import StringIO
 
 import random
-
-MANGAKI_DB_NAME = connections.databases['default']['NAME']
-MANGAKI_SEED_DB_NAME = '{}_seed'.format(MANGAKI_DB_NAME)
+import json
 
 PARAMETERS = {
     'small': {
         'max_anime': 20,
-        'max_manga': 20,
-        'max_users': 200
+        'max_manga': 20
     },
     'big': {
         'max_anime': 200,
-        'max_manga': 200,
-        'max_users': 500
+        'max_manga': 200
     }
 }
+
+def create_fixture(*parameters):
+    buf = StringIO()
+    call_command('dumpdata', *parameters, stdout=buf)
+    buf.seek(0)
+    return buf
+
+def limit(mapping, items):
+    limited_items = []
+    counts = {key: 0 for key in mapping.keys()}
+    for item in items:
+        for key, limit_params in mapping.items():
+            test, size = limit_params
+            if test(item):
+                if counts[key] < size:
+                    limited_items.append(item)
+                    counts[key] += 1
+                else:
+                    break
+        else:
+            limited_items.append(item)
+
+    return limited_items
+
+def fix_work_ids(items):
+    new_items = []
+    work_ids = set([i['pk'] for i in items if i['model'] == 'mangaki.work'])
+
+    for item in items:
+        if 'work' in item['fields'] and item['fields']['work'] in work_ids:
+            new_items.append(item)
+
+    return new_items
+
+def test_anime(model_row):
+    return model_row['model'] == 'mangaki.work' and model_row['fields']['category'] == 1
+
+def test_manga(model_row):
+    return model_row['model'] == 'mangaki.work' and model_row['fields']['category'] == 2
+
 
 class Command(BaseCommand):
     args = ''
@@ -39,140 +75,33 @@ class Command(BaseCommand):
         size, filename = options.get('size'), options.get('filename')
         print('Generating a {} seed data to {}'.format(size.lower(), filename))
 
-        # Save current state of the DB
-        self.save_db()
-        try:
-            self.clean_out_db()
-            print('Seed database purged from useless data.')
-            # Proceed to the seed data
-            chosen_parameters = PARAMETERS[size.lower()]
-            ## Limit the works
-            self.delete_works(**chosen_parameters)
-            ## Anonymize the users
-            self.delete_users(**chosen_parameters)
-            print('Works and users were limited as per to the {} size seed parameters.'.format(size.lower()))
-            ## Save the seed
-            self.dump_data(filename)
-            print('Seed saved in {}'.format(filename))
-        except Exception as e:
-            print('Exception occurred during the seed process: {}'.format(e))
-        finally:
-            # Restore the DB
-            self.drop_seed_db()
-            print('Temporary database deleted.')
+        models_to_dump = [
+            Category,
+            Work,
+            Role,
+            Staff,
+            Editor,
+            Studio,
+            Genre,
+            Track,
+            Artist,
+            ArtistSpelling,
+            Top,
+            Ranking
+        ]
 
-    def create_seed_db(self):
-        try:
-            conn = connection._nodb_connection
-            with conn.cursor() as c:
-                c.execute('CREATE DATABASE {} WITH TEMPLATE {}'.format(MANGAKI_SEED_DB_NAME, MANGAKI_DB_NAME))
-            conn.close()
-            return True
-        except Exception as e:
-            return False
+        models = ['mangaki.{}'.format(model.__name__.lower()) for model in models_to_dump]
+        fixture_data = json.loads(create_fixture(*models).read())
+        print ('Limiting the data.')
 
+        # Limit animes and mangas
+        mapping = {
+            'animes': (test_anime, PARAMETERS[size]['max_anime']),
+            'manga': (test_manga, PARAMETERS[size]['max_manga'])
+        }
 
-    def save_db(self):
-        if not self.create_seed_db():
-            print('Database seems to be already created.')
-            self.drop_seed_db()
-            created = False
-            for x in range(3):
-                if self.create_seed_db():
-                    created = True
-                    break
-            if not created:
-                print('It seems really impossible to create the seed database, '
-                      'investigate what is happening on your computer.')
-        try:
-            print('Temporary database {} created.'.format(MANGAKI_SEED_DB_NAME))
+        final_fixture = fix_work_ids(limit(mapping, fixture_data))
 
-            if 'seed' in connections.databases:
-                print('Warning: `seed` database detected, the parameters will be replaced.')
-
-            connections._databases['seed'] = connections.databases['default'].copy()
-            # This is really important to use `NAME` and not `name` !
-            connections._databases['seed']['NAME'] = MANGAKI_SEED_DB_NAME
-
-            print('Seed database injected in connections table.')
-        except Exception as e:
-            print('Exception occurred during database cloning: {} (rolling-back the clone)'.format(e))
-            self.drop_seed_db()
-            raise e
-
-    def drop_seed_db(self):
-        if 'seed' in connections:
-            connections['seed'].close()
-        conn = connection._nodb_connection
-        with conn.cursor() as c:
-            c.execute('DROP DATABASE {}'.format(MANGAKI_SEED_DB_NAME))
-
-    def clean_out_db(self):
-        """
-        Clean out the database of useless and personal data.
-        """
-        models = [SearchIssue, Suggestion, Recommendation, Pairing,
-                  Session, ContentType]
-
-        for model in models:
-            model.objects.using('seed').all().delete()
-
-
-    def delete_works(self, max_anime, max_manga, max_users):
-        nb = Counter(Rating.objects.values_list('work_id', flat=True))
-        # Distinction between Anime and Manga will disappear with PR #153
-        if max_anime:
-            work_ids = list(Work.objects\
-                            .filter(category__slug='anime')\
-                            .values_list('id', flat=True))
-            work_ids.sort(key=lambda work_id: -nb[work_id])
-            Work.objects.using('seed')\
-                .exclude(id__in=work_ids[:max_anime]).delete()
-            print('Animes limited.')
-        if max_manga:
-            work_ids = list(Work.objects\
-                            .filter(category__slug='manga')\
-                            .values_list('id', flat=True))
-            work_ids.sort(key=lambda work_id: -nb[work_id])
-            Work.objects.using('seed')\
-                .exclude(id__in=work_ids[:max_manga]).delete()
-            print('Manga limited.')
-
-        if max_anime or max_manga:
-            bundle = []
-            for artist_ids in Work.objects.values_list('artists'):
-                bundle.extend(artist_ids)
-            kept_artist_ids = list(set([x for x in bundle if x is not None]))
-            Artist.objects.using('seed')\
-                .exclude(id__in=kept_artist_ids).delete()
-
-            print('Artists limited.')
-
-    def delete_users(self, max_anime, max_manga, max_users):
-        max_user_id = max(User.objects.values_list('id', flat=True))
-        chosen = User.objects.order_by('?')[:max_users]
-        kept_ids = chosen.values_list('id', flat=True)
-        User.objects.using('seed')\
-            .exclude(id__in=kept_ids).delete()
-        print('Users limited.')
-        self.anonymize_users(max_user_id, max_users)
-
-    def anonymize_users(self, max_user_id, max_users):
-        new_ids = random.sample(range(max_user_id + 1, max_user_id + max_users + 1), max_users)
-        for user, new_id in zip(User.objects.using('seed').all(), new_ids):
-            old_id = user.id
-            user.pk = new_id
-            user.username = str(new_id)
-            user.is_superuser = False
-            user.set_password('mangaki')
-            user.email = '%d@mangaki.fr' % new_id
-            user.date_joined = timezone.now()
-            user.last_login = timezone.now()
-            user.save(using='seed')
-            old_user = User.objects.using('seed').get(id=old_id)
-            old_user.rating_set.update(user=user)
-            old_user.delete()
-        print('Users anonymized.')
-
-    def dump_data(self, path):
-        call_command('dumpdata', database='seed', output=path, format='json')
+        with open(filename, 'w') as f:
+            f.write(json.dumps(final_fixture))
+        print ('Fixture ready.')
