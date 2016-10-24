@@ -1,0 +1,5 @@
+git-lint
+pylint
+pep8
+yamllint
+html-linter
