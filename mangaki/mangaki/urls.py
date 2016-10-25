@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.static import static
+from django.conf.urls import handler400, handler404, handler500
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
@@ -48,6 +49,11 @@ urlpatterns = [
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
 ]
+
+handler404 = views.error("POST", 404)
+handler403 = views.error("POST", 403)
+handler400 = views.error("POST", 400)
+handler500 = views.error("POST", 500)
 
 if DEBUG:  # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<div class="jumbotron">
+		<h2>Cette page n'existe pas. ({{ error }})</h2>
+		“{{trope.trope}}„ — {{ trope.author }}, <a href="{% url 'work-detail' category origin.id %}">{{ origin.title }}</a>
+	</div>
+{% endblock %}

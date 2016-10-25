@@ -21,7 +21,7 @@ from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
+from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme, Trope
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
@@ -710,3 +710,11 @@ def faq_index(request):
         'information': all_information,
     }
     return render(request, 'faq/faq_index.html', context)
+
+def error(request, error_type):
+    trope = Trope.objects.order_by('?').first()
+    return render(request, 'error.html', {
+        'error': error_type,
+        'trope': trope,
+        'origin': trope.origin,
+    })
