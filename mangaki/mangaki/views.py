@@ -711,10 +711,29 @@ def faq_index(request):
     }
     return render(request, 'faq/faq_index.html', context)
 
-def error(request, error_type):
+def page_not_found(request):
     trope = Trope.objects.order_by('?').first()
+    error_code = 404
+
+    # TODO: Implement an if in case we get an error code
+    #       `raise Http404('some error code')`
+    error = 'Cette page n\'existe pas.'
+
     return render(request, 'error.html', {
-        'error': error_type,
+        'error_code': error_code,
+        'error': error,
         'trope': trope,
         'origin': trope.origin,
-    })
+    }, status=404)
+
+def permission_denied(request):
+    trope = Trope.objects.order_by('?').first()
+    error_code = 403
+    error = 'Tu n\'as pas la permission d\'accéder à ce contenu.'
+
+    return render(request, 'error.html', {
+        'error_code': error_code,
+        'error': error,
+        'trope': trope,
+        'origin': trope.origin,
+    }, status=403)
