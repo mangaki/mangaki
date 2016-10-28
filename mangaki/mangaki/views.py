@@ -719,21 +719,35 @@ def page_not_found(request):
     #       `raise Http404('some error code')`
     error = 'Cette page n\'existe pas.'
 
-    return render(request, 'error.html', {
-        'error_code': error_code,
-        'error': error,
-        'trope': trope,
-        'origin': trope.origin,
-    }, status=404)
+    if not trope:
+        return render(request, 'error.html', {
+            'error_code': error_code,
+            'error': error,
+        }, status=404)
+    else:
+        return render(request, 'error.html', {
+            'error_code': error_code,
+            'error': error,
+            'trope': trope,
+            'origin': trope.origin,
+        }, status=404)
+
+# FIXME: DRY
 
 def permission_denied(request):
     trope = Trope.objects.order_by('?').first()
     error_code = 403
     error = 'Tu n\'as pas la permission d\'accéder à ce contenu.'
 
-    return render(request, 'error.html', {
-        'error_code': error_code,
-        'error': error,
-        'trope': trope,
-        'origin': trope.origin,
-    }, status=403)
+    if not trope:
+        return render(request, 'error.html', {
+            'error_code': error_code,
+            'error': error,
+        }, status=403)
+    else:
+        return render(request, 'error.html', {
+            'error_code': error_code,
+            'error': error,
+            'trope': trope,
+            'origin': trope.origin,
+        }, status=403)

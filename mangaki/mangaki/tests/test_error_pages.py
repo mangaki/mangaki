@@ -17,8 +17,15 @@ class ErrorPageTest(TestCase):
             author='Keisuke Takahashi',
             origin_id='1'
         )
+        self.work = Work.objects.get(id=1)
+        self.trope = Trope.objects.get(id=1)
 
     def test_trope(self):
         response = self.client.get('/404/')
         self.assertEqual(response.status_code, 404)
-        self.assertIn(Trope.objects.only('trope').get(pk=1), response.content)
+        self.assertIn(trope, response.content)
+
+    def test_no_trope(self): # An error 500 could occur in this case.
+        trope.delete()
+        response = self.client.get('/404/')
+        self.assertEqual(response.status_code, 404)
