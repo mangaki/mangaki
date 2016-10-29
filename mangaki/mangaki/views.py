@@ -711,43 +711,21 @@ def faq_index(request):
     }
     return render(request, 'faq/faq_index.html', context)
 
-def page_not_found(request):
-    trope = Trope.objects.order_by('?').first()
-    error_code = 404
+def generic_error_view(error, error_code):
+    def error_view(request):
+        trope = Trope.objects.order_by('?').first()
 
-    # TODO: Implement an if in case we get an error code
-    #       `raise Http404('some error code')`
-    error = 'Cette page n\'existe pas.'
-
-    if not trope:
-        return render(request, 'error.html', {
-            'error_code': error_code,
-            'error': error,
-        }, status=404)
-    else:
-        return render(request, 'error.html', {
-            'error_code': error_code,
-            'error': error,
-            'trope': trope,
-            'origin': trope.origin,
-        }, status=404)
-
-# FIXME: DRY
-
-def permission_denied(request):
-    trope = Trope.objects.order_by('?').first()
-    error_code = 403
-    error = 'Tu n\'as pas la permission d\'accéder à ce contenu.'
-
-    if not trope:
-        return render(request, 'error.html', {
-            'error_code': error_code,
-            'error': error,
-        }, status=403)
-    else:
-        return render(request, 'error.html', {
-            'error_code': error_code,
-            'error': error,
-            'trope': trope,
-            'origin': trope.origin,
-        }, status=403)
+        if not trope:
+            return render(request, 'error.html', {
+                'request': request,
+                'error_code': error_code,
+                'error': error,
+            }, status=error_code)
+        else:
+            return render(request, 'error.html', {
+                'error_code': error_code,
+                'error': error,
+                'trope': trope,
+                'origin': trope.origin,
+            }, status=error_code)
+    return error_view

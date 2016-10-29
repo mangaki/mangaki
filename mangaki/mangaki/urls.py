@@ -50,8 +50,10 @@ urlpatterns = [
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
 ]
 
-handler404 = views.page_not_found
-handler403 = views.permission_denied
+handler500 = views.generic_error_view("Le serveur a rencontré une erreur.", 500)
+handler404 = views.generic_error_view("Le contenu que tu cherches est introuvable.", 404)
+handler403 = views.generic_error_view("L'accès au contenu que tu cherches est refusé.", 403)
+handler400 = views.generic_error_view("Ta requête est incorrecte.", 400)
 
 if DEBUG:  # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
