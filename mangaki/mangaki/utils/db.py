@@ -8,8 +8,8 @@ def get_potential_posters(work):
     posters = []
     if work.has_poster_on_disk():
         posters.append('%s://%s%s' % (request.scheme, Site.objects.get_current().domain, work.safe_poster(request.user)))
-    if work.poster:
-        posters.append(work.poster)
+    if work.ext_poster:
+        posters.append(work.ext_poster)
     mal = MAL()
     mal.search(work.title)  # Query the poster to MAL from the title
     poster_url = mal.get_poster()
@@ -21,7 +21,7 @@ def get_potential_posters(work):
 def retrieve_poster(work, poster_url):
     try:
         urlretrieve(poster_url, work.get_poster_path())
-        work.poster = ''
+        work.ext_poster = ''
         work.save()
         return work.title
     except:

@@ -80,7 +80,7 @@ class Category(models.Model):
 class Work(models.Model):
     title = models.CharField(max_length=128)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
-    poster = models.CharField(max_length=128)
+    ext_poster = models.CharField(max_length=128)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
