@@ -24,6 +24,9 @@
 </ul>
 {% endfor %}
 <div>
+{% for obj in queryset %}
+<input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+{% endfor %}
 <input type="hidden" name="action" value="refresh_work" />
 <input type="hidden" name="confirm" value="yes" />
 <input type="submit" style="display: block; clear: both" value="{% trans "Yes, I'm sure" %}" />
