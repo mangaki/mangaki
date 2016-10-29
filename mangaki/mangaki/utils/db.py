@@ -21,7 +21,6 @@ def get_potential_posters(work):
 def retrieve_poster(work, poster_url):
     try:
         urlretrieve(poster_url, work.get_poster_path())
-        work.ext_poster = ''
         work.save()
         return work.title
     except:

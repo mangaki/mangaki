@@ -125,7 +125,9 @@ class Work(models.Model):
         if self.id is None:
             return '{}{}'.format(settings.MEDIA_URL, 'img/chiro.gif')
         if not self.nsfw or (user.is_authenticated and user.profile.nsfw_ok):
-            return '{}posters/{}.jpg'.format(settings.MEDIA_URL, self.id)
+            if self.has_poster_on_disk():
+                return '{}posters/{}.jpg'.format(settings.MEDIA_URL, self.id)
+            return self.ext_poster
         return '{}{}'.format(settings.STATIC_URL, 'img/nsfw.jpg')
 
     def has_poster_on_disk(self):
