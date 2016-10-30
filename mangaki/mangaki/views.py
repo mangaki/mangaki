@@ -2,6 +2,7 @@ from django.views.generic.detail import DetailView, SingleObjectTemplateResponse
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormMixin
 from django.views.generic import View
+from django.views.defaults import server_error
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -18,7 +19,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from django.dispatch import receiver
 from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
-from django.db import connection
+from django.db import connection, DatabaseError
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added
 from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme, Trope
@@ -713,11 +714,13 @@ def faq_index(request):
 
 def generic_error_view(error, error_code):
     def error_view(request):
-        trope = Trope.objects.order_by('?').first()
+        try:
+            trope = Trope.objects.order_by('?').first()
+        except DatabaseError:
+            return server_error
 
         if not trope:
             return render(request, 'error.html', {
-                'request': request,
                 'error_code': error_code,
                 'error': error,
             }, status=error_code)
