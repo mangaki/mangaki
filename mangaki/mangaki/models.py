@@ -132,7 +132,9 @@ class Work(models.Model):
             return self.ext_poster
         return '{}{}'.format(settings.STATIC_URL, 'img/nsfw.jpg')
 
-    def retrieve_poster(self, url=None):
+    def retrieve_poster(self, url=None, session=None):
+        if session is None:
+            session = requests
         if url is None:
             url = self.ext_poster
         if not url:
@@ -141,7 +143,7 @@ class Work(models.Model):
         filename = os.path.basename(urlparse(url).path)
 
         try:
-            r = requests.get(url, timeout=5, stream=True)
+            r = session.get(url, timeout=5, stream=True)
         except requests.RequestException as e:
             return False
 
