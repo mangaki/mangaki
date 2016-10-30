@@ -151,6 +151,7 @@ class Work(models.Model):
             with tempfile.TemporaryFile() as f:
                 for chunk in r.iter_content(chunk_size=1024):
                     f.write(chunk)
+                self.ext_poster = url
                 self.int_poster.save(filename, File(f))
         finally:
             r.close()
