@@ -6,7 +6,11 @@ from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
+from django.core.files import File
 
+import tempfile
+import requests
+from urllib.parse import urlparse
 import os.path
 
 from mangaki.discourse import get_discourse_data
@@ -119,20 +123,36 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
-    def get_poster_path(self):
-        return '{}/posters/{:d}.jpg'.format(settings.MEDIA_ROOT, self.id)
-
     def safe_poster(self, user):
         if self.id is None:
             return '{}{}'.format(settings.MEDIA_URL, 'img/chiro.gif')
         if not self.nsfw or (user.is_authenticated and user.profile.nsfw_ok):
-            if self.has_poster_on_disk():
-                return '{}posters/{}.jpg'.format(settings.MEDIA_URL, self.id)
+            if self.int_poster:
+                return self.int_poster.url
             return self.ext_poster
         return '{}{}'.format(settings.STATIC_URL, 'img/nsfw.jpg')
 
-    def has_poster_on_disk(self):
-        return os.path.isfile(self.get_poster_path())
+    def retrieve_poster(self, url=None):
+        if url is None:
+            url = self.ext_poster
+        if not url:
+            return False
+
+        filename = os.path.basename(urlparse(url).path)
+
+        try:
+            r = requests.get(url, timeout=5, stream=True)
+        except requests.RequestException as e:
+            return False
+
+        try:
+            with tempfile.TemporaryFile() as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    f.write(chunk)
+                self.int_poster.save(filename, File(f))
+        finally:
+            r.close()
+        return True
 
     def __str__(self):
         return self.title
