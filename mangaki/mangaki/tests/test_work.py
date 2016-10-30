@@ -1,5 +1,6 @@
 from django.test import TestCase
-from mangaki.models import Work, Category
+from django.db import IntegrityError
+from mangaki.models import Work, Category, Editor, Studio
 from django.contrib.auth.models import User, AnonymousUser
 
 from mangaki.factories import create_user_with_profile
@@ -8,17 +9,22 @@ class WorkTest(TestCase):
 
     def create_anime(self, **kwargs):
         anime = Category.objects.get(slug='anime')
-        return Work.objects.create(**kwargs, category=anime)
+        return Work.objects.create(category=anime, **kwargs)
 
     def create_manga(self, **kwargs):
         manga = Category.objects.get(slug='manga')
-        return Work.objects.create(**kwargs, category=manga)
+        return Work.objects.create(category=manga, **kwargs)
 
     def create_album(self, **kwargs):
         album = Category.objects.get(slug='album')
-        return Work.objects.create(**kwargs, category=album)
+        return Work.objects.create(category=album, **kwargs)
 
     def setUp(self):
+        # FIXME: The defaults for editor and studio in Work requires those to
+        # exist, or else foreign key constraints fail.
+        Editor.objects.create(pk=1)
+        Studio.objects.create(pk=1)
+
         self.anime = self.create_anime(title='STEINS;GATE',
             source='Ryan',
             poster='ryan.png',
@@ -79,22 +85,22 @@ class WorkTest(TestCase):
 
     def test_work_creation(self):
         """
-        Work cannot be created without a category, the `Work.save` method will throw a TypeError.
+        Work cannot be created without a category, the `Work.save` method will throw an IntegrityError.
         """
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(IntegrityError):
             Work.objects.create(title='a cool work')
 
     def test_work_safe_poster_for_non_nsfw(self):
         w = self.anime
 
-        self.assertIn(w.poster, w.safe_poster(AnonymousUser()))
-        self.assertIn(w.poster, w.safe_poster(self.fake_user))
-        self.assertIn(w.poster, w.safe_poster(self.fake_user_with_nsfw))
+        self.assertNotIn('nsfw', w.safe_poster(AnonymousUser()))
+        self.assertNotIn('nsfw', w.safe_poster(self.fake_user))
+        self.assertNotIn('nsfw', w.safe_poster(self.fake_user_with_nsfw))
 
     def test_work_safe_poster_for_nsfw(self):
         w = self.nsfw_anime
 
         self.assertIn('nsfw', w.safe_poster(AnonymousUser()))
         self.assertIn('nsfw', w.safe_poster(self.fake_user))
-        self.assertIn('dakara.png', w.safe_poster(self.fake_user_with_nsfw))
+        self.assertNotIn('nsfw', w.safe_poster(self.fake_user_with_nsfw))
