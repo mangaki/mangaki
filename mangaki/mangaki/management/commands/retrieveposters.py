@@ -26,21 +26,20 @@ class Command(BaseCommand):
                 if work.int_poster:
                     if not options['check_exists']:
                         continue
-                    try:
-                        with work.int_poster.open() as f:
-                            pass
-                    except FileNotFoundError:
-                        pass
-                    else:
+                    if work.int_poster.storage.exists(work.int_poster.name):
                         continue
 
                 while len(recent) >= options['ratelimit']:
                     now = time.time()
                     recent = [t for t in recent if now - t < 1.]
                     if len(recent) >= options['ratelimit']:
+                        # We want to sleep:
+                        #  - No less than 0 seconds (as a sanity check)
+                        #  - No more than 1 second
+                        #  - Enough time so that when we wake up, the oldest
+                        #    time in recent was more than 1 second ago.
                         time.sleep(min(max(1.1 - now + recent[0], 0.), 1.))
-                    else:
-                        recent.append(now)
+                recent.append(now)
 
                 if work.retrieve_poster(session=s):
                     nb_success += 1
