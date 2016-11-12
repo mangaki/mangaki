@@ -21,7 +21,6 @@ class UserFactory(DjangoModelFactory):
 
     username = factory.Faker('user_name')
     email = factory.LazyAttribute(lambda o: '{}@mangaki.fr'.format(o.username))
-    profile = factory.RelatedFactory(ProfileFactory, 'user')
 
 class WorkFactory(DjangoModelFactory):
     class Meta:
