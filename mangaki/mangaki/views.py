@@ -19,8 +19,6 @@ from django.views.generic.detail import SingleObjectMixin
 from django.dispatch import receiver
 from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection
-from allauth.account.signals import user_signed_up
-from allauth.socialaccount.signals import social_account_added
 from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.mixins import AjaxableResponseMixin
@@ -694,13 +692,6 @@ def add_pairing(request, artist_id, work_id):
         work = get_object_or_404(Work, id=work_id)
         Pairing(user=request.user, artist=artist, work=work).save()
     return HttpResponse()
-
-
-@receiver(user_signed_up)
-@receiver(social_account_added)
-def register_profile(sender, **kwargs):
-    user = kwargs['user']
-    Profile(user=user).save()
 
 
 def faq_index(request):

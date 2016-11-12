@@ -281,10 +281,9 @@ class Suggestion(models.Model):
         score = suggestions_score + recommendations_score
         Profile.objects.filter(user=self.user).update(score=score)
 
-
-def suggestion_saved(sender, instance, *args, **kwargs):
-    instance.update_scores()
-models.signals.post_save.connect(suggestion_saved, sender=Suggestion)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.update_scores()
 
 
 class Neighborship(models.Model):
