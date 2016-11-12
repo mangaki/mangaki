@@ -5,6 +5,7 @@ from django.contrib.auth.models import User, AnonymousUser
 
 from mangaki.factories import create_user_with_profile
 
+
 class WorkTest(TestCase):
 
     def create_anime(self, **kwargs):
@@ -61,6 +62,32 @@ class WorkTest(TestCase):
             'nsfw_ok': True
         })
 
+    def test_search(self):
+        accents = self.create_anime(title='Un titre accentué oui oui')
+        no_accents = self.create_anime(title='Un titre sans accents non non')
+        tests = [
+            ('medaka', self.manga),
+            ('titre', [accents, no_accents]),
+            ('titre oui', accents),
+            ('titre non', no_accents),
+            ('accentue', accents),
+            ('accent', [accents, no_accents]),
+            ('boxers', None),
+        ]
+        for query, expected in tests:
+            qs = list(Work.objects.filter(title__search=query))
+            if expected is None:
+                self.assertFalse(qs)
+                continue
+            elif isinstance(expected, (list, tuple)):
+                self.assertEqual(len(qs), len(expected))
+                for w in qs:
+                    self.assertIn(w, expected)
+                for e in expected:
+                    self.assertIn(e, qs)
+            else:
+                self.assertEqual(len(qs), 1)
+                self.assertEqual(qs[0], expected)
 
     def test_anime_creation(self):
         w = self.anime
