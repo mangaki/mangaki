@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('poster', models.CharField(null=True, max_length=128, blank=True)),
                 ('mal_id', models.IntegerField(null=True, blank=True)),
                 ('score', models.IntegerField(null=True, blank=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },

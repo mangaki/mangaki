@@ -21,8 +21,8 @@ class Migration(migrations.Migration):
                 ('problem', models.CharField(max_length=8, choices=[('title', "Le titre n'est pas le bon"), ('poster', 'Le poster ne convient pas'), ('synopsis', 'Le synopsis comporte des erreurs')], verbose_name='Problème')),
                 ('message', models.TextField(blank=True, verbose_name='Correction (facultatif)')),
                 ('is_checked', models.BooleanField(default=False)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('work', models.ForeignKey(to='mangaki.Work')),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('work', models.ForeignKey(to='mangaki.Work', on_delete=models.CASCADE)),
             ],
             options={
             },

@@ -16,8 +16,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
                 ('url', models.CharField(max_length=512)),
-                ('suggestion', models.ForeignKey(blank=True, to='mangaki.Suggestion', null=True)),
-                ('work', models.ForeignKey(to='mangaki.Work')),
+                ('suggestion', models.ForeignKey(blank=True, to='mangaki.Suggestion', null=True, on_delete=models.CASCADE)),
+                ('work', models.ForeignKey(to='mangaki.Work', on_delete=models.CASCADE)),
             ],
             options={
             },

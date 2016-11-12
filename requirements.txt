@@ -1,11 +1,10 @@
 Django==1.9.1
-django-allauth==0.24.1
+django-allauth==0.28
 markdown
 django-bootstrap-form
 -e git+https://github.com/tindie/pydiscourse.git#egg=pydiscourse
 psycopg2
 numpy
-PyYAML
 beautifulsoup4
 natsort
 django-analytical
