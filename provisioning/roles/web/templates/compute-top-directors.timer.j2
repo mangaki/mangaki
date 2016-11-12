@@ -2,7 +2,7 @@
 Description=Compute top directors daily
 After=postgresql
 Type=oneshot
-ExecStart={{ command_to_compute_top_directors }}
+ExecStart={{ manage_path }} top director
 
 [Timer]
 OnBootSec=15min
