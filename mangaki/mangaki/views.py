@@ -117,7 +117,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
                 context['rating'] = self.object.rating_set.get(user=self.request.user).choice
@@ -159,7 +159,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
             )))
         if len(events) > 0:
             my_events = {}
-            if self.request.user.is_authenticated():
+            if self.request.user.is_authenticated:
                 my_events = dict(self.request.user.attendee_set.filter(
                     event__in=events).values_list('event_id', 'attending'))
 
@@ -179,7 +179,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         return context
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseForbidden()
         self.object = self.get_object()
         form_class = self.get_form_class()
@@ -225,8 +225,11 @@ class CardList(JSONResponseMixin, ListView):
 
     def get_queryset(self):
         category = self.kwargs.get('category')
-        sort_id = self.kwargs.pop('sort_id')
-        if sort_id < 1 or sort_id > 4:
+        try:
+            sort_id = int(self.kwargs.pop('sort_id'))
+            if sort_id < 1 or sort_id > 4:
+                sort_id = 1
+        except ValueError:
             sort_id = 1
         deja_vu = self.request.GET.get('dejavu', '').split(',')
         sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
@@ -239,7 +242,7 @@ class CardList(JSONResponseMixin, ListView):
             queryset = queryset.top()
         else:
             queryset = queryset.random().order_by('?')
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             rated_works = self.request.user.rating_set.values('work_id')
             queryset = queryset.exclude(id__in=rated_works)
         return queryset[:POSTERS_PER_PAGE]
@@ -266,7 +269,7 @@ class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             ratings = dict(
                 Rating.objects.filter(
                     user=self.request.user,
@@ -459,7 +462,7 @@ def get_profile(request, username):
             'link': attendee.event.link,
             'location': attendee.event.location,
             'title': attendee.event.work.title,
-        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event', 'event__work__title')
+        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event', 'event__work')
     ]
 
     data = {
@@ -488,7 +491,7 @@ def get_profile(request, username):
 
 
 def index(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         if Rating.objects.filter(user=request.user).count() == 0:
             return redirect('/anime/')
     # texte = Announcement.objects.get(title='Flash News').text
@@ -505,12 +508,12 @@ def about(request):
 
 def events(request):
     uta_rating = None
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         for rating in Rating.objects.filter(work_id=UTA_ID, user=request.user):
             if rating.work_id == UTA_ID:
                 uta_rating = rating.choice
     ghibli_works = Work.objects.in_bulk(GHIBLI_IDS)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         ghibli_ratings = dict(Rating.objects.filter(user=request.user, work_id__in=GHIBLI_IDS).values_list('work_id', 'choice'))
     else:
         ghibli_ratings = {}
@@ -555,7 +558,7 @@ def top(request, category_slug):
 
 
 def rate_work(request, work_id):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee', 'favorite']:
@@ -571,7 +574,7 @@ def rate_work(request, work_id):
 
 
 def recommend_work(request, work_id, target_id):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         target_user = get_object_or_404(User, id=target_id)
         if target_user == request.user:
@@ -657,25 +660,25 @@ def get_reco(request):
 
 
 def update_shared(request):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(is_shared=request.POST['is_shared'] == 'true')
     return HttpResponse()
 
 
 def update_nsfw(request):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(nsfw_ok=request.POST['nsfw_ok'] == 'true')
     return HttpResponse()
 
 
 def update_newsletter(request):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(newsletter_ok=request.POST['newsletter_ok'] == 'true')
     return HttpResponse()
 
 
 def update_reco_willsee(request):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
     return HttpResponse()
 
@@ -688,7 +691,7 @@ def import_from_mal(request, mal_username):
 
 
 def add_pairing(request, artist_id, work_id):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         artist = get_object_or_404(Artist, id=artist_id)
         work = get_object_or_404(Work, id=work_id)
         Pairing(user=request.user, artist=artist, work=work).save()

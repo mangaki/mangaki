@@ -68,7 +68,7 @@ if config.has_section('allauth'):
         for name in config.options('allauth')
     )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -79,7 +79,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 if DEBUG:
-    MIDDLEWARE_CLASSES += (
+    MIDDLEWARE += (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
     )
 
@@ -107,7 +107,7 @@ TEMPLATES = [
         'OPTIONS': {
             'debug': DEBUG,
             'context_processors': [
-                'django.core.context_processors.request',
+                'django.template.context_processors.request',
                 'django.template.context_processors.static',
                 'django.template.context_processors.media',
                 'django.template.context_processors.debug',

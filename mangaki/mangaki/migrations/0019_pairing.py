@@ -18,9 +18,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, primary_key=True, auto_created=True, verbose_name='ID')),
                 ('date', models.DateTimeField(auto_now=True)),
-                ('artist', models.ForeignKey(to='mangaki.Artist')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('work', models.ForeignKey(to='mangaki.Work')),
+                ('artist', models.ForeignKey(to='mangaki.Artist', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('work', models.ForeignKey(to='mangaki.Work', on_delete=models.CASCADE)),
             ],
             options={
             },
