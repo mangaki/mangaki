@@ -6,4 +6,6 @@ class MangakiConfig(AppConfig):
     verbose_name = 'Mangaki'
 
     def ready(self):
+        # Ensure signal receivers decorated with `@receiver` are connected by
+        # importing the `receivers` module.
         from . import receivers
