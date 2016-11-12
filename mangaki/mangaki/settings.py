@@ -154,6 +154,9 @@ if config.has_section('discourse'):
     DISCOURSE_SSO_SECRET = config.get('secrets', 'DISCOURSE_SSO_SECRET')
     DISCOURSE_API_USERNAME = config.get('discourse', 'DISCOURSE_API_USERNAME')
     DISCOURSE_API_KEY = config.get('secrets', 'DISCOURSE_API_KEY')
+    HAS_DISCOURSE = True
+else:
+    HAS_DISCOURSE = False
 
 if config.has_section('mal'):
     MAL_USER = config.get('mal', 'MAL_USER')
