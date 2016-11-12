@@ -1,3 +1,4 @@
+{% load js_reverse %}
 {% extends "base.html" %}
 
 {% block body %}
@@ -159,5 +160,7 @@ function removeAllReco(elt) {
 }
 </script>
 
-<script src="{% url 'js_reverse' %}" type="text/javascript"></script>
+<script type='text/javascript' charset='utf-8'>
+    {% js_reverse_inline %}
+</script>
 {% endblock %}

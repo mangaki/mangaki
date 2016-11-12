@@ -13,8 +13,6 @@ urlpatterns = [
     # url(r'^$', views.home, name='home'),
     # url(r'^blog/', include('blog.urls')),
 
-    url(r'^jsreverse/$', urls_js, name='js_reverse'),
-
     url(r'^$', views.index, name='home'),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works, name='get-work'),
     url(r'^data/reco/(?P<category>\w+)/(?P<editor>\w+)\.json$', views.get_reco_list, name='get-reco-list'),
