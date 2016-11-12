@@ -34,5 +34,7 @@ test:
       --with-xunit
       --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml
       --cover-package=mangaki,irl,discourse
+    - cd ..
   post:
+    # CodeCov MUST absolutely run in the project root folder
     - bash <(curl -s https://codecov.io/bash)
