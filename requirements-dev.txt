@@ -1,6 +1,18 @@
+-r ./requirements.txt
+# General development
 django-debug-toolbar==1.6
 django-extensions
 django-nose
 scipy
 scikit-learn
 flake8
+# Linting
+git-lint
+pylint
+pep8
+yamllint
+html-linter
+# Testing
+factory_boy
+coverage
+django_coverage_plugin
