@@ -224,8 +224,11 @@ class CardList(JSONResponseMixin, ListView):
 
     def get_queryset(self):
         category = self.kwargs.get('category')
-        sort_id = int(self.kwargs.pop('sort_id'))
-        if sort_id < 1 or sort_id > 4:
+        try:
+            sort_id = int(self.kwargs.pop('sort_id'))
+            if sort_id < 1 or sort_id > 4:
+                sort_id = 1
+        except ValueError:
             sort_id = 1
         deja_vu = self.request.GET.get('dejavu', '').split(',')
         sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
