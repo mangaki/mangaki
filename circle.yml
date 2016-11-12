@@ -16,7 +16,6 @@ dependencies:
     - pip install -U pip
   post:
     - pip install -r requirements-dev.txt
-    - pip install -r requirements-testing.txt
 database:
   override:
     - psql -d circle_test -c "create extension if not exists pg_trgm;
@@ -29,6 +28,7 @@ test:
   pre:
     - python mangaki/manage.py collectstatic --no-input
   override:
+    - git lint --last-commit
     - cd mangaki && coverage run manage.py test
       --with-coverage
       --with-xunit
