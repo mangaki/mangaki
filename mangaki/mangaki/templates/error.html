@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<div class="jumbotron">
+		<h2>{{ error }} ({{error_code}})
+
+		{% if trope %}
+		<small>«{{trope.trope}}»   trope.author }}, <a href="{% url 'work-detail' orgin.category.slug origin.id %}">{{ origin.title }}</a></small>
+		{% endif %}
+		</h2>
+	</div>
+{% endblock %}

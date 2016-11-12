@@ -374,3 +374,11 @@ class FAQEntry(models.Model):
 
     def __str__(self):
         return self.question
+
+class Trope(models.Model): 
+    trope = models.CharField(max_length=320)
+    author = models.CharField(max_length=80)
+    origin = models.ForeignKey(Work, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.trope
