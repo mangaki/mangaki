@@ -25,7 +25,6 @@ from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
 from mangaki.utils.recommendations import get_recommendations
-from mangaki.utils.chrono import Chrono
 from irl.models import Event, Partner, Attendee
 
 from collections import Counter, OrderedDict
@@ -63,11 +62,6 @@ RATING_COLORS = {
 UTA_ID = 14293
 
 GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
-
-
-def display_queries():
-    for line in connection.queries:
-        print(line['sql'][:100], line['time'])
 
 
 def update_score_while_rating(user, work, choice):
@@ -178,9 +172,9 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         return context
 
     def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
         if not request.user.is_authenticated:
             return HttpResponseForbidden()
-        self.object = self.get_object()
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
@@ -224,12 +218,11 @@ class CardList(JSONResponseMixin, ListView):
 
     def get_queryset(self):
         category = self.kwargs.get('category')
-        try:
-            sort_id = int(self.kwargs.pop('sort_id'))
-            if sort_id < 1 or sort_id > 4:
-                sort_id = 1
-        except ValueError:
-            sort_id = 1
+        # This call to `int` shouldn't fail because `sort_id` must match the
+        # `\d+` regexp, cf urls.py.
+        sort_id = int(self.kwargs.pop('sort_id'))
+        if sort_id < 1 or sort_id > 4:
+            raise Http404
         deja_vu = self.request.GET.get('dejavu', '').split(',')
         sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
         queryset = Category.objects.get(slug=category).work_set.all()
@@ -410,21 +403,12 @@ class UserList(ListView):
 
 
 def get_profile(request, username):
-    chrono = Chrono(True)
-    try:
-        is_shared = Profile.objects.get(user__username=username).is_shared
-    except Profile.DoesNotExist:
-        Profile(user=request.user).save()  # À supprimer à terme # Tu parles, maintenant ça va être encore plus compliqué
-        is_shared = True
-    # chrono.save('get profile')
-    user = User.objects.get(username=username)
+    user = get_object_or_404(User, username=username)
+    is_shared = user.profile.is_shared
     category = request.GET.get('category', 'anime')
     ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
     c = 0
     rating_list = natsorted(Rating.objects.filter(user__username=username).select_related('work'), key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
-    # , key=lambda x: (ordering.index(x['choice']), 1))  # Tri par note puis nom
-    # print(rating_list[:5])
-    # chrono.save('get ratings %d queries' % len(connection.queries))
 
     received_recommendation_list = []
     sent_recommendation_list = []
@@ -437,7 +421,6 @@ def get_profile(request, username):
         for reco in sent_recommendations:
             if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
                 sent_recommendation_list.append({'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
-    # chrono.save('get reco %d queries' % len(connection.queries))
 
     seen_lists = {'anime': [], 'manga': [], 'album': 0}
     unseen_lists = {'anime': [], 'manga': [], 'album': []}
@@ -446,7 +429,6 @@ def get_profile(request, username):
             seen_lists[r.work.category.slug].append(r)
         else:
             unseen_lists[r.work.category.slug].append(r)
-    # chrono.save('categorize ratings')
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
 
     # Events
@@ -480,12 +462,6 @@ def get_profile(request, username):
         'sent_recommendation_list': sent_recommendation_list if is_shared else [],
         'events': events,
     }
-    for key in data:
-        try:
-            print(key, len(data[key]))
-        except:
-            print(key, '->', data[key])
-    chrono.save('get request')
     return render(request, 'profile.html', data)
 
 
