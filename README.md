@@ -19,7 +19,6 @@ Prérequis
 - Python 3.4
 - virtualenv
 - PostgreSQL ≥ 9.3 (9.4.2 étant mieux)
-* `python3-sqlparse` pour la Debug Toolbar (**inutile** en production).
 
 Si vous n'avez jamais fait de Django, je vous renvoie vers [leur super tutoriel](https://docs.djangoproject.com/en/1.9/intro/tutorial01/).
 
@@ -40,6 +39,12 @@ aléatoire lors de la configuration.
 
 Configurer un environnement virtuel
 -----------------------------------
+
+Afin de limiter l'attente durant l'installation, il vous est recommandé d'installer les paquets suivants au préalable :
+
+   # Varie selon votre distribution, voici quelques exemples:
+   apt-get install python3-scipy python3-numpy python3-psycopg2
+   pacman -S python-scipy python-numpy python-psycopg2
 
 Il est fortement recommandé d'installer les dépendances de Mangaki dans un
 environnement virtuel, ce qui est fait par les commandes ci-dessous.
@@ -77,9 +82,8 @@ pour un aperçu des options utiles.
 Remplir la base de données
 --------------------------
     
-    cd mangaki
     ./manage.py migrate
-    ./manage.py loaddata ../fixtures/{partners,seed_data}.json
+    ./manage.py loaddata fixtures/{partners,seed_data}.json
     ./manage.py ranking # Compute cached ranking information. This should be done regularly.
     ./manage.py top director # Store data for the Top20 page. This should be done regularly.
 
@@ -94,7 +98,7 @@ Afficher les notebooks
 Ensuite, vous pourrez faire `./manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
 
 
-Lancer les tests
+Lancer les tests (nécessite d'avoir un utilisateur PostgreSQL en superuser)
 ----------------
 
     . venv/bin/activate
@@ -108,7 +112,7 @@ Pour calculer la couverture de test, il faut plutôt faire:
 
 Ainsi, vous aurez un dossier `cover` qui contiendra les informations de couverture en HTML.
 
-Installation facile (Vagrant)
+Installation facile (Vagrant), obsolète!
 -----------------------------
 
 Vous devez installer [Vagrant](https://www.vagrantup.com/downloads.html), puis installer les dépendances de rôles avec [ansible-galaxy](http://docs.ansible.com/ansible/galaxy.html):
