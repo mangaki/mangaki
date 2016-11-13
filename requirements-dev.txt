@@ -4,7 +4,7 @@ django-debug-toolbar==1.6
 django-extensions
 django-nose
 scipy
-scikit-learn
+scikit-learn==0.18.*
 flake8
 # Linting
 git-lint
