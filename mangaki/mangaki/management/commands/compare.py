@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from sklearn import cross_validation
 from sklearn.metrics import mean_squared_error
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.pca import MangakiPCA
 from mangaki.utils.knn import MangakiKNN
