@@ -51,7 +51,7 @@ class WorkDetailAnonymousTest(WorkFactoryMixin, TestCase):
         response = self.client.get('/anime/{:d}/'.format(self.anime.pk))
         self.assertEqual(response.status_code, 404)  # 404 Not Found
 
-    def test_work_detail_nonexistant(self):
+    def test_work_detail_nonexistent(self):
         invalid_pk = self.get_invalid_pk(Work)
 
         response = self.client.get('/anime/{:d}'.format(invalid_pk))
