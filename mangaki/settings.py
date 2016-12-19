@@ -13,7 +13,7 @@ import json
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
-config.read(os.path.join(BASE_DIR, 'settings.ini'))
+config.read(os.path.join(BASE_DIR, 'mangaki', 'settings.ini'))
 
 DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
 
