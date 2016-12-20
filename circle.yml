@@ -21,20 +21,21 @@ database:
     - psql -d circle_test -c "create extension if not exists pg_trgm;
                               create extension if not exists unaccent"
     - cp .circle_mangaki_settings.ini mangaki/settings.ini
-    - python ./manage.py migrate
-    - python ./manage.py ranking
-    - python ./manage.py top director
+    - python mangaki/manage.py migrate
+    - python mangaki/manage.py ranking
+    - python mangaki/manage.py top director
 test:
   pre:
-    - python ./manage.py collectstatic --no-input
+    - python mangaki/manage.py collectstatic --no-input
   override:
     # FIXME: Figure out how to configure this thing.
     # - git lint --last-commit
-    - coverage run ./manage.py test
+    - cd mangaki && coverage run manage.py test
       --with-coverage
       --with-xunit
       --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml
       --cover-package=mangaki,irl,discourse
+    - cd ..
   post:
     # CodeCov MUST absolutely run in the project root folder
     - bash <(curl -s https://codecov.io/bash)

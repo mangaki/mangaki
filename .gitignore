@@ -15,4 +15,3 @@ node_modules
 fixtures/*.json
 restore.sh
 *.coverage
-settings.ini
