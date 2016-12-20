@@ -19,7 +19,7 @@ cat > ~vagrant/.bash_profile <<EOF
 export PATH="\$PATH:\$HOME/.local/bin"
 
 # Mangaki est installé dans /vagrant
-cd /vagrant
+cd /vagrant/mangaki
 EOF
 chown vagrant:vagrant ~vagrant/.bash_profile
 
@@ -39,7 +39,7 @@ EOF
 sudo -H -u vagrant pip3 install --user -r /vagrant/requirements.txt scikit-learn
 
 # On va dans le dossier où est installé Mangaki
-cd /vagrant
+cd /vagrant/mangaki
 
 # Configuration de la base de données
 sudo -H -u vagrant python3 manage.py migrate
