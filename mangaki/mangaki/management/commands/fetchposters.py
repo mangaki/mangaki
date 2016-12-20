@@ -17,9 +17,9 @@ class Command(BaseCommand):
     help = 'Fetches anime posters'
 
     def handle(self, *args, **options):
-        for anime in Work.objects.filter(category__slug='anime', poster=''):
+        for anime in Work.objects.filter(category__slug='anime', ext_poster=''):
             try:
-                anime.poster = poster(anime.title)
+                anime.ext_poster = poster(anime.title)
                 anime.save()
                 print('Done', anime.title)
             except:

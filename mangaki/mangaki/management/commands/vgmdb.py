@@ -48,7 +48,7 @@ class Command(BaseCommand):
             vgmdb_album = vgmdb.get(album.vgmdb_aid)
             print(vgmdb_album)
             album.title = vgmdb_album.title
-            album.poster = vgmdb_album.poster
+            album.ext_poster = vgmdb_album.poster
             album.date = vgmdb_album.date
             album.catalog_number = vgmdb_album.catalog_number
             try_replace(album, 'composer', vgmdb_album.composers[0][0])
