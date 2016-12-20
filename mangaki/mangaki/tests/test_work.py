@@ -28,14 +28,14 @@ class WorkTest(TestCase):
 
         self.anime = self.create_anime(title='STEINS;GATE',
             source='Ryan',
-            poster='ryan.png',
+            ext_poster='ryan.png',
             nb_episodes=26, # + 1 with the alternate beta episode.
             anime_type='Seinen'
         )
 
         self.nsfw_anime = self.create_anime(title='Dakara boku ga H wa dekinai.',
             source='Not Ryan',
-            poster='dakara.png',
+            ext_poster='dakara.png',
             nsfw=True,
             nb_episodes=24, # unsure, but we don't care.
             anime_type='Ecchi-Hentai'
@@ -44,13 +44,13 @@ class WorkTest(TestCase):
 
         self.manga = self.create_manga(title='Medaka Box',
             source='Ryan',
-            poster='zenkichi.png',
+            ext_poster='zenkichi.png',
             manga_type='Shonen'
         )
 
         self.album = self.create_album(title='Bungou Stray Dogs Original Soundtrack',
             source='Ryan',
-            poster='atsuchi_and_dazai.png',
+            ext_poster='atsuchi_and_dazai.png',
             vgmdb_aid=58065
         )
 
