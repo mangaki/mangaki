@@ -42,9 +42,9 @@ Configurer un environnement virtuel
 
 Afin de limiter l'attente durant l'installation, il vous est recommandé d'installer les paquets suivants au préalable :
 
-    # Varie selon votre distribution, voici quelques exemples:
-    apt-get install python3-scipy python3-numpy python3-psycopg2
-    pacman -S python-scipy python-numpy python-psycopg2
+   # Varie selon votre distribution, voici quelques exemples:
+   apt-get install python3-scipy python3-numpy python3-psycopg2
+   pacman -S python-scipy python-numpy python-psycopg2
 
 Il est fortement recommandé d'installer les dépendances de Mangaki dans un
 environnement virtuel, ce qui est fait par les commandes ci-dessous.
