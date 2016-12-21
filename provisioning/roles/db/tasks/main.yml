@@ -2,7 +2,7 @@
 - name: Install PostgreSQL
   become: true
   become_user: root
-  apt: name={{ item }} update_cache=true state=latest
+  apt: name={{ item }} state=latest
   with_items:
     - postgresql
     - postgresql-contrib  # for unaccent and pg_trgm extensions

@@ -1,13 +1,24 @@
 server {
-    {% if not force_redirect_to_https %}
+    # if no Host match, close the connection to prevent host spoofing
     listen 80 default_server;
-    listen [::]:80 default_server;
-    {% else %}
+    return 444;
+}
+
+server {
     listen 80;
     listen [::]:80;
-    {% endif %}
 
     server_name {{ app_hosts|join(' ') }};
+
+    {% if use_letsencrypt %}
+
+    # Let's encrypt
+    location /.well-known/acme-challenge/ {
+        alias {{ acme_wellknown }};
+        try_files $uri =404;
+    }
+
+    {% endif %}
 
     {% if force_redirect_to_https %}
 
@@ -28,17 +39,6 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Host $server_name;
-    }
-
-    {% endif %}
-
-
-    {% if use_letsencrypt %}
-
-    # Let's encrypt
-    location /.well-known/acme-challenge/ {
-        alias {{ acme_wellknown }};
-        try_files $uri =404;
     }
 
     {% endif %}

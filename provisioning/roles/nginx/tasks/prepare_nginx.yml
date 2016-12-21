@@ -1,7 +1,7 @@
 ---
 - block:
   - name: Install nginx
-    apt: name=nginx update_cache=true state=latest
+    apt: name=nginx state=latest
     tags: packages
 
 
@@ -35,7 +35,7 @@
       src: /etc/nginx/sites-available/{{ application_name }}.upstream
       dest: /etc/nginx/sites-enabled/{{ application_name }}.upstream
       state: link
-    notify: reload nginx
+    notify: restart nginx
 
   become: true
   become_user: root

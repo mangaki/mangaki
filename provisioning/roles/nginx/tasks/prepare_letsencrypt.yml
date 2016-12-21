@@ -15,7 +15,7 @@
 - name: ensure letsencrypt.sh dependencies are installed
   become: true
   become_user: root
-  apt: name={{ item }} update_cache=true state=latest
+  apt: name={{ item }} state=latest
   with_items:
     - openssl
     - curl
@@ -51,6 +51,8 @@
   run_once: true
   become: true
   become_user: letsencrypt
+  register: cert_result
+  changed_when: '"skipping renew!" not in cert_result.stdout.lower()'
 
 - name: Let's Encrypt is ready
   set_fact: 

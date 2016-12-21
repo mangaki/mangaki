@@ -44,14 +44,20 @@
 
     - name: Upgrade pip executable in the virtualenv
       command: "{{ virtualenv_path }}/bin/pip install --upgrade pip"
+      register: result
+      changed_when: '"installing" in result.stdout.lower()'
       tags: packages
 
     - name: Install pip requirements
       command: "{{ virtualenv_path }}/bin/pip install -r {{ requirements_file }}"
+      register: result
+      changed_when: '"installing" in result.stdout.lower()'
       tags: packages
 
     - name: Install gunicorn
       command: "{{ virtualenv_path }}/bin/pip install gunicorn"
+      register: result
+      changed_when: '"installing" in result.stdout.lower()'
       tags: packages,deploy
 
     - name: Copy settings.ini
@@ -81,11 +87,6 @@
 # Workaround for https://github.com/Supervisor/supervisor/issues/121
 - name: Restart supervisor
   service: name=supervisor state=restarted
-  become: true
-  become_user: root
-
-- name: Reload supervisor
-  command: supervisorctl reload
   become: true
   become_user: root
 

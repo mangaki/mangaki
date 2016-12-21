@@ -1,6 +1,6 @@
 ---
 - name: Ensure supervisor is installed
-  apt: name=supervisor update_cache=true state=present
+  apt: name=supervisor state=present
   tags: packages
 
 - name: Create the supervisor config file

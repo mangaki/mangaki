@@ -1,11 +1,6 @@
 server {
-    {% if force_redirect_to_https %}
-    listen 443 ssl default_server;
-    listen [::]:443 ssl default_server;
-    {% else %}
     listen 443 ssl;
     listen [::]:443 ssl;
-    {% endif %}
 
     server_name {{ app_hosts|join(' ') }};
 

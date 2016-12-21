@@ -1,6 +1,6 @@
 ---
 - name: Ensure systemd is installed
-  apt: name=systemd update_cache=true state=present
+  apt: name=systemd state=present
   tags: packages
 
 - name: Copy the ranking timer unit file
