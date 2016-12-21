@@ -47,10 +47,14 @@
 
 
 - name: generate certificates
-  command: "{{ letsencrypt_sh_root }}/letsencrypt.sh -c"
+  command: "{{ letsencrypt_sh_root }}/dehydrated -c"
   run_once: true
   become: true
   become_user: letsencrypt
+
+- name: Let's Encrypt is ready
+  set_fact: 
+    letsencrypt_ready: true
 
 - name: set up timer to renew certificates
   template:

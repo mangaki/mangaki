@@ -1,0 +1,6 @@
+---
+letsencrypt_sh_root: /opt/letsencrypt.sh
+staging_letsencrypt_api: true
+use_letsencrypt: true
+force_redirect_to_https: true
+ssl_dhparam: /etc/ssl/private/dhparams.pem

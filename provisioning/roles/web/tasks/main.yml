@@ -28,22 +28,30 @@
     group: "{{ web_group }}"
     mode: 0755
 
+
+- include: setup_git.yml
+  become: true
+  become_user: "{{ web_user }}"
+  tags: deploy, repository
+
 # Set up non-root elements using `web_user`
 - block:
-    - include: setup_git.yml
-      tags: deploy
+    - name: Ensure virtualenv exists # workaround: https://github.com/ansible/ansible-modules-core/issues/5458
+      command: virtualenv --python=python3 --system-site-packages "{{ virtualenv_path }}"
+      args:
+        creates: "{{ virtualenv_path }}/bin/python3"
+      tags: packages
+
+    - name: Upgrade pip executable in the virtualenv
+      command: "{{ virtualenv_path }}/bin/pip install --upgrade pip"
+      tags: packages
 
     - name: Install pip requirements
-      pip:
-        requirements: "{{ requirements_file }}"
-        virtualenv: "{{ virtualenv_path }}"
-        # we use the system lxml package due to heavy build requirements
-        virtualenv_site_packages: true
-        virtualenv_python: python3
+      command: "{{ virtualenv_path }}/bin/pip install -r {{ requirements_file }}"
       tags: packages
 
     - name: Install gunicorn
-      pip: virtualenv={{ virtualenv_path }} name=gunicorn
+      command: "{{ virtualenv_path }}/bin/pip install gunicorn"
       tags: packages,deploy
 
     - name: Copy settings.ini
@@ -70,7 +78,20 @@
   become: true
   become_user: "{{ web_user }}"
 
+# Workaround for https://github.com/Supervisor/supervisor/issues/121
+- name: Restart supervisor
+  service: name=supervisor state=restarted
+  become: true
+  become_user: root
+
+- name: Reload supervisor
+  command: supervisorctl reload
+  become: true
+  become_user: root
+
 - name: Run Mangaki application server (gunicorn)
-  supervisorctl: name=mangaki state=started
+  supervisorctl:
+    name: mangaki
+    state: started
   become: true
   become_user: root

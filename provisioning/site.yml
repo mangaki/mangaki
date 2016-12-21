@@ -8,6 +8,4 @@
     - base
     - db
     - web
-    - nginx           # For Let's Encrypt
-    - letsencrypt
-    - nginx_with_ssl  # For Mangaki
+    - nginx

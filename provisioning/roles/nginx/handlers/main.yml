@@ -8,3 +8,10 @@
   service: name=nginx state=reloaded
   become: true
   become_user: root
+
+- name: reload app template
+  template:
+    src: "app.j2"
+    dest: /etc/nginx/sites-available/{{ application_name }}
+    backup: yes
+  notify: reload nginx

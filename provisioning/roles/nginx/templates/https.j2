@@ -1,35 +1,22 @@
-upstream {{ application_name }}_servers {
-    {% for app_server in app_servers %}
-    server {{ app_server }} fail_timeout=0;
-    {% endfor %}
-}
-
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-
-    server_name {{ app_hosts|join(' ') }};
-
-    # Let's encrypt
-    location /.well-known/acme-challenge/ {
-        alias {{ acme_wellknown }};
-        try_files $uri =404;
-    }
-
-    location / {
-        return 301 https://$server_name$request_uri;
-    }
-}
-
-server {
+    {% if force_redirect_to_https %}
     listen 443 ssl default_server;
     listen [::]:443 ssl default_server;
+    {% else %}
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    {% endif %}
 
     server_name {{ app_hosts|join(' ') }};
 
     ssl on;
-    ssl_certificate {{ ssl_certificate }};
-    ssl_certificate_key {{ ssl_certificate_key }};
+    {% if use_letsencrypt %}
+    ssl_certificate {{ le_cert }};
+    ssl_certificate_key {{ le_cert_key }};
+    {% else %}
+    ssl_certificate {{ snakeoil_cert }};
+    ssl_certificate_key {{ snakeoil_cert_key }};
+    {% endif %}
 
     ssl_session_timeout 1d;
     ssl_session_cache shared:SSL:50m;
@@ -58,3 +45,6 @@ server {
         proxy_set_header X-Forwarded-Host $server_name;
     }
 }
+
+
+

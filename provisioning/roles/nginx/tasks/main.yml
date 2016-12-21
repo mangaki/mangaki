@@ -1,34 +1,26 @@
 ---
-- name: Install nginx
+- include: prepare_nginx.yml
+
+- include: prepare_letsencrypt.yml
+  when: use_letsencrypt
+
+- assert:
+    that:
+      - "letsencrypt_ready == true"
+    msg: "Let\'s Encrypt must be ready after its setup."
+  when: use_letsencrypt
+
+- name: Generate dhparams
   become: true
   become_user: root
-  apt: name=nginx update_cache=true state=latest
-  tags: packages
+  command: /usr/bin/openssl dhparam -out {{ ssl_dhparam }} 2048
+  args:
+    creates: '{{ ssl_dhparam }}'
 
-
-- name: Create the (initial) nginx configuration for Let's Encrypt
-  become: true
-  become_user: root
-  template:
-    src: "letsencrypt.j2"
-    dest: /etc/nginx/sites-available/{{ application_name }}
-    backup: yes
-  notify: reload nginx
-
-- name: Ensure the default nginx site is disabled
-  become: true
-  become_user: root
-  file: path=/etc/nginx/sites-enabled/default state=absent
-  notify: reload nginx
-
-- name: Ensure the application site is enabled
-  become: true
-  become_user: root
-  file:
-    src: /etc/nginx/sites-available/{{ application_name }}
-    dest: /etc/nginx/sites-enabled/{{ application_name }}
-    state: link
+- include: add_https.yml
   notify: reload nginx
 
 - name: Ensure nginx is running
+  become: true
+  become_user: root
   service: name=nginx state=started enabled=true

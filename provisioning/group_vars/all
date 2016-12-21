@@ -15,3 +15,5 @@ static_root: "/srv/mangaki/"
 
 acme_wellknown: "/var/www/challenges/"
 staging_letsencrypt_api: false
+use_letsencrypt: true
+force_redirect_to_https: true

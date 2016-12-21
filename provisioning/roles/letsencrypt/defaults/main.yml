@@ -1,3 +1,0 @@
----
-letsencrypt_sh_root: /opt/letsencrypt.sh/
-staging_letsencrypt_api: true
