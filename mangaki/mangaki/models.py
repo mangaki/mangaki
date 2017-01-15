@@ -125,7 +125,7 @@ class Work(models.Model):
 
     def safe_poster(self, user):
         if self.id is None:
-            return '{}{}'.format(settings.MEDIA_URL, 'img/chiro.gif')
+            return '{}{}'.format(settings.STATIC_URL, 'img/chiro.gif')
         if not self.nsfw or (user.is_authenticated and user.profile.nsfw_ok):
             if self.int_poster:
                 return self.int_poster.url
