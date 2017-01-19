@@ -4,7 +4,7 @@ from urllib.request import urlretrieve
 import requests
 
 
-def get_potential_posters(work):
+def get_potential_posters(work, request):
     posters = []
     if work.has_poster_on_disk():
         posters.append('%s://%s%s' % (request.scheme, Site.objects.get_current().domain, work.safe_poster(request.user)))

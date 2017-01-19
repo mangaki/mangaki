@@ -93,7 +93,7 @@ class WorkAdmin(admin.ModelAdmin):
             return None
         bundle = []
         for work in queryset:
-            bundle.append((work.id, work.title, get_potential_posters(work)))
+            bundle.append((work.id, work.title, get_potential_posters(work, request)))
         context = {
             'queryset': queryset,
             'bundle': bundle,
