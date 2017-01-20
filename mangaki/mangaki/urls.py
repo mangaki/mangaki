@@ -36,7 +36,7 @@ urlpatterns = [
     url(r'^newsletter/$', views.update_newsletter, name='newsletter'),
     url(r'^reco_willsee/$', views.update_reco_willsee, name='reco-willsee'),
     url(r'^mal/(?P<mal_username>.+)$', views.import_from_mal, name='import-mal'),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
     url(r'^discourse/sso$', discourse_views.sso),
     url(r'^about/$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),

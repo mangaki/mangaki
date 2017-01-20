@@ -34,13 +34,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='anime',
             name='composer',
-            field=models.ForeignKey(to='mangaki.Artist', default=1, related_name='composed'),
+            field=models.ForeignKey(to='mangaki.Artist', default=1, related_name='composed', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='anime',
             name='director',
-            field=models.ForeignKey(to='mangaki.Artist', default=1, related_name='directed'),
+            field=models.ForeignKey(to='mangaki.Artist', default=1, related_name='directed', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

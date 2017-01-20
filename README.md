@@ -16,8 +16,7 @@ Que vous soyez simple otaku, data expert, codeur Python, passionné d'algo, data
 Prérequis
 ---------
 
-- Python 3.4
-- virtualenv
+- Python ≥ 3.4
 - PostgreSQL ≥ 9.3 (9.4.2 étant mieux)
 * `python3-sqlparse` pour la Debug Toolbar (**inutile** en production).
 
@@ -46,8 +45,7 @@ environnement virtuel, ce qui est fait par les commandes ci-dessous.
     
     python3 -m venv venv --system-site-packages
     . venv/bin/activate
-    pip install -r requirements.txt
-    pip install -r requirements-dev.txt # Si installation d'une instance de développement
+    pip install -r requirements-dev.txt # Si installation d'une instance de développement, sinon utilisez requirements.txt
 
 Pour activer l'environnement virtuel dans le futur, il faudra faire
 
@@ -90,9 +88,9 @@ Afficher les notebooks
 ----------------------
 
     . venv/bin/activate
-    pip install ipython[notebook]
+    pip install jupyter[notebook]
 
-Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer IPython Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
+Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer Jupyter Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
 
 
 Lancer les tests

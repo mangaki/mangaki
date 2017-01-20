@@ -16,7 +16,6 @@ dependencies:
     - pip install -U pip
   post:
     - pip install -r requirements-dev.txt
-    - pip install -r requirements-testing.txt
 database:
   override:
     - psql -d circle_test -c "create extension if not exists pg_trgm;
@@ -29,10 +28,14 @@ test:
   pre:
     - python mangaki/manage.py collectstatic --no-input
   override:
-    - coverage run ./mangaki/manage.py test
+    # FIXME: Figure out how to configure this thing.
+    # - git lint --last-commit
+    - cd mangaki && coverage run manage.py test
       --with-coverage
       --with-xunit
       --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml
       --cover-package=mangaki,irl,discourse
+    - cd ..
   post:
+    # CodeCov MUST absolutely run in the project root folder
     - bash <(curl -s https://codecov.io/bash)

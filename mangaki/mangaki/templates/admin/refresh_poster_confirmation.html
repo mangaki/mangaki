@@ -13,20 +13,29 @@
 {% endblock %}
 
 {% block content %}
-<form action="" method="post">{% csrf_token %}
+<form method="post">{% csrf_token %}
 <p>Tout d'abord, quels posters souhaitez-vous conserver ?</p>
-{% for work_id, work_title, poster_urls in bundle %}
+{% for work_id, work_title, posters in bundle %}
 <p style="display: block; clear: both">{{ work_title }}</p>
 <ul>
-    {% for poster_url in poster_urls %}
-    <li style="float: left"><label><input type="radio" name="chosen_poster_{{ work_id }}" value="{{ poster_url }}" /> <img src="{{ poster_url }}" /></label></li>
+    {% for poster in posters %}
+    <li style="float: left">
+        <label>
+            <input type="radio" name="chosen_poster_{{ work_id }}" value="{% if not poster.current %}{{ poster.url }}{% endif %}"{% if poster.current %} checked="checked"{% endif %} />
+            <img src="{{ poster.url }}" />
+        </label>
+    </li>
     {% endfor %}
 </ul>
 {% endfor %}
-<div>
+<div style="clear: both">
+{% for obj in queryset %}
+<input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+{% endfor %}
 <input type="hidden" name="action" value="refresh_work" />
 <input type="hidden" name="confirm" value="yes" />
-<input type="submit" style="display: block; clear: both" value="{% trans "Yes, I'm sure" %}" />
+<input type="submit" value="{% trans "Yes, I'm sure" %}" />
+<a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
 </div>
 </form>
 {% endblock %}
