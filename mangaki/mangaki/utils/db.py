@@ -3,7 +3,7 @@ import requests
 from urllib.parse import urlparse
 
 
-def get_potential_posters(work, request):
+def get_potential_posters(work):
     posters = []
     ext_urls = set()
     if work.int_poster:
