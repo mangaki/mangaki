@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
+from mangaki.utils.wals import MangakiWALS
 from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.pca import MangakiPCA
 from mangaki.utils.knn import MangakiKNN
@@ -28,7 +29,8 @@ class Experiment(object):
     results = {}
     algos = None
     def __init__(self, PIG_ID=None):
-        self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN(20), MangakiZero()]
+        # self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN(20), MangakiZero()]
+        self.algos = [MangakiALS(20), MangakiWALS(20)]
         # self.results.setdefault('x_axis', []).append()
         self.make_dataset(PIG_ID)
         self.execute()

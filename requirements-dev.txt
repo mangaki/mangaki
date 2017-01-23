@@ -5,6 +5,7 @@ django-extensions
 django-nose
 scipy
 scikit-learn==0.18.*
+tensorflow
 flake8
 # Linting
 git-lint
