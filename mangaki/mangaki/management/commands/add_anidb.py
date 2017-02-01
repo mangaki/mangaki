@@ -20,9 +20,6 @@ class Command(BaseCommand):
         parser.add_argument('id', type=int)
 
     def handle(self, *args, **options):        
-        if options.get('id'):
-            print(options.get('id'))
-            anidb = AniDB('mangakihttp', 1)
-            anime = create_anime(**anidb.get(options.get('id')))
-            print(anime)
-            anime.retrieve_poster()
+        anidb = AniDB('mangakihttp', 1)
+        anime = create_anime(**anidb.get(options.get('id')))
+        anime.retrieve_poster()  # Save for future use
