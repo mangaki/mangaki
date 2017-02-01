@@ -1,17 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-
 from datetime import datetime
+
 
 BASE_URL = "http://api.anidb.net:9001/httpapi"
 SEARCH_URL = "http://anisearch.outrance.pl/"
 PROTOCOL_VERSION = 1
 
-try:
-  str = unicode
-except:
-  pass
-  # str = str
 
 class AniDB:
   def __init__(self, client_id, client_ver=0):
@@ -45,12 +40,10 @@ class AniDB:
     results = []
     animetitles = BeautifulSoup(r.text, 'xml').animetitles
     for anime in animetitles.find_all('anime'):
-      results.append(Anime({
-        'id': int(anime['aid']),
-        'title': str(anime.find('title', attrs={'type': "official"}).string),
-        'picture': "http://img7.anidb.net/pics/anime/" + str(anime.find('picture').string),
-      }, partial=True, updater=lambda: self.get(anime.id)))
-
+      results.append(
+        (int(anime['aid']),
+        str(anime.find('title', attrs={'type': "official"}).string))
+      )
     return results
 
   def get(self, id):
@@ -62,81 +55,30 @@ class AniDB:
 
     r = self._request("anime", {'aid': id})
     soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')  # http://stackoverflow.com/questions/31126831/beautifulsoup-with-xml-fails-to-parse-full-unicode-strings#comment50430922_31146912
-    """with open('backup.xml', 'w') as f:
-      f.write(r.text)"""
+    with open('backup.xml', 'w') as f:
+      f.write(r.text)
     if soup.error is not None:
       raise Exception(soup.error.string)
 
     anime = soup.anime
-    titles = anime.titles
+    all_titles = anime.titles
+    # creators = anime.creators
+    # episodes = anime.episodes
+    # tags = anime.tags
+    # characters = anime.characters
+    # ratings = anime.ratings.{permanent, temporary}
 
-    a = Anime({
-      'id': id,
-      'type': str(anime.type.string),
-      'episodecount': int(anime.episodecount.string),
-      'startdate': datetime(*list(map(int, anime.startdate.string.split("-")))),
-      'enddate': datetime(*list(map(int, anime.enddate.string.split("-")))),
-      'titles': [(
-        str(title.string),
-        title['type'] if 'type' in title else "unknown"
-      ) for title in anime.find_all('title')],
-      'title': str(titles.find('title', attrs={'type': "main"}).string),
-      'relatedanime': [],
-      'url': str(anime.url.string) if anime.url else None,
-      'creators': anime.creators,
-      'description': str(anime.description.string),
-      'ratings': SmartDict({
-        'permanent': float(anime.ratings.permanent.string),
-        'temporary': float(anime.ratings.temporary.string),
-        'review': float(anime.ratings.review.string) if anime.ratings.review else ''
-      }),
-      'picture': "http://img7.anidb.net/pics/anime/" + str(anime.picture.string),
-      'categories': [],
-      'tags': [],
-      'characters': [],
-      'episodes': [],
-    })
-
-    self._cache[id] = a
-
+    a = {
+      'title': str(all_titles.find('title', attrs={'type': "main"}).string),
+      'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
+      'ext_poster': 'http://img7.anidb.net/pics/anime/' + str(anime.picture.string),
+      # 'nsfw': ?
+      'date': datetime(*list(map(int, anime.startdate.string.split("-")))),
+      # not yet in model: 'enddate': datetime(*list(map(int, anime.enddate.string.split("-")))),
+      'synopsis': str(anime.description.string),
+      # 'artists': ? from anime.creators
+      'nb_episodes': int(anime.episodecount.string),
+      'anime_type': str(anime.type.string),
+      'anidb_aid': id
+    }
     return a
-
-class SmartDict(dict):
-  def __init__(self, *a, **kw):
-    super(SmartDict, self).__init__(**kw)
-    for x in a:
-      try:
-        self.update(x)
-      except TypeError:
-        self.update(x.__dict__)
-    self.__dict__ = self
-
-class Anime:
-  def __init__(self, data={}, partial=False, **kw):
-    self._data = data
-    self._partial = partial
-    if partial:
-      self._updater = kw['updater']
-
-  def _update(self):
-    if not self._partial:
-      raise Exception("Attempted to update a ready object")
-    else:
-      self._data = self._updater()._data
-      self._partial = False
-
-  def __getattr__(self, name):
-    if name in self._data:
-      return self._data[name]
-    else:
-      if self._partial:
-        self._update()
-        if name in self._data:
-          return self._data[name]
-        else:
-          raise AttributeError("no attribute called '%s'" % name)
-      else:
-        raise AttributeError("no attribute called '%s'" % name)
-
-  def __repr__(self):
-    return u'<Anime %i "%s">' % (self.id, self.title)
