@@ -46,14 +46,14 @@ class AniDB:
       )
     return results
 
-  def get(self, id):
+  def get(self, anidb_aid):
     """
     Allows retrieval of non-file or episode related information for a specific anime by AID (AniDB anime id).
     http://wiki.anidb.net/w/HTTP_API_Definition#Anime
     """
-    id = int(id) # why?
+    anidb_aid = int(anidb_aid) # why?
 
-    r = self._request("anime", {'aid': id})
+    r = self._request("anime", {'aid': anidb_aid})
     soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')  # http://stackoverflow.com/questions/31126831/beautifulsoup-with-xml-fails-to-parse-full-unicode-strings#comment50430922_31146912
     if soup.error is not None:
       raise Exception(soup.error.string)
@@ -66,7 +66,7 @@ class AniDB:
     # characters = anime.characters
     # ratings = anime.ratings.{permanent, temporary}
 
-    a = {
+    anime_dict = {
       'title': str(all_titles.find('title', attrs={'type': "main"}).string),
       'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
       'ext_poster': 'http://img7.anidb.net/pics/anime/' + str(anime.picture.string),
@@ -77,6 +77,6 @@ class AniDB:
       # 'artists': ? from anime.creators
       'nb_episodes': int(anime.episodecount.string),
       'anime_type': str(anime.type.string),
-      'anidb_aid': id
+      'anidb_aid': anidb_aid
     }
-    return a
+    return anime_dict
