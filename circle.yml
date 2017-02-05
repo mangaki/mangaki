@@ -30,12 +30,17 @@ test:
   override:
     # FIXME: Figure out how to configure this thing.
     # - git lint --last-commit
-    - cd mangaki && coverage run manage.py test
+    # Must:
+    #   - run inside of the root folder
+    #   - tell to nosetests how to find tests.
+    #   - get the coverage and store a XUnit format in the $CIRCLE_TESTS_REPORTS folder.
+    #   - cover only the package we care about (e.g. no third-party, migrations).
+    - coverage run manage.py test
+      mangaki
       --with-coverage
       --with-xunit
       --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml
       --cover-package=mangaki,irl,discourse
-    - cd ..
   post:
     # CodeCov MUST absolutely run in the project root folder
     - bash <(curl -s https://codecov.io/bash)
