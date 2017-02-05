@@ -35,7 +35,7 @@ test:
     #   - tell to nosetests how to find tests.
     #   - get the coverage and store a XUnit format in the $CIRCLE_TESTS_REPORTS folder.
     #   - cover only the package we care about (e.g. no third-party, migrations).
-    - coverage run manage.py test
+    - coverage run mangaki/manage.py test
       mangaki
       --with-coverage
       --with-xunit
