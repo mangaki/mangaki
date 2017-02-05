@@ -19,7 +19,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('id', type=int)
 
-    def handle(self, *args, **options):        
+    def handle(self, *args, **options):
         anidb = AniDB('mangakihttp', 1)
         anime = create_anime(**anidb.get(options.get('id')))
         anime.retrieve_poster()  # Save for future use
+        self.stdout.write(self.style.SUCCESS('Successfully added %s' % anime))
