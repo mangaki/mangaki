@@ -1,16 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from mangaki.utils.anidb import AniDB
 from mangaki.models import Work, Category
-from django.db.models import Count
-from urllib.parse import urlparse, parse_qs
-import sys
+from urllib.parse import urlparse
 
 def create_anime(**kwargs):
     anime = Category.objects.get(slug='anime')
-    if 'anidb_aid' in kwargs:
-        return Work.objects.update_or_create(category=anime, anidb_aid=kwargs['anidb_aid'], defaults=kwargs)[0]
-    else:
-        return Work.objects.create(category=anime, **kwargs)
+    return Work.objects.update_or_create(category=anime, anidb_aid=kwargs['anidb_aid'], defaults=kwargs)[0]
 
 class Command(BaseCommand):
     args = ''

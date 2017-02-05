@@ -1,12 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+from urllib.parse import urljoin
 
 
 BASE_URL = "http://api.anidb.net:9001/httpapi"
 SEARCH_URL = "http://anisearch.outrance.pl/"
 PROTOCOL_VERSION = 1
 
+def to_python_datetime(mal_date):
+  return datetime(*list(map(int, mal_date.split("-"))))
 
 class AniDB:
   def __init__(self, client_id, client_ver=0):
@@ -51,7 +54,7 @@ class AniDB:
     Allows retrieval of non-file or episode related information for a specific anime by AID (AniDB anime id).
     http://wiki.anidb.net/w/HTTP_API_Definition#Anime
     """
-    anidb_aid = int(anidb_aid) # why?
+    anidb_aid = int(anidb_aid)
 
     r = self._request("anime", {'aid': anidb_aid})
     soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')  # http://stackoverflow.com/questions/31126831/beautifulsoup-with-xml-fails-to-parse-full-unicode-strings#comment50430922_31146912
@@ -60,19 +63,22 @@ class AniDB:
 
     anime = soup.anime
     all_titles = anime.titles
-    # creators = anime.creators
+    # creators = anime.creators # TODO
     # episodes = anime.episodes
     # tags = anime.tags
     # characters = anime.characters
     # ratings = anime.ratings.{permanent, temporary}
 
+    print(urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)))
+    print(to_python_datetime(anime.startdate.string))
+
     anime_dict = {
       'title': str(all_titles.find('title', attrs={'type': "main"}).string),
       'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
-      'ext_poster': 'http://img7.anidb.net/pics/anime/' + str(anime.picture.string),
+      'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
       # 'nsfw': ?
-      'date': datetime(*list(map(int, anime.startdate.string.split("-")))),
-      # not yet in model: 'enddate': datetime(*list(map(int, anime.enddate.string.split("-")))),
+      'date': to_python_datetime(anime.startdate.string),
+      # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
       'synopsis': str(anime.description.string),
       # 'artists': ? from anime.creators
       'nb_episodes': int(anime.episodecount.string),
