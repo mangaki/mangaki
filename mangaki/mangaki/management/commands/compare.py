@@ -16,7 +16,7 @@ from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.values import rating_values
 from mangaki.utils.zero import MangakiZero
 
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 TEST_SIZE = 50000
 
