@@ -60,6 +60,7 @@ class Command(BaseCommand):
             sources = set(Work.objects.get(id=anime_id).source for anime_id in ids)
             nb_sources = len(sources)
             id_of_poster = {}
+            nb_ratings = 0
             for anime_id in ids:
                 anime = Work.objects.get(id=anime_id)
                 nb_ratings = len(anime.rating_set.all())
