@@ -1,8 +1,10 @@
+from django.conf import settings
 from mangaki.utils.chrono import Chrono
 from sklearn.decomposition import NMF
 from scipy.sparse import lil_matrix
 import numpy as np
 import csv
+import os
 
 PIG_ID = 1124#1407 # QCTX=1434  JJ=1407  SebNL=1124
 
