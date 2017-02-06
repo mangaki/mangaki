@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from mangaki.models import Work
 import requests
+import time
 
 class Command(BaseCommand):
     help = 'Downloads posters'
