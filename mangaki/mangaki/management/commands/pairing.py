@@ -1,7 +1,8 @@
-from django.core.management.base import BaseCommand, CommandError
-from mangaki.utils.anidb import AniDB
+from django.core.management.base import BaseCommand
 from django.db.models import Count
+
 from mangaki.models import Work
+from mangaki.utils.anidb import AniDB
 
 
 class Command(BaseCommand):

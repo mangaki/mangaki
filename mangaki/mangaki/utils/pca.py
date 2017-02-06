@@ -1,11 +1,7 @@
-from mangaki.utils.chrono import Chrono
-from mangaki.utils.values import rating_values
-from sklearn.decomposition import PCA
 import numpy as np
-from django.db import connection
-import pickle
-import json
-import math
+from sklearn.decomposition import PCA
+
+from mangaki.utils.chrono import Chrono
 
 
 class MangakiPCA(object):

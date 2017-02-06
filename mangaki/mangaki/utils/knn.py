@@ -1,4 +1,7 @@
 from django.contrib.auth.models import User
+
+from mangaki.models import Rating
+from mangaki.models import Work
 from mangaki.utils.values import rating_values
 from collections import Counter, defaultdict
 from math import sqrt
