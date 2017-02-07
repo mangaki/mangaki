@@ -9,6 +9,9 @@ SEARCH_URL = "http://anisearch.outrance.pl/"
 PROTOCOL_VERSION = 1
 
 def to_python_datetime(mal_date):
+  """
+  Converts myAnimeList's XML date YYYY-MM-DD to Python datetime format.
+  """
   return datetime(*list(map(int, mal_date.split("-"))))
 
 class AniDB:
@@ -68,9 +71,6 @@ class AniDB:
     # tags = anime.tags
     # characters = anime.characters
     # ratings = anime.ratings.{permanent, temporary}
-
-    print(urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)))
-    print(to_python_datetime(anime.startdate.string))
 
     anime_dict = {
       'title': str(all_titles.find('title', attrs={'type': "main"}).string),
