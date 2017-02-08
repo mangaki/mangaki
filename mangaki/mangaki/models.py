@@ -141,6 +141,7 @@ class Work(models.Model):
             return False
 
         filename = os.path.basename(urlparse(url).path)
+        # Hé mais ça va pas écraser des posters / créer des collisions, ça ?
 
         try:
             r = session.get(url, timeout=5, stream=True)
