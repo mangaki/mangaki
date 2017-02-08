@@ -11,6 +11,8 @@ PROTOCOL_VERSION = 1
 def to_python_datetime(mal_date):
   """
   Converts myAnimeList's XML date YYYY-MM-DD to Python datetime format.
+  >>> to_python_datetime('2015-07-14')
+  datetime.datetime(2015, 7, 14, 0, 0)
   """
   return datetime(*list(map(int, mal_date.split("-"))))
 
@@ -86,3 +88,7 @@ class AniDB:
       'anidb_aid': anidb_aid
     }
     return anime_dict
+
+if __name__ == "__main__":
+  import doctest
+  doctest.testmod()
