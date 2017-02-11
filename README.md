@@ -122,6 +122,8 @@ Vous pouvez utiliser Mangaki à l'adresse `app.mangaki.dev:8000` (si vous avez l
 
 Pour plus de détails, lisez le script `provisioning/bootstrap.sh` qui s'occupe de mettre en place la machine.
 
+:warning: **Attention** :warning: : L'installation vous prendra environ _3 Gio_, une fois terminée. C'est en raison principalement de l'image Debian qui est téléchargée puis installée dans la machine virtuelle.
+
 Remarques utiles
 ----------------
 
