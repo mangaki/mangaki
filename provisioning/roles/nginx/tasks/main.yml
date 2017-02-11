@@ -14,7 +14,7 @@
 - assert:
     that:
       - "letsencrypt_ready == true"
-    msg: "Let\'s Encrypt must be ready after its setup."
+    msg: "Let's Encrypt must be ready after its setup."
   when: use_letsencrypt
 
 - name: Generate dhparams
