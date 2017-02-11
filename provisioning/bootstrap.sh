@@ -43,7 +43,8 @@ DB_PASSWORD = ${DB_PASSWORD}
 EMAIL_BACKEND = django.core.mail.backends.console.EmailBackend
 EOF
 
-sudo -H -u vagrant pip3 install virtualenv
+# We install a virtualenv as a user.
+sudo -H -u vagrant pip3 install --user virtualenv
 sudo -H -u vagrant /home/vagrant/.local/bin/virtualenv --python=python3 $VIRTUALENV_PATH
 echo 'Virtual environment built.'
 sudo -H -u vagrant $VIRTUALENV_PATH/bin/pip install -r /vagrant/requirements.txt
