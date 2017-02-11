@@ -1,5 +1,6 @@
 ---
 letsencrypt_sh_root: /opt/letsencrypt.sh
+letsencrypt_sh_version: v0.4.0
 staging_letsencrypt_api: true
 use_letsencrypt: true
 force_redirect_to_https: true

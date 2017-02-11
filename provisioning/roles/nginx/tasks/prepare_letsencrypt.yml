@@ -21,10 +21,14 @@
     - curl
   tags: packages
 
+# FIXME: Someday, we should rename letsencrypt.sh to dehydrated. Someday.
 - name: install letsencrypt.sh
   become: true
   become_user: letsencrypt
-  git: repo=https://github.com/lukas2511/letsencrypt.sh.git dest={{ letsencrypt_sh_root }}
+  git:
+    repo: https://github.com/lukas2511/dehydrated.git
+    dest: "{{ letsencrypt_sh_root }}"
+    version: "{{ letsencrypt_sh_version }}"
 
 - name: setup acme wellknown directory
   file:
@@ -47,7 +51,7 @@
 
 
 - name: generate certificates
-  command: "{{ letsencrypt_sh_root }}/dehydrated -c"
+  command: "{{ letsencrypt_sh_root }}/dehydrated --accept-terms -c"
   run_once: true
   become: true
   become_user: letsencrypt

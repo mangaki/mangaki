@@ -4,7 +4,6 @@
     apt: name=nginx state=latest
     tags: packages
 
-
   - name: Create the HTTP NGINX configuration
     template:
       src: "http.j2"

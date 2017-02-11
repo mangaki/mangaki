@@ -1,6 +1,13 @@
 ---
 - include: prepare_nginx.yml
 
+# Workaround handlers not called at the end of the `prepare_nginx.yml` block.
+# FIXME: there should be a more elegant way to handle this.
+- name: Ensure nginx has restarted
+  service: name=nginx state=restarted
+  become: true
+  become_user: root
+
 - include: prepare_letsencrypt.yml
   when: use_letsencrypt
 
