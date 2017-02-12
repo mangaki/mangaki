@@ -46,7 +46,7 @@ class Command(BaseCommand):
             todo = Work.objects.filter(category__slug='anime', id=anime_id, anidb_aid__gt=0)
         else:
             todo = Work.objects\
-                .only('pk', 'title', 'poster', 'nsfw')\
+                .only('pk', 'title', 'ext_poster', 'nsfw')\
                 .annotate(rating_count=Count('rating'))\
                 .filter(category__slug=category, rating_count__gte=6)\
                 .exclude(anidb_aid=0)\

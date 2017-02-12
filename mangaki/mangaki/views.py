@@ -271,7 +271,6 @@ class WorkListMixin:
             ratings = {}
         for work in context['object_list']:
             work.rating = ratings.get(work.id, None)
-            work.poster = work.safe_poster(self.request.user)
 
         return context
 
@@ -322,7 +321,7 @@ class WorkList(WorkListMixin, ListView):
         if search_text is not None:
             queryset = queryset.search(search_text)
 
-        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug')
+        queryset = queryset.only('pk', 'title', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
         return queryset
 
@@ -339,7 +338,7 @@ class WorkList(WorkListMixin, ListView):
 
         if sort_mode == 'mosaic':
             context['object_list'] = [
-                Work(title='Chargement…', poster='/static/img/chiro.gif')
+                Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
                 for _ in range(4)
             ]
 
@@ -601,7 +600,7 @@ def get_works(request, category):
 def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
+        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
             'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
@@ -628,7 +627,7 @@ def get_reco(request):
     category = request.GET.get('category', 'all')
     editor = request.GET.get('editor', 'unspecified')
     if request.user.rating_set.exists():
-        reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+        reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
     else:
         reco_list = []
     return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
