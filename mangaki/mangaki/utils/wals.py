@@ -28,10 +28,10 @@ class MangakiWALS(object):
     M = None
     U = None
     VT = None
-    def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10, LAMBDA=0.1):
+    def __init__(self, NB_COMPONENTS=20):
+        """An implementation of the Weighted Alternate Least Squares.
+        NB_COMPONENTS: the number of components in the factorization"""
         self.NB_COMPONENTS = NB_COMPONENTS
-        self.NB_ITERATIONS = NB_ITERATIONS
-        self.LAMBDA = LAMBDA
         self.chrono = Chrono(True)
 
     def save(self, filename):
@@ -57,7 +57,7 @@ class MangakiWALS(object):
         for (user, work), rating in zip(X, y):
             matrix[(user, work)] = rating
             means[user] += rating
-            nb_ratings[user] += 1.
+            nb_ratings[user] += 1
             users.add(user)
         for user in users:
             means[user] /= nb_ratings[user]
@@ -67,21 +67,7 @@ class MangakiWALS(object):
             matrix[(user, work)] -= means[user]
             indices.append((user, work))
             values.append(matrix[(user, work)])
-        print(indices[:5])
         return indices, values, means
-        # return matrix, means
-
-    def fit_user(self, user, matrix):
-        Ru = np.array(list(matrix[user].values()), ndmin=2).T
-        Vu = self.VT[:,list(matrix[user].keys())]
-        Gu = self.LAMBDA * len(matrix[user]) * np.eye(self.NB_COMPONENTS)
-        self.U[[user],:] = np.linalg.solve(Vu.dot(Vu.T) + Gu, Vu.dot(Ru)).T
-
-    def fit_work(self, work, matrixT):
-        Ri = np.array(list(matrixT[work].values()), ndmin=2).T
-        Ui = self.U[list(matrixT[work].keys()),:].T
-        Gi = self.LAMBDA  * len(matrixT[work]) * np.eye(self.NB_COMPONENTS)
-        self.VT[:,[work]] = np.linalg.solve(Ui.dot(Ui.T) + Gi, Ui.dot(Ri))
 
     def factorize(self, indices, values):
         rows = self.nb_users
@@ -95,10 +81,10 @@ class MangakiWALS(object):
             rows,
             cols,
             dims,
-            unobserved_weight=0.01,
-            regularization=0.001,
-            row_weights=row_wts,
-            col_weights=col_wts,
+            unobserved_weight=1,#.1,
+            regularization=0.001,#001,
+            row_weights=None,#row_wts,
+            col_weights=None,#col_wts,
             use_factors_weights_cache=use_factors_weights_cache)
         simple_train(model, inp, 25)
         row_factor = model.row_factors[0].eval()
@@ -116,8 +102,6 @@ class MangakiWALS(object):
 
         self.M = self.factorize(indices, values)
         
-        #self.save('backup.pickle')
-
         self.chrono.save('factor matrix')
 
     def predict(self, X):
