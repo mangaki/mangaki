@@ -33,7 +33,7 @@ cat > /vagrant/mangaki/settings.ini <<EOF
 DEBUG = True
 
 [hosts]
-ALLOWED_HOSTS = * # Necessary since Django 1.10.
+ALLOWED_HOSTS = *
 
 [secrets]
 SECRET_KEY = $(pwgen -s -c 60 1)
