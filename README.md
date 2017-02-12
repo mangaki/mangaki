@@ -110,26 +110,23 @@ Ainsi, vous aurez un dossier `cover` qui contiendra les informations de couvertu
 Installation facile (Vagrant)
 -----------------------------
 
-Vous devez installer [Vagrant](https://www.vagrantup.com/downloads.html), puis installer les dépendances de rôles avec [ansible-galaxy](http://docs.ansible.com/ansible/galaxy.html):
+Vous devez installer [Vagrant](https://www.vagrantup.com/downloads.html).
 
     vagrant up
     vagrant ssh
-    cd /mnt/mangaki
-    . .venv/bin/activate
-    cd mangaki
     ./manage.py runserver 0.0.0.0:8000
 
-Votre machine virtuelle tourne sous Trusty64, le repo est monté via un shared folder sur `/mnt/mangaki`.
-Il y a un virtualenv dans `/mnt/mangaki/.venv`, et le serveur devrait être lancé sur `0.0.0.0:8000`.
-Enfin, vous pouvez contacter votre version locale de Mangaki à travers `192.168.42.10:8000` et `127.0.0.1:8080` (port forwarded).
+Votre machine virtuelle est maintenant prête.
+Vous pouvez utiliser Mangaki à l'adresse `app.mangaki.dev:8000` (si vous avez le plugin `vagrant-hostsupdater`) ou `192.168.33.10:8000`.
 
+Pour plus de détails, lisez le script `provisioning/bootstrap.sh` qui s'occupe de mettre en place la machine.
+
+:warning: **Attention** :warning: : L'installation vous prendra environ _3 Gio_, une fois terminée. C'est en raison principalement de l'image Debian qui est téléchargée puis installée dans la machine virtuelle.
 
 Remarques utiles
 ----------------
 
 Si vous vous rendez sur la page des mangas, la troisième colonne chargera en boucle. C'est parce que le Top Manga est vide, pour des raisons intrinsèques à [`ranking.py`](https://github.com/mangaki/mangaki/blob/master/mangaki/mangaki/management/commands/ranking.py#L9).
-
-Lors d'une mise en production, il est plus sage d'écrire `from .prod import *` dans le fichier `mangaki/settings/__init__.py` avant de lancer votre conteneur WSGI.
 
 Si vous obtenez des erreurs 400 lorsque vous mettez Mangaki en production (c'est-à-dire que `DEBUG = False`), faites bien attention à modifier les `ALLOWED_HOSTS` qui se trouvent dans votre configuration (`mangaki/settings/`) afin d'autoriser votre [FQDN](https://fr.wikipedia.org/wiki/Fully_qualified_domain_name) dedans.
 
