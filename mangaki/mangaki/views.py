@@ -525,7 +525,6 @@ def top(request, category_slug):
         'top': data,
     })
 
-
 def rate_work(request, work_id):
     if request.user.is_authenticated and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
