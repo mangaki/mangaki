@@ -10,14 +10,14 @@ function vote(elt) {
     var work_id = entity.data('id');
     var choice = $(elt).data('choice');
     var pos = entity.data('pos');
-    $.post('/vote/' + work_id, {choice: choice}, function(rating) {
+    $.post( Urls['vote'](work_id), {choice: choice}, function(rating) {
         if(rating === '') {
             // FIXME: We should take the vote into account after the
             // user signs up or logs in.
             var next = window.location.pathname +
                 window.location.search + window.location.hash;
             window.location.assign(
-                '/user/signup?next=' + encodeURIComponent(next));
+                 Urls['account_signup']() + '?next=' + encodeURIComponent(next));
         }
         if(typeof(sort_mode) !== 'undefined' && sort_mode === 'mosaic' && rating)
             loadCard(pos);
@@ -33,7 +33,7 @@ function vote(elt) {
 }
 
 function suggestion(mangaki_class) {
-    $.post('/' + mangaki_class + '/' + $('#id_work').val(), {
+    $.post(Urls['work-detail'](mangaki_class, $('#id_work').val()), {
         'work': $('#id_work').val(),
         'problem': $('#id_problem').val(),
         'message': $('#id_message').val()
@@ -71,7 +71,7 @@ function displayWork(pos, work) {
     work_div.find('.work-snapshot-title h4').text(work.title);
     work_div.find('.work-synopsis').text(work.synopsis);
     $('[data-toggle="tooltip"]').tooltip('fixTitle');
-    work_div.find('a.work-snapshot').attr('href', '/' + work_div.data('category') + '/' + work_div.data('id'));
+    work_div.find('a.work-snapshot').attr('href',Urls['work-detail'](work_div.data('category'), work_div.data('id')));
     work_div.fadeOut().promise().done(function () {
             work_div.find('.work-votes').promise().done(function () {
                 if (display_votes)
@@ -111,7 +111,8 @@ function loadCard(pos) {
             return loadCardFrom(pos, works);
     }
 
-    return $.getJSON('/data/card/' + category + '/' + pos + '.json', function(works) {
+    return $.getJSON(Urls['get-card'](category, pos), function(json) {
+        works = json['cards'];
         globalWorks[pos] = works;
         works = filterWorks(pos);
 

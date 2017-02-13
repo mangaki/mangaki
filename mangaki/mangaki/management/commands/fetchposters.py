@@ -1,10 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
-from mangaki.models import Work
-import xml.etree.ElementTree as ET
-import requests
 import html
 import re
+import xml.etree.ElementTree as ET
+
+import requests
+from django.conf import settings
+from django.core.management.base import BaseCommand
+
+from mangaki.models import Work
 
 
 def poster(query):
@@ -17,9 +19,9 @@ class Command(BaseCommand):
     help = 'Fetches anime posters'
 
     def handle(self, *args, **options):
-        for anime in Work.objects.filter(category__slug='anime', poster=''):
+        for anime in Work.objects.filter(category__slug='anime', ext_poster=''):
             try:
-                anime.poster = poster(anime.title)
+                anime.ext_poster = poster(anime.title)
                 anime.save()
                 print('Done', anime.title)
             except:

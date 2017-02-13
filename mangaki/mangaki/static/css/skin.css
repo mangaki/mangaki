@@ -357,8 +357,6 @@ ul.checklist .list-icon {
 /** Base class **/
 .search-input {
     width: 100%;
-    border: 1px solid #eee;
-    padding: 10px;
     font-size: 1.15em;
 }
 

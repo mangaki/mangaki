@@ -1,0 +1,30 @@
+# Source files
+# ============
+*.pxd		text
+*.py 		text
+*.py3 		text
+*.pyw 		text
+*.pyx  		text
+
+# Binary files
+# ============
+*.db		binary
+*.p 		binary
+*.pkl 		binary
+*.pyc 		binary
+*.pyd		binary
+*.pyo 		binary
+*.ipynb         binary
+
+# Graphics
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.tif binary
+*.tiff binary
+*.ico binary
+*.svg binary
+*.eps binary
+
+fixtures/*.json binary

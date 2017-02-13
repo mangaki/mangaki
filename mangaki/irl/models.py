@@ -20,8 +20,8 @@ class Attendee(models.Model):
     attending = models.BooleanField(default=False)
 
 class Event(models.Model):
-    work = models.ForeignKey(Work)
-    location = models.ForeignKey('Location', blank=True, null=True)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
+    location = models.ForeignKey('Location', blank=True, null=True, on_delete=models.CASCADE)
     event_type = models.CharField(max_length=9, choices=(
         ('premiere', 'avant-première'),
         ('screening', 'projection'),

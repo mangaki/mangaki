@@ -1,9 +1,35 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
 root = true
 
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+
+# 4 spaces indentation for Python
+[*.py]
+indent_style = space
+indent_size = 4
+
+# 4 spaces indentation for CSS
+[*.css]
+indent_size = 4
+indent_style = space
+
+# 2 spaces indentation for JavaScript
+[*.js]
+indent_size = 2
+indent_style = space
+
+# 4 spaces for Vagrantfile
 [Vagrantfile]
 indent_size = 4
 indent_style = space
 
-[*.css]
-indent_size = 4
+# 2 spaces for YAML files
+[*.yml]
+indent_size = 2
 indent_style = space

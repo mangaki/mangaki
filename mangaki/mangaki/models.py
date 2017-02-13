@@ -1,15 +1,22 @@
 # coding=utf8
-from django.db import models
+import os.path
+import tempfile
+from urllib.parse import urlparse
+
+import requests
+from django.conf import settings
 from django.contrib.auth.models import User
-from django.db.models import F, Q, Func, Value, Lookup, CharField
-from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.files import File
 from django.core.urlresolvers import reverse
+from django.db import models
+from django.db.models import CharField, F, Func, Lookup, Value
 
+from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
 from mangaki.discourse import get_discourse_data
-from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
-from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+from mangaki.utils.ranking import RANDOM_MAX_DISLIKES, RANDOM_MIN_RATINGS, RANDOM_RATIO, TOP_MIN_RATINGS
+
 
 @CharField.register_lookup
 class SearchLookup(Lookup):
@@ -25,6 +32,7 @@ class SearchLookup(Lookup):
         params = lhs_params + rhs_params + lhs_params + rhs_params
         return "(UPPER(F_UNACCENT(%s)) LIKE '%%%%' || UPPER(F_UNACCENT(%s)) || '%%%%' OR UPPER(F_UNACCENT(%s)) %%%% UPPER(F_UNACCENT(%s)))" % (lhs, rhs, lhs, rhs), params
 
+
 class SearchSimilarity(Func):
     """Helper class for computing the search similarity ignoring case and
     accents"""
@@ -33,6 +41,7 @@ class SearchSimilarity(Func):
 
     def __init__(self, lhs, rhs):
         super().__init__(Func(Func(lhs, function='F_UNACCENT'), function='UPPER'), Func(Func(rhs, function='F_UNACCENT'), function='UPPER'))
+
 
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
@@ -55,12 +64,12 @@ class WorkQuerySet(models.QuerySet):
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
-
     def random(self):
         return self.filter(
             nb_ratings__gte=RANDOM_MIN_RATINGS,
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
+
 
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
@@ -69,14 +78,16 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Work(models.Model):
     title = models.CharField(max_length=128)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
-    poster = models.CharField(max_length=128)
+    ext_poster = models.CharField(max_length=128)
+    int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
-    category = models.ForeignKey('Category', blank=False, null=False)
+    category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
 
     # Some of these fields do not make sense for some categories of works.
@@ -89,8 +100,8 @@ class Work(models.Model):
     catalog_number = models.CharField(max_length=20, blank=True)
     anidb_aid = models.IntegerField(default=0, blank=True)
     vgmdb_aid = models.IntegerField(blank=True, null=True)
-    editor = models.ForeignKey('Editor', default=1)
-    studio = models.ForeignKey('Studio', default=1)
+    editor = models.ForeignKey('Editor', default=1, on_delete=models.PROTECT)
+    studio = models.ForeignKey('Studio', default=1, on_delete=models.PROTECT)
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -111,24 +122,43 @@ class Work(models.Model):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
     def safe_poster(self, user):
-        if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
-            return self.poster
-        return '/static/img/nsfw.jpg'
+        if self.id is None:
+            return '{}{}'.format(settings.STATIC_URL, 'img/chiro.gif')
+        if not self.nsfw or (user.is_authenticated and user.profile.nsfw_ok):
+            if self.int_poster:
+                return self.int_poster.url
+            return self.ext_poster
+        return '{}{}'.format(settings.STATIC_URL, 'img/nsfw.jpg')
+
+    def retrieve_poster(self, url=None, session=None):
+        if session is None:
+            session = requests
+        if url is None:
+            url = self.ext_poster
+        if not url:
+            return False
+
+        filename = os.path.basename(urlparse(url).path)
+        # Hé mais ça va pas écraser des posters / créer des collisions, ça ?
+
+        try:
+            r = session.get(url, timeout=5, stream=True)
+        except requests.RequestException as e:
+            return False
+
+        try:
+            with tempfile.TemporaryFile() as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    f.write(chunk)
+                self.ext_poster = url
+                self.int_poster.save(filename, File(f))
+        finally:
+            r.close()
+        return True
 
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            if isinstance(self, Anime):
-                self.category = Category.objects.get(slug='anime')
-            elif isinstance(self, Manga):
-                self.category = Category.objects.get(slug='manga')
-            elif isinstance(self, Album):
-                self.category = Category.objects.get(slug='album')
-            else:
-                raise TypeError('Unexpected subclass of work: {}'.format(type(self)))
-        super().save(*args, **kwargs)
 
 class Role(models.Model):
     name = models.CharField(max_length=255)
@@ -137,10 +167,11 @@ class Role(models.Model):
     def __str__(self):
         return '{} /{}/'.format(self.name, self.slug)
 
+
 class Staff(models.Model):
-    work = models.ForeignKey('Work')
-    artist = models.ForeignKey('Artist')
-    role = models.ForeignKey('Role')
+    work = models.ForeignKey('Work', on_delete=models.CASCADE)
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE)
+    role = models.ForeignKey('Role', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('work', 'artist', 'role')
@@ -150,6 +181,7 @@ class Staff(models.Model):
             self.artist.name,
             self.role.name.lower(),
             self.work.title)
+
 
 class Editor(models.Model):
     title = models.CharField(max_length=33, db_index=True)
@@ -165,34 +197,6 @@ class Studio(models.Model):
         return self.title
 
 
-class Anime(Work):
-    # Deprecated fields
-    deprecated_director = models.ForeignKey('Artist', related_name='directed', default=1)
-    deprecated_author = models.ForeignKey('Artist', related_name='authored', default=1)
-    deprecated_composer = models.ForeignKey('Artist', related_name='composed', default=1)
-    deprecated_genre = models.ManyToManyField('Genre')
-    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='')
-    deprecated_nb_episodes = models.TextField(default='Inconnu', max_length=16)
-    deprecated_anime_type = models.TextField(max_length=42, default='')
-    deprecated_anidb_aid = models.IntegerField(default=0)
-    deprecated_editor = models.ForeignKey('Editor', default=1)
-    deprecated_studio = models.ForeignKey('Studio', default=1)
-
-    def __str__(self):
-        return '[%d] %s' % (self.id, self.title)
-
-
-class Manga(Work):
-    # Deprecated fields
-    deprecated_mangaka = models.ForeignKey('Artist', related_name='drew')
-    deprecated_writer = models.ForeignKey('Artist', related_name='wrote')
-    deprecated_genre = models.ManyToManyField('Genre')
-    deprecated_origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES)
-    deprecated_vo_title = models.CharField(max_length=128)
-    deprecated_manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
-    deprecated_editor = models.CharField(max_length=32)
-
-
 class Genre(models.Model):
     title = models.CharField(max_length=17)
 
@@ -202,20 +206,12 @@ class Genre(models.Model):
 
 class Track(models.Model):
     title = models.CharField(max_length=32)
-    album = models.ManyToManyField('Album')
+    album = models.ManyToManyField('Work')
 
     def __str__(self):
         return self.title
 
 
-class Album(Work):
-    # Deprecated fields
-    deprecated_composer = models.ForeignKey('Artist', related_name='composer', default=1)
-    deprecated_catalog_number = models.CharField(max_length=20)
-    deprecated_vgmdb_aid = models.IntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return '[{id}] {title}'.format(id=self.id, title=self.title)
 
 class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
@@ -225,14 +221,15 @@ class Artist(models.Model):
     def __str__(self):
         return self.name
 
+
 class ArtistSpelling(models.Model):
     was = models.CharField(max_length=255, db_index=True)
-    artist = models.ForeignKey('Artist')
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE)
 
 
 class Rating(models.Model):
-    user = models.ForeignKey(User)
-    work = models.ForeignKey(Work)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
     choice = models.CharField(max_length=8, choices=(
         ('favorite', 'Mon favori !'),
         ('like', 'J\'aime'),
@@ -259,7 +256,7 @@ class Page(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_shared = models.BooleanField(default=True)
     nsfw_ok = models.BooleanField(default=False)
     newsletter_ok = models.BooleanField(default=True)
@@ -280,8 +277,8 @@ class Profile(models.Model):
 
 
 class Suggestion(models.Model):
-    user = models.ForeignKey(User)
-    work = models.ForeignKey(Work)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
     problem = models.CharField(verbose_name='Partie concernée', max_length=8, choices=(
         ('title', 'Le titre n\'est pas le bon'),
@@ -309,21 +306,20 @@ class Suggestion(models.Model):
         score = suggestions_score + recommendations_score
         Profile.objects.filter(user=self.user).update(score=score)
 
-
-def suggestion_saved(sender, instance, *args, **kwargs):
-    instance.update_scores()
-models.signals.post_save.connect(suggestion_saved, sender=Suggestion)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.update_scores()
 
 
 class Neighborship(models.Model):
-    user = models.ForeignKey(User)
-    neighbor = models.ForeignKey(User, related_name='neighbor')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    neighbor = models.ForeignKey(User, related_name='neighbor', on_delete=models.CASCADE)
     score = models.DecimalField(decimal_places=3, max_digits=8)
 
 
 class SearchIssue(models.Model):
     date = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=128)
     poster = models.CharField(max_length=128, blank=True, null=True)
     mal_id = models.IntegerField(blank=True, null=True)
@@ -339,9 +335,9 @@ class Announcement(models.Model):
 
 
 class Recommendation(models.Model):
-    user = models.ForeignKey(User)
-    target_user = models.ForeignKey(User, related_name='target_user')
-    work = models.ForeignKey(Work)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    target_user = models.ForeignKey(User, related_name='target_user', on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s recommends %s to %s' % (self.user, self.work, self.target_user)
@@ -349,16 +345,17 @@ class Recommendation(models.Model):
 
 class Pairing(models.Model):
     date = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
-    artist = models.ForeignKey(Artist)
-    work = models.ForeignKey(Work)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
     is_checked = models.BooleanField(default=False)
 
 
 class Reference(models.Model):
-    work = models.ForeignKey('Work')
+    work = models.ForeignKey('Work', on_delete=models.CASCADE)
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
+
 
 class Top(models.Model):
     date = models.DateField(auto_now_add=True)
@@ -372,6 +369,7 @@ class Top(models.Model):
             date=self.date,
             id=self.id)
 
+
 class Ranking(models.Model):
     top = models.ForeignKey('Top', on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -381,3 +379,22 @@ class Ranking(models.Model):
     score = models.FloatField()
     nb_ratings = models.PositiveIntegerField()
     nb_stars = models.PositiveIntegerField()
+
+
+class FAQTheme(models.Model):
+    order = models.IntegerField(unique=True)
+    theme = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.theme
+
+
+class FAQEntry(models.Model):
+    theme = models.ForeignKey(FAQTheme, on_delete=models.CASCADE, related_name="entries")
+    question = models.CharField(max_length=200)
+    answer = models.TextField()
+    pub_date = models.DateTimeField('Date de publication', auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.question

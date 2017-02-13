@@ -1,19 +1,25 @@
-from django.core.management.base import BaseCommand, CommandError
-from sklearn import cross_validation
-from sklearn.metrics import mean_squared_error
-from sklearn.cross_validation import train_test_split
-from mangaki.utils.svd import MangakiSVD
-from mangaki.utils.pca import MangakiPCA
-from mangaki.utils.knn import MangakiKNN
-from mangaki.utils.als import MangakiALS
-from mangaki.utils.values import rating_values
+import csv
+import os.path
 from collections import Counter
+
 import numpy as np
-import random
-import pandas
-# import matplotlib.pyplot as plt
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+
+from mangaki.utils.wals import MangakiWALS
+from mangaki.utils.als import MangakiALS
+from mangaki.utils.knn import MangakiKNN
+from mangaki.utils.svd import MangakiSVD
+
+from mangaki.utils.values import rating_values
+from mangaki.utils.zero import MangakiZero
+
+import matplotlib.pyplot as plt
 
 TEST_SIZE = 50000
+
 
 class Experiment(object):
     X = None
@@ -24,7 +30,8 @@ class Experiment(object):
     results = {}
     algos = None
     def __init__(self, PIG_ID=None):
-        self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN()]
+        # self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN(20), MangakiZero()]
+        self.algos = [MangakiALS(20), MangakiWALS(20)]
         # self.results.setdefault('x_axis', []).append()
         self.make_dataset(PIG_ID)
         self.execute()
@@ -38,22 +45,25 @@ class Experiment(object):
 
     def make_dataset(self, PIG_ID):
         self.clean_dataset()
-        ratings = pandas.read_csv('data/ratings.csv', header=None).as_matrix()
+        with open(os.path.join(settings.BASE_DIR, '../data/ratings.csv')) as f:
+            ratings = [[int(line[0]), int(line[1]), line[2]] for line in csv.reader(f)]
+        ratings = np.array(ratings, dtype=np.object)
         if PIG_ID:  # Let's focus on the PIG
             pig_ratings = {}
             for user_id, work_id, choice in ratings:
                 if user_id == PIG_ID:
-                    pig_ratings[work_id] = rating_values[choice]
+                    pig_ratings[work_id] = rating_values[choice]  # just choice for Movielens
         self.nb_users = max(ratings[:, 0]) + 1
         self.nb_works = max(ratings[:, 1]) + 1
-        self.works = pandas.read_csv('data/works.csv', header=None).as_matrix()[:, 1]
+        with open(os.path.join(settings.BASE_DIR, '../data/works.csv')) as f:
+            self.works = [x for _, x in csv.reader(f)]
         train, test = train_test_split(ratings, random_state=0, test_size=TEST_SIZE)
         if PIG_ID:
             train = ratings
         self.X = train[:, 0:2]
-        self.y = list(map(lambda choice: rating_values[choice], train[:, 2]))
+        self.y = list(map(lambda choice: rating_values[choice], train[:, 2]))  # train[:, 2] for Movielens
         self.X_test = test[:, 0:2]
-        self.y_test = list(map(lambda choice: rating_values[choice], test[:, 2]))
+        self.y_test = list(map(lambda choice: rating_values[choice], test[:, 2]))  # test[:, 2] for Movielens
         if PIG_ID:
             self.X_test = []
             self.y_test = []
