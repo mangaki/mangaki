@@ -1,23 +1,34 @@
 from collections import Counter
-
+from mangaki.models import Rating, ColdStartRating, Work
+from mangaki.utils.chrono import Chrono
+from mangaki.utils.values import rating_values, rating_values_dpp
+from django.contrib.auth.models import User
+from django.db.models import Count
 from django.db import connection
 
-from mangaki.models import Rating, Work
-from mangaki.utils.chrono import Chrono
 
 NB_NEIGHBORS = 15
 MIN_RATINGS = 3
 
 CHRONO_ENABLED = False
 
-def get_recommendations(user, category, editor):
+
+def get_recommendations(user, category, editor='unspecified', dpp=False):
     # What if user is not authenticated? We will see soon.
     chrono = Chrono(CHRONO_ENABLED)
 
     chrono.save('[%dQ] begin' % len(connection.queries))
 
     rated_works = {}
-    for work_id, choice in Rating.objects.filter(user=user).values_list('work_id', 'choice'):
+    if dpp:
+        qs = ColdStartRating.objects.filter(user=user).values_list('work_id', 'choice')
+        values = rating_values_dpp
+
+    else:
+        qs = Rating.objects.filter(user=user).values_list('work_id', 'choice')
+        values = rating_values
+
+    for work_id, choice in qs:
         rated_works[work_id] = choice
 
     willsee = set()
@@ -32,6 +43,7 @@ def get_recommendations(user, category, editor):
         banned_works = set(rated_works.keys())
 
     mangas = Work.objects.filter(category__slug='manga')
+
     if editor == 'otototaifu':
         mangas = mangas.filter(editor__title__in=['Ototo Manga', 'Taifu comics'])
     elif editor != 'unspecified':
@@ -45,23 +57,13 @@ def get_recommendations(user, category, editor):
         kept_works = set(manga_ids)
 
     chrono.save('[%dQ] retrieve her %d ratings' % (len(connection.queries), len(rated_works)))
-
-    values = {
-        'favorite': 4,
-        'like': 2,
-        'dislike': -2,
-        'neutral': 0.1,
-        'willsee': 0.5,
-        'wontsee': -0.5
-    }
-
     final_works = Counter()
     nb_ratings = {}
     c = 0
     neighbors = Counter()
     for user_id, work_id, choice in Rating.objects.filter(work__in=rated_works.keys()).values_list('user_id', 'work_id', 'choice'):
         c += 1
-        neighbors[user_id] += values[rated_works[work_id]] * values[choice]
+        neighbors[user_id] += values[rated_works[work_id]] * rating_values[choice]
 
     chrono.save('[%dQ] fill neighbors with %d ratings' % (len(connection.queries), c))
 
@@ -83,7 +85,7 @@ def get_recommendations(user, category, editor):
         if work_id in banned_works or (kept_works and work_id not in kept_works):
             continue
 
-        sum_ratings[work_id] += values[choice]
+        sum_ratings[work_id] += rating_values[choice]
         nb_ratings[work_id] += 1
         sum_scores[work_id] += score_of_neighbor[user_id]
 
@@ -95,7 +97,7 @@ def get_recommendations(user, category, editor):
         # Adding interesting works to the arena (rated at least MIN_RATINGS by neighbors)
         if nb_ratings[work_id] >= MIN_RATINGS:
             k += 1
-            final_works[(work_id, work_id in manga_ids, work_id in willsee)] = (float(sum_ratings[work_id]) / nb_ratings[work_id], sum_scores[work_id])    
+            final_works[(work_id, work_id in manga_ids, work_id in willsee)] = (sum_ratings[work_id] / nb_ratings[work_id], sum_scores[work_id])
         i += 1
 
     chrono.save('[%dQ] rank %d %d works' % (len(connection.queries), k, i))

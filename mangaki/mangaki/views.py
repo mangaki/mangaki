@@ -8,17 +8,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden, Http404, HttpResponsePermanentRedirect
+from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.utils.timezone import utc
 from django.utils.functional import cached_property
-
-
+from django.db.models import Case, When, Value, Sum, IntegerField
 from django.views.generic.detail import SingleObjectMixin
 
 from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection, DatabaseError
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme, Trope
+from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme, Trope
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import import_mal
@@ -35,6 +35,7 @@ from mangaki.choices import TOP_CATEGORY_CHOICES
 
 from natsort import natsorted
 
+NB_POINTS_DPP = 10
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
@@ -217,10 +218,10 @@ class CardList(JSONResponseMixin, ListView):
         # This call to `int` shouldn't fail because `sort_id` must match the
         # `\d+` regexp, cf urls.py.
         sort_id = int(self.kwargs.pop('sort_id'))
-        if sort_id < 1 or sort_id > 4:
+        if sort_id < 1 or sort_id > 5:
             raise Http404
         deja_vu = self.request.GET.get('dejavu', '').split(',')
-        sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
+        sort_mode = ['popularity', 'controversy', 'top', 'random', 'dpp'][int(sort_id) - 1]
         queryset = Category.objects.get(slug=category).work_set.all()
         if sort_mode == 'popularity':
             queryset = queryset.popular()
@@ -228,8 +229,10 @@ class CardList(JSONResponseMixin, ListView):
             queryset = queryset.controversial()
         elif sort_mode == 'top':
             queryset = queryset.top()
+        elif sort_mode == 'random':
+            queryset.random().order_by('?')
         else:
-            queryset = queryset.random().order_by('?')
+            queryset = queryset.dpp(NB_POINTS_DPP)
         if self.request.user.is_authenticated:
             rated_works = self.request.user.rating_set.values('work_id')
             queryset = queryset.exclude(id__in=rated_works)
@@ -289,12 +292,18 @@ class WorkList(WorkListMixin, ListView):
         else:
             return sort
 
+    # FIXME @property
+    def is_dpp(self):
+        dpp = self.kwargs.get('dpp', False)
+        return dpp
+
     def get_queryset(self):
+        search_text = self.search()
         queryset = self.category.work_set.all()
         sort_mode = self.sort_mode()
-        search_text = self.search()
-
-        if sort_mode == 'top':
+        if self.is_dpp():
+            queryset = self.category.work_set.exclude(coldstartrating__user=self.request.user).dpp(10)
+        elif sort_mode == 'top':
             queryset = queryset.top()
         elif sort_mode == 'popularity':
             queryset = queryset.popular()
@@ -325,18 +334,20 @@ class WorkList(WorkListMixin, ListView):
         context = super().get_context_data(**kwargs)
         search_text = self.search()
         sort_mode = self.sort_mode()
+        is_dpp = self.is_dpp()
 
         context['search'] = search_text
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
         context['objects_count'] = self.category.work_set.count()
+        context['is_dpp'] = is_dpp
 
-        if sort_mode == 'mosaic':
+        if sort_mode == 'mosaic' and not is_dpp:
             context['object_list'] = [
                 Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
                 for _ in range(4)
-            ]
+                ]
 
         return context
 
@@ -542,6 +553,18 @@ def rate_work(request, work_id):
     return HttpResponse()
 
 
+# FIXME @login_required
+def dpp_work(request, work_id):
+    if request.user.is_authenticated() and request.method == 'POST':
+        work = get_object_or_404(Work, id=work_id)
+        choice = request.POST.get('choice', '')
+        if choice not in ['like', 'dislike', 'dontknow']:
+            raise SuspiciousOperation("Attempted access denied. There are only 3 ratings here: like, dislike and dontknow")
+        ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
+        return HttpResponse(choice)
+    raise SuspiciousOperation("Attempted access denied. You are not logged in or it is currently a GET request")
+
+
 def recommend_work(request, work_id, target_id):
     if request.user.is_authenticated and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -596,8 +619,17 @@ def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
-            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
+            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else None})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
+
+
+def get_reco_list_dpp(request, category):
+    reco_list_dpp = []
+    for work, is_manga, in_willsee in get_recommendations(request.user, category, dpp=True):
+        update_poster_if_nsfw(work, request.user)
+        reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
+            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else None})
+    return HttpResponse(json.dumps(reco_list_dpp), content_type='application/json')
 
 
 def remove_reco(request, work_id, username, targetname):
@@ -626,6 +658,13 @@ def get_reco(request):
     else:
         reco_list = []
     return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
+
+
+@login_required
+def get_reco_dpp(request):
+    category = request.GET.get('category', 'all')
+    reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+    return render(request, 'mangaki/reco_list_dpp.html', {'reco_list': reco_list, 'category': category})
 
 
 def update_shared(request):
