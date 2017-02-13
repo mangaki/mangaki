@@ -1,21 +1,22 @@
-from django.core.management.base import BaseCommand, CommandError
+import csv
+import os.path
+from collections import Counter
+
+import numpy as np
+from django.conf import settings
+from django.core.management.base import BaseCommand
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
+
 from mangaki.utils.wals import MangakiWALS
-from mangaki.utils.svd import MangakiSVD
-from mangaki.utils.pca import MangakiPCA
-from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.als import MangakiALS
-from mangaki.utils.nmf import MangakiNMF
-from mangaki.utils.zero import MangakiZero
+from mangaki.utils.knn import MangakiKNN
+from mangaki.utils.svd import MangakiSVD
+
 from mangaki.utils.values import rating_values
-from django.conf import settings
-from collections import Counter
-import os.path
-import numpy as np
-import random
-import csv
-# import matplotlib.pyplot as plt
+from mangaki.utils.zero import MangakiZero
+
+import matplotlib.pyplot as plt
 
 TEST_SIZE = 50000
 

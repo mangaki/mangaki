@@ -1,11 +1,13 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Count
-from mangaki.models import Work, Rating
-from mangaki.utils.mal import lookup_mal_api
-from django.conf import settings
-from urllib.request import urlretrieve, urlopen
 import os
-from heapq import heappush, heappop
+from heapq import heappop, heappush
+from urllib.request import urlretrieve
+
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from django.db.models import Count
+
+from mangaki.models import Rating, Work
+from mangaki.utils.mal import lookup_mal_api
 
 
 def merge_anime(ids):
@@ -60,6 +62,7 @@ class Command(BaseCommand):
             sources = set(Work.objects.get(id=anime_id).source for anime_id in ids)
             nb_sources = len(sources)
             id_of_poster = {}
+            nb_ratings = 0
             for anime_id in ids:
                 anime = Work.objects.get(id=anime_id)
                 nb_ratings = len(anime.rating_set.all())

@@ -1,9 +1,9 @@
 from collections import Counter
+
+from django.db import connection
+
 from mangaki.models import Rating, Work
 from mangaki.utils.chrono import Chrono
-from django.contrib.auth.models import User
-from django.db.models import Count
-from django.db import connection
 
 NB_NEIGHBORS = 15
 MIN_RATINGS = 3

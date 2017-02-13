@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden, Http404, HttpResponsePermanentRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.timezone import utc
 from django.utils.functional import cached_property
@@ -16,23 +15,19 @@ from django.utils.functional import cached_property
 
 from django.views.generic.detail import SingleObjectMixin
 
-from django.dispatch import receiver
-from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
-from django.db import connection
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
-from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
+from django.db.models import Case, When, Value, Sum, IntegerField
+from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
+from mangaki.mixins import JSONResponseMixin
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
-from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
+from mangaki.utils.mal import import_mal
 from mangaki.utils.recommendations import get_recommendations
 from irl.models import Event, Partner, Attendee
 
 from collections import Counter, OrderedDict
 from markdown import markdown
 from urllib.parse import urlencode
-from random import shuffle, randint
 import datetime
-import hashlib
 import json
 
 from mangaki.choices import TOP_CATEGORY_CHOICES

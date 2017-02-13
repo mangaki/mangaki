@@ -1,23 +1,21 @@
 # coding=utf8
-from django.db import models
+import os.path
+import tempfile
+from urllib.parse import urlparse
+
+import requests
+from django.conf import settings
 from django.contrib.auth.models import User
-from django.db.models import F, Q, Func, Value, Lookup, CharField
-from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.core.files import File
+from django.core.urlresolvers import reverse
+from django.db import models
+from django.db.models import CharField, F, Func, Lookup, Value
 
-import tempfile
-import requests
-from urllib.parse import urlparse
-import os.path
-
+from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
 from mangaki.discourse import get_discourse_data
-from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
-from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
-from django.conf import settings
-
+from mangaki.utils.ranking import RANDOM_MAX_DISLIKES, RANDOM_MIN_RATINGS, RANDOM_RATIO, TOP_MIN_RATINGS
 
 
 @CharField.register_lookup

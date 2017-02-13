@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from mangaki.models import Work
 import requests
+import time
 
 class Command(BaseCommand):
     help = 'Downloads posters'
@@ -29,6 +30,7 @@ class Command(BaseCommand):
                     if work.int_poster.storage.exists(work.int_poster.name):
                         continue
 
+                now = time.time()
                 while len(recent) >= options['ratelimit']:
                     now = time.time()
                     recent = [t for t in recent if now - t < 1.]

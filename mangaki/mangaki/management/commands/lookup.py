@@ -1,8 +1,9 @@
-from django.core.management.base import BaseCommand, CommandError
-from mangaki.models import Work, Rating
-from django.db import connection
-from django.db.models import Count
 from collections import Counter
+
+from django.core.management.base import BaseCommand
+from django.db.models import Count
+
+from mangaki.models import Rating, Work
 
 
 class Command(BaseCommand):

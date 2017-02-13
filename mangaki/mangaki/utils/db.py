@@ -1,6 +1,6 @@
-from mangaki.utils.mal import MAL
-import requests
 from urllib.parse import urlparse
+
+from mangaki.utils.mal import MAL
 
 
 def get_potential_posters(work):
