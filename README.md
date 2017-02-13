@@ -45,7 +45,7 @@ environnement virtuel, ce qui est fait par les commandes ci-dessous.
     
     python3 -m venv venv --system-site-packages
     . venv/bin/activate
-    pip install -r requirements/dev.txt # Si il s'agit d'une instance de développement, sinon utilisez requirements/production.txt
+    pip install -r requirements/dev.txt # S'il s'agit d'une instance de développement, sinon utilisez requirements/production.txt
 
 Pour activer l'environnement virtuel dans le futur, il faudra faire
 
