@@ -1,12 +1,9 @@
 from sklearn.utils.extmath import randomized_svd
 from scipy.spatial.distance import pdist, squareform
-from scipy.sparse import csc_matrix
 from numpy.random import choice
-from mangaki.utils.values import rating_values
-from mangaki.models import Rating
-import pandas
 import numpy as np
 
+MAX_ITER_SAMPLE_DPP = 10
 
 def diameter(r, points):
     nb_points = points.shape[0]
@@ -16,52 +13,16 @@ def diameter(r, points):
 
 def diameter_0(points):
     r = 1
-    premier = diameter(r, points)
-    deuxième = diameter(r / 2, points)
-    while premier - deuxième > 0.01 * deuxième:
-        premier = diameter(r, points)
+    first = diameter(r, points)
+    second = diameter(r / 2, points)
+    while (first - second) > (0.01 * second):
+        first = diameter(r, points)
         r = r / 2
-        deuxième = diameter(r, points)
-    return deuxième
+        second = diameter(r, points)
+    return second
 
 
-class BuildMatrix(object):
-
-    def build_matrix(self, fname=None):
-        user_list, item_list, data = [], [], []
-
-        if fname is None:
-            content = Rating.objects.values_list('user_id',
-                                                 'work_id',
-                                                 'rating')
-            for user_id, item_id, rating in content:
-                user_list.append(user_id)
-                item_list.append(item_id)
-                data.append(rating_values[rating])
-        else:
-            content = pandas.read_csv(fname,
-                                      header=None).as_matrix()
-            for user_id, item_id, rating in content:
-                user_list.append(user_id)
-                item_list.append(item_id)
-                data.append(rating_values[rating])
-
-        user_set = set(user_list)
-        item_set = set(item_list)
-        user_dict = {v: k for k, v in enumerate(user_set)}
-        item_dict = {v: k for k, v in enumerate(item_set)}
-        row = [user_dict[v] for v in user_list]
-        col = [item_dict[v] for v in item_list]
-        matrix = csc_matrix((data, (row, col)), shape=(
-            len(user_set), len(item_set)))
-        self.item_set = item_set
-        self.user_set = user_set
-        self.item_dict = item_dict
-        self.user_dict = user_dict
-        return matrix
-
-
-class SimilarityMatrix(object):
+class SimilarityMatrix:
 
     def __init__(self, matrix, nb_components_svd=10,
                  fname=None, algo='svd', metric='cosine'):
@@ -81,7 +42,7 @@ class SimilarityMatrix(object):
         return 1 - squareform(pdist(self.matrix.T, metric=metric))
 
 
-class MangakiUniform(object):
+class MangakiUniform:
 
     def __init__(self, items):
         self.items = items
@@ -90,15 +51,14 @@ class MangakiUniform(object):
         return choice(self.items, nb_points).tolist()
 
 
-class MangakiDPP(object):
+class MangakiDPP:
 
     def __init__(self, items, similarity_matrix):
         self.items = items
         self.similarity_matrix = similarity_matrix
 
     def sample_k(self, *args, **kwargs):
-        MAX_ITER = 10
-        for i in range(MAX_ITER):
+        for i in range(MAX_ITER_SAMPLE_DPP):
             try:
                 return self._sample_k(*args, **kwargs)
             except np.linalg.linalg.LinAlgError as e:
@@ -112,7 +72,7 @@ class MangakiDPP(object):
         by the similarity matrix L. The algorithm
         is iterative and runs for max_nb_iterations.
         The algorithm used is from
-        (Fast Determinantal Point Process Sampling withw
+        (Fast Determinantal Point Process Sampling with
         Application to Clustering, Byungkon Kang, NIPS 2013)
         """
         items = self.items
@@ -166,14 +126,3 @@ def compare(similarity, algos, nb_points, nb_iterations=20):
     resultats /= nb_iterations
 
     return resultats
-
-
-if __name__ == '__main__':
-    build_matrix = BuildMatrix()
-    matrix = build_matrix.build_matrix(fname='/home/voisin/Bureau/ratings.csv')
-    similarity = SimilarityMatrix(matrix, nb_components_svd=70)
-    items = list(build_matrix.item_dict.values())
-    uniform = MangakiUniform(items)
-    dpp = MangakiDPP(items, similarity.similarity_matrix)
-    algos = [uniform, dpp]
-    results = compare(similarity, algos, 20)

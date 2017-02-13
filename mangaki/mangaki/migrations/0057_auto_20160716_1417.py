@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mangaki', '0056_merge'),
+        ('mangaki', '0057_auto_20160702_2048'),
     ]
 
     operations = [

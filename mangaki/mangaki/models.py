@@ -15,7 +15,11 @@ from django.db.models import CharField, F, Func, Lookup, Value
 
 from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
 from mangaki.discourse import get_discourse_data
-from mangaki.utils.ranking import RANDOM_MAX_DISLIKES, RANDOM_MIN_RATINGS, RANDOM_RATIO, TOP_MIN_RATINGS
+from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
+from mangaki.utils.ratingsmatrix import RatingsMatrix
+
+NB_POPULAR_WORKS = 1000
 
 
 @CharField.register_lookup
@@ -63,6 +67,21 @@ class WorkQuerySet(models.QuerySet):
         # show the relevant results first.
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
+
+    def dpp(self, nb_points):
+        """
+        sample "nb_points" popular works which are far from each other (using DPP)
+        """
+        ratings_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
+                                                                  'work_id',
+                                                                  'choice'))
+        similarity = SimilarityMatrix(ratings_matrix.matrix, nb_components_svd=70)
+        set_item_id_popular = set(self.popular()[:NB_POPULAR_WORKS].values_list('pk', flat=True))
+        items = [ratings_matrix.item_dict[item] for item in ratings_matrix.item_set if item in set_item_id_popular]
+        dpp = MangakiDPP(items, similarity.similarity_matrix)
+        liste_dpp = dpp.sample_k(nb_points)
+        liste_dpp_work_ids = [ratings_matrix.item_dict_inv[element] for element in liste_dpp]
+        return self.filter(id__in=liste_dpp_work_ids)
 
     def random(self):
         return self.filter(
@@ -212,7 +231,6 @@ class Track(models.Model):
         return self.title
 
 
-
 class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
     last_name = models.CharField(max_length=32)  # No longer used
@@ -232,8 +250,8 @@ class Rating(models.Model):
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
     choice = models.CharField(max_length=8, choices=(
         ('favorite', 'Mon favori !'),
-        ('like', 'J\'aime'),
-        ('dislike', 'Je n\'aime pas'),
+        ('like', "J'aime"),
+        ('dislike', "Je n'aime pas"),
         ('neutral', 'Neutre'),
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
@@ -379,6 +397,23 @@ class Ranking(models.Model):
     score = models.FloatField()
     nb_ratings = models.PositiveIntegerField()
     nb_stars = models.PositiveIntegerField()
+
+
+class ColdStartRating(models.Model):
+    user = models.ForeignKey(User, related_name='cold_start_rating')
+    work = models.ForeignKey(Work)
+    choice = models.CharField(max_length=8, choices=(
+        ('like', 'J\'aime'),
+        ('dislike', 'Je n\'aime pas'),
+        ('dontknow', 'Je ne connais pas')
+    ))
+    date = models.DateField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'work')
+
+    def __str__(self):
+        return '%s %s %s' % (self.user, self.choice, self.work)
 
 
 class FAQTheme(models.Model):

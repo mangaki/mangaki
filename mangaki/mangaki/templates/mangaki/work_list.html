@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block body %}
+
+{% if not is_dpp %}
 <div class="col-xs-12">
   <p class="alert alert-info">
 {% if user.is_authenticated %}
@@ -11,9 +13,17 @@
 {% endif %}
   </p>
 </div>
+{% endif %}
 
 <div class="col-xs-12">
   <ul class="nav nav-tabs">
+    {% if is_dpp %}
+
+    <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}"><em>Anime</em> seulement</a></li>
+    
+    <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'manga' %}"><em>Manga</em> seulement</a></li>
+    
+    {% else %}
     <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}">Mosaïque</a></li>
     <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
@@ -26,8 +36,12 @@
       <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
     <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
+      {% endif %}
   </ul>
 </div>
+
+
+
 <div class="col-xs-12" style="margin: 10px 0; text-align: center">
 {% if sort_mode == 'alpha' %}
 <ul class="pagination pagination-sm" style="margin: 0">
@@ -42,7 +56,7 @@
     </li>
   {% endfor %}
 </ul>
-{% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' %}
+{% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' and not is_dpp %}
   <form method="GET">
     <div class="input-group">
       <input class="search-input form-control {{category}}" placeholder="Entrez un titre d'{{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
@@ -54,7 +68,15 @@
   </form>
 {% endif %}
 </div>
-  
+
+{% if is_dpp %}
+<div class="col-xs-12 text-center" style="padding: 10px 0">
+    
+    <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
+    <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+    <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne  connais pas</span>
+</div>
+{% else %}
 <div class="col-xs-12 text-center" style="padding: 10px 0">
     <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
     <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
@@ -76,13 +98,20 @@
       {% endif %}
     {% endspaceless %}</span>
 </div>
+{% endif %}
 
-{% include "works.html" with works=object_list only %}
+{% include "works.html" with works=object_list is_dpp=is_dpp %}
+
 
 {% if user.is_authenticated %}
+
 <div class="row margin">
   <div class="col-md-12 col-sm-12">
+    {% if is_dpp %}
+    <a class="btn btn-primary btn-lg" href="{% url 'reco_dpp' %}?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">montrez-moi de nouvelles oeuvres&nbsp;!</a>
+    {% else %}
     <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
+    {% endif %}
   </div>
 </div>
 {% endif %}
@@ -92,7 +121,11 @@
 <br />
 <br />
 <br />
+
+{% if not is_dpp %}
+
 <script>
+
 category = '{{ category }}';
 sort_mode = '{{ sort_mode }}';
 loadMenu();
@@ -100,5 +133,8 @@ loadMenu();
 for(pos = 1; pos <= 4; pos++)
     loadCard(pos);
 {% endif %}
+
+
 </script>
+{% endif %}
 {% endblock %}
