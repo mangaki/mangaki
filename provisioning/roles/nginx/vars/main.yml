@@ -1,0 +1,6 @@
+---
+le_cert: "{{ letsencrypt_sh_root }}/certs/{{ app_hosts.0 }}/fullchain.pem"
+le_cert_key: "{{ letsencrypt_sh_root }}/certs/{{ app_hosts.0 }}/privkey.pem"
+snakeoil_cert: /etc/ssl/certs/ssl-cert-snakeoil.pem
+snakeoil_cert_key: /etc/ssl/private/ssl-cert-snakeoil.key
+letsencrypt_ready: false
