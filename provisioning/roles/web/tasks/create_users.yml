@@ -1,0 +1,6 @@
+---
+- name: Create the web group
+  group: name={{ web_group }} state=present
+
+- name: Create the web user
+  user: name={{ web_user }} group={{ web_group }} state=present

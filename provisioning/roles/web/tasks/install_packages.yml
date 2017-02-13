@@ -1,0 +1,15 @@
+---
+
+- name: Install base packages
+  apt: name={{ item }} state=present
+  with_items:
+    - git
+    - libpq-dev
+    - libxml2-dev
+    - libxslt-dev
+    - python3-dev
+    - python3-lxml   # lxml package rather than manually building it through pip.
+    - python3-numpy  # numy package, we don't want to spend too much time compiling linalg
+    - python3-pip
+    - python-virtualenv
+  tags: packages

@@ -1,0 +1,11 @@
+---
+- name: Setup a single Mangaki server
+  hosts: all
+  vars_files:
+    - env_vars/secret.yml
+
+  roles:
+    - base
+    - db
+    - web
+    - nginx
