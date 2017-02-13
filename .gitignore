@@ -16,3 +16,5 @@ fixtures/*.json
 restore.sh
 *.coverage
 media
+/provisioning/inventory
+/provisioning/env_vars/

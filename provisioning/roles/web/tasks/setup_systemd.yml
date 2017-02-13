@@ -1,0 +1,24 @@
+---
+- name: Ensure systemd is installed
+  apt: name=systemd state=present
+  tags: packages
+
+- name: Copy the ranking timer unit file
+  template:
+          src: compute-ranking.timer.j2
+          dest: /etc/systemd/system/compute-ranking.timer
+          mode: 0600
+          backup: true
+
+- name: Copy the top director time unit file
+  template:
+          src: compute-top-directors.timer.j2
+          dest: /etc/systemd/system/compute-top-directors.timer
+          mode: 0600
+          backup: true
+
+- name: Ensure that new timers are enabled
+  systemd: name={{item}} enabled=yes daemon_reload=yes
+  with_items:
+          - compute-ranking.timer
+          - compute-top-directors.timer

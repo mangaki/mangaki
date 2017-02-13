@@ -26,8 +26,8 @@ SITE_ID = config.getint('deployment', 'SITE_ID', fallback=1)
 
 # Application definition
 INSTALLED_APPS = (
-    'mangaki', # Mangaki main application
-    'irl', # Mangaki IRL events
+    'mangaki',  # Mangaki main application
+    'irl',      # Mangaki IRL events
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,6 +131,16 @@ AUTHENTICATION_BACKENDS = (
 )
 
 EMAIL_BACKEND = config.get('email', 'EMAIL_BACKEND', fallback='django.core.mail.backends.smtp.EmailBackend')
+if config.has_section('smtp'):
+    EMAIL_HOST = config.get('smtp', 'EMAIL_HOST', fallback='localhost')
+    EMAIL_PORT = config.get('smtp', 'EMAIL_PORT', fallback=25)
+    EMAIL_HOST_USER = config.get('smtp', 'EMAIL_HOST_USER', fallback='')
+    EMAIL_HOST_PASSWORD = config.get('smtp', 'EMAIL_HOST_PASSWORD', fallback='')
+    EMAIL_USE_TLS = config.get('smtp', 'EMAIL_USE_TLS', fallback=True)
+    EMAIL_USE_SSL = config.get('smtp', 'EMAIL_USE_SSL', fallback=False)
+    EMAIL_TIMEOUT = config.get('smtp', 'EMAIL_TIMEOUT', fallback=None)
+    EMAIL_SSL_KEYFILE = config.get('smtp', 'EMAIL_SSL_KEYFILE', fallback=None)
+    EMAIL_SSL_CERTFILE = config.get('smtp', 'EMAIL_SSL_CERTFILE', fallback=None)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
