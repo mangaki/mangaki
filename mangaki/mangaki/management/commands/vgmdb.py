@@ -1,7 +1,7 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
+
+from mangaki.models import Artist, ArtistSpelling, Work
 from mangaki.utils.vgmdb import VGMdb
-from mangaki.models import Artist, Work, ArtistSpelling
-from urllib.parse import urlparse, parse_qs
 
 
 def get_or_create_artist(name):

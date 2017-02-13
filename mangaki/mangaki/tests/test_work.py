@@ -1,9 +1,9 @@
-from django.test import TestCase
+from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError
-from mangaki.models import Work, Category, Editor, Studio
-from django.contrib.auth.models import User, AnonymousUser
+from django.test import TestCase
 
 from mangaki.factories import create_user_with_profile
+from mangaki.models import Category, Editor, Studio, Work
 
 
 class WorkTest(TestCase):

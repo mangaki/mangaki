@@ -1,10 +1,10 @@
-from django.contrib.auth.decorators import login_required
-from django.conf.urls.static import static
 from django.conf.urls import handler400, handler404, handler500
-from django.conf.urls import include, url
-from django.contrib import admin
 from django.conf import settings
+from django.conf.urls import include, url
+from django.conf.urls.static import static
+from django.contrib import admin
 from django_js_reverse.views import urls_js
+
 from discourse import views as discourse_views
 from mangaki import views
 from mangaki.settings import DEBUG

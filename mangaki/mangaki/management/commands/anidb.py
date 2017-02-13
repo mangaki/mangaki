@@ -1,9 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
-from mangaki.utils.anidb import AniDB
-from mangaki.models import Artist, Role, Staff, Work, ArtistSpelling
+from urllib.parse import parse_qs, urlparse
+
+from django.core.management.base import BaseCommand
 from django.db.models import Count
-from urllib.parse import urlparse, parse_qs
-import sys
+
+from mangaki.models import Artist, ArtistSpelling, Role, Staff, Work
+from mangaki.utils.anidb import AniDB
 
 
 def get_or_create_artist(name):

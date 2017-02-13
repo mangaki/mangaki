@@ -1,11 +1,10 @@
 import json
-import unittest
-
-from django.test import TestCase, Client
-from django.db.models import Max
 
 from django.contrib.auth import get_user_model
-from mangaki.models import Work, Editor, Studio, Category, Page
+from django.db.models import Max
+from django.test import Client, TestCase
+
+from mangaki.models import Category, Editor, Studio, Work
 
 
 class WorkFactoryMixin:

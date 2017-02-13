@@ -1,10 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
-from mangaki.models import Work
-import xml.etree.ElementTree as ET
-import requests
 import html
 import re
+import xml.etree.ElementTree as ET
+
+import requests
+from django.conf import settings
+from django.core.management.base import BaseCommand
+
+from mangaki.models import Work
 
 
 def poster(query):

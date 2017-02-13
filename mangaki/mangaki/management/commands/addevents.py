@@ -1,8 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
-from irl.models import Event, Location
+from datetime import datetime
+
+from django.core.management.base import BaseCommand
+
+from irl.models import Location
 from mangaki.models import Work
 
-from datetime import datetime
 
 class Command(BaseCommand):
     args = ''

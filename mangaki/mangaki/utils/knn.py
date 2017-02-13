@@ -1,4 +1,7 @@
 from django.contrib.auth.models import User
+
+from mangaki.models import Rating
+from mangaki.models import Work
 from mangaki.utils.values import rating_values
 from collections import Counter, defaultdict
 from math import sqrt
@@ -94,7 +97,12 @@ class MangakiKNN(object):
             if abs(my) >= 1 and abs(their) >= 1:
                 print('%d.' % rank, works[work_id].title, my, their, '=', my * their)
 
-    def fit(self, X=[], y=[], all_dataset=False):
+    def fit(self, X=None, y=None, all_dataset=False):
+        if X is None:
+            X = []
+        if y is None:
+            y = []
+
         if all_dataset:
             for user_id, work_id, choice in Rating.objects.values_list('user_id', 'work_id', 'choice'):
                 X.append((user_id, work_id))
