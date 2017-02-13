@@ -1,10 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Count
-from django.db import connection
-from mangaki.models import Rating, Artist, Top, Ranking
-from mangaki.utils.chrono import Chrono
-from mangaki.choices import TOP_CATEGORY_CHOICES
 from collections import Counter
+
+from django.core.management.base import BaseCommand, CommandError
+
+from mangaki.choices import TOP_CATEGORY_CHOICES
+from mangaki.models import Artist, Ranking, Rating, Top
+from mangaki.utils.chrono import Chrono
+
 
 class Command(BaseCommand):
     args = ''

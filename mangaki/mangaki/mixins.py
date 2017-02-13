@@ -1,6 +1,4 @@
 from django.http import JsonResponse
-from django.db.models.query import QuerySet
-from django.forms.models import model_to_dict
 
 
 class AjaxableResponseMixin(object):

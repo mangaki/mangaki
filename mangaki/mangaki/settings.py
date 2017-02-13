@@ -26,8 +26,8 @@ SITE_ID = config.getint('deployment', 'SITE_ID', fallback=1)
 
 # Application definition
 INSTALLED_APPS = (
-    'mangaki', # Mangaki main application
-    'irl', # Mangaki IRL events
+    'mangaki',  # Mangaki main application
+    'irl',      # Mangaki IRL events
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -68,7 +68,7 @@ if config.has_section('allauth'):
         for name in config.options('allauth')
     )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -79,7 +79,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 if DEBUG:
-    MIDDLEWARE_CLASSES += (
+    MIDDLEWARE += (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
     )
 
@@ -107,7 +107,7 @@ TEMPLATES = [
         'OPTIONS': {
             'debug': DEBUG,
             'context_processors': [
-                'django.core.context_processors.request',
+                'django.template.context_processors.request',
                 'django.template.context_processors.static',
                 'django.template.context_processors.media',
                 'django.template.context_processors.debug',
@@ -131,6 +131,16 @@ AUTHENTICATION_BACKENDS = (
 )
 
 EMAIL_BACKEND = config.get('email', 'EMAIL_BACKEND', fallback='django.core.mail.backends.smtp.EmailBackend')
+if config.has_section('smtp'):
+    EMAIL_HOST = config.get('smtp', 'EMAIL_HOST', fallback='localhost')
+    EMAIL_PORT = config.get('smtp', 'EMAIL_PORT', fallback=25)
+    EMAIL_HOST_USER = config.get('smtp', 'EMAIL_HOST_USER', fallback='')
+    EMAIL_HOST_PASSWORD = config.get('smtp', 'EMAIL_HOST_PASSWORD', fallback='')
+    EMAIL_USE_TLS = config.get('smtp', 'EMAIL_USE_TLS', fallback=True)
+    EMAIL_USE_SSL = config.get('smtp', 'EMAIL_USE_SSL', fallback=False)
+    EMAIL_TIMEOUT = config.get('smtp', 'EMAIL_TIMEOUT', fallback=None)
+    EMAIL_SSL_KEYFILE = config.get('smtp', 'EMAIL_SSL_KEYFILE', fallback=None)
+    EMAIL_SSL_CERTFILE = config.get('smtp', 'EMAIL_SSL_CERTFILE', fallback=None)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -154,6 +164,9 @@ if config.has_section('discourse'):
     DISCOURSE_SSO_SECRET = config.get('secrets', 'DISCOURSE_SSO_SECRET')
     DISCOURSE_API_USERNAME = config.get('discourse', 'DISCOURSE_API_USERNAME')
     DISCOURSE_API_KEY = config.get('secrets', 'DISCOURSE_API_KEY')
+    HAS_DISCOURSE = True
+else:
+    HAS_DISCOURSE = False
 
 if config.has_section('mal'):
     MAL_USER = config.get('mal', 'MAL_USER')

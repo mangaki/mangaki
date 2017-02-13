@@ -1,0 +1,20 @@
+---
+- name: Ensure .ssh config directory exists
+  file:
+    path: ~{{ web_user }}/.ssh
+    state: directory
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    mode: 0700
+
+- name: Copy SSH's known_hosts file
+  copy:
+    src: ssh_known_hosts
+    dest: ~{{ web_user }}/.ssh/known_hosts
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    mode: 0600
+
+- name: Clone the repo
+  git: repo={{ git_repo }} version={{ git_branch }} dest={{ git_dest }}
+  tags: git

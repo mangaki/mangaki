@@ -1,7 +1,8 @@
-from django.core.management.base import BaseCommand, CommandError
-from mangaki.utils.anidb import AniDB
+from django.core.management.base import BaseCommand
 from django.db.models import Count
+
 from mangaki.models import Work
+from mangaki.utils.anidb import AniDB
 
 
 class Command(BaseCommand):
@@ -10,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         q = Work.objects\
-                .only('pk', 'title', 'poster', 'nsfw')\
+                .only('pk', 'title', 'ext_poster', 'nsfw')\
                 .annotate(rating_count=Count('rating'))\
                 .filter(anidb_aid=0, category__slug='anime', rating_count__gte=6)\
                 .order_by('-rating_count')

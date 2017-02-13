@@ -1,11 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Count
-from mangaki.models import Work, Rating
-from mangaki.utils.ranking import controversy
 from collections import Counter
 from itertools import groupby
+
+from django.core.management.base import BaseCommand
 from django.db import connection
-import sys
+from django.db.models import Count
+
+from mangaki.models import Rating, Work
+from mangaki.utils.ranking import controversy
 
 
 class Command(BaseCommand):

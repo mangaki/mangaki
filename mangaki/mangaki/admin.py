@@ -1,10 +1,10 @@
-from mangaki.models import Work, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff, FAQTheme, FAQEntry
-from mangaki.utils.db import get_potential_posters, retrieve_poster
 from django.contrib import admin
-from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
-from django.core.urlresolvers import reverse
+from django.template.response import TemplateResponse
 
+from mangaki.models import Announcement, Artist, Editor, FAQEntry, FAQTheme, Genre, Page, Pairing, Ranking, Rating, \
+    Recommendation, Reference, Role, SearchIssue, Staff, Studio, Suggestion, Top, Track, Work
+from mangaki.utils.db import get_potential_posters
 
 
 class StaffInline(admin.TabularInline):
@@ -82,10 +82,11 @@ class WorkAdmin(admin.ModelAdmin):
         if request.POST.get('confirm'):  # Confirmed
             downloaded_titles = []
             for obj in queryset:
-                if obj.category.slug == 'anime':
-                    title = retrieve_poster(obj, request.POST.get('chosen_poster_%d' % obj.id))
-                    if title:
-                        downloaded_titles.append(title)
+                chosen_poster = request.POST.get('chosen_poster_{:d}'.format(obj.id))
+                if not chosen_poster:
+                    continue
+                if obj.retrieve_poster(chosen_poster):
+                    downloaded_titles.append(obj.title)
             if downloaded_titles:
                 self.message_user(request, "Des posters ont été trouvés pour les anime suivants : %s." % ', '.join(downloaded_titles))
             else:

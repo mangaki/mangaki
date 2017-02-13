@@ -1,11 +1,13 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Count
-from mangaki.models import Work, Rating
-from mangaki.utils.mal import lookup_mal_api
-from django.conf import settings
-from urllib.request import urlretrieve, urlopen
 import os
-from heapq import heappush, heappop
+from heapq import heappop, heappush
+from urllib.request import urlretrieve
+
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from django.db.models import Count
+
+from mangaki.models import Rating, Work
+from mangaki.utils.mal import lookup_mal_api
 
 
 def merge_anime(ids):
@@ -14,13 +16,13 @@ def merge_anime(ids):
     anime = Work.objects.get(id=chosen_id)
     if '/' in anime.source:
         mal_id = anime.source[anime.source.rindex('/') + 1:]
-        old_poster = anime.poster
-        new_poster = Work.objects.get(id=max(ids)).poster
+        old_poster = anime.ext_poster
+        new_poster = Work.objects.get(id=max(ids)).ext_poster
         if old_poster != new_poster:
             answer = input('Change poster as well? [y/n] ')
             if answer == 'y':
                 urlretrieve(old_poster, os.path.join(settings.BASE_DIR, 'mangaki/static/img/old/mal-%s.jpg' % mal_id))
-                anime.poster = new_poster
+                anime.ext_poster = new_poster
                 anime.save()
     for anime_id in ids:
         if anime_id != chosen_id:
@@ -42,7 +44,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         conflicts = []
         entries = {
-            'poster': Work.objects.filter(category__slug='anime').values_list('poster').annotate(Count('poster')).filter(poster__count__gte=2),
+            'poster': Work.objects.filter(category__slug='anime').values_list('ext_poster').annotate(Count('ext_poster')).filter(ext_poster__count__gte=2),
             'title': Work.objects.filter(category__slug='anime').values_list('title').annotate(Count('title')).filter(title__count__gte=2)
         }
         for category in entries:
@@ -60,15 +62,14 @@ class Command(BaseCommand):
             sources = set(Work.objects.get(id=anime_id).source for anime_id in ids)
             nb_sources = len(sources)
             id_of_poster = {}
+            nb_ratings = 0
             for anime_id in ids:
                 anime = Work.objects.get(id=anime_id)
                 nb_ratings = len(anime.rating_set.all())
-                """try:
-                    urlopen(anime.poster)"""
-                print('%d : %s (%s)' % (anime_id, anime.title, anime.poster))
+                print('%d : %s (%s)' % (anime_id, anime.title, anime.ext_poster))
                 print('%d l\'ont noté' % nb_ratings)
                 total_nb_ratings += nb_ratings
-                id_of_poster[anime.poster] = anime_id
+                id_of_poster[anime.ext_poster] = anime_id
             if nb_sources > 1:
                 print('Bizarre, plusieurs sources :', sources)
                 rename_tasks = []

@@ -1,0 +1,12 @@
+Django==1.10.*
+django-allauth==0.28
+markdown
+django-bootstrap-form
+-e git+https://github.com/tindie/pydiscourse.git#egg=pydiscourse
+psycopg2
+numpy
+beautifulsoup4
+natsort
+django-analytical
+django-cookie-law
+django-js-reverse

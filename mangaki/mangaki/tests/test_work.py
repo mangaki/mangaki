@@ -1,34 +1,41 @@
+from django.contrib.auth.models import AnonymousUser
+from django.db import IntegrityError
 from django.test import TestCase
-from mangaki.models import Work, Category
-from django.contrib.auth.models import User, AnonymousUser
 
 from mangaki.factories import create_user_with_profile
+from mangaki.models import Category, Editor, Studio, Work
+
 
 class WorkTest(TestCase):
 
     def create_anime(self, **kwargs):
         anime = Category.objects.get(slug='anime')
-        return Work.objects.create(**kwargs, category=anime)
+        return Work.objects.create(category=anime, **kwargs)
 
     def create_manga(self, **kwargs):
         manga = Category.objects.get(slug='manga')
-        return Work.objects.create(**kwargs, category=manga)
+        return Work.objects.create(category=manga, **kwargs)
 
     def create_album(self, **kwargs):
         album = Category.objects.get(slug='album')
-        return Work.objects.create(**kwargs, category=album)
+        return Work.objects.create(category=album, **kwargs)
 
     def setUp(self):
+        # FIXME: The defaults for editor and studio in Work requires those to
+        # exist, or else foreign key constraints fail.
+        Editor.objects.create(pk=1)
+        Studio.objects.create(pk=1)
+
         self.anime = self.create_anime(title='STEINS;GATE',
             source='Ryan',
-            poster='ryan.png',
+            ext_poster='ryan.png',
             nb_episodes=26, # + 1 with the alternate beta episode.
             anime_type='Seinen'
         )
 
         self.nsfw_anime = self.create_anime(title='Dakara boku ga H wa dekinai.',
             source='Not Ryan',
-            poster='dakara.png',
+            ext_poster='dakara.png',
             nsfw=True,
             nb_episodes=24, # unsure, but we don't care.
             anime_type='Ecchi-Hentai'
@@ -37,13 +44,13 @@ class WorkTest(TestCase):
 
         self.manga = self.create_manga(title='Medaka Box',
             source='Ryan',
-            poster='zenkichi.png',
+            ext_poster='zenkichi.png',
             manga_type='Shonen'
         )
 
         self.album = self.create_album(title='Bungou Stray Dogs Original Soundtrack',
             source='Ryan',
-            poster='atsuchi_and_dazai.png',
+            ext_poster='atsuchi_and_dazai.png',
             vgmdb_aid=58065
         )
 
@@ -55,6 +62,32 @@ class WorkTest(TestCase):
             'nsfw_ok': True
         })
 
+    def test_search(self):
+        accents = self.create_anime(title='Un titre accentué oui oui')
+        no_accents = self.create_anime(title='Un titre sans accents non non')
+        tests = [
+            ('medaka', self.manga),
+            ('titre', [accents, no_accents]),
+            ('titre oui', accents),
+            ('titre non', no_accents),
+            ('accentue', accents),
+            ('accent', [accents, no_accents]),
+            ('boxers', None),
+        ]
+        for query, expected in tests:
+            qs = list(Work.objects.filter(title__search=query))
+            if expected is None:
+                self.assertFalse(qs)
+                continue
+            elif isinstance(expected, (list, tuple)):
+                self.assertEqual(len(qs), len(expected))
+                for w in qs:
+                    self.assertIn(w, expected)
+                for e in expected:
+                    self.assertIn(e, qs)
+            else:
+                self.assertEqual(len(qs), 1)
+                self.assertEqual(qs[0], expected)
 
     def test_anime_creation(self):
         w = self.anime
@@ -79,22 +112,22 @@ class WorkTest(TestCase):
 
     def test_work_creation(self):
         """
-        Work cannot be created without a category, the `Work.save` method will throw a TypeError.
+        Work cannot be created without a category, the `Work.save` method will throw an IntegrityError.
         """
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(IntegrityError):
             Work.objects.create(title='a cool work')
 
     def test_work_safe_poster_for_non_nsfw(self):
         w = self.anime
 
-        self.assertIn(w.poster, w.safe_poster(AnonymousUser()))
-        self.assertIn(w.poster, w.safe_poster(self.fake_user))
-        self.assertIn(w.poster, w.safe_poster(self.fake_user_with_nsfw))
+        self.assertNotIn('nsfw', w.safe_poster(AnonymousUser()))
+        self.assertNotIn('nsfw', w.safe_poster(self.fake_user))
+        self.assertNotIn('nsfw', w.safe_poster(self.fake_user_with_nsfw))
 
     def test_work_safe_poster_for_nsfw(self):
         w = self.nsfw_anime
 
         self.assertIn('nsfw', w.safe_poster(AnonymousUser()))
         self.assertIn('nsfw', w.safe_poster(self.fake_user))
-        self.assertIn('dakara.png', w.safe_poster(self.fake_user_with_nsfw))
+        self.assertNotIn('nsfw', w.safe_poster(self.fake_user_with_nsfw))

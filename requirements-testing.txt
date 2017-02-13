@@ -1,3 +1,0 @@
-factory_boy
-coverage
-django_coverage_plugin

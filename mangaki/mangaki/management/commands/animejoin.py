@@ -1,9 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
-from mangaki.models import Artist, Work, Genre
-from django.db.models import Count
-from django.db.utils import IntegrityError, DataError
 import re
 from collections import Counter, OrderedDict
+
+from django.core.management.base import BaseCommand
+from django.db.models import Count
+
+from mangaki.models import Work
 
 
 def get_slug(name, trim=False):
