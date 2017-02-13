@@ -7,12 +7,11 @@
 <table class="table table-condensed table-hover">
     <tr><th></th><th>Nom</th><th>Score</th><th>Nombre de notes</th><th>Nombre de favoris</th></tr>
 {% for artist in top %}
-    <tr><td>{{ artist.rank }}</td><td><a href="/artist/{{ artist.id }}">{{ artist.name }}</a></td><td>{{ artist.score }}</td><td>{{ artist.nb_ratings }}</td><td>{{ artist.nb_stars }}</td></tr>
+    <tr><td>{{ artist.rank }}</td><td><a href="{% url 'artist-detail' artist.id %}">{{ artist.name }}</a></td><td>{{ artist.score }}</td><td>{{ artist.nb_ratings }}</td><td>{{ artist.nb_stars }}</td></tr>
 {% endfor %}
 </table>
 
 <div id='discourse-comments'></div>
-
 <script type="text/javascript">
   DiscourseEmbed = { discourseUrl: 'http://meta.mangaki.fr/',
                      discourseEmbedUrl: 'http://mangaki.fr/top/{{ category_slug }}/' };

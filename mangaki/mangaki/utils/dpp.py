@@ -5,7 +5,6 @@ import numpy as np
 
 MAX_ITER_SAMPLE_DPP = 10
 
-
 def diameter(r, points):
     nb_points = points.shape[0]
     return ((2 / (nb_points * (nb_points - 1)) *

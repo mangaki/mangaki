@@ -1,0 +1,57 @@
+{% set is_mal_available = mal_user is defined and mal_password is defined and mal_user_agent is defined %}
+{% set is_discourse_available = discourse_sso_secret is defined and discourse_api_key is defined and discourse_api_username is defined %}
+
+[secrets]
+SECRET_KEY = {{ secret_key | mandatory }}
+DB_PASSWORD = {{ db_password | mandatory }}
+
+{# We don't want to include MAL stuff if these are not defined. #}
+{% if is_mal_available %}
+MAL_PASS = {{ mal_password }}
+{% endif %}
+
+{# We don't want to include Discourse stuff if these are not defined. #}
+{% if is_discourse_available %}
+DISCOURSE_SSO_SECRET = {{ discourse_sso_secret }}
+DISCOURSE_API_KEY = {{ discourse_api_key }}
+{% endif %}
+
+[deployment]
+SITE_ID = 1
+STATIC_ROOT = {{ static_root | mandatory }}
+
+[hosts]
+ALLOWED_HOSTS = {{ app_hosts|join(', ') }}
+
+[pgsql]
+DB_HOST = {{ db_host | mandatory }}
+DB_NAME = {{ db_name | mandatory }}
+DB_USER = {{ db_user | mandatory }}
+
+[email]
+EMAIL_BACKEND = django.core.mail.backends.smtp.EmailBackend
+
+[smtp]
+EMAIL_HOST = {{ email_host | mandatory }}
+EMAIL_HOST_USER = {{ email_host_user | mandatory }}
+EMAIL_HOST_PASSWORD = {{ email_host_password | mandatory }}
+EMAIL_PORT = {{ email_port | mandatory }}
+
+{# We don't want to include Discourse stuff if these are not defined. #}
+{% if is_discourse_available %}
+[discourse]
+DISCOURSE_BASE_URL = http://meta.mangaki.fr
+DISCOURSE_API_USERNAME = {{ discourse_api_username }}
+{% endif %}
+
+{# We don't want to include MAL stuff if these are not defined. #}
+{% if is_mal_available %}
+[mal]
+MAL_USER = {{ mal_user }}
+MAL_USER_AGENT = {{ mal_user_agent }}
+{% endif %}
+
+[allauth]
+{% for auth_provider in auth_providers %}
+{{ auth_provider }}
+{% endfor %}

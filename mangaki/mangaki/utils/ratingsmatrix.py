@@ -7,15 +7,14 @@ class RatingsMatrix:
 
     def __init__(self, qs=None, fname=None):
         user_list, item_list, data = [], [], []
+        if fname is None and qs is None:
+            raise ValueError('one of fname or qs must be non None')
         if fname is None:
-            if qs is None:
-                raise ValueError('one of fname or qs must be non None')
-            else:
-                content = qs
-                for user_id, item_id, rating in content:
-                    user_list.append(user_id)
-                    item_list.append(item_id)
-                    data.append(rating_values[rating])
+            content = qs
+            for user_id, item_id, rating in content:
+                user_list.append(user_id)
+                item_list.append(item_id)
+                data.append(rating_values[rating])
         else:
             content = pandas.read_csv(fname,
                                       header=None).as_matrix()

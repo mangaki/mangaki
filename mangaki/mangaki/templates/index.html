@@ -4,13 +4,12 @@
 {% load account socialaccount %}
 
 {% get_providers as socialaccount_providers %}
-
 <div class="row featured text-center">
     <h1>Mangaki, la recommandation d'anime et manga.</h1>
     <h3 style="margin-bottom: 1em">Notez vos séries favorites, on vous en fera découvrir d'autres !</h3>
 {% if not user.is_authenticated %}
     <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="/about/">En savoir plus</a>
+        <a class="btn btn-mangaki btn-lg" href="{% url 'about' %}">En savoir plus</a>
     </div>
     <div class="col-md-4 col-sm-12 margin">
         {% include "socialaccount/snippets/provider_list.html" with process="login" verb="try" %}
@@ -22,10 +21,10 @@
     </div>
 {% else %}
     <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="/u/{{ user.username }}">Import myAnimeList</a>
+        <a class="btn btn-mangaki btn-lg" href="{% url 'profile' user.username %}">Import myAnimeList</a>
     </div>
     <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="/anime/">C'est parti !</a>
+        <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">C'est parti !</a>
     </div>
     <div class="col-md-4 col-sm-12 text-center margin">
         <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki/wiki" target="_blank">Contribuer à Mangaki</a>
@@ -36,14 +35,9 @@
     <div class="col-md-6 col-sm-12">
       <div style="width: 80%; margin: auto;">
         <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; text-align: center;">
-          Mangaki a remporté le <a href="http://www.mcjp.fr/fr/agenda/les-concours-de-la-mcjp-2016">concours de projets de la MCJP</a>&nbsp;!
+            Dernières nouveautés
         </h2>
-        <div style="float: left">
-          Ryan et Jill-Jênn sont au Japon pour présenter Mangaki à des entreprises japonaises.
-        </div>
-        <div style="text-align: center">
-          <a href="http://www.mcjp.fr/fr/agenda/les-concours-de-la-mcjp-2016"><img src="//mcjp.fr/media/cache/mcjp_370x370/media/mcjp/155532-auto-promo-speech-contest-1.jpg" /></a>
-        </div>
+        <blockquote class="twitter-tweet" data-lang="fr"><p lang="fr" dir="ltr">Nous avons été mentionnés dans un article de recherche brésilien ! Nos débuts à l&#39;international :D <a href="https://twitter.com/jjvie">@jjvie</a> <a href="https://twitter.com/Sedeto">@Sedeto</a> <a href="https://twitter.com/LesLueursdeLily">@LesLueursdeLily</a> <a href="https://t.co/B9Pm1qYgR5">pic.twitter.com/B9Pm1qYgR5</a></p>&mdash; Mangaki (@MangakiFR) <a href="https://twitter.com/MangakiFR/status/810082665869246464">17 décembre 2016</a></blockquote> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
       </div>
     </div>
     <div class="col-md-6 col-sm-12">

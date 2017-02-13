@@ -1,13 +1,11 @@
-from django.contrib.auth.models import User
-from mangaki.models import Rating, Work, Recommendation
-from mangaki.utils.chrono import Chrono
-from mangaki.utils.values import rating_values
-from sklearn.utils.extmath import randomized_svd
-import numpy as np
-from django.db import connection
 import pickle
-import json
-import math
+
+import numpy as np
+from django.contrib.auth.models import User
+from sklearn.utils.extmath import randomized_svd
+
+from mangaki.models import Rating, Recommendation
+from mangaki.utils.chrono import Chrono
 
 TOP = 10
 

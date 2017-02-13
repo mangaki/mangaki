@@ -17,9 +17,9 @@ class Migration(migrations.Migration):
             name='Recommendation',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
-                ('target_user', models.ForeignKey(related_name='target_user', to=settings.AUTH_USER_MODEL)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('work', models.ForeignKey(to='mangaki.Work')),
+                ('target_user', models.ForeignKey(related_name='target_user', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('work', models.ForeignKey(to='mangaki.Work', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(

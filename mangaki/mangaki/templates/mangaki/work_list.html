@@ -5,13 +5,12 @@
 {% if not is_dpp %}
 <div class="col-xs-12">
   <p class="alert alert-info">
-    {% if user.is_authenticated %}
-    Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'recommendations' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
-    {% else %}
-    Nouveau sur Mangaki ? <a href="/user/signup/?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
-    <a class="alert-link" href="/user/login/?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
-    et obtenir des recommandations.
-    {% endif %}
+{% if user.is_authenticated %}
+    Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
+{% else %}
+    Nouveau sur Mangaki ? <a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
+    <a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
+{% endif %}
   </p>
 </div>
 {% endif %}
@@ -109,9 +108,9 @@
 <div class="row margin">
   <div class="col-md-12 col-sm-12">
     {% if is_dpp %}
-    <a class="btn btn-primary btn-lg" href="/dpp/{{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">montrez-moi de nouvelles oeuvres&nbsp;!</a>
+    <a class="btn btn-primary btn-lg" href="{% url 'reco_dpp' %}?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">montrez-moi de nouvelles oeuvres&nbsp;!</a>
     {% else %}
-    <a class="btn btn-primary btn-lg" href="/reco/?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
+    <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
     {% endif %}
   </div>
 </div>

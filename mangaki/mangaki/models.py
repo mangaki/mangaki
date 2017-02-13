@@ -1,14 +1,20 @@
 # coding=utf8
-from django.db import models
+import os.path
+import tempfile
+from urllib.parse import urlparse
+
+import requests
+from django.conf import settings
 from django.contrib.auth.models import User
-from django.db.models import F, Q, Func, Value, Lookup, CharField
-from django.db.models.functions import Coalesce
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.files import File
 from django.core.urlresolvers import reverse
+from django.db import models
+from django.db.models import CharField, F, Func, Lookup, Value
 
+from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
 from mangaki.discourse import get_discourse_data
-from mangaki.choices import ORIGIN_CHOICES, TYPE_CHOICES, TOP_CATEGORY_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
 from mangaki.utils.ratingsmatrix import RatingsMatrix
@@ -95,11 +101,12 @@ class Category(models.Model):
 class Work(models.Model):
     title = models.CharField(max_length=128)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
-    poster = models.CharField(max_length=128)
+    ext_poster = models.CharField(max_length=128)
+    int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
-    category = models.ForeignKey('Category', blank=False, null=False)
+    category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
 
     # Some of these fields do not make sense for some categories of works.
@@ -112,8 +119,8 @@ class Work(models.Model):
     catalog_number = models.CharField(max_length=20, blank=True)
     anidb_aid = models.IntegerField(default=0, blank=True)
     vgmdb_aid = models.IntegerField(blank=True, null=True)
-    editor = models.ForeignKey('Editor', default=1)
-    studio = models.ForeignKey('Studio', default=1)
+    editor = models.ForeignKey('Editor', default=1, on_delete=models.PROTECT)
+    studio = models.ForeignKey('Studio', default=1, on_delete=models.PROTECT)
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -134,9 +141,39 @@ class Work(models.Model):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
     def safe_poster(self, user):
-        if not self.nsfw or (user.is_authenticated() and user.profile.nsfw_ok):
-            return self.poster
-        return '/static/img/nsfw.jpg'
+        if self.id is None:
+            return '{}{}'.format(settings.STATIC_URL, 'img/chiro.gif')
+        if not self.nsfw or (user.is_authenticated and user.profile.nsfw_ok):
+            if self.int_poster:
+                return self.int_poster.url
+            return self.ext_poster
+        return '{}{}'.format(settings.STATIC_URL, 'img/nsfw.jpg')
+
+    def retrieve_poster(self, url=None, session=None):
+        if session is None:
+            session = requests
+        if url is None:
+            url = self.ext_poster
+        if not url:
+            return False
+
+        filename = os.path.basename(urlparse(url).path)
+        # Hé mais ça va pas écraser des posters / créer des collisions, ça ?
+
+        try:
+            r = session.get(url, timeout=5, stream=True)
+        except requests.RequestException as e:
+            return False
+
+        try:
+            with tempfile.TemporaryFile() as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    f.write(chunk)
+                self.ext_poster = url
+                self.int_poster.save(filename, File(f))
+        finally:
+            r.close()
+        return True
 
     def __str__(self):
         return self.title
@@ -151,9 +188,9 @@ class Role(models.Model):
 
 
 class Staff(models.Model):
-    work = models.ForeignKey('Work')
-    artist = models.ForeignKey('Artist')
-    role = models.ForeignKey('Role')
+    work = models.ForeignKey('Work', on_delete=models.CASCADE)
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE)
+    role = models.ForeignKey('Role', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('work', 'artist', 'role')
@@ -205,16 +242,16 @@ class Artist(models.Model):
 
 class ArtistSpelling(models.Model):
     was = models.CharField(max_length=255, db_index=True)
-    artist = models.ForeignKey('Artist')
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE)
 
 
 class Rating(models.Model):
-    user = models.ForeignKey(User)
-    work = models.ForeignKey(Work)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
     choice = models.CharField(max_length=8, choices=(
         ('favorite', 'Mon favori !'),
-        ('like', 'J\'aime'),
-        ('dislike', 'Je n\'aime pas'),
+        ('like', "J'aime"),
+        ('dislike', "Je n'aime pas"),
         ('neutral', 'Neutre'),
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
@@ -237,7 +274,7 @@ class Page(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_shared = models.BooleanField(default=True)
     nsfw_ok = models.BooleanField(default=False)
     newsletter_ok = models.BooleanField(default=True)
@@ -258,8 +295,8 @@ class Profile(models.Model):
 
 
 class Suggestion(models.Model):
-    user = models.ForeignKey(User)
-    work = models.ForeignKey(Work)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
     problem = models.CharField(verbose_name='Partie concernée', max_length=8, choices=(
         ('title', 'Le titre n\'est pas le bon'),
@@ -287,21 +324,20 @@ class Suggestion(models.Model):
         score = suggestions_score + recommendations_score
         Profile.objects.filter(user=self.user).update(score=score)
 
-
-def suggestion_saved(sender, instance, *args, **kwargs):
-    instance.update_scores()
-models.signals.post_save.connect(suggestion_saved, sender=Suggestion)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.update_scores()
 
 
 class Neighborship(models.Model):
-    user = models.ForeignKey(User)
-    neighbor = models.ForeignKey(User, related_name='neighbor')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    neighbor = models.ForeignKey(User, related_name='neighbor', on_delete=models.CASCADE)
     score = models.DecimalField(decimal_places=3, max_digits=8)
 
 
 class SearchIssue(models.Model):
     date = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=128)
     poster = models.CharField(max_length=128, blank=True, null=True)
     mal_id = models.IntegerField(blank=True, null=True)
@@ -317,9 +353,9 @@ class Announcement(models.Model):
 
 
 class Recommendation(models.Model):
-    user = models.ForeignKey(User)
-    target_user = models.ForeignKey(User, related_name='target_user')
-    work = models.ForeignKey(Work)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    target_user = models.ForeignKey(User, related_name='target_user', on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s recommends %s to %s' % (self.user, self.work, self.target_user)
@@ -327,14 +363,14 @@ class Recommendation(models.Model):
 
 class Pairing(models.Model):
     date = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
-    artist = models.ForeignKey(Artist)
-    work = models.ForeignKey(Work)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
     is_checked = models.BooleanField(default=False)
 
 
 class Reference(models.Model):
-    work = models.ForeignKey('Work')
+    work = models.ForeignKey('Work', on_delete=models.CASCADE)
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
 

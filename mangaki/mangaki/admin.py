@@ -1,9 +1,10 @@
-# coding=utf8
-from mangaki.models import Work, Genre, Track, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff, FAQTheme, FAQEntry
 from django.contrib import admin
-from django.template.response import TemplateResponse
 from django.contrib.admin import helpers
-from django.core.urlresolvers import reverse
+from django.template.response import TemplateResponse
+
+from mangaki.models import Announcement, Artist, Editor, FAQEntry, FAQTheme, Genre, Page, Pairing, Ranking, Rating, \
+    Recommendation, Reference, Role, SearchIssue, Staff, Studio, Suggestion, Top, Track, Work
+from mangaki.utils.db import get_potential_posters
 
 
 class StaffInline(admin.TabularInline):
@@ -21,7 +22,7 @@ class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
     list_filter = ('category', 'nsfw',)
-    actions = ['make_nsfw', 'make_sfw', 'merge']
+    actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work']
     inlines = [StaffInline]
     readonly_fields = (
         'sum_ratings',
@@ -77,6 +78,32 @@ class WorkAdmin(admin.ModelAdmin):
         return TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
     merge.short_description = "Fusionner les œuvres sélectionnées"
 
+    def refresh_work(self, request, queryset):
+        if request.POST.get('confirm'):  # Confirmed
+            downloaded_titles = []
+            for obj in queryset:
+                chosen_poster = request.POST.get('chosen_poster_{:d}'.format(obj.id))
+                if not chosen_poster:
+                    continue
+                if obj.retrieve_poster(chosen_poster):
+                    downloaded_titles.append(obj.title)
+            if downloaded_titles:
+                self.message_user(request, "Des posters ont été trouvés pour les anime suivants : %s." % ', '.join(downloaded_titles))
+            else:
+                self.message_user(request, "Aucun poster n'a été trouvé, essayez de changer le titre.")
+            return None
+        bundle = []
+        for work in queryset:
+            bundle.append((work.id, work.title, get_potential_posters(work)))
+        context = {
+            'queryset': queryset,
+            'bundle': bundle,
+            'opts': self.model._meta,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+        }
+        return TemplateResponse(request, 'admin/refresh_poster_confirmation.html', context)
+    refresh_work.short_description = "Mettre à jour la fiche de l'anime (poster)"
+
 
 class GenreAdmin(admin.ModelAdmin):
     pass
@@ -110,6 +137,7 @@ class SuggestionAdmin(admin.ModelAdmin):
     list_display = ('work', 'problem', 'date', 'user', 'is_checked')
     list_filter = ('problem',)
     actions = ['check_suggestions', 'uncheck_suggestions']
+    raw_id_fields = ('work',)
 
     def view_on_site(self, obj):
         return obj.work.get_absolute_url()

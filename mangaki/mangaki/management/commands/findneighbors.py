@@ -1,7 +1,9 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth.models import User
-from mangaki.models import Neighborship, Rating
 from collections import Counter
+
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
+
+from mangaki.models import Neighborship, Rating
 
 
 class Command(BaseCommand):

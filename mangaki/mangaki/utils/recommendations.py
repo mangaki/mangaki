@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.db import connection
 
+
 NB_NEIGHBORS = 15
 MIN_RATINGS = 3
 
@@ -96,7 +97,7 @@ def get_recommendations(user, category, editor='unspecified', dpp=False):
         # Adding interesting works to the arena (rated at least MIN_RATINGS by neighbors)
         if nb_ratings[work_id] >= MIN_RATINGS:
             k += 1
-            final_works[(work_id, work_id in manga_ids, work_id in willsee)] = (float(sum_ratings[work_id]) / nb_ratings[work_id], sum_scores[work_id])
+            final_works[(work_id, work_id in manga_ids, work_id in willsee)] = (sum_ratings[work_id] / nb_ratings[work_id], sum_scores[work_id])
         i += 1
 
     chrono.save('[%dQ] rank %d %d works' % (len(connection.queries), k, i))

@@ -18,8 +18,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
                 ('score', models.DecimalField(decimal_places=3, max_digits=8)),
-                ('neighbor', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='neighbor')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('neighbor', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='neighbor', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },

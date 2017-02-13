@@ -1,4 +1,3 @@
-from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
 # print(urlopen('http://myanimelist.net/topanime.php?type=bypopularity').read())

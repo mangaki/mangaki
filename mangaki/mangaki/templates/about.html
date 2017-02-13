@@ -26,7 +26,7 @@
         <aside class="performer">
             <img src="/static/img/jj.jpg" alt="JJ" />
         </aside>
-        <h2><a href="/u/jj">JJ</a></h2>Jill-Jênn Vie
+        <h2><a href="{% url 'profile' 'jj' %}">JJ</a></h2>Jill-Jênn Vie
         <h3>Président</h3>
         <hr />
         <p style="font-style: italic">Il fait une thèse d'informatique à l'université Paris-Saclay, sur les tests adaptatifs. Il a conçu l'algorithme de recommandation et pilote l'association.</p>
@@ -36,7 +36,7 @@
         <aside class="performer">
             <a href="https://github.com/RaitoBezarius"><img src="/static/img/ryan.jpg" alt="Hououin Kyouma (le vrai)" /></a>
         </aside>
-        <h2><a href="/u/RaitoBezarius">RaitoBezarius</a></h2>Ryan Lahfa
+        <h2><a href="{% url 'profile' 'RaitoBezarius' %}">RaitoBezarius</a></h2>Ryan Lahfa
         <h3>Développeur</h3>
         <hr />
         <p style="font-style: italic">Ryan participe activement à des projets open source, notamment basés sur le langage <a href="http://apprendre-python.com" target="_blank">Python</a> et les technologies Web telles que <a href="https://facebook.github.io/react/" target="_blank">React.js</a>, la bibliothèque JavaScript qui supporte aujourd'hui <a href="https://facebook.com" target="_blank">Facebook</a>.</p>
@@ -47,7 +47,7 @@
         <aside class="performer">
             <a href="http://sedeto.fr"><img src="/static/img/solene.jpg" alt="Sedeto" /></a>
         </aside>
-        <h2><a href="/u/Sedeto">Sedeto</a></h2>Solène Pichereau
+        <h2><a href="{% url 'profile' 'Sedeto' %}">Sedeto</a></h2>Solène Pichereau
         <h3>Directrice artistique</h3>
         <hr />
         <p style="font-style: italic">Elle travaille en tant que graphiste manga pour le Groupe Delcourt. C'est elle qui a réalisé le logo de Mangaki.
@@ -64,7 +64,7 @@
 
     <p><strong>Soubi</strong> s'assure que la base de données soit propre : c'est notre data cleaner. Il s'occupe de l'accessibilité du site, c'est en outre grâce à lui que les fiches sont liées aux réseaux sociaux.</p>
 
-    <p><strong>Mako-kun</strong> est notre respo IRL. Grâce à lui, vous pouvez consulter <a href="/events/#fauvettes">la liste des séances Ghibli aux Fauvettes</a>.</p>
+    <p><strong>Mako-kun</strong> est notre respo IRL. Grâce à lui, vous pouvez consulter <a href="{% url 'events' %}#fauvettes">la liste des séances Ghibli aux Fauvettes</a>.</p>
 
     Retrouvez <a href="https://github.com/mangaki/mangaki/graphs/contributors" target="_blank">tous les contributeurs sur le repo GitHub</a>.
 </div>

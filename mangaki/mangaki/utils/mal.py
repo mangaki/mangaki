@@ -35,7 +35,7 @@ def retrieve_anime(entries):
     unknown = Artist.objects.get(id=1)
     anime_cat = Category.objects.get(slug='anime')
     for entry in entries:
-        if Work.objects.filter(category=anime_cat, poster=entry['image']).count() == 0:  # SCANDALE
+        if Work.objects.filter(category=anime_cat, ext_poster=entry['image']).count() == 0:  # SCANDALE
             title = entry['english'] if entry['english'] else entry['title']
             if '0000' in entry['start_date']:
                 anime_date = None
@@ -45,7 +45,7 @@ def retrieve_anime(entries):
                 anime_date = entry['start_date'].replace('-00', '-01')
             else:
                 anime_date = entry['start_date']
-            Work.objects.create(category=anime_cat, title=title, source='http://myanimelist.net/anime/' + entry['id'], poster=entry['image'], date=anime_date)
+            Work.objects.create(category=anime_cat, title=title, source='http://myanimelist.net/anime/' + entry['id'], ext_poster=entry['image'], date=anime_date)
 
 
 def lookup_mal_api(query):
@@ -125,14 +125,14 @@ def import_mal(mal_username, mangaki_username):
                 try:
                     anime = animes.get(title=title)
                 except Work.DoesNotExist:
-                    if animes.filter(poster=poster).count() == 1:
-                        anime = Work.objects.get(poster=poster)
-                    elif animes.filter(poster=poster).count() >= 2:
+                    if animes.filter(ext_poster=poster).count() == 1:
+                        anime = Work.objects.get(ext_poster=poster)
+                    elif animes.filter(ext_poster=poster).count() >= 2:
                         raise Exception('Integrity violation: found two or more works with the same poster, do you come from the past?')
                     else:
                         entries = lookup_mal_api(title)
                         retrieve_anime(entries)
-                        anime = animes.get(poster=poster)
+                        anime = animes.get(ext_poster=poster)
                 if anime:
                     if not Rating.objects.filter(user=user, work=anime).count():
                         if 7 <= score <= 10:
@@ -150,3 +150,30 @@ def import_mal(mal_username, mangaki_username):
                 SearchIssue(user=user, title=title, poster=poster, mal_id=mal_id, score=score).save()
                 fails.append(title)
     return nb_added, fails
+
+class MAL:
+    def __init__(self):
+        self.SEARCH_URL = 'http://myanimelist.net/api/anime/search.xml'
+        self.HEADERS = {
+            'X-Real-IP': random_ip(),
+            'User-Agent': 'Mozilla/5.0 (X11; Linux i686 on x86_64; rv:36.0) Gecko/20100101 Firefox/36.0'
+        }
+        self.entry = None
+
+    def search(self, query):
+        r = requests.get(self.SEARCH_URL,
+            params={'q': query},
+            headers=self.HEADERS,
+            auth=(settings.MAL_USER, settings.MAL_PASS))
+        html_code = html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'&\1;', r.text))
+        xml = re.sub(r'&([^alg])', r'&amp;\1', _encoding_translation(html_code))
+        try:
+            self.entry = ET.fromstring(xml).find('entry')
+        except ET.ParseError as e:
+            print(e)
+
+    def get_poster(self):
+        if self.entry:
+            return self.entry.find('image').text
+        else:
+            return ''
