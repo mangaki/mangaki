@@ -48,7 +48,7 @@ sudo -H -u vagrant pip3 install --user virtualenv
 sudo -H -u vagrant /home/vagrant/.local/bin/virtualenv --python=python3 $VIRTUALENV_PATH
 echo 'Virtual environment built.'
 sudo -H -u vagrant $VIRTUALENV_PATH/bin/pip install -r /vagrant/requirements.txt
-sudo -H -u vagrant $VIRTUALENV_PATH/bin/pip install -r /vagrant/requirements-dev.txt
+sudo -H -u vagrant $VIRTUALENV_PATH/bin/pip install -r /vagrant/requirements/dev.txt
 sudo -H -u vagrant $VIRTUALENV_PATH/bin/pip install scikit-learn
 echo 'Dependencies installed.'
 
