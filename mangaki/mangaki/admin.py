@@ -1,15 +1,60 @@
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
+from django.core.urlresolvers import reverse
+from django.db.models import Count
 
-from mangaki.models import Announcement, Artist, Editor, FAQEntry, FAQTheme, Genre, Page, Pairing, Ranking, Rating, \
-    Recommendation, Reference, Role, SearchIssue, Staff, Studio, Suggestion, Top, Track, Work
+from mangaki.models import Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff, FAQTheme, FAQEntry
+from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
+
+
+class TagAdmin(admin.ModelAdmin):
+    list_display = ("title", )
+    readonly_fields = ("nb_works_linked",)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(works_linked=Count('work'))
+
+    def nb_works_linked(self, obj):
+        return obj.works_linked
+    nb_works_linked.short_description = 'Nombre d\'oeuvres liées au tag'
+
+
+class TaggedWorkAdmin(admin.ModelAdmin):
+    search_fields = ('work', 'tag')
+
+
+class TaggedWorkInline(admin.TabularInline):
+    model = TaggedWork
+    fields = ('work', 'tag', 'weight')
 
 
 class StaffInline(admin.TabularInline):
     model = Staff
     fields = ('role', 'artist')
+
+
+class WorkTitleInline(admin.TabularInline):
+    model = WorkTitle
+    fields = ('title', 'language', 'type')
+
+
+class AniDBaidListFilter(admin.SimpleListFilter):
+    title = ('AniDB aid')
+    parameter_name = 'AniDB aid'
+
+    def lookups(self, request, model_admin):
+        return (('Vrai', ('Oui')), ('Faux', ('Non')))
+
+    def queryset(self, request, queryset):
+        if self.value() == 'Faux':
+            return queryset.filter(anidb_aid=0)
+        elif self.value() == 'Vrai':
+            return queryset.exclude(anidb_aid=0)
+        else:
+            return queryset
 
 
 class FAQAdmin(admin.ModelAdmin):
@@ -21,9 +66,9 @@ class FAQAdmin(admin.ModelAdmin):
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'title', 'nsfw')
-    list_filter = ('category', 'nsfw',)
-    actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work']
-    inlines = [StaffInline]
+    list_filter = ('category', 'nsfw', AniDBaidListFilter, )
+    actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work', 'update_tags_via_anidb']
+    inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
         'nb_ratings',
@@ -41,6 +86,50 @@ class WorkAdmin(admin.ModelAdmin):
         self.message_user(request, "%s désormais NSFW." % message_bit)
     make_nsfw.short_description = "Rendre NSFW les œuvres sélectionnées"
 
+    # FIXME : https://github.com/mangaki/mangaki/issues/205
+    def update_tags_via_anidb(self, request, queryset):
+        if request.POST.get("post"):
+            chosen_ids = request.POST.getlist('checks')
+            for anime_id in chosen_ids:
+                anime = Work.objects.get(id=anime_id)
+                a = AniDB('mangakihttp', 1)
+                retrieve_tags = anime.retrieve_tags(a)
+                deleted_tags = retrieve_tags["deleted_tags"]
+                added_tags = retrieve_tags["added_tags"]
+                updated_tags = retrieve_tags["updated_tags"]
+
+                anime.update_tags(deleted_tags, added_tags, updated_tags)
+
+            self.message_user(request, "Modifications sur les tags faites")
+            return None
+
+        for anime in queryset.select_related("category"):
+            if anime.category.slug != 'anime':
+                self.message_user(request, "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les animes " % anime.title)
+                self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
+                return None
+            elif not anime.anidb_aid:
+                self.message_user(request, "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" % anime.title)
+                self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
+                return None
+
+        all_information = {}
+        for anime in queryset:
+            a = AniDB('mangakihttp', 1)
+            retrieve_tags = anime.retrieve_tags(a)
+            deleted_tags = retrieve_tags["deleted_tags"]
+            added_tags = retrieve_tags["added_tags"]
+            updated_tags = retrieve_tags["updated_tags"]
+            kept_tags = retrieve_tags["kept_tags"]
+            all_information[anime.id] = {'title': anime.title, 'deleted_tags': deleted_tags.items(), 'added_tags': added_tags.items(), 'updated_tags': updated_tags.items(), "kept_tags": kept_tags.items()}
+
+        context = {
+                   'all_information': all_information.items(),
+                   'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+                  }
+        return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
+    update_tags_via_anidb.short_description = "Mise à jour des tags des oeuvres sélectionnées"
+
     def make_sfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=False)
         if rows_updated == 1:
@@ -57,7 +146,7 @@ class WorkAdmin(admin.ModelAdmin):
             for obj in queryset:
                 if obj.id != chosen_id:
                     for rating in Rating.objects.filter(work=obj).select_related('user'):
-                        # S'il n'a pas déjà voté pour l'autre
+                        # S'il n'a pas déjà voté pour l'autre
                         if Rating.objects.filter(user=rating.user, work__id=chosen_id).count() == 0:
                             rating.work_id = chosen_id
                             rating.save()
@@ -282,5 +371,7 @@ admin.site.register(Pairing, PairingAdmin)
 admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(Top, TopAdmin)
 admin.site.register(Role, RoleAdmin)
+admin.site.register(Tag, TagAdmin)
+admin.site.register(TaggedWork, TaggedWorkAdmin)
 admin.site.register(FAQTheme, FAQAdmin)
 admin.site.register(FAQEntry)
