@@ -718,7 +718,7 @@ def generic_error_view(error, error_code):
         try:
             trope = Trope.objects.order_by('?').first()
         except DatabaseError:
-            return server_error
+            return server_error(request)
 
         parameters = {
             'error_code': error_code,
