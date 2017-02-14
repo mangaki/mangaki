@@ -725,7 +725,7 @@ def generic_error_view(error, error_code):
             'error': error,
         }
         if trope:
-            parameters['trope'] = trope,
+            parameters['trope'] = trope
             parameters['origin'] = trope.origin
         return render(request, 'error.html', parameters, status=error_code)
     return error_view

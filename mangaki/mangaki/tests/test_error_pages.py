@@ -25,7 +25,7 @@ class ErrorPageTest(TestCase):
         self.work = work
         self.trope = trope
 
-    def get_404_url():
+    def get_404_url(self):
         return '/does/not/exist/'
 
     def test_trope(self):

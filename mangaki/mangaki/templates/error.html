@@ -2,11 +2,11 @@
 
 {% block body %}
 	<div class="jumbotron">
-		<h2>{{ error }} ({{error_code}})
+		<h2>{{ error }} ({{ error_code }})</h2>
 
 		{% if trope %}
-		<small>« {{trope.trope}} »   trope.author }}, <a href="{% url 'work-detail' origin.category.slug origin.id %}">{{ origin.title }}</a></small>
+		« {{ trope.trope }} » {{ trope.author }}, <a href="{% url 'work-detail' origin.category.slug origin.id %}">{{ origin.title }}</a>
 		{% endif %}
-		</h2>
+
 	</div>
 {% endblock %}
