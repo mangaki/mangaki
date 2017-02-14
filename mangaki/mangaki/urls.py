@@ -1,3 +1,4 @@
+from django.conf.urls import handler400, handler403, handler404
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
@@ -56,6 +57,10 @@ urlpatterns = [
     url(r'^dpp/(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='dpp-works', kwargs={'dpp': True})
 
 ]
+
+handler404 = views.generic_error_view("Le contenu que tu cherches est introuvable.", 404)
+handler403 = views.generic_error_view("L'accès au contenu que tu cherches est refusé.", 403)
+handler400 = views.generic_error_view("Ta requête est incorrecte.", 400)
 
 if DEBUG:  # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
     import debug_toolbar

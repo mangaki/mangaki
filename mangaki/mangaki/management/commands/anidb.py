@@ -1,9 +1,8 @@
 from django.core.management.base import BaseCommand
+from django.db.models import Count
 from mangaki.utils.anidb import AniDB
 from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling, Language
 from urllib.parse import parse_qs, urlparse
-from django.db.models import Count
-
 
 
 def get_or_create_artist(name):

@@ -24,6 +24,5 @@ class LookupTest(TestCase):
         call_command('lookup', 'Steins;Gate', stdout=out)
         output = out.getvalue().lower()
 
-        self.assertIn(output, 'steins;gate')
-        for item in ('like', 'dislike', 'willsee', 'wontsee', 'neutral'):
-            self.assertIn(output, item)
+        self.assertIn('steins;gate', output)
+        self.assertIn('counter', output)

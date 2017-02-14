@@ -16,8 +16,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         query = options.get('query')[0]
         work = Work.objects.filter(title__icontains=query).annotate(Count('rating')).order_by('-rating__count')[0]
-        print(work.title, work.id)
+        self.stdout.write(self.style.SUCCESS('%s (ID: %d)' % (work.title, work.id)))
         nb = Counter()
         for rating in Rating.objects.filter(work=work):
             nb[rating.choice] += 1
-        print(nb)
+        self.stdout.write(str(nb))

@@ -2,6 +2,7 @@ from django.views.generic.detail import DetailView, SingleObjectTemplateResponse
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormMixin
 from django.views.generic import View
+from django.views.defaults import server_error
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -14,10 +15,10 @@ from django.utils.timezone import utc
 from django.utils.functional import cached_property
 from django.db.models import Case, When, Value, Sum, IntegerField
 from django.views.generic.detail import SingleObjectMixin
+from django.db import connection, DatabaseError
 
-from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
-from mangaki.mixins import JSONResponseMixin
-from mangaki.mixins import AjaxableResponseMixin
+from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme, Trope
+from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import import_mal
 from mangaki.utils.recommendations import get_recommendations
@@ -711,3 +712,20 @@ def faq_index(request):
         'information': all_information,
     }
     return render(request, 'faq/faq_index.html', context)
+
+def generic_error_view(error, error_code):
+    def error_view(request):
+        try:
+            trope = Trope.objects.order_by('?').first()
+        except DatabaseError:
+            return server_error(request)
+
+        parameters = {
+            'error_code': error_code,
+            'error': error,
+        }
+        if trope:
+            parameters['trope'] = trope
+            parameters['origin'] = trope.origin
+        return render(request, 'error.html', parameters, status=error_code)
+    return error_view
