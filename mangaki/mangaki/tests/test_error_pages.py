@@ -1,24 +1,29 @@
 from django.test import TestCase, Client
-from mangaki.models import Work, Category, Trope
+from mangaki.models import Work, Category, Trope, Editor, Studio
 
 
 class ErrorPageTest(TestCase):
 
     def setUp(self):
+        # FIXME: The defaults for editor and studio in Work requires those to
+        # exist, or else foreign key constraints fail.
+        Editor.objects.create(pk=1)
+        Studio.objects.create(pk=1)
+
         self.client = Client()
         anime = Category.objects.get(slug='anime')
-        Work.objects.create(
+        work = Work.objects.create(
             title='Initial D',
             source='Fujiwara Bunta',
             category=anime
         )
-        Trope.objects.create(
+        trope = Trope.objects.create(
             trope='INERTIA DORIFTU ?!',
             author='Keisuke Takahashi',
-            origin=Work.objects.get(title='Initial D')
+            origin=work
         )
-        self.work = Work.objects.get(title='Initial D')
-        self.trope = Trope.objects.get()
+        self.work = work
+        self.trope = trope
 
     def test_trope(self):
         response = self.client.get('/404/')
