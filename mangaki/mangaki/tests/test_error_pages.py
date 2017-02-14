@@ -25,12 +25,15 @@ class ErrorPageTest(TestCase):
         self.work = work
         self.trope = trope
 
+    def get_404_url():
+        return '/does/not/exist/'
+
     def test_trope(self):
-        response = self.client.get('/404/')
+        response = self.client.get(self.get_404_url())
         self.assertEqual(response.status_code, 404)
         self.assertIn(self.trope.trope, str(response.content))
 
     def test_no_trope(self):  # An error 500 could occur in this case.
         self.trope.delete()
-        response = self.client.get('/404/')
+        response = self.client.get(self.get_404_url())
         self.assertEqual(response.status_code, 404)

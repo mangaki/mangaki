@@ -720,16 +720,12 @@ def generic_error_view(error, error_code):
         except DatabaseError:
             return server_error
 
-        if not trope:
-            return render(request, 'error.html', {
-                'error_code': error_code,
-                'error': error,
-            }, status=error_code)
-        else:
-            return render(request, 'error.html', {
-                'error_code': error_code,
-                'error': error,
-                'trope': trope,
-                'origin': trope.origin,
-            }, status=error_code)
+        parameters = {
+            'error_code': error_code,
+            'error': error,
+        }
+        if trope:
+            parameters['trope'] = trope,
+            parameters['origin'] = trope.origin
+        return render(request, 'error.html', parameters, status=error_code)
     return error_view
