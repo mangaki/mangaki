@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('is_shared', models.BooleanField(default=True)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('choice', models.CharField(choices=[('like', "J'aime"), ('dislike', "Je n'aime pas"), ('neutral', 'Neutre'), ('willsee', 'Je veux voir'), ('wontsee', 'Je ne veux pas voir')], max_length=7)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='OST',
             fields=[
-                ('work_ptr', models.OneToOneField(serialize=False, to='mangaki.Work', primary_key=True, parent_link=True, auto_created=True)),
+                ('work_ptr', models.OneToOneField(serialize=False, to='mangaki.Work', primary_key=True, parent_link=True, auto_created=True, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -90,10 +90,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Anime',
             fields=[
-                ('work_ptr', models.OneToOneField(serialize=False, to='mangaki.Work', primary_key=True, parent_link=True, auto_created=True)),
+                ('work_ptr', models.OneToOneField(serialize=False, to='mangaki.Work', primary_key=True, parent_link=True, auto_created=True, on_delete=models.CASCADE)),
                 ('synopsis', models.TextField(blank=True)),
-                ('composer', models.ForeignKey(to='mangaki.Artist', related_name='composed')),
-                ('director', models.ForeignKey(to='mangaki.Artist', related_name='directed')),
+                ('composer', models.ForeignKey(to='mangaki.Artist', related_name='composed', on_delete=models.CASCADE)),
+                ('director', models.ForeignKey(to='mangaki.Artist', related_name='directed', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -102,13 +102,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='track',
             name='ost',
-            field=models.ForeignKey(to='mangaki.OST'),
+            field=models.ForeignKey(to='mangaki.OST', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='rating',
             name='work',
-            field=models.ForeignKey(to='mangaki.Work'),
+            field=models.ForeignKey(to='mangaki.Work', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

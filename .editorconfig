@@ -29,7 +29,7 @@ indent_style = space
 indent_size = 4
 indent_style = space
 
-# 2 spaces for Travis
-[.travis.yml]
+# 2 spaces for YAML files
+[*.yml]
 indent_size = 2
 indent_style = space

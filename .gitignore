@@ -13,3 +13,8 @@ data/
 /.vagrant
 node_modules
 fixtures/*.json
+restore.sh
+*.coverage
+media
+/provisioning/inventory
+/provisioning/env_vars/

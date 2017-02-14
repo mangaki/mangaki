@@ -4,7 +4,7 @@ function loadMenu() {
   pieces = new Bloodhound({
     datumTokenizer: function(d) { return Bloodhound.tokenizers.whitespace(d.title); },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    remote: '/data/' + category + '.json?q=%QUERY'
+    remote: Urls['get-work'](category) + '?q=%QUERY'
   });
 
   pieces.initialize();
@@ -26,8 +26,8 @@ function loadMenuReco() {
   pieces = new Bloodhound({
     datumTokenizer: function(d) { return d.tokens; },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    prefetch: '/getuser/' + work_id + '.json',
-    remote: '/getuser/' + work_id + '/%QUERY.json'
+    prefetch: Urls['get-user-for-reco'](work_id),
+    remote: Urls['get-user-for-reco'](work_id).replace('.json','/%QUERY.json')
   });
 
   pieces.initialize();
@@ -47,8 +47,8 @@ function loadMenuUser() {
   pieces = new Bloodhound({
     datumTokenizer: function(d) { return d.tokens; },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    prefetch: '/getuser.json',
-    remote: '/getuser/%QUERY.json'
+    prefetch: Urls['get-user'](),
+    remote: Urls['get-user']().replace('.json','/%QUERY.json')
   });
 
   pieces.initialize();
@@ -68,9 +68,9 @@ $(document).ready(function() {
   $('input.typeahead').on('typeahead:selected', function(event, selection) {
     if (!selection.synopsis) {
     	if (!selection.work_id)
-        location.href = '/u/' + selection.username ;
+        location.href = Urls['profile'](selection.username) ;
       else {
-        $.post('/recommend/'+ selection.work_id +'/'+ selection.id, function(status) {
+        $.post(Urls['reco-work'](selection.work_id, selection.id), function(status) {
           if (status === 'success') {
             $('#alert-reco').hide();
             if($('#success-reco').css('display') === 'none')
@@ -95,13 +95,13 @@ $(document).ready(function() {
     else if(typeof(artistID) !== 'undefined') {
       addPairing(artistID, selection.id);
     } else
-      location.href = '/' + category + '/' + selection.id;
+      location.href = Urls['work-detail'](category, selection.id);
     $(this).val('');
   }).on('typeahead:autocompleted', function(event, selection) {
     if (!selection.synopsis) {
-     if (!selection.work_id) { location.href = '/u/' + selection.username ; }
+     if (!selection.work_id) { location.href = Urls['profile'](selection.username); }
      else {
-      $.post('/recommend/'+ selection.work_id +'/'+ selection.id,  function(status) {
+      $.post(Urls['reco-work'](selection.work_id, selection.id),  function(status) {
        if (status === 'success') {
          $('#alert-reco').hide();
          if($('#success-reco').css('display') === 'none')
@@ -125,7 +125,7 @@ $(document).ready(function() {
   }
   else if(typeof(artistID) !== 'undefined') {
     addPairing(artistID, selection.id);
-  } else { location.href = '/' + category + '/' + selection.id; }
+  } else { location.href = Urls['work-detail'](category, selection.id); }
   $(this).val('');
 }).on('change', function(object, datum) {
   pieces.clearPrefetchCache();
@@ -141,12 +141,12 @@ function lookup(query, category) {
     promise = pieces.initialize(true);
     promise.done(function() {console.log('win')}).fail(function() {console.log('fail')});
     // vote({id: id});
-    location.href = '/' + category + '/' + id;
+    location.href = Urls['work-detail'](category, id);
   })
 }
 
 function addPairing(artistID, workID) {
-  $.post('/artist/' + artistID + '/add/' + workID, {artist_id: artistID, work_id: workID}, function(data) {
+  $.post(Urls['add-pairing'](artistID, workID), {artist_id: artistID, work_id: workID}, function(data) {
     $('.typeahead').attr('placeholder', 'Merci d\'avoir contribué à Mangaki !');
   });
 }

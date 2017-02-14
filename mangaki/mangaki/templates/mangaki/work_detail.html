@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 {% load bootstrap %}
+{% load posters %}
 
 {% block opengraph %}
 <meta property="og:title" content="{{ object.title }} - Mangaki" />
 <meta property="og:type" content="video.movie" />
 <meta property="og:url" content="http://mangaki.fr{{ object.get_absolute_url }}" />
-{% if object.poster %}
-  <meta property="og:image" content="{{ object.poster }}" />
-{% endif %}
+<meta property="og:image" content="{% poster_url object %}" />
 {% if object.synopsis %}
   <meta property="og:description" content="{{ object.synopsis }}" />
   <meta name="description" content="{{ object.synopsis }}" />
@@ -21,9 +20,7 @@
 {% if object.synopsis %}
   <meta name="twitter:description" content="{{ object.synopsis }}" />
 {% endif %}
-{% if object.poster %}
-  <meta name="twitter:image" content="{{ object.poster }}" />
-{% endif %}
+<meta name="twitter:image" content="{% poster_url object %}" />
 {% endblock %}
 
 {% block title %}{{ object.title }} - Mangaki{% endblock %}
@@ -57,7 +54,7 @@
 	{% endif %}
 
         {% for staff in object.staff_set.all %}
-            <p>{{ staff.role.name }}&nbsp;: <a href="/artist/{{ staff.artist.id }}">{{ staff.artist }}</a></p>
+            <p>{{ staff.role.name }}&nbsp;: <a href="{% url 'artist-detail' staff.artist.id %}">{{ staff.artist }}</a></p>
         {% endfor %}
 	{% if object.category.slug == 'anime' or object.category.slug == 'manga' %}
 	  <p>Éditeur : {{ object.editor }}</p>

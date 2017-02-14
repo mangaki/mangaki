@@ -2,12 +2,22 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 from mangaki.models import Language
+from urllib.parse import urljoin
 
-extract_date = lambda s: datetime(*list(map(int, s.split('-'))))
 
 BASE_URL = "http://api.anidb.net:9001/httpapi"
 SEARCH_URL = "http://anisearch.outrance.pl/"
 PROTOCOL_VERSION = 1
+
+
+def to_python_datetime(mal_date):
+    """
+    Converts myAnimeList's XML date YYYY-MM-DD to Python datetime format.
+    >>> to_python_datetime('2015-07-14')
+    datetime.datetime(2015, 7, 14, 0, 0)
+    """
+    return datetime(*list(map(int, mal_date.split("-"))))
+
 
 try:
     str = unicode
@@ -55,6 +65,41 @@ class AniDB:
 
         return results
 
+    def get_dict(self, anidb_aid):
+        """
+        Allows retrieval of non-file or episode related information for a specific anime by AID (AniDB anime id).
+        Unlike get, this version can directly be converted to a Work object in Mangaki.
+        """
+        anidb_aid = int(anidb_aid)
+
+        r = self._request("anime", {'aid': anidb_aid})
+        soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')  # http://stackoverflow.com/questions/31126831/beautifulsoup-with-xml-fails-to-parse-full-unicode-strings#comment50430922_31146912
+        if soup.error is not None:
+            raise Exception(soup.error.string)
+
+        anime = soup.anime
+        all_titles = anime.titles
+        # creators = anime.creators # TODO
+        # episodes = anime.episodes
+        # tags = anime.tags
+        # characters = anime.characters
+        # ratings = anime.ratings.{permanent, temporary}
+
+        anime_dict = {
+            'title': str(all_titles.find('title', attrs={'type': "main"}).string),
+            'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
+            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
+            # 'nsfw': ?
+            'date': to_python_datetime(anime.startdate.string),
+            # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
+            'synopsis': str(anime.description.string),
+            # 'artists': ? from anime.creators
+            'nb_episodes': int(anime.episodecount.string),
+            'anime_type': str(anime.type.string),
+            'anidb_aid': anidb_aid
+        }
+        return anime_dict
+
     def get(self, id):
         """
         Allows retrieval of non-file or episode related information for a specific anime by AID (AniDB anime id).
@@ -82,8 +127,8 @@ class AniDB:
                         if title['type'] != 'short' and title['xml:lang'] in languages],
         'type': str(anime.type.string),
         'episodecount': int(anime.episodecount.string),
-        'startdate': extract_date(anime.startdate.string),
-        'enddate': extract_date(anime.enddate.string),
+        'startdate': to_python_datetime(anime.startdate.string),
+        'enddate': to_python_datetime(anime.enddate.string),
         'titles': [(
           str(title.string),
           title['type'] if 'type' in title else "unknown"
@@ -150,3 +195,8 @@ class Anime:
 
     def __repr__(self):
         return u'<Anime %i "%s">' % (self.id, self.title)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

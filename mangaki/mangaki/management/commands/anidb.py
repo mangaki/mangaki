@@ -1,9 +1,9 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from mangaki.utils.anidb import AniDB
 from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling, Language
+from urllib.parse import parse_qs, urlparse
 from django.db.models import Count
-from urllib.parse import urlparse, parse_qs
-import sys
+
 
 
 def get_or_create_artist(name):
@@ -47,7 +47,7 @@ class Command(BaseCommand):
             todo = Work.objects.filter(category__slug='anime', id=anime_id, anidb_aid__gt=0)
         else:
             todo = Work.objects\
-                .only('pk', 'title', 'poster', 'nsfw')\
+                .only('pk', 'title', 'ext_poster', 'nsfw')\
                 .annotate(rating_count=Count('rating'))\
                 .filter(category__slug=category, rating_count__gte=6)\
                 .exclude(anidb_aid=0)\

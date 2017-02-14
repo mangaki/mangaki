@@ -1,8 +1,10 @@
+from django.conf import settings
 from mangaki.utils.chrono import Chrono
 from sklearn.decomposition import NMF
 from scipy.sparse import lil_matrix
 import numpy as np
-import pandas
+import csv
+import os
 
 PIG_ID = 1124#1407 # QCTX=1434  JJ=1407  SebNL=1124
 
@@ -46,7 +48,8 @@ class MangakiNMF(object):
     def __init__(self, NB_COMPONENTS=10):
         self.NB_COMPONENTS = NB_COMPONENTS
         self.chrono = Chrono(True)
-        self.works = pandas.read_csv('data/works.csv', header=None).as_matrix()[:, 1]
+        with open(os.path.join(settings.BASE_DIR, '../data/works.csv')) as f:
+            self.works = [x for _, x in csv.reader(f)]
 
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users

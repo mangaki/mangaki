@@ -1,6 +1,0 @@
-django-debug-toolbar
-django-extensions
-scipy
-pandas
-scikit-learn
-flake8

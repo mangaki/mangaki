@@ -1,13 +1,1 @@
-Django==1.9.1
-django-allauth==0.24.1
-markdown
-django-bootstrap-form
--e git+https://github.com/tindie/pydiscourse.git#egg=pydiscourse
-psycopg2
-numpy
-PyYAML
-beautifulsoup4
-lxml
-natsort
-django-analytical
-django-cookie-law
+-r requirements/production.txt

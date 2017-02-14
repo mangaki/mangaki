@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; Mettre à jour les posters
+</div>
+{% endblock %}
+
+{% block content %}
+<form method="post">{% csrf_token %}
+<p>Tout d'abord, quels posters souhaitez-vous conserver ?</p>
+{% for work_id, work_title, posters in bundle %}
+<p style="display: block; clear: both">{{ work_title }}</p>
+<ul>
+    {% for poster in posters %}
+    <li style="float: left">
+        <label>
+            <input type="radio" name="chosen_poster_{{ work_id }}" value="{% if not poster.current %}{{ poster.url }}{% endif %}"{% if poster.current %} checked="checked"{% endif %} />
+            <img src="{{ poster.url }}" />
+        </label>
+    </li>
+    {% endfor %}
+</ul>
+{% endfor %}
+<div style="clear: both">
+{% for obj in queryset %}
+<input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+{% endfor %}
+<input type="hidden" name="action" value="refresh_work" />
+<input type="hidden" name="confirm" value="yes" />
+<input type="submit" value="{% trans "Yes, I'm sure" %}" />
+<a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
+</div>
+</form>
+{% endblock %}

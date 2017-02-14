@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
+from mangaki.models import Rating, Work
 from mangaki.utils.values import rating_values
-from collections import Counter
+from collections import Counter, defaultdict
 from math import sqrt
 import numpy as np
 from scipy.sparse import lil_matrix
@@ -56,12 +57,12 @@ class MangakiKNN(object):
                     neighbors[user_id] = similarity_f(my_user_id, user_id)
 
         self.closest_neighbors[my_user_id] = {}
-        # users = []
+        users = []
         for user_id, sim_score in neighbors.most_common(self.NB_NEIGHBORS):
             self.closest_neighbors[my_user_id][user_id] = sim_score
-            # users.append(User.objects.get(id=user_id).username)
-        print(self.closest_neighbors[my_user_id])
-        # return users
+            users.append(User.objects.get(id=user_id).username)
+        # print(self.closest_neighbors[my_user_id])
+        return users
 
     def get_all_neighbors(self):
         score = self.M.dot(self.M.transpose())
@@ -94,24 +95,26 @@ class MangakiKNN(object):
             if abs(my) >= 1 and abs(their) >= 1:
                 print('%d.' % rank, works[work_id].title, my, their, '=', my * their)
 
-    def fit(self, X=[], y=[], all_dataset=False):
-        if all_dataset:
+    def fit(self, X=None, y=None, whole_dataset=False):
+        if X is None:
+            X = []
+        if y is None:
+            y = []
+        if whole_dataset:
             for user_id, work_id, choice in Rating.objects.values_list('user_id', 'work_id', 'choice'):
                 X.append((user_id, work_id))
                 y.append(rating_values[choice])
-        self.ratings = {}
-        self.sum_ratings = {}
-        self.nb_ratings = {}
+                nb_users = max(nb_users, user_id + 1)
+                nb_works = max(nb_works, work_id + 1)
+        self.set_parameters(nb_users, nb_works)
+        self.ratings = defaultdict(dict)
+        self.sum_ratings = defaultdict(lambda: 0)
+        self.nb_ratings = defaultdict(lambda: 0)
         self.M = lil_matrix((self.nb_users, self.nb_works))
         for (user_id, work_id), rating in zip(X, y):
-            if not user_id in self.ratings:
-                self.ratings[user_id] = {}
-            if not work_id in self.nb_ratings:
-                self.nb_ratings[work_id] = 1
-                self.sum_ratings[work_id] = rating
             self.ratings[user_id][work_id] = rating
             self.nb_ratings[work_id] += 1
-            self.sum_ratings[work_id] = rating
+            self.sum_ratings[work_id] += rating
             self.M[user_id, work_id] = rating
         for work_id in self.nb_ratings:
             self.mean_score[work_id] = self.sum_ratings[work_id] / self.nb_ratings[work_id]

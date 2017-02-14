@@ -7,40 +7,33 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden, Http404, HttpResponsePermanentRedirect
+from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.timezone import utc
 from django.utils.functional import cached_property
-
-
+from django.db.models import Case, When, Value, Sum, IntegerField
 from django.views.generic.detail import SingleObjectMixin
 
-from django.dispatch import receiver
-from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
-from django.db import connection
-from allauth.account.signals import user_signed_up
-from allauth.socialaccount.signals import social_account_added
-from mangaki.models import Work, Rating, Page, Profile, Artist, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
+from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme
+from mangaki.mixins import JSONResponseMixin
 from mangaki.mixins import AjaxableResponseMixin
 from mangaki.forms import SuggestionForm
-from mangaki.utils.mal import lookup_mal_api, import_mal, retrieve_anime
+from mangaki.utils.mal import import_mal
 from mangaki.utils.recommendations import get_recommendations
-from mangaki.utils.chrono import Chrono
 from irl.models import Event, Partner, Attendee
 
 from collections import Counter, OrderedDict
 from markdown import markdown
 from urllib.parse import urlencode
-from random import shuffle, randint
 import datetime
-import hashlib
 import json
 
 from mangaki.choices import TOP_CATEGORY_CHOICES
 
 from natsort import natsorted
 
+NB_POINTS_DPP = 10
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
@@ -64,21 +57,6 @@ RATING_COLORS = {
 UTA_ID = 14293
 
 GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
-
-
-def display_queries():
-    for line in connection.queries:
-        print(line['sql'][:100], line['time'])
-
-
-def update_poster_if_nsfw(obj, user):
-    if obj.nsfw and (not user.is_authenticated() or not user.profile.nsfw_ok):
-        obj.poster = '/static/img/nsfw.jpg'  # NSFW
-
-
-def update_poster_if_nsfw_dict(d, user):
-    if d['nsfw'] and (not user.is_authenticated() or not user.profile.nsfw_ok):
-        d['poster'] = '/static/img/nsfw.jpg'  # NSFW
 
 
 def update_score_while_rating(user, work, choice):
@@ -123,12 +101,11 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        update_poster_if_nsfw(self.object, self.request.user)
         self.object.source = self.object.source.split(',')[0]
 
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
             try:
                 context['rating'] = self.object.rating_set.get(user=self.request.user).choice
@@ -170,7 +147,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
             )))
         if len(events) > 0:
             my_events = {}
-            if self.request.user.is_authenticated():
+            if self.request.user.is_authenticated:
                 my_events = dict(self.request.user.attendee_set.filter(
                     event__in=events).values_list('event_id', 'attending'))
 
@@ -190,9 +167,9 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         return context
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
-            return HttpResponseForbidden()
         self.object = self.get_object()
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden()
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
@@ -231,36 +208,57 @@ class EventDetail(LoginRequiredMixin, DetailView):
         return redirect(request.GET['next'])
 
 
-def get_card(request, category, sort_id=1):
-    chrono = Chrono(True)
-    deja_vu = request.GET.get('dejavu', '').split(',')
-    sort_mode = ['popularity', 'controversy', 'top', 'random'][int(sort_id) - 1]
-    queryset = Work.objects.filter(category__slug=category)
-    if sort_mode == 'popularity':
-        queryset = queryset.popular()
-    elif sort_mode == 'controversy':
-        queryset = queryset.controversial()
-    elif sort_mode == 'top':
-        queryset = queryset.top()
-    else:
-        queryset = queryset.random().order_by('?')
-    if request.user.is_authenticated():
-        rated_works = Rating.objects.filter(user=request.user).values('work_id')
-        queryset = queryset.exclude(id__in=rated_works)
-    queryset = queryset[:54]
-    cards = []
-    for work in queryset.values('id', 'title', 'poster', 'synopsis', 'nsfw'):
-        update_poster_if_nsfw_dict(work, request.user)
-        work['category'] = category
-        cards.append(work)
-    return HttpResponse(json.dumps(cards), content_type='application/json')
+class CardList(JSONResponseMixin, ListView):
+    model = Work
+
+    def get_queryset(self):
+        category = self.kwargs.get('category')
+        # This call to `int` shouldn't fail because `sort_id` must match the
+        # `\d+` regexp, cf urls.py.
+        sort_id = int(self.kwargs.pop('sort_id'))
+        if sort_id < 1 or sort_id > 5:
+            raise Http404
+        deja_vu = self.request.GET.get('dejavu', '').split(',')
+        sort_mode = ['popularity', 'controversy', 'top', 'random', 'dpp'][int(sort_id) - 1]
+        queryset = Category.objects.get(slug=category).work_set.all()
+        if sort_mode == 'popularity':
+            queryset = queryset.popular()
+        elif sort_mode == 'controversy':
+            queryset = queryset.controversial()
+        elif sort_mode == 'top':
+            queryset = queryset.top()
+        elif sort_mode == 'random':
+            queryset.random().order_by('?')
+        else:
+            queryset = queryset.dpp(NB_POINTS_DPP)
+        if self.request.user.is_authenticated:
+            rated_works = self.request.user.rating_set.values('work_id')
+            queryset = queryset.exclude(id__in=rated_works)
+        return queryset[:POSTERS_PER_PAGE]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cards = []
+        for work in context['object_list']:
+            cards.append({
+                'id': work.id,
+                'category': work.category.slug,
+                'title': work.title,
+                'poster': work.safe_poster(self.request.user),
+                'synopsis': work.synopsis,
+                'nsfw': work.nsfw
+            })
+        return {'cards': cards}
+
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_to_json_response(context, **response_kwargs)
 
 
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             ratings = dict(
                 Rating.objects.filter(
                     user=self.request.user,
@@ -270,7 +268,6 @@ class WorkListMixin:
             ratings = {}
         for work in context['object_list']:
             work.rating = ratings.get(work.id, None)
-            work.poster = work.safe_poster(self.request.user)
 
         return context
 
@@ -293,12 +290,18 @@ class WorkList(WorkListMixin, ListView):
         else:
             return sort
 
+    # FIXME @property
+    def is_dpp(self):
+        dpp = self.kwargs.get('dpp', False)
+        return dpp
+
     def get_queryset(self):
+        search_text = self.search()
         queryset = self.category.work_set.all()
         sort_mode = self.sort_mode()
-        search_text = self.search()
-
-        if sort_mode == 'top':
+        if self.is_dpp():
+            queryset = self.category.work_set.exclude(coldstartrating__user=self.request.user).dpp(10)
+        elif sort_mode == 'top':
             queryset = queryset.top()
         elif sort_mode == 'popularity':
             queryset = queryset.popular()
@@ -321,7 +324,7 @@ class WorkList(WorkListMixin, ListView):
         if search_text is not None:
             queryset = queryset.search(search_text)
 
-        queryset = queryset.only('pk', 'title', 'poster', 'nsfw', 'synopsis', 'category__slug')
+        queryset = queryset.only('pk', 'title', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
         return queryset
 
@@ -329,18 +332,20 @@ class WorkList(WorkListMixin, ListView):
         context = super().get_context_data(**kwargs)
         search_text = self.search()
         sort_mode = self.sort_mode()
+        is_dpp = self.is_dpp()
 
         context['search'] = search_text
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
         context['objects_count'] = self.category.work_set.count()
+        context['is_dpp'] = is_dpp
 
-        if sort_mode == 'mosaic':
+        if sort_mode == 'mosaic' and not is_dpp:
             context['object_list'] = [
-                Work(title='Chargement…', poster='/static/img/chiro.gif')
+                Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
                 for _ in range(4)
-            ]
+                ]
 
         return context
 
@@ -402,21 +407,12 @@ class UserList(ListView):
 
 
 def get_profile(request, username):
-    chrono = Chrono(True)
-    try:
-        is_shared = Profile.objects.get(user__username=username).is_shared
-    except Profile.DoesNotExist:
-        Profile(user=request.user).save()  # À supprimer à terme # Tu parles, maintenant ça va être encore plus compliqué
-        is_shared = True
-    # chrono.save('get profile')
-    user = User.objects.get(username=username)
+    user = get_object_or_404(User, username=username)
+    is_shared = user.profile.is_shared
     category = request.GET.get('category', 'anime')
     ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
     c = 0
     rating_list = natsorted(Rating.objects.filter(user__username=username).select_related('work'), key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
-    # , key=lambda x: (ordering.index(x['choice']), 1))  # Tri par note puis nom
-    # print(rating_list[:5])
-    # chrono.save('get ratings %d queries' % len(connection.queries))
 
     received_recommendation_list = []
     sent_recommendation_list = []
@@ -429,7 +425,6 @@ def get_profile(request, username):
         for reco in sent_recommendations:
             if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
                 sent_recommendation_list.append({'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
-    # chrono.save('get reco %d queries' % len(connection.queries))
 
     seen_lists = {'anime': [], 'manga': [], 'album': 0}
     unseen_lists = {'anime': [], 'manga': [], 'album': []}
@@ -438,7 +433,6 @@ def get_profile(request, username):
             seen_lists[r.work.category.slug].append(r)
         else:
             unseen_lists[r.work.category.slug].append(r)
-    # chrono.save('categorize ratings')
     member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
 
     # Events
@@ -453,7 +447,7 @@ def get_profile(request, username):
             'link': attendee.event.link,
             'location': attendee.event.location,
             'title': attendee.event.work.title,
-        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event', 'event__work__title')
+        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event', 'event__work')
     ]
 
     data = {
@@ -472,17 +466,11 @@ def get_profile(request, username):
         'sent_recommendation_list': sent_recommendation_list if is_shared else [],
         'events': events,
     }
-    for key in data:
-        try:
-            print(key, len(data[key]))
-        except:
-            print(key, '->', data[key])
-    chrono.save('get request')
     return render(request, 'profile.html', data)
 
 
 def index(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         if Rating.objects.filter(user=request.user).count() == 0:
             return redirect('/anime/')
     # texte = Announcement.objects.get(title='Flash News').text
@@ -499,12 +487,12 @@ def about(request):
 
 def events(request):
     uta_rating = None
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         for rating in Rating.objects.filter(work_id=UTA_ID, user=request.user):
             if rating.work_id == UTA_ID:
                 uta_rating = rating.choice
     ghibli_works = Work.objects.in_bulk(GHIBLI_IDS)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         ghibli_ratings = dict(Rating.objects.filter(user=request.user, work_id__in=GHIBLI_IDS).values_list('work_id', 'choice'))
     else:
         ghibli_ratings = {}
@@ -547,9 +535,8 @@ def top(request, category_slug):
         'top': data,
     })
 
-
 def rate_work(request, work_id):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee', 'favorite']:
@@ -564,8 +551,20 @@ def rate_work(request, work_id):
     return HttpResponse()
 
 
-def recommend_work(request, work_id, target_id):
+# FIXME @login_required
+def dpp_work(request, work_id):
     if request.user.is_authenticated() and request.method == 'POST':
+        work = get_object_or_404(Work, id=work_id)
+        choice = request.POST.get('choice', '')
+        if choice not in ['like', 'dislike', 'dontknow']:
+            raise SuspiciousOperation("Attempted access denied. There are only 3 ratings here: like, dislike and dontknow")
+        ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
+        return HttpResponse(choice)
+    raise SuspiciousOperation("Attempted access denied. You are not logged in or it is currently a GET request")
+
+
+def recommend_work(request, work_id, target_id):
+    if request.user.is_authenticated and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         target_user = get_object_or_404(User, id=target_id)
         if target_user == request.user:
@@ -617,10 +616,18 @@ def get_works(request, category):
 def get_reco_list(request, category, editor):
     reco_list = []
     for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
-        update_poster_if_nsfw(work, request.user)
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
-            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else 'None'})
+        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
+            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else None})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
+
+
+def get_reco_list_dpp(request, category):
+    reco_list_dpp = []
+    for work, is_manga, in_willsee in get_recommendations(request.user, category, dpp=True):
+        update_poster_if_nsfw(work, request.user)
+        reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
+            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else None})
+    return HttpResponse(json.dumps(reco_list_dpp), content_type='application/json')
 
 
 def remove_reco(request, work_id, username, targetname):
@@ -645,32 +652,39 @@ def get_reco(request):
     category = request.GET.get('category', 'all')
     editor = request.GET.get('editor', 'unspecified')
     if request.user.rating_set.exists():
-        reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+        reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
     else:
         reco_list = []
     return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
 
 
+@login_required
+def get_reco_dpp(request):
+    category = request.GET.get('category', 'all')
+    reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+    return render(request, 'mangaki/reco_list_dpp.html', {'reco_list': reco_list, 'category': category})
+
+
 def update_shared(request):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(is_shared=request.POST['is_shared'] == 'true')
     return HttpResponse()
 
 
 def update_nsfw(request):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(nsfw_ok=request.POST['nsfw_ok'] == 'true')
     return HttpResponse()
 
 
 def update_newsletter(request):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(newsletter_ok=request.POST['newsletter_ok'] == 'true')
     return HttpResponse()
 
 
 def update_reco_willsee(request):
-    if request.user.is_authenticated() and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
     return HttpResponse()
 
@@ -683,18 +697,11 @@ def import_from_mal(request, mal_username):
 
 
 def add_pairing(request, artist_id, work_id):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         artist = get_object_or_404(Artist, id=artist_id)
         work = get_object_or_404(Work, id=work_id)
         Pairing(user=request.user, artist=artist, work=work).save()
     return HttpResponse()
-
-
-@receiver(user_signed_up)
-@receiver(social_account_added)
-def register_profile(sender, **kwargs):
-    user = kwargs['user']
-    Profile(user=user).save()
 
 
 def faq_index(request):

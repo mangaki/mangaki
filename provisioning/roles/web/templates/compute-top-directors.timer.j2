@@ -1,0 +1,12 @@
+[Unit]
+Description=Compute top directors daily
+After=postgresql
+Type=oneshot
+ExecStart={{ manage_path }} top director
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1d
+
+[Install]
+WantedBy=timers.target
