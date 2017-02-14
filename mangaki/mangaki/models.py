@@ -111,6 +111,7 @@ class Work(models.Model):
 
     # Some of these fields do not make sense for some categories of works.
     genre = models.ManyToManyField('Genre')
+    tags = models.ManyToManyField('Tag', through="TaggedWork")
     origin = models.CharField(max_length=10, choices=ORIGIN_CHOICES, default='', blank=True)
     nb_episodes = models.TextField(default='Inconnu', max_length=16, blank=True)
     anime_type = models.TextField(max_length=42, blank=True)
@@ -139,6 +140,40 @@ class Work(models.Model):
 
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
+
+    def retrieve_tags(self, anidb):
+        anidb_tags_list = anidb.get(self.anidb_aid).tags
+        anidb_tags = {title: int(weight) for title, weight in anidb_tags_list}
+
+        tag_work = TaggedWork.objects.filter(work=self)
+        current_tags = {tagwork.tag.title: tagwork.weight for tagwork in tag_work}
+
+        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
+        deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
+
+        added_tags_keys = anidb_tags.keys() - current_tags.keys()
+        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
+
+        remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
+        remaining_tags = {key: current_tags[key] for key in remaining_tags_keys}
+
+        updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
+        kept_tags = {title: current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
+
+        return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
+
+    def update_tags(self, deleted_tags, added_tags, updated_tags):
+        for title, weight in added_tags.items():
+            current_tag = Tag.objects.get_or_create(title=title)[0]
+            TaggedWork(tag=current_tag, work=self, weight=weight).save()
+
+        tags = Tag.objects.filter(title__in=updated_tags.keys())
+        for tag in tags:
+            tagged_work = self.taggedwork_set.get(tag=tag)
+            tagged_work.weight = updated_tags[tag.title][1]
+            tagged_work.save()
+
+        TaggedWork.objects.filter(work=self, tag__title__in=deleted_tags.keys()).delete()
 
     def safe_poster(self, user):
         if self.id is None:
@@ -177,6 +212,33 @@ class Work(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class WorkTitle (models.Model):
+    work = models.ForeignKey('Work')
+    title = models.CharField(max_length=128, blank=True, db_index=True)
+    language = models.ForeignKey('Language')
+    type = models.CharField(max_length=9, choices=(
+                            ('main', 'principal'),
+                            ('official', 'officiel'),
+                            ('synonym', 'synonyme')),
+                            blank=True,
+                            db_index=True)
+
+    def __str__(self):
+        return ("%s" % self.title)
+
+
+class Language(models.Model):
+    anidb_language = models.CharField(max_length=5,
+                                      blank=True,
+                                      db_index=True)
+    iso639 = models.CharField(max_length=2,
+                            unique=True,
+                            db_index=True)
+
+    def __str__(self):
+        return "%s : %s" % (self.anidb_language, self.iso639)
 
 
 class Role(models.Model):
@@ -223,6 +285,25 @@ class Genre(models.Model):
         return self.title
 
 
+class Tag(models.Model):
+    title = models.TextField(unique = True)
+
+    def __str__(self):
+        return self.title
+
+
+class TaggedWork(models.Model):
+    work = models.ForeignKey('Work')
+    tag = models.ForeignKey('Tag')
+    weight = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('work', 'tag')
+
+    def __str__(self):
+        return "%s %s %s" % (self.work, self.tag, self.weight)
+
+
 class Track(models.Model):
     title = models.CharField(max_length=32)
     album = models.ManyToManyField('Work')
@@ -235,6 +316,7 @@ class Artist(models.Model):
     first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
     last_name = models.CharField(max_length=32)  # No longer used
     name = models.CharField(max_length=255)
+    anidb_creator_id = models.IntegerField(null=True, unique=True)
 
     def __str__(self):
         return self.name

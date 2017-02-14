@@ -5,7 +5,7 @@
 		<h2>{{ error }} ({{error_code}})
 
 		{% if trope %}
-		<small>«{{trope.trope}}»   trope.author }}, <a href="{% url 'work-detail' orgin.category.slug origin.id %}">{{ origin.title }}</a></small>
+		<small>« {{trope.trope}} »   trope.author }}, <a href="{% url 'work-detail' origin.category.slug origin.id %}">{{ origin.title }}</a></small>
 		{% endif %}
 		</h2>
 	</div>

@@ -1,4 +1,4 @@
-from django.conf.urls import handler400, handler404, handler500
+from django.conf.urls import handler400, handler403, handler404, handler500
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
@@ -58,7 +58,7 @@ urlpatterns = [
 
 ]
 
-handler500 = views.generic_error_view("Le serveur a rencontré une erreur.", 500)
+# handler500 = views.generic_error_view("Le serveur a rencontré une erreur.", 500)
 handler404 = views.generic_error_view("Le contenu que tu cherches est introuvable.", 404)
 handler403 = views.generic_error_view("L'accès au contenu que tu cherches est refusé.", 403)
 handler400 = views.generic_error_view("Ta requête est incorrecte.", 400)

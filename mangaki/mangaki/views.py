@@ -15,9 +15,8 @@ from django.utils.timezone import utc
 from django.utils.functional import cached_property
 from django.db.models import Case, When, Value, Sum, IntegerField
 from django.views.generic.detail import SingleObjectMixin
-
-from django.db.models import Count, Case, When, F, Value, Sum, IntegerField
 from django.db import connection, DatabaseError
+
 from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme, Trope
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.forms import SuggestionForm

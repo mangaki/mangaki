@@ -1,0 +1,65 @@
+{% extends "admin/base_site.html" %}
+{% load staticfiles %} 
+
+{% block content %}
+
+{% for key, value in all_information %}
+
+{{value.title}}
+    
+    <p>Les tags enlevés sont:</p>
+    {% for tag, weight in value.deleted_tags %}
+        <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
+    {% endfor %}
+
+    <p></p>
+    
+    <p>Les tous nouveaux tags sont:</p>
+    {% for tag, weight in value.added_tags %}
+        <p> &nbsp;&nbsp;&nbsp; {{tag}} :  {{weight}} </p>
+    {% endfor %}
+
+    <p></p>
+    
+    <p>Les tags modifiés sont :</p>
+    {% for tag, weight in value.updated_tags %}            
+        <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight.0}} -> {{weight.1}} </p>
+    {% endfor %}
+
+    <p></p>
+
+    <p>Les tags non modifiés/restés identiques sont:</p>
+    {% for tag, weight in value.kept_tags %}
+        <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
+    {% endfor %}
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+{% endfor %}
+
+<form action="" method="post">{% csrf_token %}
+<ul>
+{% for key, value in all_information %}
+<li><label><input type="checkbox" name="checks" value="{{ key }}" /> {{ value.title }} </label></li>
+
+{% endfor %}
+</ul>
+
+{% for key, value in all_information %}
+<input type="hidden" name="{{ action_checkbox_name }}" value="{{ key }}" />
+{% endfor %}
+
+<input type="hidden" name="action" value="update_tags_via_anidb" />
+<input type="hidden" name="post" value="yes" />
+<input type="submit" value="faire les modifications sur les oeuvres sélectionnées" />
+</div>
+</form>
+
+{% endblock %}

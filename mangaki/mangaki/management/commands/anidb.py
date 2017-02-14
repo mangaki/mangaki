@@ -1,10 +1,8 @@
-from urllib.parse import parse_qs, urlparse
-
 from django.core.management.base import BaseCommand
 from django.db.models import Count
-
-from mangaki.models import Artist, ArtistSpelling, Role, Staff, Work
 from mangaki.utils.anidb import AniDB
+from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling, Language
+from urllib.parse import parse_qs, urlparse
 
 
 def get_or_create_artist(name):
@@ -30,7 +28,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('id', nargs='*', type=int)
 
-    def handle(self, *args, **options):        
+    def handle(self, *args, **options):
+
         category = 'anime'
         start = 0
         if options.get('id'):
@@ -52,16 +51,57 @@ class Command(BaseCommand):
                 .filter(category__slug=category, rating_count__gte=6)\
                 .exclude(anidb_aid=0)\
                 .order_by('-rating_count')
+
         a = AniDB('mangakihttp', 1)
         i = 0
+
         for anime in todo:
             i += 1
             if i < start:
                 continue
             print(i, ':', anime.title, anime.id)
+
             creators = a.get(anime.anidb_aid).creators
-            print(creators)
+            worktitles = a.get(anime.anidb_aid).worktitles
+
+            for worktitle in worktitles:
+                language = Language.objects.get(iso639=worktitle[2])
+                WorkTitle.objects.get_or_create(work=anime, title=worktitle[0], language=language, type=worktitle[1])
+            retrieve_tags = anime.retrieve_tags(a)
+            deleted_tags = retrieve_tags["deleted_tags"]
+            added_tags = retrieve_tags["added_tags"]
+            updated_tags = retrieve_tags["updated_tags"]
+            kept_tags = retrieve_tags["kept_tags"]
+
+            print(anime.title+":")
+            if deleted_tags:
+                print("\n\tLes tags enlevés sont :")
+                for tag, weight in deleted_tags.items():
+                    print('\t\t{}: {} '.format(tag, weight))
+
+            if added_tags:
+                print("\n\tLes tags totalement nouveaux sont :")
+                for tag, weight in added_tags.items():
+                    print('\t\t{}: {} '.format(tag, weight))
+
+            if updated_tags:
+                print("\n\tLes tags modifiés sont :")
+                for tag, weight in updated_tags.items():
+                    print('\t\t{}: {} -> {}'.format(tag, weight[0], weight[1]))
+
+            if kept_tags:
+                print("\n\tLes tags non modifiés/restés identiques sont :")
+                for tag, weight in kept_tags.items():
+                    print('\t\t{}: {} '.format(tag, weight))
+
+            choice = input("Voulez-vous réaliser ces changements [y/n] : ")
+            if choice == 'n':
+                print("\nOk, aucun changement ne va être fait")
+            elif choice == 'y':
+                anime.update_tags(deleted_tags, added_tags, updated_tags)
+
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
+
             for creator in creators.findAll('name'):
                 artist = get_or_create_artist(creator.string)
                 if creator['type'] == 'Direction':

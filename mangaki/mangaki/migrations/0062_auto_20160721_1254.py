@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('mangaki', '0057_auto_20160716_1417'),
+        ('mangaki', '0061_merge_20161112_1539'),
     ]
 
     operations = [
