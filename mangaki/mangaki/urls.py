@@ -21,7 +21,7 @@ urlpatterns = [
 
     url(r'^$', views.index, name='home'),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works, name='get-work'),
-    url(r'^data/reco/(?P<category>\w+)/(?P<editor>\w+)\.json$', views.get_reco_list, name='get-reco-list'),
+    url(r'^data/reco/(?P<algo>\w+)/(?P<category>\w+)\.json$', views.get_reco_algo_list, name='get-reco-algo-list'),
     url(r'^data/reco_dpp/(?P<category>\w+)\.json$', views.get_reco_list_dpp, name='get-dpp-list'),
     url(r'^data/card/(?P<category>\w+)/(?P<sort_id>\d+)\.json$', views.CardList.as_view(), name='get-card'),
     url(r'^getuser/(?P<work_id>\w+)\.json$', views.get_user_for_recommendations, name='get-user-for-reco'),

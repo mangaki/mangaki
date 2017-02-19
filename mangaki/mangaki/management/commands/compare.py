@@ -30,8 +30,7 @@ class Experiment(object):
     results = {}
     algos = None
     def __init__(self, PIG_ID=None):
-        # self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN(20), MangakiZero()]
-        self.algos = [MangakiALS(20), MangakiWALS(20)]
+        self.algos = [MangakiALS(20), MangakiSVD(20), MangakiKNN(20), MangakiZero()]
         # self.results.setdefault('x_axis', []).append()
         self.make_dataset(PIG_ID)
         self.execute()

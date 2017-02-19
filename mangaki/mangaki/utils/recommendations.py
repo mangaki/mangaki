@@ -5,119 +5,134 @@ from mangaki.utils.values import rating_values, rating_values_dpp
 from django.contrib.auth.models import User
 from django.db.models import Count
 from django.db import connection
+import random
+from mangaki.utils.wals import MangakiWALS
+from mangaki.utils.als import MangakiALS
+from mangaki.utils.knn import MangakiKNN
+from mangaki.utils.svd import MangakiSVD
+import numpy as np
+import pickle
 
 
-NB_NEIGHBORS = 15
-MIN_RATINGS = 3
-
+PERMANENT_REFRESH = True
+NB_NEIGHBORS = 20
+NB_RECO = 10
+RATED_BY_AT_LEAST = 2
 CHRONO_ENABLED = False
 
 
-def get_recommendations(user, category, editor='unspecified', dpp=False):
-    # What if user is not authenticated? We will see soon.
+def make_anonymous_data(queryset):
+    triplets = []
+    users = set()
+    works = set()
+    nb_ratings = Counter()
+    X = []
+    y = []
+    for user_id, work_id, rating in queryset.values_list('user_id', 'work_id', 'choice'):
+        users.add(user_id)
+        works.add(work_id)
+        triplets.append((user_id, work_id, rating))
+        nb_ratings[work_id] += 1
+    random.shuffle(triplets)  # Scramble time
+
+    anonymous_u = list(range(len(users)))
+    anonymous_w = list(range(len(works)))
+    random.shuffle(anonymous_u)
+    random.shuffle(anonymous_w)
+    encode_user = dict(zip(users, anonymous_u))
+    encode_work = dict(zip(works, anonymous_w))
+    decode_user = dict(zip(anonymous_u, users))
+    decode_work = dict(zip(anonymous_w, works))
+
+    interesting_works = set()
+    for work_id, _ in nb_ratings.most_common():
+        if nb_ratings[work_id] < RATED_BY_AT_LEAST:
+            break
+        interesting_works.add(work_id)
+
+    for user_id, work_id, rating in triplets:
+        X.append((encode_user[user_id], encode_work[work_id]))
+        y.append(rating_values[rating])
+    return np.array(X), np.array(y), len(users), len(works), encode_user, decode_user, encode_work, decode_work, interesting_works
+
+
+def get_reco_algo(user, algo_name='knn', category='all'):
     chrono = Chrono(CHRONO_ENABLED)
 
-    chrono.save('[%dQ] begin' % len(connection.queries))
+    already_rated_works = Rating.objects.filter(user=user).values_list('work_id', flat=True)
 
-    rated_works = {}
-    if dpp:
-        qs = ColdStartRating.objects.filter(user=user).values_list('work_id', 'choice')
-        values = rating_values_dpp
+    chrono.save('[%dQ] get rated works' % len(connection.queries))
 
+    if algo_name == 'knn':
+        queryset = Rating.objects.filter(work__in=already_rated_works)
+        ratings_pack = make_anonymous_data(queryset)
+
+        chrono.save('[%dQ] make first anonymous data' % len(connection.queries))
+
+        X, y, nb_users, nb_works, encode_user, decode_user, encode_work, decode_work, interesting_works = ratings_pack
+        algo = MangakiKNN(NB_NEIGHBORS, single_user=True, missing_is_mean=False)
+        algo.set_parameters(nb_users, nb_works)
+        algo.fit(X, y)
+
+        chrono.save('[%dQ] prepare first fit' % len(connection.queries))
+
+        algo.get_neighbors([encode_user[user.id]])
+        encoded_neighbors = list(algo.closest_neighbors[encode_user[user.id]].items())
+        neighbors = list(map(lambda x: decode_user[x[0]], encoded_neighbors))
+
+        chrono.save('[%dQ] get neighbors (checksum: %d)' % (len(connection.queries), sum(neighbors)))
+
+        queryset = Rating.objects.filter(user__id__in=neighbors + [user.id]).exclude(choice__in=['willsee', 'wontsee'])
     else:
-        qs = Rating.objects.filter(user=user).values_list('work_id', 'choice')
-        values = rating_values
+        queryset = Rating.objects.all()
 
-    for work_id, choice in qs:
-        rated_works[work_id] = choice
+    chrono.save('[%dQ] get interesting %d ratings' % (len(connection.queries), queryset.count()))
 
-    willsee = set()
-    if user.profile.reco_willsee_ok:
-        banned_works = set()
-        for work_id in rated_works:
-            if rated_works[work_id] != 'willsee':
-                banned_works.add(work_id)
-            else:
-                willsee.add(work_id)
+    filename = 'ratings.pickle'
+    if PERMANENT_REFRESH:
+        ratings_pack = make_anonymous_data(queryset)
+        with open(filename, 'wb') as f:
+            pickle.dump(ratings_pack, f)
     else:
-        banned_works = set(rated_works.keys())
+        with open(filename, 'rb') as f:
+            ratings_pack = pickle.load(f)
+    X, y, nb_users, nb_works, encode_user, decode_user, encode_work, decode_work, interesting_works = ratings_pack
 
-    mangas = Work.objects.filter(category__slug='manga')
+    chrono.save('[%dQ] get all %d interesting ratings' % (len(connection.queries), queryset.count()))
 
-    if editor == 'otototaifu':
-        mangas = mangas.filter(editor__title__in=['Ototo Manga', 'Taifu comics'])
-    elif editor != 'unspecified':
-        mangas = mangas.filter(editor__title__icontains=editor)
-    manga_ids = mangas.values_list('id', flat=True)
+    algo = {
+        'knn': MangakiKNN(NB_NEIGHBORS, single_user=True, missing_is_mean=False),
+        'svd': MangakiSVD(20),
+        'als': MangakiALS(20),
+    }[algo_name]
+    algo.set_parameters(nb_users, nb_works)
+    # algo.load('backup.pickle')
+    algo.fit(X, y)
+    # algo.save('backup.pickle')  # Only if SVD or ALS
 
-    kept_works = None
-    if category == 'anime':
-        banned_works |= set(manga_ids)
-    elif category == 'manga':
-        kept_works = set(manga_ids)
+    chrono.save('[%dQ] fit KNN' % len(connection.queries))
 
-    chrono.save('[%dQ] retrieve her %d ratings' % (len(connection.queries), len(rated_works)))
-    final_works = Counter()
-    nb_ratings = {}
-    c = 0
-    neighbors = Counter()
-    for user_id, work_id, choice in Rating.objects.filter(work__in=rated_works.keys()).values_list('user_id', 'work_id', 'choice'):
-        c += 1
-        neighbors[user_id] += values[rated_works[work_id]] * rating_values[choice]
+    if category != 'all':
+        category_filter = set(Work.objects.filter(category__slug=category).values_list('id', flat=True))
+    else:
+        category_filter = interesting_works
 
-    chrono.save('[%dQ] fill neighbors with %d ratings' % (len(connection.queries), c))
+    filtered_works = list((interesting_works & category_filter) - set(already_rated_works))
+    encoded_works = [encode_work.get(work_id) for work_id in filtered_works]
+    nb_test = len(encoded_works)
 
-    score_of_neighbor = {}
-    # print('Neighbors:')
-    # nbr = []
-    for user_id, score in neighbors.most_common(NB_NEIGHBORS):
-        # print(User.objects.get(id=user_id).username, score)
-        score_of_neighbor[user_id] = score
-        # nbr.append(user_id)
-    # print(nbr)
+    chrono.save('[%dQ] remove already rated' % len(connection.queries))
 
-    sum_ratings = Counter()
-    nb_ratings = Counter()
-    sum_scores = Counter()
-    i = 0
-    for work_id, user_id, choice in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']).values_list('work_id', 'user_id', 'choice'):
-        i += 1
-        if work_id in banned_works or (kept_works and work_id not in kept_works):
-            continue
+    X_test = list(zip([encode_user[user.id]] * nb_test, encoded_works))
+    X_test = np.asarray(X_test)
+    y_pred = algo.predict(X_test)
+    pos = y_pred.argsort()[-NB_RECO:][::-1]
 
-        sum_ratings[work_id] += rating_values[choice]
-        nb_ratings[work_id] += 1
-        sum_scores[work_id] += score_of_neighbor[user_id]
+    chrono.save('[%dQ] compute everything' % len(connection.queries))
 
-    chrono.save('[%dQ] compute and filter all ratings from %d sources' % (len(connection.queries), i))
+    best_work_ids = list(map(lambda x: decode_work[x[1]], X_test[pos]))
+    works = Work.objects.in_bulk(best_work_ids)
 
-    i = 0
-    k = 0
-    for work_id in nb_ratings:
-        # Adding interesting works to the arena (rated at least MIN_RATINGS by neighbors)
-        if nb_ratings[work_id] >= MIN_RATINGS:
-            k += 1
-            final_works[(work_id, work_id in manga_ids, work_id in willsee)] = (sum_ratings[work_id] / nb_ratings[work_id], sum_scores[work_id])
-        i += 1
+    chrono.save('[%dQ] get bulk' % len(connection.queries))
 
-    chrono.save('[%dQ] rank %d %d works' % (len(connection.queries), k, i))
-
-    reco = []
-    rank = 0
-    rank_of = {}
-    for (work_id, is_manga, in_willsee), _ in final_works.most_common(4):  # Retrieving top 4
-        rank_of[work_id] = rank
-        reco.append([work_id, is_manga, in_willsee])
-        rank += 1
-
-    works = Work.objects.filter(id__in=rank_of.keys())
-    for work in works:
-        reco[rank_of[work.id]][0] = work
-
-    # print(len(connection.queries), 'queries')
-    """for line in connection.queries:
-        print(line)"""
-
-    chrono.save('[%dQ] retrieve top 4' % len(connection.queries))
-
-    return reco
+    return {'work_ids': best_work_ids, 'works': works}

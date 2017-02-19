@@ -23,6 +23,7 @@ class MangakiALS(object):
         self.M = backup.M
         self.U = backup.U
         self.VT = backup.VT
+        self.means = backup.means
 
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users

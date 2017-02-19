@@ -38,6 +38,7 @@ class MangakiSVD(object):
         self.inv_work = backup.inv_work
         self.inv_user = backup.inv_user
         self.work_titles = backup.work_titles
+        self.means = backup.means
 
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users

@@ -11,29 +11,13 @@
             Notez-les puis rechargez la page pour en faire apparaître
             d'autres.
 
-    Inclure la liste des "À voir" dans les recommandations : <input type="checkbox" name="reco_willsee_ok" {% if user.profile.reco_willsee_ok %} checked{% endif %}/>
-    <form name="editor_choice">
-      <div>
-      Filtrer par éditeur :
-      <select name="editorURL" onChange="document.location.href=document.editor_choice.editorURL.options[document.editor_choice.editorURL.selectedIndex].value">
-        <option value="{% url 'reco' %}?category={{ category }}" {% if editor == '' %} selected {% endif %}>Tous</option>
-        <option value="{% url 'reco' %}?category=manga&editor=Taifu" {% if editor == 'Taifu' %} selected {% endif %}> Taifu Comics</option>
-        <option value="{% url 'reco' %}?category=manga&editor=Ototo" {% if editor == 'Ototo' %} selected {% endif %}>Ototo Manga</option>
-        <!--<option value="{% url 'reco' %}?category=manga&editor=otototaifu" {% if editor == 'otototaifu' %} selected {% endif %}>Ototo/Taifu</a>-->
-        <option value="{% url 'reco' %}?category=manga&editor=delcourt" {% if editor == 'delcourt' %} selected {% endif %}>Delcourt</option>
-        <option value="{% url 'reco' %}?category=manga&editor=tonkam" {% if editor == 'tonkam' %} selected {% endif %}>Tonkam</option>
-        <option value="{% url 'reco' %}?category=manga&editor=soleil" {% if editor == 'soleil' %} selected {% endif %}>Soleil</option>
-        <option value="{% url 'reco' %}?category=manga&editor=kaze" {% if editor == 'kaze' %} selected {% endif %}>Kaze</option>
-      </select>
-      </div>
-    </form>
         </p>
     </div>
 </div>
 <div class="row">
         <div class="col-md-12 col-sm-12" align="center">
             Légende :
-             <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
+            <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
             <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
             <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
             <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
@@ -53,12 +37,12 @@
 {% include "works.html" with works=reco_list is_dpp=False %}
 <div class="row margin">
     <div class="col-xs-12">
-        <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}&editor={{ editor }}" style="display: block; margin: auto">Je veux d'autres recommandations&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
+        <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}" style="display: block; margin: auto">Je veux d'autres recommandations&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
     </div>
 </div>
     <script>
     sort_mode = '';
-    $.getJSON('{% url 'get-reco-list' category editor %}', function(data) {
+    $.getJSON('{% url 'get-reco-algo-list' 'knn' category %}', function(data) {
         data.forEach(function(work, i) {
             displayWork(i + 1, work);
         });
