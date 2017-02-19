@@ -66,8 +66,6 @@ class MangakiSVD(object):
         print('Shapes', self.U.shape, self.sigma.shape, self.VT.shape)
         self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
 
-        self.save('backup.pickle')
-
         self.chrono.save('factor matrix')
 
     def predict(self, X):

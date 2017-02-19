@@ -6,15 +6,16 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.db import connection
 import random
+from datetime import datetime
 from mangaki.utils.wals import MangakiWALS
 from mangaki.utils.als import MangakiALS
 from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.svd import MangakiSVD
 import numpy as np
 import pickle
+import os.path
 
 
-PERMANENT_REFRESH = True
 NB_NEIGHBORS = 20
 NB_RECO = 10
 RATED_BY_AT_LEAST = 2
@@ -89,10 +90,11 @@ def get_reco_algo(user, algo_name='knn', category='all'):
     chrono.save('[%dQ] get interesting %d ratings' % (len(connection.queries), queryset.count()))
 
     filename = 'ratings.pickle'
-    if PERMANENT_REFRESH:
+    if algo_name == 'knn' or not os.path.isfile('ratings.pickle'):
         ratings_pack = make_anonymous_data(queryset)
-        with open(filename, 'wb') as f:
-            pickle.dump(ratings_pack, f)
+        if algo_name != 'knn':
+            with open(filename, 'wb') as f:
+                pickle.dump(ratings_pack, f)
     else:
         with open(filename, 'rb') as f:
             ratings_pack = pickle.load(f)
@@ -104,13 +106,19 @@ def get_reco_algo(user, algo_name='knn', category='all'):
         'knn': MangakiKNN(NB_NEIGHBORS, single_user=True, missing_is_mean=False),
         'svd': MangakiSVD(20),
         'als': MangakiALS(20),
+        'wals': MangakiWALS(20),
     }[algo_name]
     algo.set_parameters(nb_users, nb_works)
-    # algo.load('backup.pickle')
-    algo.fit(X, y)
-    # algo.save('backup.pickle')  # Only if SVD or ALS
 
-    chrono.save('[%dQ] fit KNN' % len(connection.queries))
+    backup_filename = '%s-%s.pickle' % (algo.get_shortname(), datetime.strftime(datetime.now(), '%Y%m%d'))
+    if os.path.isfile(backup_filename):
+        algo.load(backup_filename)
+    else:
+        algo.fit(X, y)
+        if algo_name in ['svd', 'als']:
+            algo.save(backup_filename)
+
+    chrono.save('[%dQ] fit %s' % (len(connection.queries), algo.get_shortname()))
 
     if category != 'all':
         category_filter = set(Work.objects.filter(category__slug=category).values_list('id', flat=True))

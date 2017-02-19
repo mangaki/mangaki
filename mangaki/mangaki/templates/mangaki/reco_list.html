@@ -28,31 +28,24 @@
 <br />
 
     <ul class="nav nav-tabs">
-        <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="{% url 'reco' %}">Tout</a></li>
-        <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'reco' %}?category=anime"><em>Anime</em> seulement</a></li>
-        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'reco' %}?category=manga">Manga seulement</a></li>
+        <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo }}">Tout</a></li>
+        <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo }}&category=anime"><em>Anime</em> seulement</a></li>
+        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo }}&category=manga">Manga seulement</a></li>
     </ul>
     <br />
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 {% include "works.html" with works=reco_list is_dpp=False %}
 <div class="row margin">
     <div class="col-xs-12">
-        <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}" style="display: block; margin: auto">Je veux d'autres recommandations&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
+        <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}&algo={{ algo }}" style="display: block; margin: auto">Je veux d'autres recommandations&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
     </div>
 </div>
     <script>
     sort_mode = '';
-    $.getJSON('{% url 'get-reco-algo-list' 'knn' category %}', function(data) {
+    $.getJSON('{% url 'get-reco-algo-list' algo category %}', function(data) {
         data.forEach(function(work, i) {
             displayWork(i + 1, work);
         });
-    });
-    $("[name='reco_willsee_ok']").bootstrapSwitch();
-    $("[name='reco_willsee_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
-       $.post(Urls['reco_willsee'](), {reco_willsee_ok: state});
-       setTimeout(function(){
-          location.reload();
-       }, 500);
     });
     </script>
 

@@ -654,12 +654,12 @@ def remove_all_reco(request, targetname):
 @login_required
 def get_reco(request):
     category = request.GET.get('category', 'all')
-    editor = request.GET.get('editor', 'unspecified')
+    algo = request.GET.get('algo', 'knn')
     if request.user.rating_set.exists():
         reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
     else:
         reco_list = []
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'algo': algo})
 
 
 @login_required
