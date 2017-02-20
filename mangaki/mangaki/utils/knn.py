@@ -17,12 +17,11 @@ class MangakiKNN(object):
     sum_ratings = None
     nb_ratings = None
     M = None
-    def __init__(self, NB_NEIGHBORS=20, RATED_BY_AT_LEAST=3, missing_is_mean=True, weighted_neighbors=False, single_user=False):
+    def __init__(self, NB_NEIGHBORS=20, RATED_BY_AT_LEAST=3, missing_is_mean=True, weighted_neighbors=False):
         self.NB_NEIGHBORS = NB_NEIGHBORS
         self.RATED_BY_AT_LEAST = RATED_BY_AT_LEAST
         self.missing_is_mean = missing_is_mean
         self.weighted_neighbors = weighted_neighbors
-        self.single_user = single_user
         self.closest_neighbors = {}
         self.rated_works = {}
         self.mean_score = {}
@@ -35,11 +34,10 @@ class MangakiKNN(object):
         self.nb_works = nb_works
 
     def get_neighbors(self, user_ids=None):
+        neighbors = []
         if user_ids is None:
-            self.single_user = False
+            score = cosine_similarity(self.M)  # All pairwise similarities
             user_ids = range(self.nb_users)
-        if not self.single_user:
-            score = cosine_similarity(self.M)  # Compute all similarities
         else:
             score = cosine_similarity(self.M[user_ids], self.M)
         for i, user_id in enumerate(user_ids):
@@ -47,9 +45,11 @@ class MangakiKNN(object):
                 neighbor_ids = score[i].argpartition(-self.NB_NEIGHBORS - 1)[-self.NB_NEIGHBORS - 1:-1]
             else:
                 neighbor_ids = range(len(score[i]))
+            neighbors.append(neighbor_ids)
             self.closest_neighbors[user_id] = {}
             for neighbor_id in neighbor_ids:
                 self.closest_neighbors[user_id][neighbor_id] = score[i, neighbor_id]
+        return neighbors
 
     def get_common_traits(self, my_username, username):
         my_user_id = User.objects.get(username=my_username).id
@@ -75,11 +75,7 @@ class MangakiKNN(object):
             if abs(my) >= 1 and abs(their) >= 1:
                 print('%d.' % rank, works[work_id].title, my, their, '=', my * their)
 
-    def fit(self, X=None, y=None, whole_dataset=False):
-        if X is None:
-            X = []
-        if y is None:
-            y = []
+    def fit(self, X, y, whole_dataset=False):
         self.ratings = defaultdict(dict)
         self.sum_ratings = defaultdict(lambda: 0)
         self.nb_ratings = defaultdict(lambda: 0)
@@ -91,14 +87,11 @@ class MangakiKNN(object):
             self.M[user_id, work_id] = rating
         for work_id in self.nb_ratings:
             self.mean_score[work_id] = self.sum_ratings[work_id] / self.nb_ratings[work_id]
-        if not self.single_user:
-            self.get_neighbors()
 
     def predict(self, X):
+        self.get_neighbors(list(set(X[:, 0])))  # Compute only relevant neighbors
         y = []
         for my_user_id, work_id in X:
-            if not my_user_id in self.closest_neighbors:
-                self.get_neighbors([my_user_id])
             weight = 0
             predicted_rating = 0
             for user_id in self.closest_neighbors[my_user_id]:

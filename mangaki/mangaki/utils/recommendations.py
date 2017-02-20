@@ -13,6 +13,7 @@ from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.svd import MangakiSVD
 import numpy as np
 import pickle
+import json
 import os.path
 
 
@@ -20,6 +21,12 @@ NB_NEIGHBORS = 20
 NB_RECO = 10
 RATED_BY_AT_LEAST = 2
 CHRONO_ENABLED = False
+ALGOS = {
+    'knn': lambda: MangakiKNN(NB_NEIGHBORS),
+    'svd': lambda: MangakiSVD(20),
+    'als': lambda: MangakiALS(20),
+    'wals': lambda: MangakiWALS(20),
+}
 
 
 def make_anonymous_data(queryset):
@@ -46,7 +53,7 @@ def make_anonymous_data(queryset):
     decode_work = dict(zip(anonymous_w, works))
 
     interesting_works = set()
-    for work_id, _ in nb_ratings.most_common():
+    for work_id, _ in nb_ratings.most_common():  # work_id are sorted by decreasing number of ratings
         if nb_ratings[work_id] < RATED_BY_AT_LEAST:
             break
         interesting_works.add(work_id)
@@ -71,15 +78,14 @@ def get_reco_algo(user, algo_name='knn', category='all'):
         chrono.save('[%dQ] make first anonymous data' % len(connection.queries))
 
         X, y, nb_users, nb_works, encode_user, decode_user, encode_work, decode_work, interesting_works = ratings_pack
-        algo = MangakiKNN(NB_NEIGHBORS, single_user=True, missing_is_mean=False)
+        algo = MangakiKNN(NB_NEIGHBORS)
         algo.set_parameters(nb_users, nb_works)
         algo.fit(X, y)
 
         chrono.save('[%dQ] prepare first fit' % len(connection.queries))
 
-        algo.get_neighbors([encode_user[user.id]])
-        encoded_neighbors = list(algo.closest_neighbors[encode_user[user.id]].items())
-        neighbors = list(map(lambda x: decode_user[x[0]], encoded_neighbors))
+        encoded_neighbors = algo.get_neighbors([encode_user[user.id]])[0]
+        neighbors = [decode_user[encoded_user_id] for encoded_user_id in encoded_neighbors]
 
         chrono.save('[%dQ] get neighbors (checksum: %d)' % (len(connection.queries), sum(neighbors)))
 
@@ -102,12 +108,7 @@ def get_reco_algo(user, algo_name='knn', category='all'):
 
     chrono.save('[%dQ] get all %d interesting ratings' % (len(connection.queries), queryset.count()))
 
-    algo = {
-        'knn': MangakiKNN(NB_NEIGHBORS, single_user=True, missing_is_mean=False),
-        'svd': MangakiSVD(20),
-        'als': MangakiALS(20),
-        'wals': MangakiWALS(20),
-    }[algo_name]
+    algo = ALGOS[algo_name]()
     algo.set_parameters(nb_users, nb_works)
 
     backup_filename = '%s-%s.pickle' % (algo.get_shortname(), datetime.strftime(datetime.now(), '%Y%m%d'))
@@ -115,7 +116,7 @@ def get_reco_algo(user, algo_name='knn', category='all'):
         algo.load(backup_filename)
     else:
         algo.fit(X, y)
-        if algo_name in ['svd', 'als']:
+        if algo_name in {'svd', 'als'}:
             algo.save(backup_filename)
 
     chrono.save('[%dQ] fit %s' % (len(connection.queries), algo.get_shortname()))
@@ -125,7 +126,7 @@ def get_reco_algo(user, algo_name='knn', category='all'):
     else:
         category_filter = interesting_works
 
-    filtered_works = list((interesting_works & category_filter) - set(already_rated_works))
+    filtered_works = (interesting_works & category_filter) - set(already_rated_works)
     encoded_works = [encode_work.get(work_id) for work_id in filtered_works]
     nb_test = len(encoded_works)
 
@@ -138,7 +139,7 @@ def get_reco_algo(user, algo_name='knn', category='all'):
 
     chrono.save('[%dQ] compute everything' % len(connection.queries))
 
-    best_work_ids = list(map(lambda x: decode_work[x[1]], X_test[pos]))
+    best_work_ids = [decode_work[work_id] for _, work_id in X_test[pos]]
     works = Work.objects.in_bulk(best_work_ids)
 
     chrono.save('[%dQ] get bulk' % len(connection.queries))
