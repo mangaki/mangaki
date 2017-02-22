@@ -15,7 +15,7 @@ class MangakiALS(object):
 
     def save(self, filename):
         with open(filename, 'wb') as f:
-            pickle.dump(self, f)
+            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     def load(self, filename):
         with open(filename, 'rb') as f:

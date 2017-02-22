@@ -100,7 +100,7 @@ def get_reco_algo(user, algo_name='knn', category='all'):
         ratings_pack = make_anonymous_data(queryset)
         if algo_name != 'knn':
             with open(filename, 'wb') as f:
-                pickle.dump(ratings_pack, f)
+                pickle.dump(ratings_pack, f, pickle.HIGHEST_PROTOCOL)
     else:
         with open(filename, 'rb') as f:
             ratings_pack = pickle.load(f)
@@ -116,7 +116,7 @@ def get_reco_algo(user, algo_name='knn', category='all'):
         algo.load(backup_filename)
     else:
         algo.fit(X, y)
-        if algo_name in {'svd', 'als'}:
+        if algo_name in {'svd', 'als', 'wals'}:
             algo.save(backup_filename)
 
     chrono.save('[%dQ] fit %s' % (len(connection.queries), algo.get_shortname()))
@@ -135,7 +135,7 @@ def get_reco_algo(user, algo_name='knn', category='all'):
     X_test = list(zip([encode_user[user.id]] * nb_test, encoded_works))
     X_test = np.asarray(X_test)
     y_pred = algo.predict(X_test)
-    pos = y_pred.argsort()[-NB_RECO:][::-1]
+    pos = y_pred.argsort()[-NB_RECO:][::-1]  # Get top NB_RECO work indices in decreasing value
 
     chrono.save('[%dQ] compute everything' % len(connection.queries))
 

@@ -622,7 +622,7 @@ def get_reco_algo_list(request, algo, category):
     for work_id in data['work_ids']:
         work = works[work_id]
         reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis, 'category': work.category.slug})
-    return HttpResponse(json.dumps(reco_list, indent=4), content_type='application/json')
+    return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 def get_reco_list_dpp(request, category):
     reco_list_dpp = []

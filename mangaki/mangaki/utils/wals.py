@@ -7,22 +7,21 @@ import tensorflow as tf
 from tensorflow.contrib.factorization.python.ops import factorization_ops
 from tensorflow.python.framework import sparse_tensor
 
-sess = tf.InteractiveSession()
 
 def simple_train(model, inp, num_iterations):
-  """Helper function to train model on inp for num_iterations."""
-  row_update_op = model.update_row_factors(sp_input=inp)[1]
-  col_update_op = model.update_col_factors(sp_input=inp)[1]
+    """Helper function to train model on inp for num_iterations."""
+    row_update_op = model.update_row_factors(sp_input=inp)[1]
+    col_update_op = model.update_col_factors(sp_input=inp)[1]
 
-  model.initialize_op.run()
-  model.worker_init.run()
-  for _ in range(num_iterations):
-    model.row_update_prep_gramian_op.run()
-    model.initialize_row_update_op.run()
-    row_update_op.run()
-    model.col_update_prep_gramian_op.run()
-    model.initialize_col_update_op.run()
-    col_update_op.run()
+    model.initialize_op.run()
+    model.worker_init.run()
+    for _ in range(num_iterations):
+        model.row_update_prep_gramian_op.run()
+        model.initialize_row_update_op.run()
+        row_update_op.run()
+        model.col_update_prep_gramian_op.run()
+        model.initialize_col_update_op.run()
+        col_update_op.run()
 
 class MangakiWALS(object):
     M = None
@@ -33,6 +32,7 @@ class MangakiWALS(object):
         NB_COMPONENTS: the number of components in the factorization"""
         self.NB_COMPONENTS = NB_COMPONENTS
         self.chrono = Chrono(True)
+        sess = tf.InteractiveSession()
 
     def save(self, filename):
         with open(filename, 'wb') as f:
@@ -44,6 +44,7 @@ class MangakiWALS(object):
         self.M = backup.M
         self.U = backup.U
         self.VT = backup.VT
+        self.means = backup.means
 
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users
