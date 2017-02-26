@@ -3,9 +3,6 @@
 django-debug-toolbar==1.6
 django-extensions
 django-nose
-pandas
-scipy
-scikit-learn==0.18.*
 tensorflow
 matplotlib
 flake8

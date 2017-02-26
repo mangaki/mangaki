@@ -9,12 +9,6 @@
     <div class="col-xs-6">
         <h1>{{ username }}</h1>
         <p><b>Score : {{ score }} pts</b></p>
-	{% if request.user.username == username %}
-        <p>
-	    Pour personnaliser ton profil, connecte-toi sur
-            <a href="http://meta.mangaki.fr/session/sso" target="_blank">Meta Mangaki</a>.
-        </p>
-        {% endif %}
         <p>Inscrit depuis {{ member_days }} jours</p>
         {% if events %}
         {% if request.user.username == username %}
