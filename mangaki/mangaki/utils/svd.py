@@ -26,7 +26,7 @@ class MangakiSVD(object):
 
     def save(self, filename):
         with open(filename, 'wb') as f:
-            pickle.dump(self, f)
+            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     def load(self, filename):
         with open(filename, 'rb') as f:
@@ -38,6 +38,7 @@ class MangakiSVD(object):
         self.inv_work = backup.inv_work
         self.inv_user = backup.inv_user
         self.work_titles = backup.work_titles
+        self.means = backup.means
 
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users
@@ -64,8 +65,6 @@ class MangakiSVD(object):
         self.U, self.sigma, self.VT = randomized_svd(matrix, self.NB_COMPONENTS, n_iter=self.NB_ITERATIONS, random_state=42)
         print('Shapes', self.U.shape, self.sigma.shape, self.VT.shape)
         self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
-
-        self.save('backup.pickle')
 
         self.chrono.save('factor matrix')
 

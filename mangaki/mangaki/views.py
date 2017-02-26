@@ -21,7 +21,7 @@ from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist,
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import import_mal
-from mangaki.utils.recommendations import get_recommendations
+from mangaki.utils.recommendations import get_reco_algo
 from irl.models import Event, Partner, Attendee
 
 from collections import Counter, OrderedDict
@@ -614,20 +614,23 @@ def get_works(request, category):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-def get_reco_list(request, category, editor):
+@login_required
+def get_reco_algo_list(request, algo, category):
     reco_list = []
-    for work, is_manga, in_willsee in get_recommendations(request.user, category, editor):
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
-            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else None})
+    data = get_reco_algo(request.user, algo, category)
+    works = data['works']
+    for work_id in data['work_ids']:
+        work = works[work_id]
+        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis, 'category': work.category.slug})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
-
 
 def get_reco_list_dpp(request, category):
     reco_list_dpp = []
-    for work, is_manga, in_willsee in get_recommendations(request.user, category, dpp=True):
-        update_poster_if_nsfw(work, request.user)
-        reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.poster, 'synopsis': work.synopsis,
-            'category': 'manga' if is_manga else 'anime', 'rating': 'willsee' if in_willsee else None})
+    data = get_reco_algo(request.user, 'knn', category)
+    works = data['works']
+    for work_id in data['work_ids']:
+        work = works[work_id]
+        reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis, 'category': work.category.slug})
     return HttpResponse(json.dumps(reco_list_dpp), content_type='application/json')
 
 
@@ -651,18 +654,18 @@ def remove_all_reco(request, targetname):
 @login_required
 def get_reco(request):
     category = request.GET.get('category', 'all')
-    editor = request.GET.get('editor', 'unspecified')
+    algo = request.GET.get('algo', 'knn')
     if request.user.rating_set.exists():
         reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
     else:
         reco_list = []
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'editor': editor})
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'algo': algo})
 
 
 @login_required
 def get_reco_dpp(request):
     category = request.GET.get('category', 'all')
-    reco_list = [Work(title='Chargement…', poster='/static/img/chiro.gif') for _ in range(4)]
+    reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
     return render(request, 'mangaki/reco_list_dpp.html', {'reco_list': reco_list, 'category': category})
 
 
