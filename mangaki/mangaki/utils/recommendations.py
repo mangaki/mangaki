@@ -29,7 +29,7 @@ def get_reco_algo(user, algo_name='knn', category='all'):
 
         chrono.save('make first anonymous data')
 
-        algo = MangakiKNN()
+        algo = ALGOS['knn']()
         algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
         algo.fit(anonymized.X, anonymized.y)
 
