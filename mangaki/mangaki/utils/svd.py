@@ -1,3 +1,4 @@
+import os
 import pickle
 
 import numpy as np
@@ -25,11 +26,11 @@ class MangakiSVD(object):
         self.chrono = Chrono(True)
 
     def save(self, filename):
-        with open(filename, 'wb') as f:
+        with open(os.path.join('pickles', filename), 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     def load(self, filename):
-        with open(filename, 'rb') as f:
+        with open(os.path.join('pickles', filename), 'rb') as f:
             backup = pickle.load(f)
         self.M = backup.M
         self.U = backup.U

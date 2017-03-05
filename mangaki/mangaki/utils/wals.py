@@ -2,7 +2,7 @@ from collections import defaultdict, Counter
 from mangaki.utils.chrono import Chrono
 import numpy as np
 import pickle
-
+import os.path
 import tensorflow as tf
 from tensorflow.contrib.factorization.python.ops import factorization_ops
 from tensorflow.python.framework import sparse_tensor
@@ -35,11 +35,11 @@ class MangakiWALS(object):
         sess = tf.InteractiveSession()
 
     def save(self, filename):
-        with open(filename, 'wb') as f:
+        with open(os.path.join('pickles', filename), 'wb') as f:
             pickle.dump(self, f)
 
     def load(self, filename):
-        with open(filename, 'rb') as f:
+        with open(os.path.join('pickles', filename), 'rb') as f:
             backup = pickle.load(f)
         self.M = backup.M
         self.U = backup.U
