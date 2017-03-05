@@ -21,7 +21,6 @@ class Dataset:
     decode_work = None
     interesting_works = None
     def __init__(self):
-        # datetime.strftime(datetime.now(), '%Y%m%d')
         self.datetime = datetime.now()
 
     def save(self, filename):
