@@ -79,14 +79,24 @@ class MangakiKNN(object):
         self.ratings = defaultdict(dict)
         self.sum_ratings = defaultdict(lambda: 0)
         self.nb_ratings = defaultdict(lambda: 0)
+        self.user_bias = defaultdict(lambda: 0)
+        self.rated_by = defaultdict(lambda: 0)
         self.M = lil_matrix((self.nb_users, self.nb_works))
         for (user_id, work_id), rating in zip(X, y):
             self.ratings[user_id][work_id] = rating
+            self.M[user_id, work_id] = rating
             self.nb_ratings[work_id] += 1
             self.sum_ratings[work_id] += rating
-            self.M[user_id, work_id] = rating
+            self.rated_by[user_id] += 1
+            self.user_bias[user_id] += rating
         for work_id in self.nb_ratings:
             self.mean_score[work_id] = self.sum_ratings[work_id] / self.nb_ratings[work_id]
+        for user_id in self.rated_by:
+            self.user_bias[user_id] /= self.rated_by[user_id]
+        """for (user_id, work_id), rating in zip(X, y):
+            self.ratings[user_id][work_id] -= self.user_bias[user_id]
+            self.M[user_id, work_id] -= self.user_bias[user_id]"""
+        print(self.M[0].sum())
 
     def predict(self, X):
         self.get_neighbors(list(set(X[:, 0])))  # Compute only relevant neighbors
@@ -112,7 +122,7 @@ class MangakiKNN(object):
                 predicted_rating = 0
             if weight > 0:
                 predicted_rating /= weight
-            y.append(predicted_rating)
+            y.append(predicted_rating)# + self.user_bias.get(user_id, 0))
         return np.array(y)
 
     def __str__(self):

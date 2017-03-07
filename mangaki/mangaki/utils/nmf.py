@@ -2,11 +2,12 @@ from django.conf import settings
 from mangaki.utils.chrono import Chrono
 from sklearn.decomposition import NMF
 from scipy.sparse import lil_matrix
+from collections import Counter
 import numpy as np
 import csv
 import os
 
-PIG_ID = 1124#1407 # QCTX=1434  JJ=1407  SebNL=1124
+PIG_ID = 0#1407 # QCTX=1434  JJ=1407  SebNL=1124
 
 explanation = {
     0: 'FATE, URBAN FANTASY',
@@ -48,8 +49,10 @@ class MangakiNMF(object):
     def __init__(self, NB_COMPONENTS=10):
         self.NB_COMPONENTS = NB_COMPONENTS
         self.chrono = Chrono(True)
-        with open(os.path.join(settings.BASE_DIR, '../data/works.csv')) as f:
+        with open(os.path.join(settings.BASE_DIR, '../data/works-ml.csv')) as f:
             self.works = [x for _, x in csv.reader(f)]
+        with open(os.path.join(settings.BASE_DIR, '../data/tags-ml.csv')) as f:
+            self.tags = [x.split('|') for _, x in csv.reader(f)]
 
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users
@@ -77,14 +80,23 @@ class MangakiNMF(object):
     def predict(self, X):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)]
 
+    def dot_tags(self, i):
+        c = Counter()
+        for _, j in sorted([(self.H[i][j], j) for j in range(self.nb_works)], reverse=True):
+            if self.H[i][j] < 1:  # Insignificant
+                break
+            for tag in self.tags[j]:
+                c[tag] += self.H[i][j]
+        return c
+
     def display_components(self):
         for i in range(self.NB_COMPONENTS):
-            if self.W[PIG_ID][i]:
-                percentage = round(self.W[PIG_ID][i] * 100 / self.W[PIG_ID].sum(), 1)
-                print('# Composante %d : %s (%.1f %%)' % (i, explanation.get(i), percentage))
-                """for _, title in sorted((-self.H[i][j], self.works[j]) for j in range(self.nb_works))[:10]:
-                    print(title)
-                print()"""
+            # if self.W[PIG_ID][i]:
+            percentage = round(self.W[PIG_ID][i] * 100 / self.W[PIG_ID].sum(), 1)
+            print('# Composante %d : %s (%.1f %%)' % (i, self.dot_tags(i).most_common(10), percentage))
+            for _, title in sorted([(self.H[i][j], self.works[j]) for j in range(self.nb_works)], reverse=True)[:15]:
+                print(title, _)
+            print()
 
     def __str__(self):
         return '[NMF]'

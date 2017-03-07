@@ -82,10 +82,10 @@ class MangakiWALS(object):
             rows,
             cols,
             dims,
-            unobserved_weight=1,#.1,
-            regularization=0.001,#001,
-            row_weights=None,#row_wts,
-            col_weights=None,#col_wts,
+            unobserved_weight=.1,
+            regularization=0.001,
+            row_weights=row_wts,
+            col_weights=col_wts,
             use_factors_weights_cache=use_factors_weights_cache)
         simple_train(model, inp, 25)
         row_factor = model.row_factors[0].eval()
