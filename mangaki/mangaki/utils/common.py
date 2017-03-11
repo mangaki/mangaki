@@ -7,7 +7,7 @@ import os.path
 PICKLE_DIR = os.path.join(settings.BASE_DIR, '../pickles')
 
 
-class RecommendationAlgorithm(object):
+class RecommendationAlgorithm:
     nb_users = None
     nb_works = None
     chrono = None
