@@ -6,7 +6,7 @@ import numpy as np
 class MangakiPCA(RecommendationAlgorithm):
     M = None
     def __init__(self, NB_COMPONENTS=10):
-        super().__init__
+        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
         self.VT = None
 
