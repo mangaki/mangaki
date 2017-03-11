@@ -19,7 +19,7 @@ from mangaki.utils.values import rating_values
 
 import matplotlib.pyplot as plt
 
-TEST_SIZE = 0.2
+TEST_SIZE = 0.2  # 20% is kept for the test set
 
 
 class Experiment(object):
