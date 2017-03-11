@@ -70,8 +70,8 @@ l'application. Pour une installation de développement, il suffit de faire :
     EOF
 
 Si vous souhaitez mettre en production une instance de Mangaki, le fichier de
-configuration est un peu plus complexe - regardez dans `mangaki/settings.py`
-pour un aperçu des options utiles.
+configuration est un peu plus complexe - regardez dans `settings.template.ini`
+et `mangaki/settings.py` pour un aperçu des options utiles.
 
 Remplir la base de données
 --------------------------
