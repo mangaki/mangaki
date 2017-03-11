@@ -8,11 +8,10 @@ PICKLE_DIR = os.path.join(settings.BASE_DIR, '../pickles')
 
 
 class RecommendationAlgorithm:
-    nb_users = None
-    nb_works = None
-    chrono = None
     def __init__(self):
         self.chrono = Chrono(True)
+        self.nb_users = None
+        self.nb_works = None
 
     def save(self, filename):
         with open(os.path.join(PICKLE_DIR, filename), 'wb') as f:
