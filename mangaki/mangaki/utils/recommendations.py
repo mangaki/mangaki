@@ -4,7 +4,6 @@ from mangaki.utils.chrono import Chrono
 from mangaki.utils.data import Dataset
 from django.contrib.auth.models import User
 from django.db.models import Count
-from django.db import connection
 from mangaki.utils.algo import ALGOS, fit_algo
 import numpy as np
 import json

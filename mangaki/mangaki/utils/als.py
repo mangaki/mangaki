@@ -1,35 +1,24 @@
+from mangaki.utils.common import RecommendationAlgorithm
 from collections import defaultdict
-from mangaki.utils.chrono import Chrono
 import numpy as np
-import os.path
-import pickle
 
 
-class MangakiALS(object):
+class MangakiALS(RecommendationAlgorithm):
     M = None
     U = None
     VT = None
     def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10, LAMBDA=0.1):
+        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
         self.NB_ITERATIONS = NB_ITERATIONS
         self.LAMBDA = LAMBDA
-        self.chrono = Chrono(True)
-
-    def save(self, filename):
-        with open(os.path.join('pickles', filename), 'wb') as f:
-            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     def load(self, filename):
-        with open(os.path.join('pickles', filename), 'rb') as f:
-            backup = pickle.load(f)
+        backup = super().load(filename)
         self.M = backup.M
         self.U = backup.U
         self.VT = backup.VT
         self.means = backup.means
-
-    def set_parameters(self, nb_users, nb_works):
-        self.nb_users = nb_users
-        self.nb_works = nb_works
 
     def make_matrix(self, X, y):
         matrix = defaultdict(dict)
@@ -88,9 +77,6 @@ class MangakiALS(object):
 
     def predict(self, X):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
-
-    def __str__(self):
-        return '[ALS]'
 
     def get_shortname(self):
         return 'als'

@@ -1,8 +1,6 @@
+from mangaki.utils.common import RecommendationAlgorithm
 from collections import defaultdict, Counter
-from mangaki.utils.chrono import Chrono
 import numpy as np
-import pickle
-import os.path
 import tensorflow as tf
 from tensorflow.contrib.factorization.python.ops import factorization_ops
 from tensorflow.python.framework import sparse_tensor
@@ -23,20 +21,17 @@ def simple_train(model, inp, num_iterations):
         model.initialize_col_update_op.run()
         col_update_op.run()
 
-class MangakiWALS(object):
+
+class MangakiWALS(RecommendationAlgorithm):
     M = None
     U = None
     VT = None
     def __init__(self, NB_COMPONENTS=20):
         """An implementation of the Weighted Alternate Least Squares.
         NB_COMPONENTS: the number of components in the factorization"""
+        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
-        self.chrono = Chrono(True)
-        sess = tf.InteractiveSession()
-
-    def save(self, filename):
-        with open(os.path.join('pickles', filename), 'wb') as f:
-            pickle.dump(self, f)
+        self.sess = tf.InteractiveSession()
 
     def load(self, filename):
         with open(os.path.join('pickles', filename), 'rb') as f:
@@ -45,10 +40,6 @@ class MangakiWALS(object):
         self.U = backup.U
         self.VT = backup.VT
         self.means = backup.means
-
-    def set_parameters(self, nb_users, nb_works):
-        self.nb_users = nb_users
-        self.nb_works = nb_works
 
     def make_matrix(self, X, y):
         matrix = defaultdict(dict)
@@ -107,9 +98,6 @@ class MangakiWALS(object):
 
     def predict(self, X):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
-
-    def __str__(self):
-        return '[WALS]'
 
     def get_shortname(self):
         return 'wals'

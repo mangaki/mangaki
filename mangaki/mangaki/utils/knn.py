@@ -1,14 +1,13 @@
+from mangaki.utils.common import RecommendationAlgorithm
 from django.contrib.auth.models import User
-from mangaki.models import Rating, Work
-from mangaki.utils.values import rating_values
+from mangaki.models import Work
 from collections import Counter, defaultdict
-from math import sqrt
 import numpy as np
 from scipy.sparse import lil_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-class MangakiKNN(object):
+class MangakiKNN(RecommendationAlgorithm):
     NB_NEIGHBORS = None
     closest_neighbors = None
     rated_works = None
@@ -28,10 +27,6 @@ class MangakiKNN(object):
         self.ratings = {}
         self.sum_ratings = {}
         self.nb_ratings = {}
-
-    def set_parameters(self, nb_users, nb_works):
-        self.nb_users = nb_users
-        self.nb_works = nb_works
 
     def get_neighbors(self, user_ids=None):
         neighbors = []
