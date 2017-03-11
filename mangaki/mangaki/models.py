@@ -313,8 +313,6 @@ class Track(models.Model):
 
 
 class Artist(models.Model):
-    first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
-    last_name = models.CharField(max_length=32)  # No longer used
     name = models.CharField(max_length=255)
     anidb_creator_id = models.IntegerField(null=True, unique=True)
 
