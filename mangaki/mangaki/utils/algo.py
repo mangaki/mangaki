@@ -20,7 +20,7 @@ def fit_algo(algo_name, queryset, backup_filename):
     anonymized = dataset.make_anonymous_data(queryset)
     algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
     algo.fit(anonymized.X, anonymized.y)
-    if algo_name in {'svd', 'als', 'wals'}:  # KNN is constantly refreshed
+    if algo_name in {'svd', 'als'}:  # KNN is constantly refreshed
         algo.save(backup_filename)
         dataset.save('ratings-' + backup_filename)
     return dataset, algo
