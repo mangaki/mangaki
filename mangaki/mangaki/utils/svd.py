@@ -1,37 +1,28 @@
-import os
-import pickle
-
-import numpy as np
-from django.contrib.auth.models import User
-from sklearn.utils.extmath import randomized_svd
-
+from mangaki.utils.common import RecommendationAlgorithm
 from mangaki.models import Rating, Recommendation
-from mangaki.utils.chrono import Chrono
+from sklearn.utils.extmath import randomized_svd
+from django.contrib.auth.models import User
+import numpy as np
+
 
 TOP = 10
 
 
-class MangakiSVD(object):
+class MangakiSVD(RecommendationAlgorithm):
     M = None
     U = None
     sigma = None
     VT = None
-    chrono = None
     inv_work = None
     inv_user = None
     work_titles = None
     def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10):
+        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
         self.NB_ITERATIONS = NB_ITERATIONS
-        self.chrono = Chrono(True)
-
-    def save(self, filename):
-        with open(os.path.join('pickles', filename), 'wb') as f:
-            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     def load(self, filename):
-        with open(os.path.join('pickles', filename), 'rb') as f:
-            backup = pickle.load(f)
+        backup = super().load(filename)
         self.M = backup.M
         self.U = backup.U
         self.sigma = backup.sigma
@@ -40,10 +31,6 @@ class MangakiSVD(object):
         self.inv_user = backup.inv_user
         self.work_titles = backup.work_titles
         self.means = backup.means
-
-    def set_parameters(self, nb_users, nb_works):
-        self.nb_users = nb_users
-        self.nb_works = nb_works
 
     def make_matrix(self, X, y):
         matrix = np.zeros((self.nb_users, self.nb_works), dtype=np.float64)
@@ -126,9 +113,6 @@ class MangakiSVD(object):
             print(line)"""
 
         self.chrono.save('complete')
-
-    def __str__(self):
-        return '[SVD]'
 
     def get_shortname(self):
         return 'svd'

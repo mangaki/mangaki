@@ -12,13 +12,14 @@ from mangaki.utils.wals import MangakiWALS
 from mangaki.utils.als import MangakiALS
 from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.svd import MangakiSVD
+from mangaki.utils.pca import MangakiPCA
+from mangaki.utils.zero import MangakiZero
 
 from mangaki.utils.values import rating_values
-from mangaki.utils.zero import MangakiZero
 
 import matplotlib.pyplot as plt
 
-TEST_SIZE = 50000
+TEST_SIZE = 0.2  # 20% is kept for the test set
 
 
 class Experiment(object):
@@ -30,7 +31,7 @@ class Experiment(object):
     results = {}
     algos = None
     def __init__(self, PIG_ID=None):
-        self.algos = [MangakiALS(20), MangakiWALS(20), MangakiSVD(20), MangakiKNN(20), MangakiZero()]
+        self.algos = [MangakiALS(20), MangakiWALS(20), MangakiSVD(20), MangakiPCA(20), MangakiKNN(20), MangakiZero()]
         # self.results.setdefault('x_axis', []).append()
         self.make_dataset(PIG_ID)
         self.execute()
