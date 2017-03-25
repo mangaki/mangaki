@@ -14,7 +14,9 @@ class RecommendationAlgorithm:
         self.nb_works = None
 
     def get_backup_path(self, filename):
-        return os.path.join(PICKLE_DIR, self.get_backup_filename())
+        if filename is None:
+            filename = self.get_backup_filename()
+        return os.path.join(PICKLE_DIR, filename)
 
     def has_backup(self, filename=None):
         if filename is None:
