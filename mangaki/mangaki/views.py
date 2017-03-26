@@ -101,7 +101,7 @@ def current_user_ratings(request, works=None):
     else:
         qs = user.rating_set.all()
         if works is not None:
-            qs = qs.filter(pk__in=works)
+            qs = qs.filter(work__in=works)
         return dict(qs.values_list('work_id', 'choice'))
 
 
