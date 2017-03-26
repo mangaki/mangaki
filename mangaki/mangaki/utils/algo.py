@@ -13,11 +13,11 @@ ALGOS = {
 }
 
 
-def fit_algo(algo_name, queryset, backup_filename):
+def fit_algo(algo_name, triplets, backup_filename):
     algo = ALGOS[algo_name]()
     dataset = Dataset()
 
-    anonymized = dataset.make_anonymous_data(queryset)
+    anonymized = dataset.make_anonymous_data(triplets)
     algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
     algo.fit(anonymized.X, anonymized.y)
     if algo_name in {'svd', 'als', 'wals'}:  # KNN is constantly refreshed
