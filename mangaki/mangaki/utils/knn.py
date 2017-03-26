@@ -16,9 +16,9 @@ class MangakiKNN(RecommendationAlgorithm):
     sum_ratings = None
     nb_ratings = None
     M = None
-    def __init__(self, NB_NEIGHBORS=20, RATED_BY_AT_LEAST=3, missing_is_mean=True, weighted_neighbors=False):
+    def __init__(self, NB_NEIGHBORS=20, RATED_BY_NEIGHBORS_AT_LEAST=3, missing_is_mean=True, weighted_neighbors=False):
         self.NB_NEIGHBORS = NB_NEIGHBORS
-        self.RATED_BY_AT_LEAST = RATED_BY_AT_LEAST
+        self.RATED_BY_NEIGHBORS_AT_LEAST = RATED_BY_NEIGHBORS_AT_LEAST
         self.missing_is_mean = missing_is_mean
         self.weighted_neighbors = weighted_neighbors
         self.closest_neighbors = {}
@@ -36,10 +36,12 @@ class MangakiKNN(RecommendationAlgorithm):
         else:
             score = cosine_similarity(self.M[user_ids], self.M)
         for i, user_id in enumerate(user_ids):
-            if self.NB_NEIGHBORS < self.nb_users:
+            if self.NB_NEIGHBORS < self.nb_users - 1:
+                score[i][user_id] = float('-inf')  # Do not select the user itself while looking at its potential neighbors
                 neighbor_ids = score[i].argpartition(-self.NB_NEIGHBORS - 1)[-self.NB_NEIGHBORS - 1:-1]  # Put top NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
             else:
                 neighbor_ids = range(len(score[i]))
+                neighbor_ids.remove(user_id)
             neighbors.append(neighbor_ids)
             self.closest_neighbors[user_id] = {}
             for neighbor_id in neighbor_ids:
@@ -89,10 +91,15 @@ class MangakiKNN(RecommendationAlgorithm):
         for my_user_id, work_id in X:
             weight = 0
             predicted_rating = 0
+            nb_neighbors_that_rated_it = 0
             for user_id in self.closest_neighbors[my_user_id]:
                 their_sim_score = self.closest_neighbors[my_user_id][user_id]
                 if self.missing_is_mean:
-                    their_rating = self.ratings[user_id].get(work_id, self.mean_score.get(work_id, 0))  # Double fallback, in case KNN was not trained on this work
+                    if work_id in self.ratings[user_id]:
+                        their_rating = self.ratings[user_id][work_id]
+                        nb_neighbors_that_rated_it += 1
+                    else:
+                        their_rating = self.mean_score.get(work_id, 0)  # In case KNN was not trained on this work
                 else:
                     their_rating = self.ratings[user_id].get(work_id)
                     if their_rating is None:
@@ -103,7 +110,8 @@ class MangakiKNN(RecommendationAlgorithm):
                 else:
                     predicted_rating += their_rating
                     weight += 1
-            if not self.weighted_neighbors and weight < self.RATED_BY_AT_LEAST:
+            if nb_neighbors_that_rated_it < self.RATED_BY_NEIGHBORS_AT_LEAST:
+                # print(work_id, nb_neighbors_that_rated_it)
                 predicted_rating = 0
             if weight > 0:
                 predicted_rating /= weight
