@@ -5,6 +5,8 @@ from django.views.generic import View
 from django.views.defaults import server_error
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden, Http404, HttpResponsePermanentRedirect
@@ -16,6 +18,7 @@ from django.utils.functional import cached_property
 from django.db.models import Case, When, Value, Sum, IntegerField
 from django.views.generic.detail import SingleObjectMixin
 from django.db import connection, DatabaseError
+from django.conf import settings
 
 from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme, Trope
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
@@ -60,6 +63,119 @@ UTA_ID = 14293
 GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
 
 
+def current_user_ratings(request, works=None):
+    """
+    Compute the set of ratings for the current user.
+
+    This handles both the case where the user is logged in and the case where
+    it is an anonymous user, in which case the rating is fetched from the
+    session.
+
+    If the `works` argument is given, then only the ratings for the given works
+    will be considered.
+
+    Arguments:
+        request -- The Request object we are currently handling.
+        works   -- An iterable of Work instances or primary keys, or None.
+
+    Returns:
+        ratings -- A dictionary mapping Work primary keys to their rating
+            string ('like', 'dislike', etc.)
+    """
+    user = request.user
+    if user.is_anonymous:
+        ratings = request.session.get(settings.ANONYMOUS_RATINGS_SESSION_KEY, {})
+        if works is not None:
+            filtered_ratings = {}
+            for work in works:
+                # Accept Work models as well as primary key integers
+                work = str(getattr(work, 'pk', work))
+                rating = ratings.get(work)
+                if rating is not None:
+                    filtered_ratings[work] = rating
+            ratings = filtered_ratings
+        # Recall that keys in the session dictionary are always converted to
+        # strings by serialization. We convert them back to integers.
+        return {int(work_pk): choice for work_pk, choice in ratings.items()}
+
+    else:
+        qs = user.rating_set.all()
+        if works is not None:
+            qs = qs.filter(work__in=works)
+        return dict(qs.values_list('work_id', 'choice'))
+
+
+def current_user_rating(request, work):
+    """
+    Get the rating the current user gave to a specific work.
+
+    This handles both the case where the user is logged in and the case where
+    it is an anonymous user, in which case the rating is fetched from the
+    session.
+
+    Note: If the ratings for several different works are needed, you should use
+    the `current_user_ratings` function directly instead.
+
+    Arguments:
+        request -- The Request object we are currently handling.
+        work    -- A Work object or primary key for which the rating is
+            required.
+
+    Returns:
+        rating -- The rating that the current user gave to the work, or None if
+            there is no such rating.
+    """
+    work = int(getattr(work, 'pk', work))
+    return current_user_ratings(request, [work]).get(work)
+
+
+def current_user_set_toggle_rating(request, work, choice):
+    """
+    Update the rating the current user gave to a specific work.
+
+    As this function's name indicated, if the user already rated the work with
+    the same choice, this will undo (toggle) this rating instead of being a
+    no-op. This corresponds to Mangaki's current UI where clicking again on an
+    existing rating will un-rate the work.
+
+    Arguments:
+        request -- The Request object we are currently handling.
+        work    -- The Work object (or its primary key) that we are currently
+            rating.
+        choice  -- The rating we want to assign (or remove) from the work.
+
+    Returns:
+        choice -- The new rating associated with the work for the current user.
+            In case an existing rating was removed, this will be None instead.
+    """
+    user = request.user
+    if user.is_authenticated:
+        old_ratings = user.rating_set.filter(work=work, choice=choice)
+        if old_ratings:
+            # FIXME: Get rid of this.
+            update_score_while_unrating(user, work, choice)
+            return None
+        else:
+            # FIXME: Get rid of this.
+            update_score_while_rating(user, work, choice)
+            user.rating_set.update_or_create(work=work, defaults={'choice': choice})
+            return choice
+    else:
+        request.session.modified = True
+        # Recall that keys in the session dictionary are always converted to
+        # strings by serialization.
+        work = str(getattr(work, 'pk', work))
+        ratings_dict = request.session.setdefault(
+            settings.ANONYMOUS_RATINGS_SESSION_KEY, {})
+        current_rating = ratings_dict.get(work)
+        if current_rating == choice:
+            del ratings_dict[work]
+            return None
+        else:
+            ratings_dict[work] = choice
+            return choice
+
+
 def update_score_while_rating(user, work, choice):
     recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
     for reco in recommendations_list:
@@ -85,6 +201,7 @@ def update_score_while_unrating(user, work, choice):
             Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
     form_class = SuggestionForm
     queryset = Work.objects.select_related('category').prefetch_related('staff_set__role', 'staff_set__artist')
@@ -108,10 +225,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 
         if self.request.user.is_authenticated:
             context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
-            try:
-                context['rating'] = self.object.rating_set.get(user=self.request.user).choice
-            except Rating.DoesNotExist:
-                pass
+        context['rating'] = current_user_rating(self.request, self.object)
 
         context['references'] = []
         for reference in self.object.reference_set.all():
@@ -232,9 +346,8 @@ class CardList(JSONResponseMixin, ListView):
             queryset.random().order_by('?')
         else:
             queryset = queryset.dpp(NB_POINTS_DPP)
-        if self.request.user.is_authenticated:
-            rated_works = self.request.user.rating_set.values('work_id')
-            queryset = queryset.exclude(id__in=rated_works)
+        rated_works = current_user_ratings(self.request)
+        queryset = queryset.exclude(id__in=list(rated_works))
         return queryset[:POSTERS_PER_PAGE]
 
     def get_context_data(self, **kwargs):
@@ -259,20 +372,15 @@ class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if self.request.user.is_authenticated:
-            ratings = dict(
-                Rating.objects.filter(
-                    user=self.request.user,
-                    work__in=list(context['object_list'])) \
-                .values_list('work_id', 'choice'))
-        else:
-            ratings = {}
+        ratings = current_user_ratings(
+            self.request, list(context['object_list']))
         for work in context['object_list']:
             work.rating = ratings.get(work.id, None)
 
         return context
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class WorkList(WorkListMixin, ListView):
     paginate_by = POSTERS_PER_PAGE
 
@@ -351,6 +459,7 @@ class WorkList(WorkListMixin, ListView):
         return context
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
     template_name = 'mangaki/artist_detail.html'
     paginate_by = POSTERS_PER_PAGE
@@ -537,19 +646,19 @@ def top(request, category_slug):
     })
 
 def rate_work(request, work_id):
-    if request.user.is_authenticated and request.method == 'POST':
+    if request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'neutral', 'dislike', 'willsee', 'wontsee', 'favorite']:
             return HttpResponse()
-        if Rating.objects.filter(user=request.user, work=work, choice=choice).count() > 0:
-            Rating.objects.filter(user=request.user, work=work, choice=choice).delete()
-            update_score_while_unrating(request.user, work, choice)
+        choice = current_user_set_toggle_rating(request, work, choice)
+        if choice is None:
             return HttpResponse('none')
-        update_score_while_rating(request.user, work, choice)
-        Rating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
-        return HttpResponse(choice)
-    return HttpResponse()
+        else:
+            return HttpResponse(choice)
+
+    else:
+        return HttpResponse()
 
 
 # FIXME @login_required
@@ -655,7 +764,7 @@ def remove_all_reco(request, targetname):
 def get_reco(request):
     category = request.GET.get('category', 'all')
     algo = request.GET.get('algo', 'knn')
-    if request.user.rating_set.exists():
+    if current_user_ratings(request):
         reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
     else:
         reco_list = []
