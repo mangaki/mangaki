@@ -177,3 +177,4 @@ if config.has_section('mal'):
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 
 JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'
+ANONYMOUS_RATINGS_SESSION_KEY = 'mangaki_ratings'
