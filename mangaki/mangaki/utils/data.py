@@ -3,6 +3,7 @@ import pickle
 import random
 from collections import Counter, namedtuple
 from mangaki.utils.values import rating_values
+from mangaki.utils.common import PICKLE_DIR
 import numpy as np
 from datetime import datetime
 
@@ -24,11 +25,11 @@ class Dataset:
         self.datetime = datetime.now()
 
     def save(self, filename):
-        with open(os.path.join('pickles', filename), 'wb') as f:
+        with open(os.path.join(PICKLE_DIR, filename), 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     def load(self, filename):
-        with open(os.path.join('pickles', filename), 'rb') as f:
+        with open(os.path.join(PICKLE_DIR, filename), 'rb') as f:
             backup = pickle.load(f)
         self.anonymized = backup.anonymized
         self.encode_user = backup.encode_user

@@ -34,8 +34,7 @@ class MangakiWALS(RecommendationAlgorithm):
         self.sess = tf.InteractiveSession()
 
     def load(self, filename):
-        with open(os.path.join('pickles', filename), 'rb') as f:
-            backup = pickle.load(f)
+        backup = super().load(filename)
         self.M = backup.M
         self.U = backup.U
         self.VT = backup.VT

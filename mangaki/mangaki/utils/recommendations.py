@@ -77,13 +77,12 @@ def get_reco_algo(request, algo_name='knn', category='all'):
     chrono.save('get all %d interesting ratings' % len(triplets))
 
     dataset = Dataset()
-    backup_filename = '%s.pickle' % algo_name
-    if os.path.isfile(os.path.join('pickles', backup_filename)):  # When Algo class will be there: 'if algo.has_backup():'
-        algo = ALGOS[algo_name]()
-        algo.load(backup_filename)
-        dataset.load('ratings-' + backup_filename)
+    algo = ALGOS[algo_name]()
+    if algo.has_backup():
+        algo.load(algo.get_backup_filename())
+        dataset.load('ratings-' + algo.get_backup_filename())
     else:
-        dataset, algo = fit_algo(algo_name, triplets, backup_filename)
+        dataset, algo = fit_algo(algo_name, triplets, algo.get_backup_filename())
 
     chrono.save('fit %s' % algo.get_shortname())
 
