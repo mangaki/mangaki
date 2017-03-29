@@ -13,6 +13,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         algo_name = options.get('algo_name')
         backup_filename = '%s.pickle' % algo_name
-        queryset = Rating.objects.all()
-        fit_algo(algo_name, queryset, backup_filename)
+        triplets = Rating.objects.values_list('user_id', 'work_id', 'choice')
+        fit_algo(algo_name, triplets, backup_filename)
         self.stdout.write(self.style.SUCCESS('Successfully fit %s' % algo_name))

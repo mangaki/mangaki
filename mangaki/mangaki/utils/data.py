@@ -38,17 +38,16 @@ class Dataset:
         self.decode_work = backup.decode_work
         self.interesting_works = backup.interesting_works
 
-    def make_anonymous_data(self, queryset):
-        triplets = []
+    def make_anonymous_data(self, triplets):
+        triplets = list(triplets)
         users = set()
         works = set()
         nb_ratings = Counter()
         X = []
         y = []
-        for user_id, work_id, rating in queryset.values_list('user_id', 'work_id', 'choice'):
+        for user_id, work_id, rating in triplets:
             users.add(user_id)
             works.add(work_id)
-            triplets.append((user_id, work_id, rating))
             nb_ratings[work_id] += 1
         random.shuffle(triplets)  # Scramble time
 
