@@ -26,7 +26,7 @@ def populate_categories(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mangaki', '0028_auto_20160124_1919_squashed_0029_auto_20160124_1922'),
+        ('mangaki', '0001_squashed'),
     ]
 
     operations = [
