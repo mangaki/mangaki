@@ -9,8 +9,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('mangaki', '0001_initial'), ('mangaki', '0002_auto_20150129_0110'), ('mangaki', '0003_suggestion'), ('mangaki', '0004_auto_20150224_1742'), ('mangaki', '0005_auto_20150224_1746'), ('mangaki', '0006_neighborship'), ('mangaki', '0007_auto_20150306_1959'), ('mangaki', '0008_auto_20150323_1842'), ('mangaki', '0009_auto_20150419_0758'), ('mangaki', '0010_searchissue'), ('mangaki', '0011_auto_20150612_1259'), ('mangaki', '0012_auto_20150616_0832'), ('mangaki', '0013_auto_20150616_0919'), ('mangaki', '0014_auto_20150624_0003'), ('mangaki', '0015_auto_20150626_0839'), ('mangaki', '0016_profile_score'), ('mangaki', '0017_profile_newsletter_ok'), ('mangaki', '0018_anime_anidb_aid'), ('mangaki', '0019_pairing'), ('mangaki', '0020_pairing_is_checked'), ('mangaki', '0021_deck'), ('mangaki', '0022_reference'), ('mangaki', '0023_auto_20151220_1706'), ('mangaki', '0024_auto_20151220_1731'), ('mangaki', '0025_auto_20151220_2132'), ('mangaki', '0026_auto_20160108_1137')]
-
     initial = True
 
     dependencies = [
