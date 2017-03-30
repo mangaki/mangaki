@@ -30,8 +30,6 @@ def create_stafftype(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('mangaki', '0001_squashed_0033_stafftype'), ('mangaki', '0034_populate_stafftype'), ('mangaki', '0035_populate_staff'), ('mangaki', '0032_rating_date'), ('mangaki', '0036_merge'), ('mangaki', '0037_auto_20160410_1847'), ('mangaki', '0038_genre_to_work'), ('mangaki', '0039_auto_20160410_1919'), ('mangaki', '0040_auto_20160410_1946'), ('mangaki', '0041_auto_20160410_1951'), ('mangaki', '0042_auto_20160410_1953'), ('mangaki', '0043_auto_20160410_2002'), ('mangaki', '0044_migrate_album_composer'), ('mangaki', '0045_migrate_catalog_number'), ('mangaki', '0046_migrate_anidb_aid'), ('mangaki', '0047_migrate_vgmdb_aid'), ('mangaki', '0048_migrate_editor'), ('mangaki', '0049_populate_work_editor'), ('mangaki', '0050_auto_20160410_2048'), ('mangaki', '0051_migrate_studio'), ('mangaki', '0052_populate_work_studio'), ('mangaki', '0053_auto_20160416_0907'), ('mangaki', '0038_auto_20160416_0930'), ('mangaki', '0054_merge')]
-
     initial = True
 
     dependencies = [

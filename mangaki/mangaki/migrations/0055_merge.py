@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mangaki', '0054_merge'),
+        ('mangaki', '0001_squashed_0054_merge'),
         ('mangaki', '0037_artistspelling'),
     ]
 

@@ -9,7 +9,7 @@ from django.contrib.postgres.operations import CreateExtension, UnaccentExtensio
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mangaki', '0035_populate_staff'),
+        ('mangaki', '0001_squashed_0054_merge'),
     ]
 
     operations = [
