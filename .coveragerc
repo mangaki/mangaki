@@ -1,5 +1,6 @@
 [run]
-include = mangaki/mangaki/*, mangaki/irl/*, mangaki/discourse/*
+source = mangaki
+omit = mangaki/*/tests/*.py, mangaki/*/migrations/*.py, mangaki/tools/*
 plugins = 
   django_coverage_plugin
 
@@ -8,10 +9,6 @@ exclude_lines =
  pragma: no cover
  def __repr__
  def __str__
-
-omit =
- mangaki/*/migrations/*
- mangaki/tools/*
 
 show_missing = True
 skip_covered = True
