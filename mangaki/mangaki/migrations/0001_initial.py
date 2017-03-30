@@ -308,6 +308,14 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='FAQTheme',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('order', models.IntegerField(unique=True)),
+                ('theme', models.CharField(max_length=200)),
+            ],
+        ),
+        migrations.CreateModel(
             name='FAQEntry',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -315,13 +323,6 @@ class Migration(migrations.Migration):
                 ('answer', models.TextField()),
                 ('pub_date', models.DateTimeField(auto_now_add=True, verbose_name='Date de publication')),
                 ('is_active', models.BooleanField(default=True)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='FAQTheme',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('order', models.IntegerField(unique=True)),
                 ('theme', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='entries', to='mangaki.FAQTheme')),
             ],
         ),
