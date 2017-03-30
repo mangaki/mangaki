@@ -10,7 +10,7 @@ from django.utils.timezone import utc
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mangaki', '0031_delete_deck'),
+        ('mangaki', '0001_squashed_0033_stafftype'),
     ]
 
     operations = [

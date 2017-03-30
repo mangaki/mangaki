@@ -19,8 +19,6 @@ def add_categories(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('mangaki', '0001_squashed'), ('mangaki', '0029_category'), ('mangaki', '0030_auto_20160127_1914'), ('mangaki', '0031_delete_deck'), ('mangaki', '0033_stafftype')]
-
     initial = True
 
     dependencies = [
