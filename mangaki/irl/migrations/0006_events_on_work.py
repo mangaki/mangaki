@@ -8,8 +8,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('irl', '0006_auto_20160415_2206'), ('irl', '0007_auto_20160415_2206')]
-
     dependencies = [
         ('irl', '0005_merge'),
     ]
