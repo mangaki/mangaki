@@ -1,6 +1,6 @@
 [run]
-source = mangaki
-omit = mangaki/*/tests/*.py, mangaki/*/migrations/*.py, mangaki/tools/*
+source = mangaki, irl
+omit = */tests/*.py, */migrations/*.py
 plugins = 
   django_coverage_plugin
 
