@@ -8,8 +8,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('mangaki', '0028_auto_20160124_1919'), ('mangaki', '0029_auto_20160124_1922')]
-
     dependencies = [
         ('mangaki', '0027_tops'),
     ]

@@ -10,7 +10,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
     dependencies = [
         ('contenttypes', '0002_remove_content_type_name'),
-        ('mangaki', '0026_auto_20160108_1137'),
+        ('mangaki', '0001_squashed_0026_auto_20160108_1137'),
     ]
 
     operations = [
