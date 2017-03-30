@@ -30,8 +30,6 @@ def create_stafftype(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('mangaki', '0001_squashed_0054_merge'), ('mangaki', '0036_artist_name'), ('mangaki', '0037_artistspelling'), ('mangaki', '0055_merge')]
-
     initial = True
 
     dependencies = [

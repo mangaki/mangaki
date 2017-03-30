@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('mangaki', '0036_trgm'),
-        ('mangaki', '0055_merge'),
+        ('mangaki', '0001_squashed_0055_merge'),
     ]
 
     operations = [
