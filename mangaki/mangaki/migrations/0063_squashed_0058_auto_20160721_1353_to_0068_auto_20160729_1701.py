@@ -8,8 +8,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('mangaki', '0058_auto_20160721_1353'), ('mangaki', '0059_auto_20160722_1243'), ('mangaki', '0060_auto_20160722_1522'), ('mangaki', '0061_auto_20160724_1351'), ('mangaki', '0062_tag_nb_works_linked'), ('mangaki', '0063_auto_20160724_1608'), ('mangaki', '0064_work_have_anidb_aid'), ('mangaki', '0065_remove_work_have_anidb_aid'), ('mangaki', '0066_work_have_anidb_id'), ('mangaki', '0067_auto_20160728_0855'), ('mangaki', '0068_auto_20160729_1701')]
-
     dependencies = [
         ('mangaki', '0062_auto_20160721_1254'),
     ]
