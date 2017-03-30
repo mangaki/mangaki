@@ -19,12 +19,15 @@ from django.db.models import Case, When, Value, Sum, IntegerField
 from django.views.generic.detail import SingleObjectMixin
 from django.db import connection, DatabaseError
 
+import allauth.account.views
+
 from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme, Trope
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import import_mal
 from mangaki.utils.ratings import (
-    current_user_ratings, current_user_rating, current_user_set_toggle_rating
+    get_anonymous_ratings, current_user_ratings,
+    current_user_rating, current_user_set_toggle_rating
 )
 from mangaki.utils.recommendations import get_reco_algo
 from irl.models import Event, Partner, Attendee
@@ -702,3 +705,32 @@ def generic_error_view(error, error_code):
             parameters['origin'] = trope.origin
         return render(request, 'error.html', parameters, status=error_code)
     return error_view
+
+class AnonymousRatingsMixin(object):
+    def get_context_data(self, **kwargs):
+        context = super(AnonymousRatingsMixin, self).get_context_data(**kwargs)
+        ratings = get_anonymous_ratings(self.request.session)
+        works = (
+            Work.objects.filter(id__in=ratings)
+                        .order_by('title')
+                        .group_by_category()
+        )
+        categories = Category.objects.filter(id__in=works).in_bulk()
+        context['ratings'] = [
+            (categories[category_id], [
+                {'choice': ratings[work.id], 'work': work}
+                for work in works_list
+            ])
+            for category_id, works_list in works.items()
+        ]
+        return context
+
+class SignupView(AnonymousRatingsMixin, allauth.account.views.SignupView):
+    pass
+
+signup = SignupView.as_view()
+
+class LoginView(AnonymousRatingsMixin, allauth.account.views.LoginView):
+    pass
+
+login = LoginView.as_view()
