@@ -19,8 +19,7 @@ test:
     - cd mangaki && python manage.py collectstatic --no-input
   override:
     - mkdir -p $CIRCLE_TEST_REPORTS/django
-    - cd mangaki && coverage run manage.py test --with-xunit --parallel --xunit-file=$CIRCLE_TEST_REPORTS/django/nosetests.xml
+    - cd mangaki && coverage run manage.py test --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/django/nosetests.xml
   post:
     - cd mangaki && coverage html -d $CIRCLE_ARTIFACTS
-    # CodeCov MUST absolutely run in the project root folder
     - cd mangaki && bash <(curl -s https://codecov.io/bash)
