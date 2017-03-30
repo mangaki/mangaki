@@ -9,8 +9,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('mangaki', '0001_squashed_0026_auto_20160108_1137'), ('mangaki', '0027_tops'), ('mangaki', '0028_auto_20160124_1919_squashed_0029_auto_20160124_1922')]
-
     dependencies = [
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

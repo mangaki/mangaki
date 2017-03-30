@@ -8,7 +8,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('irl', '0006_events_on_work'),
         ('mangaki', '0056_merge'),
     ]
 

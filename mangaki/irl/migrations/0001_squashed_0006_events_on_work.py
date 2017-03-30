@@ -9,13 +9,11 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('irl', '0001_initial'), ('irl', '0002_auto_20160110_2244'), ('irl', '0003_auto_20160124_1537'), ('irl', '0004_event_attendees'), ('irl', '0003_auto_20160124_1919'), ('irl', '0005_merge'), ('irl', '0006_events_on_work')]
-
     initial = True
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('mangaki', '0001_squashed'),
+        ('mangaki', '0001_squashed_0033_stafftype'),
     ]
 
     operations = [
