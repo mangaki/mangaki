@@ -1,5 +1,6 @@
 from django.conf import settings
 from mangaki.utils.chrono import Chrono
+from sklearn.metrics import mean_squared_error
 import pickle
 import os.path
 
@@ -41,6 +42,9 @@ class RecommendationAlgorithm:
 
     def get_backup_filename(self):
         return '%s.pickle' % self.get_shortname()
+
+    def compute_rmse(self, y_pred, y_test):
+        return mean_squared_error(y_pred, y_test) ** 0.5
 
     def __str__(self):
         return '[%s]' % self.get_shortname().upper()

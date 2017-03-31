@@ -1,6 +1,7 @@
 from sklearn.utils.extmath import randomized_svd
 from scipy.spatial.distance import pdist, squareform
 from numpy.random import choice
+from mangaki.utils import dpplib
 import numpy as np
 
 MAX_ITER_SAMPLE_DPP = 10
@@ -49,6 +50,18 @@ class MangakiUniform:
 
     def sample_k(self, nb_points):
         return choice(self.items, nb_points).tolist()
+
+
+class MangakiProxyDPP:
+    def __init__(self, vectors):
+        self.vectors = vectors
+        L = self.vectors.dot(self.vectors.T)
+        D, V = np.linalg.eig(L.T)
+        self.D = np.real(D)
+        self.V = np.real(V)
+
+    def sample_k(self, k):
+        return dpplib.sample_k(k, self.D, self.V)
 
 
 class MangakiDPP:
