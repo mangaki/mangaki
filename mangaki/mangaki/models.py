@@ -14,7 +14,6 @@ from django.db import models
 from django.db.models import CharField, F, Func, Lookup, Value
 
 from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
-from mangaki.discourse import get_discourse_data
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
 from mangaki.utils.ratingsmatrix import RatingsMatrix
@@ -365,13 +364,6 @@ class Profile(models.Model):
 
     def get_anime_count(self):
         return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike', 'favorite']).count()
-
-    def get_avatar_url(self):
-        if not self.avatar_url:
-            avatar_url = get_discourse_data(self.user.email)['avatar'].format(size=150)
-            self.avatar_url = avatar_url
-            self.save()
-        return self.avatar_url
 
 
 class Suggestion(models.Model):

@@ -429,7 +429,7 @@ def get_profile(request, username):
         'score': user.profile.score,
         'is_shared': is_shared,
         'category': category,
-        'avatar_url': user.profile.get_avatar_url(),
+        'avatar_url': user.profile.avatar_url,
         'member_days': member_time.days,
         'anime_count': len(seen_lists['anime']),
         'manga_count': len(seen_lists['manga']),
