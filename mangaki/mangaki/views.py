@@ -426,7 +426,6 @@ def get_profile(request, username):
 
     data = {
         'username': username,
-        'score': user.profile.score,
         'is_shared': is_shared,
         'category': category,
         'avatar_url': user.profile.get_avatar_url(),
