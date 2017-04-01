@@ -1,121 +1,75 @@
-import csv
-import os.path
-from collections import Counter
-
-import numpy as np
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
 
+from collections import defaultdict
+from sklearn.model_selection import ShuffleSplit
+import numpy as np
+import csv
+import os.path
+
+from mangaki.utils.data import Dataset
 from mangaki.utils.wals import MangakiWALS
 from mangaki.utils.als import MangakiALS
 from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.pca import MangakiPCA
 from mangaki.utils.zero import MangakiZero
-
 from mangaki.utils.values import rating_values
 
-import matplotlib.pyplot as plt
 
-TEST_SIZE = 0.2  # 20% is kept for the test set
+NB_SPLIT = 5  # Divide the dataset into 5 buckets
 
 
 class Experiment(object):
-    X = None
-    y = None
-    X_test = None
-    y_test = None
-    y_pred = None
-    results = {}
-    algos = None
-    def __init__(self, PIG_ID=None):
-        self.algos = [MangakiALS(20), MangakiWALS(20), MangakiSVD(20), MangakiPCA(20), MangakiKNN(20), MangakiZero()]
-        # self.results.setdefault('x_axis', []).append()
-        self.make_dataset(PIG_ID)
-        self.execute()
+    def __init__(self, dataset_name):
+        self.algos = [
+            lambda: MangakiALS(20),
+            # lambda: MangakiWALS(20),
+            lambda: MangakiSVD(20),
+            # lambda: MangakiPCA(20),
+            # lambda: MangakiKNN(20),
+            # lambda: MangakiZero()
+        ]
+        self.anonymized = None
+        self.load_dataset(dataset_name)
+        self.compare_models()
 
-    def clean_dataset(self):
-        self.X = []
-        self.y = []
-        self.X_test = []
-        self.y_test = []
-        self.y_pred = []
+    def load_dataset(self, dataset_name):
+        dataset = Dataset()
+        if dataset_name == 'movies':
+            dataset.load_csv('ratings-ml.csv')
+        else:
+            dataset.load_csv('ratings.csv', convert=lambda choice: rating_values[choice])
+        self.anonymized = dataset.anonymized
 
-    def make_dataset(self, PIG_ID):
-        self.clean_dataset()
-        with open(os.path.join(settings.BASE_DIR, '../data/ratings.csv')) as f:
-            ratings = [[int(line[0]), int(line[1]), line[2]] for line in csv.reader(f)]
-        ratings = np.array(ratings, dtype=np.object)
-        if PIG_ID:  # Let's focus on the PIG
-            pig_ratings = {}
-            for user_id, work_id, choice in ratings:
-                if user_id == PIG_ID:
-                    pig_ratings[work_id] = rating_values[choice]  # just choice for Movielens
-        self.nb_users = max(ratings[:, 0]) + 1
-        self.nb_works = max(ratings[:, 1]) + 1
-        with open(os.path.join(settings.BASE_DIR, '../data/works.csv')) as f:
-            self.works = [x for _, x in csv.reader(f)]
-        train, test = train_test_split(ratings, random_state=0, test_size=TEST_SIZE)
-        if PIG_ID:
-            train = ratings
-        self.X = train[:, 0:2]
-        self.y = list(map(lambda choice: rating_values[choice], train[:, 2]))  # train[:, 2] for Movielens
-        self.X_test = test[:, 0:2]
-        self.y_test = list(map(lambda choice: rating_values[choice], test[:, 2]))  # test[:, 2] for Movielens
-        if PIG_ID:
-            self.X_test = []
-            self.y_test = []
-            for work_id in range(self.nb_works):
-                self.X_test.append((PIG_ID, work_id))
-                self.y_test.append(0 if work_id not in pig_ratings else pig_ratings[work_id])
-            self.X_test = np.asarray(self.X_test)
-            self.y_test = np.asarray(self.y_test)
-
-    def execute(self):
-        for algo in self.algos:
-            print(algo)
-            algo.set_parameters(self.nb_users, self.nb_works)
-            # algo.load('backup.pickle')
-            algo.fit(self.X, self.y)
-            # algo.save('backup.pickle')
-            self.y_pred = algo.predict(self.X_test)
-            rmse = mean_squared_error(self.y_test, self.y_pred) ** 0.5
-            print('RMSE', rmse)
-            self.results.setdefault(algo.get_shortname(), []).append(rmse)
-
-    def display_ranking(self):
-        error = Counter()
-        print(len(self.X_test))
-        for rank, i in enumerate(sorted(range(len(self.X_test)), key=lambda i: -self.y_pred[i]), start=1):
-            if True or rank <= 100 or rank >= 8338 or self.X_test[i][1] == 491:
-                _, work_id = self.X_test[i]
-                if self.y_test[i]:
-                    print('%d. %s %f (was: %f)' % (rank, self.works[work_id], self.y_pred[i], self.y_test[i]))
-                    error[(self.works[work_id], self.y_pred[i], self.y_test[i])] = mean_squared_error([self.y_pred[i]], [self.y_test[i]])
-                else:
-                    print('%d. %s %f' % (rank, self.works[work_id], self.y_pred[i]))
-        print('Most deviated')
-        for (title, pred, true), _ in error.most_common(50):
-            if true < 0:
-                print(title, pred, true)
-
-    def display_chart(self):
-        handles = []
-        for algo in self.algos:
-            shortname = algo.get_shortname()
-            curve, = plt.plot(self.results['x_axis'], self.results[shortname], label=str(algo), linewidth=1 if shortname == 'svd' else algo.NB_NEIGHBORS / 15, color='red' if shortname == 'svd' else 'blue')
-            handles.append(curve)
-        plt.legend(handles=handles)
-        plt.show()
+    def compare_models(self):
+        k_fold = ShuffleSplit(n_splits=NB_SPLIT)
+        rmse_values = defaultdict(lambda: [])
+        for i_train, i_test in k_fold.split(self.anonymized.X):
+            for algo in self.algos:
+                model = algo()
+                print(model.get_shortname())
+                model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
+                model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
+                y_pred = model.predict(self.anonymized.X[i_test])
+                rmse = model.compute_rmse(y_pred, self.anonymized.y[i_test])
+                if model.verbose:
+                    print('Predicted:', y_pred[:5])
+                    print('Was:', self.anonymized.y[i_test][:5])
+                print('RMSE', rmse)
+                rmse_values[model.get_shortname()].append(rmse)
+        print('Final results')
+        for algo_name in rmse_values:
+            print('%s: RMSE = %f' % (algo_name, np.mean(rmse_values[algo_name])))
 
 
 class Command(BaseCommand):
     args = ''
     help = 'Compare recommendation algorithms'
 
+    def add_arguments(self, parser):
+        parser.add_argument('dataset_name', type=str)
+
     def handle(self, *args, **options):
-        experiment = Experiment()  # 1706
-        #experiment.display_ranking()
-        # experiment.display_chart()
+        dataset_name = options.get('dataset_name')
+        experiment = Experiment(dataset_name)

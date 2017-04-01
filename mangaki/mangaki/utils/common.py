@@ -5,12 +5,14 @@ import pickle
 import os.path
 
 
+VERBOSE = False
 PICKLE_DIR = os.path.join(settings.BASE_DIR, '../pickles')
 
 
 class RecommendationAlgorithm:
     def __init__(self):
-        self.chrono = Chrono(True)
+        self.verbose = VERBOSE
+        self.chrono = Chrono(self.verbose)
         self.nb_users = None
         self.nb_works = None
 

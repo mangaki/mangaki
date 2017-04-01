@@ -6,6 +6,8 @@ from mangaki.utils.values import rating_values
 from mangaki.utils.common import PICKLE_DIR
 import numpy as np
 from datetime import datetime
+from django.conf import settings
+import csv
 
 
 RATED_BY_AT_LEAST = 2
@@ -37,6 +39,17 @@ class Dataset:
         self.encode_work = backup.encode_work
         self.decode_work = backup.decode_work
         self.interesting_works = backup.interesting_works
+
+    def load_csv(self, filename, convert=float):
+        with open(os.path.join(settings.BASE_DIR, '../data', filename)) as f:
+            triplets = [[int(user_id), int(work_id), convert(rating)] for user_id, work_id, rating in csv.reader(f)]
+        triplets = np.array(triplets, dtype=np.object)
+        self.anonymized = AnonymizedData(
+            X=triplets[:, 0:2],
+            y=triplets[:, 2],
+            nb_users=max(triplets[:, 0]) + 1, 
+            nb_works=max(triplets[:, 1]) + 1
+        )
 
     def make_anonymous_data(self, queryset):
         triplets = []

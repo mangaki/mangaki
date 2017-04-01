@@ -45,13 +45,15 @@ class MangakiSVD(RecommendationAlgorithm):
         return matrix, means
 
     def fit(self, X, y):
-        print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
+        if self.verbose:
+            print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         matrix, self.means = self.make_matrix(X, y)
 
         self.chrono.save('fill and center matrix')
 
         self.U, self.sigma, self.VT = randomized_svd(matrix, self.NB_COMPONENTS, n_iter=self.NB_ITERATIONS, random_state=42)
-        print('Shapes', self.U.shape, self.sigma.shape, self.VT.shape)
+        if self.verbose:
+            print('Shapes', self.U.shape, self.sigma.shape, self.VT.shape)
         self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
 
         self.chrono.save('factor matrix')
@@ -115,4 +117,4 @@ class MangakiSVD(RecommendationAlgorithm):
         self.chrono.save('complete')
 
     def get_shortname(self):
-        return 'svd'
+        return 'svd-%d' % self.NB_COMPONENTS

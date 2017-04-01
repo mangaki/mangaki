@@ -61,7 +61,8 @@ class MangakiProxyDPP:
         self.V = np.real(V)
 
     def sample_k(self, k):
-        return dpplib.sample_k(k, self.D, self.V)
+        indices = dpplib.sample_k(k, self.D, self.V)
+        return [int(index) for index in indices]
 
 
 class MangakiDPP:
