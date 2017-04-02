@@ -1,4 +1,3 @@
-from mangaki.models import Recommendation, Rating, Profile
 from django.conf import settings
 
 
@@ -116,12 +115,8 @@ def current_user_set_toggle_rating(request, work, choice):
     if user.is_authenticated:
         old_ratings = user.rating_set.filter(work=work, choice=choice)
         if old_ratings:
-            # FIXME: Get rid of this.
-            update_score_while_unrating(user, work, choice)
             return None
         else:
-            # FIXME: Get rid of this.
-            update_score_while_rating(user, work, choice)
             user.rating_set.update_or_create(work=work, defaults={'choice': choice})
             return choice
     else:
@@ -138,30 +133,3 @@ def current_user_set_toggle_rating(request, work, choice):
         else:
             ratings_dict[work] = choice
             return choice
-
-
-def update_score_while_rating(user, work, choice):
-    recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
-    for reco in recommendations_list:
-        if choice == 'like':
-            reco.user.profile.score += 1
-        elif choice == 'favorite':
-            reco.user.profile.score += 5
-        if Rating.objects.filter(user=user, work=work, choice='like').count() > 0:
-            reco.user.profile.score -= 1
-        if Rating.objects.filter(user=user, work=work, choice='favorite').count() > 0:
-            reco.user.profile.score -= 5
-        Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
-
-
-def update_score_while_unrating(user, work, choice):
-    recommendations_list = Recommendation.objects.filter(target_user=user, work=work)
-    for reco in recommendations_list:
-        if choice == 'like':
-            reco.user.profile.score -= 1
-            Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
-        elif choice == 'favorite':
-            reco.user.profile.score -= 5
-            Profile.objects.filter(user=reco.user).update(score=reco.user.profile.score)
-
-

@@ -5,7 +5,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django_js_reverse.views import urls_js
 
-from discourse import views as discourse_views
 from mangaki import views
 from mangaki.settings import DEBUG
 
@@ -47,7 +46,6 @@ urlpatterns = [
     url(r'^reco_willsee/$', views.update_reco_willsee, name='reco-willsee'),
     url(r'^mal/(?P<mal_username>.+)$', views.import_from_mal, name='import-mal'),
     url(r'^admin/', admin.site.urls),
-    url(r'^discourse/sso$', discourse_views.sso),
     url(r'^about/$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}, name='cgu'),

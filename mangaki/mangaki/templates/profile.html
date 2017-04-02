@@ -8,7 +8,6 @@
     </div>
     <div class="col-xs-6">
         <h1>{{ username }}</h1>
-        <p><b>Score : {{ score }} pts</b></p>
         <p>Inscrit depuis {{ member_days }} jours</p>
         {% if events %}
         {% if request.user.username == username %}
@@ -72,7 +71,7 @@
            {% for user in best_neighbors_list %}
            <div class="row">
                <div class="col-xs-3">
-                   <img src="{{ user.profile.get_avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
+                   <img src="{{ user.profile.avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
                </div>
                <div class="col-xs-7">
                    <h4><a href="{% url 'profile' user.username %}">{{ user.username }}</a></h4>
