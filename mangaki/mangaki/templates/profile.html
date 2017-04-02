@@ -8,7 +8,6 @@
     </div>
     <div class="col-xs-6">
         <h1>{{ username }}</h1>
-        <p><b>Score : {{ score }} pts</b></p>
         <p>Inscrit depuis {{ member_days }} jours</p>
         {% if events %}
         {% if request.user.username == username %}

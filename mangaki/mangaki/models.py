@@ -360,7 +360,6 @@ class Profile(models.Model):
     reco_willsee_ok = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
-    score = models.IntegerField(default=0)
 
     def get_anime_count(self):
         return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike', 'favorite']).count()
@@ -383,22 +382,6 @@ class Suggestion(models.Model):
     ), default='ref')
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
-
-    def update_scores(self):
-        suggestions_score = 5 * Suggestion.objects.filter(user=self.user, is_checked=True).count()
-        recommendations_score = 0
-        reco_list = Recommendation.objects.filter(user=self.user)
-        for reco in reco_list:
-            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count() > 0:
-                recommendations_score += 1
-            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count() > 0:
-                recommendations_score += 5
-        score = suggestions_score + recommendations_score
-        Profile.objects.filter(user=self.user).update(score=score)
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        self.update_scores()
 
 
 class Neighborship(models.Model):
