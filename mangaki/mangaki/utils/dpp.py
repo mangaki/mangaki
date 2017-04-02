@@ -55,8 +55,10 @@ class MangakiUniform:
 class MangakiProxyDPP:
     def __init__(self, vectors):
         self.vectors = vectors
-        L = self.vectors.dot(self.vectors.T)
-        D, V = np.linalg.eig(L.T)
+        self.L = self.vectors.dot(self.vectors.T)
+
+    def subset(self, indices):
+        D, V = np.linalg.eig(self.L.T[np.ix_(indices, indices)])
         self.D = np.real(D)
         self.V = np.real(V)
 
