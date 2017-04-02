@@ -160,15 +160,6 @@ STATIC_ROOT = config.get('deployment', 'STATIC_ROOT', fallback=os.path.join(BASE
 MEDIA_ROOT = config.get('deployment', 'MEDIA_ROOT', fallback=os.path.join(BASE_DIR, 'media'))
 
 # External services
-if config.has_section('discourse'):
-    DISCOURSE_BASE_URL = config.get('discourse', 'DISCOURSE_BASE_URL')
-    DISCOURSE_SSO_SECRET = config.get('secrets', 'DISCOURSE_SSO_SECRET')
-    DISCOURSE_API_USERNAME = config.get('discourse', 'DISCOURSE_API_USERNAME')
-    DISCOURSE_API_KEY = config.get('secrets', 'DISCOURSE_API_KEY')
-    HAS_DISCOURSE = True
-else:
-    HAS_DISCOURSE = False
-
 if config.has_section('mal'):
     MAL_USER = config.get('mal', 'MAL_USER')
     MAL_PASS = config.get('secrets', 'MAL_PASS')
