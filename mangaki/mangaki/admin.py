@@ -233,14 +233,10 @@ class SuggestionAdmin(admin.ModelAdmin):
 
     def check_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=True)
-        users_list = []
         for suggestion in queryset:
             if suggestion.problem == 'ref':  # Reference suggestion
                 reference, created = Reference.objects.get_or_create(work=suggestion.work, url=suggestion.message)
                 reference.suggestions.add(suggestion)
-            if suggestion.user not in users_list:
-                users_list.append(suggestion.user)
-                suggestion.update_scores()
         if rows_updated == 1:
             message_bit = "1 suggestion"
         else:
@@ -250,11 +246,6 @@ class SuggestionAdmin(admin.ModelAdmin):
 
     def uncheck_suggestions(self, request, queryset):
         rows_updated = queryset.update(is_checked=False)
-        users_list = []
-        for suggestion in queryset:
-            if suggestion.user not in users_list:
-                users_list.append(suggestion.user)
-                suggestion.update_scores()
         if rows_updated == 1:
             message_bit = "1 suggestion"
         else:
