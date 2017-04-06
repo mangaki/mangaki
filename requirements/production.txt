@@ -12,3 +12,4 @@ django-js-reverse
 scikit-learn==0.18.*
 scipy
 pandas
+responses==0.5.1
