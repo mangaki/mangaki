@@ -36,7 +36,7 @@ def clear_anonymous_ratings(session):
     """
     Removes any existing anonymous ratings.
     """
-    del session[settings.ANONYMOUS_RATINGS_SESSION_KEY]
+    session.pop(settings.ANONYMOUS_RATINGS_SESSION_KEY, None)
 
 
 def current_user_ratings(request, works=None):

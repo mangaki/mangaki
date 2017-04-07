@@ -715,6 +715,17 @@ class AnonymousRatingsMixin(object):
                         .group_by_category()
         )
         categories = Category.objects.filter(id__in=works).in_bulk()
+        # Build the tree of ratings. This is a list of pairs (category, works)
+        # where category is a Category object and works is the list of ratings
+        # for objects of this category. works itself is a list of dictionnaries
+        # {'work', 'choice'} where the 'work' key corresponds to the Work
+        # object that was rated and 'choice' corresponds to the rating.
+        #
+        # Example:
+        # [
+        # (anime_category, [{'choice': 'like', 'work': Work()}, {'choice': 'dislike', 'work': Work()}]),
+        # (manga_ategory, [{'choice': 'like', 'work': Work()}])
+        # ]
         context['ratings'] = [
             (categories[category_id], [
                 {'choice': ratings[work.id], 'work': work}

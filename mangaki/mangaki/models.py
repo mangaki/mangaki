@@ -90,7 +90,8 @@ class WorkQuerySet(models.QuerySet):
 
     def group_by_category(self):
         """
-        Groups this queryset by category.
+        Groups this queryset by category. This returns a dictionnary mapping
+        categories to the corresponding works in the queryset.
 
         Returns:
           by_category -- A mapping from category IDs to the list of works in
