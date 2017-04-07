@@ -25,83 +25,88 @@
     <script src="/static/js/tooltip.js"></script>
     <script src="/static/cookielaw/js/cookielaw.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/static/css/bootstrap-switch.min.css" />
-    <link rel="stylesheet" href="/static/css/typeahead.css" />
-    <link rel="stylesheet" href="/static/css/skin.css" />
-    <link rel="stylesheet" href="/static/css/test.css" />
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/css/bootstrap-switch.min.css"/>
+    <link rel="stylesheet" href="/static/css/typeahead.css"/>
+    <link rel="stylesheet" href="/static/css/skin.css"/>
+    <link rel="stylesheet" href="/static/css/test.css"/>
     <!-- Social Share Kit CSS -->
-    <link rel="stylesheet" href="/static/css/social-share-kit.css" />
+    <link rel="stylesheet" href="/static/css/social-share-kit.css"/>
     {% analytical_head_bottom %}
 </head>
 
 <body>
-    {% analytical_body_top %}
-    {% cookielaw_banner %}
-    <header class="navbar navbar-default">
-        <nav class="navbar navbar-default" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-collapse">
-                        <span class="sr-only">Ouvrir le menu</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="{% url 'home' %}">
-                        <img src="/static/img/minilogo.png" style="margin-top: -10px; margin-left: 5px" />
-                    </a>
-                </div>
+{% analytical_body_top %}
+{% cookielaw_banner %}
 
-                <div class="collapse navbar-collapse" id="menu-collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href="{% url 'about' %}">
-                                C'est quoi ?
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href="{% url 'work-list' 'anime' %}">
-                                Anime
-                            </a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="{% url 'work-list' 'manga' %}">
-                                Mangas
-                            </a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="{% url 'reco' %}">
-                                Recommandations
-                            </a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="{% url 'events' %}">
-                                Événements
-                            </a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="{% url 'top' 'directors' %}">
-                                Top 20
-                            </a>
-                        </li>
-                    </ul>
-
-                    <ul class="nav navbar-nav navbar-right">
-                    {% if not user.is_authenticated %}
-                        <li><a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
-                        <li><a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}"><span class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
-                    {% else %}
-                        <li><a href="{% url 'profile' user.username %}">Bienvenue, <strong>{{ user.username }}</strong> !</a></li>
-                        <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Quitter</a></li>
-                    {% endif %}
-                    </ul>
-                </div>
+<header class="navbar navbar-default">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#menu-collapse">
+                    <span class="sr-only">Ouvrir le menu</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <img src="/static/img/minilogo.png" style="margin-top: -10px; margin-left: 5px"/>
+                </a>
             </div>
-        </nav>
-    </header>
+
+            <div class="collapse navbar-collapse" id="menu-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="{% url 'about' %}">
+                            C'est quoi ?
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="{% url 'work-list' 'anime' %}">
+                            Anime
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="{% url 'work-list' 'manga' %}">
+                            Mangas
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="{% url 'reco' %}">
+                            Recommandations
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="{% url 'events' %}">
+                            Événements
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="{% url 'top' 'directors' %}">
+                            Top 20
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    {% if not user.is_authenticated %}
+                        <li><a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"><span
+                                class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
+                        <li><a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}"><span
+                                class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
+                    {% else %}
+                        <li><a href="{% url 'profile' user.username %}">Bienvenue, <strong>{{ user.username }}</strong> !</a>
+                        </li>
+                        <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Quitter</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
 {% if request|has_anonymous_ratings and request|should_show_anonymous_banner%}
     <div class="alert alert-warning anonymous-rating-alert">
         Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les
@@ -112,34 +117,38 @@
 </header>
 
 
-    <div class="container">
-        {% block body %}{% endblock %}
-    </div>
 
-    <footer>
-        <nav class="navbar navbar-default">
-            <div class="navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="{% url 'about' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le projet</a></li>
-                    <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
-                    <li><a href="{% url 'cgu' %}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
-                    <li><a href="https://twitter.com/mangakifr" target="_blank">@mangakifr</a></li>
-                    <li><a href="mailto:jjv@lri.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Contact : jjv@lri.fr</a></li>
-                    <li><a href="https://github.com/mangaki/mangaki/issues" target="_blank"><span class="glyphicon glyphicon-fire"></span>&nbsp;Signaler un bug</a></li>
-                </ul>
-            </div>
-        </nav>
-    </footer>
-    {% block extrajs %}{% endblock %}
-    <script>
-        $("nav [href='{{ request.path }}']").parents("li").addClass('active');
-    </script>
+<div class="container">
+    {% block body %}{% endblock %}
+</div>
 
-    <script>
-        $(function () {
-          $('[data-toggle="tooltip"]').tooltip()
-        })
-    </script>
-    {% analytical_body_bottom %}
-    </body>
+<footer>
+    <nav class="navbar navbar-default">
+        <div class="navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{% url 'about' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le
+                    projet</a></li>
+                <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
+                <li><a href="{% url 'cgu' %}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
+                <li><a href="https://twitter.com/mangakifr" target="_blank">@mangakifr</a></li>
+                <li><a href="mailto:jjv@lri.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Contact :
+                    jjv@lri.fr</a></li>
+                <li><a href="https://github.com/mangaki/mangaki/issues" target="_blank"><span
+                        class="glyphicon glyphicon-fire"></span>&nbsp;Signaler un bug</a></li>
+            </ul>
+        </div>
+    </nav>
+</footer>
+{% block extrajs %}{% endblock %}
+<script>
+    $("nav [href='{{ request.path }}']").parents("li").addClass('active');
+</script>
+
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+{% analytical_body_bottom %}
+</body>
 </html>

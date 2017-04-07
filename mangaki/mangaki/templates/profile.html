@@ -2,155 +2,232 @@
 
 {% block body %}
 
-<div class="row">
-    <div class="col-xs-2">
-        <img src="{{ avatar_url }}" alt="Avatar de {{ username }}" id="avatar" />
-    </div>
-    <div class="col-xs-6">
-        <h1>{{ username }}</h1>
-        <p>Inscrit depuis {{ member_days }} jours</p>
-        {% if events %}
-        {% if request.user.username == username %}
-        <h4>Mes événements</h4>
-        {% else %}
-        <h4>Ses événements</h4>
-        {% endif %}
-        <p>
-        <ul>
-          {% for event in events %}
-              <li>{{ event.type|capfirst }} <a href="{% url 'work-detail' 'anime' event.work_id %}"><em>{{ event.title }}</em></a> le <strong>{{ event.date }}</strong>{% if event.type == 'tv' %}
-              sur {{ event.channel }}{% elif event.location %},
-              {% if event.link %}
-                  <a href="{{ event.link }}" target="_blank">{{ event.location }}</a>
-              {% else %}
-                  {{ event.location }}
-              {% endif %}
-              {% endif %}
-              </li>
-         {% endfor %}
-        </ul>
-        </p>
-        {% endif %}
-    </div>
-    <div class="col-xs-4">
-        {% if request.user.username == username %}
-            <br />
-            Profil public : <input type="checkbox" name="is_shared" {% if user.profile.is_shared %} checked{% endif %}/>
-            <hr />
-	    Afficher visuels pour public averti : <input type="checkbox" name="nsfw_ok" {% if user.profile.nsfw_ok %} checked{% endif %}/>
-            <hr />
-	    Recevoir la newsletter : <input type="checkbox" name="newsletter_ok" {% if user.profile.newsletter_ok %} checked{% endif %}/>
-            <hr />
-            <p>Importer depuis myAnimeList :</p>
-            <div class="input-group">
-                <input type="text" class="form-control" id="mal_username" placeholder="Ton login" onkeydown="if(event.keyCode == 13) {$('#import_mal').click(); this.value = ''};" />
-                <span class="input-group-btn">
-                    <button id="import_mal" class="btn btn-default">OK</button>
-                </span>
+    <div class="row">
+        {% if not is_anonymous %}
+            <div class="col-xs-2">
+                <img src="{{ avatar_url }}" alt="Avatar de {{ username }}" id="avatar"/>
             </div>
         {% endif %}
+
+        <div class="col-xs-6 col-lg-8">
+            {% if not is_anonymous %}
+                <h1>{{ username }}</h1>
+            {% else %}
+                <h1>Mes notes</h1>
+                <h2>Inscrivez-vous pour pouvoir les sauvegarder!</h2>
+                <a href="{% url 'remove-all-anon-ratings' %}">Supprimer toutes mes notes</a>
+            {% endif %}
+
+            {% if member_days %}
+                <p>Inscrit depuis {{ member_days }} jours</p>
+            {% endif %}
+            {% if events %}
+                {% if request.user.username == username %}
+                    <h4>Mes événements</h4>
+                {% else %}
+                    <h4>Ses événements</h4>
+                {% endif %}
+                <p>
+                <ul>
+                    {% for event in events %}
+                        <li>{{ event.type|capfirst }} <a
+                                href="{% url 'work-detail' 'anime' event.work_id %}"><em>{{ event.title }}</em></a> le
+                            <strong>{{ event.date }}</strong>{% if event.type == 'tv' %}
+                                sur {{ event.channel }}{% elif event.location %},
+                                {% if event.link %}
+                                    <a href="{{ event.link }}" target="_blank">{{ event.location }}</a>
+                                {% else %}
+                                    {{ event.location }}
+                                {% endif %}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+                </p>
+            {% endif %}
+        </div>
+        <div class="col-xs-4">
+            {% if request.user.username == username %}
+                <br/>
+                Profil public :
+                <input type="checkbox" name="is_shared" {% if user.profile.is_shared %} checked{% endif %}/>
+                <hr/>
+                Afficher visuels pour public averti :
+                <input type="checkbox" name="nsfw_ok" {% if user.profile.nsfw_ok %} checked{% endif %}/>
+                <hr/>
+                Recevoir la newsletter :
+                <input type="checkbox" name="newsletter_ok" {% if user.profile.newsletter_ok %} checked{% endif %}/>
+                <hr/>
+                <p>Importer depuis myAnimeList :</p>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="mal_username" placeholder="Ton login"
+                           onkeydown="if(event.keyCode == 13) {$('#import_mal').click(); this.value = ''};"/>
+                    <span class="input-group-btn">
+                    <button id="import_mal" class="btn btn-default">OK</button>
+                </span>
+                </div>
+            {% endif %}
+        </div>
     </div>
-</div>
-
-<ul class="nav nav-tabs">
-    <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'profile' username %}">Liste d'<em>anime</em> de {{ username }} <span class="badge alert-info">{{ anime_count }}</span></a></li>
-    <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'profile' username %}?category=manga">Liste de mangas de {{ username }} <span class="badge alert-info">{{ manga_count }}</span></a></li>
-    <li role="presentation"{% if category == 'recommendation' %} class="active"{% endif %}><a href="{% url 'profile' username %}?category=recommendation">Liste de recommandations de {{ username }} <span class="badge alert-info">{{ reco_count }}</span></a></li>
-    {% if best_neighbors_list %}
-    <li role="presentation"{% if category == 'neighbor' %} class="active"{% endif %}><a href="{% url 'profile' username %}?category=neighbor">Les {{ neighbor_count }} plus proches voisins de {{ username }}</a></li>
+    {% if not is_anonymous %}
+        <ul class="nav nav-tabs">
+            <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a
+                    href="{% url 'profile' username %}">Liste d'<em>anime</em> de {{ username }} <span
+                    class="badge alert-info">{{ anime_count }}</span></a></li>
+            <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a
+                    href="{% url 'profile' username %}?category=manga">Liste de mangas de {{ username }} <span
+                    class="badge alert-info">{{ manga_count }}</span></a></li>
+            <li role="presentation"{% if category == 'recommendation' %} class="active"{% endif %}><a
+                    href="{% url 'profile' username %}?category=recommendation">Liste de recommandations
+                de {{ username }} <span class="badge alert-info">{{ reco_count }}</span></a></li>
+            {% if best_neighbors_list %}
+                <li role="presentation"{% if category == 'neighbor' %} class="active"{% endif %}><a
+                        href="{% url 'profile' username %}?category=neighbor">Les {{ neighbor_count }} plus proches
+                    voisins de {{ username }}</a></li>
+            {% endif %}
+        </ul>
     {% endif %}
-</ul>
-<div class="row mangas-list{% if request.user.username != username %} another{% endif %}">
-    {% if not is_shared %}
-        <br />
-        <p class="well">Le profil de {{ username }} n'est pas public.</p>
-    {% else %}
-    {% if best_neighbors_list and category == 'neighbor' %}
-        <div class="col-xs-4 col-xs-offset-1">
-           <h1>Les {{ neighbor_count }} plus proches voisins de {{ username }}</h1>
-           {% for user in best_neighbors_list %}
-           <div class="row">
-               <div class="col-xs-3">
-                   <img src="{{ user.profile.avatar_url }}" alt="Avatar de {{ user.username }}" id="avatar" />
-               </div>
-               <div class="col-xs-7">
-                   <h4><a href="{% url 'profile' user.username %}">{{ user.username }}</a></h4>
-                   <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
-               </div>
-           </div>
-           {% endfor %}
-        </div>
-    {% else %}
-    {% if category == 'recommendation' %}
-        <div class="col-xs-4 col-xs-offset-1">
-            <h1>Recommandations envoyées</h1>
-            {% for object in sent_recommendation_list %}
-                <p class="row flatlist"><a href="{% url 'work-detail' object.category object.id %}">{{ object.title }}</a> a été conseillé à <a href="{% url 'profile' object.username %}">{{ object.username }}</a> {% if request.user.username == username %}<a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}" data-target="{{ object.username }}" data-user="{{ username }}" onclick="removeReco(this)" title="supprimer la recommandation"><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
-            {% empty %}
-                <p>(Cette liste est vide.)</p>
-            {% endfor %}
-        </div>
-        <div class="col-xs-4 col-xs-offset-1">
-            <h1>Recommandations reçues</h1>
-            {% for object in received_recommendation_list %}
-                <p class="row flatlist"><a href="{% url 'work.detail' object.category object.id %}">{{ object.title }}</a> vous a été conseillé par <a href="{% url 'profile' object.username %}">{{ object.username }}</a> {% if request.user.username == username %}<a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}" data-target="{{ username }}" data-user="{{ object.username }}" onclick="removeReco(this)" title="supprimer la recommandation"><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
-            {% empty %}
-                <p>(Cette liste est vide.)</p>
-            {% endfor %}
-	    {% if request.user.username == username and received_recommendation_list %}<p class="row flatlist"><a class="btn btn-danger" data-target="{{ username }}" onclick="removeAllReco(this)" title="supprimer toutes les recommandations reçues"><span class="label label-danger"><span class="glyphicon glyphicon-remove"></span> Supprimer toutes les recommandations reçues</span></a></p>{% endif %}
-        </div>
-    {% else %}
-        <div class="col-xs-4 col-xs-offset-1">
-            <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a> vus{% else %}<a href="{% url 'work-list' 'manga' %}">Mangas</a> lus{% endif %}</h1>
-            {% include "works_no_poster.html" with works=seen_list class=category %}
-        </div>
-        <div class="col-xs-4 col-xs-offset-1">
-            <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a> à voir (ou non){% else %}<a href="{% url 'work-list' 'manga' %}">Mangas</a> à lire (ou pas){% endif %}</h1>
-            {% include "works_no_poster.html" with works=unseen_list class=category %}
-        </div>
-        </div>
-    {% endif %}
-    {% endif %}
-    {% endif %}
-</div>
-<br />
-<br />
-<br />
-<script>
-$("[name='is_shared']").bootstrapSwitch();
-$("[name='is_shared']").on('switchChange.bootstrapSwitch', function(event, state) {
-    $.post(Urls['shared'](), {is_shared: state});
-});
-$("[name='nsfw_ok']").bootstrapSwitch();
-$("[name='nsfw_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
-    $.post(Urls['nsfw'](), {nsfw_ok: state});
-});
-$("[name='newsletter_ok']").bootstrapSwitch();
-$("[name='newsletter_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
-    $.post(Urls['newsletter'](), {newsletter_ok: state});
-});
-$("#import_mal").on('click', function() {
-    $.post(Urls['import-mal']($('#mal_username').val()), function(data) {
-        console.log(data);
-        location.reload();
-    });
-});
+    <div class="row mangas-list{% if request.user.username != username and not is_anonymous %} another{% endif %}">
+        {% if not is_shared %}
+            <br/>
+            <p class="well">Le profil de {{ username }} n'est pas public.</p>
+        {% else %}
+            {% if best_neighbors_list and category == 'neighbor' and not is_anonymous %}
+                <div class="col-xs-4 col-xs-offset-1">
+                    <h1>Les {{ neighbor_count }} plus proches voisins de {{ username }}</h1>
+                    {% for user in best_neighbors_list %}
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <img src="{{ user.profile.avatar_url }}" alt="Avatar de {{ user.username }}"
+                                     id="avatar"/>
+                            </div>
+                            <div class="col-xs-7">
+                                <h4><a href="{% url 'profile' user.username %}">{{ user.username }}</a></h4>
+                                <p>Nombre d'<em>œuvres</em> vues : {{ user.profile.get_anime_count }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {% if category == 'recommendation' %}
+                    <div class="col-xs-4 col-xs-offset-1">
+                        <h1>Recommandations envoyées</h1>
+                        {% for object in sent_recommendation_list %}
+                            <p class="row flatlist"><a
+                                    href="{% url 'work-detail' object.category object.id %}">{{ object.title }}</a> a
+                                été conseillé à <a href="{% url 'profile' object.username %}">{{ object.username }}</a>
+                                {% if request.user.username == username %}
+                                    <a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}"
+                                       data-target="{{ object.username }}" data-user="{{ username }}"
+                                       onclick="removeReco(this)" title="supprimer la recommandation"><span
+                                            class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
+                        {% empty %}
+                            <p>(Cette liste est vide.)</p>
+                        {% endfor %}
+                    </div>
+                    <div class="col-xs-4 col-xs-offset-1">
+                        <h1>Recommandations reçues</h1>
+                        {% for object in received_recommendation_list %}
+                            <p class="row flatlist"><a
+                                    href="{% url 'work.detail' object.category object.id %}">{{ object.title }}</a> vous
+                                a été conseillé par <a
+                                        href="{% url 'profile' object.username %}">{{ object.username }}</a>
+                                {% if request.user.username == username %}
+                                    <a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}"
+                                       data-target="{{ username }}" data-user="{{ object.username }}"
+                                       onclick="removeReco(this)" title="supprimer la recommandation"><span
+                                            class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
+                        {% empty %}
+                            <p>(Cette liste est vide.)</p>
+                        {% endfor %}
+                        {% if request.user.username == username and received_recommendation_list %}
+                            <p class="row flatlist"><a class="btn btn-danger" data-target="{{ username }}"
+                                                       onclick="removeAllReco(this)"
+                                                       title="supprimer toutes les recommandations reçues"><span
+                                    class="label label-danger"><span class="glyphicon glyphicon-remove"></span> Supprimer toutes les recommandations reçues</span></a>
+                            </p>{% endif %}
+                    </div>
+                {% else %}
+                    {% if show_all_categories %}
+                        {% for category, seen_list, unseen_list in categories %}
+                            <div class="col-xs-6 col-xs-offset1">
+                                <h1>
+                                    <a href="{% url 'work-list' category %}">{{ category | title }}</a>
+                                    {% if category == 'manga' %} lus
+                                    {% elif category == 'anime' %} vus
+                                    {% elif category == 'album' %} écoutés
+                                    {% else %} lus/vus/écoutés {% endif %}
+                                </h1>
+                                {% include "works_no_poster.html" with works=seen_list class=category %}
+                            </div>
+                            <div class="col-xs-6 col-xs-offset1">
+                                <h1>
+                                    <a href="{% url 'work-list' category %}">{{ category | title }}</a>
+                                    {% if category == 'manga' %} à lire
+                                    {% elif category == 'anime' %} à voir
+                                    {% elif category == 'album' %} à écouter
+                                    {% else %} à lire / à voir / à écouter
+                                    {% endif %}
+                                </h1>
+                                {% include "works_no_poster.html" with works=unseen_list class=category %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-xs-4 col-xs-offset-1">
+                            <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a>
+                                vus{% else %}<a href="{% url 'work-list' 'manga' %}">Mangas</a> lus{% endif %}</h1>
+                            {% include "works_no_poster.html" with works=seen_list class=category %}
+                        </div>
+                        <div class="col-xs-4 col-xs-offset-1">
+                            <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a> à voir (ou
+                                non){% else %}<a href="{% url 'work-list' 'manga' %}">Mangas</a> à lire (ou
+                                pas){% endif %}</h1>
+                            {% include "works_no_poster.html" with works=unseen_list class=category %}
+                        </div>
+                    {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+    <br/>
+    <br/>
+    <br/>
+    <script>
+        $("[name='is_shared']").bootstrapSwitch();
+        $("[name='is_shared']").on('switchChange.bootstrapSwitch', function (event, state) {
+            $.post(Urls['shared'](), {is_shared: state});
+        });
+        $("[name='nsfw_ok']").bootstrapSwitch();
+        $("[name='nsfw_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
+            $.post(Urls['nsfw'](), {nsfw_ok: state});
+        });
+        $("[name='newsletter_ok']").bootstrapSwitch();
+        $("[name='newsletter_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
+            $.post(Urls['newsletter'](), {newsletter_ok: state});
+        });
+        $("#import_mal").on('click', function () {
+            $.post(Urls['import-mal']($('#mal_username').val()), function (data) {
+                console.log(data);
+                location.reload();
+            });
+        });
 
-function removeReco(elt) {
-  var $elt = $(elt);
-  $.post(Urls['remove-reco']($elt.data('work'), $elt.data('user'), $elt.data('target')));
-  setTimeout(function(){
-    location.reload();
-  }, 500);
-}
+        function removeReco(elt) {
+            var $elt = $(elt);
+            $.post(Urls['remove-reco']($elt.data('work'), $elt.data('user'), $elt.data('target')));
+            setTimeout(function () {
+                location.reload();
+            }, 500);
+        }
 
-function removeAllReco(elt) {
-  $.post(Urls['remove-all-reco']($(elt).data('target')));
-  setTimeout(function(){
-    location.reload();
-  }, 1000);
-}
-</script>
+        function removeAllReco(elt) {
+            $.post(Urls['remove-all-reco']($(elt).data('target')));
+            setTimeout(function () {
+                location.reload();
+            }, 1000);
+        }
+    </script>
 
-<script src="{% url 'js_reverse' %}" type="text/javascript"></script>
+    <script src="{% url 'js_reverse' %}" type="text/javascript"></script>
 {% endblock %}

@@ -1,4 +1,3 @@
-from django.conf.urls import handler400, handler403, handler404
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
@@ -7,9 +6,6 @@ from django_js_reverse.views import urls_js
 
 from mangaki import views
 from mangaki.settings import DEBUG
-
-#if settings.DEBUG:
-    
 
 urlpatterns = [
     # Examples:
@@ -67,7 +63,7 @@ handler400 = views.generic_error_view("Ta requête est incorrecte.", 400)
 
 if DEBUG:  # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
     import debug_toolbar
+
     urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    # urlpatterns += 
+                       url(r'^__debug__/', include(debug_toolbar.urls)),
+                   ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

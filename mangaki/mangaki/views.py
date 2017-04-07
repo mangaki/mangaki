@@ -105,11 +105,11 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         nb = Counter(Rating.objects.filter(work=self.object).values_list('choice', flat=True))
         labels = OrderedDict([
             ('favorite', 'Ajoutés aux favoris'),
-            ('like',     'Ont aimé'),
-            ('neutral',  'Neutre'),
-            ('dislike',  'N\'ont pas aimé'),
-            ('willsee',  'Ont envie de voir'),
-            ('wontsee',  'N\'ont pas envie de voir'),
+            ('like', 'Ont aimé'),
+            ('neutral', 'Neutre'),
+            ('dislike', 'N\'ont pas aimé'),
+            ('willsee', 'Ont envie de voir'),
+            ('wontsee', 'N\'ont pas envie de voir'),
         ])
         seen_ratings = {'favorite', 'like', 'neutral', 'dislike'}
         total = sum(nb.values())
@@ -122,13 +122,13 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
                 context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': label})
             context['seen_percent'] = round(100 * seen_total / float(total))
 
-        events = self.object.event_set\
-            .filter(date__gte=timezone.now())\
+        events = self.object.event_set \
+            .filter(date__gte=timezone.now()) \
             .annotate(nb_attendees=Sum(Case(
-                When(attendee__attending=True, then=Value(1)),
-                default=Value(0),
-                output_field=IntegerField(),
-            )))
+            When(attendee__attending=True, then=Value(1)),
+            default=Value(0),
+            output_field=IntegerField(),
+        )))
         if len(events) > 0:
             my_events = {}
             if self.request.user.is_authenticated:
@@ -264,7 +264,7 @@ class WorkList(WorkListMixin, ListView):
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
         if self.search() is not None and sort == default:
-            return 'popularity' # Mosaic cannot be searched through because it is random. We enforce the popularity as the second default when searching.
+            return 'popularity'  # Mosaic cannot be searched through because it is random. We enforce the popularity as the second default when searching.
         else:
             return sort
 
@@ -287,7 +287,7 @@ class WorkList(WorkListMixin, ListView):
             queryset = queryset.controversial()
         elif sort_mode == 'alpha':
             letter = self.request.GET.get('letter', '0')
-            if letter == '0': # '#'
+            if letter == '0':  # '#'
                 queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
             else:
                 queryset = queryset.filter(title__istartswith=letter)
@@ -323,7 +323,7 @@ class WorkList(WorkListMixin, ListView):
             context['object_list'] = [
                 Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
                 for _ in range(4)
-                ]
+            ]
 
         return context
 
@@ -349,6 +349,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
 
 class UserList(ListView):
     model = User
+
     # context_object_name = 'anime'
 
     def get_queryset(self):
@@ -378,7 +379,8 @@ class UserList(ListView):
             user_list = paginator.page(paginator.num_pages)
         context['params'] = {'letter': letter, 'page': page}
         context['url'] = urlencode({'letter': letter})
-        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages, range(user_list.number - 2, user_list.number + 2 + 1))
+        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages,
+                                  range(user_list.number - 2, user_list.number + 2 + 1))
         context['object_list'] = user_list
 
         context['trio_elm'] = User.objects.filter(username__in=['jj', 'Lily', 'Sedeto'])
@@ -526,7 +528,8 @@ def events(request):
                 uta_rating = rating.choice
     ghibli_works = Work.objects.in_bulk(GHIBLI_IDS)
     if request.user.is_authenticated:
-        ghibli_ratings = dict(Rating.objects.filter(user=request.user, work_id__in=GHIBLI_IDS).values_list('work_id', 'choice'))
+        ghibli_ratings = dict(
+            Rating.objects.filter(user=request.user, work_id__in=GHIBLI_IDS).values_list('work_id', 'choice'))
     else:
         ghibli_ratings = {}
     utamonogatari = Work.objects.in_bulk([UTA_ID])
@@ -568,6 +571,7 @@ def top(request, category_slug):
         'top': data,
     })
 
+
 def rate_work(request, work_id):
     if request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -590,7 +594,8 @@ def dpp_work(request, work_id):
         work = get_object_or_404(Work, id=work_id)
         choice = request.POST.get('choice', '')
         if choice not in ['like', 'dislike', 'dontknow']:
-            raise SuspiciousOperation("Attempted access denied. There are only 3 ratings here: like, dislike and dontknow")
+            raise SuspiciousOperation(
+                "Attempted access denied. There are only 3 ratings here: like, dislike and dontknow")
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
     raise SuspiciousOperation("Attempted access denied. You are not logged in or it is currently a GET request")
@@ -604,7 +609,8 @@ def recommend_work(request, work_id, target_id):
             return HttpResponse('nonsense')
         if Recommendation.objects.filter(user=request.user, work=work, target_user=target_user).count() > 0:
             return HttpResponse('double')
-        if not Rating.objects.filter(user=target_user, work=work, choice__in=['favorite', 'like', 'neutral', 'dislike']):
+        if not Rating.objects.filter(user=target_user, work=work,
+                                     choice__in=['favorite', 'like', 'neutral', 'dislike']):
             Recommendation.objects.update_or_create(user=request.user, work=work, target_user=target_user)
             return HttpResponse('success')
     return HttpResponse()
@@ -620,7 +626,8 @@ def get_users(request, query=''):
 def get_user_for_recommendations(request, work_id, query=''):
     data = []
     for user in User.objects.all() if not query else User.objects.filter(username__icontains=query):
-        data.append({'id': user.id, 'username': user.username, 'work_id': work_id, 'tokens': user.username.lower().split()})
+        data.append(
+            {'id': user.id, 'username': user.username, 'work_id': work_id, 'tokens': user.username.lower().split()})
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -652,8 +659,10 @@ def get_reco_algo_list(request, algo, category):
     works = data['works']
     for work_id in data['work_ids']:
         work = works[work_id]
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis, 'category': work.category.slug})
+        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
+                          'category': work.category.slug})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
+
 
 def get_reco_list_dpp(request, category):
     reco_list_dpp = []
@@ -661,7 +670,8 @@ def get_reco_list_dpp(request, category):
     works = data['works']
     for work_id in data['work_ids']:
         work = works[work_id]
-        reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis, 'category': work.category.slug})
+        reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
+                              'category': work.category.slug})
     return HttpResponse(json.dumps(reco_list_dpp), content_type='application/json')
 
 
@@ -669,7 +679,9 @@ def remove_reco(request, work_id, username, targetname):
     work = get_object_or_404(Work, id=work_id)
     user = get_object_or_404(User, username=username)
     target = get_object_or_404(User, username=targetname)
-    if Rating.objects.filter(user=target, work=work, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0 and (request.user == user or request.user == target):
+    if Rating.objects.filter(user=target, work=work,
+                             choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0 and (
+                request.user == user or request.user == target):
         Recommendation.objects.get(work=work, user=user, target_user=target).delete()
 
 
@@ -678,7 +690,8 @@ def remove_all_reco(request, targetname):
     if target == request.user:
         reco_list = Recommendation.objects.filter(target_user=target)
         for reco in reco_list:
-            if Rating.objects.filter(user=request.user, work=reco.work, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+            if Rating.objects.filter(user=request.user, work=reco.work,
+                                     choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
                 reco.delete()
 
 
@@ -739,11 +752,14 @@ def add_pairing(request, artist_id, work_id):
 
 def faq_index(request):
     latest_theme_list = FAQTheme.objects.order_by('order')
-    all_information = [[faqtheme.theme, [(entry.question, entry.answer) for entry in faqtheme.entries.filter(is_active=True).order_by('-pub_date')]] for faqtheme in latest_theme_list]
+    all_information = [[faqtheme.theme, [(entry.question, entry.answer) for entry in
+                                         faqtheme.entries.filter(is_active=True).order_by('-pub_date')]] for faqtheme in
+                       latest_theme_list]
     context = {
         'information': all_information,
     }
     return render(request, 'faq/faq_index.html', context)
+
 
 def generic_error_view(error, error_code):
     def error_view(request):
@@ -760,16 +776,18 @@ def generic_error_view(error, error_code):
             parameters['trope'] = trope
             parameters['origin'] = trope.origin
         return render(request, 'error.html', parameters, status=error_code)
+
     return error_view
 
-class AnonymousRatingsMixin(object):
+
+class AnonymousRatingsMixin:
     def get_context_data(self, **kwargs):
-        context = super(AnonymousRatingsMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         ratings = get_anonymous_ratings(self.request.session)
         works = (
             Work.objects.filter(id__in=ratings)
-                        .order_by('title')
-                        .group_by_category()
+                .order_by('title')
+                .group_by_category()
         )
         categories = Category.objects.filter(id__in=works).in_bulk()
         # Build the tree of ratings. This is a list of pairs (category, works)
@@ -792,12 +810,16 @@ class AnonymousRatingsMixin(object):
         ]
         return context
 
+
 class SignupView(AnonymousRatingsMixin, allauth.account.views.SignupView):
     pass
 
+
 signup = SignupView.as_view()
+
 
 class LoginView(AnonymousRatingsMixin, allauth.account.views.LoginView):
     pass
+
 
 login = LoginView.as_view()
