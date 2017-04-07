@@ -28,12 +28,14 @@ urlpatterns = [
     url(r'^recommend/(?P<work_id>\w+)/(?P<target_id>\w+)$', views.recommend_work, name='reco-work'),
     url(r'^removeReco/(?P<work_id>\d+)/(?P<username>\w+)/(?P<targetname>\w+)$', views.remove_reco, name='remove-reco'),
     url(r'^removeReco/(?P<targetname>\w+)$', views.remove_all_reco, name='remove-all-reco'),
+    url(r'^remove_anon_ratings/$', views.remove_all_anon_ratings, name='remove-all-anon-ratings'),
     url(r'^users/', views.UserList.as_view()),
     # We explicitely want to override allauth's signup and login views
     url(r'^user/signup/$', views.signup, name="account_signup"),
     url(r'^user/login/$', views.login, name="account_login"),
     url(r'^user/', include('allauth.urls')),
-    url(r'^u/(?P<username>.+)$', views.get_profile, name='profile'),  # login_required?
+    url(r'^profile/$', views.get_my_profile, name='my-profile'),
+    url(r'^u/(?P<username>.+)$', views.get_named_profile, name='profile'),  # login_required?
     url(r'^reco/$', views.get_reco, name='reco'),
     url(r'^reco_dpp/$', views.get_reco_dpp, name='reco_dpp'),
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),

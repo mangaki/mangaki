@@ -364,3 +364,11 @@ ul.checklist .list-icon {
 
 /** Anime **/
 /** Manga **/
+
+/*
+ * ANONYMOUS RATING ALERT
+ */
+
+.anonymous-rating-alert {
+    margin-bottom: 0;
+}

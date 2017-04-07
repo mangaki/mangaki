@@ -1,5 +1,7 @@
 {% load analytical %}
 {% load cookielaw_tags %}
+{% load anonymous_ratings %}
+{% load bootstrap3 %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -100,6 +102,14 @@
             </div>
         </nav>
     </header>
+{% if request|has_anonymous_ratings and request|should_show_anonymous_banner%}
+    <div class="alert alert-warning anonymous-rating-alert">
+        Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les
+        voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les
+        sauvegarder!
+    </div>
+{% endif %}
+</header>
 
 
     <div class="container">

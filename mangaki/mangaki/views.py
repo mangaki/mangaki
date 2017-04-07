@@ -21,13 +21,15 @@ from django.db import connection, DatabaseError
 
 import allauth.account.views
 
-from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, Top, Ranking, Staff, Category, FAQTheme, Trope
+from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, \
+    Top, Ranking, Staff, Category, FAQTheme, Trope
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import import_mal
 from mangaki.utils.ratings import (
     get_anonymous_ratings, current_user_ratings,
-    current_user_rating, current_user_set_toggle_rating
+    current_user_rating, current_user_set_toggle_rating,
+    clear_anonymous_ratings
 )
 from mangaki.utils.recommendations import get_reco_algo
 from irl.models import Event, Partner, Attendee
@@ -383,56 +385,107 @@ class UserList(ListView):
         return context
 
 
-def get_profile(request, username):
-    user = get_object_or_404(User, username=username)
-    is_shared = user.profile.is_shared
+def remove_all_anon_ratings(request):
+    clear_anonymous_ratings(request.session)
+    return redirect('home')
+
+
+def get_named_profile(request, username):
+    return get_profile(request, username)
+
+
+def get_my_profile(request):
+    if request.user.is_authenticated():
+        return redirect('profile', request.user.username, permanent=True)
+
+    return get_profile(request)
+
+
+def get_profile(request, username=None):
+    is_anonymous = False
+    if username:
+        user = get_object_or_404(User, username=username)
+    else:
+        user = request.user
+        is_anonymous = not user.is_authenticated()
+
+    is_shared = is_anonymous or (username is None) or user.profile.is_shared
     category = request.GET.get('category', 'anime')
+    categories = ('anime', 'manga', 'album')
     ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
-    c = 0
-    rating_list = natsorted(Rating.objects.filter(user__username=username).select_related('work'), key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
+    if is_anonymous:
+        ratings = []
+        anon_ratings = get_anonymous_ratings(request.session)
+        works_per_pk = Work.objects.select_related('category').in_bulk(anon_ratings.keys())
+        for pk, choice in anon_ratings.items():
+            rating = Rating()
+            rating.work = works_per_pk[pk]
+            rating.choice = choice
+            ratings.append(rating)
+    else:
+        ratings = Rating.objects.filter(user__username=username).select_related('work')
+
+    rating_list = natsorted(ratings,
+                            key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
 
     received_recommendation_list = []
     sent_recommendation_list = []
-    if category == 'recommendation':
-        received_recommendations = Recommendation.objects.filter(target_user__username=username).select_related('work', 'work__category')
-        sent_recommendations = Recommendation.objects.filter(user__username=username).select_related('work', 'work__category')
+    if not is_anonymous and category == 'recommendation':
+        received_recommendations = Recommendation.objects.filter(target_user__username=username).select_related('work',
+                                                                                                                'work__category')
+        sent_recommendations = Recommendation.objects.filter(user__username=username).select_related('work',
+                                                                                                     'work__category')
         for reco in received_recommendations:
-            if Rating.objects.filter(work=reco.work, user__username=username, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                received_recommendation_list.append({'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title, 'username': reco.user.username})
+            if Rating.objects.filter(work=reco.work, user__username=username,
+                                     choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                received_recommendation_list.append(
+                    {'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title,
+                     'username': reco.user.username})
         for reco in sent_recommendations:
-            if Rating.objects.filter(work=reco.work, user=reco.target_user, choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                sent_recommendation_list.append({'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title, 'username': reco.target_user.username})
+            if Rating.objects.filter(work=reco.work, user=reco.target_user,
+                                     choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                sent_recommendation_list.append(
+                    {'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title,
+                     'username': reco.target_user.username})
 
-    seen_lists = {'anime': [], 'manga': [], 'album': 0}
-    unseen_lists = {'anime': [], 'manga': [], 'album': []}
+    # FIXME: if we don't show 4 lists out of 6, we should never fetch / create them from the start.
+    seen_lists = {key: [] for key in categories}
+    unseen_lists = {key: [] for key in categories}
     for r in rating_list:
         if r.choice in ['favorite', 'like', 'neutral', 'dislike']:
             seen_lists[r.work.category.slug].append(r)
         else:
             unseen_lists[r.work.category.slug].append(r)
-    member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
+
+    member_time = None
+    if not is_anonymous:
+        member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
 
     # Events
-    events = [
-        {
-            'id': attendee.event_id,
-            'work_id': attendee.event.work_id,
-            'attending': True,
-            'type': attendee.event.get_event_type_display(),
-            'channel': attendee.event.channel,
-            'date': attendee.event.get_date(),
-            'link': attendee.event.link,
-            'location': attendee.event.location,
-            'title': attendee.event.work.title,
-        } for attendee in user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event', 'event__work')
-    ]
+    events = []
+    if not is_anonymous:
+        events = [
+            {
+                'id': attendee.event_id,
+                'work_id': attendee.event.work_id,
+                'attending': True,
+                'type': attendee.event.get_event_type_display(),
+                'channel': attendee.event.channel,
+                'date': attendee.event.get_date(),
+                'link': attendee.event.link,
+                'location': attendee.event.location,
+                'title': attendee.event.work.title,
+            } for attendee in
+            user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event',
+                                                                                                     'event__work')
+        ]
 
     data = {
         'username': username,
         'is_shared': is_shared,
         'category': category,
-        'avatar_url': user.profile.avatar_url,
-        'member_days': member_time.days,
+        'avatar_url': user.profile.avatar_url if not is_anonymous else None,
+        'member_days': member_time.days if member_time else None,
         'anime_count': len(seen_lists['anime']),
         'manga_count': len(seen_lists['manga']),
         'reco_count': len(received_recommendation_list),
@@ -441,6 +494,10 @@ def get_profile(request, username):
         'received_recommendation_list': received_recommendation_list if is_shared else [],
         'sent_recommendation_list': sent_recommendation_list if is_shared else [],
         'events': events,
+        'is_anonymous': is_anonymous,
+        'show_all_categories': is_anonymous,
+        'categories': [(category, seen_lists.get(category, []), unseen_lists.get(category, []))
+                       for category in categories]
     }
     return render(request, 'profile.html', data)
 
