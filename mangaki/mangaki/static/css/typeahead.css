@@ -267,12 +267,6 @@ p {
   background-image: none;
 }
 
-.btn:hover,
-.btn:focus,
-.btn:active {
-    text-decoration: none;
-}
-
 .btn::-moz-focus-inner {
     border: 0;
     padding: 0;

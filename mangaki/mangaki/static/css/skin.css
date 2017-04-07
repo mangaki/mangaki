@@ -75,10 +75,6 @@ color: #fff;
 background-color: #E84C15;
 
 }
-.btn:hover, .btn:focus {
-color: #fff;
-text-decoration: none;
-}
 .btn-lg{
 padding: 25px 25px;
 font-size: 20px;
@@ -280,6 +276,12 @@ color: #b2B2B2;
 .flatlist {
     padding: 2px 2px 2px 5px;
     border-radius: 4px;
+}
+
+.flatlist:after {
+    display: block;
+    content: " ";
+    clear: both;
 }
 
 #avatar {

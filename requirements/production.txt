@@ -1,7 +1,7 @@
 Django==1.10.*
 django-allauth==0.28
 markdown
-django-bootstrap-form
+django-bootstrap3==8.2.*
 psycopg2
 numpy
 beautifulsoup4

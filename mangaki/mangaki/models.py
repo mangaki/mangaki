@@ -88,6 +88,21 @@ class WorkQuerySet(models.QuerySet):
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
 
+    def group_by_category(self):
+        """
+        Groups this queryset by category. This returns a dictionnary mapping
+        categories to the corresponding works in the queryset.
+
+        Returns:
+          by_category -- A mapping from category IDs to the list of works in
+              this queryset in the corresponding category. Order inside a
+              category is preserved.
+        """
+        by_category = {}
+        for work in self:
+            by_category.setdefault(work.category_id, []).append(work)
+
+        return by_category
 
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
