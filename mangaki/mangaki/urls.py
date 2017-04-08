@@ -7,6 +7,7 @@ from django_js_reverse.views import urls_js
 from mangaki import views
 from mangaki.settings import DEBUG
 
+
 urlpatterns = [
     # Examples:
     # url(r'^$', views.home, name='home'),
