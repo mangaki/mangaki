@@ -200,15 +200,15 @@
     <script>
         $("[name='is_shared']").bootstrapSwitch();
         $("[name='is_shared']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['shared'](), {is_shared: state});
+            $.post(Urls['profiles:shared'](), {is_shared: state});
         });
         $("[name='nsfw_ok']").bootstrapSwitch();
         $("[name='nsfw_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['nsfw'](), {nsfw_ok: state});
+            $.post(Urls['profiles:nsfw'](), {nsfw_ok: state});
         });
         $("[name='newsletter_ok']").bootstrapSwitch();
         $("[name='newsletter_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['newsletter'](), {newsletter_ok: state});
+            $.post(Urls['profiles:newsletter'](), {newsletter_ok: state});
         });
         $("#import_mal").on('click', function () {
             $.post(Urls['import-mal']($('#mal_username').val()), function (data) {

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
-from mangaki.models import Profile
+from profiles.models import Profile
 
 
 class UserTest(TestCase):

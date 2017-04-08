@@ -5,8 +5,9 @@ from urllib.parse import urlencode
 
 import allauth.account.views
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
@@ -30,7 +31,7 @@ from irl.models import Attendee, Event, Partner
 from mangaki.choices import TOP_CATEGORY_CHOICES
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
-from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
+from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Top, Trope, Work)
 from mangaki.utils.mal import import_mal
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
@@ -61,6 +62,8 @@ RATING_COLORS = {
 UTA_ID = 14293
 
 GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
+
+User = get_user_model()
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -339,7 +342,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
 
 
 class UserList(ListView):
-    model = User
+    model = settings.AUTH_USER_MODEL
 
     # context_object_name = 'anime'
 
@@ -604,7 +607,8 @@ def recommend_work(request, work_id, target_id):
 
 def get_users(request, query=''):
     data = []
-    for user in User.objects.all() if not query else User.objects.filter(username__icontains=query):
+    query_set = User.objects.all() if not query else User.objects.filter(username__icontains=query)
+    for user in query_set:
         data.append({'id': user.id, 'username': user.username, 'tokens': user.username.lower().split()})
     return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -697,28 +701,6 @@ def get_reco_dpp(request):
     return render(request, 'mangaki/reco_list_dpp.html', {'reco_list': reco_list, 'category': category})
 
 
-def update_shared(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(is_shared=request.POST['is_shared'] == 'true')
-    return HttpResponse()
-
-
-def update_nsfw(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(nsfw_ok=request.POST['nsfw_ok'] == 'true')
-    return HttpResponse()
-
-
-def update_newsletter(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(newsletter_ok=request.POST['newsletter_ok'] == 'true')
-    return HttpResponse()
-
-
-def update_reco_willsee(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
-    return HttpResponse()
 
 
 def import_from_mal(request, mal_username):
