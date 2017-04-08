@@ -4,7 +4,6 @@ from django.views.generic.edit import FormMixin
 from django.views.generic import View
 from django.views.defaults import server_error
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
@@ -17,7 +16,7 @@ from django.utils.timezone import utc
 from django.utils.functional import cached_property
 from django.db.models import Case, When, Value, Sum, IntegerField
 from django.views.generic.detail import SingleObjectMixin
-from django.db import connection, DatabaseError
+from django.db import DatabaseError
 
 import allauth.account.views
 
