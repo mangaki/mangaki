@@ -3,10 +3,12 @@ from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
 from django.db.models import Count
 
-from mangaki.models import (Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
-                            Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
-                            Role, Staff, FAQTheme,
-                            FAQEntry)
+from mangaki.models import (
+    Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
+    Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
+    Role, Staff, FAQTheme,
+    FAQEntry
+)
 from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
 
@@ -94,13 +96,17 @@ class WorkAdmin(admin.ModelAdmin):
         for anime in queryset.select_related("category"):
             if anime.category.slug != 'anime':
                 self.message_user(request,
-                                  "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les animes " % anime.title)
+                                  "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les "
+                                  "animes " % anime.title)
                 self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
                 return None
             elif not anime.anidb_aid:
-                self.message_user(request,
-                                  "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" % anime.title)
-                self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
+                self.message_user(
+                    request,
+                    "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" % anime.title)
+                self.message_user(
+                    request,
+                    "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
                 return None
 
         all_information = {}
@@ -172,8 +178,9 @@ class WorkAdmin(admin.ModelAdmin):
                 if obj.retrieve_poster(chosen_poster):
                     downloaded_titles.append(obj.title)
             if downloaded_titles:
-                self.message_user(request, "Des posters ont été trouvés pour les anime suivants : %s." % ', '.join(
-                    downloaded_titles))
+                self.message_user(
+                    request,
+                    "Des posters ont été trouvés pour les anime suivants : %s." % ', '.join(downloaded_titles))
             else:
                 self.message_user(request, "Aucun poster n'a été trouvé, essayez de changer le titre.")
             return None
