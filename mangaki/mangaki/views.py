@@ -411,7 +411,11 @@ def get_profile(request, username=None):
             rating.choice = choice
             ratings.append(rating)
     else:
-        ratings = Rating.objects.filter(user__username=username).select_related('work')
+        ratings = (
+            Rating.objects
+            .filter(user__username=username)
+            .select_related('work', 'work__category')
+        )
 
     rating_list = natsorted(ratings,
                             key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
