@@ -32,7 +32,11 @@ class Command(BaseCommand):
             """if 'Baccano' in anime_map[anime].title:
                 print(anime_map[anime].title, (nb_likes, nb_dislikes))"""
             # if nb_dislikes <= 2:
-            score[(anime, (nb_likes, nb_dislikes))] = controversy(nb_likes, nb_dislikes)  # nb_likes
+            nb = {
+                'dislike': nb_dislikes,
+                'like': nb_likes
+            }
+            score[(anime, (nb_likes, nb_dislikes))] = controversy(nb)
         print(len(score.keys()), 'anime après filtrage')
         for k, v in score.most_common(50):
             print(anime_map[k[0]].title, k[1], v, anime_map[k[0]].rating_set.count(), 'ratings')
