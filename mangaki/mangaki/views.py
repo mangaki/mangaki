@@ -34,7 +34,7 @@ from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, P
                             Recommendation, Staff, Suggestion, Top, Trope, Work)
 from mangaki.utils.mal import import_mal
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
-     current_user_set_toggle_rating, get_anonymous_ratings)
+                                   current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.recommendations import get_reco_algo
 
 NB_POINTS_DPP = 10
