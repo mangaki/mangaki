@@ -39,9 +39,12 @@ class MangakiKNN(RecommendationAlgorithm):
             score = cosine_similarity(self.M[user_ids], self.M)
         for i, user_id in enumerate(user_ids):
             if self.NB_NEIGHBORS < self.nb_users:
-                neighbor_ids = score[i]\
-                                   .argpartition(-self.NB_NEIGHBORS - 1)[-self.NB_NEIGHBORS - 1:-1]  # Put top
-                # NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
+                # Put top NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
+                neighbor_ids = (
+                    score[i]
+                    .argpartition(-self.NB_NEIGHBORS - 1)
+                    [-self.NB_NEIGHBORS - 1:-1]
+                )
             else:
                 neighbor_ids = range(len(score[i]))
             neighbors.append(neighbor_ids)
