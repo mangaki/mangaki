@@ -4,7 +4,6 @@ from django.views.generic.edit import FormMixin
 from django.views.generic import View
 from django.views.defaults import server_error
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
@@ -17,7 +16,7 @@ from django.utils.timezone import utc
 from django.utils.functional import cached_property
 from django.db.models import Case, When, Value, Sum, IntegerField
 from django.views.generic.detail import SingleObjectMixin
-from django.db import connection, DatabaseError
+from django.db import DatabaseError
 
 import allauth.account.views
 
@@ -266,16 +265,15 @@ class WorkList(WorkListMixin, ListView):
         else:
             return sort
 
-    # FIXME @property
+    @property
     def is_dpp(self):
-        dpp = self.kwargs.get('dpp', False)
-        return dpp
+        return self.kwargs.get('dpp', False)
 
     def get_queryset(self):
         search_text = self.search()
         queryset = self.category.work_set.all()
         sort_mode = self.sort_mode()
-        if self.is_dpp():
+        if self.is_dpp:
             queryset = self.category.work_set.exclude(coldstartrating__user=self.request.user).dpp(10)
         elif sort_mode == 'top':
             queryset = queryset.top()
@@ -308,16 +306,15 @@ class WorkList(WorkListMixin, ListView):
         context = super().get_context_data(**kwargs)
         search_text = self.search()
         sort_mode = self.sort_mode()
-        is_dpp = self.is_dpp()
 
         context['search'] = search_text
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
         context['objects_count'] = self.category.work_set.count()
-        context['is_dpp'] = is_dpp
+        context['is_dpp'] = self.is_dpp
 
-        if sort_mode == 'mosaic' and not is_dpp:
+        if sort_mode == 'mosaic' and not self.is_dpp:
             context['object_list'] = [
                 Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
                 for _ in range(4)

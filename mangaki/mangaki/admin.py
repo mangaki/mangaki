@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
-from django.core.urlresolvers import reverse
 from django.db.models import Count
 
 from mangaki.models import Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page, Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking, Role, Staff, FAQTheme, FAQEntry
