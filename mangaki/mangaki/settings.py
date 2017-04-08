@@ -41,7 +41,7 @@ INSTALLED_APPS = (
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'bootstrapform',
+    'bootstrap3',
     'analytical',
     'cookielaw',
     'django_js_reverse',
@@ -128,6 +128,7 @@ WSGI_APPLICATION = 'mangaki.wsgi.application'
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FORM_CLASS= 'mangaki.forms.SignupForm'
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",

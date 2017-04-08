@@ -5,6 +5,40 @@ def pk_from_object_or_pk(obj):
     return getattr(obj, 'pk', obj)
 
 
+def get_anonymous_ratings(session, works=None):
+    """
+    Compute the set of anonymous ratings currently stored in the session.
+
+    Arguments:
+        request -- The Request object we are currently handling.
+        works   -- An iterable of Work instances or primary keys, or None.
+
+    Returns:
+        ratings -- A dictionary mapping Work primary keys to their rating
+            string ('like', 'dislike', etc.)
+    """
+    ratings = session.get(settings.ANONYMOUS_RATINGS_SESSION_KEY, {})
+    if works is not None:
+        filtered_ratings = {}
+        for work in works:
+            # Accept Work models as well as primary key integers
+            work = str(pk_from_object_or_pk(work))
+            rating = ratings.get(work)
+            if rating is not None:
+                filtered_ratings[work] = rating
+        ratings = filtered_ratings
+    # Recall that keys in the session dictionary are always converted to
+    # strings by serialization. We convert them back to integers.
+    return {int(work_pk): choice for work_pk, choice in ratings.items()}
+
+
+def clear_anonymous_ratings(session):
+    """
+    Removes any existing anonymous ratings.
+    """
+    session.pop(settings.ANONYMOUS_RATINGS_SESSION_KEY, None)
+
+
 def current_user_ratings(request, works=None):
     """
     Compute the set of ratings for the current user.
@@ -26,20 +60,7 @@ def current_user_ratings(request, works=None):
     """
     user = request.user
     if user.is_anonymous:
-        ratings = request.session.get(settings.ANONYMOUS_RATINGS_SESSION_KEY, {})
-        if works is not None:
-            filtered_ratings = {}
-            for work in works:
-                # Accept Work models as well as primary key integers
-                work = str(pk_from_object_or_pk(work))
-                rating = ratings.get(work)
-                if rating is not None:
-                    filtered_ratings[work] = rating
-            ratings = filtered_ratings
-        # Recall that keys in the session dictionary are always converted to
-        # strings by serialization. We convert them back to integers.
-        return {int(work_pk): choice for work_pk, choice in ratings.items()}
-
+        return get_anonymous_ratings(request.session, works)
     else:
         qs = user.rating_set.all()
         if works is not None:
