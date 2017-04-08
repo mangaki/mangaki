@@ -5,6 +5,18 @@ def pk_from_object_or_pk(obj):
     return getattr(obj, 'pk', obj)
 
 
+def has_anonymous_ratings(session) -> bool:
+    """
+    Look if the session contains any ratings.
+    
+    :param session: Django Session
+    :type session: dict-like
+    :return: True if the session contains any ratings, False otherwise.
+    :rtype: bool
+    """
+    return bool(session.get(settings.ANONYMOUS_RATINGS_SESSION_KEY, {}))
+
+
 def get_anonymous_ratings(session, works=None):
     """
     Compute the set of anonymous ratings currently stored in the session.
