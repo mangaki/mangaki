@@ -30,8 +30,8 @@ urlpatterns = [
     url(r'^user/signup/$', views.signup, name="account_signup"),
     url(r'^user/login/$', views.login, name="account_login"),
     url(r'^user/', include('allauth.urls')),
-    url(r'^profile/$', views.get_my_profile, name='my-profile'),
-    url(r'^u/(?P<username>.+)$', views.get_named_profile, name='profile'),  # login_required?
+    url(r'^profile/$', views.get_profile, name='my-profile'),
+    url(r'^u/(?P<username>.+)$', views.get_profile, name='profile'),  # login_required?
     url(r'^reco/$', views.get_reco, name='reco'),
     url(r'^reco_dpp/$', views.get_reco_dpp, name='reco_dpp'),
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),

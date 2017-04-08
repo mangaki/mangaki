@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% block anonymous_rating_banner %} {% endblock %}
 {% block body %}
 
     <div class="row">
@@ -15,7 +16,10 @@
             {% else %}
                 <h1>Mes notes</h1>
                 <h2>Inscrivez-vous pour pouvoir les sauvegarder!</h2>
-                <a href="{% url 'remove-all-anon-ratings' %}">Supprimer toutes mes notes</a>
+                <form method="POST" action="{% url 'remove-all-anon-ratings' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Supprimer toutes mes notes</button>
+                </form>
             {% endif %}
 
             {% if member_days %}

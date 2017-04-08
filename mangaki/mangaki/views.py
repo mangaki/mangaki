@@ -1,48 +1,40 @@
-from django.views.generic.detail import DetailView, SingleObjectTemplateResponseMixin
-from django.views.generic.list import ListView
-from django.views.generic.edit import FormMixin
-from django.views.generic import View
-from django.views.defaults import server_error
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.contrib.auth.models import User
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseForbidden, Http404, HttpResponsePermanentRedirect
-from django.core.exceptions import SuspiciousOperation
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.utils import timezone
-from django.utils.timezone import utc
-from django.utils.functional import cached_property
-from django.db.models import Case, When, Value, Sum, IntegerField
-from django.views.generic.detail import SingleObjectMixin
-from django.db import connection, DatabaseError
-
-import allauth.account.views
-
-from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist, Suggestion, Recommendation, Pairing, \
-    Top, Ranking, Staff, Category, FAQTheme, Trope
-from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
-from mangaki.forms import SuggestionForm
-from mangaki.utils.mal import import_mal
-from mangaki.utils.ratings import (
-    get_anonymous_ratings, current_user_ratings,
-    current_user_rating, current_user_set_toggle_rating,
-    clear_anonymous_ratings
-)
-from mangaki.utils.recommendations import get_reco_algo
-from irl.models import Event, Partner, Attendee
-
-from collections import Counter, OrderedDict
-from markdown import markdown
-from urllib.parse import urlencode
 import datetime
 import json
+from collections import Counter, OrderedDict
+from urllib.parse import urlencode
 
-from mangaki.choices import TOP_CATEGORY_CHOICES
-
+import allauth.account.views
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.core.exceptions import SuspiciousOperation
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db import DatabaseError
+from django.db.models import Case, IntegerField, Sum, Value, When
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
+from django.utils.timezone import utc
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.defaults import server_error
+from django.views.generic import View
+from django.views.generic.detail import DetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin
+from django.views.generic.edit import FormMixin
+from django.views.generic.list import ListView
+from markdown import markdown
 from natsort import natsorted
+
+from irl.models import Attendee, Event, Partner
+from mangaki.choices import TOP_CATEGORY_CHOICES
+from mangaki.forms import SuggestionForm
+from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
+from mangaki.models import Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating, \
+    Recommendation, Staff, Suggestion, Top, Trope, Work
+from mangaki.utils.mal import import_mal
+from mangaki.utils.ratings import clear_anonymous_ratings, current_user_rating, current_user_ratings, \
+    current_user_set_toggle_rating, get_anonymous_ratings
+from mangaki.utils.recommendations import get_reco_algo
 
 NB_POINTS_DPP = 10
 POSTERS_PER_PAGE = 24
@@ -388,22 +380,17 @@ class UserList(ListView):
 
 
 def remove_all_anon_ratings(request):
-    clear_anonymous_ratings(request.session)
-    return redirect('home')
-
-
-def get_named_profile(request, username):
-    return get_profile(request, username)
-
-
-def get_my_profile(request):
-    if request.user.is_authenticated():
-        return redirect('profile', request.user.username, permanent=True)
-
-    return get_profile(request)
+    if request.method == 'POST':
+        clear_anonymous_ratings(request.session)
+        return redirect('home')
+    else:
+        raise Http404
 
 
 def get_profile(request, username=None):
+    if username is None and request.user.is_authenticated():
+        return redirect('profile', request.user.username, permanent=True)
+
     is_anonymous = False
     if username:
         user = get_object_or_404(User, username=username)
