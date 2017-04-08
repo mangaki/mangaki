@@ -7,10 +7,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import os
 import configparser
 import json
+import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+FIXTURE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
+TEST_DATA_DIR = os.path.join(BASE_DIR, 'tests', 'data')
 
 config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
 config.read(os.path.join(BASE_DIR, 'settings.ini'))
