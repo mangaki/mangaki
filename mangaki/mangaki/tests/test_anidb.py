@@ -16,7 +16,7 @@ class AniDBTest(TestCase):
 
     @staticmethod
     def read_fixture(filename):
-        with open(os.path.join(settings.TEST_FIXTURE_DIR, filename), 'r') as f:
+        with open(os.path.join(settings.TEST_DATA_DIR, filename), 'r') as f:
             return f.read()
 
     def setUp(self):
