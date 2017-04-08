@@ -29,11 +29,12 @@ from irl.models import Attendee, Event, Partner
 from mangaki.choices import TOP_CATEGORY_CHOICES
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
-from mangaki.models import Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating, \
-    Recommendation, Staff, Suggestion, Top, Trope, Work
+from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
+                            Recommendation, Staff, Suggestion, Top, Trope, Work)
 from mangaki.utils.mal import import_mal
-from mangaki.utils.ratings import clear_anonymous_ratings, current_user_rating, current_user_ratings, \
-    current_user_set_toggle_rating, get_anonymous_ratings
+from mangaki.utils.ratings import \
+    (clear_anonymous_ratings, current_user_rating, current_user_ratings,
+     current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.recommendations import get_reco_algo
 
 NB_POINTS_DPP = 10
