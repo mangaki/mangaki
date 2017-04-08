@@ -39,8 +39,9 @@ class MangakiKNN(RecommendationAlgorithm):
             score = cosine_similarity(self.M[user_ids], self.M)
         for i, user_id in enumerate(user_ids):
             if self.NB_NEIGHBORS < self.nb_users:
-                neighbor_ids = score[i].argpartition(-self.NB_NEIGHBORS - 1)[
-                               -self.NB_NEIGHBORS - 1:-1]  # Put top NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
+                neighbor_ids = score[i]\
+                                   .argpartition(-self.NB_NEIGHBORS - 1)[-self.NB_NEIGHBORS - 1:-1]  # Put top
+                # NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
             else:
                 neighbor_ids = range(len(score[i]))
             neighbors.append(neighbor_ids)
@@ -95,8 +96,9 @@ class MangakiKNN(RecommendationAlgorithm):
             for user_id in self.closest_neighbors[my_user_id]:
                 their_sim_score = self.closest_neighbors[my_user_id][user_id]
                 if self.missing_is_mean:
+                    # Double fallback, in case KNN was not trained on this work
                     their_rating = self.ratings[user_id].get(work_id, self.mean_score.get(work_id,
-                                                                                          0))  # Double fallback, in case KNN was not trained on this work
+                                                                                          0))
                 else:
                     their_rating = self.ratings[user_id].get(work_id)
                     if their_rating is None:
