@@ -378,14 +378,6 @@ class UserList(ListView):
         return context
 
 
-def remove_all_anon_ratings(request):
-    if request.method == 'POST':
-        clear_anonymous_ratings(request.session)
-        return redirect('home')
-    else:
-        raise Http404
-
-
 def get_profile(request, username=None):
     if username is None and request.user.is_authenticated():
         return redirect('profile', request.user.username, permanent=True)
@@ -584,7 +576,8 @@ def dpp_work(request, work_id):
                 "Attempted access denied. There are only 3 ratings here: like, dislike and dontknow")
         ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
         return HttpResponse(choice)
-    raise SuspiciousOperation("Attempted access denied. You are not logged in or it is currently a GET request")
+    else:
+        raise Http404
 
 
 def recommend_work(request, work_id, target_id):
@@ -661,24 +654,42 @@ def get_reco_list_dpp(request, category):
     return HttpResponse(json.dumps(reco_list_dpp), content_type='application/json')
 
 
+def remove_all_anon_ratings(request):
+    if request.method == 'POST':
+        clear_anonymous_ratings(request.session)
+        return redirect('home')
+    else:
+        raise Http404
+
+
 def remove_reco(request, work_id, username, targetname):
-    work = get_object_or_404(Work, id=work_id)
-    user = get_object_or_404(User, username=username)
-    target = get_object_or_404(User, username=targetname)
-    if Rating.objects.filter(user=target, work=work,
-                             choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0 and (
-                request.user == user or request.user == target):
-        Recommendation.objects.get(work=work, user=user, target_user=target).delete()
+    if request.method == 'POST':
+        work = get_object_or_404(Work, id=work_id)
+        user = get_object_or_404(User, username=username)
+        target = get_object_or_404(User, username=targetname)
+        if Rating.objects.filter(user=target, work=work,
+                                 choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0 and (
+                    request.user == user or request.user == target):
+            Recommendation.objects.get(work=work, user=user, target_user=target).delete()
+
+        return HttpResponse()
+    else:
+        raise Http404
 
 
 def remove_all_reco(request, targetname):
-    target = get_object_or_404(User, username=targetname)
-    if target == request.user:
-        reco_list = Recommendation.objects.filter(target_user=target)
-        for reco in reco_list:
-            if Rating.objects.filter(user=request.user, work=reco.work,
-                                     choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                reco.delete()
+    if request.method == 'POST':
+        target = get_object_or_404(User, username=targetname)
+        if target == request.user:
+            reco_list = Recommendation.objects.filter(target_user=target)
+            for reco in reco_list:
+                if Rating.objects.filter(user=request.user, work=reco.work,
+                                         choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
+                    reco.delete()
+
+        return HttpResponse()
+    else:
+        raise Http404
 
 
 def get_reco(request):
@@ -724,7 +735,11 @@ def update_reco_willsee(request):
 def import_from_mal(request, mal_username):
     if request.method == 'POST':
         nb_added, fails = import_mal(mal_username, request.user.username)
-        return HttpResponse('%d added; %d fails: %s' % (nb_added, len(fails), '\n'.join(fails)))
+        payload = {
+            'added': nb_added,
+            'failures': fails
+        }
+        return HttpResponse(json.dumps(payload), content_type='application/json')
     return HttpResponse()
 
 
