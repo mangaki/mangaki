@@ -294,7 +294,7 @@ class WorkList(WorkListMixin, ListView):
         if search_text is not None:
             queryset = queryset.search(search_text)
 
-        queryset = queryset.only('pk', 'title', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
+        queryset = queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
         return queryset
 
