@@ -92,16 +92,11 @@ if DEBUG:
 
     NOSE_ARGS = [
         '--with-doctest',
-        '--nologcapture'
     ]
 
     NOTEBOOK_ARGUMENTS = [
         '--ip=0.0.0.0',
     ]
-
-    # DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': 'test'}}
-
-    LOGGING = {'version': 1, 'loggers': []}
 
 TEMPLATES = [
     {
