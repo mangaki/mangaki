@@ -361,6 +361,10 @@ class Profile(models.Model):
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
 
+    @property
+    def avatar_url(self):
+        return '/static/img/chiro.png'  # Fallback while we put the avatars back
+
     def get_anime_count(self):
         return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike', 'favorite']).count()
 
