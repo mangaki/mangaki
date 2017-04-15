@@ -3,7 +3,6 @@ import pickle
 import random
 from collections import Counter, namedtuple
 from mangaki.utils.values import rating_values
-from mangaki.utils.common import PICKLE_DIR
 import numpy as np
 from datetime import datetime
 from django.conf import settings
@@ -27,11 +26,11 @@ class Dataset:
         self.datetime = datetime.now()
 
     def save(self, filename):
-        with open(os.path.join(PICKLE_DIR, filename), 'wb') as f:
+        with open(os.path.join(settings.PICKLE_DIR, filename), 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     def load(self, filename):
-        with open(os.path.join(PICKLE_DIR, filename), 'rb') as f:
+        with open(os.path.join(settings.PICKLE_DIR, filename), 'rb') as f:
             backup = pickle.load(f)
         self.anonymized = backup.anonymized
         self.encode_user = backup.encode_user
@@ -41,7 +40,7 @@ class Dataset:
         self.interesting_works = backup.interesting_works
 
     def load_csv(self, filename, convert=float):
-        with open(os.path.join(settings.BASE_DIR, '../data', filename)) as f:
+        with open(os.path.join(settings.DATA_DIR, filename)) as f:
             triplets = [[int(user_id), int(work_id), convert(rating)] for user_id, work_id, rating in csv.reader(f)]
         triplets = np.array(triplets, dtype=np.object)
         self.anonymized = AnonymizedData(

@@ -32,12 +32,12 @@ CONVERT_FUNCTIONS = {
 class Experiment(object):
     def __init__(self, dataset_name):
         self.algos = [
-            # lambda: MangakiALS(20),
+            lambda: MangakiALS(20),
             # lambda: MangakiWALS(20),
-            # lambda: MangakiSVD(20),
+            lambda: MangakiSVD(20),
             # lambda: MangakiPCA(20),
             # lambda: MangakiKNN(20),
-            lambda: MangakiZero()
+            # lambda: MangakiZero()
         ]
         self.anonymized = None
         self.load_dataset(dataset_name)
@@ -63,7 +63,7 @@ class Experiment(object):
                 y_pred = model.predict(self.anonymized.X[i_test])
                 rmse = model.compute_rmse(y_pred, self.anonymized.y[i_test])
                 if model.verbose:
-                    self.logger.debug('Predicted:', y_pred[:5])
+                    self.logger.debug('Predicted: %s' % y_pred[:5])
                     self.logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
                 self.logger.debug('RMSE %f' % rmse)
                 rmse_values[model.get_shortname()].append(rmse)

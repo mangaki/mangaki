@@ -5,13 +5,9 @@ import pickle
 import os.path
 
 
-VERBOSE = False
-PICKLE_DIR = os.path.join(settings.BASE_DIR, '../pickles')
-
-
 class RecommendationAlgorithm:
     def __init__(self):
-        self.verbose = VERBOSE
+        self.verbose = settings.RECO_ALGORITHMS_DEFAULT_VERBOSE
         self.chrono = Chrono(self.verbose)
         self.nb_users = None
         self.nb_works = None
@@ -19,7 +15,7 @@ class RecommendationAlgorithm:
     def get_backup_path(self, filename):
         if filename is None:
             filename = self.get_backup_filename()
-        return os.path.join(PICKLE_DIR, filename)
+        return os.path.join(settings.PICKLE_DIR, filename)
 
     def has_backup(self, filename=None):
         if filename is None:

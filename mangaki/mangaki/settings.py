@@ -11,6 +11,8 @@ import os
 import configparser
 import json
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+PICKLE_DIR = os.path.join(BASE_DIR, '../pickles')
+DATA_DIR = os.path.join(BASE_DIR, '../data')
 
 config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
 config.read(os.path.join(BASE_DIR, 'settings.ini'))
@@ -199,3 +201,5 @@ if config.has_section('mal'):
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 
 JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'
+
+RECO_ALGORITHMS_DEFAULT_VERBOSE = True
