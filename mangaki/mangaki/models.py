@@ -16,7 +16,7 @@ from django.db.models import CharField, F, Func, Lookup, Value
 from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
 from mangaki.discourse import get_discourse_data
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
-from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
+from mangaki.utils.dpp import MangakiDPP
 from mangaki.utils.ratingsmatrix import RatingsMatrix
 
 NB_POPULAR_WORKS = 1000
@@ -72,16 +72,11 @@ class WorkQuerySet(models.QuerySet):
         """
         sample "nb_points" popular works which are far from each other (using DPP)
         """
-        ratings_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
-                                                                  'work_id',
-                                                                  'choice'))
-        similarity = SimilarityMatrix(ratings_matrix.matrix, nb_components_svd=70)
-        set_item_id_popular = set(self.popular()[:NB_POPULAR_WORKS].values_list('pk', flat=True))
-        items = [ratings_matrix.item_dict[item] for item in ratings_matrix.item_set if item in set_item_id_popular]
-        dpp = MangakiDPP(items, similarity.similarity_matrix)
-        liste_dpp = dpp.sample_k(nb_points)
-        liste_dpp_work_ids = [ratings_matrix.item_dict_inv[element] for element in liste_dpp]
-        return self.filter(id__in=liste_dpp_work_ids)
+        work_ids = self.popular().values_list('id', flat=True)[:100]
+        dpp = MangakiDPP(work_ids)
+        dpp.load_from_algo('svd')
+        sampled_work_ids = dpp.sample_k(5)
+        return self.filter(id__in=sampled_work_ids)
 
     def random(self):
         return self.filter(

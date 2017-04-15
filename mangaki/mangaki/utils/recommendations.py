@@ -80,12 +80,12 @@ def get_reco_algo(user, algo_name='knn', category='all'):
     else:
         category_filter = dataset.interesting_works
 
-    filtered_works = (dataset.interesting_works & category_filter) - set(already_rated_works)
+    filtered_works = list((dataset.interesting_works & category_filter) - set(already_rated_works))
 
     chrono.save('remove already rated')
 
     pos_of_best = get_pos_of_best_works_for_user_via_algo(algo, dataset, user.id, filtered_works, limit=NB_RECO)
-    best_work_ids = np.array(work_ids)[pos_of_best]
+    best_work_ids = [filtered_works[pos] for pos in pos_of_best]
 
     chrono.save('compute every prediction')
 

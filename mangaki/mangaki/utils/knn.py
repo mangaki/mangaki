@@ -1,6 +1,4 @@
 from mangaki.utils.common import RecommendationAlgorithm
-from django.contrib.auth.models import User
-from mangaki.models import Work
 from collections import Counter, defaultdict
 import numpy as np
 from scipy.sparse import lil_matrix
@@ -47,30 +45,6 @@ class MangakiKNN(RecommendationAlgorithm):
             for neighbor_id in neighbor_ids:
                 self.closest_neighbors[user_id][neighbor_id] = score[i, neighbor_id]
         return neighbors
-
-    def get_common_traits(self, my_username, username):
-        my_user_id = User.objects.get(username=my_username).id
-        user_id = User.objects.get(username=username).id
-        self.rated_works = set(self.ratings[my_user_id].keys())
-        agree = []
-        disagree = []
-        for work_id in self.rated_works & set(self.ratings[user_id].keys()):
-            score = self.ratings[my_user_id][work_id] * self.ratings[user_id][work_id]
-            if self.ratings[my_user_id][work_id] * self.ratings[user_id][work_id] > 0:
-                agree.append((score, work_id, self.ratings[my_user_id][work_id], self.ratings[user_id][work_id]))
-            elif self.ratings[my_user_id][work_id] * self.ratings[user_id][work_id] < 0:
-                disagree.append((score, work_id, self.ratings[my_user_id][work_id], self.ratings[user_id][work_id]))
-        agree.sort(reverse=True)
-        disagree.sort()
-        works = Work.objects.in_bulk(map(lambda x: x[1], agree + disagree))
-        print('Strongly agree: (over %d positive products)' % len(agree))
-        for rank, (_, work_id, my, their) in enumerate(agree, start=1):
-            if abs(my) >= 1 and abs(their) >= 1:
-                print('%d.' % rank, works[work_id].title, my, their, '=', my * their)
-        print('Strongly disagree: (over %d negative products)' % len(disagree))
-        for rank, (_, work_id, my, their) in enumerate(disagree, start=1):
-            if abs(my) >= 1 and abs(their) >= 1:
-                print('%d.' % rank, works[work_id].title, my, their, '=', my * their)
 
     def fit(self, X, y, whole_dataset=False):
         self.ratings = defaultdict(dict)

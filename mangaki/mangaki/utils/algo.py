@@ -25,15 +25,13 @@ def fit_algo(algo_name, queryset, backup_filename):
         dataset.save('ratings-' + backup_filename)
     return dataset, algo
 
-
 def get_algo_backup(algo_name):
     algo = ALGOS[algo_name]()
-    algo.load(algo.get_backup_filename())  # Or exception
+    algo.load(algo.get_backup_filename())  # Or raises FileNotFoundException
     return algo
-
 
 def get_dataset_backup(algo_name):
     algo = ALGOS[algo_name]()
     dataset = Dataset()
-    dataset.load('ratings-' + algo.get_backup_filename())  # Or exception
+    dataset.load('ratings-' + algo.get_backup_filename())  # Or raises FileNotFoundException
     return dataset
