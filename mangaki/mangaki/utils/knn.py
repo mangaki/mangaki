@@ -40,7 +40,7 @@ class MangakiKNN(RecommendationAlgorithm):
                 score[i][user_id] = float('-inf')  # Do not select the user itself while looking at its potential neighbors
                 neighbor_ids = score[i].argpartition(-self.NB_NEIGHBORS - 1)[-self.NB_NEIGHBORS - 1:-1]  # Put top NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
             else:
-                neighbor_ids = range(len(score[i]))
+                neighbor_ids = list(range(len(score[i])))
                 neighbor_ids.remove(user_id)
             neighbors.append(neighbor_ids)
             self.closest_neighbors[user_id] = {}

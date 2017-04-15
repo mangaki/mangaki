@@ -21,7 +21,7 @@ from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist,
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import import_mal
-from mangaki.utils.recommendations import get_reco_algo
+from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup
 from irl.models import Event, Partner, Attendee
 
 from collections import Counter, OrderedDict
@@ -654,12 +654,12 @@ def remove_all_reco(request, targetname):
 @login_required
 def get_reco(request):
     category = request.GET.get('category', 'all')
-    algo = request.GET.get('algo', 'knn')
+    algo_name = request.GET.get('algo', 'svd' if user_exists_in_backup(request.user, 'svd') else 'knn')
     if request.user.rating_set.exists():
         reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
     else:
         reco_list = []
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'algo': algo})
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'algo': algo_name})
 
 
 @login_required

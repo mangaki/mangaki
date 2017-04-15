@@ -14,6 +14,15 @@ NB_RECO = 10
 CHRONO_ENABLED = True
 
 
+def user_exists_in_backup(user, algo_name):
+    algo = ALGOS[algo_name]()
+    if algo.has_backup():
+        dataset = Dataset()
+        dataset.load('ratings-' + algo.get_backup_filename())
+        return user.id in dataset.encode_user
+    return False
+
+
 def get_reco_algo(user, algo_name='knn', category='all'):
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
 
