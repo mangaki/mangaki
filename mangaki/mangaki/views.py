@@ -21,7 +21,8 @@ from mangaki.models import Work, Rating, ColdStartRating, Page, Profile, Artist,
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.forms import SuggestionForm
 from mangaki.utils.mal import import_mal
-from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup
+from mangaki.utils.algo import get_algo_backup, get_dataset_backup
+from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
 from irl.models import Event, Partner, Attendee
 
 from collections import Counter, OrderedDict
@@ -411,9 +412,24 @@ def get_profile(request, username):
     user = get_object_or_404(User, username=username)
     is_shared = user.profile.is_shared
     category = request.GET.get('category', 'anime')
+    algo_name = request.GET.get('algo', None)
     ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
     c = 0
-    rating_list = natsorted(Rating.objects.filter(user__username=username).select_related('work'), key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
+    ratings = list(Rating.objects.filter(user__username=username).select_related('work'))
+    compare_function = lambda x: (ordering.index(x.choice), x.work.title.lower())  # By default, sort by rating then name
+    if algo_name is not None:
+        try:
+            work_ids = [rating.work_id for rating in ratings]
+            algo = get_algo_backup(algo_name)
+            dataset = get_dataset_backup(algo_name)
+            best_pos = get_pos_of_best_works_for_user_via_algo(algo, dataset, user.id, work_ids)
+            ranking = {}
+            for rank, pos in enumerate(best_pos):
+                ranking[ratings[pos].id] = rank
+            compare_function = lambda x: (ordering.index(x.choice), ranking[x.id])
+        except:  # Two possible reasons: no backup or user not in backup
+            pass
+    rating_list = natsorted(ratings, key=compare_function)
 
     received_recommendation_list = []
     sent_recommendation_list = []
@@ -453,7 +469,6 @@ def get_profile(request, username):
 
     data = {
         'username': username,
-        'score': user.profile.score,
         'is_shared': is_shared,
         'category': category,
         'avatar_url': user.profile.get_avatar_url(),

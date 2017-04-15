@@ -4,7 +4,7 @@ from mangaki.utils.chrono import Chrono
 from mangaki.utils.data import Dataset
 from django.contrib.auth.models import User
 from django.db.models import Count
-from mangaki.utils.algo import ALGOS, fit_algo
+from mangaki.utils.algo import ALGOS, fit_algo, get_algo_backup, get_dataset_backup
 import numpy as np
 import json
 import os.path
@@ -15,12 +15,22 @@ CHRONO_ENABLED = True
 
 
 def user_exists_in_backup(user, algo_name):
-    algo = ALGOS[algo_name]()
-    if algo.has_backup():
-        dataset = Dataset()
-        dataset.load('ratings-' + algo.get_backup_filename())
+    try:
+        dataset = get_dataset_backup(algo_name)
         return user.id in dataset.encode_user
-    return False
+    except FileNotFoundError:
+        return False
+
+
+def get_pos_of_best_works_for_user_via_algo(algo, dataset, user_id, work_ids, limit=None):
+    encoded_user_id = dataset.encode_user[user_id]
+    encoded_works = dataset.encode_works(work_ids)
+    X_test = np.asarray([[encoded_user_id, encoded_work_id] for encoded_work_id in encoded_works])
+    y_pred = algo.predict(X_test)
+    pos_of_best = y_pred.argsort()[::-1]  # Get top work indices in decreasing value
+    if limit is not None:
+        pos_of_best = pos_of_best[:limit]  # Up to some limit
+    return pos_of_best
 
 
 def get_reco_algo(user, algo_name='knn', category='all'):
@@ -57,11 +67,10 @@ def get_reco_algo(user, algo_name='knn', category='all'):
     chrono.save('get all %d interesting ratings' % queryset.count())
 
     dataset = Dataset()
-    algo = ALGOS[algo_name]()
-    if algo.has_backup():
-        algo.load(algo.get_backup_filename())
-        dataset.load('ratings-' + algo.get_backup_filename())
-    else:
+    try:
+        algo = get_algo_backup(algo_name)
+        dataset = get_dataset_backup(algo_name)
+    except FileNotFoundError:
         dataset, algo = fit_algo(algo_name, queryset, algo.get_backup_filename())
 
     chrono.save('fit %s' % algo.get_shortname())
@@ -72,19 +81,14 @@ def get_reco_algo(user, algo_name='knn', category='all'):
         category_filter = dataset.interesting_works
 
     filtered_works = (dataset.interesting_works & category_filter) - set(already_rated_works)
-    encoded_works = dataset.encode_works(filtered_works)
-    nb_test = len(encoded_works)
 
     chrono.save('remove already rated')
 
-    encoded_request_user_id = dataset.encode_user[user.id]
-    X_test = np.asarray([[encoded_request_user_id, encoded_work_id] for encoded_work_id in encoded_works])
-    y_pred = algo.predict(X_test)
-    pos = y_pred.argsort()[-NB_RECO:][::-1]  # Get top NB_RECO work indices in decreasing value
+    pos_of_best = get_pos_of_best_works_for_user_via_algo(algo, dataset, user.id, filtered_works, limit=NB_RECO)
+    best_work_ids = np.array(work_ids)[pos_of_best]
 
     chrono.save('compute every prediction')
 
-    best_work_ids = [dataset.decode_work[encoded_work_id] for _, encoded_work_id in X_test[pos]]
     works = Work.objects.in_bulk(best_work_ids)
 
     chrono.save('get bulk')
