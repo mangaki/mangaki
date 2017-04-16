@@ -13,7 +13,7 @@ ALGOS = {
 }
 
 
-def fit_algo(algo_name, triplets, backup_filename):
+def fit_algo(algo_name, triplets):
     algo = ALGOS[algo_name]()
     dataset = Dataset()
 
@@ -21,8 +21,8 @@ def fit_algo(algo_name, triplets, backup_filename):
     algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
     algo.fit(anonymized.X, anonymized.y)
     if algo_name in {'svd', 'als'}:  # KNN is constantly refreshed
-        algo.save(backup_filename)
-        dataset.save('ratings-' + backup_filename)
+        algo.save(algo.get_backup_filename())
+        dataset.save('ratings-' + algo.get_backup_filename())
     return dataset, algo
 
 def get_algo_backup(algo_name):

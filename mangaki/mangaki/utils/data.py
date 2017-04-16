@@ -3,7 +3,6 @@ import pickle
 import random
 from collections import Counter, namedtuple
 from mangaki.utils.values import rating_values
-from mangaki.utils.common import PICKLE_DIR
 import numpy as np
 from datetime import datetime
 from django.conf import settings

@@ -407,7 +407,7 @@ def get_profile(request, username=None):
             rating.choice = choice
             ratings.append(rating)
     else:
-        ratings = (
+        ratings = list(
             Rating.objects
             .filter(user__username=username)
             .select_related('work', 'work__category')
