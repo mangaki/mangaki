@@ -12,6 +12,8 @@ import json
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+PICKLE_DIR = os.path.join(BASE_DIR, '../pickles')
+DATA_DIR = os.path.join(BASE_DIR, '../data')
 FIXTURE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
 TEST_DATA_DIR = os.path.join(BASE_DIR, 'tests', 'data')
 
@@ -122,6 +124,28 @@ TEMPLATES = [
     }
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log'
+        }
+    },
+    'loggers': {
+        'mangaki': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        }
+    },
+}
+
 ROOT_URLCONF = 'mangaki.urls'
 WSGI_APPLICATION = 'mangaki.wsgi.application'
 
@@ -172,4 +196,7 @@ if config.has_section('mal'):
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 
 JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'
+
+RECO_ALGORITHMS_DEFAULT_VERBOSE = True
+
 ANONYMOUS_RATINGS_SESSION_KEY = 'mangaki_ratings'

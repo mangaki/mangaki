@@ -62,13 +62,15 @@ class MangakiALS(RecommendationAlgorithm):
                 self.fit_work(work, matrixT)
 
     def fit(self, X, y):
-        print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
+        if self.verbose:
+            print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         matrix, self.means = self.make_matrix(X, y)
 
         self.chrono.save('fill and center matrix')
 
         self.factorize(matrix, random_state=42)
-        print('Shapes', self.U.shape, self.VT.shape)
+        if self.verbose:
+            print('Shapes', self.U.shape, self.VT.shape)
         self.M = self.U.dot(self.VT)
 
         #self.save('backup.pickle')
@@ -79,4 +81,4 @@ class MangakiALS(RecommendationAlgorithm):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
 
     def get_shortname(self):
-        return 'als'
+        return 'als-%d' % self.NB_COMPONENTS

@@ -35,7 +35,10 @@ from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, P
 from mangaki.utils.mal import import_mal
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
-from mangaki.utils.recommendations import get_reco_algo
+from mangaki.utils.algo import get_algo_backup, get_dataset_backup
+from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
+from irl.models import Event, Partner, Attendee
+
 
 NB_POINTS_DPP = 10
 POSTERS_PER_PAGE = 24
@@ -391,6 +394,7 @@ def get_profile(request, username=None):
 
     is_shared = is_anonymous or (username is None) or user.profile.is_shared
     category = request.GET.get('category', 'anime')
+    algo_name = request.GET.get('algo', None)
     categories = ('anime', 'manga', 'album')
     ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
     if is_anonymous:
@@ -403,14 +407,27 @@ def get_profile(request, username=None):
             rating.choice = choice
             ratings.append(rating)
     else:
-        ratings = (
+        ratings = list(
             Rating.objects
             .filter(user__username=username)
             .select_related('work', 'work__category')
         )
 
-    rating_list = natsorted(ratings,
-                            key=lambda x: (ordering.index(x.choice), x.work.title.lower()))  # Tri par note puis nom
+    compare_function = lambda x: (ordering.index(x.choice), x.work.title.lower())  # By default, sort by rating then name
+    if algo_name is not None:
+        try:
+            work_ids = [rating.work_id for rating in ratings]
+            algo = get_algo_backup(algo_name)
+            dataset = get_dataset_backup(algo_name)
+            best_pos = get_pos_of_best_works_for_user_via_algo(algo, dataset, user.id, work_ids)
+            ranking = {}
+            for rank, pos in enumerate(best_pos):
+                ranking[ratings[pos].id] = rank
+            compare_function = lambda x: (ordering.index(x.choice), ranking[x.id])
+        except:  # Two possible reasons: no backup or user not in backup
+            pass
+
+    rating_list = natsorted(ratings, key=compare_function)
 
     received_recommendation_list = []
     sent_recommendation_list = []
@@ -698,12 +715,12 @@ def remove_all_reco(request, targetname):
 
 def get_reco(request):
     category = request.GET.get('category', 'all')
-    algo = request.GET.get('algo', 'knn')
+    algo_name = request.GET.get('algo', 'svd' if user_exists_in_backup(request.user, 'svd') else 'knn')
     if current_user_ratings(request):
         reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
     else:
         reco_list = []
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'algo': algo})
+    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'algo': algo_name})
 
 
 def get_reco_dpp(request):

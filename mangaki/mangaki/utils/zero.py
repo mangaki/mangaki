@@ -1,18 +1,15 @@
-class MangakiZero(object):
-    def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10):
-        pass
+from mangaki.utils.common import RecommendationAlgorithm
 
-    def set_parameters(self, nb_users, nb_works):
-        pass
+
+class MangakiZero(RecommendationAlgorithm):
+    def __init__(self):
+        super().__init__()
 
     def fit(self, X, y):
         pass
 
     def predict(self, X):
         return [0] * len(X)
-
-    def __str__(self):
-        return '[ZERO]'
 
     def get_shortname(self):
         return 'zero'

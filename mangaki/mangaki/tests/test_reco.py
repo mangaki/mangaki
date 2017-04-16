@@ -1,12 +1,12 @@
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 
 class RecoTest(TestCase):
 
     def setUp(self):
-        User.objects.create_user(username='test', password='test')
+        get_user_model().objects.create_user(username='test', password='test')
 
     def test_reco(self, **kwargs):
         self.client.login(username='test', password='test')
