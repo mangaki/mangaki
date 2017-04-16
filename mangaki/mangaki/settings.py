@@ -47,25 +47,6 @@ INSTALLED_APPS = (
     'django_js_reverse',
 )
 
-if DEBUG:
-    INSTALLED_APPS += (
-        'debug_toolbar',
-        'django_extensions',
-        'django_nose',
-    )
-
-    INTERNAL_IPS = ('127.0.0.1',)
-
-    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-    NOSE_ARGS = [
-        '--with-doctest'
-    ]
-
-    NOTEBOOK_ARGUMENTS = [
-        '--ip=0.0.0.0',
-    ]
-
 if config.has_section('allauth'):
     INSTALLED_APPS += tuple(
         'allauth.socialaccount.providers.{}'.format(name)
@@ -100,6 +81,25 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+if DEBUG:
+    INSTALLED_APPS += (
+        'debug_toolbar',
+        'django_extensions',
+        'django_nose',
+    )
+
+    INTERNAL_IPS = ('127.0.0.1',)
+
+    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+    NOSE_ARGS = [
+        '--with-doctest',
+    ]
+
+    NOTEBOOK_ARGUMENTS = [
+        '--ip=0.0.0.0',
+    ]
 
 TEMPLATES = [
     {
