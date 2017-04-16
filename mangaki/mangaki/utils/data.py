@@ -3,6 +3,7 @@ import pickle
 import random
 from collections import Counter, namedtuple
 from mangaki.utils.values import rating_values
+from mangaki.utils.common import PICKLE_DIR
 import numpy as np
 from datetime import datetime
 from django.conf import settings
@@ -50,17 +51,16 @@ class Dataset:
             nb_works=max(triplets[:, 1]) + 1
         )
 
-    def make_anonymous_data(self, queryset):
-        triplets = []
+    def make_anonymous_data(self, triplets):
+        triplets = list(triplets)
         users = set()
         works = set()
         nb_ratings = Counter()
         X = []
         y = []
-        for user_id, work_id, rating in queryset.values_list('user_id', 'work_id', 'choice'):
+        for user_id, work_id, rating in triplets:
             users.add(user_id)
             works.add(work_id)
-            triplets.append((user_id, work_id, rating))
             nb_ratings[work_id] += 1
         random.shuffle(triplets)  # Scramble time
 

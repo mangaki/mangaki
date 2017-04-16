@@ -15,6 +15,7 @@ class MangakiKNN(RecommendationAlgorithm):
     nb_ratings = None
     M = None
     def __init__(self, NB_NEIGHBORS=20, RATED_BY_NEIGHBORS_AT_LEAST=3, missing_is_mean=True, weighted_neighbors=False):
+        super().__init__()
         self.NB_NEIGHBORS = NB_NEIGHBORS
         self.RATED_BY_NEIGHBORS_AT_LEAST = RATED_BY_NEIGHBORS_AT_LEAST
         self.missing_is_mean = missing_is_mean
@@ -36,7 +37,12 @@ class MangakiKNN(RecommendationAlgorithm):
         for i, user_id in enumerate(user_ids):
             if self.NB_NEIGHBORS < self.nb_users - 1:
                 score[i][user_id] = float('-inf')  # Do not select the user itself while looking at its potential neighbors
-                neighbor_ids = score[i].argpartition(-self.NB_NEIGHBORS - 1)[-self.NB_NEIGHBORS - 1:-1]  # Put top NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
+                # Put top NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
+                neighbor_ids = (
+                    score[i]
+                    .argpartition(-self.NB_NEIGHBORS - 1)
+                    [-self.NB_NEIGHBORS - 1:-1]
+                )
             else:
                 neighbor_ids = list(range(len(score[i])))
                 neighbor_ids.remove(user_id)

@@ -7,7 +7,7 @@ class Chrono(object):
     connection = None
     is_enabled = True
 
-    def __init__(self, is_enabled, connection=None):
+    def __init__(self, is_enabled):
         self.is_enabled = is_enabled
         self.checkpoint = datetime.now()
 

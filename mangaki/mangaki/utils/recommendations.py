@@ -5,6 +5,8 @@ from mangaki.utils.data import Dataset
 from django.contrib.auth.models import User
 from django.db.models import Count
 from mangaki.utils.algo import ALGOS, fit_algo, get_algo_backup, get_dataset_backup
+from mangaki.utils.algo import ALGOS, fit_algo
+from mangaki.utils.ratings import current_user_ratings
 import numpy as np
 import json
 import os.path
@@ -33,17 +35,33 @@ def get_pos_of_best_works_for_user_via_algo(algo, dataset, user_id, work_ids, li
     return pos_of_best
 
 
-def get_reco_algo(user, algo_name='knn', category='all'):
+def get_reco_algo(request, algo_name='knn', category='all'):
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
-
-    already_rated_works = Rating.objects.filter(user=user).values_list('work_id', flat=True)
+    already_rated_works = list(current_user_ratings(request))
+    if request.user.is_anonymous:
+        current_user_id = 0
+        # We only support KNN for anonymous users, since the offline models did
+        # not learn anything about them.
+        # FIXME: We should also force KNN for new users for which we have no
+        # offline trained model available.
+        algo_name = 'knn'
+    else:
+        current_user_id = request.user.id
 
     chrono.save('get rated works')
 
     if algo_name == 'knn':
         queryset = Rating.objects.filter(work__in=already_rated_works)
         dataset = Dataset()
-        anonymized = dataset.make_anonymous_data(queryset)
+        triplets = list(
+            queryset.values_list('user_id', 'work_id', 'choice'))
+        if request.user.is_anonymous:
+            triplets.extend([
+                (current_user_id, work_id, choice)
+                for work_id, choice in current_user_ratings(request).items()
+            ])
+
+        anonymized = dataset.make_anonymous_data(triplets)
 
         chrono.save('make first anonymous data')
 
@@ -53,25 +71,37 @@ def get_reco_algo(user, algo_name='knn', category='all'):
 
         chrono.save('prepare first fit')
 
-        encoded_neighbors = algo.get_neighbors([dataset.encode_user[user.id]])
+        encoded_neighbors = algo.get_neighbors([dataset.encode_user[current_user_id]])
         neighbors = dataset.decode_users(encoded_neighbors[0])  # We only want for the first user
 
         chrono.save('get neighbors')
 
         # Only keep useful ratings for recommendation
-        queryset = Rating.objects.filter(user__id__in=neighbors + [user.id]).exclude(choice__in=['willsee', 'wontsee'])
+        triplets = list(
+            Rating.objects
+                  .filter(user__id__in=neighbors + [current_user_id])
+                  .exclude(choice__in=['willsee', 'wontsee'])
+                  .values_list('user_id', 'work_id', 'choice')
+        )
+        if request.user.is_anonymous:
+            triplets.extend([
+                (current_user_id, work_id, choice)
+                for work_id, choice in current_user_ratings(request).items()
+                if choice not in ('willsee', 'wontsee')
+            ])
     else:
         # Every rating is useful
-        queryset = Rating.objects.all()
+        triplets = list(
+            Rating.objects.values_list('user_id', 'work_id', 'choice'))
 
-    chrono.save('get all %d interesting ratings' % queryset.count())
+    chrono.save('get all %d interesting ratings' % len(triplets))
 
     dataset = Dataset()
     try:
         algo = get_algo_backup(algo_name)
         dataset = get_dataset_backup(algo_name)
     except FileNotFoundError:
-        dataset, algo = fit_algo(algo_name, queryset, algo.get_backup_filename())
+        dataset, algo = fit_algo(algo_name, triplets, algo.get_backup_filename())
 
     chrono.save('fit %s' % algo.get_shortname())
 
