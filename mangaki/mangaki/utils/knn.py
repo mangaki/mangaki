@@ -85,7 +85,6 @@ class MangakiKNN(RecommendationAlgorithm):
                     predicted_rating += their_rating
                     weight += 1
             if nb_neighbors_that_rated_it < self.RATED_BY_NEIGHBORS_AT_LEAST:
-                # print(work_id, nb_neighbors_that_rated_it)
                 predicted_rating = 0
             if weight > 0:
                 predicted_rating /= weight

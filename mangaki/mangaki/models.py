@@ -19,7 +19,7 @@ from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MA
 from mangaki.utils.dpp import MangakiDPP
 from mangaki.utils.ratingsmatrix import RatingsMatrix
 
-NB_POPULAR_WORKS = 1000
+TOP_POPULAR_WORKS_FOR_SAMPLING = 200
 
 
 @CharField.register_lookup
@@ -68,14 +68,14 @@ class WorkQuerySet(models.QuerySet):
         return self.filter(title__search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
-    def dpp(self, nb_points):
+    def dpp(self, nb_works):
         """
         sample "nb_points" popular works which are far from each other (using DPP)
         """
-        work_ids = self.popular().values_list('id', flat=True)[:100]
+        work_ids = self.popular()[:TOP_POPULAR_WORKS_FOR_SAMPLING].values_list('id', flat=True)
         dpp = MangakiDPP(work_ids)
         dpp.load_from_algo('svd')
-        sampled_work_ids = dpp.sample_k(5)
+        sampled_work_ids = dpp.sample_k(nb_works)
         return self.filter(id__in=sampled_work_ids)
 
     def random(self):

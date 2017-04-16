@@ -27,6 +27,9 @@ class RecommendationAlgorithm:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
     def load(self, filename):
+        """
+        This function raises FileNotFoundException if no backup exists.
+        """
         with open(self.get_backup_path(filename), 'rb') as f:
             backup = pickle.load(f)
         return backup

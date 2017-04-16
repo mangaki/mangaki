@@ -28,6 +28,8 @@ CONVERT_FUNCTIONS = {
     'mangas': lambda choice: rating_values[choice]
 }
 
+logger = logging.getLogger(__name__)
+
 
 class Experiment(object):
     def __init__(self, dataset_name):
@@ -41,7 +43,6 @@ class Experiment(object):
         ]
         self.anonymized = None
         self.load_dataset(dataset_name)
-        self.logger = logging.getLogger(__name__)
 
     def load_dataset(self, dataset_name):
         dataset = Dataset()
@@ -57,19 +58,19 @@ class Experiment(object):
         for i_train, i_test in k_fold.split(self.anonymized.X):
             for algo in self.algos:
                 model = algo()
-                self.logger.info(model.get_shortname())
+                logger.info(model.get_shortname())
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
                 y_pred = model.predict(self.anonymized.X[i_test])
                 rmse = model.compute_rmse(y_pred, self.anonymized.y[i_test])
                 if model.verbose:
-                    self.logger.debug('Predicted: %s' % y_pred[:5])
-                    self.logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
-                self.logger.debug('RMSE %f' % rmse)
+                    logger.debug('Predicted: %s' % y_pred[:5])
+                    logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
+                logger.debug('RMSE %f' % rmse)
                 rmse_values[model.get_shortname()].append(rmse)
-        self.logger.info('Final results')
+        logger.info('Final results')
         for algo_name in rmse_values:
-            self.logger.info('%s: RMSE = %f' % (algo_name, np.mean(rmse_values[algo_name])))
+            logger.info('%s: RMSE = %f' % (algo_name, np.mean(rmse_values[algo_name])))
 
 
 class Command(BaseCommand):

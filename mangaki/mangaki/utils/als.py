@@ -25,8 +25,6 @@ class MangakiALS(RecommendationAlgorithm):
         means = np.zeros((self.nb_users,))
         for (user, work), rating in zip(X, y):
             matrix[user][work] = rating
-            # print(user, rating)
-            # print(type(user), type(rating))
             means[user] += rating
         for user in matrix:
             means[user] /= len(matrix[user])
