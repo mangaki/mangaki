@@ -7,10 +7,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import os
 import configparser
 import json
+import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+FIXTURE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
+TEST_DATA_DIR = os.path.join(BASE_DIR, 'tests', 'data')
 
 config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
 config.read(os.path.join(BASE_DIR, 'settings.ini'))
@@ -38,7 +41,7 @@ INSTALLED_APPS = (
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'bootstrapform',
+    'bootstrap3',
     'analytical',
     'cookielaw',
     'django_js_reverse',
@@ -125,6 +128,7 @@ WSGI_APPLICATION = 'mangaki.wsgi.application'
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FORM_CLASS= 'mangaki.forms.SignupForm'
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",

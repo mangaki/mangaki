@@ -75,10 +75,6 @@ color: #fff;
 background-color: #E84C15;
 
 }
-.btn:hover, .btn:focus {
-color: #fff;
-text-decoration: none;
-}
 .btn-lg{
 padding: 25px 25px;
 font-size: 20px;
@@ -282,6 +278,12 @@ color: #b2B2B2;
     border-radius: 4px;
 }
 
+.flatlist:after {
+    display: block;
+    content: " ";
+    clear: both;
+}
+
 #avatar {
     width: 100%;
     max-width: 150px;
@@ -362,3 +364,11 @@ ul.checklist .list-icon {
 
 /** Anime **/
 /** Manga **/
+
+/*
+ * ANONYMOUS RATING ALERT
+ */
+
+.anonymous-rating-alert {
+    margin-bottom: 0;
+}

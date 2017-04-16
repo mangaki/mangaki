@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 {% load posters %}
 
 {% block opengraph %}
@@ -179,7 +179,7 @@
       <div class="modal-body">
         <div class="alert alert-danger" role="alert" id="alert" style="display: none"></div>
         <div class="alert alert-success" role="alert" id="success" style="display: none"></div>
-        {{ suggestion_form|bootstrap }}
+        {% bootstrap_form suggestion_form %}
       </div>
       </form>
       <div class="modal-footer">

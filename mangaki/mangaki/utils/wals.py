@@ -26,6 +26,7 @@ class MangakiWALS(RecommendationAlgorithm):
     M = None
     U = None
     VT = None
+
     def __init__(self, NB_COMPONENTS=20):
         """An implementation of the Weighted Alternate Least Squares.
         NB_COMPONENTS: the number of components in the factorization"""
@@ -72,10 +73,10 @@ class MangakiWALS(RecommendationAlgorithm):
             rows,
             cols,
             dims,
-            unobserved_weight=1,#.1,
-            regularization=0.001,#001,
-            row_weights=None,#row_wts,
-            col_weights=None,#col_wts,
+            unobserved_weight=1,  # .1,
+            regularization=0.001,  # 001,
+            row_weights=None,  # row_wts,
+            col_weights=None,  # col_wts,
             use_factors_weights_cache=use_factors_weights_cache)
         simple_train(model, inp, 25)
         row_factor = model.row_factors[0].eval()
@@ -92,7 +93,7 @@ class MangakiWALS(RecommendationAlgorithm):
         self.chrono.save('fill and center matrix')
 
         self.M = self.factorize(indices, values)
-        
+
         self.chrono.save('factor matrix')
 
     def predict(self, X):
