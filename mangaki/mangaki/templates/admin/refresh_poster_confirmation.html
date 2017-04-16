@@ -13,7 +13,8 @@
 {% endblock %}
 
 {% block content %}
-<form method="post">{% csrf_token %}
+<form method="post">
+{% csrf_token %}
 <p>Tout d'abord, quels posters souhaitez-vous conserver ?</p>
 {% for work_id, work_title, posters in bundle %}
 <p style="display: block; clear: both">{{ work_title }}</p>

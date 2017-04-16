@@ -12,6 +12,8 @@ from mangaki.models import (
 from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
 
+from collections import defaultdict
+
 
 class TaggedWorkInline(admin.TabularInline):
     model = TaggedWork
@@ -54,7 +56,7 @@ class FAQAdmin(admin.ModelAdmin):
 @admin.register(Work)
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
-    list_display = ('id', 'title', 'nsfw')
+    list_display = ('id', 'category', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter,)
     actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work', 'update_tags_via_anidb']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
@@ -141,27 +143,105 @@ class WorkAdmin(admin.ModelAdmin):
 
     def merge(self, request, queryset):
         queryset = queryset.order_by('id')
-        if request.POST.get('post'):
-            chosen_id = int(request.POST.get('chosen_id'))
-            for obj in queryset:
-                if obj.id != chosen_id:
-                    for rating in Rating.objects.filter(work=obj).select_related('user'):
+        if request.POST.get('confirm'):
+            chosen_id = int(request.POST.get('id'))
+            chosen_work = Work.objects.get(id=chosen_id)
+            for field in request.POST.get('fields_to_choose').split(','):
+                if request.POST.get(field) != 'None':
+                    setattr(chosen_work, field, request.POST.get(field))
+            for work in queryset:
+                if work.id != chosen_id:
+                    for rating in work.rating_set.select_related('user'):
                         # S'il n'a pas déjà voté pour l'autre
                         if Rating.objects.filter(user=rating.user, work__id=chosen_id).count() == 0:
                             rating.work_id = chosen_id
                             rating.save()
                         else:
                             rating.delete()
-                    self.message_user(request, "%s a bien été supprimé." % obj.title)
-                    obj.delete()
+                    for staff in work.staff_set.all():
+                        if Staff.objects.filter(artist=staff.artist, role=staff.role).count() == 0:
+                            staff.work_id = chosen_id
+                            staff.save()
+                        else:
+                            staff.delete()
+                    for work_title in work.worktitle_set.all():
+                        work_title.work_id = chosen_id
+                        work_title.save()
+                    for tagged_work in work.taggedwork_set.all():
+                        tagged_work.work_id = chosen_id
+                        tagged_work.save()
+                    for suggestion in work.suggestion_set.all():
+                        suggestion.work_id = chosen_id
+                        suggestion.save()
+                    for recommendation in work.recommendation_set.all():
+                        recommendation.work_id = chosen_id
+                        recommendation.save()
+                    for pairing in work.pairing_set.all():
+                        pairing.work_id = chosen_id
+                        pairing.save()
+                    for reference in work.reference_set.all():
+                        reference.work_id = chosen_id
+                        reference.save()
+                    for cold_start_rating in work.coldstartrating_set.all():
+                        cold_start_rating.work_id = chosen_id
+                        cold_start_rating.save()
+                    for trope in work.trope_set.all():
+                        trope.origin_id = chosen_id
+                        trope.save()
+                    for genre in work.genre.all():
+                        chosen_work.genre.add(genre)
+                    self.message_user(request, "%s a bien été supprimé." % work.title)
+                    work.delete()
+            chosen_work.save()
             return None
-        deletable_objects = []
-        for obj in queryset:
-            deletable_objects.append(Rating.objects.filter(work=obj)[:10])
+
+        do_not_compare = ['sum_ratings', 'nb_ratings', 'nb_likes', 'nb_dislikes', 'controversy']
+        priority = {
+            'ACTION_REQUESTED': 2,
+            'OBVIOUS_VALUE': 1,
+            'INFO_ONLY': 0
+        }
+        row_color = {
+            'ACTION_REQUESTED': 'red',
+            'OBVIOUS_VALUE': 'green',
+            'INFO_ONLY': 'black'
+        }
+        merge_type = {}
+        rows = defaultdict(list)
+        for work in queryset.values():
+            for field in work:
+                rows[field].append(work[field])
+        fields_to_choose = []
+        template_rows = []
+        for field in rows:
+            choices = rows[field]
+            suggested = None
+            if field in do_not_compare:
+                merge_type[field] = 'INFO_ONLY'
+            elif all(choice == choices[0] for choice in choices):  # All equal
+                merge_type[field] = 'OBVIOUS_VALUE'
+                suggested = choices[0]
+            elif sum(not choice or choice == 'Inconnu' for choice in choices) == len(choices) - 1:  # All empty but one
+                merge_type[field] = 'OBVIOUS_VALUE'
+                suggested = [choice for choice in choices if choice and choice != 'Inconnu'][0]  # Remaining one
+            else:
+                merge_type[field] = 'ACTION_REQUESTED'
+            template_rows.append(dict(field=field, choices=choices, merge_type=merge_type[field], suggested=suggested, color=row_color[merge_type[field]]))
+            if field != 'id' and merge_type[field] != 'INFO_ONLY':
+                fields_to_choose.append(field)
+        template_rows.sort(key=lambda row: priority[row['merge_type']], reverse=True)
+
+        rating_samples = []
+        for work in queryset:
+            rating_samples.append(Rating.objects.filter(work=work)[:10])
+
         context = {
+            'fields_to_choose': ','.join(fields_to_choose),
+            'works_to_merge': queryset,
+            'template_rows': template_rows,
+            'rating_samples': rating_samples,
             'queryset': queryset,
             'opts': self.model._meta,
-            'deletable_objects': deletable_objects,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
         }
         return TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
