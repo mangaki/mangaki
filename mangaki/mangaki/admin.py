@@ -7,7 +7,7 @@ from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
     Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
-    FAQEntry
+    FAQEntry, ColdStartRating, Trope
 )
 from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
@@ -164,32 +164,12 @@ class WorkAdmin(admin.ModelAdmin):
                             staff.save()
                         else:
                             staff.delete()
-                    for work_title in work.worktitle_set.all():
-                        work_title.work_id = chosen_id
-                        work_title.save()
-                    for tagged_work in work.taggedwork_set.all():
-                        tagged_work.work_id = chosen_id
-                        tagged_work.save()
-                    for suggestion in work.suggestion_set.all():
-                        suggestion.work_id = chosen_id
-                        suggestion.save()
-                    for recommendation in work.recommendation_set.all():
-                        recommendation.work_id = chosen_id
-                        recommendation.save()
-                    for pairing in work.pairing_set.all():
-                        pairing.work_id = chosen_id
-                        pairing.save()
-                    for reference in work.reference_set.all():
-                        reference.work_id = chosen_id
-                        reference.save()
-                    for cold_start_rating in work.coldstartrating_set.all():
-                        cold_start_rating.work_id = chosen_id
-                        cold_start_rating.save()
-                    for trope in work.trope_set.all():
-                        trope.origin_id = chosen_id
-                        trope.save()
                     for genre in work.genre.all():
                         chosen_work.genre.add(genre)
+                    Trope.objects.filter(origin_id=work.id).update(origin_id=chosen_id)
+                    models_to_update = [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]
+                    for model in models_to_update:
+                        model.objects.filter(work_id=work.id).update(work_id=chosen_id)
                     self.message_user(request, "%s a bien été supprimé." % work.title)
                     work.delete()
             chosen_work.save()
@@ -446,3 +426,5 @@ admin.site.register(Rating)
 admin.site.register(Page)
 admin.site.register(FAQEntry)
 admin.site.register(Recommendation)
+admin.site.register(ColdStartRating)
+admin.site.register(Trope)
