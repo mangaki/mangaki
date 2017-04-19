@@ -141,6 +141,7 @@ class WorkAdmin(admin.ModelAdmin):
 
     make_sfw.short_description = "Rendre SFW les œuvres sélectionnées"
 
+    @transaction.atomic  # In case trouble happens
     def merge(self, request, queryset):
         queryset = queryset.order_by('id')
         if request.POST.get('confirm'):
@@ -152,11 +153,14 @@ class WorkAdmin(admin.ModelAdmin):
             for work in queryset:
                 if work.id != chosen_id:
                     for rating in work.rating_set.select_related('user'):
-                        # S'il n'a pas déjà voté pour l'autre
                         if Rating.objects.filter(user=rating.user, work__id=chosen_id).count() == 0:
+                            # No rating already exists for this work
                             rating.work_id = chosen_id
                             rating.save()
                         else:
+                            other_rating = Rating.objects.filter(user=rating.user, work__id=chosen_id)
+                            if other_rating.date and rating.date and other_rating.date < rating.date:  # Other rating is not the latest given
+                                other_rating.choice = rating.choice
                             rating.delete()
                     for staff in work.staff_set.all():
                         if Staff.objects.filter(artist=staff.artist, role=staff.role).count() == 0:
@@ -206,7 +210,13 @@ class WorkAdmin(admin.ModelAdmin):
                 suggested = [choice for choice in choices if choice and choice != 'Inconnu'][0]  # Remaining one
             else:
                 merge_type[field] = 'ACTION_REQUESTED'
-            template_rows.append(dict(field=field, choices=choices, merge_type=merge_type[field], suggested=suggested, color=row_color[merge_type[field]]))
+            template_rows.append({
+                'field': field,
+                'choices': choices,
+                'merge_type': merge_type[field],
+                'suggested': suggested,
+                'color': row_color[merge_type[field]],
+            })
             if field != 'id' and merge_type[field] != 'INFO_ONLY':
                 fields_to_choose.append(field)
         template_rows.sort(key=lambda row: priority[row['merge_type']], reverse=True)

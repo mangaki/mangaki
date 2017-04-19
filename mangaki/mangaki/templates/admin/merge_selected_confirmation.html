@@ -24,6 +24,9 @@
             <td>
                 <label>
                     {% if row.merge_type != 'INFO_ONLY' %}
+                        {% comment %}
+                        We need a |safe tag below, because of the datetime objects that are automatically converted into human readable.
+                        {% endcomment %}
                         <input type="radio" name="{{ row.field }}" value="{{ choice|safe }}" {% if choice == row.suggested %} checked{% endif %} />
                     {% endif %}
                     {% if row.field == 'ext_poster' %}
