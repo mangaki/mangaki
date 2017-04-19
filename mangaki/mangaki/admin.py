@@ -2,12 +2,13 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
 from django.db.models import Count
+from django.db import transaction
 
 from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
     Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
-    FAQEntry, ColdStartRating, Trope
+    FAQEntry, ColdStartRating, Trope, Language
 )
 from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
@@ -158,7 +159,7 @@ class WorkAdmin(admin.ModelAdmin):
                             rating.work_id = chosen_id
                             rating.save()
                         else:
-                            other_rating = Rating.objects.filter(user=rating.user, work__id=chosen_id)
+                            other_rating = Rating.objects.get(user=rating.user, work__id=chosen_id)
                             if other_rating.date and rating.date and other_rating.date < rating.date:  # Other rating is not the latest given
                                 other_rating.choice = rating.choice
                             rating.delete()
@@ -438,3 +439,4 @@ admin.site.register(FAQEntry)
 admin.site.register(Recommendation)
 admin.site.register(ColdStartRating)
 admin.site.register(Trope)
+admin.site.register(Language)
