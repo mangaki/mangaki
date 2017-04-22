@@ -87,7 +87,7 @@ class MALEntry:
 class MALClient:
     SEARCH_URL = 'https://myanimelist.net/api/{type}/search.xml'
     HEADERS = {
-        'User-Agent': settings.MAL_USER_AGENT
+        'User-Agent': getattr(settings, 'MAL_USER_AGENT', 'mangaki')
     }
 
     def __init__(self):
