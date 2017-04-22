@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import QuerySet, Q
 
-from mangaki.models import Work, Rating, SearchIssue, Category
+from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle
 
 from collections import namedtuple
 
@@ -41,6 +41,10 @@ def _encoding_translation(text):
 class MALWorks(Enum):
     animes = 'anime'
     mangas = 'manga'
+    novels = 'novel'
+
+
+SUPPORTED_MANGAKI_WORKS = [MALWorks.animes, MALWorks.mangas]
 
 
 MALUserWork = namedtuple('MALUserWork', 'title poster mal_id score')
@@ -51,6 +55,17 @@ class MALEntry:
         self.xml = xml_entry
         self.raw_properties = {child.tag: child.text for child in xml_entry}
         self.work_type = work_type
+        self.anime_type = None
+        self.manga_type = None
+
+        if self.work_type == MALWorks.animes:
+            self.anime_type = self.raw_properties['type'].lower()
+        elif (self.work_type == MALWorks.mangas
+              and self.raw_properties.get('type').lower() == MALWorks.novels):
+            # MAL(stupidity): You thought it was a manga! It's a light novel !
+            self.work_type = MALWorks.novels
+        elif self.work_type == MALWorks.mangas:
+            self.manga_type = self.raw_properties['type'].lower()
 
     @property
     def poster(self) -> Optional[str]:
@@ -82,6 +97,31 @@ class MALEntry:
     def source_url(self) -> str:
         return (
             'https://myanimelist.net/{}/{}'.format(self.work_type.value, self.raw_properties['id'])
+        )
+
+    @property
+    def mal_id(self) -> int:
+        return int(self.raw_properties['id'])
+
+    @property
+    def synonyms(self) -> List[str]:
+        if not self.raw_properties.get('synonyms'):
+            return []
+
+        return [synonym.strip() for synonym in self.raw_properties['synonyms'].split(';')]
+
+    @property
+    def nb_episodes(self) -> Optional[int]:
+        if not self.raw_properties.get('episodes'):
+            return None
+
+        return int(self.raw_properties.get('episodes'))
+
+    def __str__(self) -> str:
+        return '<MALEntry {} - {} - {}>'.format(
+            self.mal_id,
+            self.title,
+            self.work_type.value
         )
 
 
@@ -195,13 +235,36 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry]):
         ).exists()
 
         if not is_present:
-            Work.objects.create(
+            extra_fields = {}
+            if entry.nb_episodes:
+                extra_fields['nb_episodes'] = entry.nb_episodes
+
+            work = Work.objects.create(
                 category=work_cat,
                 title=entry.english_title or entry.title,
                 source=entry.source_url,
                 ext_poster=entry.poster,
-                date=entry.start_date
+                date=entry.start_date,
+                **extra_fields
             )
+
+            work_titles = [
+                WorkTitle(
+                    work=work,
+                    title=synonym,
+                    language=None,
+                    type='synonyme'
+                )
+                for synonym in entry.synonyms
+            ]
+
+            # TODO: we should add entry.english_title as main title.
+            # After Language is split into ExtLanguage and Language.
+
+            if work_titles:
+                WorkTitle.objects.bulk_create(work_titles)
+
+            # TODO: add ext genre, ext type.
 
 
 def poster_url(work_type: MALWorks, query: str) -> str:
@@ -263,22 +326,21 @@ def get_or_create_from_mal(work_list: QuerySet,
     except Work.MultipleObjectsReturned:
         works = work_list.filter(title__iexact=title).values_list('id').all()
         logger.warning('Duplicates detected (title) for the work <{}> -- selecting first.'.format(title))
-        return works[0]
+        return Work.objects.get(id=works[0][0])
     except Work.DoesNotExist:
-        count = work_list.filter(ext_poster=poster_link).count()
-        if count == 1:
-            return Work.objects.get(ext_poster=poster_link)
-        elif count >= 2:
-            logger.warning('Duplicates detected (ext_poster) for work with <{}> (during <{}> import) '
-                           '-- selecting first.'
-                           .format(poster_link, title))
-            return Work.objects.filter(ext_poster=poster_link).first()
-        else:
+        try:
+            return work_list.get(ext_poster=poster_link)
+        except Work.DoesNotExist:
             works = client.search_works(work_type, title)
             insert_into_mangaki_database_from_mal(works)
             return work_list.filter(
                 Q(ext_poster=poster_link)
                 | Q(title__iexact=title)).first()
+        except Work.MultipleObjectsReturned:
+            logger.warning('Duplicates detected (ext_poster) for work with <{}> (during <{}> import) '
+                           '-- selecting first.'
+                           .format(poster_link, title))
+            return Work.objects.filter(ext_poster=poster_link).first()
 
 
 def import_mal(mal_username: str, mangaki_username: str):
