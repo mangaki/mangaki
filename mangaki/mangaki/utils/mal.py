@@ -91,9 +91,13 @@ class MALClient:
     }
 
     def __init__(self):
-        self.session = requests.Session()
-        self.session.headers = self.HEADERS
-        self.session.auth = (settings.MAL_USER, settings.MAL_PASS)
+        if not hasattr(settings, 'MAL_USER') or not hastattr(settings, 'MAL_PASS'):
+            self.is_available = False
+        else:
+            self.session = requests.Session()
+            self.session.headers = self.HEADERS
+            self.session.auth = (settings.MAL_USER, settings.MAL_PASS)
+            self.is_available = True
 
     @staticmethod
     def _translate_http_exceptions(resp: requests.Response) -> None:
