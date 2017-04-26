@@ -14,6 +14,7 @@ from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
+from enum import Enum
 
 
 class TaggedWorkInline(admin.TabularInline):
@@ -52,6 +53,12 @@ class FAQAdmin(admin.ModelAdmin):
     ordering = ('order',)
     search_fields = ('theme',)
     list_display = ('theme', 'order')
+
+
+class MergeType(Enum):
+    INFO_ONLY = 0
+    JUST_CONFIRM = 1
+    CHOICE_REQUIRED = 2
 
 
 @admin.register(Work)
@@ -154,7 +161,7 @@ class WorkAdmin(admin.ModelAdmin):
             for work in queryset:
                 if work.id != chosen_id:
                     for rating in work.rating_set.select_related('user'):
-                        if Rating.objects.filter(user=rating.user, work__id=chosen_id).count() == 0:
+                        if Rating.objects.filter(user=rating.user, work__id=chosen_id).exists():
                             # No rating already exists for this work
                             rating.work_id = chosen_id
                             rating.save()
@@ -163,8 +170,8 @@ class WorkAdmin(admin.ModelAdmin):
                             if other_rating.date and rating.date and other_rating.date < rating.date:  # Other rating is not the latest given
                                 other_rating.choice = rating.choice
                             rating.delete()
-                    for staff in work.staff_set.all():
-                        if Staff.objects.filter(artist=staff.artist, role=staff.role).count() == 0:
+                    for staff in work.staff_set.select_related('artist', 'role').all():
+                        if Staff.objects.filter(artist=staff.artist, role=staff.role).exists():
                             staff.work_id = chosen_id
                             staff.save()
                         else:
@@ -182,14 +189,14 @@ class WorkAdmin(admin.ModelAdmin):
 
         do_not_compare = ['sum_ratings', 'nb_ratings', 'nb_likes', 'nb_dislikes', 'controversy']
         priority = {
-            'ACTION_REQUESTED': 2,
-            'OBVIOUS_VALUE': 1,
-            'INFO_ONLY': 0
+            MergeType.CHOICE_REQUIRED: 2,
+            MergeType.JUST_CONFIRM: 1,
+            MergeType.INFO_ONLY: 0
         }
         row_color = {
-            'ACTION_REQUESTED': 'red',
-            'OBVIOUS_VALUE': 'green',
-            'INFO_ONLY': 'black'
+            MergeType.CHOICE_REQUIRED: 'red',
+            MergeType.JUST_CONFIRM: 'green',
+            MergeType.INFO_ONLY: 'black'
         }
         merge_type = {}
         rows = defaultdict(list)
@@ -202,15 +209,15 @@ class WorkAdmin(admin.ModelAdmin):
             choices = rows[field]
             suggested = None
             if field in do_not_compare:
-                merge_type[field] = 'INFO_ONLY'
+                merge_type[field] = MergeType.INFO_ONLY
             elif all(choice == choices[0] for choice in choices):  # All equal
-                merge_type[field] = 'OBVIOUS_VALUE'
+                merge_type[field] = MergeType.JUST_CONFIRM
                 suggested = choices[0]
             elif sum(not choice or choice == 'Inconnu' for choice in choices) == len(choices) - 1:  # All empty but one
-                merge_type[field] = 'OBVIOUS_VALUE'
+                merge_type[field] = MergeType.JUST_CONFIRM
                 suggested = [choice for choice in choices if choice and choice != 'Inconnu'][0]  # Remaining one
             else:
-                merge_type[field] = 'ACTION_REQUESTED'
+                merge_type[field] = MergeType.CHOICE_REQUIRED
             template_rows.append({
                 'field': field,
                 'choices': choices,
@@ -218,7 +225,7 @@ class WorkAdmin(admin.ModelAdmin):
                 'suggested': suggested,
                 'color': row_color[merge_type[field]],
             })
-            if field != 'id' and merge_type[field] != 'INFO_ONLY':
+            if field != 'id' and merge_type[field] != MergeType.INFO_ONLY:
                 fields_to_choose.append(field)
         template_rows.sort(key=lambda row: priority[row['merge_type']], reverse=True)
 
