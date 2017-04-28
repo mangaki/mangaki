@@ -43,8 +43,11 @@
 {% endfor %}
     <tr>
         <th>rating_set</th>
-        {% for rating_sample in rating_samples %}
-            <td>{{ rating_sample|unordered_list }}</td>
+        {% for nb_ratings, rating_sample in rating_samples %}
+            <td>
+                {{ nb_ratings }} ratings
+                {{ rating_sample|unordered_list }}
+            </td>
         {% endfor %}
     </tr>
 </table>

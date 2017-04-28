@@ -89,8 +89,8 @@ class WorkAdmin(admin.ModelAdmin):
     # FIXME : https://github.com/mangaki/mangaki/issues/205
     def update_tags_via_anidb(self, request, queryset):
         if request.POST.get("post"):
-            chosen_ids = request.POST.getlist('checks')
-            for anime_id in chosen_ids:
+            kept_ids = request.POST.getlist('checks')
+            for anime_id in kept_ids:
                 anime = Work.objects.get(id=anime_id)
                 a = AniDB('mangakihttp', 1)
                 retrieve_tags = anime.retrieve_tags(a)
@@ -153,38 +153,38 @@ class WorkAdmin(admin.ModelAdmin):
     def merge(self, request, queryset):
         queryset = queryset.order_by('id')
         if request.POST.get('confirm'):
-            chosen_id = int(request.POST.get('id'))
-            chosen_work = Work.objects.get(id=chosen_id)
+            kept_id = int(request.POST.get('id'))
+            kept_work = Work.objects.get(id=kept_id)
             for field in request.POST.get('fields_to_choose').split(','):
                 if request.POST.get(field) != 'None':
-                    setattr(chosen_work, field, request.POST.get(field))
-            for work in queryset:
-                if work.id != chosen_id:
-                    for rating in work.rating_set.select_related('user'):
-                        if Rating.objects.filter(user=rating.user, work__id=chosen_id).exists():
-                            # No rating already exists for this work
-                            rating.work_id = chosen_id
-                            rating.save()
-                        else:
-                            other_rating = Rating.objects.get(user=rating.user, work__id=chosen_id)
-                            if other_rating.date and rating.date and other_rating.date < rating.date:  # Other rating is not the latest given
-                                other_rating.choice = rating.choice
-                            rating.delete()
-                    for staff in work.staff_set.select_related('artist', 'role').all():
-                        if Staff.objects.filter(artist=staff.artist, role=staff.role).exists():
-                            staff.work_id = chosen_id
-                            staff.save()
-                        else:
-                            staff.delete()
-                    for genre in work.genre.all():
-                        chosen_work.genre.add(genre)
-                    Trope.objects.filter(origin_id=work.id).update(origin_id=chosen_id)
-                    models_to_update = [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]
-                    for model in models_to_update:
-                        model.objects.filter(work_id=work.id).update(work_id=chosen_id)
-                    self.message_user(request, "%s a bien été supprimé." % work.title)
-                    work.delete()
-            chosen_work.save()
+                    setattr(kept_work, field, request.POST.get(field))
+            for work_to_delete in queryset:
+                if work_to_delete.id == kept_id:
+                    continue
+                for rating_to_delete in work_to_delete.rating_set.all():
+                    try:
+                        kept_rating = Rating.objects.get(work_id=kept_id, user_id=rating_to_delete.user_id)
+                        if kept_rating.date and rating_to_delete.date and kept_rating.date < rating_to_delete.date:  # Kept rating is not the latest given
+                            kept_rating.choice = rating_to_delete.choice  # Update the kept rating
+                        rating_to_delete.delete()
+                    except Rating.DoesNotExist:
+                        rating_to_delete.work_id = kept_id  # Safely transfer the rating to the kept work
+                        rating_to_delete.save()
+                for staff_to_delete in work_to_delete.staff_set.all():
+                    if Staff.objects.filter(work_id=kept_id, artist_id=staff_to_delete.artist_id, role_id=staff_to_delete.role_id).exists():  # This staff is already in the kept work
+                        staff_to_delete.delete()
+                    else:
+                        staff_to_delete.work_id = kept_id  # Safely transfer the staff to the kept work
+                        staff_to_delete.save()
+                for genre in work_to_delete.genre.all():
+                    kept_work.genre.add(genre)
+                Trope.objects.filter(origin_id=work_to_delete.id).update(origin_id=kept_id)
+                models_to_update = [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]
+                for model in models_to_update:
+                    model.objects.filter(work_id=work_to_delete.id).update(work_id=kept_id)
+                self.message_user(request, "L'œuvre %s a bien été supprimée." % work_to_delete.title)
+                work_to_delete.delete()
+            kept_work.save()
             return None
 
         do_not_compare = ['sum_ratings', 'nb_ratings', 'nb_likes', 'nb_dislikes', 'controversy']
@@ -231,7 +231,10 @@ class WorkAdmin(admin.ModelAdmin):
 
         rating_samples = []
         for work in queryset:
-            rating_samples.append(Rating.objects.filter(work=work)[:10])
+            rating_samples.append(
+                (Rating.objects.filter(work=work).count(),
+                 Rating.objects.filter(work=work)[:10])
+            )
 
         context = {
             'fields_to_choose': ','.join(fields_to_choose),
