@@ -223,7 +223,7 @@ class Work(models.Model):
         return self.title
 
 
-class WorkTitle (models.Model):
+class WorkTitle(models.Model):
     work = models.ForeignKey('Work')
     title = models.CharField(max_length=128, blank=True, db_index=True)
     language = models.ForeignKey('Language')
