@@ -2,15 +2,19 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
 from django.db.models import Count
+from django.db import transaction
 
 from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
     Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
-    FAQEntry
+    FAQEntry, ColdStartRating, Trope, Language
 )
 from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
+
+from collections import defaultdict
+from enum import Enum
 
 
 class TaggedWorkInline(admin.TabularInline):
@@ -51,10 +55,16 @@ class FAQAdmin(admin.ModelAdmin):
     list_display = ('theme', 'order')
 
 
+class MergeType(Enum):
+    INFO_ONLY = 0
+    JUST_CONFIRM = 1
+    CHOICE_REQUIRED = 2
+
+
 @admin.register(Work)
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
-    list_display = ('id', 'title', 'nsfw')
+    list_display = ('id', 'category', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter,)
     actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work', 'update_tags_via_anidb']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
@@ -79,8 +89,8 @@ class WorkAdmin(admin.ModelAdmin):
     # FIXME : https://github.com/mangaki/mangaki/issues/205
     def update_tags_via_anidb(self, request, queryset):
         if request.POST.get("post"):
-            chosen_ids = request.POST.getlist('checks')
-            for anime_id in chosen_ids:
+            kept_ids = request.POST.getlist('checks')
+            for anime_id in kept_ids:
                 anime = Work.objects.get(id=anime_id)
                 a = AniDB('mangakihttp', 1)
                 retrieve_tags = anime.retrieve_tags(a)
@@ -139,29 +149,100 @@ class WorkAdmin(admin.ModelAdmin):
 
     make_sfw.short_description = "Rendre SFW les œuvres sélectionnées"
 
+    @transaction.atomic  # In case trouble happens
     def merge(self, request, queryset):
         queryset = queryset.order_by('id')
-        if request.POST.get('post'):
-            chosen_id = int(request.POST.get('chosen_id'))
-            for obj in queryset:
-                if obj.id != chosen_id:
-                    for rating in Rating.objects.filter(work=obj).select_related('user'):
-                        # S'il n'a pas déjà voté pour l'autre
-                        if Rating.objects.filter(user=rating.user, work__id=chosen_id).count() == 0:
-                            rating.work_id = chosen_id
-                            rating.save()
-                        else:
-                            rating.delete()
-                    self.message_user(request, "%s a bien été supprimé." % obj.title)
-                    obj.delete()
+        if request.POST.get('confirm'):
+            kept_id = int(request.POST.get('id'))
+            kept_work = Work.objects.get(id=kept_id)
+            for field in request.POST.get('fields_to_choose').split(','):
+                if request.POST.get(field) != 'None':
+                    setattr(kept_work, field, request.POST.get(field))
+            for work_to_delete in queryset:
+                if work_to_delete.id == kept_id:
+                    continue
+                for rating_to_delete in work_to_delete.rating_set.all():
+                    try:
+                        kept_rating = Rating.objects.get(work_id=kept_id, user_id=rating_to_delete.user_id)
+                        if kept_rating.date and rating_to_delete.date and kept_rating.date < rating_to_delete.date:  # Kept rating is not the latest given
+                            kept_rating.choice = rating_to_delete.choice  # Update the kept rating
+                        rating_to_delete.delete()
+                    except Rating.DoesNotExist:
+                        rating_to_delete.work_id = kept_id  # Safely transfer the rating to the kept work
+                        rating_to_delete.save()
+                for staff_to_delete in work_to_delete.staff_set.all():
+                    if Staff.objects.filter(work_id=kept_id, artist_id=staff_to_delete.artist_id, role_id=staff_to_delete.role_id).exists():  # This staff is already in the kept work
+                        staff_to_delete.delete()
+                    else:
+                        staff_to_delete.work_id = kept_id  # Safely transfer the staff to the kept work
+                        staff_to_delete.save()
+                for genre in work_to_delete.genre.all():
+                    kept_work.genre.add(genre)
+                Trope.objects.filter(origin_id=work_to_delete.id).update(origin_id=kept_id)
+                models_to_update = [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]
+                for model in models_to_update:
+                    model.objects.filter(work_id=work_to_delete.id).update(work_id=kept_id)
+                self.message_user(request, "L'œuvre %s a bien été supprimée." % work_to_delete.title)
+                work_to_delete.delete()
+            kept_work.save()
             return None
-        deletable_objects = []
-        for obj in queryset:
-            deletable_objects.append(Rating.objects.filter(work=obj)[:10])
+
+        do_not_compare = ['sum_ratings', 'nb_ratings', 'nb_likes', 'nb_dislikes', 'controversy']
+        priority = {
+            MergeType.CHOICE_REQUIRED: 2,
+            MergeType.JUST_CONFIRM: 1,
+            MergeType.INFO_ONLY: 0
+        }
+        row_color = {
+            MergeType.CHOICE_REQUIRED: 'red',
+            MergeType.JUST_CONFIRM: 'green',
+            MergeType.INFO_ONLY: 'black'
+        }
+        merge_type = {}
+        rows = defaultdict(list)
+        for work in queryset.values():
+            for field in work:
+                rows[field].append(work[field])
+        fields_to_choose = []
+        template_rows = []
+        for field in rows:
+            choices = rows[field]
+            suggested = None
+            if field in do_not_compare:
+                merge_type[field] = MergeType.INFO_ONLY
+            elif all(choice == choices[0] for choice in choices):  # All equal
+                merge_type[field] = MergeType.JUST_CONFIRM
+                suggested = choices[0]
+            elif sum(not choice or choice == 'Inconnu' for choice in choices) == len(choices) - 1:  # All empty but one
+                merge_type[field] = MergeType.JUST_CONFIRM
+                suggested = [choice for choice in choices if choice and choice != 'Inconnu'][0]  # Remaining one
+            else:
+                merge_type[field] = MergeType.CHOICE_REQUIRED
+            template_rows.append({
+                'field': field,
+                'choices': choices,
+                'merge_type': merge_type[field],
+                'suggested': suggested,
+                'color': row_color[merge_type[field]],
+            })
+            if field != 'id' and merge_type[field] != MergeType.INFO_ONLY:
+                fields_to_choose.append(field)
+        template_rows.sort(key=lambda row: priority[row['merge_type']], reverse=True)
+
+        rating_samples = []
+        for work in queryset:
+            rating_samples.append(
+                (Rating.objects.filter(work=work).count(),
+                 Rating.objects.filter(work=work)[:10])
+            )
+
         context = {
+            'fields_to_choose': ','.join(fields_to_choose),
+            'works_to_merge': queryset,
+            'template_rows': template_rows,
+            'rating_samples': rating_samples,
             'queryset': queryset,
             'opts': self.model._meta,
-            'deletable_objects': deletable_objects,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
         }
         return TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
@@ -366,3 +447,6 @@ admin.site.register(Rating)
 admin.site.register(Page)
 admin.site.register(FAQEntry)
 admin.site.register(Recommendation)
+admin.site.register(ColdStartRating)
+admin.site.register(Trope)
+admin.site.register(Language)
