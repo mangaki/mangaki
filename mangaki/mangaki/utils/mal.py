@@ -1,17 +1,16 @@
 """
-This module contains multiple functions to scrap MyAnimeList,
+This module contains multiple functions to interact with MyAnimeList API,
 looking for anime and finding URL of posters.
 """
 
 import xml.etree.ElementTree as ET
 from enum import Enum
-from typing import Optional, List
+from typing import Optional, List, Generator
 
 import requests
 import html
 import re
 from functools import reduce
-from random import randint
 
 from django.conf import settings
 
@@ -19,6 +18,8 @@ from django.contrib.auth.models import User
 from django.db.models import QuerySet, Q
 
 from mangaki.models import Work, Rating, SearchIssue, Category
+
+from collections import namedtuple
 
 import logging
 
@@ -36,13 +37,13 @@ def _encoding_translation(text):
     return reduce(lambda s, r: s.replace(*r), translations.items(), text)
 
 
-def random_ip():
-    return '.'.join(map(str, [randint(100, 255) for _ in range(4)]))
-
-
+# User-friendly representation of works' type.
 class MALWorks(Enum):
     animes = 'anime'
     mangas = 'manga'
+
+
+MALUserWork = namedtuple('MALUserWork', 'title poster mal_id score')
 
 
 class MALEntry:
@@ -86,17 +87,20 @@ class MALEntry:
 
 class MALClient:
     SEARCH_URL = 'https://myanimelist.net/api/{type}/search.xml'
+    LIST_WORK_URL = 'https://myanimelist.net/malappinfo.php?u={username}&status=all&type={type}'
     HEADERS = {
         'User-Agent': getattr(settings, 'MAL_USER_AGENT', 'mangaki')
     }
 
-    def __init__(self):
-        if not hasattr(settings, 'MAL_USER') or not hastattr(settings, 'MAL_PASS'):
+    def __init__(self,
+                 mal_user: Optional[str] = None,
+                 mal_pass: Optional[str] = None):
+        if not mal_user or not mal_pass:
             self.is_available = False
         else:
             self.session = requests.Session()
             self.session.headers = self.HEADERS
-            self.session.auth = (settings.MAL_USER, settings.MAL_PASS)
+            self.session.auth = (mal_user, mal_pass)
             self.is_available = True
 
     @staticmethod
@@ -107,14 +111,36 @@ class MALClient:
         if not resp.status_code == requests.codes['ALL_GOOD']:
             raise RuntimeError('MAL request failure!')
 
-    def list_works_from_a_user(self, work_type: MALWorks, username: str) -> str:
+    def list_works_from_a_user(self,
+                               work_type: MALWorks,
+                               username: str) -> Generator[MALUserWork, None, None]:
         resp = (
             self.session.get(
-                'https://myanimelist.net/malappinfo.php?u={}&status=all&type={}'.format(username, work_type.value)
+                self.LIST_WORK_URL.format(
+                    username=username,
+                    type=work_type.value)
             )
         )
 
-        return resp.text
+        xml = ET.fromstring(resp.text)
+        for entry in xml:
+            # Skip the myinfo part.
+            if entry.tag == 'myinfo':
+                continue
+            try:
+                title = entry.find('series_title').text
+                poster = entry.find('series_image').text
+                score = int(entry.find('my_score').text)
+                mal_id = entry.find('series_{}db_id'.format(work_type.value)).text
+            except AttributeError:
+                logger.exception('Malformed XML response (or MAL changed its API!)')
+                continue
+
+            yield MALUserWork(
+                title=title,
+                poster=poster,
+                mal_id=mal_id,
+                score=score)
 
     def _search_api(self, work_type: MALWorks, query: str) -> requests.Response:
         return self.session.get(
@@ -123,21 +149,22 @@ class MALClient:
                 'q': query
             })
 
-    def search_work(self, work_type: MALWorks, query: str) -> MALEntry:
+    def _search_works(self, work_type: MALWorks, query: str) -> str:
         resp = self._search_api(work_type, query)
         self._translate_http_exceptions(resp)
 
         html_code = html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'a\1;', resp.text))
         xml = re.sub(r'&([^alg])', r'&amp;\1', _encoding_translation(html_code))
+
+        return xml
+
+    def search_work(self, work_type: MALWorks, query: str) -> MALEntry:
+        xml = self._search_works(work_type, query)
 
         return MALEntry(ET.fromstring(xml).find('entry'), work_type)
 
     def search_works(self, work_type: MALWorks, query: str) -> List[MALEntry]:
-        resp = self._search_api(work_type, query)
-        self._translate_http_exceptions(resp)
-
-        html_code = html.unescape(re.sub(r'&amp;([A-Za-z]+);', r'a\1;', resp.text))
-        xml = re.sub(r'&([^alg])', r'&amp;\1', _encoding_translation(html_code))
+        xml = self._search_works(work_type, query)
 
         entries = []
         for entry in ET.fromstring(xml).findall('entry'):
@@ -150,7 +177,8 @@ class MALClient:
             return entries
 
 
-client = MALClient()
+client = MALClient(getattr(settings, 'MAL_USER', None),
+                   getattr(settings, 'MAL_PASS', None))
 
 
 def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry]):
@@ -191,6 +219,16 @@ def compute_rating_choice_from_mal_score(score: int) -> Optional[str]:
     :type score: int
     :return: None if the score is out of the range, otherwise, [7, 10] => like, [5, 6] => neutral, [0, 4] => dislike.
     :rtype: Optional[str]
+    
+    
+    >>> compute_rating_choice_from_mal_score(8)
+    'like'
+    >>> compute_rating_choice_from_mal_score(-1)
+    None
+    >>> compute_rating_choice_from_mal_score(0)
+    'dislike'
+    >>> compute_rating_choice_from_mal_score(5)
+    'neutral'
     """
     if 7 <= score <= 10:
         return 'like'
@@ -257,30 +295,19 @@ def import_mal(mal_username: str, mangaki_username: str):
         MALWorks.mangas: Work.objects.filter(category__slug='manga')
     }
 
-    for work_type in MALWorks:
-        xml = ET.fromstring(client.list_works_from_a_user(work_type, mal_username))
-        for entry in xml:
-            title = None
-            # Skip the myinfo part.
-            if entry.tag == 'myinfo':
-                continue
+    for work_type in SUPPORTED_MANGAKI_WORKS:
+        for user_work in client.list_works_from_a_user(work_type, mal_username):
             try:
-                title = entry.find('series_title').text
-                poster = entry.find('series_image').text
-                score = int(entry.find('my_score').text)
-                mal_id = entry.find('series_{}db_id'.format(work_type.value)).text
-            except AttributeError:
-                logger.exception('Malformed XML response (or MAL changed its API!)')
-                fails.append(title or 'Unknown failure')
-                continue
-
-            try:
-                work = get_or_create_from_mal(mangaki_lists[work_type], work_type, title, poster)
+                work = get_or_create_from_mal(
+                    mangaki_lists[work_type],
+                    work_type,
+                    user_work.title,
+                    user_work.poster)
 
                 if work:
                     already_rated = Rating.objects.filter(user=user, work=work).exists()
                     if not already_rated:
-                        choice = compute_rating_choice_from_mal_score(score)
+                        choice = compute_rating_choice_from_mal_score(user_work.score)
                         if not choice:
                             raise RuntimeError('No choice was deduced from MAL score.')
 
@@ -289,7 +316,12 @@ def import_mal(mal_username: str, mangaki_username: str):
                     nb_added += 1
             except Exception:
                 logger.exception('Failure to fetch the work from MAL and import it into the Mangaki database.')
-                SearchIssue(user=user, title=title, poster=poster, mal_id=mal_id, score=score).save()
-                fails.append(title)
+                SearchIssue(
+                    user=user,
+                    title=user_work.title,
+                    poster=user_work.poster,
+                    mal_id=user_work.mal_id,
+                    score=user_work.score).save()
+                fails.append(user_work.title)
 
     return nb_added, fails
