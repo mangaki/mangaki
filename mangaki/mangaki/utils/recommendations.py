@@ -101,7 +101,7 @@ def get_reco_algo(request, algo_name='knn', category='all'):
         algo = get_algo_backup(algo_name)
         dataset = get_dataset_backup(algo_name)
     except FileNotFoundError:
-        dataset, algo = fit_algo(algo_name, triplets, algo.get_backup_filename())
+        dataset, algo = fit_algo(algo_name, triplets)
 
     chrono.save('fit %s' % algo.get_shortname())
 
