@@ -124,7 +124,6 @@ class MALEntry:
             self.work_type.value
         )
 
-
 class MALClient:
     SEARCH_URL = 'https://myanimelist.net/api/{type}/search.xml'
     LIST_WORK_URL = 'https://myanimelist.net/malappinfo.php?u={username}&status=all&type={type}'
@@ -326,7 +325,7 @@ def get_or_create_from_mal(work_list: QuerySet,
     except Work.MultipleObjectsReturned:
         works = work_list.filter(title__iexact=title).values_list('id').all()
         logger.warning('Duplicates detected (title) for the work <{}> -- selecting first.'.format(title))
-        return Work.objects.get(id=works[0][0])
+        return works[0]
     except Work.DoesNotExist:
         try:
             return work_list.get(ext_poster=poster_link)
