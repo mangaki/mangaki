@@ -20,9 +20,11 @@
         <iframe src="https://ghbtns.com/github-btn.html?user=mangaki&repo=mangaki&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
     </div>
 {% else %}
+    {% if is_mal_import_available %}
     <div class="col-md-4 col-sm-12 text-center margin">
         <a class="btn btn-mangaki btn-lg" href="{% url 'profile' user.username %}">Import myAnimeList</a>
     </div>
+    {% endif %}
     <div class="col-md-4 col-sm-12 text-center margin">
         <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">C'est parti !</a>
     </div>

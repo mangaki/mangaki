@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Count
 
 from mangaki.models import Rating, Work
-from mangaki.utils.mal import lookup_mal_api
+from mangaki.utils.mal import client, MALWorks
 
 
 def merge_anime(ids):
@@ -44,7 +44,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         conflicts = []
         entries = {
-            'poster': Work.objects.filter(category__slug='anime').values_list('ext_poster').annotate(Count('ext_poster')).filter(ext_poster__count__gte=2),
+            'ext_poster': Work.objects.filter(category__slug='anime').values_list('ext_poster').annotate(Count('ext_poster')).filter(ext_poster__count__gte=2),
             'title': Work.objects.filter(category__slug='anime').values_list('title').annotate(Count('title')).filter(title__count__gte=2)
         }
         for category in entries:
@@ -73,12 +73,13 @@ class Command(BaseCommand):
             if nb_sources > 1:
                 print('Bizarre, plusieurs sources :', sources)
                 rename_tasks = []
-                for entry in lookup_mal_api(Work.objects.get(id=ids[0]).title):
-                    poster = entry['image']
+                first_work = Work.objects.get(id=ids[0])
+                for entry in client.search_works(MALWorks(first_work.category.slug), first_work.title):
+                    poster = entry.poster
                     if poster in id_of_poster:
-                        rename_tasks.append((id_of_poster[poster], entry['title']))
+                        rename_tasks.append((id_of_poster[poster], entry.english_title or entry.title))
                     else:
-                        print(entry['title'])
+                        print(entry.english_title or entry.title)
                 for anime_id, proposed_title in rename_tasks:
                     print(anime_id, proposed_title)
                 for anime_id, proposed_title in rename_tasks:

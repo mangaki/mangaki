@@ -61,6 +61,7 @@
                 <hr/>
                 Recevoir la newsletter :
                 <input type="checkbox" name="newsletter_ok" {% if user.profile.newsletter_ok %} checked{% endif %}/>
+                {% if is_mal_import_available %}
                 <hr/>
                 <p>Importer depuis myAnimeList :</p>
                 <div class="input-group">
@@ -70,6 +71,7 @@
                     <button id="import_mal" class="btn btn-default">OK</button>
                 </span>
                 </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>

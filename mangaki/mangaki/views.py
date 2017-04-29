@@ -32,7 +32,7 @@ from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Top, Trope, Work)
-from mangaki.utils.mal import import_mal
+from mangaki.utils.mal import import_mal, client
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.algo import get_algo_backup, get_dataset_backup
@@ -482,6 +482,7 @@ def get_profile(request, username=None):
         ]
 
     data = {
+        'is_mal_import_available': client.is_available,
         'username': username,
         'is_shared': is_shared,
         'category': category,
@@ -512,6 +513,7 @@ def index(request):
     partners = Partner.objects.filter()
     return render(request, 'index.html', {
         'partners': partners,
+        'is_mal_import_available': client.is_available
     })
 
 
@@ -754,14 +756,17 @@ def update_reco_willsee(request):
 
 
 def import_from_mal(request, mal_username):
-    if request.method == 'POST':
+    if request.method == 'POST' and client.is_available:
         nb_added, fails = import_mal(mal_username, request.user.username)
         payload = {
             'added': nb_added,
             'failures': fails
         }
         return HttpResponse(json.dumps(payload), content_type='application/json')
-    return HttpResponse()
+    elif not client.is_available:
+        raise Http404()
+    else:
+        return HttpResponse()
 
 
 def add_pairing(request, artist_id, work_id):
