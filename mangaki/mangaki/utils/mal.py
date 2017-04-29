@@ -224,7 +224,6 @@ def compute_rating_choice_from_mal_score(score: int) -> Optional[str]:
     >>> compute_rating_choice_from_mal_score(8)
     'like'
     >>> compute_rating_choice_from_mal_score(-1)
-    None
     >>> compute_rating_choice_from_mal_score(0)
     'dislike'
     >>> compute_rating_choice_from_mal_score(5)
