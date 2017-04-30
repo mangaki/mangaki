@@ -135,7 +135,7 @@
                         <h1>Recommandations reçues</h1>
                         {% for object in received_recommendation_list %}
                             <p class="row flatlist"><a
-                                    href="{% url 'work.detail' object.category object.id %}">{{ object.title }}</a> vous
+                                    href="{% url 'work-detail' object.category object.id %}">{{ object.title }}</a> vous
                                 a été conseillé par <a
                                         href="{% url 'profile' object.username %}">{{ object.username }}</a>
                                 {% if request.user.username == username %}
