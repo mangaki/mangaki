@@ -226,7 +226,8 @@ class Work(models.Model):
 class WorkTitle(models.Model):
     work = models.ForeignKey('Work')
     title = models.CharField(max_length=128, blank=True, db_index=True)
-    language = models.ForeignKey('Language')
+    language = models.ForeignKey('Language',
+                                 null=True)
     type = models.CharField(max_length=9, choices=(
                             ('main', 'principal'),
                             ('official', 'officiel'),
@@ -235,7 +236,7 @@ class WorkTitle(models.Model):
                             db_index=True)
 
     def __str__(self):
-        return ("%s" % self.title)
+        return "%s" % self.title
 
 
 class Language(models.Model):
