@@ -8,7 +8,7 @@ from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
     Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
-    FAQEntry, ColdStartRating, Trope, Language
+    FAQEntry, ColdStartRating, Trope, Language, WorkCluster
 )
 from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
@@ -302,6 +302,15 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(TaggedWork)
 class TaggedWorkAdmin(admin.ModelAdmin):
     search_fields = ('work', 'tag')
+
+
+@admin.register(WorkCluster)
+class WorkClusterAdmin(admin.ModelAdmin):
+    list_display = ('user', 'get_work_titles', 'reported_on', 'merged_on', 'checker')
+    raw_id_fields = ('works',)
+
+    def get_work_titles(self, obj):
+        return ' & '.join([work.title for work in obj.works.all()])
 
 
 @admin.register(Suggestion)

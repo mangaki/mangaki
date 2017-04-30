@@ -395,6 +395,14 @@ class Suggestion(models.Model):
     is_checked = models.BooleanField(default=False)
 
 
+class WorkCluster(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    works = models.ManyToManyField(Work)
+    reported_on = models.DateTimeField(auto_now=True)
+    merged_on = models.DateTimeField(auto_now=True)
+    checker = models.ForeignKey(User, related_name='checker', on_delete=models.CASCADE, null=True)
+
+
 class Neighborship(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     neighbor = models.ForeignKey(User, related_name='neighbor', on_delete=models.CASCADE)
