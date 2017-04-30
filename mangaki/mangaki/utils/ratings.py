@@ -127,6 +127,7 @@ def current_user_set_toggle_rating(request, work, choice):
     if user.is_authenticated:
         old_ratings = user.rating_set.filter(work=work, choice=choice)
         if old_ratings:
+            old_ratings.delete()
             return None
         else:
             user.rating_set.update_or_create(work=work, defaults={'choice': choice})
