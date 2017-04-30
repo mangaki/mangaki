@@ -323,7 +323,7 @@ def get_or_create_from_mal(work_list: QuerySet,
     try:
         return work_list.get(title__iexact=title)
     except Work.MultipleObjectsReturned:
-        works = work_list.filter(title__iexact=title).values_list('id').all()
+        works = work_list.filter(title__iexact=title).all()
         logger.warning('Duplicates detected (title) for the work <{}> -- selecting first.'.format(title))
         return works[0]
     except Work.DoesNotExist:
