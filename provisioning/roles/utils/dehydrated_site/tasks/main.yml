@@ -1,0 +1,62 @@
+---
+- name: Ensure required directories exist.
+  file:
+    path: '{{ item }}'
+    state: 'directory'
+    owner: '{{ dehydrated_site_user }}'
+    group: '{{ dehydrated_site_group }}'
+    mode: 0755
+    recurse: true
+  with_items: ['{{ dehydrated_site_root }}/live', '{{ dehydrated_site_acme_wellknown }}']
+  become: true
+
+- name: Setup dehydrated config and domains.
+  template:
+    src: 'etc/dehydrated/{{ item }}.j2'
+    dest: '{{ dehydrated_site_root }}/{{ item }}'
+    mode: '0600'
+    owner: '{{ dehydrated_site_user }}'
+    group: '{{ dehydrated_site_group }}'
+  with_items: ['config', 'domains.txt']
+  become: true
+  become_user: '{{ dehydrated_site_user }}'
+
+- name: Setup dehydrated hook.
+  template:
+    src: 'etc/dehydrated/hook.sh.j2'
+    dest: '{{ dehydrated_site_root }}/hook.sh'
+    mode: '0700'
+    owner: '{{ dehydrated_site_user }}'
+    group: '{{ dehydrated_site_group }}'
+  become: true
+  become_user: '{{ dehydrated_site_user }}'
+
+- name: Setup systemd units and timers.
+  template:
+    src: 'etc/systemd/system/dehydrated{{ item }}.j2'
+    dest: '/etc/systemd/system/dehydrated-{{ dehydrated_site_name }}{{ item }}'
+    mode: '0644'
+    owner: 'root'
+    group: 'root'
+  become: true
+  with_items: ['.timer', '.service', '-renewed.service']
+
+- name: Flush handlers to ensure we have a working HTTP server.
+  meta: flush_handlers
+
+- name: Enable timer.
+  service:
+    name: 'dehydrated-{{ dehydrated_site_name }}.timer'
+    state: started
+    enabled: true
+  become: true
+
+- name: Ensure links to certificates are set up properly.
+  file:
+    src: '{{ dehydrated_site_root }}/live/{{ dehydrated_site_domains.0 }}/{{ item.0 }}'
+    dest: '/etc/ssl/{{ item.1 }}'
+    state: 'link'
+  with_items:
+    - ['cert.pem', 'certs/{{ dehydrated_site_domains.0 }}.pem']
+    - ['fullchain.pem', 'certs/{{ dehydrated_site_domains.0 }}.chained.pem']
+    - ['privkey.pem', 'private/{{ dehydrated_site_domains.0 }}.key']

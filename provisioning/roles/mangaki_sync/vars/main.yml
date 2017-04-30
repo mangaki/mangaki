@@ -1,0 +1,8 @@
+---
+mangaki_sync_user: '{{ mangaki_source_user }}'
+mangaki_sync_group: '{{ mangaki_source_group }}'
+mangaki_sync_home: '{{ mangaki_source_home }}'
+mangaki_sync_venv_path: '{{ mangaki_source_venv_path }}'
+mangaki_sync_settings_path: '{{ mangaki_source_settings_path }}'
+mangaki_sync_manage: '{{ mangaki_source_manage }}'
+mangaki_sync_env: '{{ mangaki_source_env }}'

@@ -1,0 +1,37 @@
+---
+- name: Collect static files
+  shell: '{{ mangaki_sync_manage }} collectstatic --no-input'
+  environment: '{{ mangaki_sync_env }}'
+  become: true
+  become_user: '{{ mangaki_sync_user }}'
+  run_once: true
+  when: 'mangaki_sync_collectstatic|bool'
+  tags: action
+
+- name: Migrate database
+  shell: '{{ mangaki_sync_manage }} migrate'
+  environment: '{{ mangaki_sync_env }}'
+  become: true
+  become_user: '{{ mangaki_sync_user }}'
+  run_once: true
+  when: 'mangaki_sync_migrate|bool'
+  tags: action
+
+- block:
+  - name: Copy fixture to remote host.
+    copy:
+      src: '{{ mangaki_sync_load_seed_path }}'
+      dest: '{{ mangaki_sync_home }}/seed.json'
+      owner: '{{ mangaki_sync_user }}'
+      group: '{{ mangaki_sync_group }}'
+      mode: '0644'
+
+  - name: Load seed data.
+    shell: '{{ mangaki_sync_manage }} loaddata {{ mangaki_sync_home }}/seed.json'
+    environment: '{{ mangaki_sync_env }}'
+
+  when: 'mangaki_sync_load_seed|bool'
+  tags: action
+  become: true
+  become_user: '{{ mangaki_sync_user }}'
+  run_once: true

@@ -1,11 +1,30 @@
 ---
-- name: Setup a single Mangaki server
+- name: Ensure apt cache and packages are up-to-date.
   hosts: all
-  vars_files:
-    - env_vars/secret.yml
+  tasks:
+    - apt:
+        upgrade: 'yes'
+        update_cache: 'yes'
+        cache_valid_time: 3600
+      become: true
 
+- name: Setup development servers.
+  hosts: mangaki_dev
   roles:
-    - base
-    - db
-    - web
-    - nginx
+    - role: mangaki_db
+    - role: mangaki_source
+    - role: mangaki_sync
+    - role: mangaki_back
+
+- name: Setup standalone servers.
+  hosts: mangaki_standalone
+  roles:
+    - role: mangaki_db
+    - role: mangaki_source
+    - role: mangaki_sync
+    - role: mangaki_front
+    - role: mangaki_back
+    - role: utils/nginx
+    - role: utils/dehydrated
+      when: 'mangaki_web_use_acme|bool'
+    - role: mangaki_web

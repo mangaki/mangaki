@@ -1,0 +1,8 @@
+---
+mangaki_web_name: '{{ mangaki_name }}'
+mangaki_web_www_root: '/var/www/{{ mangaki_name }}'
+mangaki_web_use_acme: true
+mangaki_web_acme_wellknown_path: '/var/www/acme-challenge/'
+mangaki_web_acme_ca: 'https://acme-staging.api.letsencrypt.org/directory'
+mangaki_web_acme_ca_terms: 'https://acme-staging.api.letsencrypt.org/terms'
+mangaki_web_app_servers: ['127.0.0.1:8000']

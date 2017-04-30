@@ -1,0 +1,24 @@
+{{ ansible_managed|comment }}
+
+[Unit]
+Description=Let's Encrypt certificate renewal
+
+[Service]
+Type=oneshot
+
+User={{ dehydrated_user }}
+Group={{ dehydrated_group }}
+UMask=0027
+
+PermissionsStartOnly=yes
+ExecStart=/usr/local/bin/dehydrated --accept-terms -c --config {{ dehydrated_site_root|quote }}/config --hook {{ dehydrated_site_root|quote }}/hook.sh
+ExecStartPost=/bin/systemctl start --no-block dehydrated-{{ dehydrated_site_name }}-renewed
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=yes
+ProtectHome=yes 
+
+CapabilityBoundingSet=
+AmbientCapabilities=
