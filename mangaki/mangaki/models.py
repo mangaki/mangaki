@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -27,7 +28,7 @@ class SearchLookup(Lookup):
     __search django lookup, but we don't care because it doesn't work for
     PostgreSQL anyways."""
 
-    lookup_name = 'search'
+    lookup_name = 'dummy_search'
 
     def as_sql(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
@@ -64,7 +65,7 @@ class WorkQuerySet(models.QuerySet):
         # We want to search when the title contains the query or when the
         # similarity between the title and the query is low; we also want to
         # show the relevant results first.
-        return self.filter(title__search=search_text).\
+        return self.filter(title__dummy_search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
     def dpp(self, nb_works):
@@ -110,7 +111,7 @@ class Category(models.Model):
 class Work(models.Model):
     title = models.CharField(max_length=128)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
-    ext_poster = models.CharField(max_length=128)
+    ext_poster = models.CharField(max_length=128, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
@@ -138,6 +139,9 @@ class Work(models.Model):
     nb_likes = models.IntegerField(blank=True, null=False, default=0)
     nb_dislikes = models.IntegerField(blank=True, null=False, default=0)
     controversy = models.FloatField(blank=True, null=False, default=0)
+
+    # Cache fields for the title deduplication
+    title_search = SearchVectorField('title')
 
     class Meta:
         index_together = [
@@ -226,6 +230,7 @@ class Work(models.Model):
 class WorkTitle(models.Model):
     work = models.ForeignKey('Work')
     title = models.CharField(max_length=128, blank=True, db_index=True)
+    title_search = SearchVectorField('title')
     language = models.ForeignKey('Language',
                                  null=True)
     type = models.CharField(max_length=9, choices=(
@@ -244,8 +249,8 @@ class Language(models.Model):
                                       blank=True,
                                       db_index=True)
     iso639 = models.CharField(max_length=2,
-                            unique=True,
-                            db_index=True)
+                              unique=True,
+                              db_index=True)
 
     def __str__(self):
         return "%s : %s" % (self.anidb_language, self.iso639)
