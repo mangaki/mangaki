@@ -171,12 +171,16 @@ class MALClient:
                 continue
             try:
                 title = entry.find('series_title').text
-                # Take all non-empty synonyms.
-                stripped_synonyms = (
-                    syn.strip()
-                    for syn in entry.find('series_synonyms').text.split('; ')
-                )
-                synonyms = list(filter(None, stripped_synonyms))
+                synonyms_node = entry.find('series_synonyms').text
+                if synonyms_node:
+                    # Take all non-empty synonyms.
+                    stripped_synonyms = (
+                        syn.strip()
+                        for syn in entry.find('series_synonyms').text.split('; ')
+                    )
+                    synonyms = list(filter(None, stripped_synonyms))
+                else:
+                    synonyms = []
                 poster = entry.find('series_image').text
                 score = int(entry.find('my_score').text)
                 mal_id = entry.find('series_{}db_id'.format(work_type.value)).text
