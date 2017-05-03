@@ -28,7 +28,7 @@ class SearchLookup(Lookup):
     __search django lookup, but we don't care because it doesn't work for
     PostgreSQL anyways."""
 
-    lookup_name = 'dummy_search'
+    lookup_name = 'mangaki_search'
 
     def as_sql(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
@@ -65,7 +65,7 @@ class WorkQuerySet(models.QuerySet):
         # We want to search when the title contains the query or when the
         # similarity between the title and the query is low; we also want to
         # show the relevant results first.
-        return self.filter(title__dummy_search=search_text).\
+        return self.filter(title__mangaki_search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
     def dpp(self, nb_works):

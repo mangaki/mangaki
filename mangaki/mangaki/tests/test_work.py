@@ -75,7 +75,7 @@ class WorkTest(TestCase):
             ('boxers', None),
         ]
         for query, expected in tests:
-            qs = list(Work.objects.filter(title__search=query))
+            qs = list(Work.objects.search(query))
             if expected is None:
                 self.assertFalse(qs)
                 continue
