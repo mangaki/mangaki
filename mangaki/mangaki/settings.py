@@ -31,8 +31,9 @@ SITE_ID = config.getint('deployment', 'SITE_ID', fallback=1)
 
 # Application definition
 INSTALLED_APPS = (
-    'mangaki',  # Mangaki main application
-    'irl',      # Mangaki IRL events
+    'profiles',  # Mangaki profiles
+    'mangaki',   # Mangaki main application
+    'irl',       # Mangaki IRL events
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
