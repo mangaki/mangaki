@@ -13,7 +13,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import CharField, F, Func, Lookup, Value
 
-from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
+from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 from mangaki.utils.dpp import MangakiDPP
 from mangaki.utils.ratingsmatrix import RatingsMatrix
@@ -108,6 +108,7 @@ class Category(models.Model):
 
 
 class Work(models.Model):
+    redirect = models.ForeignKey('Work', blank=True, null=True)
     title = models.CharField(max_length=128)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
     ext_poster = models.CharField(max_length=128)
@@ -399,8 +400,13 @@ class WorkCluster(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     works = models.ManyToManyField(Work)
     reported_on = models.DateTimeField(auto_now=True)
-    merged_on = models.DateTimeField(auto_now=True)
-    checker = models.ForeignKey(User, related_name='checker', on_delete=models.CASCADE, null=True)
+    status = models.CharField(max_length=11, choices=CLUSTER_CHOICES, default='unprocessed')
+    checker = models.ForeignKey(User, related_name='reported_clusters', on_delete=models.CASCADE, blank=True, null=True)
+    resulting_work = models.ForeignKey(Work, related_name='clusters', blank=True, null=True)
+    merged_on = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])
 
 
 class Neighborship(models.Model):
