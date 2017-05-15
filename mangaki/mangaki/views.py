@@ -752,30 +752,26 @@ def update_newsletter(request):
 
 
 def update_research(request):
-    return render(request, 'research.html')
     is_ok = None
-    if request.user.is_authenticated and request.method == 'POST':
+    if request.user.is_authenticated and request.method == 'POST':  # Toggle on one's profile
         username = request.user.username
         is_ok = request.POST['research_ok'] == 'true'
         Profile.objects.filter(user__username=username).update(research_ok=is_ok)
-    #try:
-    if request.method == 'GET':
-        print(request.GET)
+        return HttpResponse()
+    if request.method == 'POST':  # Confirmed from mail
+        is_ok = 'yes' in request.POST
+        username = request.POST['username']
+        token = request.POST['token']
+    elif request.method == 'GET':  # Clicked on mail link
         username = request.GET['username']
         token = request.GET['token']
-        print(username)
-        print(token)
-        message = settings.HASH_NACL + username
-        if hashlib.sha1(message.encode('utf-8')).hexdigest() == token:
-            is_ok = False
-        else:
-            print(token)
-            print(hashlib.sha1(message.encode('utf-8')).hexdigest())
-    #except:
-        #return redirect('home')
-    if is_ok is not None:
+    message = settings.HASH_NACL + username
+    if hashlib.sha1(message.encode('utf-8')).hexdigest() != token:  # If the token is invalid
+        # Add an error message
+        return redirect('home')
+    elif is_ok is not None:
         Profile.objects.filter(user__username=username).update(research_ok=is_ok)
-    return HttpResponse()
+    return render(request, 'research.html', {'username': username, 'token': token})
 
 
 def update_reco_willsee(request):

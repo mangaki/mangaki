@@ -4,6 +4,8 @@
 <form method="post">
 {% csrf_token %}
 <p>Êtes-vous sûr·e de ne pas vouloir participer au data challenge de Kyoto ?</p>
-<input type="submit" class="btn btn-danger" value="Ne pas participer" /> <input type="submit" class="btn btn-success" value="Participer" />
+<input type="hidden" name="username" value="{{ username }}" />
+<input type="hidden" name="token" value="{{ token }}" />
+<input type="submit" class="btn btn-danger" name="no" value="Ne pas participer" /> <input type="submit" class="btn btn-success" name="yes" value="Participer" />
 </form>
 {% endblock %}
