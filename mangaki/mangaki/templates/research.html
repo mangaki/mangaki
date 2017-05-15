@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block body %}
+<form method="post">
+{% csrf_token %}
+<p>Êtes-vous sûr·e de ne pas vouloir participer au data challenge de Kyoto ?</p>
+<input type="submit" class="btn btn-danger" value="Ne pas participer" /> <input type="submit" class="btn btn-success" value="Participer" />
+</form>
+{% endblock %}

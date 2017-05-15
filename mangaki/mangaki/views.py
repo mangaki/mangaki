@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 
 import allauth.account.views
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
@@ -25,6 +26,7 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 from markdown import markdown
 from natsort import natsorted
+import hashlib
 
 from irl.models import Attendee, Event, Partner
 from mangaki.choices import TOP_CATEGORY_CHOICES
@@ -746,6 +748,33 @@ def update_nsfw(request):
 def update_newsletter(request):
     if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(newsletter_ok=request.POST['newsletter_ok'] == 'true')
+    return HttpResponse()
+
+
+def update_research(request):
+    return render(request, 'research.html')
+    is_ok = None
+    if request.user.is_authenticated and request.method == 'POST':
+        username = request.user.username
+        is_ok = request.POST['research_ok'] == 'true'
+        Profile.objects.filter(user__username=username).update(research_ok=is_ok)
+    #try:
+    if request.method == 'GET':
+        print(request.GET)
+        username = request.GET['username']
+        token = request.GET['token']
+        print(username)
+        print(token)
+        message = settings.HASH_NACL + username
+        if hashlib.sha1(message.encode('utf-8')).hexdigest() == token:
+            is_ok = False
+        else:
+            print(token)
+            print(hashlib.sha1(message.encode('utf-8')).hexdigest())
+    #except:
+        #return redirect('home')
+    if is_ok is not None:
+        Profile.objects.filter(user__username=username).update(research_ok=is_ok)
     return HttpResponse()
 
 

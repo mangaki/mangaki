@@ -39,91 +39,92 @@
 {% analytical_body_top %}
 {% cookielaw_banner %}
 
-<header class="navbar navbar-default">
-    <nav class="navbar navbar-default" role="navigation">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target="#menu-collapse">
-                    <span class="sr-only">Ouvrir le menu</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{% url 'home' %}">
-                    <img src="/static/img/minilogo.png" style="margin-top: -10px; margin-left: 5px"/>
-                </a>
-            </div>
+<div id="wrapper">
+    <header class="navbar navbar-default">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#menu-collapse">
+                        <span class="sr-only">Ouvrir le menu</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{% url 'home' %}">
+                        <img src="/static/img/minilogo.png" style="margin-top: -10px; margin-left: 5px"/>
+                    </a>
+                </div>
 
-            <div class="collapse navbar-collapse" id="menu-collapse">
-                <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a href="{% url 'about' %}">
-                            C'est quoi ?
-                        </a>
-                    </li>
-                </ul>
-                <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a href="{% url 'work-list' 'anime' %}">
-                            Anime
-                        </a>
-                    </li>
-                    <li class="dropdown">
-                        <a href="{% url 'work-list' 'manga' %}">
-                            Mangas
-                        </a>
-                    </li>
-                    <li class="dropdown">
-                        <a href="{% url 'reco' %}">
-                            Recommandations
-                        </a>
-                    </li>
-                    <li class="dropdown">
-                        <a href="{% url 'events' %}">
-                            Événements
-                        </a>
-                    </li>
-                    <li class="dropdown">
-                        <a href="{% url 'top' 'directors' %}">
-                            Top 20
-                        </a>
-                    </li>
-                </ul>
-
-                <ul class="nav navbar-nav navbar-right">
-                    {% if not user.is_authenticated %}
-                        <li><a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"><span
-                                class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
-                        <li><a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}"><span
-                                class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
-                    {% else %}
-                        <li><a href="{% url 'profile' user.username %}">Bienvenue, <strong>{{ user.username }}</strong> !</a>
+                <div class="collapse navbar-collapse" id="menu-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="{% url 'about' %}">
+                                C'est quoi ?
+                            </a>
                         </li>
-                        <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Quitter</a>
+                    </ul>
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="{% url 'work-list' 'anime' %}">
+                                Anime
+                            </a>
                         </li>
-                    {% endif %}
-                </ul>
+                        <li class="dropdown">
+                            <a href="{% url 'work-list' 'manga' %}">
+                                Mangas
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="{% url 'reco' %}">
+                                Recommandations
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="{% url 'events' %}">
+                                Événements
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="{% url 'top' 'directors' %}">
+                                Top 20
+                            </a>
+                        </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if not user.is_authenticated %}
+                            <li><a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"><span
+                                    class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
+                            <li><a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}"><span
+                                    class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
+                        {% else %}
+                            <li><a href="{% url 'profile' user.username %}">Bienvenue, <strong>{{ user.username }}</strong> !</a>
+                            </li>
+                            <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Quitter</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
-    {% block anonymous_rating_banner %}
-        {% if request|has_anonymous_ratings %}
-            <div class="alert alert-warning anonymous-rating-alert">
-                Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les
-                voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les
-                sauvegarder!
-            </div>
-        {% endif %}
-    {% endblock %}
-</header>
+        </nav>
+        {% block anonymous_rating_banner %}
+            {% if request|has_anonymous_ratings %}
+                <div class="alert alert-warning anonymous-rating-alert">
+                    Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les
+                    voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les
+                    sauvegarder!
+                </div>
+            {% endif %}
+        {% endblock %}
+    </header>
 
-
-
-<div class="container">
-    {% block body %}{% endblock %}
+    <div class="container">
+        {% block body %}{% endblock %}
+    </div>
+    <div id="push"></div>
 </div>
-
+    
 <footer>
     <nav class="navbar navbar-default">
         <div class="navbar-collapse">

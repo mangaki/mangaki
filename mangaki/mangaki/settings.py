@@ -23,6 +23,7 @@ config.read(os.path.join(BASE_DIR, 'settings.ini'))
 DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
 
 SECRET_KEY = config.get('secrets', 'SECRET_KEY')
+HASH_NACL = config.get('secrets', 'HASH_NACL')
 
 if config.has_section('hosts'):
     ALLOWED_HOSTS = [host.strip() for host in config.get('hosts', 'ALLOWED_HOSTS').split(',')]
