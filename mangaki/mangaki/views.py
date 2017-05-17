@@ -752,7 +752,6 @@ def update_research(request):
     if request.user.is_authenticated and request.method == 'POST' and 'research_ok' in request.POST:  # Toggle on one's profile
         username = request.user.username
         is_ok = request.POST.get('research_ok') == 'true'
-        print(is_ok, 'wwahahaa')
         Profile.objects.filter(user__username=username).update(research_ok=is_ok)
         return HttpResponse()
     if request.method == 'POST':  # Confirmed from mail link
