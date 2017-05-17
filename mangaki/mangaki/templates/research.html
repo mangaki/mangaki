@@ -1,11 +1,21 @@
 {% extends "base.html" %}
 
 {% block body %}
-<form method="post">
-{% csrf_token %}
-<p>Êtes-vous sûr·e de ne pas vouloir participer au data challenge de Kyoto ?</p>
-<input type="hidden" name="username" value="{{ username }}" />
-<input type="hidden" name="token" value="{{ token }}" />
-<input type="submit" class="btn btn-danger" name="no" value="Ne pas participer" /> <input type="submit" class="btn btn-success" name="yes" value="Participer" />
-</form>
+    {% if messages %}
+        {% for message in messages %}
+            <p class="alert alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}info{% endif %}">
+                {{ message }}
+            </p>
+        {% endfor %}
+        <a href="{% url 'home' %}" class="btn btn-default">Retourner à la page d'accueil</a>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            <p>Êtes-vous sûr·e de ne pas vouloir participer au data challenge de Kyoto ?</p>
+            <input type="hidden" name="username" value="{{ username }}" />
+            <input type="hidden" name="token" value="{{ token }}" />
+            <input type="submit" class="btn btn-danger" name="no" value="Ne pas participer" />
+            <input type="submit" class="btn btn-success" name="yes" value="Participer" />
+        </form>
+    {% endif %}
 {% endblock %}

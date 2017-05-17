@@ -8,6 +8,7 @@ import allauth.account.views
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
@@ -26,7 +27,7 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 from markdown import markdown
 from natsort import natsorted
-import hashlib
+import hmac
 
 from irl.models import Attendee, Event, Partner
 from mangaki.choices import TOP_CATEGORY_CHOICES
@@ -65,7 +66,9 @@ RATING_COLORS = {
 
 UTA_ID = 14293
 
-GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
+
+def compute_token(username):
+    return hmac.new(settings.HASH_NACL.encode('utf-8'), username.encode('utf-8')).hexdigest()
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -529,18 +532,11 @@ def events(request):
         for rating in Rating.objects.filter(work_id=UTA_ID, user=request.user):
             if rating.work_id == UTA_ID:
                 uta_rating = rating.choice
-    ghibli_works = Work.objects.in_bulk(GHIBLI_IDS)
-    if request.user.is_authenticated:
-        ghibli_ratings = dict(
-            Rating.objects.filter(user=request.user, work_id__in=GHIBLI_IDS).values_list('work_id', 'choice'))
-    else:
-        ghibli_ratings = {}
     utamonogatari = Work.objects.in_bulk([UTA_ID])
     return render(
         request, 'events.html',
         {
             'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
-            'ghibli': [(ghibli_works.get(work_id, None), ghibli_ratings.get(work_id, None)) for work_id in GHIBLI_IDS],
             'utamonogatari': utamonogatari.get(UTA_ID, None),
             'wakanim': Partner.objects.get(pk=12),
             'utamonogatari_rating': uta_rating,
@@ -753,24 +749,32 @@ def update_newsletter(request):
 
 def update_research(request):
     is_ok = None
-    if request.user.is_authenticated and request.method == 'POST':  # Toggle on one's profile
+    if request.user.is_authenticated and request.method == 'POST' and 'research_ok' in request.POST:  # Toggle on one's profile
         username = request.user.username
-        is_ok = request.POST['research_ok'] == 'true'
+        is_ok = request.POST.get('research_ok') == 'true'
+        print(is_ok, 'wwahahaa')
         Profile.objects.filter(user__username=username).update(research_ok=is_ok)
         return HttpResponse()
-    if request.method == 'POST':  # Confirmed from mail
+    if request.method == 'POST':  # Confirmed from mail link
         is_ok = 'yes' in request.POST
-        username = request.POST['username']
-        token = request.POST['token']
+        username = request.POST.get('username')
+        token = request.POST.get('token')
     elif request.method == 'GET':  # Clicked on mail link
-        username = request.GET['username']
-        token = request.GET['token']
-    message = settings.HASH_NACL + username
-    if hashlib.sha1(message.encode('utf-8')).hexdigest() != token:  # If the token is invalid
+        username = request.GET.get('username')
+        token = request.GET.get('token')
+    expected_token = compute_token(username)
+    if not hmac.compare_digest(token, expected_token):  # If the token is invalid
         # Add an error message
-        return redirect('home')
+        messages.error(request, 'Vous n\'êtes pas autorisé à effectuer cette action.')
+        return render(request, 'research.html', status=401)  # Unauthorized
     elif is_ok is not None:
+        message = 'Votre profil a bien été mis à jour. '
+        if is_ok:
+            message += 'Vous participerez au data challenge de Kyoto.'
+        else:
+            message += 'Vous ne participerez pas au data challenge de Kyoto.'
         Profile.objects.filter(user__username=username).update(research_ok=is_ok)
+        messages.success(request, message)
     return render(request, 'research.html', {'username': username, 'token': token})
 
 
