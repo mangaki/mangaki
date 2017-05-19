@@ -7,17 +7,18 @@ from django.db import connection
 
 class Command(BaseCommand):
     args = ''
-    help = 'Generate tokens from HASH_NACL'
+    help = 'Generate tokens for a certain salt'
 
     def add_arguments(self, parser):
         parser.add_argument('username', nargs=1, type=str)
+        parser.add_argument('salt', nargs=1, type=str)
 
     def handle(self, *args, **options):
         username = options.get('username')[0]
+        salt = options.get('salt')[0]
         if username == '*':
-            with open('mails.txt', 'w') as f:
-                for user in get_user_model().objects.filter(profile__newsletter_ok=True):
-                    if user.email:
-                        f.write('%d;%s;%s;%s\n' % (user.id, user.username, user.email, compute_token(user.username)))
+            for user in get_user_model().objects.filter(profile__newsletter_ok=True):
+                if user.email:
+                    pass  # Send a mail
         else:
             self.stdout.write(self.style.SUCCESS(compute_token(username)))

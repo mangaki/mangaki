@@ -67,6 +67,7 @@ RATING_COLORS = {
 }
 
 UTA_ID = 14293
+CURRENT_SALT = 'research-kyoto-2017'
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -759,7 +760,7 @@ def update_research(request):
     elif request.method == 'GET':  # Clicked on mail link
         username = request.GET.get('username')
         token = request.GET.get('token')
-    expected_token = compute_token(username)
+    expected_token = compute_token(CURRENT_SALT, username)
     if not constant_time_compare(token, expected_token):  # If the token is invalid
         # Add an error message
         messages.error(request, 'Vous n\'êtes pas autorisé à effectuer cette action.')
