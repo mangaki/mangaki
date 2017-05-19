@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from mangaki.views import compute_token
+from mangaki.utils.tokens import compute_token
 from django.contrib.auth import get_user_model
 from django.db import connection
 

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from mangaki.models import Profile
-from mangaki.views import compute_token
+from mangaki.utils.tokens import compute_token
 from django.conf import settings
 
 
