@@ -40,7 +40,7 @@ from mangaki.utils.mal import import_mal, client
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.algo import get_algo_backup, get_dataset_backup
-from mangaki.utils.tokens import compute_token
+from mangaki.utils.tokens import compute_token, KYOTO_SALT
 from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
 from irl.models import Event, Partner, Attendee
 
@@ -67,7 +67,6 @@ RATING_COLORS = {
 }
 
 UTA_ID = 14293
-CURRENT_SALT = 'research-kyoto-2017'
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -760,7 +759,7 @@ def update_research(request):
     elif request.method == 'GET':  # Clicked on mail link
         username = request.GET.get('username')
         token = request.GET.get('token')
-    expected_token = compute_token(CURRENT_SALT, username)
+    expected_token = compute_token(KYOTO_SALT, username)
     if not constant_time_compare(token, expected_token):  # If the token is invalid
         # Add an error message
         messages.error(request, 'Vous n\'êtes pas autorisé à effectuer cette action.')

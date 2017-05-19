@@ -21,4 +21,4 @@ class Command(BaseCommand):
                 if user.email:
                     pass  # Send a mail
         else:
-            self.stdout.write(self.style.SUCCESS(compute_token(username)))
+            self.stdout.write(self.style.SUCCESS(compute_token(salt, username)))

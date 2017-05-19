@@ -2,9 +2,8 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from mangaki.models import Profile
-from mangaki.utils.tokens import compute_token
+from mangaki.utils.tokens import compute_token, KYOTO_SALT
 from django.conf import settings
-from mangaki.views import CURRENT_SALT
 
 
 class ResearchTest(TestCase):
@@ -14,7 +13,7 @@ class ResearchTest(TestCase):
         self.user = get_user_model().objects.create_user(username=self.username, password='test')
         self.research_url = reverse('research')
         self.bad_token = 'xxx'
-        self.good_token = compute_token(CURRENT_SALT, self.username)
+        self.good_token = compute_token(KYOTO_SALT, self.username)
 
     def test_post_research_nok_when_logged(self, **kwargs):
         self.client.login(username=self.username, password='test')
