@@ -28,7 +28,6 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 from markdown import markdown
 from natsort import natsorted
-import hmac
 
 from irl.models import Attendee, Event, Partner
 from mangaki.choices import TOP_CATEGORY_CHOICES
