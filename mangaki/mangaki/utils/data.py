@@ -45,7 +45,7 @@ class Dataset:
         ratings_path = os.path.join(settings.DATA_DIR, 'ratings{}.csv'.format(suffix))
         works_path = os.path.join(settings.DATA_DIR, 'works{}.csv'.format(suffix))
         if os.path.isfile(ratings_path) or os.path.isfile(works_path):
-            confirm = input('Already exists. Continue? [y/n] ')
+            confirm = input('Already exists. Continue? [y/n] ') == 'y'
         if confirm:
             with open(ratings_path, 'w', newline='') as csvfile:
                 data = csv.writer(csvfile, delimiter=',', quotechar='', quoting=csv.QUOTE_NONE)
