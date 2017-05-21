@@ -123,4 +123,4 @@ def get_reco_algo(request, algo_name='knn', category='all'):
 
     chrono.save('get bulk')
 
-    return {'work_ids': best_work_ids, 'works': works}
+    return {'work_ids': works.keys(), 'works': works}
