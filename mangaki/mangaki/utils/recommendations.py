@@ -39,14 +39,12 @@ def get_reco_algo(request, algo_name='knn', category='all'):
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
     already_rated_works = list(current_user_ratings(request))
     if request.user.is_anonymous:
-        current_user_id = 0
+        assert request.user.id is None
         # We only support KNN for anonymous users, since the offline models did
         # not learn anything about them.
         # FIXME: We should also force KNN for new users for which we have no
         # offline trained model available.
         algo_name = 'knn'
-    else:
-        current_user_id = request.user.id
 
     chrono.save('get rated works')
 
@@ -57,7 +55,7 @@ def get_reco_algo(request, algo_name='knn', category='all'):
             queryset.values_list('user_id', 'work_id', 'choice'))
         if request.user.is_anonymous:
             triplets.extend([
-                (current_user_id, work_id, choice)
+                (request.user.id, work_id, choice)
                 for work_id, choice in current_user_ratings(request).items()
             ])
 
@@ -71,7 +69,7 @@ def get_reco_algo(request, algo_name='knn', category='all'):
 
         chrono.save('prepare first fit')
 
-        encoded_neighbors = algo.get_neighbors([dataset.encode_user[current_user_id]])
+        encoded_neighbors = algo.get_neighbors([dataset.encode_user[request.user.id]])
         neighbors = dataset.decode_users(encoded_neighbors[0])  # We only want for the first user
 
         chrono.save('get neighbors')
@@ -79,13 +77,13 @@ def get_reco_algo(request, algo_name='knn', category='all'):
         # Only keep useful ratings for recommendation
         triplets = list(
             Rating.objects
-                  .filter(user__id__in=neighbors + [current_user_id])
+                  .filter(user__id__in=neighbors + [request.user.id])
                   .exclude(choice__in=['willsee', 'wontsee'])
                   .values_list('user_id', 'work_id', 'choice')
         )
         if request.user.is_anonymous:
             triplets.extend([
-                (current_user_id, work_id, choice)
+                (request.user.id, work_id, choice)
                 for work_id, choice in current_user_ratings(request).items()
                 if choice not in ('willsee', 'wontsee')
             ])
@@ -101,7 +99,7 @@ def get_reco_algo(request, algo_name='knn', category='all'):
         algo = get_algo_backup(algo_name)
         dataset = get_dataset_backup(algo_name)
     except FileNotFoundError:
-        dataset, algo = fit_algo(algo_name, triplets, algo.get_backup_filename())
+        dataset, algo = fit_algo(algo_name, triplets)
 
     chrono.save('fit %s' % algo.get_shortname())
 
@@ -120,7 +118,9 @@ def get_reco_algo(request, algo_name='knn', category='all'):
     chrono.save('compute every prediction')
 
     works = Work.objects.in_bulk(best_work_ids)
+    # Some of the works may have been deleted since the algo backup was created.
+    ranked_work_ids = [work_id for work_id in best_work_ids if work_id in works]
 
     chrono.save('get bulk')
 
-    return {'work_ids': best_work_ids, 'works': works}
+    return {'work_ids': ranked_work_ids, 'works': works}

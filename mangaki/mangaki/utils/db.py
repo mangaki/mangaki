@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 
-from mangaki.utils.mal import MAL
+from mangaki.utils.mal import client
 
 
 def get_potential_posters(work):
@@ -17,15 +17,13 @@ def get_potential_posters(work):
             'current': False,
             'url': work.ext_poster
         })
-    mal = MAL()
-    mal.search(work.title)  # Query the poster to MAL from the title
-    poster_url = mal.get_poster()
-    if poster_url:
-        path = urlparse(poster_url).path
+    work = client.search_work(work.title)  # Query the poster to MAL from the title
+    if work.poster_url:
+        path = urlparse(work.poster_url).path
         if path not in ext_urls:
-            ext_urls.add(poster_url)
+            ext_urls.add(work.poster_url)
             posters.append({
                 'current': False,
-                'url': poster_url,
+                'url': work.poster_url,
             })
     return posters

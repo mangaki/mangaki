@@ -5,8 +5,10 @@ from urllib.parse import urlencode
 
 import allauth.account.views
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
@@ -14,6 +16,7 @@ from django.db.models import Case, IntegerField, Sum, Value, When
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.timezone import utc
@@ -32,10 +35,11 @@ from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Top, Trope, Work)
-from mangaki.utils.mal import import_mal
+from mangaki.utils.mal import import_mal, client
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.algo import get_algo_backup, get_dataset_backup
+from mangaki.utils.tokens import compute_token, KYOTO_SALT
 from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
 from irl.models import Event, Partner, Attendee
 
@@ -62,8 +66,6 @@ RATING_COLORS = {
 }
 
 UTA_ID = 14293
-
-GHIBLI_IDS = [2591, 8153, 2461, 53, 958, 30, 1563, 410, 60, 3315, 3177, 106]
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -482,6 +484,7 @@ def get_profile(request, username=None):
         ]
 
     data = {
+        'is_mal_import_available': client.is_available,
         'username': username,
         'is_shared': is_shared,
         'category': category,
@@ -512,6 +515,7 @@ def index(request):
     partners = Partner.objects.filter()
     return render(request, 'index.html', {
         'partners': partners,
+        'is_mal_import_available': client.is_available
     })
 
 
@@ -525,18 +529,11 @@ def events(request):
         for rating in Rating.objects.filter(work_id=UTA_ID, user=request.user):
             if rating.work_id == UTA_ID:
                 uta_rating = rating.choice
-    ghibli_works = Work.objects.in_bulk(GHIBLI_IDS)
-    if request.user.is_authenticated:
-        ghibli_ratings = dict(
-            Rating.objects.filter(user=request.user, work_id__in=GHIBLI_IDS).values_list('work_id', 'choice'))
-    else:
-        ghibli_ratings = {}
     utamonogatari = Work.objects.in_bulk([UTA_ID])
     return render(
         request, 'events.html',
         {
             'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
-            'ghibli': [(ghibli_works.get(work_id, None), ghibli_ratings.get(work_id, None)) for work_id in GHIBLI_IDS],
             'utamonogatari': utamonogatari.get(UTA_ID, None),
             'wakanim': Partner.objects.get(pk=12),
             'utamonogatari_rating': uta_rating,
@@ -747,6 +744,36 @@ def update_newsletter(request):
     return HttpResponse()
 
 
+def update_research(request):
+    is_ok = None
+    if request.user.is_authenticated and request.method == 'POST' and 'research_ok' in request.POST:  # Toggle on one's profile
+        username = request.user.username
+        is_ok = request.POST.get('research_ok') == 'true'
+        Profile.objects.filter(user__username=username).update(research_ok=is_ok)
+        return HttpResponse()
+    if request.method == 'POST':  # Confirmed from mail link
+        is_ok = 'yes' in request.POST
+        username = request.POST.get('username')
+        token = request.POST.get('token')
+    elif request.method == 'GET':  # Clicked on mail link
+        username = request.GET.get('username')
+        token = request.GET.get('token')
+    expected_token = compute_token(KYOTO_SALT, username)
+    if not constant_time_compare(token, expected_token):  # If the token is invalid
+        # Add an error message
+        messages.error(request, 'Vous n\'êtes pas autorisé à effectuer cette action.')
+        return render(request, 'research.html', status=401)  # Unauthorized
+    elif is_ok is not None:
+        message = 'Votre profil a bien été mis à jour. '
+        if is_ok:
+            message += 'Vous participerez au data challenge de Kyoto.'
+        else:
+            message += 'Vous ne participerez pas au data challenge de Kyoto.'
+        Profile.objects.filter(user__username=username).update(research_ok=is_ok)
+        messages.success(request, message)
+    return render(request, 'research.html', {'username': username, 'token': token})
+
+
 def update_reco_willsee(request):
     if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
@@ -754,14 +781,17 @@ def update_reco_willsee(request):
 
 
 def import_from_mal(request, mal_username):
-    if request.method == 'POST':
+    if request.method == 'POST' and client.is_available:
         nb_added, fails = import_mal(mal_username, request.user.username)
         payload = {
             'added': nb_added,
             'failures': fails
         }
         return HttpResponse(json.dumps(payload), content_type='application/json')
-    return HttpResponse()
+    elif not client.is_available:
+        raise Http404()
+    else:
+        return HttpResponse()
 
 
 def add_pairing(request, artist_id, work_id):
