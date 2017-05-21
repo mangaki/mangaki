@@ -115,16 +115,13 @@ def get_reco_algo(request, algo_name='knn', category='all'):
     chrono.save('remove already rated')
 
     pos_of_best = get_pos_of_best_works_for_user_via_algo(algo, dataset, request.user.id, filtered_works, limit=NB_RECO)
-    # Some of the works may have been deleted since the algo backup was created.
     best_work_ids = [filtered_works[pos] for pos in pos_of_best]
 
     chrono.save('compute every prediction')
 
     works = Work.objects.in_bulk(best_work_ids)
-    ranked_work_ids = []
-    for work_id in best_work_ids:
-        if work_id in works:
-            ranked_work_ids.append(work_id)
+    # Some of the works may have been deleted since the algo backup was created.
+    ranked_work_ids = [work_id for work_id in best_work_ids if work_id in works]
 
     chrono.save('get bulk')
 
