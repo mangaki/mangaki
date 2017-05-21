@@ -655,8 +655,9 @@ def get_reco_algo_list(request, algo, category):
     data = get_reco_algo(request, algo, category)
     works = data['works']
     for work_id in data['work_ids']:
-        work = works[work_id]
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
+        work = works.get(work_id)
+        if work is not None:
+            reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
                           'category': work.category.slug})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
