@@ -120,7 +120,9 @@ def get_reco_algo(request, algo_name='knn', category='all'):
     chrono.save('compute every prediction')
 
     works = Work.objects.in_bulk(best_work_ids)
+    # Some of the works may have been deleted since the algo backup was created.
+    ranked_work_ids = [work_id for work_id in best_work_ids if work_id in works]
 
     chrono.save('get bulk')
 
-    return {'work_ids': best_work_ids, 'works': works}
+    return {'work_ids': ranked_work_ids, 'works': works}
