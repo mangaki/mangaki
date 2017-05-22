@@ -72,6 +72,10 @@ class Dataset:
             nb_users=max(triplets[:, 0]) + 1, 
             nb_works=max(triplets[:, 1]) + 1
         )
+        if title_filename is not None:
+            with open(os.path.join(settings.DATA_DIR, title_filename)) as f:
+                titles = [title for _, title in csv.reader(f)]
+                self.titles = np.array(titles, dtype=np.object)
 
     def make_anonymous_data(self, triplets, convert=lambda choice: rating_values[choice], ordered=False):
         triplets = list(triplets)
