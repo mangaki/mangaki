@@ -44,6 +44,7 @@ class Dataset:
     def save_csv(self, suffix=''):
         ratings_path = os.path.join(settings.DATA_DIR, 'ratings{}.csv'.format(suffix))
         works_path = os.path.join(settings.DATA_DIR, 'works{}.csv'.format(suffix))
+        confirm = True
         if os.path.isfile(ratings_path) or os.path.isfile(works_path):
             confirm = input('Already exists. Continue? [y/n] ') == 'y'
         if confirm:
@@ -61,7 +62,7 @@ class Dataset:
                 for line in lines:
                     data.writerow(line)
 
-    def load_csv(self, filename, convert=float):
+    def load_csv(self, filename, convert=float, title_filename=None):
         with open(os.path.join(settings.DATA_DIR, filename)) as f:
             triplets = [[int(user_id), int(work_id), convert(rating)] for user_id, work_id, rating in csv.reader(f)]
         triplets = np.array(triplets, dtype=np.object)
@@ -72,7 +73,7 @@ class Dataset:
             nb_works=max(triplets[:, 1]) + 1
         )
 
-    def make_anonymous_data(self, triplets, convert=lambda choice: rating_values[choice]):
+    def make_anonymous_data(self, triplets, convert=lambda choice: rating_values[choice], ordered=False):
         triplets = list(triplets)
         users = set()
         works = set()
@@ -88,7 +89,10 @@ class Dataset:
         anonymous_u = list(range(len(users)))
         anonymous_w = list(range(len(works)))
         random.shuffle(anonymous_u)
-        random.shuffle(anonymous_w)
+        if ordered:
+            works = sorted(works, key=lambda work_id: nb_ratings[work_id], reverse=True)
+        else:
+            random.shuffle(anonymous_w)
         encode_user = dict(zip(users, anonymous_u))
         encode_work = dict(zip(works, anonymous_w))
         decode_user = dict(zip(anonymous_u, users))
