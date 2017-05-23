@@ -1,3 +1,4 @@
+from mangaki.utils.common import RecommendationAlgorithm
 from django.conf import settings
 from mangaki.utils.chrono import Chrono
 from sklearn.decomposition import FactorAnalysis
@@ -5,7 +6,7 @@ from scipy.sparse import csr_matrix
 import numpy as np
 
 
-class MangakiEFA(object):
+class MangakiEFA(RecommendationAlgorithm):
     M = None
     W = None
     H = None
@@ -29,14 +30,19 @@ class MangakiEFA(object):
 
         model = FactorAnalysis(n_components=self.NB_COMPONENTS)
         matrix = matrix.toarray()
+        self.matrix = matrix
         if truncated is not None:
             matrix = matrix[:, :truncated]
         self.W = model.fit_transform(matrix)
         self.H = model.components_
         print('Shapes', self.W.shape, self.H.shape)
-        self.M = self.W.dot(self.H)
+        self.M = self.W.dot(self.H) + model.mean_
+        self.model = model
 
         self.chrono.save('factor matrix')
+
+    def fit_user(self, user_id, sparse_matrix_dict):
+        pass
 
     def predict(self, X):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)]
