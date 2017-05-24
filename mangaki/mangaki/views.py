@@ -771,6 +771,7 @@ def update_research(request):
             message += 'Vous ne participerez pas au data challenge de Kyoto.'
         Profile.objects.filter(user__username=username).update(research_ok=is_ok)
         messages.success(request, message)
+        return render(request, 'research.html')
     return render(request, 'research.html', {'username': username, 'token': token})
 
 
