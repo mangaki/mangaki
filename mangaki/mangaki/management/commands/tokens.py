@@ -34,7 +34,7 @@ class Command(BaseCommand):
         if username == 'DEBUG':
             queryset = get_user_model().objects.filter(profile__newsletter_ok=True, username__in=DEBUG_USERNAMES)
         else:
-            queryset = get_user_model().objects.filter(profile__newsletter_ok=True)[:5]
+            queryset = get_user_model().objects.filter(profile__newsletter_ok=True)
         nb_mails = queryset.count()
         for rank, user in enumerate(queryset, start=1):
             if user.email:
