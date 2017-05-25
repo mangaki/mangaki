@@ -24,7 +24,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         username = options.get('username')[0]
         salt = options.get('salt')[0]
-        newsletter = yaml.load(open(os.path.join(settings.DATA_DIR, 'newsletter.yaml')).read())
+        filename = open(os.path.join(settings.DATA_DIR, 'newsletter.yaml')).read()
+        if os.access(filename, os.R_OK):
+            newsletter = yaml.load(filename)
         message = Template(newsletter['body'])
 
         if username not in ['DEBUG', '*']:
