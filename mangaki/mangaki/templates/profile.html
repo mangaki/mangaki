@@ -191,6 +191,10 @@
                             <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a> à voir (ou
                                 non){% else %}<a href="{% url 'work-list' 'manga' %}">Mangas</a> à lire (ou
                                 pas){% endif %}</h1>
+                            <p class="well">✨🍰✨ Trier selon Mangaki !
+                            <a href="{% url 'profile' username %}?category={{ category }}&algo=svd">mainstream</a> /
+                            <a href="{% url 'profile' username %}?category={{ category }}&algo=als">perles</a>
+                            </p>
                             {% include "works_no_poster.html" with works=unseen_list class=category %}
                         </div>
                     {% endif %}
