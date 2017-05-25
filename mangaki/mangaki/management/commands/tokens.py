@@ -10,43 +10,44 @@ import yaml
 from jinja2 import Template
 
 
-DEBUG_USERNAMES = ['jj', 'RaitoBezarius']
-
-
 class Command(BaseCommand):
     args = ''
     help = 'Generate tokens for a certain salt'
 
     def add_arguments(self, parser):
-        parser.add_argument('username', nargs=1, type=str)
-        parser.add_argument('salt', nargs=1, type=str)
+        parser.add_argument('username', nargs='+', type=str)
+        parser.add_argument('--salt', type=str, required=True)
+        parser.add_argument('--email-template', type=str)
 
     def handle(self, *args, **options):
-        username = options.get('username')[0]
-        salt = options.get('salt')[0]
-        filename = open(os.path.join(settings.DATA_DIR, 'newsletter.yaml')).read()
-        if os.access(filename, os.R_OK):
-            newsletter = yaml.load(filename)
-        message = Template(newsletter['body'])
+        usernames = options['username']
+        salt = options['salt']
 
-        if username not in ['DEBUG', '*']:
-            self.stdout.write(self.style.SUCCESS(compute_token(salt, username)))
-            return
+        if options['email_template'] is None:
+            for username in usernames:
+                self.stdout.write(self.style.SUCCESS(
+                    '{} {}'.format(username, compute_token(salt, username))))
 
-        if username == 'DEBUG':
-            queryset = get_user_model().objects.filter(profile__newsletter_ok=True, username__in=DEBUG_USERNAMES)
         else:
+            filename = os.path.join(settings.DATA_DIR, options['email_template'])
+            with open(filename, 'r') as f:
+                newsletter = yaml.safe_load(f)
+            message = Template(newsletter['body'])
+
             queryset = get_user_model().objects.filter(profile__newsletter_ok=True)
-        nb_mails = queryset.count()
-        for rank, user in enumerate(queryset, start=1):
-            if user.email:
-                token = compute_token(salt, user.username)
-                ok = send_mail(
-                    newsletter['subject'],
-                    message.render(username=user.username, token=token),
-                    newsletter['from'], [user.email], fail_silently=False)
-                prefix = '[{} / {}]'.format(rank, nb_mails)
-                if ok:
-                    self.stdout.write(self.style.SUCCESS('{}: {} OK'.format(prefix, user.username)))
-                else:
-                    self.stdout.write(self.style.ERROR('{}: {} NOK'.format(prefix, user.username)))
+            if '*' not in usernames:
+                queryset = queryset.filter(username__in=usernames)
+
+            nb_mails = queryset.count()
+            for rank, user in enumerate(queryset, start=1):
+                if user.email:
+                    token = compute_token(salt, user.username)
+                    ok = send_mail(
+                        newsletter['subject'],
+                        message.render(username=user.username, token=token),
+                        newsletter['from'], [user.email], fail_silently=False)
+                    prefix = '[{} / {}]'.format(rank, nb_mails)
+                    if ok:
+                        self.stdout.write(self.style.SUCCESS('{}: {} OK'.format(prefix, user.username)))
+                    else:
+                        self.stdout.write(self.style.ERROR('{}: {} NOK'.format(prefix, user.username)))
