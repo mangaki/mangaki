@@ -12,11 +12,12 @@
     {% if token %} 
         <form method="post">
             {% csrf_token %}
-            <p>Êtes-vous sûr·e de ne pas vouloir participer au data challenge de Kyoto ?</p>
+            <p>Souhaitez-vous que vos données de votes (sans votre pseudo, ni votre mail, ni le titre des œuvres) apparaissent dans un fichier public anonymisé destiné au data challenge organisé avec l'université de Kyoto ?</p>
+            <p>Pour en savoir plus, voir <a href="http://research.mangaki.fr/2017/05/27/data-challenge-kyoto-university/">le post à ce sujet sur notre blog</a>.</p>
             <input type="hidden" name="username" value="{{ username }}" />
             <input type="hidden" name="token" value="{{ token }}" />
-            <input type="submit" class="btn btn-danger" name="no" value="Ne pas participer" />
-            <input type="submit" class="btn btn-success" name="yes" value="Participer" />
+            <input type="submit" class="btn btn-danger" name="no" value="Ne pas utiliser mes données pour le data challenge de Kyoto, même anonymisées" />
+            <input type="submit" class="btn btn-success" name="yes" value="Oui, avec plaisir !" />
         </form>
     {% endif %}
 {% endblock %}
