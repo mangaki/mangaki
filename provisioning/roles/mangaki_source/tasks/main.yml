@@ -95,7 +95,7 @@
       export MANGAKI_SETTINGS_PATH={{ mangaki_source_settings_path }}
       cd {{ mangaki_source_package }}
       tmux new-session -s {{ mangaki_source_name }} '{{ mangaki_source_manage }} runserver 0.0.0.0:8000' 2> /dev/null || true
-      echo "Development server is running on port 8000; attach with `tmux attach -t mangaki`"
+      echo "Development server is running on port 8000; attach with 'tmux attach -t mangaki'"
   when: 'mangaki_source_install_type == "develop"'
   become: true
   become_user: '{{ mangaki_source_user }}'
