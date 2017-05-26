@@ -768,7 +768,7 @@ def update_research(request):
         if is_ok:
             message += 'Merci. Vos données seront présentes dans le data challenge de Kyoto.'
         else:
-            message += 'Vos données ne feront pas l\'objet de recherches.'
+            message += 'Vos données ne feront pas partie du jeu-concours de Kyoto.'
         Profile.objects.filter(user__username=username).update(research_ok=is_ok)
         messages.success(request, message)
         return render(request, 'research.html')
