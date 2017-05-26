@@ -14,3 +14,4 @@ scipy
 pandas
 responses==0.5.1
 lxml==3.5.0
+jinja2

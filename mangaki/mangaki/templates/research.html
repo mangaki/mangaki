@@ -8,7 +8,8 @@
             </p>
         {% endfor %}
         <a href="{% url 'home' %}" class="btn btn-default">Retourner à la page d'accueil</a>
-    {% else %}
+    {% endif %}
+    {% if token %} 
         <form method="post">
             {% csrf_token %}
             <p>Êtes-vous sûr·e de ne pas vouloir participer au data challenge de Kyoto ?</p>

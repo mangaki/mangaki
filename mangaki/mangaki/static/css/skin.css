@@ -37,14 +37,14 @@ body > .container {
 }
 
 #wrapper {
-    margin: 0 auto -30px;
+    margin: 0 auto -52px;
     min-height: 100%;
     height: auto !important;
     height: 100%;
 }
 
 footer, #push {
-    height: 30px;
+    height: 52px;
 }
 
 .featured {
