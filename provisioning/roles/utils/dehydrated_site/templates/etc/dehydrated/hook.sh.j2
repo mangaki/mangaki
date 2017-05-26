@@ -54,6 +54,7 @@ deploy_cert() {
     # - TIMESTAMP
     #   Timestamp when the specified certificate was created.
 
+    mkdir -p {{ dehydrated_site_root | quote }}/live/"$DOMAIN"
     install --mode 0600 "$KEYFILE" {{ dehydrated_site_root|quote }}/live/"$DOMAIN"/privkey.pem
     install --mode 0644 "$CERTFILE" {{ dehydrated_site_root|quote }}/live/"$DOMAIN"/cert.pem
     install --mode 0644 "$CHAINFILE" {{ dehydrated_site_root|quote }}/live/"$DOMAIN"/chain.pem

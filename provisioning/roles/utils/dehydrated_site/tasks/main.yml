@@ -62,6 +62,7 @@
     src: '{{ dehydrated_site_root }}/live/{{ dehydrated_site_domains.0 }}/{{ item.src }}'
     dest: '/etc/ssl/{{ item.dest }}'
     state: 'link'
+    force: true  # As destination may exist (snakeoil files), we have to ovewrite in case of files and not links.
   with_items:
     - { src: 'cert.pem', dest: 'certs/{{ dehydrated_site_domains.0 }}.pem' }
     - { src: 'fullchain.pem', dest: 'certs/{{ dehydrated_site_domains.0 }}.chained.pem' }
