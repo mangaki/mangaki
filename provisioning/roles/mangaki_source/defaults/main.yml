@@ -24,5 +24,3 @@ mangaki_source_email_port: 587
 
 # MAL
 mangaki_source_has_mal: false
-
-mangaki_source_has_data: false

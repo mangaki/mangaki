@@ -110,7 +110,7 @@ mangaki_source_db_password: 'tuturuu'
 #######################
 
 # Whether to enable an email provider. If disabled, mails will be written to
-the console instead; defaults to false when mangaki_source_debug is enabled.
+# the console instead; defaults to false when mangaki_source_debug is enabled.
 mangaki_source_has_email: true
 
 # Address of the email server to use.
