@@ -45,6 +45,7 @@ EMAIL_PORT = {{ mangaki_source_email_port }}
 {% if mangaki_source_has_mal|bool %}
 [mal]
 MAL_USER = {{ mangaki_source_mal_user }}
+MAL_USER_AGENT = {{ mangaki_source_mal_user_agent }}
 {% endif %}
 
 [allauth]
