@@ -51,12 +51,18 @@
     enabled: true
   become: true
 
+- name: Run once the certificate generation.
+  service:
+    name: 'dehydrated-{{ dehydrated_site_name }}.service'
+    state: started
+  become: true
+
 - name: Ensure links to certificates are set up properly.
   file:
-    src: '{{ dehydrated_site_root }}/live/{{ dehydrated_site_domains.0 }}/{{ item.0 }}'
-    dest: '/etc/ssl/{{ item.1 }}'
+    src: '{{ dehydrated_site_root }}/live/{{ dehydrated_site_domains.0 }}/{{ item.src }}'
+    dest: '/etc/ssl/{{ item.dest }}'
     state: 'link'
   with_items:
-    - ['cert.pem', 'certs/{{ dehydrated_site_domains.0 }}.pem']
-    - ['fullchain.pem', 'certs/{{ dehydrated_site_domains.0 }}.chained.pem']
-    - ['privkey.pem', 'private/{{ dehydrated_site_domains.0 }}.key']
+    - { src: 'cert.pem', dest: 'certs/{{ dehydrated_site_domains.0 }}.pem' }
+    - { src: 'fullchain.pem', dest: 'certs/{{ dehydrated_site_domains.0 }}.chained.pem' }
+    - { src: 'privkey.pem', dest: 'private/{{ dehydrated_site_domains.0 }}.key' }

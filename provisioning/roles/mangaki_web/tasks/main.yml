@@ -12,7 +12,7 @@
     nginx_site_name: '{{ mangaki_web_name }}'
     nginx_site_enabled: true
     nginx_site_use_acme: '{{ mangaki_web_use_acme }}'
-    nginx_site_acme_wellknown: '{{ mangaki_web_acme_wellknown|default(omit) }}'
+    nginx_site_acme_wellknown: '{{ mangaki_web_acme_wellknown_path|default(omit) }}'
     nginx_site_root: '{{ mangaki_web_www_root }}'
     nginx_site_domains: '{{ mangaki_web_domains }}'
     nginx_site_upstreams:
@@ -24,7 +24,7 @@
     name: utils/dehydrated_site
   vars:
     dehydrated_site_name: '{{ mangaki_web_name }}'
-    dehydrated_site_acme_wellknown: '{{ mangaki_web_acme_wellknown }}'
+    dehydrated_site_acme_wellknown: '{{ mangaki_web_acme_wellknown_path }}'
     dehydrated_site_acme_ca: '{{ mangaki_web_acme_ca }}'
     dehydrated_site_acme_ca_terms: '{{ mangaki_web_acme_ca_terms }}'
     dehydrated_site_domains: '{{ mangaki_web_domains }}'
