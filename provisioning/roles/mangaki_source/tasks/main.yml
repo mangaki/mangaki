@@ -34,7 +34,7 @@
 
 - name: Ensure packaged project is present.
   copy:
-    src: '{{ mangaki_source_package_src }}'
+    src: '{{ mangaki_source_package_local }}'
     dest: '{{ mangaki_source_package }}'
     owner: '{{ mangaki_source_user }}'
     group: '{{ mangaki_source_group }}'
