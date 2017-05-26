@@ -392,9 +392,9 @@ def get_profile(request, username=None):
         user = get_object_or_404(User, username=username)
     else:
         user = request.user
-        is_anonymous = not user.is_authenticated()
+        is_anonymous = not request.user.is_authenticated()
 
-    is_shared = is_anonymous or (username is None) or user.profile.is_shared
+    is_shared = is_anonymous or (username is None) or user == request.user or user.profile.is_shared
     category = request.GET.get('category', 'anime')
     algo_name = request.GET.get('algo', None)
     categories = ('anime', 'manga', 'album')
