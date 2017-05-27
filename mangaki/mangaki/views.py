@@ -751,13 +751,16 @@ def update_research(request):
         is_ok = request.POST.get('research_ok') == 'true'
         Profile.objects.filter(user__username=username).update(research_ok=is_ok)
         return HttpResponse()
-    if request.method == 'POST':  # Confirmed from mail link
+    elif request.method == 'POST':  # Confirmed from mail link
         is_ok = 'yes' in request.POST
         username = request.POST.get('username')
         token = request.POST.get('token')
     elif request.method == 'GET':  # Clicked on mail link
         username = request.GET.get('username')
         token = request.GET.get('token')
+    else:
+        raise Http404()
+
     expected_token = compute_token(KYOTO_SALT, username)
     if not constant_time_compare(token, expected_token):  # If the token is invalid
         # Add an error message
