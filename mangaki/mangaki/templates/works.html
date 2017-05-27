@@ -1,18 +1,7 @@
-<div class="row works-list">
-{% for work in works %}
-    <div align="center" class="manga-sheet">
-    <!-- manga-sheet doit être sur le premier div -->
-        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 text-center">
-            <!-- Ne pas modifier la class row sinon ça casse loadCard de vote.js -->
-            <div class="work-sheet data" data-category="{{ work.category }}" data-id="{{ work.id }}" data-pos="{{ forloop.counter }}">
-                {% if is_dpp %}
-                    {% include "work_dpp.html" with rating=work.rating %}
-                {% else %}
-                    {% include "work_rating.html" with rating=work.rating %}
-                {% endif %}
-            </div>
-            
-        </div>
-    </div>
-{% endfor %}
+<div class="row">
+  <div class="col-xs-12 cards-grid">
+    {% for work in works %}
+      {% include "mangaki/work_rating.html" with is_dpp=is_dpp sort_mode=sort_mode work=work rating=work.rating only %}
+    {% endfor %}
+  </div>
 </div>
