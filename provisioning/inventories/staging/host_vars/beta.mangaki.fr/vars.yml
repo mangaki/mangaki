@@ -5,7 +5,7 @@ mangaki_source_install_type: 'package'
 mangaki_source_package: '{{ mangaki_source_home }}/{{ mangaki_source_package_local|basename }}'
 
 # Web configuration
-mangaki_web_domains: ['beta.mangaki.fr', 'www.beta.mangaki.fr']
+mangaki_web_domains: ['beta.mangaki.fr'] # , 'www.beta.mangaki.fr']
 mangaki_web_use_acme: true
 
 # Database configuration
@@ -15,15 +15,18 @@ mangaki_db_password: '{{ vault_mangaki_db_password }}'
 mangaki_source_secret_key: '{{ vault_mangaki_source_secret_key }}'
 
 # MAL configuration
-mangaki_source_has_mal: true
+mangaki_source_has_mal: false
 mangaki_source_mal_user: '{{ vault_mangaki_source_mal_user }}'
 mangaki_source_mal_password: '{{ vault_mangaki_source_mal_password }}'
 
 # Email configuration
-mangaki_source_has_email: true
+mangaki_source_has_email: false
 mangaki_source_email_host: '127.0.0.1'
 mangaki_source_email_user: 'mangaki'
 mangaki_source_email_password: '{{ vault_mangaki_source_email_password }}'
 
-# vi: ft=yaml
+# Let's Encrypt
+mangaki_web_acme_ca: 'https://acme-v01.api.letsencrypt.org/directory'
+mangaki_web_acme_ca_terms: 'https://acme-v01.api.letsencrypt.org/terms'
 
+# vi: ft=yaml

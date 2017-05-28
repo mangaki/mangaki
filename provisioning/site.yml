@@ -2,6 +2,10 @@
 - name: Ensure apt cache and packages are up-to-date.
   hosts: all
   tasks:
+    - name: "FIX: Ensure aptitude is installed."
+      raw: apt-get install aptitude -y
+      become: true
+
     - apt:
         upgrade: 'yes'
         update_cache: 'yes'
