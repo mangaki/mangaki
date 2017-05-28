@@ -39,7 +39,7 @@
     owner: '{{ mangaki_source_user }}'
     group: '{{ mangaki_source_group }}'
     mode: '0644'
-  when: 'mangaki_source_install_type == "copy"'
+  when: 'mangaki_source_install_type == "package"'
 
 - name: Ensure system-wide development dependencies are installed.
   apt:
