@@ -1,0 +1,5 @@
+---
+cron_timer_description: "Timer for {{ cron_description }}"
+cron_group: '{{ cron_user }}'
+cron_enabled: true
+cron_schedule: 'daily'
