@@ -138,7 +138,7 @@ mangaki_source_has_mal: false
 # enabled).
 mangaki_source_mal_user: 'mangaki'
 
-# User Agent for connectiong to the MAL API (required if mangaki_source_has_mal
+# User Agent for connecting to the MAL API (required if mangaki_source_has_mal
 # is enabled).
 mangaki_source_mal_user_agent: 'mangaki 0.1.4'
 
