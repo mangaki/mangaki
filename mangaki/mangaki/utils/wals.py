@@ -1,28 +1,27 @@
 from mangaki.utils.common import RecommendationAlgorithm
 from collections import defaultdict, Counter
 import numpy as np
+from sklearn.externals import joblib
 
 
-def simple_train(model, inp, num_iterations):
+def simple_train(sess, model, inp, num_iterations):
     """Helper function to train model on inp for num_iterations."""
     row_update_op = model.update_row_factors(sp_input=inp)[1]
     col_update_op = model.update_col_factors(sp_input=inp)[1]
 
-    model.initialize_op.run()
-    model.worker_init.run()
+    model.initialize_op.run(session=sess)
+    model.worker_init.run(session=sess)
     for _ in range(num_iterations):
-        model.row_update_prep_gramian_op.run()
-        model.initialize_row_update_op.run()
-        row_update_op.run()
-        model.col_update_prep_gramian_op.run()
-        model.initialize_col_update_op.run()
-        col_update_op.run()
+        model.row_update_prep_gramian_op.run(session=sess)
+        model.initialize_row_update_op.run(session=sess)
+        row_update_op.run(session=sess)
+        model.col_update_prep_gramian_op.run(session=sess)
+        model.initialize_col_update_op.run(session=sess)
+        col_update_op.run(session=sess)
 
 
 class MangakiWALS(RecommendationAlgorithm):
     M = None
-    U = None
-    VT = None
 
     def __init__(self, NB_COMPONENTS=20):
         """An implementation of the Weighted Alternate Least Squares.
@@ -31,14 +30,19 @@ class MangakiWALS(RecommendationAlgorithm):
 
         super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
-        self.sess = tf.InteractiveSession()
+        self.tf = tf
+        self.sess = tf.Session()
 
     def load(self, filename):
-        backup = super().load(filename)
-        self.M = backup.M
-        self.U = backup.U
-        self.VT = backup.VT
-        self.means = backup.means
+        results = joblib.load(self.get_backup_path(filename))
+        self.M = results['M']
+        self.means = results['means']
+
+    def save(self, filename):
+        joblib.dump({
+            'means': self.means,
+            'M': self.M
+        }, self.get_backup_path(filename))
 
     def make_matrix(self, X, y):
         matrix = defaultdict(dict)
@@ -64,12 +68,17 @@ class MangakiWALS(RecommendationAlgorithm):
         from tensorflow.contrib.factorization.python.ops import factorization_ops
         from tensorflow.python.framework import sparse_tensor
 
+        weights = self.tf.Variable(values, name='weights')
+        init_op = self.tf.global_variables_initializer()
+
         rows = self.nb_users
         cols = self.nb_works
         dims = self.NB_COMPONENTS
         row_wts = 0.1 + np.random.rand(rows)
         col_wts = 0.1 + np.random.rand(cols)
-        inp = sparse_tensor.SparseTensor(indices, values, [rows, cols])
+        self.sess.run(init_op)
+
+        inp = sparse_tensor.SparseTensor(indices, self.tf.identity(weights), [rows, cols])
         use_factors_weights_cache = True
         model = factorization_ops.WALSModel(
             rows,
@@ -80,13 +89,14 @@ class MangakiWALS(RecommendationAlgorithm):
             row_weights=None,  # row_wts,
             col_weights=None,  # col_wts,
             use_factors_weights_cache=use_factors_weights_cache)
-        simple_train(model, inp, 25)
-        row_factor = model.row_factors[0].eval()
+        simple_train(self.sess, model, inp, 25)
+        row_factor = self.sess.run(model.row_factors[0])
         print('Shape', row_factor.shape)
-        col_factor = model.col_factors[0].eval()
+        col_factor = self.sess.run(model.col_factors[0])
         print('Shape', col_factor.shape)
-        out = np.dot(row_factor, np.transpose(col_factor))
-        return out
+        # Dot product with TF seems to pay off: https://relinklabs.com/tensorflow-vs-numpy
+        M = self.tf.matmul(row_factor, self.tf.transpose(col_factor))
+        return self.sess.run(M)
 
     def fit(self, X, y):
         print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
