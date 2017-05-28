@@ -1,17 +1,15 @@
 ---
-- name: Ensure static files directory to be present
+- name: Ensure static files directory is present.
   file:
     owner: '{{ mangaki_sync_user }}'
     group: '{{ mangaki_sync_group }}'
     mode: 'u=rwx,g=rx,o=rx'
-    path: '{{ mangaki_source_static_root }}'
+    path: '{{ mangaki_sync_static_root }}'
     state: 'directory'
+    recurse: true
   become: true
-  run_once: true
-  when: 'mangaki_sync_collectstatic|bool'
-  tags: action
 
-- name: Collect static files
+- name: Collect static files.
   shell: '{{ mangaki_sync_manage }} collectstatic --no-input'
   environment: '{{ mangaki_sync_env }}'
   become: true
@@ -20,7 +18,7 @@
   when: 'mangaki_sync_collectstatic|bool'
   tags: action
 
-- name: Migrate database
+- name: Migrate database.
   shell: '{{ mangaki_sync_manage }} migrate'
   environment: '{{ mangaki_sync_env }}'
   become: true

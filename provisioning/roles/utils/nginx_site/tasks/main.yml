@@ -18,9 +18,3 @@
   notify:
     - Test and reload nginx.
   become: true
-
-- name: Ensure site root has at least read permissions
-  file:
-    mode: 'o+rx'
-    path: '{{ nginx_site_root }}'
-  become: true
