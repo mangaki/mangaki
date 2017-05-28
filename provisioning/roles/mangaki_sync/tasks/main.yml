@@ -1,4 +1,16 @@
 ---
+- name: Ensure static files directory to be present
+  file:
+    owner: '{{ mangaki_sync_user }}'
+    group: '{{ mangaki_sync_group }}'
+    mode: 'u=rwx,g=rx,o=rx'
+    path: '{{ mangaki_source_static_root }}'
+    state: 'directory'
+  become: true
+  run_once: true
+  when: 'mangaki_sync_collectstatic|bool'
+  tags: action
+
 - name: Collect static files
   shell: '{{ mangaki_sync_manage }} collectstatic --no-input'
   environment: '{{ mangaki_sync_env }}'
