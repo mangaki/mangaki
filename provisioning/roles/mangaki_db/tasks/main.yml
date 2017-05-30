@@ -1,0 +1,50 @@
+---
+- name: Setup PostgreSQL
+  include_role:
+    name: utils/postgresql
+  vars:
+    postgresql_database: '{{ mangaki_db_name }}'
+    postgresql_extensions: ['unaccent', 'pg_trgm']
+    postgresql_user: '{{ mangaki_db_user }}'
+    postgresql_password: '{{ mangaki_db_password }}'
+
+- block:
+  - name: Dump database.
+    command: pg_dump {{ mangaki_db_name }} --format custom --file {{ mangaki_db_temp_dump_path }}
+    become: true
+    become_user: 'postgres'
+
+  - name: Download database dump.
+    fetch:
+      src: '{{ mangaki_db_temp_dump_path }}'
+      dest: '{{ mangaki_db_dump_path_local }}'
+      flat: true
+
+  - name: Remove database dump from host.
+    file:
+      path: '{{ mangaki_db_temp_dump_path }}'
+      state: absent
+    become: true
+    become_user: 'postgres'
+
+  when: 'mangaki_db_dump|bool'
+  tags: action
+
+- block:
+  - name: Download database dump.
+    copy:
+      src: '{{ mangaki_db_dump_path_local }}'
+      dest: '{{ mangaki_db_temp_dump_path }}'
+
+  - name: Load database.
+    command: pg_restore --role {{ mangaki_db_user }} --dbname {{ mangaki_db_name }} --no-owner --schema public /tmp/{{ mangaki_db_name }}.pgdump
+    become: true
+    become_user: 'postgres'
+
+  - name: Remove database dump from host.
+    file:
+      path: '{{ mangaki_db_temp_dump_path }}'
+      state: absent
+
+  when: 'mangaki_db_load|bool'
+  tags: action

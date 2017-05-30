@@ -1,0 +1,3 @@
+---
+dehydrated_site_user: '{{ dehydrated_user }}'
+dehydrated_site_group: '{{ dehydrated_group }}'

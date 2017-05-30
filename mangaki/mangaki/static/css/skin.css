@@ -1,4 +1,6 @@
-
+html {
+    height: 100%;
+}
 
 /*************
  *  GENERAL  *
@@ -6,6 +8,7 @@
 body {
     background: #fdfdfd;
     font-family:'Open Sans', sans-serif;
+    height: 100%;
 }
 
 .jumbotron {
@@ -30,9 +33,18 @@ header nav.navbar {
 
 /* Margin for body to prevent unused space from the header/footer nav menu. */
 body > .container {
-    margin-top: 25px;
-    margin-bottom: 75px;
+    
+}
 
+#wrapper {
+    margin: 0 auto -52px;
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+}
+
+footer, #push {
+    height: 52px;
 }
 
 .featured {

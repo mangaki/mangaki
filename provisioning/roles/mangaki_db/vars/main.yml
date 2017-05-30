@@ -1,0 +1,2 @@
+---
+mangaki_db_temp_dump_path: '/tmp/{{ mangaki_db_name }}.pgdump'

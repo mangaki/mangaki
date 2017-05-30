@@ -1,9 +1,6 @@
 from mangaki.utils.common import RecommendationAlgorithm
 from collections import defaultdict, Counter
 import numpy as np
-import tensorflow as tf
-from tensorflow.contrib.factorization.python.ops import factorization_ops
-from tensorflow.python.framework import sparse_tensor
 
 
 def simple_train(model, inp, num_iterations):
@@ -30,6 +27,8 @@ class MangakiWALS(RecommendationAlgorithm):
     def __init__(self, NB_COMPONENTS=20):
         """An implementation of the Weighted Alternate Least Squares.
         NB_COMPONENTS: the number of components in the factorization"""
+        import tensorflow as tf
+
         super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
         self.sess = tf.InteractiveSession()
@@ -62,6 +61,9 @@ class MangakiWALS(RecommendationAlgorithm):
         return indices, values, means
 
     def factorize(self, indices, values):
+        from tensorflow.contrib.factorization.python.ops import factorization_ops
+        from tensorflow.python.framework import sparse_tensor
+
         rows = self.nb_users
         cols = self.nb_works
         dims = self.NB_COMPONENTS

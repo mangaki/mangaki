@@ -53,16 +53,19 @@
         <div class="col-xs-6 col-lg-4">
             {% if request.user.username == username %}
                 <br/>
+                Je participe au data challenge de Kyoto :
+                <input type="checkbox" name="research_ok" {% if user.profile.research_ok %} checked{% endif %}/>
+                <hr />
                 Profil public :
                 <input type="checkbox" name="is_shared" {% if user.profile.is_shared %} checked{% endif %}/>
-                <hr/>
+                <hr />
                 Afficher visuels pour public averti :
                 <input type="checkbox" name="nsfw_ok" {% if user.profile.nsfw_ok %} checked{% endif %}/>
-                <hr/>
+                <hr />
                 Recevoir la newsletter :
                 <input type="checkbox" name="newsletter_ok" {% if user.profile.newsletter_ok %} checked{% endif %}/>
                 {% if is_mal_import_available %}
-                <hr/>
+                <hr />
                 <p>Importer depuis myAnimeList :</p>
                 <div class="input-group">
                     <input type="text" class="form-control" id="mal_username" placeholder="Ton login"
@@ -188,6 +191,10 @@
                             <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a> à voir (ou
                                 non){% else %}<a href="{% url 'work-list' 'manga' %}">Mangas</a> à lire (ou
                                 pas){% endif %}</h1>
+                            <p class="well">✨🍰✨ Trier selon Mangaki !
+                            <a href="{% url 'profile' username %}?category={{ category }}&algo=svd">mainstream</a> /
+                            <a href="{% url 'profile' username %}?category={{ category }}&algo=als">perles</a>
+                            </p>
                             {% include "works_no_poster.html" with works=unseen_list class=category %}
                         </div>
                     {% endif %}
@@ -200,6 +207,10 @@
     <br/>
     <br/>
     <script>
+        $("[name='research_ok']").bootstrapSwitch();
+        $("[name='research_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
+            $.post(Urls['research'](), {research_ok: state});
+        });
         $("[name='is_shared']").bootstrapSwitch();
         $("[name='is_shared']").on('switchChange.bootstrapSwitch', function (event, state) {
             $.post(Urls['shared'](), {is_shared: state});

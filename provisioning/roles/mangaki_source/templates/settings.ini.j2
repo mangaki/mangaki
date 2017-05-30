@@ -1,0 +1,55 @@
+{{ ansible_managed|comment }}
+
+{% if mangaki_source_debug|bool %}
+[debug]
+DEBUG = True
+{% endif %}
+
+[secrets]
+SECRET_KEY = {{ mangaki_source_secret_key }}
+DB_PASSWORD = {{ mangaki_source_db_password }}
+
+{# We don't want to include MAL stuff if these are not defined. #}
+{% if mangaki_source_has_mal|bool %}
+MAL_PASS = {{ mangaki_source_mal_password }}
+{% endif %}
+
+[deployment]
+SITE_ID = 1
+STATIC_ROOT = {{ mangaki_source_static_root }}
+
+[hosts]
+ALLOWED_HOSTS = {{ mangaki_source_domains|join(', ') }}
+
+[pgsql]
+DB_HOST = {{ mangaki_source_db_host }}
+DB_NAME = {{ mangaki_source_db_name }}
+DB_USER = {{ mangaki_source_db_user }}
+
+[email]
+{% if mangaki_source_has_email|bool %}
+EMAIL_BACKEND = django.core.mail.backends.smtp.EmailBackend
+{% else %}
+EMAIL_BACKEND = django.core.mail.backends.console.EmailBackend
+{% endif %}
+
+{% if mangaki_source_has_email|bool %}
+[smtp]
+EMAIL_HOST = {{ mangaki_source_email_host }}
+EMAIL_HOST_USER = {{ mangaki_source_email_user }}
+EMAIL_HOST_PASSWORD = {{ mangaki_source_email_password }}
+EMAIL_PORT = {{ mangaki_source_email_port }}
+{% endif %}
+
+{# We don't want to include MAL stuff if these are not defined. #}
+{% if mangaki_source_has_mal|bool %}
+[mal]
+MAL_USER = {{ mangaki_source_mal_user }}
+MAL_USER_AGENT = {{ mangaki_source_mal_user_agent }}
+{% endif %}
+
+[allauth]
+{% for auth_provider in mangaki_source_auth_providers %}
+{{ auth_provider }}
+{% endfor %}
+
