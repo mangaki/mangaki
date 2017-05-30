@@ -46,6 +46,11 @@ class SearchSimilarity(Func):
         super().__init__(Func(Func(lhs, function='F_UNACCENT'), function='UPPER'), Func(Func(rhs, function='F_UNACCENT'), function='UPPER'))
 
 
+class FilteredWorkManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(redirect__isnull=True)
+
+
 class WorkQuerySet(models.QuerySet):
     # There are indexes in the database related to theses queries. Please don't
     # change the formulaes without issuing the appropriate migrations.
@@ -146,7 +151,8 @@ class Work(models.Model):
             ['category', 'nb_ratings'],
         ]
 
-    objects = WorkQuerySet.as_manager()
+    all_objects = WorkQuerySet.as_manager()  # Equivalent to default_manager_name = 'all_objects', because first in the list
+    objects = FilteredWorkManager.from_queryset(WorkQuerySet)()
 
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])

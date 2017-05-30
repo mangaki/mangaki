@@ -36,5 +36,5 @@ class RecoTest(TestCase):
             'fields_to_choose': ''
         }
         self.client.post(merge_url, context)
-        self.assertEqual(Work.objects.filter(redirect__isnull=False).count(), 1)
+        self.assertEqual(Work.all_objects.filter(redirect__isnull=False).count(), 1)
         self.assertEqual(WorkCluster.objects.count(), 1)
