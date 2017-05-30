@@ -1,6 +1,0 @@
-{% if staging_letsencrypt_api %}
-# Remove this line to enable production API of Let's Encrypt.
-# To issue real certificates.
-CA="https://acme-staging.api.letsencrypt.org/directory"
-{% endif %}
-WELLKNOWN={{ acme_wellknown }}

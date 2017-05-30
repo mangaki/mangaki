@@ -1,0 +1,71 @@
+{{ ansible_managed|comment }}
+
+{% for upstream in nginx_site_upstreams %}
+
+upstream {{ upstream.name }} {
+  {% for server in upstream.servers %}
+  server {{ server }} fail_timeout=0;
+  {% endfor %}
+}
+{% endfor %}
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name {{ nginx_site_domains|join(' ') }};
+
+    {% if nginx_site_use_acme %}
+    location /.well-known/acme-challenge/ {
+        alias {{ nginx_site_acme_wellknown }};
+        try_files $uri =404;
+    }
+    {% endif %}
+
+    location / {
+        return 301 https://$server_name$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+
+    server_name {{ nginx_site_domains|join(' ') }};
+    root {{ nginx_site_root }};
+
+    ssl on;
+    ssl_certificate "/etc/ssl/certs/{{ nginx_site_domains.0 }}.chained.pem";
+    ssl_certificate_key "/etc/ssl/private/{{ nginx_site_domains.0 }}.key";
+
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+
+    # Disable old SSL protocols with known vulnerabilities.
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
+    ssl_prefer_server_ciphers on;
+
+    # Diffie-Hellman parameter for DHE ciphersuites, recommended 2048 bits
+    # ssl_dhparam ;
+
+    ## FIXME: OCSP stapling
+
+    location / {
+        try_files $uri {% if nginx_site_upstreams %}@{{ nginx_site_upstreams|map(attribute='name')|join(' @') }}{% endif %};
+    }
+
+    {% for upstream in nginx_site_upstreams %}
+
+    location @{{ upstream.name }} {
+        proxy_pass http://{{ upstream.name }};
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $server_name;
+    }
+    {% endfor %}
+}
+
+# vim: ft=nginx.conf ts=4 sts=4 sw=4 et:
