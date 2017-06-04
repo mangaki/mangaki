@@ -1,0 +1,25 @@
+{{ ansible_managed|comment }}
+
+[Unit]
+Description=Restart selected daemons when Let's Encrypt certificates are renewed
+ConditionFileNotEmpty={{ dehydrated_site_root|quote }}/renewed
+
+[Service]
+Type=oneshot
+
+User={{ dehydrated_user }}
+Group={{ dehydrated_group }}
+UMask=0027
+
+PermissionsStartOnly=yes
+ExecStart=/bin/rm -- {{ dehydrated_site_root|quote }}/renewed
+ExecStartPost=/bin/systemctl restart --no-block nginx
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=yes
+ProtectHome=yes
+
+CapabilityBoundingSet=
+AmbientCapabilities=

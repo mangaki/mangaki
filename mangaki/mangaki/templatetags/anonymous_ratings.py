@@ -7,4 +7,4 @@ register = template.Library()
 
 @register.filter()
 def has_anonymous_ratings(request):
-    return ratings.has_anonymous_ratings(request.session)
+    return request.user.is_anonymous and ratings.has_anonymous_ratings(request.session)

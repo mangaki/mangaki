@@ -1,0 +1,8 @@
+---
+- name: Run crons.
+  service:
+    name: '{{ mangaki_back_name }}-{{ item }}.service'
+    state: 'started'
+  with_items: ['ranking', 'top-directors']
+  become: true
+  listen: Restart Mangaki services.
