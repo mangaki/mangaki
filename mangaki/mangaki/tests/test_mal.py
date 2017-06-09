@@ -28,18 +28,17 @@ class MALTest(TestCase):
     def test_mal_client_exceptions(self, choice, query):
         work_type = MALWorks(choice(list(map(lambda x: x.value, MALWorks))))
         catch_all = re.compile('https?://myanimelist\.net/api/.*')
-        statuses = [400, 401, 403, 500, 502]
-        for status in statuses:
-            responses.add(
-                responses.GET,
-                catch_all,
-                status=status
-            )
-
-        for _ in statuses:
-            with self.assertRaisesRegex(RuntimeError,
-                                        r'(Invalid MAL credentials!)|(MAL request failure!)'):
-                self.mal.search_works(work_type, query)
+        for status_code in [400, 401, 403, 500, 502]:
+            with self.subTest("Testing {} status code through MAL API search wrapper".format(status_code),
+                              status_code=status_code):
+                responses.add(
+                    responses.GET,
+                    catch_all,
+                    status=status_code
+                )
+                with self.assertRaisesRegex(RuntimeError,
+                                            r'(Invalid MAL credentials!)|(MAL request failure!)'):
+                    self.mal.search_works(work_type, query)
 
     @responses.activate
     def test_mal_search_one_work(self):
@@ -56,7 +55,7 @@ class MALTest(TestCase):
         self.assertEqual(len(responses.calls), 1)
 
         # FIXME: rather clunky, we should move this into another test.
-        # and control the original XML.
+        # We should be able to be test-data-agnostic.
         self.assertNotEqual(result.start_date, None)
         self.assertEqual(result.synonyms, [])
         self.assertEqual(result.nb_episodes, 25)
