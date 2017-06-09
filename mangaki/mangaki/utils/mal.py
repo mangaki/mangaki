@@ -48,8 +48,24 @@ class MALWorks(Enum):
 
 SUPPORTED_MANGAKI_WORKS = [MALWorks.animes, MALWorks.mangas]
 
-MALUserWork = namedtuple('MALUserWork', 'title synonyms poster mal_id score')
-MALUserWork.__hash__ = lambda work: hash(work.title)
+
+class MALUserWork:
+    __slots__ = ['title', 'synonyms', 'poster', 'mal_id', 'score']
+
+    def __init__(self,
+                 title: str,
+                 synonyms: List[str],
+                 poster: str,
+                 mal_id: str,
+                 score: float):
+        self.title = title
+        self.synonyms = synonyms
+        self.poster = poster
+        self.mal_id = mal_id
+        self.score = score
+
+    def __hash__(self):
+        return hash(self.mal_id)
 
 
 class MALEntry:
@@ -449,8 +465,8 @@ def import_mal(mal_username: str, mangaki_username: str):
 
     existing_ratings = (
         Rating.objects.filter(user=user, work__in=scores.keys())
-        .values_list('work', flat=True)
-        .all()
+            .values_list('work', flat=True)
+            .all()
     )
 
     for related_work_id in existing_ratings:
