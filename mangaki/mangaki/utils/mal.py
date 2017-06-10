@@ -5,7 +5,7 @@ looking for anime and finding URL of posters.
 
 import xml.etree.ElementTree as ET
 from enum import Enum
-from typing import Optional, List, Generator
+from typing import Optional, List, Generator, Set
 
 import requests
 import html
@@ -15,7 +15,9 @@ from functools import reduce
 from django.conf import settings
 
 from django.contrib.auth.models import User
+from django.contrib.postgres.search import SearchQuery
 from django.db.models import QuerySet, Q
+from django.db import transaction
 
 from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle
 
@@ -47,7 +49,23 @@ class MALWorks(Enum):
 SUPPORTED_MANGAKI_WORKS = [MALWorks.animes, MALWorks.mangas]
 
 
-MALUserWork = namedtuple('MALUserWork', 'title poster mal_id score')
+class MALUserWork:
+    __slots__ = ['title', 'synonyms', 'poster', 'mal_id', 'score']
+
+    def __init__(self,
+                 title: str,
+                 synonyms: List[str],
+                 poster: str,
+                 mal_id: str,
+                 score: float):
+        self.title = title
+        self.synonyms = synonyms
+        self.poster = poster
+        self.mal_id = mal_id
+        self.score = score
+
+    def __hash__(self):
+        return hash(self.mal_id)
 
 
 class MALEntry:
@@ -124,6 +142,7 @@ class MALEntry:
             self.work_type.value
         )
 
+
 class MALClient:
     SEARCH_URL = 'https://myanimelist.net/api/{type}/search.xml'
     LIST_WORK_URL = 'https://myanimelist.net/malappinfo.php?u={username}&status=all&type={type}'
@@ -168,6 +187,16 @@ class MALClient:
                 continue
             try:
                 title = entry.find('series_title').text
+                synonyms_node = entry.find('series_synonyms').text
+                if synonyms_node:
+                    # Take all non-empty synonyms.
+                    stripped_synonyms = (
+                        syn.strip()
+                        for syn in entry.find('series_synonyms').text.split('; ')
+                    )
+                    synonyms = list(filter(None, stripped_synonyms))
+                else:
+                    synonyms = []
                 poster = entry.find('series_image').text
                 score = int(entry.find('my_score').text)
                 mal_id = entry.find('series_{}db_id'.format(work_type.value)).text
@@ -177,6 +206,7 @@ class MALClient:
 
             yield MALUserWork(
                 title=title,
+                synonyms=synonyms,
                 poster=poster,
                 mal_id=mal_id,
                 score=score)
@@ -220,18 +250,82 @@ client = MALClient(getattr(settings, 'MAL_USER', None),
                    getattr(settings, 'MAL_PASS', None))
 
 
-def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry]):
+def lookup_works(work_list: QuerySet,
+                 ext_poster: str,
+                 titles: List[str]) -> List[Work]:
+    """
+    Look into the database all the works
+    matching one of the `titles` or the external poster.
+
+    Raise ValueError when no `titles` (empty list) are given.
+
+    :param work_list: A (filtered) QuerySet from Django starting from the Work model
+    :type work_list: A queryset, e.g. `Work.objects.filter(category__slug='anime')`
+    :param ext_poster: A string path to the external poster (a URL link)
+    :type ext_poster: string
+    :param titles: A list of potential titles that the work can hold, e.g. synonyms and unofficial titles.
+    :type titles: list of strings
+    :return: a list of matching works (can be empty)
+    :rtype: list of Work objects
+    """
+    if len(titles) == 0:
+        raise ValueError('Empty list of `titles` !')
+
+    constraints_work = constraints_title = reduce(
+        lambda x, y: x | y,
+        (
+            SearchQuery(syn, config='simple')
+            for syn in titles
+        )
+    )
+    constraints_work = Q(title_search=constraints_work) | Q(ext_poster=ext_poster)
+
+    works_ids_matched = set(work_list.filter(constraints_work)
+                            .values_list('id', flat=True)[:2])
+    titles_ids_matched = set(
+        WorkTitle.objects
+            .filter(title_search=constraints_title)
+            .values_list('work_id', flat=True).all()
+    )
+
+    return list(Work.objects.in_bulk(titles_ids_matched | works_ids_matched).values())
+
+
+def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
+                                          title: Optional[str] = None) -> Optional[Work]:
+    """
+    Insert into Mangaki database from MAL data.
+    And return the work corresponding to the title.
+    :param mal_entries: a list of entries that will be inserted into the database if not present
+    :type mal_entries: List[MALEntry]
+    :param title: title of work looked for (optional)
+    :type title: str (can be None)
+    :return: a work if title is specified
+    :rtype: Optional[Work]
+    """
     # Assumption: Mangaki's slugs are the same as MAL's work types.
     if not mal_entries:
         return
 
+    first_matching_work = None
+
     # All entries are supposed of the same type.
     work_cat = Category.objects.get(slug=mal_entries[0].work_type.value)
     for entry in mal_entries:
-        is_present = Work.objects.filter(
-            category=work_cat,
-            ext_poster=entry.poster
-        ).exists()
+        # Check over all known titles.
+        titles = [entry.title]
+        if entry.english_title:
+            titles.append(entry.english_title)
+
+        is_present = (
+            len(lookup_works(
+                Work.objects.filter(
+                    category=work_cat
+                ),
+                entry.poster,
+                titles
+            )) > 0
+        )
 
         if not is_present:
             extra_fields = {}
@@ -246,6 +340,10 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry]):
                 date=entry.start_date,
                 **extra_fields
             )
+
+            if (title and not first_matching_work
+                and title.upper() in list(map(str.upper, titles))):
+                first_matching_work = work
 
             work_titles = [
                 WorkTitle(
@@ -263,7 +361,10 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry]):
             if work_titles:
                 WorkTitle.objects.bulk_create(work_titles)
 
-            # TODO: add ext genre, ext type.
+                # FIXME: add ext genre, ext type.
+                # Tracked in https://github.com/mangaki/mangaki/issues/339
+
+    return first_matching_work
 
 
 def poster_url(work_type: MALWorks, query: str) -> str:
@@ -304,6 +405,7 @@ def compute_rating_choice_from_mal_score(score: int) -> Optional[str]:
 def get_or_create_from_mal(work_list: QuerySet,
                            work_type: MALWorks,
                            title: str,
+                           synonyms: List[str],
                            poster_link: str) -> Optional[Work]:
     """
     Get a work from the current `work_list` (a queryset, filtered by category)
@@ -315,65 +417,59 @@ def get_or_create_from_mal(work_list: QuerySet,
     :type work_type: MALWorks enum
     :param title: title of the work
     :type title: str
+    :param synonyms: list of alternative titles
+    :type synonyms: list of str
     :param poster_link: poster URL of the work
     :type poster_link: str
     :return: a new work or already existing work!
     :rtype: Work
     """
-    try:
-        return work_list.get(title__iexact=title)
-    except Work.MultipleObjectsReturned:
-        works = work_list.filter(title__iexact=title).all()
-        logger.warning('Duplicates detected (title) for the work <{}> -- selecting first.'.format(title))
-        return works[0]
-    except Work.DoesNotExist:
-        try:
-            return work_list.get(ext_poster=poster_link)
-        except Work.DoesNotExist:
-            works = client.search_works(work_type, title)
-            insert_into_mangaki_database_from_mal(works)
-            return work_list.filter(
-                Q(ext_poster=poster_link)
-                | Q(title__iexact=title)).first()
-        except Work.MultipleObjectsReturned:
-            logger.warning('Duplicates detected (ext_poster) for work with <{}> (during <{}> import) '
-                           '-- selecting first.'
-                           .format(poster_link, title))
-            return Work.objects.filter(ext_poster=poster_link).first()
+    # Either, we find something with the good poster or one of the good titles.
+    # Also looking into WorkTitle as it is available.
+    items = lookup_works(work_list, poster_link, [title] + synonyms)
+
+    if len(items) == 1:
+        return items[0]
+    elif len(items) > 1:
+        logger.warning('Duplicates detected (titles) for the work <{}> -- selecting first.'.format(title))
+        return items[0]
+    else:
+        logger.info('Fetching new works using MAL ({})'.format(title))
+        works = client.search_works(work_type, title)
+        # Return the first matching work while inserting into DB.
+        return insert_into_mangaki_database_from_mal(works, title)
 
 
+@transaction.atomic
 def import_mal(mal_username: str, mangaki_username: str):
     """
     Import myAnimeList by username
     """
 
     user = User.objects.get(username=mangaki_username)
-    nb_added = 0
     fails = []
     mangaki_lists = {
         MALWorks.animes: Work.objects.filter(category__slug='anime'),
         MALWorks.mangas: Work.objects.filter(category__slug='manga')
     }
+    scores = {}
 
     for work_type in SUPPORTED_MANGAKI_WORKS:
-        for user_work in client.list_works_from_a_user(work_type, mal_username):
+        user_works = set(
+            client.list_works_from_a_user(work_type, mal_username)
+        )
+        logger.info('Fetching {} works from {}\'s MAL.'.format(len(user_works), mal_username))
+        for user_work in user_works:
             try:
                 work = get_or_create_from_mal(
                     mangaki_lists[work_type],
                     work_type,
                     user_work.title,
+                    user_work.synonyms,
                     user_work.poster)
 
                 if work:
-                    already_rated = Rating.objects.filter(user=user, work=work).exists()
-                    if not already_rated:
-                        choice = compute_rating_choice_from_mal_score(user_work.score)
-                        if not choice:
-                            raise RuntimeError('No choice was deduced from MAL score.')
-
-                        Rating(user=user, choice=choice, work=work).save()
-
-                    nb_added += 1
+                    scores[work.id] = user_work.score
             except Exception:
                 logger.exception('Failure to fetch the work from MAL and import it into the Mangaki database.')
                 SearchIssue(
@@ -384,4 +480,24 @@ def import_mal(mal_username: str, mangaki_username: str):
                     score=user_work.score).save()
                 fails.append(user_work.title)
 
-    return nb_added, fails
+    existing_ratings = (
+        Rating.objects.filter(user=user, work__in=scores.keys())
+            .values_list('work', flat=True)
+            .all()
+    )
+
+    for related_work_id in existing_ratings:
+        del scores[related_work_id]
+
+    ratings = []
+    for work_id, score in scores.items():
+        choice = compute_rating_choice_from_mal_score(score)
+        if not choice:
+            raise RuntimeError('No choice was deduced from MAL score!')
+
+        rating = Rating(user=user, choice=choice, work_id=work_id)
+        ratings.append(rating)
+
+    Rating.objects.bulk_create(ratings)
+
+    return len(ratings), fails
