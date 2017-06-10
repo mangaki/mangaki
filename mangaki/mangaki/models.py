@@ -245,15 +245,18 @@ class WorkTitle(models.Model):
 
 
 class Language(models.Model):
-    anidb_language = models.CharField(max_length=5,
+    anidb_language = models.CharField(max_length=8,
                                       blank=True,
+                                      unique=True,
                                       db_index=True)
-    iso639 = models.CharField(max_length=2,
-                              unique=True,
-                              db_index=True)
+    lang_code = models.CharField(
+        default='unknown',
+        max_length=10,
+        db_index=True)  # ISO639-1 or custom (for example: x-jat, x-ko, x-ins)
 
     def __str__(self):
-        return "%s : %s" % (self.anidb_language, self.iso639)
+        return ("<Language (AniDB: {}) → (Lang: {})>"
+                .format(self.anidb_language, self.lang_code))
 
 
 class Role(models.Model):

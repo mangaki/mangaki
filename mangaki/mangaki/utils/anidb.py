@@ -84,8 +84,27 @@ class AniDB:
         # characters = anime.characters
         # ratings = anime.ratings.{permanent, temporary}
 
+        main_title = None
+        synonyms = {}
+        titles = {}
+        for title_node in all_titles.find_all('title'):
+            title = str(title_node.string).strip()
+            lang = title_node.get('xml:lang')
+            title_type = title_node.get('type')
+            titles[lang] = {
+                'title': title,
+                'type': title_type
+            }
+
+            if title_type == 'main':
+                main_title = title
+
+            if title_type == 'synonym':
+                synonyms[lang] = title
+
         anime_dict = {
-            'title': str(all_titles.find('title', attrs={'type': "main"}).string),
+            'main_title': main_title,
+            'titles': titles,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
             # 'nsfw': ?
@@ -97,6 +116,7 @@ class AniDB:
             'anime_type': str(anime.type.string),
             'anidb_aid': anidb_aid
         }
+
         return anime_dict
 
     def get(self, id):
@@ -115,10 +135,10 @@ class AniDB:
 
         anime = soup.anime
         titles = anime.titles
-        if Language.objects.count() == 0:
-            Language.objects.create(anidb_language='x-jat', iso639='ja')
-            Language.objects.create(anidb_language='en', iso639='en')
-            Language.objects.create(anidb_language='fr', iso639='fr')
+        # if Language.objects.count() == 0:
+        #     Language.objects.create(anidb_language='x-jat', iso639='ja')
+        #     Language.objects.create(anidb_language='en', iso639='en')
+        #     Language.objects.create(anidb_language='fr', iso639='fr')
         languages = {language.anidb_language: language.iso639 for language in Language.objects.all()}
         a = Anime({
             'id': id,
