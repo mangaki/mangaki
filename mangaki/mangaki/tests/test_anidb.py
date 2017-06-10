@@ -4,20 +4,11 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.models import Category, Editor, Studio, Work, Language, WorkTitle
-from mangaki.utils.anidb import AniDB
+from mangaki.models import Editor, Studio
+from mangaki.utils.anidb import client, AniDB
 
 
 class AniDBTest(TestCase):
-    @staticmethod
-    def create_anime(work, work_titles):
-        work.save()
-        for title in work_titles:
-            title.work = work
-        WorkTitle.objects.bulk_create(work_titles)
-        work.refresh_from_db()
-        return work
-
     @staticmethod
     def read_fixture(filename):
         with open(os.path.join(settings.TEST_DATA_DIR, filename), 'r') as f:
@@ -28,7 +19,7 @@ class AniDBTest(TestCase):
         # exist, or else foreign key constraints fail.
         Editor.objects.create(pk=1)
         Studio.objects.create(pk=1)
-        self.anidb = AniDB('mangakihttp', 1)
+        self.anidb = client
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
         self.anime_fixture = self.read_fixture('sangatsu_no_lion.xml')
 
@@ -55,6 +46,6 @@ class AniDBTest(TestCase):
             status=200,
             content_type='application/xml'
         )
-        anime = self.create_anime(*self.anidb.get_mangaki_work(11606))
+        anime = self.anidb.get_mangaki_work(11606)
         self.assertNotEqual(anime.title, '')
-        self.assertNotEqual(len(anime.worktitle_set.all()), 0)
+        self.assertNotEqual(anime.worktitle_set.count(), 0)
