@@ -132,8 +132,10 @@ class AniDB:
 
     @cached_property
     def lang_map(self) -> Dict[str, ExtLanguage]:
-        ext_langs = ExtLanguage.objects.filter(source='anidb')\
+        ext_langs = (
+            ExtLanguage.objects.filter(source='anidb')
             .select_related('lang').all()
+        )
 
         return {
             ext.lang.code: ext for ext in ext_langs
