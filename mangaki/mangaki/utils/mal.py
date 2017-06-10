@@ -253,7 +253,23 @@ client = MALClient(getattr(settings, 'MAL_USER', None),
 def lookup_works(work_list: QuerySet,
                  ext_poster: str,
                  titles: List[str]) -> List[Work]:
-    assert (len(titles) > 0)
+    """
+    Look into the database all the works
+    matching one of the `titles` or the external poster.
+
+    Raise ValueError when no `titles` (empty list) are given.
+
+    :param work_list: A (filtered) QuerySet from Django starting from the Work model
+    :type work_list: A queryset, e.g. `Work.objects.filter(category__slug='anime')`
+    :param ext_poster: A string path to the external poster (a URL link)
+    :type ext_poster: string
+    :param titles: A list of potential titles that the work can hold, e.g. synonyms and unofficial titles.
+    :type titles: list of strings
+    :return: a list of matching works (can be empty)
+    :rtype: list of Work objects
+    """
+    if len(titles) == 0:
+        raise ValueError('Empty list of `titles` !')
 
     constraints_work = constraints_title = reduce(
         lambda x, y: x | y,
@@ -345,7 +361,8 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
             if work_titles:
                 WorkTitle.objects.bulk_create(work_titles)
 
-                # TODO: add ext genre, ext type.
+                # FIXME: add ext genre, ext type.
+                # Tracked in https://github.com/mangaki/mangaki/issues/339
 
     return first_matching_work
 
