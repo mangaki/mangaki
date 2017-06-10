@@ -11,7 +11,7 @@ from mangaki.models import (
     FAQEntry, ColdStartRating, Trope, Language,
     ExtLanguage
 )
-from mangaki.utils.anidb import AniDB
+from mangaki.utils.anidb import client
 from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
@@ -93,8 +93,7 @@ class WorkAdmin(admin.ModelAdmin):
             kept_ids = request.POST.getlist('checks')
             for anime_id in kept_ids:
                 anime = Work.objects.get(id=anime_id)
-                a = AniDB('mangakihttp', 1)
-                retrieve_tags = anime.retrieve_tags(a)
+                retrieve_tags = anime.retrieve_tags(client)
                 deleted_tags = retrieve_tags["deleted_tags"]
                 added_tags = retrieve_tags["added_tags"]
                 updated_tags = retrieve_tags["updated_tags"]
@@ -122,8 +121,7 @@ class WorkAdmin(admin.ModelAdmin):
 
         all_information = {}
         for anime in queryset:
-            a = AniDB('mangakihttp', 1)
-            retrieve_tags = anime.retrieve_tags(a)
+            retrieve_tags = anime.retrieve_tags(client)
             deleted_tags = retrieve_tags["deleted_tags"]
             added_tags = retrieve_tags["added_tags"]
             updated_tags = retrieve_tags["updated_tags"]

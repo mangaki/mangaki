@@ -1,11 +1,12 @@
 from datetime import datetime
-from typing import Dict, Tuple, List
+from typing import Dict, List, Optional
 from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
 from lazy_object_proxy.utils import cached_property
 
+from mangaki import settings
 from mangaki.models import Language, Work, WorkTitle, Category, ExtLanguage
 
 
@@ -23,12 +24,21 @@ class AniDB:
     SEARCH_URL = "http://anisearch.outrance.pl/"
     PROTOCOL_VERSION = 1
 
-    def __init__(self, client_id, client_ver=0):
-        self.client_id = client_id
-        self.client_ver = client_ver
-        self._cache = {}
+    def __init__(self,
+                 client_id: Optional[str] = None,
+                 client_ver: Optional[int] = None):
+        if not client_id and self.client_ver:
+            self.is_available = False
+        else:
+            self.client_id = client_id
+            self.client_ver = client_ver
+            self._cache = {}
+            self.is_available = True
 
     def _request(self, datapage, params=None):
+        if not self.is_available:
+            raise RuntimeError('AniDB API is not available!')
+
         if params is None:
             params = {}
 
@@ -234,6 +244,11 @@ class AniDB:
         self._cache[id] = a
 
         return a
+
+
+client = AniDB(
+    getattr(settings, 'ANIDB_CLIENT', None),
+    getattr(settings, 'ANIDB_VERSION', None))
 
 
 class SmartDict(dict):
