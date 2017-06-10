@@ -109,7 +109,7 @@ class Category(models.Model):
 
 
 class Work(models.Model):
-    title = models.CharField(max_length=300)
+    title = models.CharField(max_length=255)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
     ext_poster = models.CharField(max_length=128, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
@@ -229,10 +229,14 @@ class Work(models.Model):
 
 class WorkTitle(models.Model):
     work = models.ForeignKey('Work')
-    title = models.CharField(max_length=300, blank=True, db_index=True)  # 300 is safe I hope, we have seen titles of 187 characters.
+    # 255 should be safe, we have seen titles of 187 characters in Japanese.
+    # So we could expect longer titles in English.
+    title = models.CharField(max_length=255, blank=True, db_index=True)
     title_search = SearchVectorField('title')
     language = models.ForeignKey('Language',
                                  null=True)
+    ext_language = models.ForeignKey('ExtLanguage',
+                                     null=True)
     type = models.CharField(max_length=9, choices=(
                             ('main', 'principal'),
                             ('official', 'officiel'),
@@ -244,15 +248,16 @@ class WorkTitle(models.Model):
         unique_together = ('title', 'language')
 
     def __str__(self):
-        return "%s" % self.title
+        return ("{} - {} (source: {}, type: {}) attached to {}"
+                .format(self.title, self.language.code, self.ext_language.source, self.type, self.work))
 
-UNK_LANG_VALUE = 'x-unk'
+UNK_LANG_VALUE = None
 
 
 class ExtLanguage(models.Model):
     source = models.CharField(max_length=30)
     ext_lang = models.CharField(
-        default=UNK_LANG_VALUE,
+        null=True,
         max_length=8,
         db_index=True
     )
@@ -272,11 +277,11 @@ class Language(models.Model):
     code = models.CharField(
         default=UNK_LANG_VALUE,
         max_length=10,
-        db_index=True)  # ISO639-1 or custom (for example: x-jat, x-ko, x-ins)
+        db_index=True,
+        help_text="ISO639-1 code or custom (e.g. x-jat, x-kot, x-ins)")
 
     def __str__(self):
-        return ("<Language: {}>"
-                .format(self.code))
+        return "<Language: {}>".format(self.code)
 
 
 class Role(models.Model):

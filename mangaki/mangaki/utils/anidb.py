@@ -198,11 +198,8 @@ class AniDB:
 
         anime = soup.anime
         titles = anime.titles
-        # if Language.objects.count() == 0:
-        #     Language.objects.create(anidb_language='x-jat', iso639='ja')
-        #     Language.objects.create(anidb_language='en', iso639='en')
-        #     Language.objects.create(anidb_language='fr', iso639='fr')
-        languages = {language.anidb_language: language.iso639 for language in Language.objects.all()}
+        ext_langs = ExtLanguage.objects.filter(source='anidb').all()
+        languages = {ext_lang.ext_lang: ext_lang.lang.code for ext_lang in ext_langs}
         a = Anime({
             'id': id,
             'worktitles': [(title.string, title['type'], languages[title['xml:lang']])

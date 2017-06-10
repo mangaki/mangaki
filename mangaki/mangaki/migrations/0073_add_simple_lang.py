@@ -8,13 +8,13 @@ from django.db import migrations
 def add_simple(apps, _):
     Language = apps.get_model('mangaki', 'Language')
 
-    Language.objects.create(code='simple')
+    Language.objects.create(code='x-simple')
 
 
 def remove_simple(apps, _):
     Language = apps.get_model('mangaki', 'Language')
 
-    Language.objects.filter(code='simple').delete()
+    Language.objects.filter(code='x-simple').delete()
 
 
 class Migration(migrations.Migration):
