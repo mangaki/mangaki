@@ -109,7 +109,7 @@ class Category(models.Model):
 
 
 class Work(models.Model):
-    title = models.CharField(max_length=128)
+    title = models.CharField(max_length=300)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
     ext_poster = models.CharField(max_length=128, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
@@ -229,7 +229,7 @@ class Work(models.Model):
 
 class WorkTitle(models.Model):
     work = models.ForeignKey('Work')
-    title = models.CharField(max_length=128, blank=True, db_index=True)
+    title = models.CharField(max_length=300, blank=True, db_index=True)  # 300 is safe I hope, we have seen titles of 187 characters.
     title_search = SearchVectorField('title')
     language = models.ForeignKey('Language',
                                  null=True)
