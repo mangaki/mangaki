@@ -92,10 +92,10 @@ def remove_languages(apps, _):
     ExtLanguage = apps.get_model('mangaki', 'ExtLanguage')
 
     for lang_code in lang_map.values():
-        Language.objects.filter(lang_code=lang_code).delete()
+        Language.objects.filter(code=lang_code).delete()
 
     for anidb_lang in lang_map.keys():
-        ExtLanguage.objects.filter(anidb_lang=anidb_lang).delete()
+        ExtLanguage.objects.filter(ext_lang=anidb_lang).delete()
 
 
 class Migration(migrations.Migration):
