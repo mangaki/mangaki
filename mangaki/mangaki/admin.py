@@ -8,7 +8,8 @@ from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
     Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
-    FAQEntry, ColdStartRating, Trope, Language
+    FAQEntry, ColdStartRating, Trope, Language,
+    ExtLanguage
 )
 from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
@@ -450,3 +451,4 @@ admin.site.register(Recommendation)
 admin.site.register(ColdStartRating)
 admin.site.register(Trope)
 admin.site.register(Language)
+admin.site.register(ExtLanguage)
