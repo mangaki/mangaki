@@ -243,20 +243,37 @@ class WorkTitle(models.Model):
     def __str__(self):
         return "%s" % self.title
 
+UNK_LANG_VALUE = 'x-unk'
+
+
+class ExtLanguage(models.Model):
+    source = models.CharField(max_length=30)
+    ext_lang = models.CharField(
+        default=UNK_LANG_VALUE,
+        max_length=8,
+        db_index=True
+    )
+    lang = models.ForeignKey('Language')
+
+    class Meta:
+        unique_together = ('ext_lang', 'source')
+
+    def __str__(self):
+        return ('<ExtLanguage: source {}, ext_lang: {}, lang: {}>'
+                .format(self.source,
+                        self.ext_lang,
+                        self.lang.code))
+
 
 class Language(models.Model):
-    anidb_language = models.CharField(max_length=8,
-                                      blank=True,
-                                      unique=True,
-                                      db_index=True)
-    lang_code = models.CharField(
-        default='unknown',
+    code = models.CharField(
+        default=UNK_LANG_VALUE,
         max_length=10,
         db_index=True)  # ISO639-1 or custom (for example: x-jat, x-ko, x-ins)
 
     def __str__(self):
-        return ("<Language (AniDB: {}) → (Lang: {})>"
-                .format(self.anidb_language, self.lang_code))
+        return ("<Language: {}>"
+                .format(self.code))
 
 
 class Role(models.Model):

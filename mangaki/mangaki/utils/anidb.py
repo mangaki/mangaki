@@ -1,10 +1,12 @@
 from datetime import datetime
+from typing import Dict, Tuple, List
 from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
+from lazy_object_proxy.utils import cached_property
 
-from mangaki.models import Language
+from mangaki.models import Language, Work, WorkTitle, Category, ExtLanguage
 
 
 def to_python_datetime(mal_date):
@@ -103,21 +105,80 @@ class AniDB:
                 synonyms[lang] = title
 
         anime_dict = {
-            'main_title': main_title,
-            'titles': titles,
-            'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
-            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
-            # 'nsfw': ?
-            'date': to_python_datetime(anime.startdate.string),
-            # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
-            'synopsis': str(anime.description.string),
-            # 'artists': ? from anime.creators
-            'nb_episodes': int(anime.episodecount.string),
-            'anime_type': str(anime.type.string),
-            'anidb_aid': anidb_aid
+            'work_titles': {
+                'main_title': main_title,
+                'titles': titles,
+            },
+            'work': {
+                'title': main_title,
+                'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
+                'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
+                # 'nsfw': ?
+                'date': to_python_datetime(anime.startdate.string),
+                # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
+                'synopsis': str(anime.description.string),
+                # 'artists': ? from anime.creators
+                'nb_episodes': int(anime.episodecount.string),
+                'anime_type': str(anime.type.string),
+                'anidb_aid': anidb_aid
+            }
         }
 
         return anime_dict
+
+    @cached_property
+    def anime_cat(self) -> Category:
+        return Category.objects.get(slug='anime')
+
+    @cached_property
+    def lang_map(self) -> Dict[str, ExtLanguage]:
+        ext_langs = ExtLanguage.objects.filter(source='anidb')\
+            .select_related('lang').all()
+
+        return {
+            ext.lang.code: ext for ext in ext_langs
+        }
+
+    def get_mangaki_work(self,
+                         anidb_aid: int,
+                         reload_lang_cache: bool = False) -> Tuple[Work, List[WorkTitle]]:
+        """
+        Use `get_dict` internally to create the bunch of objects you need to create a work.
+
+        Cache internally intermediate models objects (e.g. Language, ExtLanguage, Category)
+
+        :param anidb_aid: the AniDB identifier
+        :type anidb_aid: integer
+        :param reload_lang_cache: forcefully reload the ExtLanguage cache,
+            if it has changed since the instantiation of the AniDB client (default: false).
+        :type reload_lang_cache: boolean
+        :return: the set of `Work`-related objects linked to the `anidb_aid` passed in parameter (e.g. Work, list of WorkTitle)
+        :rtype: A tuple composed of a `mangaki.models.Work` instance and a list of `mangaki.models.WorkTitle`
+        (in this order.)
+        """
+        data = self.get_dict(anidb_aid)
+
+        work = Work(category=self.anime_cat, **data['work'])
+        titles = data['work_titles']['titles']
+        if reload_lang_cache:
+            # Re-compute `lang_map`.
+            delattr(self, 'lang_map')
+            getattr(self, 'lang_map')
+
+        work_titles = []
+        for lang, title_data in titles.items():
+            ext_lang_model = self.lang_map.get(lang)
+            if ext_lang_model:
+                work_titles.append(
+                    WorkTitle(
+                        work=work,
+                        title=title_data['title'],
+                        language=ext_lang_model.lang,  # Use the Language model and not the ExtLanguage!
+                        type=title_data['type']
+                    )
+                )
+
+        return work, work_titles
 
     def get(self, id):
         """
