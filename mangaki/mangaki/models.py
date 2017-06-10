@@ -240,6 +240,9 @@ class WorkTitle(models.Model):
                             blank=True,
                             db_index=True)
 
+    class Meta:
+        unique_together = ('title', 'language')
+
     def __str__(self):
         return "%s" % self.title
 

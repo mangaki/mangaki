@@ -19,7 +19,7 @@ from django.contrib.postgres.search import SearchQuery
 from django.db.models import QuerySet, Q
 from django.db import transaction
 
-from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle
+from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle, Language
 
 from collections import namedtuple
 
@@ -345,18 +345,27 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
                 and title.upper() in list(map(str.upper, titles))):
                 first_matching_work = work
 
+            # FIXME: will create many redundant queries.
+            simple_lang = Language.objects.get(code='simple')
+            english_lang = Language.objects.get(code='en')
+
             work_titles = [
                 WorkTitle(
                     work=work,
                     title=synonym,
-                    language=None,
-                    type='synonyme'
+                    language=simple_lang,
+                    type='synonym'
                 )
                 for synonym in entry.synonyms
             ]
 
-            # TODO: we should add entry.english_title as main title.
-            # After Language is split into ExtLanguage and Language.
+            if entry.english_title:
+                work_titles += [WorkTitle(
+                    work=work,
+                    title=entry.english_title,
+                    language=english_lang,
+                    type='main'
+                )]
 
             if work_titles:
                 WorkTitle.objects.bulk_create(work_titles)
