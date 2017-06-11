@@ -5,7 +5,7 @@ looking for anime and finding URL of posters.
 
 import xml.etree.ElementTree as ET
 from enum import Enum
-from typing import Optional, List, Generator, Set
+from typing import Optional, List, Generator
 
 import requests
 import html
@@ -17,15 +17,27 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.postgres.search import SearchQuery
 from django.db.models import QuerySet, Q
+from django.utils.functional import cached_property
 from django.db import transaction
 
-from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle, Language
-
-from collections import namedtuple
+from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle, ExtLanguage
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+# refer to 0072 migration to understand why ext_lang is set to these values.
+class MyAnimeListLanguages:
+    @cached_property
+    def unk_ext_lang(self):
+        return ExtLanguage.objects.select_related('lang').get(source='mal', ext_lang='unknown')
+
+    @cached_property
+    def english_ext_lang(self):
+        return ExtLanguage.objects.select_related('lang').get(source='mal', ext_lang='english')
+
+mal_langs = MyAnimeListLanguages()
 
 
 def _encoding_translation(text):
@@ -76,14 +88,18 @@ class MALEntry:
         self.anime_type = None
         self.manga_type = None
 
+        # MAL can return a None type, no type, or an unknown type.
+        mal_type = self.raw_properties.get('type', 'unknown') or 'unknown'
+        mal_type = mal_type.lower()
+
         if self.work_type == MALWorks.animes:
-            self.anime_type = self.raw_properties['type'].lower()
+            self.anime_type = mal_type
         elif (self.work_type == MALWorks.mangas
-              and self.raw_properties.get('type').lower() == MALWorks.novels):
+              and mal_type == MALWorks.novels):
             # MAL(stupidity): You thought it was a manga! It's a light novel !
             self.work_type = MALWorks.novels
         elif self.work_type == MALWorks.mangas:
-            self.manga_type = self.raw_properties['type'].lower()
+            self.manga_type = mal_type
 
     @property
     def poster(self) -> Optional[str]:
@@ -345,15 +361,12 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
                 and title.upper() in list(map(str.upper, titles))):
                 first_matching_work = work
 
-            # FIXME: will create many redundant queries.
-            simple_lang = Language.objects.get(code='simple')
-            english_lang = Language.objects.get(code='en')
-
             work_titles = [
                 WorkTitle(
                     work=work,
                     title=synonym,
-                    language=simple_lang,
+                    ext_language=mal_langs.unk_ext_lang,
+                    language=mal_langs.unk_ext_lang.lang,
                     type='synonym'
                 )
                 for synonym in entry.synonyms
@@ -363,7 +376,8 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
                 work_titles += [WorkTitle(
                     work=work,
                     title=entry.english_title,
-                    language=english_lang,
+                    ext_language=mal_langs.english_ext_lang,
+                    language=mal_langs.english_ext_lang.lang,
                     type='main'
                 )]
 
