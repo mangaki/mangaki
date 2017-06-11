@@ -241,7 +241,8 @@ class WorkTitle(models.Model):
     type = models.CharField(max_length=9, choices=(
                             ('main', 'principal'),
                             ('official', 'officiel'),
-                            ('synonym', 'synonyme')),
+                            ('synonym', 'synonyme'),
+                            ('short', 'court')),
                             blank=True,
                             db_index=True)
 
