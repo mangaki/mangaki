@@ -1,4 +1,6 @@
 import time
+import logging
+
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
@@ -17,8 +19,6 @@ from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
 from enum import Enum
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -164,7 +164,7 @@ class WorkAdmin(admin.ModelAdmin):
                               "Veuillez ne sélectionner que des œuvres ayant un identifiant AniDB. (détails: {})"
                               .format(",".join(map(lambda w: w.title, offending_works))))
 
-        for index, work in enumerate(works, 1):
+        for index, work in enumerate(works, start=1):
             logger.info('Refreshing {} from AniDB.'.format(work))
             client.get_or_update_work(work.anidb_aid)
             if index % 25 == 0:
