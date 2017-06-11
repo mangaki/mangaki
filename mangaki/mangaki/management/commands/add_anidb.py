@@ -10,6 +10,6 @@ class Command(BaseCommand):
         parser.add_argument('id', type=int)
 
     def handle(self, *args, **options):
-        anime = client.get_work(options.get('id'))
+        anime = client.get_or_update_work(options.get('id'))
         anime.retrieve_poster()  # Save for future use
         self.stdout.write(self.style.SUCCESS('Successfully added %s' % anime))

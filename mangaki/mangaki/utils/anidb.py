@@ -126,7 +126,7 @@ class AniDB:
                 # 'nsfw': ?
                 'date': to_python_datetime(anime.startdate.string),
                 # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
-                'synopsis': str(anime.description.string),
+                'ext_synopsis': str(anime.description.string),
                 # 'artists': ? from anime.creators
                 'nb_episodes': int(anime.episodecount.string),
                 'anime_type': str(anime.type.string),
@@ -192,9 +192,9 @@ class AniDB:
 
         return missing_titles
 
-    def get_work(self,
-                 anidb_aid: int,
-                 reload_lang_cache: bool = False) -> Work:
+    def get_or_update_work(self,
+                           anidb_aid: int,
+                           reload_lang_cache: bool = False) -> Work:
         """
         Use `get_dict` internally to create (in the database) the bunch of objects you need to create a work.
 
@@ -212,7 +212,9 @@ class AniDB:
         """
         data = self.get_dict(anidb_aid)
 
-        work, created = Work.objects.update_or_create(category=self.anime_category, defaults=data['work'])
+        work, created = Work.objects.update_or_create(category=self.anime_category,
+                                                      anidb_aid=anidb_aid,
+                                                      defaults=data['work'])
         self._build_work_titles(work, data['work_titles']['titles'], reload_lang_cache)
 
         return work

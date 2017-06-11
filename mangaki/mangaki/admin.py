@@ -1,3 +1,4 @@
+import time
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
@@ -16,6 +17,10 @@ from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
 from enum import Enum
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class TaggedWorkInline(admin.TabularInline):
@@ -67,7 +72,7 @@ class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'category', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter,)
-    actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work', 'update_tags_via_anidb']
+    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge', 'refresh_work', 'update_tags_via_anidb']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
@@ -147,6 +152,29 @@ class WorkAdmin(admin.ModelAdmin):
         self.message_user(request, "%s désormais plus NSFW." % message_bit)
 
     make_sfw.short_description = "Rendre SFW les œuvres sélectionnées"
+
+    @transaction.atomic
+    def refresh_work_from_anidb(self, request, queryset):
+        works = queryset.all()
+
+        if not all(work.anidb_aid for work in works):
+            offending_works = [work for work in works if not work.anidb_aid]
+            self.message_user(request,
+                              "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
+                              "Veuillez ne sélectionner que des œuvres ayant un identifiant AniDB. (détails: {})"
+                              .format(",".join(map(lambda w: w.title, offending_works))))
+
+        for index, work in enumerate(works, 1):
+            logger.info('Refreshing {} from AniDB.'.format(work))
+            client.get_or_update_work(work.anidb_aid)
+            if index % 25 == 0:
+                logger.info('(AniDB refresh): Sleeping...')
+                time.sleep(1)  # Don't spam AniDB.
+
+        self.message_user(request,
+                          "Le rafraichissement des œuvres a été effectué avec succès.")
+
+    refresh_work_from_anidb.short_description = "Rapatrie les titres alternatifs et synopsis depuis AniDB"
 
     @transaction.atomic  # In case trouble happens
     def merge(self, request, queryset):
