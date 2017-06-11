@@ -27,7 +27,7 @@ class AniDB:
     def __init__(self,
                  client_id: Optional[str] = None,
                  client_ver: Optional[int] = None):
-        if not client_id and self.client_ver:
+        if not client_id and client_ver:
             self.is_available = False
         else:
             self.client_id = client_id
