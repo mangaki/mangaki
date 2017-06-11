@@ -52,15 +52,16 @@ class Dataset:
                 data = csv.writer(csvfile, delimiter=',', quotechar='', quoting=csv.QUOTE_NONE)
                 for (encoded_user_id, encoded_work_id), rating in zip(self.anonymized.X, self.anonymized.y):
                     data.writerow([encoded_user_id, encoded_work_id, rating])
-            with open(works_path, 'w', newline='') as csvfile:
-                data = csv.writer(csvfile, delimiter=',')
-                lines = []
-                for work_id, title in self.titles.items():
-                    if work_id in self.encode_work:
-                        lines.append([self.encode_work[work_id], title])
-                lines.sort()
-                for line in lines:
-                    data.writerow(line)
+            if self.titles:
+                with open(works_path, 'w', newline='') as csvfile:
+                    data = csv.writer(csvfile, delimiter=',')
+                    lines = []
+                    for work_id, title in self.titles.items():
+                        if work_id in self.encode_work:
+                            lines.append([self.encode_work[work_id], title])
+                    lines.sort()
+                    for line in lines:
+                        data.writerow(line)
 
     def load_csv(self, filename, convert=float, title_filename=None):
         with open(os.path.join(settings.DATA_DIR, filename)) as f:
