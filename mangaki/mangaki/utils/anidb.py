@@ -152,8 +152,8 @@ class AniDB:
         }
 
     @cached_property
-    def unknown_language(self) -> Language:
-        return Language.objects.get(code=None)
+    def unknown_language(self) -> ExtLanguage:
+        return ExtLanguage.objects.get(source='anidb', ext_lang='x-unk')
 
     def _build_work_titles(self,
                            work: Work,
@@ -185,16 +185,16 @@ class AniDB:
         missing_titles = [
             work_title
             for work_title in work_titles
-            if work_title.title in already_existing_titles
+            if work_title.title not in already_existing_titles
         ]
 
         WorkTitle.objects.bulk_create(missing_titles)
 
         return missing_titles
 
-    def get_mangaki_work(self,
-                         anidb_aid: int,
-                         reload_lang_cache: bool = False) -> Work:
+    def get_work(self,
+                 anidb_aid: int,
+                 reload_lang_cache: bool = False) -> Work:
         """
         Use `get_dict` internally to create (in the database) the bunch of objects you need to create a work.
 
@@ -212,35 +212,10 @@ class AniDB:
         """
         data = self.get_dict(anidb_aid)
 
-        work = Work.objects.update_or_create(category=self.anime_category, **data['work'])
+        work, created = Work.objects.update_or_create(category=self.anime_category, defaults=data['work'])
         self._build_work_titles(work, data['work_titles']['titles'], reload_lang_cache)
 
         return work
-
-    def get_mangaki_titles(self, work: Work, reload_lang_cache: bool = False) -> List[WorkTitle]:
-        """
-        Use `get_dict` internally to create (in the database) a **new** set of WorkTitle associated to the Work passed in parameter.
-        This work MUST have a `anidb_aid` (different from None).
-
-        This won't return already existing WorkTitle objects attached to the Work.
-
-        :param work: the work
-        :type work: A `mangaki.models.Work` object instance
-        :param reload_lang_cache: forcefully reload the ExtLanguage cache,
-            if it has changed since the instantiation of the AniDB client (default: false).
-        :type reload_lang_cache: boolean
-        :return: a list of WorkTitle model objects linked to the `Work` passed in parameter.
-        :rtype: A list of **new** `mangaki.models.WorkTitle` objects.
-        """
-        if not work.anidb_aid:
-            raise ValueError('Work does not have any AniDB ID.')
-
-        data = self.get_dict(work.anidb_aid)
-        work_titles = self._build_work_titles(work,
-                                              data['work_titles']['titles'],
-                                              reload_lang_cache)
-
-        return work_titles
 
     def get(self, id):
         """

@@ -22,9 +22,9 @@ def rename_synonym_to_synonyme(apps, schema):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mangaki', '0076_auto_20170610_2317'),
+        ('mangaki', '0072_fill_ext_languages'),
     ]
 
     operations = [
-        migrations.RunPython(rename_synonyme_to_synonym, rename_synonym_to_synonyme)
+        migrations.RunPython(rename_synonyme_to_synonym, rename_synonym_to_synonyme, elidable=False)
     ]

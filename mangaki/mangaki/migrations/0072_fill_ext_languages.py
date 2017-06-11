@@ -68,41 +68,47 @@ anidb_lang_map = {
 }
 
 
-def add_languages(apps, _):
+def add_languages(apps, schema):
     Language = apps.get_model('mangaki', 'Language')
-    languages = Language.objects.bulk_create([
+    db_alias = schema.connection.alias
+    extended_iso639_langs = [
         Language(code=extended_iso639)
-        for extended_iso639 in anidb_lang_map.values()
-    ])
+        for extended_iso639 in set(anidb_lang_map.values())
+    ]
 
+    extended_iso639_langs.append(
+        Language(code='x-simple')
+    )
+    languages = Language.objects.using(db_alias).bulk_create(extended_iso639_langs)
     lang_model_map = {lang.code: lang for lang in languages}
 
     ExtLanguage = apps.get_model('mangaki', 'ExtLanguage')
 
     # AniDB
-    ExtLanguage.objects.bulk_create([
+    ExtLanguage.objects.using(db_alias).bulk_create([
         ExtLanguage(source='anidb', ext_lang=x,
                     lang=lang_model_map[y])
         for x, y in anidb_lang_map.items()
     ])
 
+    # MAL
+    ExtLanguage.objects.using(db_alias).bulk_create([
+        ExtLanguage(source='mal', ext_lang='unknown',
+                    lang=lang_model_map[None]),
+        ExtLanguage(source='mal', ext_lang='english',
+                    lang=lang_model_map['en'])
+    ])
 
-def remove_languages(apps, _):
-    Language = apps.get_model('mangaki', 'Language')
-    ExtLanguage = apps.get_model('mangaki', 'ExtLanguage')
 
-    for lang_code in lang_map.values():
-        Language.objects.filter(code=lang_code).delete()
-
-    for anidb_lang in lang_map.keys():
-        ExtLanguage.objects.filter(ext_lang=anidb_lang).delete()
+def noop(_, __):
+    pass
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('mangaki', '0071_add_ext_language'),
+        ('mangaki', '0071_ext_language'),
     ]
 
     operations = [
-        migrations.RunPython(add_languages, remove_languages)
+        migrations.RunPython(add_languages, noop, elidable=False)
     ]

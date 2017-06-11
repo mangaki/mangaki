@@ -46,6 +46,6 @@ class AniDBTest(TestCase):
             status=200,
             content_type='application/xml'
         )
-        anime = self.anidb.get_mangaki_work(11606)
+        anime = self.anidb.get_work(11606)
         self.assertNotEqual(anime.title, '')
         self.assertNotEqual(anime.worktitle_set.count(), 0)

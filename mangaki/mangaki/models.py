@@ -116,6 +116,7 @@ class Work(models.Model):
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
+    ext_synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
 
@@ -244,9 +245,6 @@ class WorkTitle(models.Model):
                             blank=True,
                             db_index=True)
 
-    class Meta:
-        unique_together = ('title', 'language')
-
     def __str__(self):
         return ("{} - {} (source: {}, type: {}) attached to {}"
                 .format(self.title, self.language.code, self.ext_language.source, self.type, self.work))
@@ -276,6 +274,8 @@ class ExtLanguage(models.Model):
 class Language(models.Model):
     code = models.CharField(
         default=UNK_LANG_VALUE,
+        null=True,
+        unique=True,
         max_length=10,
         db_index=True,
         help_text="ISO639-1 code or custom (e.g. x-jat, x-kot, x-ins)")
