@@ -183,11 +183,6 @@ class AniDB:
             if title_type == 'synonym':
                 synonyms[lang] = title
 
-        work_titles = {
-            'main_title': main_title,
-            'titles': titles,
-        }
-
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
@@ -205,7 +200,7 @@ class AniDB:
         work, created = Work.objects.update_or_create(category=self.anime_category,
                                                       anidb_aid=anidb_aid,
                                                       defaults=anime)
-        self._build_work_titles(work, work_titles, reload_lang_cache)
+        self._build_work_titles(work, titles, reload_lang_cache)
 
         return work
 
