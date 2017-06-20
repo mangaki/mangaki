@@ -125,12 +125,8 @@ def current_user_set_toggle_rating(request, work, choice):
     """
     user = request.user
     if user.is_authenticated:
-        # FIXME: We are doing too much queries to the database here.
-        # We should use delete() and check the resulting number of works deleted instead.
-        # https://github.com/mangaki/mangaki/issues/313
-        old_ratings = user.rating_set.filter(work=work, choice=choice)
-        if old_ratings:
-            old_ratings.delete()
+        deleted, _ = user.rating_set.filter(work=work, choice=choice).delete()
+        if deleted:
             return None
         else:
             user.rating_set.update_or_create(work=work, defaults={'choice': choice})
