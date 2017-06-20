@@ -26,5 +26,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(rename_synonyme_to_synonym, rename_synonym_to_synonyme, elidable=False)
+        migrations.RunPython(rename_synonyme_to_synonym, rename_synonym_to_synonyme)
     ]

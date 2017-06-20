@@ -27,7 +27,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# refer to 0072 migration to understand why ext_lang is set to these values.
+# MAL provides three fields related to titles:
+#   — `english_title` which is, by definition, in english.
+#   — `title` which is, of language: unknown.
+#   — `synonyms` which is, also, of language: unknown.
 class MyAnimeListLanguages:
     @cached_property
     def unk_ext_lang(self):

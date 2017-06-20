@@ -250,8 +250,6 @@ class WorkTitle(models.Model):
         return ("{} - {} (source: {}, type: {}) attached to {}"
                 .format(self.title, self.language.code, self.ext_language.source, self.type, self.work))
 
-UNK_LANG_VALUE = None
-
 
 class ExtLanguage(models.Model):
     source = models.CharField(max_length=30)
@@ -274,7 +272,7 @@ class ExtLanguage(models.Model):
 
 class Language(models.Model):
     code = models.CharField(
-        default=UNK_LANG_VALUE,
+        default=None,
         null=True,
         unique=True,
         max_length=10,

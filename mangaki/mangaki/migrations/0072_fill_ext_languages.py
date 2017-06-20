@@ -91,7 +91,7 @@ def add_languages(apps, schema):
         for x, y in anidb_lang_map.items()
     ])
 
-    # MAL
+    # MAL, refer to mangaki/utils/mal.py to understand `ext_lang` values.
     ExtLanguage.objects.using(db_alias).bulk_create([
         ExtLanguage(source='mal', ext_lang='unknown',
                     lang=lang_model_map[None]),
@@ -100,15 +100,11 @@ def add_languages(apps, schema):
     ])
 
 
-def noop(_, __):
-    pass
-
-
 class Migration(migrations.Migration):
     dependencies = [
         ('mangaki', '0071_ext_language'),
     ]
 
     operations = [
-        migrations.RunPython(add_languages, noop, elidable=False)
+        migrations.RunPython(add_languages, migrations.RunPython.noop)
     ]
