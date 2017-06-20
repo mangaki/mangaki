@@ -200,7 +200,7 @@ Slot.prototype.fetch = function () {
     slot.fetcher = undefined;
     throw exn;
   }).then(function (result) {
-    Array.prototype.push.apply(works, result['cards']);
+    Array.prototype.push.apply(works, result);
 
     slot.fetcher = undefined;
     return works;
@@ -210,6 +210,10 @@ Slot.prototype.fetch = function () {
 /* Mosaic takes care of mapping Cards inside an element with Slots pointing to
  * some remote URLs on the server.
  */
+function buildSlotURL(category, slot_sort) {
+  return '/api/cards/' + category + '/' + slot_sort;
+}
+
 function Mosaic(el, category) {
   var mosaic = this;
 
@@ -219,8 +223,8 @@ function Mosaic(el, category) {
 
   var els = $(el).find('.work-card').toArray();
 
-  this.slots = els.map(function (el, index) {
-    return new Slot('/data/card/' + category + '/' + (index + 1) + '.json');
+  this.slots = els.map(function (el) {
+    return new Slot(buildSlotURL(category, $(el).data('slot-sort')));
   });
   this.cards = els.map(function (el, index) {
     var card = new Card(el, category);

@@ -5,6 +5,7 @@ from django.contrib import admin
 from django_js_reverse.views import urls_js
 
 from mangaki import views
+from mangaki.api.urls import urlpatterns as apipatterns
 from mangaki.settings import DEBUG
 
 
@@ -14,12 +15,11 @@ urlpatterns = [
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^jsreverse/$', urls_js, name='js_reverse'),
-
+    url(r'^api/', include(apipatterns)),
     url(r'^$', views.index, name='home'),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works, name='get-work'),
     url(r'^data/reco/(?P<algo>\w+)/(?P<category>\w+)\.json$', views.get_reco_algo_list, name='get-reco-algo-list'),
     url(r'^data/reco_dpp/(?P<category>\w+)\.json$', views.get_reco_list_dpp, name='get-dpp-list'),
-    url(r'^data/card/(?P<category>\w+)/(?P<sort_id>\d+)\.json$', views.CardList.as_view(), name='get-card'),
     url(r'^getuser/(?P<work_id>\w+)\.json$', views.get_user_for_recommendations, name='get-user-for-reco'),
     url(r'^getuser\.json$', views.get_users, name='get-user'),
     url(r'^recommend/(?P<work_id>\w+)/(?P<target_id>\w+)$', views.recommend_work, name='reco-work'),

@@ -70,8 +70,11 @@
   </form>
 {% endif %}
 </div>
-
-{% include "works.html" with works=object_list is_dpp=is_dpp %}
+{% if sort_mode != "mosaic" %}
+    {% include "works.html" with works=object_list is_dpp=is_dpp %}
+{% else %}
+    {% include "works_mosaic.html" with works=object_list %}
+{% endif %}
 
 {% if user.is_authenticated %}
 

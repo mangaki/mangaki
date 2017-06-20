@@ -52,7 +52,6 @@ from irl.models import Event, Partner, Attendee
 
 NB_POINTS_DPP = 10
 RATINGS_PER_PAGE = 24
-POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 REFERENCE_DOMAINS = (
@@ -250,51 +249,6 @@ class EventDetail(LoginRequiredMixin, DetailView):
         return redirect(request.GET['next'])
 
 
-class CardList(JSONResponseMixin, ListView):
-    model = Work
-
-    def get_queryset(self):
-        category = self.kwargs.get('category')
-        # This call to `int` shouldn't fail because `sort_id` must match the
-        # `\d+` regexp, cf urls.py.
-        sort_id = int(self.kwargs.pop('sort_id'))
-        if sort_id < 1 or sort_id > 5:
-            raise Http404
-        deja_vu = self.request.GET.get('dejavu', '').split(',')
-        sort_mode = ['popularity', 'controversy', 'top', 'random', 'dpp'][int(sort_id) - 1]
-        queryset = Category.objects.get(slug=category).work_set.all()
-        if sort_mode == 'popularity':
-            queryset = queryset.popular()
-        elif sort_mode == 'controversy':
-            queryset = queryset.controversial()
-        elif sort_mode == 'top':
-            queryset = queryset.top()
-        elif sort_mode == 'random':
-            queryset.random().order_by('?')
-        else:
-            queryset = queryset.dpp(NB_POINTS_DPP)
-        rated_works = current_user_ratings(self.request)
-        queryset = queryset.exclude(id__in=list(rated_works))
-        return queryset[:POSTERS_PER_PAGE]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        cards = []
-        for work in context['object_list']:
-            cards.append({
-                'id': work.id,
-                'category': work.category.slug,
-                'title': work.title,
-                'poster': work.safe_poster(self.request.user),
-                'synopsis': work.synopsis,
-                'nsfw': work.nsfw
-            })
-        return {'cards': cards}
-
-    def render_to_response(self, context, **response_kwargs):
-        return self.render_to_json_response(context, **response_kwargs)
-
-
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -365,6 +319,7 @@ class WorkList(WorkListMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        slot_sort_types = ['popularity', 'controversy', 'top', 'random']
         search_text = self.search()
         sort_mode = self.sort_mode()
 
@@ -378,8 +333,8 @@ class WorkList(WorkListMixin, ListView):
 
         if sort_mode == 'mosaic' and not self.is_dpp:
             context['object_list'] = [
-                Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
-                for _ in range(4)
+                (slot_sort_type, Work(title='Chargement…', ext_poster='/static/img/chiro.gif'))
+                for slot_sort_type in slot_sort_types
             ]
 
         return context
