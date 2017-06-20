@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
-from mangaki.models import UNK_LANG_VALUE
 
 # AniDB → ISO639-1 or custom.
 anidb_lang_map = {
@@ -62,8 +61,8 @@ anidb_lang_map = {
     'th': 'th',
     'tr': 'tr',
     'uk': 'uk',
-    'x-unk': UNK_LANG_VALUE,
-    'x-other': UNK_LANG_VALUE,
+    'x-unk': None,
+    'x-other': None,
     'vi': 'vi'
 }
 
