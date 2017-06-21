@@ -1,4 +1,26 @@
 ---
+- name: Setup Redis.
+  include_role:
+    name: utils/redis
+  vars:
+    redis_databases: '{{ mangaki_back_redis_database + 1 | int }}'
+    redis_bind: ['{{ mangaki_back_redis_host }}']
+    redis_port: '{{ mangaki_back_redis_port }}'
+    redis_password: '{{ mangaki_back_redis_password }}'
+
+- name: Setup Celery.
+  include_role:
+    name: utils/celery
+  vars:
+      celery_name: '{{ mangaki_back_celery_name }}'
+      celery_user: '{{ mangaki_back_user }}'
+      celery_app_module: 'mangaki'
+      celery_app_name: 'celery_app'
+      celery_venv_path: '{{ mangaki_back_venv_path }}'
+      celery_env:
+        DJANGO_SETTINGS_MODULE: 'mangaki.settings'
+        MANGAKI_SETTINGS_PATH: '{{ mangaki_back_settings_path }}'
+
 - name: Setup rankings cron.
   include_role:
     name: utils/cron

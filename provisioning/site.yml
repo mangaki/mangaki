@@ -18,7 +18,7 @@
     - role: mangaki_db
     - role: mangaki_source
     - role: mangaki_sync
-    - role: mangaki_back
+    - { role: mangaki_back, start_celery: false }
 
 - name: Setup standalone servers.
   hosts: mangaki_standalone

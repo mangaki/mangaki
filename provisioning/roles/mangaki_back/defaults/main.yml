@@ -1,0 +1,7 @@
+---
+mangaki_back_redis_database: 0
+mangaki_back_redis_host: '127.0.0.1'
+mangaki_back_redis_port: 6379
+mangaki_back_redis_password: '{{ mangaki_redis_password | default("") }}'
+mangaki_back_celery_name: '{{ mangaki_back_name }}_celery'
+start_celery: true

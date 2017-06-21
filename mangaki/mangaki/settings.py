@@ -205,11 +205,30 @@ REST_FRAMEWORK = {
     }
 }
 
-# Celery configuration
+########################
+# Celery configuration #
+########################
 
-# redis:// is redis://localhost/0
-CELERY_BROKER_URL = config.get('celery', 'broker_url', fallback='redis://')
-CELERY_RESULT_BACKEND = config.get('celery', 'result_backend', fallback='redis://')
+SCHEMA = config.get('celery', 'schema', fallback='redis')
+CELERY_STORE = {
+    'schema': SCHEMA,
+    'host': config.get('celery', '{}_host'.format(SCHEMA), fallback='127.0.0.1'),
+    'port': int(config.get('celery', '{}_port'.format(SCHEMA), fallback=6379)),
+    'password': config.get('secrets', '{}_password'.format(SCHEMA), fallback='')
+}
+
+if SCHEMA == 'redis':
+    CELERY_STORE['database'] = int(config.get('celery', 'redis_database', fallback=0))
+
+if SCHEMA == 'redis':
+    if CELERY_STORE['password']:
+        CELERY_BROKER_URL = "{schema}://:{password}@{host}:{port}/{database}".format(**CELERY_STORE)
+    else:
+        CELERY_BROKER_URL = "{schema}://{host}:{port}/{database}".format(**CELERY_STORE)
+
+    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+else:
+    raise NotImplementedError('Unsupported schema: {}'.format(SCHEMA))
 
 EMAIL_BACKEND = config.get('email', 'EMAIL_BACKEND', fallback='django.core.mail.backends.smtp.EmailBackend')
 if config.has_section('smtp'):

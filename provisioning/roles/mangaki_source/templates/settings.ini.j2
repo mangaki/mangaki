@@ -8,6 +8,9 @@ DEBUG = True
 [secrets]
 SECRET_KEY = {{ mangaki_source_secret_key }}
 DB_PASSWORD = {{ mangaki_source_db_password }}
+{% if mangaki_source_redis_password %}
+REDIS_PASSWORD = {{ mangaki_source_redis_password }}
+{% endif %}
 
 {# We don't want to include MAL stuff if these are not defined. #}
 {% if mangaki_source_has_mal|bool %}
@@ -30,6 +33,12 @@ DB_USER = {{ mangaki_source_db_user }}
 [sentry]
 DSN = {{ mangaki_source_sentry_dsn }}
 {% endif %}
+
+[celery]
+SCHEMA = redis
+REDIS_HOST = {{ mangaki_source_redis_host }}
+REDIS_PORT = {{ mangaki_source_redis_port }}
+REDIS_DATABASE = {{ mangaki_source_redis_database }}
 
 [email]
 {% if mangaki_source_has_email|bool %}

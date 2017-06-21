@@ -16,6 +16,9 @@ mangaki_source_debug: true
 # Database configuration
 mangaki_db_password: 'tuturuu'
 
+# Redis configuration
+# mangaki_redis_password: 'madscientist'
+
 # Web configuration
 mangaki_web_www_root: '/home/vagrant/www'
 mangaki_web_domains: ['mangaki.dev']
