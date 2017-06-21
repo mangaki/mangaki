@@ -51,6 +51,15 @@ INSTALLED_APPS = (
     'django_js_reverse',
 )
 
+if config.has_section('sentry'):
+    import raven
+
+    INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
+
+    RAVEN_CONFIG = {
+        'dsn': config.get('sentry', 'dsn')
+    }
+
 if config.has_section('allauth'):
     INSTALLED_APPS += tuple(
         'allauth.socialaccount.providers.{}'.format(name)
@@ -129,6 +138,10 @@ TEMPLATES = [
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'root': {
+        'level': 'WARNING',
+        'handlers': [],
+    },
     'handlers': {
         'console': {
             'level': 'INFO',
@@ -139,9 +152,42 @@ LOGGING = {
         'mangaki': {
             'handlers': ['console'],
             'level': 'DEBUG'
-        }
+        },
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
     },
 }
+
+if config.has_section('sentry'):
+    LOGGING['handlers']['sentry'] = {
+            'level': 'ERROR',
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+    }
+    LOGGING['root']['handlers'].append('sentry')
+    LOGGING['loggers']['raven'] = {
+        'level': 'DEBUG',
+        'handlers': ['console'],
+        'propagate': False,
+    }
+    LOGGING['loggers']['sentry.errors'] = {
+        'level': 'DEBUG',
+        'handlers': ['console'],
+        'propagate': False,
+    }
+
 
 ROOT_URLCONF = 'mangaki.urls'
 WSGI_APPLICATION = 'mangaki.wsgi.application'
