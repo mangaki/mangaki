@@ -13,6 +13,7 @@ from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import CharField, F, Func, Lookup, Value
+from django.utils.functional import cached_property
 
 from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
@@ -246,9 +247,27 @@ class WorkTitle(models.Model):
                             blank=True,
                             db_index=True)
 
+    @cached_property
+    def code(self):
+        return self.language.code if self.language else None
+
+    @cached_property
+    def source(self):
+        return self.ext_language.source if self.ext_language else None
+
     def __str__(self):
-        return ("{} - {} (source: {}, type: {}) attached to {}"
-                .format(self.title, self.language.code, self.ext_language.source, self.type, self.work))
+        if self.code and self.source:
+            return ("{} - {} (source: {}, type: {}) attached to {}"
+                    .format(self.title, self.code, self.source, self.type, self.work))
+        elif self.source:
+            return ("{} (source: {}, type: {}) attached to {}"
+                    .format(self.title, self.source, self.type, self.work))
+        elif self.code:
+            return ("{} - {} (type: {}) attached to {}"
+                    .format(self.title, self.code, self.type, self.work))
+        else:
+            return ("{} (type: {}) attached to {}"
+                    .format(self.title, self.type, self.work))
 
 
 class ExtLanguage(models.Model):
