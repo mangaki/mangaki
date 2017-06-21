@@ -103,12 +103,12 @@ def merge_works(request, selected_queryset):
     if selected_queryset.model == WorkCluster:  # Author is reviewing an existing WorkCluster
         from_cluster = True
         cluster = selected_queryset.first()
-        works_to_merge = cluster.works.order_by('id')
+        works_to_merge = cluster.works.order_by('id').prefetch_related('rating_set')
     else:  # Author is merging those works from a Work queryset
         from_cluster = False
         cluster = WorkCluster(user=request.user, checker=request.user)
         cluster.save()  # Otherwise we cannot add works
-        works_to_merge = selected_queryset
+        works_to_merge = selected_queryset.prefetch_related('rating_set')
         cluster.works.add(*works_to_merge)
     if request.POST.get('confirm'):
         final_id = int(request.POST.get('id'))
