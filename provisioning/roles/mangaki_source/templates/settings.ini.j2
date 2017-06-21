@@ -26,6 +26,11 @@ DB_HOST = {{ mangaki_source_db_host }}
 DB_NAME = {{ mangaki_source_db_name }}
 DB_USER = {{ mangaki_source_db_user }}
 
+{% if mangaki_source_has_sentry | bool %}
+[sentry]
+DSN = {{ mangaki_source_sentry_dsn }}
+{% endif %}
+
 [email]
 {% if mangaki_source_has_email|bool %}
 EMAIL_BACKEND = django.core.mail.backends.smtp.EmailBackend
