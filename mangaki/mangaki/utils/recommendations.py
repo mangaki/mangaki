@@ -61,7 +61,7 @@ def get_reco_algo(request, algo_name='knn', category='all'):
 
         anonymized = dataset.make_anonymous_data(triplets)
 
-        chrono.save('make first anonymous data')
+        chrono.save('make first anonymous data with {} ratings'.format(len(triplets)))
 
         algo = ALGOS['knn']()
         algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
@@ -87,19 +87,17 @@ def get_reco_algo(request, algo_name='knn', category='all'):
                 for work_id, choice in current_user_ratings(request).items()
                 if choice not in ('willsee', 'wontsee')
             ])
-    else:
-        # Every rating is useful
-        triplets = list(
-            Rating.objects.values_list('user_id', 'work_id', 'choice'))
-
-    chrono.save('get all %d interesting ratings' % len(triplets))
-
-    dataset = Dataset()
-    try:
-        algo = get_algo_backup(algo_name)
-        dataset = get_dataset_backup(algo_name)
-    except FileNotFoundError:
         dataset, algo = fit_algo(algo_name, triplets)
+    else:  # SVD or ALS, etc.
+        try:
+            algo = get_algo_backup(algo_name)
+            dataset = get_dataset_backup(algo_name)
+        except FileNotFoundError:
+            # Every rating is useful
+            triplets = list(
+                Rating.objects.values_list('user_id', 'work_id', 'choice'))
+            chrono.save('get all %d interesting ratings' % len(triplets))
+            dataset, algo = fit_algo(algo_name, triplets)
 
     chrono.save('fit %s' % algo.get_shortname())
 
