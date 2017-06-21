@@ -299,7 +299,7 @@ class Language(models.Model):
         help_text="ISO639-1 code or custom (e.g. x-jat, x-kot, x-ins)")
 
     def __str__(self):
-        return "<Language: {}>".format(self.code)
+        return self.code if self.code else 'inconnu'
 
 
 class Role(models.Model):
