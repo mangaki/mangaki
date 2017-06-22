@@ -15,7 +15,7 @@ from django.db import models
 from django.db.models import CharField, F, Func, Lookup, Value
 from django.utils.functional import cached_property
 
-from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
+from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 from mangaki.utils.dpp import MangakiDPP
 from mangaki.utils.ratingsmatrix import RatingsMatrix
@@ -46,6 +46,11 @@ class SearchSimilarity(Func):
 
     def __init__(self, lhs, rhs):
         super().__init__(Func(Func(lhs, function='F_UNACCENT'), function='UPPER'), Func(Func(rhs, function='F_UNACCENT'), function='UPPER'))
+
+
+class FilteredWorkManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(redirect__isnull=True)
 
 
 class WorkQuerySet(models.QuerySet):
@@ -110,6 +115,7 @@ class Category(models.Model):
 
 
 class Work(models.Model):
+    redirect = models.ForeignKey('Work', blank=True, null=True)
     title = models.CharField(max_length=255)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
     ext_poster = models.CharField(max_length=128, db_index=True)
@@ -151,7 +157,8 @@ class Work(models.Model):
             ['category', 'nb_ratings'],
         ]
 
-    objects = WorkQuerySet.as_manager()
+    all_objects = WorkQuerySet.as_manager()  # Equivalent to default_manager_name = 'all_objects', because first in the list
+    objects = FilteredWorkManager.from_queryset(WorkQuerySet)()
 
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
@@ -445,6 +452,19 @@ class Suggestion(models.Model):
     ), default='ref')
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
+
+
+class WorkCluster(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    works = models.ManyToManyField(Work)
+    reported_on = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=11, choices=CLUSTER_CHOICES, default='unprocessed')
+    checker = models.ForeignKey(User, related_name='reported_clusters', on_delete=models.CASCADE, blank=True, null=True)
+    resulting_work = models.ForeignKey(Work, related_name='clusters', blank=True, null=True)
+    merged_on = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])
 
 
 class Neighborship(models.Model):
