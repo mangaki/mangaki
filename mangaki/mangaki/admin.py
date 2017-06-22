@@ -57,7 +57,13 @@ def redirect_staff(works_to_merge, final_work):
     final_work_staff = set()
     kept_staff_ids = []
     # Only one query: put final_work's Staff objects first in the list
-    for staff_id, work_id, artist_id, role_id in Staff.objects.filter(work__in=works_to_merge).annotate(belongs_to_final_work=Case(When(work_id=final_work.id, then=Value(1)), default=Value(0), output_field=IntegerField())).order_by('-belongs_to_final_work').values_list('id', 'work_id', 'artist_id', 'role_id'):
+    queryset = (Staff.objects.filter(work__in=works_to_merge)
+                             .annotate(belongs_to_final_work=Case(
+                                        When(work_id=final_work.id, then=Value(1)),
+                                        default=Value(0), output_field=IntegerField()))
+                             .order_by('-belongs_to_final_work')
+                             .values_list('id', 'work_id', 'artist_id', 'role_id'))
+    for staff_id, work_id, artist_id, role_id in queryset:
         if work_id == final_work.id:  # This condition will be met for the first iterations
             final_work_staff.add((artist_id, role_id))
         elif (artist_id, role_id) not in final_work_staff:  # Now we are sure we know every staff of the final work
