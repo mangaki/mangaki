@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Case, When, Value, IntegerField
+from django.db.models.aggregates import Max
 from django.template.response import TemplateResponse
 from django.utils.html import format_html, format_html_join
 
@@ -37,30 +38,40 @@ def overwrite_fields(final_work, request):
     final_work.save()
 
 
+def redirect_ratings(works_to_merge, final_work):
+    # Get all IDs of considered ratings
+    get_id_of_rating = {}
+    for rating_id, user_id, date in Rating.objects.filter(work__in=works_to_merge).values_list('id', 'user_id', 'date'):
+        get_id_of_rating[(user_id, date)] = rating_id
+    # What is the latest rating of every user? (N. B. – latest may be null)
+    kept_rating_ids = []
+    for rating in Rating.objects.filter(work__in=works_to_merge).values('user_id').annotate(latest=Max('date')):
+        user_id = rating['user_id']
+        date = rating['latest']
+        kept_rating_ids.append(get_id_of_rating[(user_id, date)])
+    Rating.objects.filter(work__in=works_to_merge).exclude(id__in=kept_rating_ids).delete()
+    Rating.objects.filter(id__in=kept_rating_ids).update(work_id=final_work.id)
+
+
+def redirect_staff(works_to_merge, final_work):
+    final_work_staff = set()
+    kept_staff_ids = []
+    # Only one query: put final_work's Staff objects first in the list
+    for staff_id, work_id, artist_id, role_id in Staff.objects.filter(work__in=works_to_merge).annotate(belongs_to_final_work=Case(When(work_id=final_work.id, then=Value(1)), default=Value(0), output_field=IntegerField())).order_by('-belongs_to_final_work').values_list('id', 'work_id', 'artist_id', 'role_id'):
+        if work_id == final_work.id:  # This condition will be met for the first iterations
+            final_work_staff.add((artist_id, role_id))
+        elif (artist_id, role_id) not in final_work_staff:  # Now we are sure we know every staff of the final work
+            kept_staff_ids.append(staff_id)
+    Staff.objects.filter(work__in=works_to_merge).exclude(work_id=final_work.id).exclude(id__in=kept_staff_ids).delete()
+    Staff.objects.filter(id__in=kept_staff_ids).update(work_id=final_work.id)
+
+
 def redirect_related_objects(works_to_merge, final_work):
-    for work_to_redirect in works_to_merge:
-        if work_to_redirect.id == final_work.id:
-            continue
-        for rating_to_redirect in work_to_redirect.rating_set.all():
-            try:
-                kept_rating = Rating.objects.get(work_id=final_work.id, user_id=rating_to_redirect.user_id)
-                if kept_rating.date and rating_to_redirect.date and kept_rating.date < rating_to_redirect.date:  # Kept rating is not the latest given
-                    kept_rating.choice = rating_to_redirect.choice  # Update the kept rating
-                rating_to_redirect.delete()
-            except Rating.DoesNotExist:
-                rating_to_redirect.work_id = final_work.id  # Safely transfer the rating to the kept work
-                rating_to_redirect.save()
-        for staff_to_redirect in work_to_redirect.staff_set.all():
-            if Staff.objects.filter(work_id=final_work.id, artist_id=staff_to_redirect.artist_id, role_id=staff_to_redirect.role_id).exists():  # This staff is already in the kept work
-                staff_to_redirect.delete()
-            else:
-                staff_to_redirect.work_id = final_work.id  # Safely transfer the staff to the kept work
-                staff_to_redirect.save()
-        final_work.genre.add(*work_to_redirect.genre.all())
-        Trope.objects.filter(origin_id=work_to_redirect.id).update(origin_id=final_work.id)
-        for model in [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]:
-            model.objects.filter(work_id=work_to_redirect.id).update(work_id=final_work.id)
-        Work.objects.filter(id=work_to_redirect.id).update(redirect=final_work)
+    final_work.genre.add(*filter(None, works_to_merge.values_list('genre', flat=True)))
+    Trope.objects.filter(origin_id__in=works_to_merge).update(origin_id=final_work.id)
+    for model in [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]:
+        model.objects.filter(work_id__in=works_to_merge).update(work_id=final_work.id)
+    Work.objects.filter(id__in=works_to_merge).exclude(id=final_work.id).update(redirect=final_work)
 
 
 def create_merge_form(works_to_merge):
@@ -114,6 +125,8 @@ def merge_works(request, selected_queryset):
         final_id = int(request.POST.get('id'))
         final_work = Work.objects.get(id=final_id)
         overwrite_fields(final_work, request)
+        redirect_ratings(works_to_merge, final_work)
+        redirect_staff(works_to_merge, final_work)
         redirect_related_objects(works_to_merge, final_work)
         WorkCluster.objects.filter(id=cluster.id).update(
             checker=request.user, resulting_work=final_work, merged_on=datetime.now(), status='accepted')

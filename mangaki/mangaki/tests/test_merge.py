@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.contrib import admin
 from django.db import connection
-from mangaki.models import Work, Editor, Category, Studio, WorkCluster, Rating
+from mangaki.models import Work, Editor, Category, Studio, WorkCluster, Rating, Staff, Role, Artist, Genre
 from datetime import date, timedelta
 
 
@@ -30,6 +30,28 @@ class MergeTest(TestCase):
         # Admin rated every movie
         Rating.objects.bulk_create([Rating(work_id=work_id, user=self.user, choice='like') for work_id in self.work_ids])
 
+        the_artist = Artist.objects.create(name='Yoko Kanno')
+
+        roles = Role.objects.bulk_create([
+            Role(name='Director', slug='xxx'),
+            Role(name='Composer', slug='yyy')
+        ])
+
+        Staff.objects.bulk_create([
+            Staff(work_id=self.work_ids[0], artist=the_artist, role=roles[0]),
+            Staff(work_id=self.work_ids[1], artist=the_artist, role=roles[0]),
+            Staff(work_id=self.work_ids[1], artist=the_artist, role=roles[1])
+        ])
+
+        genres = Genre.objects.bulk_create([
+            Genre(title='SF'),
+            Genre(title='Slice of life')
+        ])
+        Work.objects.get(id=self.work_ids[0]).genre.add(genres[0])
+        Work.objects.get(id=self.work_ids[1]).genre.add(genres[0])
+        Work.objects.get(id=self.work_ids[1]).genre.add(genres[1])
+
+        # Rating are built so that after merge, only the favorites should be kept
         Rating.objects.bulk_create([
             Rating(work_id=self.work_ids[0], user=self.users[0], choice='like', date=today),
             Rating(work_id=self.work_ids[1], user=self.users[0], choice='favorite', date=tomorrow),
@@ -39,6 +61,10 @@ class MergeTest(TestCase):
             Rating(work_id=self.work_ids[2], user=self.users[2], choice='like', date=yesterday),
             Rating(work_id=self.work_ids[0], user=self.users[3], choice='favorite', date=yesterday)
         ])
+        Rating.objects.filter(work_id=self.work_ids[1], user=self.users[0]).update(date=tomorrow)
+        Rating.objects.filter(work_id=self.work_ids[2], user=self.users[0]).update(date=yesterday)
+        Rating.objects.filter(work_id=self.work_ids[2], user=self.users[2]).update(date=yesterday),
+        Rating.objects.filter(work_id=self.work_ids[0], user=self.users[3]).update(date=yesterday)
 
     def test_merge(self, **kwargs):
         self.client.login(username='test', password='test')
@@ -56,7 +82,10 @@ class MergeTest(TestCase):
             'id': self.work_ids[0],  # Chosen ID for the canonical work
             'fields_to_choose': ''
         }
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(36):
             self.client.post(merge_url, context)
+        self.assertEqual(list(Rating.objects.filter(user__in=self.users).values_list('choice', flat=True)), ['favorite'] * 4)
         self.assertEqual(Work.all_objects.filter(redirect__isnull=True).count(), 1)
         self.assertEqual(WorkCluster.objects.count(), 1)
+        self.assertEqual(Staff.objects.count(), 2)
+        self.assertEqual(Work.objects.get(id=self.work_ids[0]).genre.count(), 2)
