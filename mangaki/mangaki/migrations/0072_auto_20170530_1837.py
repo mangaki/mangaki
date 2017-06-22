@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('mangaki', '0069_profile_research_ok'),
+        ('mangaki', '0071_fix_mal_cdn'),
     ]
 
     operations = [
