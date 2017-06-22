@@ -4,29 +4,26 @@ from random import sample
 import numpy as np
 
 
-REPEAT = 5
-
-
 def get_volume(vectors):
     return np.linalg.det(vectors.dot(vectors.T))
 
 
 class MangakiUniform:
-    def __init__(self, vectors=None):
+    def __init__(self, vectors=None, REPEAT=5):
         self.vectors = vectors
         self.items = list(range(len(vectors)))
 
     def sample_k(self, nb_points):
         volumes = []
-        for _ in range(REPEAT):
+        for _ in range(self.REPEAT):
             sampled = sample(self.items, nb_points)
             volumes.append((get_volume(self.vectors[sampled]), sampled))
-        #print(volumes)
         return max(volumes)[1]
 
 
 class MangakiDPP:
-    def __init__(self, vectors=None, ids=None):
+    def __init__(self, vectors=None, ids=None, REPEAT=5):
+        self.REPEAT = REPEAT
         self.vectors = vectors
         self.ids = ids
         self.indices = None if vectors is None else np.array(list(range(len(vectors))))
@@ -50,9 +47,8 @@ class MangakiDPP:
 
     def sample_k(self, k):
         volumes = []
-        for _ in range(REPEAT):
+        for _ in range(self.REPEAT):
             sampled = [int(index) for index in dpplib.sample_k(k, self.D, self.V)]
             volumes.append((get_volume(self.vectors[sampled]), sampled))
-        #print(volumes)
         sampled = max(volumes)[1]
         return self.indices[sampled] if self.ids is None else self.ids[self.indices[sampled]]
