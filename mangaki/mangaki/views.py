@@ -392,9 +392,9 @@ def get_profile(request, username=None):
         user = get_object_or_404(User, username=username)
     else:
         user = request.user
-        is_anonymous = not user.is_authenticated()
+        is_anonymous = not request.user.is_authenticated()
 
-    is_shared = is_anonymous or (username is None) or user.profile.is_shared
+    is_shared = is_anonymous or (username is None) or user == request.user or user.profile.is_shared
     category = request.GET.get('category', 'anime')
     algo_name = request.GET.get('algo', None)
     categories = ('anime', 'manga', 'album')
@@ -766,11 +766,12 @@ def update_research(request):
     elif is_ok is not None:
         message = 'Votre profil a bien été mis à jour. '
         if is_ok:
-            message += 'Vous participerez au data challenge de Kyoto.'
+            message += 'Merci. Vos données seront présentes dans le data challenge de Kyoto.'
         else:
-            message += 'Vous ne participerez pas au data challenge de Kyoto.'
+            message += 'Vos données ne feront pas partie du data challenge de Kyoto.'
         Profile.objects.filter(user__username=username).update(research_ok=is_ok)
         messages.success(request, message)
+        return render(request, 'research.html')
     return render(request, 'research.html', {'username': username, 'token': token})
 
 

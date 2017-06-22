@@ -18,7 +18,8 @@ FIXTURE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
 TEST_DATA_DIR = os.path.join(BASE_DIR, 'tests', 'data')
 
 config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
-config.read(os.path.join(BASE_DIR, 'settings.ini'))
+config.read(
+    os.environ.get('MANGAKI_SETTINGS_PATH', os.path.join(BASE_DIR, 'settings.ini')))
 
 DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.postgres',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -132,15 +134,10 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
         },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log'
-        }
     },
     'loggers': {
         'mangaki': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG'
         }
     },

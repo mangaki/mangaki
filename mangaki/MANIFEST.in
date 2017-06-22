@@ -1,0 +1,2 @@
+recursive-include mangaki/static *
+recursive-include mangaki/templates *

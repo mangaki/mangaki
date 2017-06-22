@@ -1,0 +1,24 @@
+{{ ansible_managed|comment }}
+
+[Unit]
+Description={{ cron_description }}
+
+[Service]
+Type=oneshot
+
+User={{ cron_user }}
+Group={{ cron_group }}
+UMask=0027
+
+PermissionsStartOnly=yes
+ExecStart={{ cron_command }}
+{% for key, value in cron_env.iteritems() %}
+Environment={{ key }}={{ value }}
+{% endfor %}
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=yes
+
+CapabilityBoundingSet=

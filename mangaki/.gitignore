@@ -1,1 +1,5 @@
 settings.ini
+/.eggs
+/mangaki.egg-info
+/build
+/dist
