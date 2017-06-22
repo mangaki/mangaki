@@ -1,20 +1,155 @@
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.template.response import TemplateResponse
-from django.db.models import Count
+from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.db.models import Count, Case, When, Value, IntegerField
+from django.db.models.aggregates import Max
+from django.template.response import TemplateResponse
+from django.utils.html import format_html, format_html_join
 
 from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
     Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
-    FAQEntry, ColdStartRating, Trope, Language
+    FAQEntry, ColdStartRating, Trope, Language, WorkCluster
 )
 from mangaki.utils.anidb import AniDB
 from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
 from enum import Enum
+from datetime import datetime
+
+
+class MergeType(Enum):
+    INFO_ONLY = (0, 'black')
+    JUST_CONFIRM = (1, 'green')
+    CHOICE_REQUIRED = (2, 'red')
+
+    def __init__(self, priority, row_color):
+        self.priority = priority
+        self.row_color = row_color
+
+
+def overwrite_fields(final_work, request):
+    for field in request.POST.get('fields_to_choose').split(','):
+        if request.POST.get(field) != 'None':
+            setattr(final_work, field, request.POST.get(field))
+    final_work.save()
+
+
+def redirect_ratings(works_to_merge, final_work):
+    # Get all IDs of considered ratings
+    get_id_of_rating = {}
+    for rating_id, user_id, date in Rating.objects.filter(work__in=works_to_merge).values_list('id', 'user_id', 'date'):
+        get_id_of_rating[(user_id, date)] = rating_id
+    # What is the latest rating of every user? (N. B. – latest may be null)
+    kept_rating_ids = []
+    for rating in Rating.objects.filter(work__in=works_to_merge).values('user_id').annotate(latest=Max('date')):
+        user_id = rating['user_id']
+        date = rating['latest']
+        kept_rating_ids.append(get_id_of_rating[(user_id, date)])
+    Rating.objects.filter(work__in=works_to_merge).exclude(id__in=kept_rating_ids).delete()
+    Rating.objects.filter(id__in=kept_rating_ids).update(work_id=final_work.id)
+
+
+def redirect_staff(works_to_merge, final_work):
+    final_work_staff = set()
+    kept_staff_ids = []
+    # Only one query: put final_work's Staff objects first in the list
+    queryset = (Staff.objects.filter(work__in=works_to_merge)
+                             .annotate(belongs_to_final_work=Case(
+                                        When(work_id=final_work.id, then=Value(1)),
+                                        default=Value(0), output_field=IntegerField()))
+                             .order_by('-belongs_to_final_work')
+                             .values_list('id', 'work_id', 'artist_id', 'role_id'))
+    for staff_id, work_id, artist_id, role_id in queryset:
+        if work_id == final_work.id:  # This condition will be met for the first iterations
+            final_work_staff.add((artist_id, role_id))
+        elif (artist_id, role_id) not in final_work_staff:  # Now we are sure we know every staff of the final work
+            kept_staff_ids.append(staff_id)
+    Staff.objects.filter(work__in=works_to_merge).exclude(work_id=final_work.id).exclude(id__in=kept_staff_ids).delete()
+    Staff.objects.filter(id__in=kept_staff_ids).update(work_id=final_work.id)
+
+
+def redirect_related_objects(works_to_merge, final_work):
+    final_work.genre.add(*filter(None, works_to_merge.values_list('genre', flat=True)))
+    Trope.objects.filter(origin_id__in=works_to_merge).update(origin_id=final_work.id)
+    for model in [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]:
+        model.objects.filter(work_id__in=works_to_merge).update(work_id=final_work.id)
+    Work.objects.filter(id__in=works_to_merge).exclude(id=final_work.id).update(redirect=final_work)
+
+
+def create_merge_form(works_to_merge):
+    rows = defaultdict(list)
+    for work in works_to_merge.values():
+        for field in work:
+            rows[field].append(work[field])
+    fields_to_choose = []
+    template_rows = []
+    for field in rows:
+        choices = rows[field]
+        suggested = None
+        if field in {'sum_ratings', 'nb_ratings', 'nb_likes', 'nb_dislikes', 'controversy'}:
+            merge_type = MergeType.INFO_ONLY
+        elif all(choice == choices[0] for choice in choices):  # All equal
+            merge_type = MergeType.JUST_CONFIRM
+            suggested = choices[0]
+        elif sum(not choice or choice == 'Inconnu' for choice in choices) == len(choices) - 1:  # All empty but one
+            merge_type = MergeType.JUST_CONFIRM
+            suggested = [choice for choice in choices if choice and choice != 'Inconnu'][0]  # Remaining one
+        else:
+            merge_type = MergeType.CHOICE_REQUIRED
+        template_rows.append({
+            'field': field,
+            'choices': choices,
+            'merge_type': merge_type,
+            'suggested': suggested,
+            'color': merge_type.row_color,
+        })
+        if field != 'id' and merge_type != MergeType.INFO_ONLY:
+            fields_to_choose.append(field)
+    template_rows.sort(key=lambda row: row['merge_type'].priority, reverse=True)
+    rating_samples = [(Rating.objects.filter(work=work).count(),
+                       Rating.objects.filter(work=work)[:10]) for work in works_to_merge]
+    return fields_to_choose, template_rows, rating_samples
+
+
+@transaction.atomic  # In case trouble happens
+def merge_works(request, selected_queryset):
+    if selected_queryset.model == WorkCluster:  # Author is reviewing an existing WorkCluster
+        from_cluster = True
+        cluster = selected_queryset.first()
+        works_to_merge = cluster.works.order_by('id').prefetch_related('rating_set')
+    else:  # Author is merging those works from a Work queryset
+        from_cluster = False
+        cluster = WorkCluster(user=request.user, checker=request.user)
+        cluster.save()  # Otherwise we cannot add works
+        works_to_merge = selected_queryset.prefetch_related('rating_set')
+        cluster.works.add(*works_to_merge)
+    if request.POST.get('confirm'):
+        final_id = int(request.POST.get('id'))
+        final_work = Work.objects.get(id=final_id)
+        overwrite_fields(final_work, request)
+        redirect_ratings(works_to_merge, final_work)
+        redirect_staff(works_to_merge, final_work)
+        redirect_related_objects(works_to_merge, final_work)
+        WorkCluster.objects.filter(id=cluster.id).update(
+            checker=request.user, resulting_work=final_work, merged_on=datetime.now(), status='accepted')
+        return len(works_to_merge), final_work, None
+
+    fields_to_choose, template_rows, rating_samples = create_merge_form(works_to_merge)
+    context = {
+        'fields_to_choose': ','.join(fields_to_choose),
+        'template_rows': template_rows,
+        'rating_samples': rating_samples,
+        'works_to_merge': works_to_merge,
+        'queryset': selected_queryset,
+        'opts': Work._meta if not from_cluster else WorkCluster._meta,
+        'action': 'merge' if not from_cluster else 'trigger_merge',
+        'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+    }
+    return len(works_to_merge), None, TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
 
 
 class TaggedWorkInline(admin.TabularInline):
@@ -25,6 +160,7 @@ class TaggedWorkInline(admin.TabularInline):
 class StaffInline(admin.TabularInline):
     model = Staff
     fields = ('role', 'artist')
+    raw_id_fields = ('artist',)
 
 
 class WorkTitleInline(admin.TabularInline):
@@ -55,17 +191,12 @@ class FAQAdmin(admin.ModelAdmin):
     list_display = ('theme', 'order')
 
 
-class MergeType(Enum):
-    INFO_ONLY = 0
-    JUST_CONFIRM = 1
-    CHOICE_REQUIRED = 2
-
-
 @admin.register(Work)
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'category', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter,)
+    raw_id_fields = ('redirect',)
     actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work', 'update_tags_via_anidb']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
@@ -75,6 +206,10 @@ class WorkAdmin(admin.ModelAdmin):
         'nb_dislikes',
         'controversy',
     )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(redirect__isnull=True)  # Exclude phantom works
 
     def make_nsfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=True)
@@ -149,103 +284,13 @@ class WorkAdmin(admin.ModelAdmin):
 
     make_sfw.short_description = "Rendre SFW les œuvres sélectionnées"
 
-    @transaction.atomic  # In case trouble happens
     def merge(self, request, queryset):
-        queryset = queryset.order_by('id')
-        if request.POST.get('confirm'):
-            kept_id = int(request.POST.get('id'))
-            kept_work = Work.objects.get(id=kept_id)
-            for field in request.POST.get('fields_to_choose').split(','):
-                if request.POST.get(field) != 'None':
-                    setattr(kept_work, field, request.POST.get(field))
-            for work_to_delete in queryset:
-                if work_to_delete.id == kept_id:
-                    continue
-                for rating_to_delete in work_to_delete.rating_set.all():
-                    try:
-                        kept_rating = Rating.objects.get(work_id=kept_id, user_id=rating_to_delete.user_id)
-                        if kept_rating.date and rating_to_delete.date and kept_rating.date < rating_to_delete.date:  # Kept rating is not the latest given
-                            kept_rating.choice = rating_to_delete.choice  # Update the kept rating
-                        rating_to_delete.delete()
-                    except Rating.DoesNotExist:
-                        rating_to_delete.work_id = kept_id  # Safely transfer the rating to the kept work
-                        rating_to_delete.save()
-                for staff_to_delete in work_to_delete.staff_set.all():
-                    if Staff.objects.filter(work_id=kept_id, artist_id=staff_to_delete.artist_id, role_id=staff_to_delete.role_id).exists():  # This staff is already in the kept work
-                        staff_to_delete.delete()
-                    else:
-                        staff_to_delete.work_id = kept_id  # Safely transfer the staff to the kept work
-                        staff_to_delete.save()
-                for genre in work_to_delete.genre.all():
-                    kept_work.genre.add(genre)
-                Trope.objects.filter(origin_id=work_to_delete.id).update(origin_id=kept_id)
-                models_to_update = [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]
-                for model in models_to_update:
-                    model.objects.filter(work_id=work_to_delete.id).update(work_id=kept_id)
-                self.message_user(request, "L'œuvre %s a bien été supprimée." % work_to_delete.title)
-                work_to_delete.delete()
-            kept_work.save()
-            return None
+        nb_merged, final_work, response = merge_works(request, queryset)
+        if response is None:  # Confirmed
 
-        do_not_compare = ['sum_ratings', 'nb_ratings', 'nb_likes', 'nb_dislikes', 'controversy']
-        priority = {
-            MergeType.CHOICE_REQUIRED: 2,
-            MergeType.JUST_CONFIRM: 1,
-            MergeType.INFO_ONLY: 0
-        }
-        row_color = {
-            MergeType.CHOICE_REQUIRED: 'red',
-            MergeType.JUST_CONFIRM: 'green',
-            MergeType.INFO_ONLY: 'black'
-        }
-        merge_type = {}
-        rows = defaultdict(list)
-        for work in queryset.values():
-            for field in work:
-                rows[field].append(work[field])
-        fields_to_choose = []
-        template_rows = []
-        for field in rows:
-            choices = rows[field]
-            suggested = None
-            if field in do_not_compare:
-                merge_type[field] = MergeType.INFO_ONLY
-            elif all(choice == choices[0] for choice in choices):  # All equal
-                merge_type[field] = MergeType.JUST_CONFIRM
-                suggested = choices[0]
-            elif sum(not choice or choice == 'Inconnu' for choice in choices) == len(choices) - 1:  # All empty but one
-                merge_type[field] = MergeType.JUST_CONFIRM
-                suggested = [choice for choice in choices if choice and choice != 'Inconnu'][0]  # Remaining one
-            else:
-                merge_type[field] = MergeType.CHOICE_REQUIRED
-            template_rows.append({
-                'field': field,
-                'choices': choices,
-                'merge_type': merge_type[field],
-                'suggested': suggested,
-                'color': row_color[merge_type[field]],
-            })
-            if field != 'id' and merge_type[field] != MergeType.INFO_ONLY:
-                fields_to_choose.append(field)
-        template_rows.sort(key=lambda row: priority[row['merge_type']], reverse=True)
-
-        rating_samples = []
-        for work in queryset:
-            rating_samples.append(
-                (Rating.objects.filter(work=work).count(),
-                 Rating.objects.filter(work=work)[:10])
-            )
-
-        context = {
-            'fields_to_choose': ','.join(fields_to_choose),
-            'works_to_merge': queryset,
-            'template_rows': template_rows,
-            'rating_samples': rating_samples,
-            'queryset': queryset,
-            'opts': self.model._meta,
-            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
-        }
-        return TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
+            self.message_user(request, format_html('La fusion de {:d} œuvres vers <a href="{:s}">{:s}</a> a bien été effectuée.'
+                .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
+        return response
 
     merge.short_description = "Fusionner les œuvres sélectionnées"
 
@@ -304,6 +349,48 @@ class TaggedWorkAdmin(admin.ModelAdmin):
     search_fields = ('work', 'tag')
 
 
+@admin.register(WorkCluster)
+class WorkClusterAdmin(admin.ModelAdmin):
+    list_display = ('user', 'get_work_titles', 'resulting_work', 'reported_on', 'merged_on', 'checker', 'status')
+    raw_id_fields = ('user', 'works', 'checker', 'resulting_work')
+    actions = ('trigger_merge', 'reject')
+
+    def trigger_merge(self, request, queryset):
+        cluster = queryset.first()
+        nb_merged, final_work, response = merge_works(request, queryset)
+        if response is None:
+            self.message_user(request, format_html('La fusion de {:d} œuvres vers <a href="{:s}">{:s}</a> a bien été effectuée.'
+                .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
+        return response
+
+    trigger_merge.short_description = "Fusionner les œuvres de ce cluster"
+
+    def reject(self, request, queryset):
+        rows_updated = queryset.update(status='rejected')
+        if rows_updated == 1:
+            message_bit = "1 cluster"
+        else:
+            message_bit = "%s clusters" % rows_updated
+        self.message_user(request, "Le rejet de %s a été réalisé avec succès." % message_bit)
+
+    reject.short_description = "Rejeter les clusters sélectionnés"
+
+    def get_work_titles(self, obj):
+        if obj.works.exists():
+            def get_admin_url(work):
+                return reverse('admin:mangaki_work_change', args=(work.id,))
+            return (
+                '<ul>' +
+                format_html_join('', '<li>{} (<a href="{}">{}</a>)</li>',
+                    ((work.title, get_admin_url(work), work.id) for work in obj.works.all())) +
+                '</ul>'
+            )
+        else:
+            return '(all deleted)'
+
+    get_work_titles.allow_tags = True
+
+
 @admin.register(Suggestion)
 class SuggestionAdmin(admin.ModelAdmin):
     list_display = ('work', 'problem', 'date', 'user', 'is_checked')
@@ -324,7 +411,7 @@ class SuggestionAdmin(admin.ModelAdmin):
             message_bit = "1 suggestion"
         else:
             message_bit = "%s suggestions" % rows_updated
-        self.message_user(request, "La validation de %s a réussi." % message_bit)
+        self.message_user(request, "La validation de %s a été réalisé avec succès." % message_bit)
 
     check_suggestions.short_description = "Valider les suggestions sélectionnées"
 
@@ -334,7 +421,7 @@ class SuggestionAdmin(admin.ModelAdmin):
             message_bit = "1 suggestion"
         else:
             message_bit = "%s suggestions" % rows_updated
-        self.message_user(request, "L'invalidation de %s a réussi." % message_bit)
+        self.message_user(request, "L'invalidation de %s a été réalisé avec succès." % message_bit)
 
     uncheck_suggestions.short_description = "Invalider les suggestions sélectionnées"
 
