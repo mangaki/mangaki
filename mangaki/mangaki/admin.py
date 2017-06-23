@@ -9,6 +9,7 @@ from django.db.models import Count, Case, When, Value, IntegerField
 from django.db.models.aggregates import Max
 from django.template.response import TemplateResponse
 from django.utils.html import format_html, format_html_join
+from django.utils import timezone
 
 from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
@@ -22,7 +23,6 @@ from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
 from enum import Enum
-from datetime import datetime
 
 
 class MergeType(Enum):
@@ -139,7 +139,7 @@ def merge_works(request, selected_queryset):
         redirect_staff(works_to_merge, final_work)
         redirect_related_objects(works_to_merge, final_work)
         WorkCluster.objects.filter(id=cluster.id).update(
-            checker=request.user, resulting_work=final_work, merged_on=datetime.now(), status='accepted')
+            checker=request.user, resulting_work=final_work, merged_on=timezone.now(), status='accepted')
         return len(works_to_merge), final_work, None
 
     fields_to_choose, template_rows, rating_samples = create_merge_form(works_to_merge)
