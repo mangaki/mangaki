@@ -311,11 +311,9 @@ class WorkAdmin(admin.ModelAdmin):
 
     refresh_work_from_anidb.short_description = "Rapatrie les titres alternatifs et synopsis depuis AniDB"
 
-    @transaction.atomic  # In case trouble happens
     def merge(self, request, queryset):
         nb_merged, final_work, response = merge_works(request, queryset)
         if response is None:  # Confirmed
-
             self.message_user(request, format_html('La fusion de {:d} œuvres vers <a href="{:s}">{:s}</a> a bien été effectuée.'
                 .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
         return response
