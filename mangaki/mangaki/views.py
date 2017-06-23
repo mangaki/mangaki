@@ -343,46 +343,6 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
         return context
 
 
-class UserList(ListView):
-    model = User
-
-    # context_object_name = 'anime'
-
-    def get_queryset(self):
-        bundle = User.objects.filter(profile__is_shared=True).order_by('-id')
-        letter = self.request.GET.get('letter', '')
-        if letter:
-            if letter == '0':  # '#'
-                bundle = bundle.exclude(username__regex=r'^[a-zA-Z]').order_by('username')
-            else:
-                bundle = bundle.filter(username__istartswith=letter).order_by('username')
-        return bundle
-
-    def get_context_data(self, **kwargs):
-        context = super(UserList, self).get_context_data(**kwargs)
-
-        letter = self.request.GET.get('letter', '')
-        page = int(self.request.GET.get('page', '1'))
-        context['object_list'] = list(context['object_list'])
-        paginator = Paginator(context['object_list'], USERNAMES_PER_PAGE)
-        try:
-            user_list = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            user_list = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            user_list = paginator.page(paginator.num_pages)
-        context['params'] = {'letter': letter, 'page': page}
-        context['url'] = urlencode({'letter': letter})
-        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages,
-                                  range(user_list.number - 2, user_list.number + 2 + 1))
-        context['object_list'] = user_list
-
-        context['trio_elm'] = User.objects.filter(username__in=['jj', 'Lily', 'Sedeto'])
-        return context
-
-
 def get_profile(request, username=None):
     if username is None and request.user.is_authenticated():
         return redirect('profile', request.user.username, permanent=True)
