@@ -56,7 +56,7 @@
     {% for obj in queryset %}
     <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
     {% endfor %}
-    <input type="hidden" name="action" value="merge" />
+    <input type="hidden" name="action" value="{{ action }}" />
     <input type="hidden" name="confirm" value="yes" />
     <input type="hidden" name="fields_to_choose" value="{{ fields_to_choose }}" />
     <input type="submit" value="{% trans "Yes, I'm sure" %}" />
