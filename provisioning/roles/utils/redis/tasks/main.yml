@@ -19,7 +19,7 @@
     dest: '/etc/redis/redis.conf'
     owner: 'root'
     group: 'root'
-    mode: '0644'
+    mode: '0640'
   become: true
 
 - name: Copy Redis' core configuration.
