@@ -26,7 +26,6 @@ urlpatterns = [
     url(r'^removeReco/(?P<work_id>\d+)/(?P<username>\w+)/(?P<targetname>\w+)$', views.remove_reco, name='remove-reco'),
     url(r'^removeReco/(?P<targetname>\w+)$', views.remove_all_reco, name='remove-all-reco'),
     url(r'^remove_anon_ratings/$', views.remove_all_anon_ratings, name='remove-all-anon-ratings'),
-    url(r'^users/', views.UserList.as_view()),
     # We explicitely want to override allauth's signup and login views
     url(r'^user/signup/$', views.signup, name="account_signup"),
     url(r'^user/login/$', views.login, name="account_login"),
