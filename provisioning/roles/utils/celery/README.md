@@ -29,4 +29,7 @@ celery_autoscale_max: 10
 
 # Additional environment for the Celery program, as a dictionary
 celery_env: {}
+
+# Start Celery through supervisorctl (default: true)
+start: true
 ```

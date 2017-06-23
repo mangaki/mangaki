@@ -19,3 +19,4 @@
     name: '{{ celery_app_module }}_celery'
     state: present
   become: true
+  when: start
