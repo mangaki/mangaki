@@ -2,6 +2,8 @@
 {% load cookielaw_tags %}
 {% load anonymous_ratings %}
 {% load bootstrap3 %}
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -59,35 +61,45 @@
                 <div class="collapse navbar-collapse" id="menu-collapse">
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
-                            <a href="{% url 'about' %}">
+                            <a href="{% url 'about' 'fr' %}">
                                 C'est quoi ?
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="{% url 'about' 'en' %}">
+                                What is it?
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="{% url 'about' 'jp' %}">
+                                なんですか？
                             </a>
                         </li>
                     </ul>
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
                             <a href="{% url 'work-list' 'anime' %}">
-                                Anime
+                                {% trans "Anime" %}
                             </a>
                         </li>
                         <li class="dropdown">
                             <a href="{% url 'work-list' 'manga' %}">
-                                Mangas
+                                {% trans "Mangas" %}
                             </a>
                         </li>
                         <li class="dropdown">
                             <a href="{% url 'reco' %}">
-                                Recommandations
+                                {% trans "Recommandations" %}
                             </a>
                         </li>
                         <li class="dropdown">
                             <a href="{% url 'events' %}">
-                                Événements
+                                {% trans "Événements" %}
                             </a>
                         </li>
                         <li class="dropdown">
                             <a href="{% url 'top' 'directors' %}">
-                                Top 20
+                                {% trans "Top 20" %}
                             </a>
                         </li>
                     </ul>
@@ -129,7 +141,7 @@
     <nav class="navbar navbar-default">
         <div class="navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="{% url 'about' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le
+                <li><a href="{% url 'about' 'fr' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le
                     projet</a></li>
                 <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
                 <li><a href="{% url 'cgu' %}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>

@@ -18,3 +18,5 @@ restore.sh
 media
 /provisioning/inventory
 /provisioning/env_vars/
+*.mo
+.hypothesis

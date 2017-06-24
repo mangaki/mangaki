@@ -46,7 +46,7 @@ urlpatterns = [
     url(r'^reco_willsee/$', views.update_reco_willsee, name='reco-willsee'),
     url(r'^mal/(?P<mal_username>.+)$', views.import_from_mal, name='import-mal'),
     url(r'^admin/', admin.site.urls),
-    url(r'^about/$', views.about, name='about'),
+    url(r'^about/(?P<lang>\w*)$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}, name='cgu'),
     url(r'^events/$', views.events, name='events'),
