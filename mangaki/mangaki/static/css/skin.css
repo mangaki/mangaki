@@ -507,6 +507,35 @@ ul.checklist .list-icon {
   padding: 0 12px;
 }
 
+.work-cover__wrapper:before {
+  content: attr(data-category);
+  /* Inspired by https://codepen.io/eode9/pen/twkKm */
+  width: 120px;
+  background: #a83333;
+  position: absolute;
+  top: 15px;
+  left: -30px;
+  text-align: center;
+  line-height: 26px;
+  letter-spacing: 1px;
+  color: #f0f0f0;
+  text-transform: capitalize;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  font-size: 16px;
+
+  /* The category should be below the content when hovered. */
+  z-index: -1;
+}
+
+.work-cover__wrapper[data-category="manga"]:before {
+  background: #273963;
+}
+
+.work-cover__wrapper[data-category="album"]:before {
+  background: #48912c;
+}
+
 .work-card__content {
   flex: 0 1 auto;
   padding: 8px 12px;
