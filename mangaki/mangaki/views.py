@@ -462,8 +462,9 @@ def get_profile(request, username=None):
         'events': events,
         'is_anonymous': is_anonymous,
         'show_all_categories': is_anonymous,
+        'ratings_disabled': request.user.username != username and not is_anonymous,
         'categories': [(category, seen_lists.get(category, []), unseen_lists.get(category, []))
-                       for category in categories]
+                       for category in categories],
     }
     return render(request, 'profile.html', data)
 
@@ -774,6 +775,10 @@ def faq_index(request):
         'information': all_information,
     }
     return render(request, 'faq/faq_index.html', context)
+
+
+def legal_mentions(request):
+    return render(request, 'mangaki/legal.html')
 
 
 def generic_error_view(error, error_code):

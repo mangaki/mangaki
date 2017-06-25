@@ -1,0 +1,47 @@
+{% load staticfiles %}
+{% load static %}
+{% load posters %}
+
+<div class="work-card{% if sort_mode == "mosaic" %} work-card_loading{% endif %} work-card_horizontal">
+  <div
+    class="work-card__media work-cover{% if not simple %} work-cover_backdrop{% endif %}"
+    style="background-image: url('{% poster_url work %}');">
+    <div class="work-cover__wrapper" data-category="{{ work.category|lower }}">
+      <div class="work-cover__title">
+	<h2 class="work-card__title">
+	  {{ work.title|truncatechars:50 }}
+	</h2>
+      </div>
+      {% if not simple %}
+      <div class="work-cover__content">
+	<div class="work-card__content">
+	  <div class="work-card__synopsis">
+	    {{ work.synopsis|linebreaksbr }}
+	  </div>
+	  <a
+	    href="{% if work.id == None %}#{% else %}{% url "work-detail" work.category.slug work.id %}{% endif %}"
+	    class="work-card__link">
+	    Plus d'infos…
+	  </a>
+	</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="ratings ratings_medium" data-endpoint="/vote{% if is_dpp %}_dpp{% endif %}">
+    {% if is_dpp %}
+      {% include "mangaki/rating.html" with name="like" title="J'aime" %}
+      {% include "mangaki/rating.html" with name="dislike" title="Je n'aime pas" %}
+      {% include "mangaki/rating.html" with name="dontknow" title="Je ne connais pas" %}
+    {% else %}
+      {% include "mangaki/rating.html" with name="favorite" title="J'adore" %}
+      {% include "mangaki/rating.html" with name="like" title="J'aime" %}
+      {% include "mangaki/rating.html" with name="neutral" title="Neutre" %}
+      {% include "mangaki/rating.html" with name="dislike" title="Je n'aime pas" %}
+
+      {% include "mangaki/rating.html" with name="willsee" title="Je veux voir" extra_classes="rating_separator" %}
+      {% include "mangaki/rating.html" with name="wontsee" title="Je ne veux pas voir" %}
+    {% endif %}
+  </div>
+</div>

@@ -47,6 +47,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^about/$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),
+    url(r'^legal/$', views.legal_mentions, name='legal'),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}, name='cgu'),
     url(r'^events/$', views.events, name='events'),
     # url(r'^lookup/$', views.lookup_work'),
