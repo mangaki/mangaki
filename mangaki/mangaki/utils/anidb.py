@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
-from lazy_object_proxy.utils import cached_property
+from django.utils.functional import cached_property
 
 from mangaki import settings
 from mangaki.models import Work, WorkTitle, Category, ExtLanguage
