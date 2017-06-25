@@ -139,10 +139,6 @@
 	(cc) <a href="http://manga-news.com/" target="_blank">Manga-News</a>
       {% endif %}
     </div>
-{% elif object.ext_synopsis %}
-    <div class="well">
-        {{ object.ext_synopsis | safe }}
-    </div>
 {% endif %}
 
 {% if user.is_authenticated %}
