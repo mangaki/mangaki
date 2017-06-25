@@ -46,13 +46,17 @@ class CardSlotQuerySerializer(serializers.Serializer):
                                         choices=slots_choices)
 
     def validate_category(self, category: str) -> str:
-        """
-        Check that the category exists in the database.
+        """Check that the category exists in the database.
 
-        :param category: A work category
-        :type category: a string
-        :return: the value or raise an error when the category does not exist.
-        :rtype: a string
+        Args:
+            category (string): A slug representing a Category object.
+
+        Returns:
+            The value of `category` unmodified.
+
+        Raises
+            :class:`serializers.ValidationError`: When the category does not exist.
+
         """
 
         if not Category.objects.filter(slug=category).exists():
