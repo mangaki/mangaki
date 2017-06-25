@@ -105,5 +105,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_languages, migrations.RunPython.noop)
+        migrations.RunPython(add_languages)
     ]
