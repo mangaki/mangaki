@@ -202,7 +202,8 @@ class CardList(JSONResponseMixin, ListView):
             raise Http404
         deja_vu = self.request.GET.get('dejavu', '').split(',')
         sort_mode = ['popularity', 'controversy', 'top', 'random', 'dpp'][int(sort_id) - 1]
-        queryset = Category.objects.get(slug=category).work_set.all()
+        category = Category.objects.get(slug=category)
+        queryset = Work.objects.filter(category=category).all()
         if sort_mode == 'popularity':
             queryset = queryset.popular()
         elif sort_mode == 'controversy':
