@@ -16,7 +16,7 @@ def get_potential_posters(work: Work) -> List[str]:
     if work.ext_poster:
         ext_urls.add(urlparse(work.ext_poster).path)
         posters.append({
-            'current': False if work.int_poster else True,
+            'current': work.int_poster is None,
             'url': work.ext_poster
         })
     entry = client.get_entry_from_work(work)  # Ask MAL for guidance.

@@ -241,13 +241,8 @@ class MALClient:
         :return: the first matching entry from MAL
         :rtype: MALEntry
         """
-        try:
-            mal_work_type = MALWorks(work.category.slug)
-        except ValueError:
-            raise RuntimeError('Unsupported type of work for MAL: {}'.format(work.category))
-
         return self.search_work(
-            mal_work_type,
+            MALWorks(work.category.slug),
             work.title
         )
 

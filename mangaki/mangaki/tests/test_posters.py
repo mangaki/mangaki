@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock, PropertyMock
+from unittest.mock import patch, NonCallableMock
 
 from django.test import TestCase
 
@@ -23,7 +23,6 @@ class PostersTest(TestCase):
             ext_poster='bRoKeN_lInK'  # That's how I feel when I see a broken poster.
         )
 
-    # We only want to abstract the MAL search implementation.
     @patch('mangaki.utils.db.client.search_work')
     def test_get_potential_posters(self, mocked_search):
         with self.subTest('When MAL returns no poster'):
@@ -32,11 +31,7 @@ class PostersTest(TestCase):
                 'url': self.kiznaiver.ext_poster
             }]
             # Set up mocks.
-            mocked_entry = MagicMock()
-            # Pay no mind to this ugliness:
-            # https://docs.python.org/3/library/unittest.mock.html#unittest.mock.PropertyMock
-            type(mocked_entry).poster = PropertyMock(return_value=None)
-            mocked_search.return_value = mocked_entry
+            mocked_search.return_value = NonCallableMock(poster=None)
             # Let the magic occur.
             posters = get_potential_posters(self.kiznaiver)
             # In this case, `get_potential_posters` cannot fix the current poster.
@@ -48,13 +43,10 @@ class PostersTest(TestCase):
                 'url': self.kiznaiver.ext_poster
             }, {
                 'current': False,
-                'url': 'some_good_poster_with_waifus'
+                'url': 'kiznaiver_mal_poster_url'
             }]
             # Set up the mocks.
-            mocked_entry = MagicMock()
-            # Pay no mind to this ugliness (refer to link mentioned above for information).
-            type(mocked_entry).poster = PropertyMock(return_value=expected[1]['url'])
-            mocked_search.return_value = mocked_entry
+            mocked_search.return_value = NonCallableMock(poster=expected[1]['url'])
             # Let the magic occur.
             posters = get_potential_posters(self.kiznaiver)
             # In this case, `get_potential_posters` should return a list of two posters, i.e. old external, MAL's one.
