@@ -21,6 +21,7 @@
     group: 'root'
     mode: '0640'
   become: true
+  notify: Restart redis.
 
 - name: Copy Redis' core configuration.
   template:
@@ -30,11 +31,4 @@
     group: 'root'
     mode: '0644'
   become: true
-
-- name: Ensure Redis is restarted.
-  service: 
-    name: redis-server
-    state: restarted
-    enabled: true
-  become: true
-
+  notify: Restart redis.
