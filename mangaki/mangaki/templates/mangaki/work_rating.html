@@ -6,7 +6,7 @@
   <div
     class="work-card__media work-cover{% if not simple %} work-cover_backdrop{% endif %}"
     style="background-image: url('{% poster_url work %}');">
-    <div class="work-cover__wrapper">
+    <div class="work-cover__wrapper" data-category="{{ work.category|lower }}">
       <div class="work-cover__title">
 	<h2 class="work-card__title">
 	  {{ work.title|truncatechars:50 }}
