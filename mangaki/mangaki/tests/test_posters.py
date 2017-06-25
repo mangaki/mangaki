@@ -30,7 +30,6 @@ class PostersTest(TestCase):
                 'current': True,
                 'url': self.kiznaiver.ext_poster
             }]
-            # Set up mocks.
             mocked_search.return_value = NonCallableMock(poster=None)
             # Let the magic occur.
             posters = get_potential_posters(self.kiznaiver)
@@ -45,9 +44,7 @@ class PostersTest(TestCase):
                 'current': False,
                 'url': 'kiznaiver_mal_poster_url'
             }]
-            # Set up the mocks.
             mocked_search.return_value = NonCallableMock(poster=expected[1]['url'])
-            # Let the magic occur.
             posters = get_potential_posters(self.kiznaiver)
             # In this case, `get_potential_posters` should return a list of two posters, i.e. old external, MAL's one.
             self.assertCountEqual(posters, expected)
