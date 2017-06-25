@@ -333,8 +333,15 @@ class WorkList(WorkListMixin, ListView):
 
         if sort_mode == 'mosaic' and not self.is_dpp:
             context['object_list'] = [
-                (slot_sort_type, Work(title='Chargement…', ext_poster='/static/img/chiro.gif'))
+                {
+                    'slot_type': slot_sort_type,
+                    'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
+                }
                 for slot_sort_type in slot_sort_types
+            ]
+        else:
+            context['object_list'] = [
+                {'work': work} for work in context['object_list']
             ]
 
         return context
@@ -680,7 +687,9 @@ def get_reco(request):
     category = request.GET.get('category', 'all')
     algo_name = request.GET.get('algo', 'svd' if user_exists_in_backup(request.user, 'svd') else 'knn')
     if current_user_ratings(request):
-        reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
+        reco_list = [{
+            'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
+        } for _ in range(4)]
     else:
         reco_list = []
     return render(request, 'mangaki/reco_list.html',
@@ -701,7 +710,6 @@ def get_reco_dpp(request):
                       'category': category,
                       'config': DPP_UI_CONFIG_FOR_RATINGS
                   })
-
 
 def update_shared(request):
     if request.user.is_authenticated and request.method == 'POST':

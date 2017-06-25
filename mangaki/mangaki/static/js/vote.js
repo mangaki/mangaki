@@ -207,13 +207,13 @@ Slot.prototype.fetch = function () {
   });
 };
 
-/* Mosaic takes care of mapping Cards inside an element with Slots pointing to
- * some remote URLs on the server.
- */
 function buildSlotURL(category, slot_sort) {
   return '/api/cards/' + category + '/' + slot_sort;
 }
 
+/* Mosaic takes care of mapping Cards inside an element with Slots pointing to
+ * some remote URLs on the server.
+ */
 function Mosaic(el, category) {
   var mosaic = this;
 
