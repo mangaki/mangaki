@@ -227,6 +227,25 @@ class MALClient:
 
         return xml
 
+    def get_entry_from_work(self, work: Work) -> MALEntry:
+        """
+        Using a mangaki.models.Work to fetch the first (potential) matching MALEntry through MAL Search API.
+
+        WARNING: it is not guaranteed that MAL Search API will return the *good* work
+        (i.e. could be same series, another season, specials, movie, or yet another Japanese invention.)
+
+        Also, will fail on unsupported MALWorks (read the Enum definition to see what is supported).
+
+        :param work: The work to search from (`work.category.slug` and `work.title` will be used)
+        :type work: `mangaki.models.Work`
+        :return: the first matching entry from MAL
+        :rtype: MALEntry
+        """
+        return self.search_work(
+            MALWorks(work.category.slug),
+            work.title
+        )
+
     def search_work(self, work_type: MALWorks, query: str) -> MALEntry:
         xml = self._search_works(work_type, query)
 
