@@ -40,14 +40,22 @@
             {% endif %}
         </h1>
         <p class="well">✨🍰✨ Trier selon Mangaki !
-            <a href="?algo=svd">mainstream</a> /
-            <a href="?algo=als">perles</a>
+            <a href="?page={{ ratings.number }}&algo=svd">mainstream</a> /
+            <a href="?page={{ ratings.number }}&algo=als">perles</a>
         </p>
         {% include "works_no_poster.html" with disabled=ratings_disabled works=ratings class=category %}
         <nav aria-label="Navigation de la page" class="text-center">
             <ul class="pagination">
                 <li {% if not ratings.has_previous %} class="disabled" {% endif %}>
-                    <a {% if rating.has_previous %}href="?page={{ ratings.previous_page_number }}" {% endif %} aria-label="Précédent">
+                    <a
+                            {% if rating.has_previous %}
+                                {% if algo_name %}
+                                    href="?page={{ rating.previous_page_number }}&algo={{ algo_name }}"
+                                {% else %}
+                                    href="?page={{ rating.previous_page_number }}"
+                                {% endif %}
+                            {% endif %}
+                        aria-label="Précédent">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
@@ -59,7 +67,11 @@
                                     {% if page == ratings.number %}
                                         href="#"
                                     {% else %}
-                                        href="?page={{ page }}"
+                                        {% if algo_name %}
+                                            href="?page={{ page }}&algo={{ algo_name }}"
+                                        {% else %}
+                                            href="?page={{ page }}"
+                                        {% endif %}
                                     {% endif %}>
                                 {{ page }} <span class="sr-only">(courante)</span>
                             </a>
@@ -67,7 +79,15 @@
                     {% endif %}
                 {% endfor %}
                 <li {% if not ratings.has_next %} class="disabled" {% endif %}>
-                    <a {% if ratings.has_next %}href="?page={{ ratings.next_page_number }}" {% endif %} aria-label="Suivant">
+                    <a
+                            {% if ratings.has_next %}
+                                {% if algo_name %}
+                                    href="?page={{ ratings.next_page_number }}&algo={{ algo_name }}"
+                                {% else %}
+                                    href="?page={{ ratings.next_page_number }}"
+                                {% endif %}
+                            {% endif %}
+                            aria-label="Suivant">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>

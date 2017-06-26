@@ -1,4 +1,4 @@
-from typing import Tuple, List, Any, Dict
+from typing import Tuple, List, Any, Dict, Optional
 from collections import Counter
 
 from django.utils import timezone
@@ -62,7 +62,7 @@ def get_profile_ratings(request,
     return ratings, counts
 
 
-def build_profile_compare_function(algo_name: str,
+def build_profile_compare_function(algo_name: Optional[str],
                                    ratings: List[Rating],
                                    user: User):
     ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']

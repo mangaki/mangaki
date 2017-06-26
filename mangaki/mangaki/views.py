@@ -503,6 +503,7 @@ def get_profile(request,
         'ratings_disabled': request.user.username != username and not is_anonymous,
         'categories': [(category, seen_lists.get(category, []), unseen_lists.get(category, []))
                        for category in categories],
+        'algo_name': algo_name
     }
     return render(request, 'profile.html', data)
 
