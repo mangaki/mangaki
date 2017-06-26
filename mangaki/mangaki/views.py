@@ -258,6 +258,13 @@ class WorkListMixin:
         for work in context['object_list']:
             work.rating = ratings.get(work.id, None)
 
+        context['object_list'] = [
+            {
+                'work': work
+                for work in context['object_list']
+            }
+        ]
+
         return context
 
 
@@ -338,10 +345,6 @@ class WorkList(WorkListMixin, ListView):
                     'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
                 }
                 for slot_sort_type in slot_sort_types
-            ]
-        else:
-            context['object_list'] = [
-                {'work': work} for work in context['object_list']
             ]
 
         return context
