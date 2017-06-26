@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-xs-12 cards-grid">
     {% for work in works %}
-      {% include "mangaki/work_rating.html" with is_dpp=is_dpp sort_mode=sort_mode work=work rating=work.rating only %}
+      {% include "mangaki/work_rating.html" with sort_mode=sort_mode work=work rating=work.rating config=config only %}
     {% endfor %}
   </div>
 </div>
