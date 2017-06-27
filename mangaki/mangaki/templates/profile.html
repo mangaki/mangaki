@@ -167,7 +167,7 @@
                                     {% elif category == 'album' %} écoutés
                                     {% else %} lus/vus/écoutés {% endif %}
                                 </h1>
-                                {% include "works_no_poster.html" with works=seen_list class=category %}
+                                {% include "works_no_poster.html" with disabled=ratings_disabled works=seen_list class=category %}
                             </div>
                             <div class="col-xs-6 col-xs-offset1">
                                 <h1>
@@ -178,14 +178,14 @@
                                     {% else %} à lire / à voir / à écouter
                                     {% endif %}
                                 </h1>
-                                {% include "works_no_poster.html" with works=unseen_list class=category %}
+                                {% include "works_no_poster.html" with disabled=ratings_disabled works=unseen_list class=category %}
                             </div>
                         {% endfor %}
                     {% else %}
                         <div class="col-xs-4 col-xs-offset-1">
                             <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a>
                                 vus{% else %}<a href="{% url 'work-list' 'manga' %}">Mangas</a> lus{% endif %}</h1>
-                            {% include "works_no_poster.html" with works=seen_list class=category %}
+                            {% include "works_no_poster.html" with disabled=ratings_disabled works=seen_list class=category %}
                         </div>
                         <div class="col-xs-4 col-xs-offset-1">
                             <h1>{% if category == 'anime' %}<a href="{% url 'work-list' 'anime' %}">Anime</a> à voir (ou
@@ -195,7 +195,7 @@
                             <a href="{% url 'profile' username %}?category={{ category }}&algo=svd">mainstream</a> /
                             <a href="{% url 'profile' username %}?category={{ category }}&algo=als">perles</a>
                             </p>
-                            {% include "works_no_poster.html" with works=unseen_list class=category %}
+                            {% include "works_no_poster.html" with disabled=ratings_disabled works=unseen_list class=category %}
                         </div>
                     {% endif %}
                     </div>
@@ -206,6 +206,9 @@
     <br/>
     <br/>
     <br/>
+{% endblock %}
+   
+{% block extrajs %}
     <script>
         $("[name='research_ok']").bootstrapSwitch();
         $("[name='research_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
@@ -245,6 +248,4 @@
             }, 1000);
         }
     </script>
-
-    <script src="{% url 'js_reverse' %}" type="text/javascript"></script>
 {% endblock %}
