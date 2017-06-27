@@ -36,7 +36,12 @@ def get_profile_ratings(request,
             count_key = 'seen_{}' if seen_work else 'unseen_{}'
             counts[count_key.format(rating.work.category.slug)] += 1
 
-            if (not already_seen) or seen_work:
+            # Proof:
+            # If the work has been seen AND we want seen work, false XOR true = true.
+            # If the work has been unseen AND we want seen work, true XOR true = false.
+            # If the work has been seen AND we want unseen work, false XOR false = false.
+            # If the work has been unseen AND we want unseen work, true XOR false = true.
+            if (not already_seen) ^ seen_work:
                 ratings.append(rating)
     elif can_see:
         ratings = list(
