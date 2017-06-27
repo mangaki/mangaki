@@ -4,34 +4,30 @@
 {% block body %}
 
     <div class="row">
-        {% if not is_anonymous %}
+        {% if not meta.is_anonymous %}
             <div class="col-xs-2">
 {# FIXME: Someday, we should uncomment this, but before, we have to data migrate avatars since death of meta.mangaki.fr#}
-{#                {% if avatar_url %}#}
-{#                    <img src="{{ avatar_url }}" alt="Avatar de {{ username }}" id="avatar" />#}
+{#                {% if profile.avatar_url %}#}
+{#                    <img src="{{ profile.avatar_url }}" alt="Avatar de {{ profile.username }}" id="avatar" />#}
 {#                {% else %}#}
-                    <img src="/static/img/chiro.png" alt="Avatar de {{ username }}" id="avatar"/>
+                    <img src="/static/img/chiro.png" alt="Avatar de {{ profile.username }}" id="avatar"/>
 {#                {% endif %}#}
             </div>
         {% endif %}
 
         <div class="col-xs-4 col-lg-6">
-            {% if not is_anonymous %}
-                <h1>{{ username }}</h1>
+            {% if not meta.is_anonymous %}
+                <h1>{{ profile.username }} {% if meta.is_me %} (vous!) {% endif %}</h1>
             {% else %}
                 <h1>Mes notes</h1>
                 <h2>Inscrivez-vous pour pouvoir les sauvegarder!</h2>
-                <form method="POST" action="{% url 'remove-all-anon-ratings' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-link">Supprimer toutes mes notes</button>
-                </form>
             {% endif %}
 
-            {% if member_days %}
-                <p>Inscrit depuis {{ member_days }} jours</p>
+            {% if profile.member_days %}
+                <p>Inscrit depuis {{ profile.member_days }} jours</p>
             {% endif %}
             {% if events %}
-                {% if request.user.username == username %}
+                {% if meta.is_me %}
                     <h4>Mes événements</h4>
                 {% else %}
                     <h4>Ses événements</h4>
@@ -56,7 +52,7 @@
             {% endif %}
         </div>
         <div class="col-xs-6 col-lg-4">
-            {% if request.user.username == username %}
+            {% if meta.is_me and not meta.is_anonymous %}
                 <br/>
                 Je participe au data challenge de Kyoto :
                 <input type="checkbox" name="research_ok" {% if user.profile.research_ok %} checked{% endif %}/>
@@ -69,7 +65,7 @@
                 <hr />
                 Recevoir la newsletter :
                 <input type="checkbox" name="newsletter_ok" {% if user.profile.newsletter_ok %} checked{% endif %}/>
-                {% if is_mal_import_available %}
+                {% if meta.is_mal_import_available %}
                 <hr />
                 <p>Importer depuis myAnimeList :</p>
                 <div class="input-group">
@@ -81,40 +77,59 @@
                 </div>
                 {% endif %}
             {% endif %}
+            {% if meta.is_anonymous %}
+                <br />
+                <br />
+                <form method="POST" action="{% url 'remove-all-anon-ratings' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Supprimer toutes mes notes</button>
+                </form>
+            {% endif %}
         </div>
     </div>
-    {% if not is_anonymous and can_see %}
+    {% if not meta.is_anonymous and meta.can_see %}
         <ul class="nav nav-tabs">
 
-            <li role="presentation"{% if category == 'anime' and seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' username 'anime' 'seen' %}">Liste d'<em>anime</em> vus de {{ username }} <span
-                    class="badge alert-info">{{ seen_anime_count }}</span></a></li>
-            <li role="presentation"{% if category == 'anime' and not seen %} class="active"{% endif %}><a
-                href="{% url 'profile' username 'anime' 'unseen' %}">Liste d'<em>anime</em> à voir de {{ username }} <span
-                class="badge alert-info">{{ unseen_anime_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'profile' profile.username 'anime' 'seen' %}">Liste d'<em>anime</em> vus de {{ profile.username }} <span
+                    class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'profile' profile.username 'anime' 'unseen' %}">Liste d'<em>anime</em> à voir de {{ profile.username }} <span
+                    class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
 
-            <li role="presentation"{% if category == 'manga' and seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' username 'manga' 'seen' %}">Liste de <em>mangas</em> lus de {{ username }} <span
-                    class="badge alert-info">{{ seen_manga_count }}</span></a></li>
-            <li role="presentation"{% if category == 'manga' and not seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' username 'manga' 'unseen' %}">Liste de <em>mangas</em> à lire de {{ username }} <span
-                    class="badge alert-info">{{ unseen_manga_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'profile' profile.username 'manga' 'seen' %}">Liste de <em>mangas</em> lus de {{ profile.username }} <span
+                    class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'profile' profile.username 'manga' 'unseen' %}">Liste de <em>mangas</em> à lire de {{ profile.username }} <span
+                    class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
 
-            <li role="presentation"{% if category == 'recommendation' %} class="active"{% endif %}><a
-                    href="{% url 'profile' username 'recommendation' %}?category=recommendation">Liste de recommandations
-                de {{ username }} <span class="badge alert-info">{{ reco_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
+                    href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Liste de recommandations
+                de {{ profile.username }} <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
+        </ul>
+    {% elif meta.is_anonymous %}
+        <ul class="nav nav-tabs">
 
-            {% if best_neighbors_list %}
-                <li role="presentation"{% if category == 'neighbor' %} class="active"{% endif %}>
-                    <a href="{% url 'profile' username 'neighbor' %}?category=neighbor">Les {{ neighbor_count }} plus proches
-                    voisins de {{ username }}</a>
-                </li>
-            {% endif %}
+            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'my-profile' 'anime' 'seen' %}">Liste d'<em>anime</em> que j'ai vu<span
+                    class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'my-profile' 'anime' 'unseen' %}">Liste d'<em>anime</em> que je veux voir <span
+                    class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
+
+            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'my-profile' 'manga' 'seen' %}">Liste de <em>mangas</em> que j'ai lu <span
+                    class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'my-profile' 'manga' 'unseen' %}">Liste de <em>mangas</em> que je veux lire <span
+                    class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
         </ul>
     {% endif %}
-    {% if can_see %}
-        <div class="row mangas-list{% if request.user.username != username and not is_anonymous %} another{% endif %}">
-            {% if best_neighbors_list and category == 'neighbor' and not is_anonymous %}
+    {% if meta.can_see %}
+        <div class="row mangas-list{% if not meta.is_me and not meta.is_anonymous %} another{% endif %}">
+{#           FIXME: Neighboorhood has disappeared from Mangaki since a long time. #}
+            {% if best_neighbors_list and meta.category == 'neighbor' and not meta.is_anonymous %}
                 {% include "profile_neighbor.html" %}
             {% elif category == 'recommendation' %}
                 {% include "profile_reco.html" %}
@@ -123,7 +138,7 @@
             {% endif %}
         </div>
     {% else %}
-        <p class="well">Le profil de {{ username }} n'est pas public.</p>
+        <p class="well">Le profil de {{ profile.username }} n'est pas public.</p>
     {% endif %}
     <br/>
     <br/>

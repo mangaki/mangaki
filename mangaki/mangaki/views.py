@@ -16,6 +16,7 @@ from django.db import DatabaseError
 from django.db.models import Case, IntegerField, Sum, Value, When
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
@@ -44,7 +45,6 @@ from mangaki.utils.profile import (
 )
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
-from mangaki.utils.algo import get_algo_backup, get_dataset_backup
 from mangaki.utils.tokens import compute_token, KYOTO_SALT
 from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
 from irl.models import Event, Partner, Attendee
@@ -89,7 +89,7 @@ DPP_UI_CONFIG_FOR_RATINGS = {
             'title': "Je ne connais pas"
         }
     ],
-    'endpoint': '/vote_dpp/'
+    'endpoint': reverse_lazy('vote-dpp')
 }
 
 VANILLA_UI_CONFIG_FOR_RATINGS = {
@@ -120,7 +120,7 @@ VANILLA_UI_CONFIG_FOR_RATINGS = {
             'title': "Je ne veux pas voir"
         }
     ],
-    'endpoint': '/vote'
+    'endpoint': reverse_lazy('vote')
 }
 
 
@@ -372,7 +372,6 @@ class WorkList(WorkListMixin, ListView):
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
-        context['objects_count'] = self.category.work_set.count()
         context['is_dpp'] = self.is_dpp
         context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS if not self.is_dpp else DPP_UI_CONFIG_FOR_RATINGS
 
@@ -400,6 +399,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['artist'] = self.object
+        context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS
 
         return context
 
@@ -435,6 +435,10 @@ def get_profile(request,
     seen_works = status == "seen"
     algo_name = request.GET.get('algo', None)
     categories = ('anime', 'manga', 'album')
+    # FIXME: We should move natural sorting on the database-side.
+    # This way, we can keep a queryset until the end.
+    # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
+    # Currently, we load the *entire set* of ratings for a (seen/willsee|wontsee) category of works.
     ratings, counts = get_profile_ratings(request,
                                           seen_works,
                                           can_see,
@@ -454,15 +458,6 @@ def get_profile(request,
     else:
         received_recommendation_list = sent_recommendation_list = []
 
-    # FIXME: if we don't show 4 lists out of 6, we should never fetch / create them from the start.
-    seen_lists = {key: [] for key in categories}
-    unseen_lists = {key: [] for key in categories}
-    for r in rating_list:
-        if r.choice in ('willsee', 'wontsee'):
-            unseen_lists[r.work.category.slug].append(r)
-        else:
-            seen_lists[r.work.category.slug].append(r)
-
     member_time = (datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
                    if (can_see and not is_anonymous) else None)
     user_events = get_profile_events(user) if (can_see and not is_anonymous) else []
@@ -478,32 +473,36 @@ def get_profile(request,
         ratings = paginator.page(paginator.num_pages)
 
     data = {
-        'is_mal_import_available': client.is_available,
-        'config': VANILLA_UI_CONFIG_FOR_RATINGS,
-        'can_see': can_see,
-        'username': username,
-        'is_shared': is_shared,
-        'category': category,
-        'seen': seen_works,
-        'avatar_url': user.profile.avatar_url if (not is_anonymous and can_see) else None,
-        'member_days': member_time.days if member_time else None,
-        'seen_anime_count': counts['seen_anime'],
-        'seen_manga_count': counts['seen_manga'],
-        'unseen_anime_count': counts['unseen_anime'],
-        'unseen_manga_count': counts['unseen_manga'],
-        'reco_count': len(received_recommendation_list),
+        'user': user,
+        'meta': {
+            'is_mal_import_available': client.is_available,
+            'config': VANILLA_UI_CONFIG_FOR_RATINGS,
+            'can_see': can_see,
+            'username': request.user.username,
+            'is_shared': is_shared,
+            'is_me': request.user == user,
+            'category': category,
+            'seen': seen_works,
+            'is_anonymous': is_anonymous,
+            'ratings_disabled': request.user != user and not is_anonymous,
+            'algo_name': algo_name
+        },
+        'profile': {
+            'avatar_url': user.profile.avatar_url if (not is_anonymous and can_see) else None,
+            'member_days': member_time.days if member_time else None,
+            'seen_anime_count': counts['seen_anime'],
+            'seen_manga_count': counts['seen_manga'],
+            'unseen_anime_count': counts['unseen_anime'],
+            'unseen_manga_count': counts['unseen_manga'],
+            'reco_count': len(received_recommendation_list),
+            'username': user.username
+        },
         'ratings': ratings,
-        'seen_list': seen_lists.get(category, []) if can_see else [],
-        'unseen_list': unseen_lists.get(category, []) if can_see else [],
-        'received_recommendation_list': received_recommendation_list,
-        'sent_recommendation_list': sent_recommendation_list,
-        'events': user_events,
-        'is_anonymous': is_anonymous,
-        'show_all_categories': is_anonymous,
-        'ratings_disabled': request.user.username != username and not is_anonymous,
-        'categories': [(category, seen_lists.get(category, []), unseen_lists.get(category, []))
-                       for category in categories],
-        'algo_name': algo_name
+        'recommendations': {
+            'received': received_recommendation_list,
+            'sent': sent_recommendation_list
+        },
+        'events': user_events
     }
     return render(request, 'profile.html', data)
 

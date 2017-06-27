@@ -1,97 +1,74 @@
-{% if show_all_categories %}
-    {% for category, seen_list, unseen_list in categories %}
-        <div class="col-xs-6 col-xs-offset1">
-            <h1>
-                <a href="{% url 'work-list' category %}">{{ category | title }}</a>
-                {% if category == 'manga' %} lus
-                {% elif category == 'anime' %} vus
-                {% elif category == 'album' %} écoutés
-                {% else %} lus/vus/écoutés {% endif %}
-            </h1>
-            {% include "works_no_poster.html" with disabled=ratings_disabled works=seen_list class=category %}
-        </div>
-        <div class="col-xs-6 col-xs-offset1">
-            <h1>
-                <a href="{% url 'work-list' category %}">{{ category | title }}</a>
-                {% if category == 'manga' %} à lire
-                {% elif category == 'anime' %} à voir
-                {% elif category == 'album' %} à écouter
-                {% else %} à lire / à voir / à écouter
-                {% endif %}
-            </h1>
-            {% include "works_no_poster.html" with disabled=ratings_disabled works=unseen_list class=category %}
-        </div>
-    {% endfor %}
-{% else %}
-    <div class="col-xs-10">
-        <h1>
-            {% if category == 'anime' %}
-                <a href="{% url 'work-list' 'anime' %}">Anime</a>
-                {% if seen %}vus {% else %} à voir (ou non) {% endif %}
-            {% elif category == 'manga' %}
-                <a href="{% url 'work-list' 'manga' %}">Mangas</a>
-                {% if seen %}lus {% else %} à lire (ou non) {% endif %}
-            {% elif category == 'album' %}
-                <a href="{% url 'work-list' 'album' %}">Albums</a>
-                {% if seen %}écoutés {% else %} à écouter (ou non) {% endif %}
-            {% else %}
-                <a href="{% url 'work-list' category %}">{{ category }}</a>
-                {% if seen %}consommés {% else %} à consommer (ou non) {% endif %}
-            {% endif %}
-        </h1>
+<div class="col-md-12">
+    <h1>
+        {% if meta.category == 'anime' %}
+            <a href="{% url 'work-list' 'anime' %}">Anime</a>
+            {% if seen %}vus {% else %} à voir (ou non) {% endif %}
+        {% elif meta.category == 'manga' %}
+            <a href="{% url 'work-list' 'manga' %}">Mangas</a>
+            {% if seen %}lus {% else %} à lire (ou non) {% endif %}
+        {% elif meta.category == 'album' %}
+            <a href="{% url 'work-list' 'album' %}">Albums</a>
+            {% if seen %}écoutés {% else %} à écouter (ou non) {% endif %}
+        {% else %}
+            <a href="{% url 'work-list' meta.category %}">{{ meta.category }}</a>
+            {% if seen %}consommés {% else %} à consommer (ou non) {% endif %}
+        {% endif %}
+    </h1>
+{#  TODO: Once ALS is online, it may be interesting to keep « perles ». #}
+    {% if not meta.is_anonymous %}
         <p class="well">✨🍰✨ Trier selon Mangaki !
             <a href="?page={{ ratings.number }}&algo=svd">mainstream</a> /
             <a href="?page={{ ratings.number }}&algo=als">perles</a>
         </p>
-        {% include "works_no_poster.html" with disabled=ratings_disabled works=ratings class=category %}
-        <nav aria-label="Navigation de la page" class="text-center">
-            <ul class="pagination">
-                <li {% if not ratings.has_previous %} class="disabled" {% endif %}>
-                    <a
-                            {% if rating.has_previous %}
-                                {% if algo_name %}
-                                    href="?page={{ rating.previous_page_number }}&algo={{ algo_name }}"
-                                {% else %}
-                                    href="?page={{ rating.previous_page_number }}"
-                                {% endif %}
+    {% endif %}
+    {% include "works_no_poster.html" with disabled=meta.ratings_disabled works=ratings category=meta.category config=meta.config %}
+    <nav aria-label="Navigation de la page" class="text-center">
+        <ul class="pagination">
+            <li {% if not ratings.has_previous %} class="disabled" {% endif %}>
+                <a
+                        {% if rating.has_previous %}
+                            {% if algo_name %}
+                                href="?page={{ rating.previous_page_number }}&algo={{ algo_name }}"
+                            {% else %}
+                                href="?page={{ rating.previous_page_number }}"
                             {% endif %}
-                        aria-label="Précédent">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                {% for page in ratings.paginator.page_range %}
-                    {% if page <= ratings.number|add:3 and page >= ratings.number|add:-3 %}
-                        <li
-                                {% if page == ratings.number %}class="active" {% endif %}>
-                            <a
-                                    {% if page == ratings.number %}
-                                        href="#"
+                        {% endif %}
+                    aria-label="Précédent">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% for page in ratings.paginator.page_range %}
+                {% if page <= ratings.number|add:3 and page >= ratings.number|add:-3 %}
+                    <li
+                            {% if page == ratings.number %}class="active" {% endif %}>
+                        <a
+                                {% if page == ratings.number %}
+                                    href="#"
+                                {% else %}
+                                    {% if algo_name %}
+                                        href="?page={{ page }}&algo={{ algo_name }}"
                                     {% else %}
-                                        {% if algo_name %}
-                                            href="?page={{ page }}&algo={{ algo_name }}"
-                                        {% else %}
-                                            href="?page={{ page }}"
-                                        {% endif %}
-                                    {% endif %}>
-                                {{ page }} <span class="sr-only">(courante)</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-                <li {% if not ratings.has_next %} class="disabled" {% endif %}>
-                    <a
-                            {% if ratings.has_next %}
-                                {% if algo_name %}
-                                    href="?page={{ ratings.next_page_number }}&algo={{ algo_name }}"
-                                {% else %}
-                                    href="?page={{ ratings.next_page_number }}"
-                                {% endif %}
+                                        href="?page={{ page }}"
+                                    {% endif %}
+                                {% endif %}>
+                            {{ page }} <span class="sr-only">(courante)</span>
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            <li {% if not ratings.has_next %} class="disabled" {% endif %}>
+                <a
+                        {% if ratings.has_next %}
+                            {% if algo_name %}
+                                href="?page={{ ratings.next_page_number }}&algo={{ algo_name }}"
+                            {% else %}
+                                href="?page={{ ratings.next_page_number }}"
                             {% endif %}
-                            aria-label="Suivant">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-{% endif %}
+                        {% endif %}
+                        aria-label="Suivant">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
