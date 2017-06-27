@@ -1,18 +1,18 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Mangaki's translation in English.
+# Copyright (C) 2017 Mangaki
+# This file is distributed under the same license as the Mangaki package.
+# Jill-Jênn Vie <vie@jill-jenn.net>, 2017.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-23 14:47+0900\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Project-Id-Version: 0.2\n"
+"Report-Msgid-Bugs-To: https://github.com/mangaki/mangaki/issues\n"
+"POT-Creation-Date: 2017-06-27 15:20+0000\n"
+"PO-Revision-Date: 2017-06-27 17:23+0000\n"
+"Last-Translator: Ryan Lahfa <masterancpp@gmail.com>\n"
+"Language-Team: English <language@mangaki.fr>\n"
+"Language: English\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -29,11 +29,11 @@ msgstr "English"
 msgid "日本語"
 msgstr "Japanese"
 
-#: mangaki/templates/about/fr.html:6
+#: mangaki/templates/about.html:6
 msgid "Quelle sera votre prochaine série favorite ?"
 msgstr "What series should you watch next?"
 
-#: mangaki/templates/about/fr.html:12
+#: mangaki/templates/about.html:12
 msgid ""
 "Mangaki est un <strong>site de recommandation de mangas et d'anime</strong> "
 "créé par une association."
@@ -41,7 +41,7 @@ msgstr ""
 "Mangaki is a <strong>non-profit recommender system of manga and anime</"
 "strong>."
 
-#: mangaki/templates/about/fr.html:14
+#: mangaki/templates/about.html:14
 msgid ""
 "À partir des séries que vous avez vues ou lues, <strong>notre algorithme</"
 "strong> détermine de nouvelles pépites susceptibles de vous plaire&nbsp;!"
@@ -49,35 +49,35 @@ msgstr ""
 "From the anime you watched and the manga you read, <strong>our algorithm</"
 "strong> discover new precious pearls that you will love!"
 
-#: mangaki/templates/about/fr.html:16
+#: mangaki/templates/about.html:16
 msgid ""
 "Si vous souhaitez participer à l'aventure, il y a plein de choses à "
 "faire&nbsp;!"
-msgstr "If you wanna join, there's plenty to do! "
+msgstr "If you want to join, there's plenty to do! "
 
-#: mangaki/templates/about/fr.html:17 mangaki/templates/about/fr.html:34
+#: mangaki/templates/about.html:17 mangaki/templates/about.html:34
 msgid "Nous contacter"
 msgstr "Contact us"
 
-#: mangaki/templates/about/fr.html:18
+#: mangaki/templates/about.html:18
 msgid "Consulter le wiki"
 msgstr "Browse the wiki"
 
-#: mangaki/templates/about/fr.html:19
+#: mangaki/templates/about.html:19
 msgid "Voir le code sur GitHub"
 msgstr "See the code on GitHub"
 
-#: mangaki/templates/about/fr.html:23
+#: mangaki/templates/about.html:23
 msgid "Découvrez la data science à travers Mangaki"
 msgstr "Discover data science with Mangaki"
 
-#: mangaki/templates/about/fr.html:29
+#: mangaki/templates/about.html:29
 msgid ""
 "Notre algorithme est open source, donc vous pouvez l'étudier, et proposer "
 "des améliorations."
 msgstr "Our algorithm is open source, so you can study it and improve it!"
 
-#: mangaki/templates/about/fr.html:31
+#: mangaki/templates/about.html:31
 msgid ""
 "Connaissez-vous ces termes : plus proches voisins, décomposition en valeurs "
 "singulières, prix Netflix, autoencodeur ? "
@@ -85,50 +85,77 @@ msgstr ""
 "Do you know these concepts? Nearest neighbors, singular value decomposition, "
 "Netflix Prize, autoencoder? "
 
-#: mangaki/templates/about/fr.html:33
+#: mangaki/templates/about.html:33
 msgid "Venez apprendre tout cela sur le repo ou dans l'asso."
 msgstr ""
 "Come and learn all of these on the GitHub repo or within the organization!"
 
-#: mangaki/templates/about/fr.html:35
+#: mangaki/templates/about.html:35
 msgid "Consulter le blog"
 msgstr "Browse the blog"
 
-#: mangaki/templates/about/fr.html:39
+#: mangaki/templates/about.html:39
 msgid "Le bureau de l'association - 団長"
-msgstr "Our Team - 団長"
+msgstr "Our Board - 団長"
 
-#: mangaki/templates/about/fr.html:47
+#: mangaki/templates/about.html:47
 msgid "Président"
-msgstr ""
+msgstr "President"
 
-#: mangaki/templates/about/fr.html:49
+#: mangaki/templates/about.html:49
 msgid ""
 "JJ est chercheur à RIKEN, Tokyo. Il a conçu l'algorithme de recommandation "
 "et pilote l'association depuis le Japon."
 msgstr ""
 
-#: mangaki/templates/about/fr.html:57
+#: mangaki/templates/about.html:57
 msgid "Trésorier"
-msgstr ""
+msgstr "Treasurer"
 
-#: mangaki/templates/about/fr.html:68
+#: mangaki/templates/about.html:63
+#, python-format
+msgid ""
+"Ryan participe activement à des projets open source, notamment basés sur le "
+"langage <a href=\"%(python_url)s\" target=\"_blank\">Python</a> et les "
+"technologies Web telles que <a href=\"%(react_url)s\" target=\"_blank"
+"\">React.js</a>, la bibliothèque JavaScript qui supporte aujourd'hui <a href="
+"\"%(facebook_url)s\" target=\"_blank\">Facebook</a>."
+msgstr ""
+"Ryan actively takes part in open source projects, some are based on the <a "
+"href=\"%(python_url)s\" target=\"_blank\">Python</a> language and web "
+"technologies such as <a href=\"%(react_url)s\" target=\"_blank\">React.js</"
+"a>, the JavaScript library which powers <a href=\"%(facebook_url)s\" target="
+"\"_blank\">Facebook</a>."
+
+#: mangaki/templates/about.html:68
+#, python-format
+msgid ""
+"Voyageur du temps aguerri, il ne cesse de remettre en cause les fondations "
+"du monde et désire un jour atteindre le <a href=\"%(steinsgate_url)s"
+"\">Steins;Gate</a>. Au passage, il est fasciné par <a href="
+"\"%(yu_kamiya_url)s\">Yû Kamiya</a>."
+msgstr ""
+"Seasoned time traveler, he never refrains from challenging the world's foundations "
+"and wants to reach someday the <a href=\"%(steinsgate_url)s\">Steins;Gate</"
+"a>. Also, he is fascinated by <a href=\"%(yu_kamiya_url)s\">Yû Kamiya</a>."
+
+#: mangaki/templates/about.html:81
 msgid "Vice-président"
-msgstr ""
+msgstr "Vice-president"
 
-#: mangaki/templates/about/fr.html:70
+#: mangaki/templates/about.html:83
 msgid ""
 "Basile est développeur professionnel, ancien élève de l'École normale "
 "supérieure. Il code entre autres des chatbots."
 msgstr ""
 
-#: mangaki/templates/about/fr.html:76
+#: mangaki/templates/about.html:89
 msgid "Le conseil d'administration - 団"
-msgstr ""
+msgstr "Board of directors — 団"
 
-#: mangaki/templates/about/fr.html:82
+#: mangaki/templates/about.html:95
 msgid "Vous souhaitez nous rejoindre ? Contactez-nous&nbsp;!"
-msgstr ""
+msgstr "Do you want to join us? Contact us!"
 
 #: mangaki/templates/account/email_confirm.html:6
 #: mangaki/templates/account/email_confirm.html:10
@@ -324,3 +351,5 @@ msgid ""
 "connecter à\n"
 "%(site_name)s. Pour terminer, veuillez compléter le formulaire suivant:"
 msgstr ""
+" You are going to use your %(provider_name)s's account to connect to\n"
+"%(site_name)s. To complete the process, please fill this form:"
