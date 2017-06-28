@@ -6,7 +6,7 @@
             été conseillé à <a href="{% url 'profile' object.username %}">{{ object.username }}</a>
             {% if meta.is_me %}
                 <a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}"
-                   data-target="{{ object.username }}" data-user="{{ username }}"
+                   data-target="{{ object.username }}" data-user="{{ profile.username }}"
                    onclick="removeReco(this)" title="supprimer la recommandation"><span
                         class="glyphicon glyphicon-remove"></span></a>
             {% endif %}
@@ -24,7 +24,7 @@
                     href="{% url 'profile' object.username %}">{{ object.username }}</a>
             {% if request.user.username == username %}
                 <a class="btn btn-danger btn-xs" style="float: right" data-work="{{ object.id }}"
-                   data-target="{{ username }}" data-user="{{ object.username }}"
+                   data-target="{{ profile.username }}" data-user="{{ object.username }}"
                    onclick="removeReco(this)" title="supprimer la recommandation"><span
                         class="glyphicon glyphicon-remove"></span></a>{% endif %}</p>
     {% empty %}

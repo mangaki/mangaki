@@ -87,7 +87,7 @@
             {% endif %}
         </div>
     </div>
-    {% if not meta.is_anonymous and meta.can_see %}
+    {% if not meta.is_anonymous and meta.can_see and not meta.is_me %}
         <ul class="nav nav-tabs">
 
             <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
@@ -108,11 +108,11 @@
                     href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Recommandations
                 de {{ profile.username }} <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
         </ul>
-    {% elif meta.is_anonymous %}
+    {% elif meta.is_anonymous or meta.is_me %}
         <ul class="nav nav-tabs">
 
             <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'seen' %}"><em>Anime</em> que j'ai vu<span
+                    href="{% url 'my-profile' 'anime' 'seen' %}"><em>Anime</em> que j'ai vu <span
                     class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
             <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
                     href="{% url 'my-profile' 'anime' 'unseen' %}"><em>Anime</em> que je veux voir <span
@@ -124,6 +124,10 @@
             <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
                     href="{% url 'my-profile' 'manga' 'unseen' %}"><em>Mangas</em> que je veux lire <span
                     class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
+
+            <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
+                    href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Mes recommandations
+                <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
         </ul>
     {% endif %}
     {% if meta.can_see %}
