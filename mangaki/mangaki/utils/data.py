@@ -19,6 +19,7 @@ class Dataset:
     def __init__(self):
         self.anonymized = None
         self.titles = None
+        self.categories = None
         self.encode_user = None
         self.decode_user = None
         self.encode_work = None
@@ -35,6 +36,7 @@ class Dataset:
             backup = pickle.load(f)
         self.anonymized = backup.anonymized
         self.titles = backup.titles
+        self.categories = backup.categories
         self.encode_user = backup.encode_user
         self.decode_user = backup.decode_user
         self.encode_work = backup.encode_work
@@ -52,13 +54,13 @@ class Dataset:
                 data = csv.writer(csvfile, delimiter=',', quotechar='', quoting=csv.QUOTE_NONE)
                 for (encoded_user_id, encoded_work_id), rating in zip(self.anonymized.X, self.anonymized.y):
                     data.writerow([encoded_user_id, encoded_work_id, rating])
-            if self.titles:
+            if self.titles and self.categories:
                 with open(works_path, 'w', newline='') as csvfile:
                     data = csv.writer(csvfile, delimiter=',')
                     lines = []
                     for work_id, title in self.titles.items():
                         if work_id in self.encode_work:
-                            lines.append([self.encode_work[work_id], title])
+                            lines.append([self.encode_work[work_id], title, self.categories[work_id]])
                     lines.sort()
                     for line in lines:
                         data.writerow(line)
@@ -75,8 +77,14 @@ class Dataset:
         )
         if title_filename is not None:
             with open(os.path.join(settings.DATA_DIR, title_filename)) as f:
-                titles = [title for _, title in csv.reader(f)]
+                titles = []
+                categories = []
+                for line in csv.reader(f):
+                    titles.append(line[1])
+                    if len(line) > 2:
+                        categories.append(line[2])
                 self.titles = np.array(titles, dtype=np.object)
+                self.categories = np.array(categories, dtype=np.object)
 
     def make_anonymous_data(self, triplets, convert=lambda choice: rating_values[choice], ordered=False):
         triplets = list(triplets)
@@ -125,4 +133,4 @@ class Dataset:
         return [self.decode_user[encoded_user_id] for encoded_user_id in encoded_user_ids]
 
     def encode_works(self, work_ids):
-        return [self.encode_work[work_id] for work_id in work_ids]
+        return [self.encode_work[work_id] for work_id in work_ids if work_id in self.encode_work]
