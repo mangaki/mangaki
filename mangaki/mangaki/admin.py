@@ -1,3 +1,6 @@
+import time
+import logging
+
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
@@ -12,9 +15,10 @@ from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
     Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
-    FAQEntry, ColdStartRating, Trope, Language, WorkCluster
+    FAQEntry, ColdStartRating, Trope, Language,
+    ExtLanguage, WorkCluster
 )
-from mangaki.utils.anidb import AniDB
+from mangaki.utils.anidb import client
 from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
@@ -151,6 +155,8 @@ def merge_works(request, selected_queryset):
     }
     return len(works_to_merge), None, TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
 
+logger = logging.getLogger(__name__)
+
 
 class TaggedWorkInline(admin.TabularInline):
     model = TaggedWork
@@ -197,7 +203,7 @@ class WorkAdmin(admin.ModelAdmin):
     list_display = ('id', 'category', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter,)
     raw_id_fields = ('redirect',)
-    actions = ['make_nsfw', 'make_sfw', 'merge', 'refresh_work', 'update_tags_via_anidb']
+    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge', 'refresh_work', 'update_tags_via_anidb']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
@@ -227,8 +233,7 @@ class WorkAdmin(admin.ModelAdmin):
             kept_ids = request.POST.getlist('checks')
             for anime_id in kept_ids:
                 anime = Work.objects.get(id=anime_id)
-                a = AniDB('mangakihttp', 1)
-                retrieve_tags = anime.retrieve_tags(a)
+                retrieve_tags = anime.retrieve_tags(client)
                 deleted_tags = retrieve_tags["deleted_tags"]
                 added_tags = retrieve_tags["added_tags"]
                 updated_tags = retrieve_tags["updated_tags"]
@@ -256,8 +261,7 @@ class WorkAdmin(admin.ModelAdmin):
 
         all_information = {}
         for anime in queryset:
-            a = AniDB('mangakihttp', 1)
-            retrieve_tags = anime.retrieve_tags(a)
+            retrieve_tags = anime.retrieve_tags(client)
             deleted_tags = retrieve_tags["deleted_tags"]
             added_tags = retrieve_tags["added_tags"]
             updated_tags = retrieve_tags["updated_tags"]
@@ -284,10 +288,32 @@ class WorkAdmin(admin.ModelAdmin):
 
     make_sfw.short_description = "Rendre SFW les œuvres sélectionnées"
 
+    @transaction.atomic
+    def refresh_work_from_anidb(self, request, queryset):
+        works = queryset.all()
+
+        if not all(work.anidb_aid for work in works):
+            offending_works = [work for work in works if not work.anidb_aid]
+            self.message_user(request,
+                              "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
+                              "Veuillez ne sélectionner que des œuvres ayant un identifiant AniDB. (détails: {})"
+                              .format(",".join(map(lambda w: w.title, offending_works))))
+
+        for index, work in enumerate(works, start=1):
+            logger.info('Refreshing {} from AniDB.'.format(work))
+            client.get_or_update_work(work.anidb_aid)
+            if index % 25 == 0:
+                logger.info('(AniDB refresh): Sleeping...')
+                time.sleep(1)  # Don't spam AniDB.
+
+        self.message_user(request,
+                          "Le rafraichissement des œuvres a été effectué avec succès.")
+
+    refresh_work_from_anidb.short_description = "Rapatrie les titres alternatifs et synopsis depuis AniDB"
+
     def merge(self, request, queryset):
         nb_merged, final_work, response = merge_works(request, queryset)
         if response is None:  # Confirmed
-
             self.message_user(request, format_html('La fusion de {:d} œuvres vers <a href="{:s}">{:s}</a> a bien été effectuée.'
                 .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
         return response
@@ -537,3 +563,4 @@ admin.site.register(Recommendation)
 admin.site.register(ColdStartRating)
 admin.site.register(Trope)
 admin.site.register(Language)
+admin.site.register(ExtLanguage)
