@@ -71,7 +71,9 @@ UTA_ID = 14293
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
     form_class = SuggestionForm
-    queryset = Work.objects.select_related('category').prefetch_related('staff_set__role', 'staff_set__artist')
+    queryset = Work.objects.select_related('category').prefetch_related('worktitle_set',
+                                                                        'staff_set__role',
+                                                                        'staff_set__artist')
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
