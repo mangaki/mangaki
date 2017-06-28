@@ -18,6 +18,7 @@ SEE_CHOICES = {
 
 
 def get_profile_ratings(request,
+                        category: str,
                         already_seen: bool,
                         can_see: bool,
                         is_anonymous: bool,
@@ -47,6 +48,7 @@ def get_profile_ratings(request,
         ratings = list(
             Rating.objects
                 .filter(user=user,
+                        work__category__slug=category,
                         choice__in=SEE_CHOICES['seen'] if already_seen else SEE_CHOICES['unseen'])
                 .select_related('work', 'work__category')
         )

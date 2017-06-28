@@ -1,19 +1,4 @@
 <div class="col-md-12">
-    <h1>
-        {% if meta.category == 'anime' %}
-            <a href="{% url 'work-list' 'anime' %}">Anime</a>
-            {% if seen %}vus {% else %} à voir (ou non) {% endif %}
-        {% elif meta.category == 'manga' %}
-            <a href="{% url 'work-list' 'manga' %}">Mangas</a>
-            {% if seen %}lus {% else %} à lire (ou non) {% endif %}
-        {% elif meta.category == 'album' %}
-            <a href="{% url 'work-list' 'album' %}">Albums</a>
-            {% if seen %}écoutés {% else %} à écouter (ou non) {% endif %}
-        {% else %}
-            <a href="{% url 'work-list' meta.category %}">{{ meta.category }}</a>
-            {% if seen %}consommés {% else %} à consommer (ou non) {% endif %}
-        {% endif %}
-    </h1>
 {#  TODO: Once ALS is online, it may be interesting to keep « perles ». #}
     {% if not meta.is_anonymous %}
         <p class="well">✨🍰✨ Trier selon Mangaki !

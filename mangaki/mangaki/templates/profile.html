@@ -91,38 +91,38 @@
         <ul class="nav nav-tabs">
 
             <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'anime' 'seen' %}">Liste d'<em>anime</em> vus de {{ profile.username }} <span
+                    href="{% url 'profile' profile.username 'anime' 'seen' %}"><em>Anime</em> vus de {{ profile.username }} <span
                     class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
             <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'anime' 'unseen' %}">Liste d'<em>anime</em> à voir de {{ profile.username }} <span
+                    href="{% url 'profile' profile.username 'anime' 'unseen' %}"><em>Anime</em> à voir de {{ profile.username }} <span
                     class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
 
             <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'manga' 'seen' %}">Liste de <em>mangas</em> lus de {{ profile.username }} <span
+                    href="{% url 'profile' profile.username 'manga' 'seen' %}"><em>Mangas</em> lus de {{ profile.username }} <span
                     class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
             <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'manga' 'unseen' %}">Liste de <em>mangas</em> à lire de {{ profile.username }} <span
+                    href="{% url 'profile' profile.username 'manga' 'unseen' %}"><em>Mangas</em> à lire de {{ profile.username }} <span
                     class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
 
             <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Liste de recommandations
+                    href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Recommandations
                 de {{ profile.username }} <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
         </ul>
     {% elif meta.is_anonymous %}
         <ul class="nav nav-tabs">
 
             <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'seen' %}">Liste d'<em>anime</em> que j'ai vu<span
+                    href="{% url 'my-profile' 'anime' 'seen' %}"><em>Anime</em> que j'ai vu<span
                     class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
             <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'unseen' %}">Liste d'<em>anime</em> que je veux voir <span
+                    href="{% url 'my-profile' 'anime' 'unseen' %}"><em>Anime</em> que je veux voir <span
                     class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
 
             <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'manga' 'seen' %}">Liste de <em>mangas</em> que j'ai lu <span
+                    href="{% url 'my-profile' 'manga' 'seen' %}"><em>Mangas</em> que j'ai lu <span
                     class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
             <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'manga' 'unseen' %}">Liste de <em>mangas</em> que je veux lire <span
+                    href="{% url 'my-profile' 'manga' 'unseen' %}"><em>Mangas</em> que je veux lire <span
                     class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
         </ul>
     {% endif %}
@@ -131,7 +131,7 @@
 {#           FIXME: Neighboorhood has disappeared from Mangaki since a long time. #}
             {% if best_neighbors_list and meta.category == 'neighbor' and not meta.is_anonymous %}
                 {% include "profile_neighbor.html" %}
-            {% elif category == 'recommendation' %}
+            {% elif meta.category == 'recommendation' %}
                 {% include "profile_reco.html" %}
             {% else %}
                 {% include "profile_work.html" %}

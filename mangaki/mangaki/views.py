@@ -440,6 +440,7 @@ def get_profile(request,
     # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
     # Currently, we load the *entire set* of ratings for a (seen/willsee|wontsee) category of works.
     ratings, counts = get_profile_ratings(request,
+                                          category,
                                           seen_works,
                                           can_see,
                                           is_anonymous,
@@ -458,6 +459,11 @@ def get_profile(request,
     else:
         received_recommendation_list = sent_recommendation_list = []
 
+    if can_see and not is_anonymous and not received_recommendation_list:
+        reco_count = Recommendation.objects.filter(target_user=user).count()
+    else:
+        reco_count = len(received_recommendation_list)
+
     member_time = (datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
                    if (can_see and not is_anonymous) else None)
     user_events = get_profile_events(user) if (can_see and not is_anonymous) else []
@@ -473,7 +479,6 @@ def get_profile(request,
         ratings = paginator.page(paginator.num_pages)
 
     data = {
-        'user': user,
         'meta': {
             'is_mal_import_available': client.is_available,
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
@@ -494,7 +499,7 @@ def get_profile(request,
             'seen_manga_count': counts['seen_manga'],
             'unseen_anime_count': counts['unseen_anime'],
             'unseen_manga_count': counts['unseen_manga'],
-            'reco_count': len(received_recommendation_list),
+            'reco_count': reco_count,
             'username': user.username
         },
         'ratings': ratings,
