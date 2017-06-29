@@ -112,14 +112,14 @@
         <ul class="nav nav-tabs">
 
             <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'seen' %}"><em>Anime</em> que j'ai vu <span
+                    href="{% url 'my-profile' 'anime' 'seen' %}"><em>Anime</em> que j'ai vus <span
                     class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
             <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
                     href="{% url 'my-profile' 'anime' 'unseen' %}"><em>Anime</em> que je veux voir <span
                     class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
 
             <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'manga' 'seen' %}"><em>Mangas</em> que j'ai lu <span
+                    href="{% url 'my-profile' 'manga' 'seen' %}"><em>Mangas</em> que j'ai lus <span
                     class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
             <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
                     href="{% url 'my-profile' 'manga' 'unseen' %}"><em>Mangas</em> que je veux lire <span
