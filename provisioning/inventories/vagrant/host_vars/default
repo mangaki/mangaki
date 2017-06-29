@@ -10,6 +10,7 @@ mangaki_source_package: '/vagrant/mangaki/'
 mangaki_source_secret_key: 'explosion'
 mangaki_source_has_mal: false
 mangaki_source_has_email: false
+mangaki_source_has_sentry: false
 mangaki_source_debug: true
 
 # Database configuration

@@ -127,9 +127,9 @@ mangaki_source_email_user: 'mangaki'
 # mangaki_source_has_email is enabled).
 mangaki_source_email_password: 'hero4fun'
 
-###########################
-# MyAnimeList integration #
-###########################
+######################################
+# MyAnimeList integration (optional) #
+######################################
 
 # Whether to enable MAL integration.
 mangaki_source_has_mal: false
@@ -145,4 +145,14 @@ mangaki_source_mal_user_agent: 'mangaki 0.1.4'
 # Password for connecting to the MAL API (required if mangaki_source_has_mal is
 # enabled).
 mangaki_source_mal_password: 'cheerio'
+
+#################################
+# Sentry integration (optional) #
+#################################
+
+# Whether to enable Sentry integration.
+mangaki_source_has_sentry: true
+
+# Sentry's DSN (required if Sentry integration is enabled)
+mangaki_source_sentry_dsn: 'http://something@sentry.io/12390123'
 ```
