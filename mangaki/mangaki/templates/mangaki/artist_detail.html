@@ -4,7 +4,7 @@
 <h1>{{ artist }}</h1>
 <hr />
 
-{% include "works.html" with works=object_list only %}
+{% include "works.html" with works=object_list config=config only %}
 
 {% if user.is_authenticated %}
 Signaler une œuvre manquante pour {{ artist }} ?

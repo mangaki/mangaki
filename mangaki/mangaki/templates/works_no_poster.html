@@ -1,15 +1,11 @@
+{% load static %}
+{% static 'img/ratings.svg' as rating_svg_link %}
 {% for object in works %}
   {% with work=object.work rating=object.choice %}
     <div class="flatlist">
         <a href="{% url 'work-detail' category work.id %}">{{ work.title }}</a>
-	<div class="ratings ratings_small {% if disabled %} ratings_disabled{% endif %}" style="float: right">
-	    {% include "mangaki/rating.html" with name="favorite" title="J'adore" %}
-	    {% include "mangaki/rating.html" with name="like" title="J'aime" %}
-	    {% include "mangaki/rating.html" with name="neutral" title="Neutre" %}
-	    {% include "mangaki/rating.html" with name="dislike" title="Je n'aime pas" %}
-
-	    {% include "mangaki/rating.html" with name="willsee" title="Je veux voir" extra_classes="rating_separator" %}
-	    {% include "mangaki/rating.html" with name="wontsee" title="Je ne veux pas voir" %}
+        <div class="ratings ratings_small {% if disabled %} ratings_disabled{% endif %}" style="float: right">
+            {% include "mangaki/ratings.html" with config=config.ui rating_svg_link=rating_svg_link rating=rating %}
         </div>
     </div>
   {% endwith %}
