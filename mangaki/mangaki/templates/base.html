@@ -61,18 +61,16 @@
                 <div class="collapse navbar-collapse" id="menu-collapse">
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
-                            <a href="{% url 'about' 'fr' %}">
-                                C'est quoi ?
-                            </a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">FR/EN/JP <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'about' 'fr' %}">Français</a></li>
+                                <li><a href="{% url 'about' 'en' %}">English</a></li>
+                                <li><a href="{% url 'about' 'jp' %}">日本語</a></li>
+                            </ul>
                         </li>
                         <li class="dropdown">
-                            <a href="{% url 'about' 'en' %}">
-                                What is it?
-                            </a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="{% url 'about' 'jp' %}">
-                                Mangakiとは？
+                            <a href="{% url 'about' '' %}">
+                                {% trans "C'est quoi ?" %}
                             </a>
                         </li>
                     </ul>
@@ -156,7 +154,7 @@
 </footer>
 {% block extrajs %}{% endblock %}
 <script>
-    $("nav [href='{{ request.path }}']").parents("li").addClass('active');
+    $("nav [href='{{ request.path }}']").parent("li").addClass('active');
 </script>
 
 <script>

@@ -520,10 +520,9 @@ def index(request):
 
 
 def about(request, lang):
-    if lang == '':
-        lang = 'fr'
-    translation.activate(lang)
-    request.session[translation.LANGUAGE_SESSION_KEY] = lang
+    if lang != '':
+        translation.activate(lang)
+        request.session[translation.LANGUAGE_SESSION_KEY] = lang
     return render(request, 'about.html')
 
 
