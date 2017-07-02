@@ -1,0 +1,12 @@
+---
+- name: Setup gunicorn.
+  include_role:
+    name: utils/gunicorn
+  vars:
+    gunicorn_program: '{{ mangaki_front_name }}'
+    gunicorn_venv_path: '{{ mangaki_front_venv_path }}'
+    gunicorn_wsgi: 'mangaki.wsgi:application'
+    gunicorn_user: '{{ mangaki_front_user }}'
+    gunicorn_env:
+      DJANGO_SETTINGS_MODULE: 'mangaki.settings'
+      MANGAKI_SETTINGS_PATH: '{{ mangaki_front_settings_path }}'

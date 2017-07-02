@@ -1,0 +1,6 @@
+{{ ansible_managed|comment(decoration='; ') }}
+
+[program:{{ gunicorn_program}}]
+command = {{ gunicorn_venv_path }}/bin/gunicorn {{ gunicorn_wsgi }}
+user = {{ gunicorn_user }}
+environment = {% for key, value in gunicorn_env.items() %}{{ key }}="{{ value }}",{% endfor %}

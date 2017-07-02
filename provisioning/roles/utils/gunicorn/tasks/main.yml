@@ -1,0 +1,30 @@
+---
+- name: Ensure supervisor is installed and up-to-date.
+  apt:
+    name: 'supervisor'
+    state: 'latest'
+  become: true
+
+- name: Ensure gunicorn is installed and up-to-date.
+  pip:
+    name: 'gunicorn'
+    state: 'latest'
+    virtualenv: '{{ gunicorn_venv_path }}'
+    virtualenv_python: 'python3'
+  become: true
+  become_user: '{{ gunicorn_user }}'
+
+- name: Ensure supervisor configuration is up-to-date.
+  template:
+    src: 'etc/supervisor/conf.d/default.conf.j2'
+    dest: '/etc/supervisor/conf.d/{{ gunicorn_program }}.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0640'
+  become: true
+
+- name: Run gunicorn.
+  supervisorctl:
+    name: '{{ gunicorn_program }}'
+    state: present
+  become: true

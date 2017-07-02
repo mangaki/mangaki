@@ -1,0 +1,22 @@
+---
+- name: Test and restart nginx.
+  command: nginx -t
+  become: true
+  notify: "Restart nginx."
+
+- name: Restart nginx.
+  service:
+    name: "nginx"
+    state: "restarted"
+  become: true
+
+- name: Test and reload nginx.
+  command: nginx -t
+  become: true
+  notify: "Reload nginx."
+
+- name: Reload nginx.
+  service:
+    name: "nginx"
+    state: "reloaded"
+  become: true

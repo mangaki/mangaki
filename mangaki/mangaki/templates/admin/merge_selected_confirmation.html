@@ -13,24 +13,54 @@
 {% endblock %}
 
 {% block content %}
-<form action="" method="post">{% csrf_token %}
-<p>Tout d'abord, laquelle des œuvres souhaitez-vous conserver ?</p>
-<ul>
-{% for obj in queryset %}
-<li><label><input type="radio" name="chosen_id" value="{{ obj.pk|unlocalize }}" /> {{ obj.title }} ({{ obj.rating_set.count }} ratings)</label></li>
+<form method="post">
+{% csrf_token %}
+<p>Sélectionnez les champs à conserver.</p>
+<table>
+{% for row in template_rows %}
+    <tr>
+        <th><span style="color: {{ row.color }}">{{ row.field }}</span></th>
+        {% for choice in row.choices %}
+            <td>
+                <label>
+                    {% if row.merge_type != 'INFO_ONLY' %}
+                        {% comment %}
+                        We need a |safe tag below, because of the datetime objects that are automatically converted into human readable.
+                        {% endcomment %}
+                        <input type="radio" name="{{ row.field }}" value="{{ choice|safe }}" {% if choice == row.suggested %} checked{% endif %} />
+                    {% endif %}
+                    {% if row.field == 'ext_poster' %}
+                        <img src="{{ choice }}" alt="{{ choice }}" />
+                    {% elif row.field == 'source' %}
+                        <a href="{{ choice }}">{{ choice }}</a>
+                    {% else %}
+                        {{ choice }}
+                    {% endif %}
+                </label>
+            </td>
+        {% endfor %}
+    </tr>
 {% endfor %}
-</ul>
-<p>Voulez-vous vraiment fusionner les œuvres sélectionnées ? Voici jusqu'à dix exemples de ratings pour chaque œuvre sélectionnée :</p>
-{% for deletable_object in deletable_objects %}
-    <ul>{{ deletable_object|unordered_list }}</ul>
-{% endfor %}
+    <tr>
+        <th>rating_set</th>
+        {% for nb_ratings, rating_sample in rating_samples %}
+            <td>
+                {{ nb_ratings }} ratings
+                {{ rating_sample|unordered_list }}
+            </td>
+        {% endfor %}
+    </tr>
+</table>
+<p>Souhaitez-vous réellement fusionner ces œuvres ?</p>
 <div>
-{% for obj in queryset %}
-<input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
-{% endfor %}
-<input type="hidden" name="action" value="merge" />
-<input type="hidden" name="post" value="yes" />
-<input type="submit" value="{% trans "Yes, I'm sure" %}" />
+    {% for obj in queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+    {% endfor %}
+    <input type="hidden" name="action" value="{{ action }}" />
+    <input type="hidden" name="confirm" value="yes" />
+    <input type="hidden" name="fields_to_choose" value="{{ fields_to_choose }}" />
+    <input type="submit" value="{% trans "Yes, I'm sure" %}" />
+    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
 </div>
 </form>
 {% endblock %}
