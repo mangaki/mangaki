@@ -213,7 +213,7 @@ LANGUAGE_CODE = 'fr'
 LANGUAGES = [
     ('fr', _('Français')),
     ('en', _('English')),
-    ('jp', _('日本語'))
+    ('ja', _('日本語'))
 ]
 TIME_ZONE = 'UTC'
 USE_I18N = True
