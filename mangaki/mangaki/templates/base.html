@@ -155,11 +155,7 @@
 </footer>
 {% block extrajs %}{% endblock %}
 <script>
-
-    // $("nav [href='/about']").parent("li").addClass('active');
-
     $("nav [href='{{ request.path }}']").parent("li").addClass('active');
-
 </script>
 
 <script>
