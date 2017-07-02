@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import configparser
 import json
 import os
+from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PICKLE_DIR = os.path.join(BASE_DIR, '../pickles')
@@ -74,6 +75,7 @@ MIDDLEWARE = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware'
 )
 
 if DEBUG:
@@ -128,6 +130,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.media',
                 'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
                 'django.contrib.messages.context_processors.messages',
                 'django.contrib.auth.context_processors.auth'
             ],
@@ -206,11 +209,17 @@ if config.has_section('smtp'):
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
-LANGUAGE_CODE = 'fr-FR'
+LANGUAGE_CODE = 'fr'
+LANGUAGES = [
+    ('fr', _('Français')),
+    ('en', _('English')),
+    ('jp', _('日本語'))
+]
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/

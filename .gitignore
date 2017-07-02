@@ -18,5 +18,6 @@ restore.sh
 media
 /provisioning/inventory
 /provisioning/env_vars/
-# Merci JJ <3
+*.mo
+.hypothesis
 /mangaki/debug.log

@@ -17,7 +17,7 @@ from django.db.models import Case, IntegerField, Sum, Value, When
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -526,7 +526,10 @@ def index(request):
     })
 
 
-def about(request):
+def about(request, lang):
+    if lang != '':
+        translation.activate(lang)
+        request.session[translation.LANGUAGE_SESSION_KEY] = lang
     return render(request, 'about.html')
 
 
