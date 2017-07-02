@@ -30,14 +30,15 @@
 <div class="row">
     <div class="col-md-12"> <!-- col-md-push-3 -->
         <h1>{{ object.title }}</h1>
-        {% if object.worktitle_set.count != 0 %}
-            <p> Titres alternatifs :
-            {% for title in object.worktitle_set.all %}
-            <p>&nbsp;&nbsp;&nbsp;{{title.language}} : {{title.title}} </p>
-        
-            {% endfor %}
-            </p>
-        {% endif %}  
+{#  FIXME: it is definitely not how we should show this. #}
+{#        {% if object.worktitle_set.count != 0 %}#}
+{#            <p> Titres alternatifs :#}
+{#            {% for title in object.worktitle_set.all %}#}
+{#            <p>&nbsp;&nbsp;&nbsp;{{title.language}} : {{title.title}} </p>#}
+{#        #}
+{#            {% endfor %}#}
+{#            </p>#}
+{#        {% endif %}  #}
     </div>
     <div class="col-sm-6 col-md-4 manga-sheet">
         <div class="work-sheet data" data-category="{{ object.category.slug }}" data-id="{{ object.id }}">
