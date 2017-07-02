@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-01 08:45+0000\n"
+"POT-Creation-Date: 2017-07-02 15:12+0000\n"
 "PO-Revision-Date: 2017-06-27 17:23+0000\n"
 "Last-Translator: Ryan Lahfa <masterancpp@gmail.com>\n"
 "Language-Team: English <language@mangaki.fr>\n"
@@ -367,23 +367,27 @@ msgstr ""
 msgid "No, take me back"
 msgstr ""
 
-#: mangaki/templates/base.html:82
+#: mangaki/templates/base.html:74
+msgid "C'est quoi ?"
+msgstr "What is Mangaki?"
+
+#: mangaki/templates/base.html:81
 msgid "Anime"
 msgstr "Anime"
 
-#: mangaki/templates/base.html:87
+#: mangaki/templates/base.html:86
 msgid "Mangas"
 msgstr "Mangas"
 
-#: mangaki/templates/base.html:92
+#: mangaki/templates/base.html:91
 msgid "Recommandations"
 msgstr "Recommendations"
 
-#: mangaki/templates/base.html:97
+#: mangaki/templates/base.html:96
 msgid "Événements"
 msgstr "Events"
 
-#: mangaki/templates/base.html:102
+#: mangaki/templates/base.html:101
 msgid "Top 20"
 msgstr "Top 20"
 

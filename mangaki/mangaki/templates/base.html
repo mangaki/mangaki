@@ -61,7 +61,8 @@
                 <div class="collapse navbar-collapse" id="menu-collapse">
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">FR/EN/JP <span class="caret"></span></a>
+                            {% get_current_language as LANGUAGE_CODE %}
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-globe"></span>&nbsp;{{ LANGUAGE_CODE }} <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'about' 'fr' %}">Français</a></li>
                                 <li><a href="{% url 'about' 'en' %}">English</a></li>
@@ -69,7 +70,7 @@
                             </ul>
                         </li>
                         <li class="dropdown">
-                            <a href="{% url 'about' '' %}">
+                            <a href="{% url 'about' LANGUAGE_CODE %}">
                                 {% trans "C'est quoi ?" %}
                             </a>
                         </li>
@@ -154,7 +155,11 @@
 </footer>
 {% block extrajs %}{% endblock %}
 <script>
+
+    // $("nav [href='/about']").parent("li").addClass('active');
+
     $("nav [href='{{ request.path }}']").parent("li").addClass('active');
+
 </script>
 
 <script>

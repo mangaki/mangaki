@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-01 08:45+0000\n"
+"POT-Creation-Date: 2017-07-02 15:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,6 +112,7 @@ msgstr ""
 "へ指示を飛ばしています！"
 
 #: mangaki/templates/about.html:56
+#, python-format
 msgid ""
 "Fan absolu de la compositrice <a href=\"%(yoko_kanno_url)s\">Yoko Kanno</a>, "
 "du réalisateur <a href=\"%(satoshi_kon_url)s\">Satoshi Kon</a> et de la "
@@ -124,8 +125,8 @@ msgstr ""
 "好き：<a href=\"%(yoko_kanno_url)s\">菅野よう子</a>、<a href="
 "\"%(satoshi_kon_url)s\">今敏</a>、<a href=\"%(cowboy_bebop_url)s\">カウボーイ"
 "ビバップ</a>、話芸、脚本、取り分け<a href=\"%(haruhi_suzumiya_url)s\">涼宮ハ"
-"ルヒ</a> (<a href=\"%(tv_tropes_hs_url)s\" target=\"_blank\">TVtropes</a>)。</"
-"p>"
+"ルヒ</a> (<a href=\"%(tv_tropes_hs_url)s\" target=\"_blank\">TVtropes</a>)。"
+"</p>"
 
 #: mangaki/templates/about.html:67
 msgid "Trésorier"
@@ -140,8 +141,9 @@ msgid ""
 "\">React.js</a>, la bibliothèque JavaScript qui supporte aujourd'hui <a href="
 "\"%(facebook_url)s\" target=\"_blank\">Facebook</a>."
 msgstr ""
-"Ryanはopen sourceが好き：<a href=\"%(python_url)s\" target=\"_blank\">Python</a>、"
-"<a href=\"%(facebook_url)s\" target=\"_blank\">Facebook</a>の<a href=\"%(react_url)s\" target=\"_blank\">React.js</a>."
+"Ryanはopen sourceが好き：<a href=\"%(python_url)s\" target=\"_blank"
+"\">Python</a>、<a href=\"%(facebook_url)s\" target=\"_blank\">Facebook</a>の"
+"<a href=\"%(react_url)s\" target=\"_blank\">React.js</a>."
 
 #: mangaki/templates/about.html:79
 #, python-format
@@ -150,7 +152,9 @@ msgid ""
 "du monde et désire un jour atteindre le <a href=\"%(steinsgate_url)s"
 "\">Steins;Gate</a>. Au passage, il est fasciné par <a href="
 "\"%(yu_kamiya_url)s\">Yû Kamiya</a>."
-msgstr "好き：<a href=\"%(steinsgate_url)s\">シュタインズ・ゲート</a>、<a href=\"%(yu_kamiya_url)s\">榎宮祐</a>。"
+msgstr ""
+"好き：<a href=\"%(steinsgate_url)s\">シュタインズ・ゲート</a>、<a href="
+"\"%(yu_kamiya_url)s\">榎宮祐</a>。"
 
 #: mangaki/templates/about.html:92
 msgid "Vice-président"
@@ -185,11 +189,11 @@ msgid ""
 "Style</a> et <a href=\"%(mangacast_url)s\" target=\"_blank\">ses critiques "
 "d'anime chez Mangacast</a>."
 msgstr ""
-"<p><strong>Sedeto</strong>はグラフィックデザイナー。Mangakiのロゴが作った。<br />"
-"好き：<a href=\"%(kunihiko_ikuhara_url)s\">幾原邦彦</"
-"a>、<a href=\"%(akiyuki_shinbou_url)s\">シャフト</a>、少女、変態。"
-"<a href=\"%(doujinstyle_url)s\" target=\"_blank\">Doujin Style</a>、"
-"<a href=\"%(mangacast_url)s\" target=\"_blank\">Mangacast</a>。"
+"<p><strong>Sedeto</strong>はグラフィックデザイナー。Mangakiのロゴが作った。"
+"<br />好き：<a href=\"%(kunihiko_ikuhara_url)s\">幾原邦彦</a>、<a href="
+"\"%(akiyuki_shinbou_url)s\">シャフト</a>、少女、変態。<a href="
+"\"%(doujinstyle_url)s\" target=\"_blank\">Doujin Style</a>、<a href="
+"\"%(mangacast_url)s\" target=\"_blank\">Mangacast</a>。"
 
 #: mangaki/templates/about.html:120
 #, python-format
@@ -205,13 +209,12 @@ msgid ""
 "\"%(takeshi_obata_url)s\">Takeshi Obata</a> ainsi que celui des studios "
 "Colorido, KyoAni et Trigger.</p>"
 msgstr ""
-"<p><strong>Soubi</strong>はコミュニケーションとCSS。<br />"
-"すき：<a href=\"%(comiket_url)s\">コミケット</a>、BL、青年、"
-"<a href=\"%(yoshiyuki_sadamoto_url)s\">貞本義行"
-"</a>, <a href=\"%(hideaki_anno_url)s\">庵野秀明</a>, <a href="
-"\"%(satoshi_kon_url)s\">今敏</a>、すしお、<a href="
-"\"%(takeshi_obata_url)s\">小畑健</a>、"
-"スタジオコロリド、京都アニメーション、トリガ.</p>"
+"<p><strong>Soubi</strong>はコミュニケーションとCSS。<br />すき：<a href="
+"\"%(comiket_url)s\">コミケット</a>、BL、青年、<a href="
+"\"%(yoshiyuki_sadamoto_url)s\">貞本義行</a>, <a href=\"%(hideaki_anno_url)s"
+"\">庵野秀明</a>, <a href=\"%(satoshi_kon_url)s\">今敏</a>、すしお、<a href="
+"\"%(takeshi_obata_url)s\">小畑健</a>、スタジオコロリド、京都アニメーション、"
+"トリガ.</p>"
 
 #: mangaki/templates/about.html:125
 msgid "Vous souhaitez nous rejoindre ? Contactez-nous&nbsp;!"
@@ -356,23 +359,27 @@ msgstr ""
 msgid "No, take me back"
 msgstr ""
 
-#: mangaki/templates/base.html:82
+#: mangaki/templates/base.html:74
+msgid "C'est quoi ?"
+msgstr "Mangakiとは？"
+
+#: mangaki/templates/base.html:81
 msgid "Anime"
 msgstr ""
 
-#: mangaki/templates/base.html:87
+#: mangaki/templates/base.html:86
 msgid "Mangas"
 msgstr ""
 
-#: mangaki/templates/base.html:92
+#: mangaki/templates/base.html:91
 msgid "Recommandations"
 msgstr ""
 
-#: mangaki/templates/base.html:97
+#: mangaki/templates/base.html:96
 msgid "Événements"
 msgstr ""
 
-#: mangaki/templates/base.html:102
+#: mangaki/templates/base.html:101
 msgid "Top 20"
 msgstr ""
 
