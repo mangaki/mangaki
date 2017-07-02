@@ -526,11 +526,23 @@ def index(request):
     })
 
 
-def about(request, lang):
-    if lang != '':
+def about(request, lang: str = ''):
+    if lang:
         translation.activate(lang)
-        request.session[translation.LANGUAGE_SESSION_KEY] = lang
-    return render(request, 'about.html')
+
+    response = render(request, 'about.html')
+    if lang:
+        if hasattr(request, 'session'):
+            request.session[translation.LANGUAGE_SESSION_KEY] = lang
+        else:
+            response.set_cookie(
+                settings.LANGUAGE_COOKIE_NAME, lang,
+                max_age=settings.LANGUAGE_COOKIE_AGE,
+                path=settings.LANGUAGE_COOKIE_PATH,
+                domain=settings.LANGUAGE_COOKIE_DOMAIN,
+            )
+
+    return response
 
 
 def events(request):
