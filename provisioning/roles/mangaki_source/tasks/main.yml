@@ -44,6 +44,12 @@
   when: 'mangaki_source_install_type == "package"'
   become: true
 
+- name: Ensure locale dependencies are installed.
+  apt:
+    name: 'gettext'
+    state: 'latest'
+  become: true
+
 - name: Ensure system-wide development dependencies are installed.
   apt:
     name: '{{ item }}'

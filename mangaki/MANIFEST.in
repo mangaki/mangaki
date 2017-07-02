@@ -1,2 +1,3 @@
 recursive-include mangaki/static *
 recursive-include mangaki/templates *
+recursive-include mangaki/locale *
