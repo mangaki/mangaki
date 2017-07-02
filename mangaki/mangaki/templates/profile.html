@@ -125,9 +125,11 @@
                     href="{% url 'my-profile' 'manga' 'unseen' %}"><em>Mangas</em> que je veux lire <span
                     class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
 
-            <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Mes recommandations
-                <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
+            {% if not meta.is_anonymous %}
+                <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
+                        href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Mes recommandations
+                    <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
+            {% endif %}
         </ul>
     {% endif %}
     {% if meta.can_see %}
