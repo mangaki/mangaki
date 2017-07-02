@@ -24,6 +24,7 @@ setup(
         'pandas',
         'typing>=3.6<3.7',
         'tensorflow>=1.1.0<1.2',
+        'raven>=6.1.0',
     ],
     packages=find_packages(),
     include_package_data=True,
