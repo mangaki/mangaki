@@ -16,24 +16,13 @@
     <title>{% block title %}Mangaki{% endblock %}</title>
     <link rel="icon" href="/static/img/favicon.png">
     <link rel="apple-touch-icon" href="/static/img/touch-icon-iphone.png">
-    <script src="/static/js/jquery-latest.min.js"></script>
-    <script src="/static/js/bootstrap-switch.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/handlebars.js"></script>
-    <script src="/static/js/csrf.js"></script>
-    <script src="/static/js/skin.js"></script>
-    <script src="/static/js/vote.js"></script>
-    <script src="/static/js/typeahead.bundle.js"></script>
-    <script src="/static/js/autocomplete.js"></script>
-    <script src="/static/js/tooltip.js"></script>
-    <script src="/static/cookielaw/js/cookielaw.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="/static/css/bootstrap-switch.min.css"/>
     <link rel="stylesheet" href="/static/css/typeahead.css"/>
     <link rel="stylesheet" href="/static/css/skin.css"/>
     <!-- Social Share Kit CSS -->
     <link rel="stylesheet" href="/static/css/social-share-kit.css"/>
+    <link href="https://fonts.googleapis.com/css?family=Economica|Open+Sans" rel="stylesheet">
     {% analytical_head_bottom %}
 </head>
 
@@ -119,18 +108,20 @@
                 </div>
             </div>
         </nav>
+    </header>
+
+    <div class="container">
         {% block anonymous_rating_banner %}
+	  <div class="col-xs-12">
             {% if request|has_anonymous_ratings %}
-                <div class="alert alert-warning anonymous-rating-alert">
+                <div class="alert alert-warning">
                     Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les
                     voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les
                     sauvegarder!
                 </div>
             {% endif %}
+	  </div>
         {% endblock %}
-    </header>
-
-    <div class="container">
         {% block body %}{% endblock %}
     </div>
     <div id="push"></div>
@@ -143,6 +134,7 @@
                 <li><a href="{% url 'about' 'fr' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le
                     projet</a></li>
                 <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
+                <li><a href="{% url 'legal' %}"><span class="glyphicon glyphicon-copyright-mark"></span>&nbsp;Mentions légales</a></li>
                 <li><a href="{% url 'cgu' %}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
                 <li><a href="https://twitter.com/mangakifr" target="_blank">@mangakifr</a></li>
                 <li><a href="mailto:jj@mangaki.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Contact :
@@ -153,16 +145,28 @@
         </div>
     </nav>
 </footer>
-{% block extrajs %}{% endblock %}
+
+<script src="{% url 'js_reverse' %}" type="text/javascript"></script>
+<script src="/static/js/jquery-latest.min.js"></script>
+<script src="/static/js/bootstrap-switch.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/handlebars.js"></script>
+<script src="/static/js/csrf.js"></script>
+<script src="/static/js/skin.js"></script>
+<script src="/static/js/vote.js"></script>
+<script src="/static/js/typeahead.bundle.js"></script>
+<script src="/static/js/autocomplete.js"></script>
+<script src="/static/js/tooltip.js"></script>
+<script src="/static/cookielaw/js/cookielaw.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 <script>
     $("nav [href='{{ request.path }}']").parent("li").addClass('active');
-</script>
 
-<script>
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })
 </script>
+{% block extrajs %}{% endblock %}
 {% analytical_body_bottom %}
 </body>
 </html>

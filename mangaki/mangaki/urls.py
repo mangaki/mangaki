@@ -26,13 +26,18 @@ urlpatterns = [
     url(r'^removeReco/(?P<work_id>\d+)/(?P<username>\w+)/(?P<targetname>\w+)$', views.remove_reco, name='remove-reco'),
     url(r'^removeReco/(?P<targetname>\w+)$', views.remove_all_reco, name='remove-all-reco'),
     url(r'^remove_anon_ratings/$', views.remove_all_anon_ratings, name='remove-all-anon-ratings'),
-    url(r'^users/', views.UserList.as_view()),
     # We explicitely want to override allauth's signup and login views
     url(r'^user/signup/$', views.signup, name="account_signup"),
     url(r'^user/login/$', views.login, name="account_login"),
     url(r'^user/', include('allauth.urls')),
+
     url(r'^profile/$', views.get_profile, name='my-profile'),
-    url(r'^u/(?P<username>.+)$', views.get_profile, name='profile'),  # login_required?
+    url(r'^profile/(?P<category>\w+)/$', views.get_profile, name='my-profile'),
+    url(r'^profile/(?P<category>\w+)/(?P<status>\w+)$', views.get_profile, name='my-profile'),
+    url(r'^u/(?P<username>.+?)/(?P<category>\w+?)/$', views.get_profile, name='profile'),  # login_required?
+    url(r'^u/(?P<username>.+?)/(?P<category>\w+?)/(?P<status>\w+)$', views.get_profile, name='profile'),  # login_required?
+    url(r'^u/(?P<username>.+?)/?$', views.get_profile, name='profile'),  # login_required?
+
     url(r'^reco/$', views.get_reco, name='reco'),
     url(r'^reco_dpp/$', views.get_reco_dpp, name='reco_dpp'),
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
@@ -48,6 +53,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^about/(?P<lang>\w*)$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),
+    url(r'^legal/$', views.legal_mentions, name='legal'),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}, name='cgu'),
     url(r'^events/$', views.events, name='events'),
     # url(r'^lookup/$', views.lookup_work'),

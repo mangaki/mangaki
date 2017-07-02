@@ -5,7 +5,7 @@ looking for anime and finding URL of posters.
 
 import xml.etree.ElementTree as ET
 from enum import Enum
-from typing import Optional, List, Generator, Set
+from typing import Optional, List, Generator
 
 import requests
 import html
@@ -17,15 +17,30 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.postgres.search import SearchQuery
 from django.db.models import QuerySet, Q
+from django.utils.functional import cached_property
 from django.db import transaction
 
-from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle
-
-from collections import namedtuple
+from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle, ExtLanguage
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+# MAL provides three fields related to titles:
+#   — `english_title` which is, by definition, in english.
+#   — `title` which is, of language: unknown.
+#   — `synonyms` which is, also, of language: unknown.
+class MyAnimeListLanguages:
+    @cached_property
+    def unk_ext_lang(self):
+        return ExtLanguage.objects.select_related('lang').get(source='mal', ext_lang='unknown')
+
+    @cached_property
+    def english_ext_lang(self):
+        return ExtLanguage.objects.select_related('lang').get(source='mal', ext_lang='english')
+
+mal_langs = MyAnimeListLanguages()
 
 
 def _encoding_translation(text):
@@ -76,14 +91,18 @@ class MALEntry:
         self.anime_type = None
         self.manga_type = None
 
+        # MAL can return a None type, no type, or an unknown type.
+        mal_type = self.raw_properties.get('type', 'unknown') or 'unknown'
+        mal_type = mal_type.lower()
+
         if self.work_type == MALWorks.animes:
-            self.anime_type = self.raw_properties['type'].lower()
+            self.anime_type = mal_type
         elif (self.work_type == MALWorks.mangas
-              and self.raw_properties.get('type').lower() == MALWorks.novels):
+              and mal_type == MALWorks.novels):
             # MAL(stupidity): You thought it was a manga! It's a light novel !
             self.work_type = MALWorks.novels
         elif self.work_type == MALWorks.mangas:
-            self.manga_type = self.raw_properties['type'].lower()
+            self.manga_type = mal_type
 
     @property
     def poster(self) -> Optional[str]:
@@ -227,6 +246,25 @@ class MALClient:
 
         return xml
 
+    def get_entry_from_work(self, work: Work) -> MALEntry:
+        """
+        Using a mangaki.models.Work to fetch the first (potential) matching MALEntry through MAL Search API.
+
+        WARNING: it is not guaranteed that MAL Search API will return the *good* work
+        (i.e. could be same series, another season, specials, movie, or yet another Japanese invention.)
+
+        Also, will fail on unsupported MALWorks (read the Enum definition to see what is supported).
+
+        :param work: The work to search from (`work.category.slug` and `work.title` will be used)
+        :type work: `mangaki.models.Work`
+        :return: the first matching entry from MAL
+        :rtype: MALEntry
+        """
+        return self.search_work(
+            MALWorks(work.category.slug),
+            work.title
+        )
+
     def search_work(self, work_type: MALWorks, query: str) -> MALEntry:
         xml = self._search_works(work_type, query)
 
@@ -349,14 +387,21 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
                 WorkTitle(
                     work=work,
                     title=synonym,
-                    language=None,
-                    type='synonyme'
+                    ext_language=mal_langs.unk_ext_lang,
+                    language=mal_langs.unk_ext_lang.lang,
+                    type='synonym'
                 )
                 for synonym in entry.synonyms
             ]
 
-            # TODO: we should add entry.english_title as main title.
-            # After Language is split into ExtLanguage and Language.
+            if entry.english_title:
+                work_titles += [WorkTitle(
+                    work=work,
+                    title=entry.english_title,
+                    ext_language=mal_langs.english_ext_lang,
+                    language=mal_langs.english_ext_lang.lang,
+                    type='main'
+                )]
 
             if work_titles:
                 WorkTitle.objects.bulk_create(work_titles)

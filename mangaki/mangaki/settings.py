@@ -199,6 +199,10 @@ if config.has_section('mal'):
     MAL_PASS = config.get('secrets', 'MAL_PASS')
     MAL_USER_AGENT = config.get('mal', 'MAL_USER_AGENT')
 
+if config.has_section('anidb'):
+    ANIDB_CLIENT = config.get('anidb', 'ANIDB_CLIENT')
+    ANIDB_VERSION = config.get('anidb', 'ANIDB_VERSION')
+
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 
 JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'

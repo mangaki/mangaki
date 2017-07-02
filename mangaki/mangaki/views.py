@@ -1,6 +1,7 @@
 import datetime
 import json
 from collections import Counter, OrderedDict
+from typing import List, Dict, Any, Tuple
 from urllib.parse import urlencode
 
 import allauth.account.views
@@ -15,6 +16,7 @@ from django.db import DatabaseError
 from django.db.models import Case, IntegerField, Sum, Value, When
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
 from django.utils import timezone, translation
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
@@ -29,22 +31,27 @@ from django.views.generic.list import ListView
 from markdown import markdown
 from natsort import natsorted
 
-from irl.models import Attendee, Event, Partner
 from mangaki.choices import TOP_CATEGORY_CHOICES
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Top, Trope, Work)
 from mangaki.utils.mal import import_mal, client
+from mangaki.utils.profile import (
+    get_profile_ratings,
+    build_profile_compare_function,
+    get_profile_recommendations,
+    get_profile_events
+)
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
-from mangaki.utils.algo import get_algo_backup, get_dataset_backup
 from mangaki.utils.tokens import compute_token, KYOTO_SALT
 from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
 from irl.models import Event, Partner, Attendee
 
 
 NB_POINTS_DPP = 10
+RATINGS_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
@@ -67,11 +74,62 @@ RATING_COLORS = {
 
 UTA_ID = 14293
 
+DPP_UI_CONFIG_FOR_RATINGS = {
+    'ui': [
+        {
+            'name': "like",
+            'title': "J'aime"
+        },
+        {
+            'name': "dislike",
+            'title': "Je n'aime pas"
+        },
+        {
+            'name': "dontknow",
+            'title': "Je ne connais pas"
+        }
+    ],
+    'endpoint': reverse_lazy('vote-dpp')
+}
+
+VANILLA_UI_CONFIG_FOR_RATINGS = {
+    'ui': [
+        {
+            'name': 'favorite',
+            'title': "J'adore"
+        },
+        {
+            'name': "like",
+            'title': "J'aime"
+        },
+        {
+            'name': "neutral",
+            'title': "Neutre"
+        },
+        {
+            'name': "dislike",
+            'title': "Je n'aime pas"
+        },
+        {
+            'name': 'willsee',
+            'title': "Je veux voir",
+            'extra_classes': ['rating_separator']
+        },
+        {
+            'name': 'wontsee',
+            'title': "Je ne veux pas voir"
+        }
+    ],
+    'endpoint': reverse_lazy('vote')
+}
+
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
     form_class = SuggestionForm
-    queryset = Work.objects.select_related('category').prefetch_related('staff_set__role', 'staff_set__artist')
+    queryset = Work.objects.select_related('category').prefetch_related('worktitle_set',
+                                                                        'staff_set__role',
+                                                                        'staff_set__artist')
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -87,6 +145,8 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.object.source = self.object.source.split(',')[0]
+
+        context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS
 
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
 
@@ -312,8 +372,9 @@ class WorkList(WorkListMixin, ListView):
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
-        context['objects_count'] = self.category.work_set.count()
         context['is_dpp'] = self.is_dpp
+        context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS if not self.is_dpp else DPP_UI_CONFIG_FOR_RATINGS
+        context['objects_count'] = self.category.work_set.count()
 
         if sort_mode == 'mosaic' and not self.is_dpp:
             context['object_list'] = [
@@ -339,169 +400,115 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['artist'] = self.object
+        context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS
 
         return context
 
 
-class UserList(ListView):
-    model = User
-
-    # context_object_name = 'anime'
-
-    def get_queryset(self):
-        bundle = User.objects.filter(profile__is_shared=True).order_by('-id')
-        letter = self.request.GET.get('letter', '')
-        if letter:
-            if letter == '0':  # '#'
-                bundle = bundle.exclude(username__regex=r'^[a-zA-Z]').order_by('username')
-            else:
-                bundle = bundle.filter(username__istartswith=letter).order_by('username')
-        return bundle
-
-    def get_context_data(self, **kwargs):
-        context = super(UserList, self).get_context_data(**kwargs)
-
-        letter = self.request.GET.get('letter', '')
-        page = int(self.request.GET.get('page', '1'))
-        context['object_list'] = list(context['object_list'])
-        paginator = Paginator(context['object_list'], USERNAMES_PER_PAGE)
-        try:
-            user_list = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            user_list = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            user_list = paginator.page(paginator.num_pages)
-        context['params'] = {'letter': letter, 'page': page}
-        context['url'] = urlencode({'letter': letter})
-        context['pages'] = filter(lambda x: 1 <= x <= paginator.num_pages,
-                                  range(user_list.number - 2, user_list.number + 2 + 1))
-        context['object_list'] = user_list
-
-        context['trio_elm'] = User.objects.filter(username__in=['jj', 'Lily', 'Sedeto'])
-        return context
-
-
-def get_profile(request, username=None):
+def get_profile(request,
+                username: str = None,
+                category: str = None,
+                status: str = None):
     if username is None and request.user.is_authenticated():
-        return redirect('profile', request.user.username, permanent=True)
+        return redirect('profile', request.user.username, category or 'anime', status or 'seen', permanent=True)
 
     is_anonymous = False
     if username:
-        user = get_object_or_404(User, username=username)
+        user = get_object_or_404(User.objects.select_related('profile'), username=username)
     else:
         user = request.user
         is_anonymous = not request.user.is_authenticated()
 
-    is_shared = is_anonymous or (username is None) or user == request.user or user.profile.is_shared
-    category = request.GET.get('category', 'anime')
+    if is_anonymous or username is None:
+        is_shared = True
+    elif user == request.user:
+        is_shared = True
+    else:
+        is_shared = user.profile.is_shared
+
+    if category is None or status is None:
+        if user.username:
+            return redirect('profile', user.username, category or 'anime', status or 'seen', permanent=True)
+        else:
+            return redirect('my-profile', category or 'anime', status or 'seen', permanent=True)
+
+    can_see = is_shared or user == request.user
+    seen_works = status == "seen"
     algo_name = request.GET.get('algo', None)
     categories = ('anime', 'manga', 'album')
-    ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
-    if is_anonymous:
-        ratings = []
-        anon_ratings = get_anonymous_ratings(request.session)
-        works_per_pk = Work.objects.select_related('category').in_bulk(anon_ratings.keys())
-        for pk, choice in anon_ratings.items():
-            rating = Rating()
-            rating.work = works_per_pk[pk]
-            rating.choice = choice
-            ratings.append(rating)
-    else:
-        ratings = list(
-            Rating.objects
-            .filter(user__username=username)
-            .select_related('work', 'work__category')
-        )
+    # FIXME: We should move natural sorting on the database-side.
+    # This way, we can keep a queryset until the end.
+    # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
+    # Currently, we load the *entire set* of ratings for a (seen/willsee|wontsee) category of works.
+    ratings, counts = get_profile_ratings(request,
+                                          category,
+                                          seen_works,
+                                          can_see,
+                                          is_anonymous,
+                                          user)
 
-    compare_function = lambda x: (ordering.index(x.choice), x.work.title.lower())  # By default, sort by rating then name
-    if algo_name is not None:
-        try:
-            work_ids = [rating.work_id for rating in ratings]
-            algo = get_algo_backup(algo_name)
-            dataset = get_dataset_backup(algo_name)
-            best_pos = get_pos_of_best_works_for_user_via_algo(algo, dataset, user.id, work_ids)
-            ranking = {}
-            for rank, pos in enumerate(best_pos):
-                ranking[ratings[pos].id] = rank
-            compare_function = lambda x: (ordering.index(x.choice), ranking[x.id])
-        except:  # Two possible reasons: no backup or user not in backup
-            pass
-
+    compare_function = build_profile_compare_function(algo_name,
+                                                      ratings,
+                                                      user)
     rating_list = natsorted(ratings, key=compare_function)
+    if category == 'recommendation':
+        received_recommendation_list, sent_recommendation_list = get_profile_recommendations(
+            is_anonymous,
+            can_see,
+            user
+        )
+    else:
+        received_recommendation_list = sent_recommendation_list = []
 
-    received_recommendation_list = []
-    sent_recommendation_list = []
-    if not is_anonymous and category == 'recommendation':
-        received_recommendations = Recommendation.objects.filter(target_user__username=username).select_related('work',
-                                                                                                                'work__category')
-        sent_recommendations = Recommendation.objects.filter(user__username=username).select_related('work',
-                                                                                                     'work__category')
-        for reco in received_recommendations:
-            if Rating.objects.filter(work=reco.work, user__username=username,
-                                     choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                received_recommendation_list.append(
-                    {'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title,
-                     'username': reco.user.username})
-        for reco in sent_recommendations:
-            if Rating.objects.filter(work=reco.work, user=reco.target_user,
-                                     choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0:
-                sent_recommendation_list.append(
-                    {'category': reco.work.category.slug, 'id': reco.work.id, 'title': reco.work.title,
-                     'username': reco.target_user.username})
+    if can_see and not is_anonymous and not received_recommendation_list:
+        reco_count = Recommendation.objects.filter(target_user=user).count()
+    else:
+        reco_count = len(received_recommendation_list)
 
-    # FIXME: if we don't show 4 lists out of 6, we should never fetch / create them from the start.
-    seen_lists = {key: [] for key in categories}
-    unseen_lists = {key: [] for key in categories}
-    for r in rating_list:
-        if r.choice in ['favorite', 'like', 'neutral', 'dislike']:
-            seen_lists[r.work.category.slug].append(r)
-        else:
-            unseen_lists[r.work.category.slug].append(r)
+    member_time = (datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
+                   if (can_see and not is_anonymous) else None)
+    user_events = get_profile_events(user) if (can_see and not is_anonymous) else []
 
-    member_time = None
-    if not is_anonymous:
-        member_time = datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
+    paginator = Paginator(rating_list, RATINGS_PER_PAGE)
+    page = request.GET.get('page')
 
-    # Events
-    events = []
-    if not is_anonymous:
-        events = [
-            {
-                'id': attendee.event_id,
-                'work_id': attendee.event.work_id,
-                'attending': True,
-                'type': attendee.event.get_event_type_display(),
-                'channel': attendee.event.channel,
-                'date': attendee.event.get_date(),
-                'link': attendee.event.link,
-                'location': attendee.event.location,
-                'title': attendee.event.work.title,
-            } for attendee in
-            user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event',
-                                                                                                     'event__work')
-        ]
+    try:
+        ratings = paginator.page(page)
+    except PageNotAnInteger:
+        ratings = paginator.page(1)
+    except EmptyPage:
+        ratings = paginator.page(paginator.num_pages)
 
     data = {
-        'is_mal_import_available': client.is_available,
-        'username': username,
-        'is_shared': is_shared,
-        'category': category,
-        'avatar_url': user.profile.avatar_url if not is_anonymous else None,
-        'member_days': member_time.days if member_time else None,
-        'anime_count': len(seen_lists['anime']),
-        'manga_count': len(seen_lists['manga']),
-        'reco_count': len(received_recommendation_list),
-        'seen_list': seen_lists.get(category, []) if is_shared else [],
-        'unseen_list': unseen_lists.get(category, []) if is_shared else [],
-        'received_recommendation_list': received_recommendation_list if is_shared else [],
-        'sent_recommendation_list': sent_recommendation_list if is_shared else [],
-        'events': events,
-        'is_anonymous': is_anonymous,
-        'show_all_categories': is_anonymous,
-        'categories': [(category, seen_lists.get(category, []), unseen_lists.get(category, []))
-                       for category in categories]
+        'meta': {
+            'is_mal_import_available': client.is_available,
+            'config': VANILLA_UI_CONFIG_FOR_RATINGS,
+            'can_see': can_see,
+            'username': request.user.username,
+            'is_shared': is_shared,
+            'is_me': request.user == user,
+            'category': category,
+            'seen': seen_works,
+            'is_anonymous': is_anonymous,
+            'ratings_disabled': request.user != user and not is_anonymous,
+            'algo_name': algo_name
+        },
+        'profile': {
+            'avatar_url': user.profile.avatar_url if (not is_anonymous and can_see) else None,
+            'member_days': member_time.days if member_time else None,
+            'seen_anime_count': counts['seen_anime'],
+            'seen_manga_count': counts['seen_manga'],
+            'unseen_anime_count': counts['unseen_anime'],
+            'unseen_manga_count': counts['unseen_manga'],
+            'reco_count': reco_count,
+            'username': user.username
+        },
+        'ratings': ratings,
+        'recommendations': {
+            'received': received_recommendation_list,
+            'sent': sent_recommendation_list
+        },
+        'events': user_events
     }
     return render(request, 'profile.html', data)
 
@@ -540,6 +547,7 @@ def events(request):
             'utamonogatari': utamonogatari.get(UTA_ID, None),
             'wakanim': Partner.objects.get(pk=12),
             'utamonogatari_rating': uta_rating,
+            'config': VANILLA_UI_CONFIG_FOR_RATINGS
         })
 
 
@@ -720,13 +728,24 @@ def get_reco(request):
         reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
     else:
         reco_list = []
-    return render(request, 'mangaki/reco_list.html', {'reco_list': reco_list, 'category': category, 'algo': algo_name})
+    return render(request, 'mangaki/reco_list.html',
+                  {
+                      'reco_list': reco_list,
+                      'category': category,
+                      'algo': algo_name,
+                      'config': VANILLA_UI_CONFIG_FOR_RATINGS
+                  })
 
 
 def get_reco_dpp(request):
     category = request.GET.get('category', 'all')
     reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
-    return render(request, 'mangaki/reco_list_dpp.html', {'reco_list': reco_list, 'category': category})
+    return render(request, 'mangaki/reco_list_dpp.html',
+                  {
+                      'reco_list': reco_list,
+                      'category': category,
+                      'config': DPP_UI_CONFIG_FOR_RATINGS
+                  })
 
 
 def update_shared(request):
@@ -815,6 +834,10 @@ def faq_index(request):
         'information': all_information,
     }
     return render(request, 'faq/faq_index.html', context)
+
+
+def legal_mentions(request):
+    return render(request, 'mangaki/legal.html')
 
 
 def generic_error_view(error, error_code):
