@@ -3,12 +3,14 @@
   group:
     name: '{{ mangaki_source_group }}'
     state: 'present'
+  become: true
 
 - name: Ensure project user exists.
   user:
     name: '{{ mangaki_source_user }}'
     group: '{{ mangaki_source_group }}'
     state: 'present'
+  become: true
 
 - name: Ensure python and virtualenv are installed and up-to-date.
   apt:
@@ -40,6 +42,7 @@
     group: '{{ mangaki_source_group }}'
     mode: '0644'
   when: 'mangaki_source_install_type == "package"'
+  become: true
 
 - name: Ensure system-wide development dependencies are installed.
   apt:
@@ -80,6 +83,7 @@
     group: '{{ mangaki_source_group }}'
     mode: '0600'
   register: settings_ini
+  become: true
 
 - name: Request service reloading.
   set_fact:
