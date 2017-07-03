@@ -42,7 +42,7 @@ def get_profile_ratings(request,
             # If the work has been unseen AND we want seen work, true XOR true = false.
             # If the work has been seen AND we want unseen work, false XOR false = false.
             # If the work has been unseen AND we want unseen work, true XOR false = true.
-            if (not already_seen) ^ seen_work:
+            if (not already_seen) ^ seen_work and rating.work.category.slug == category:
                 ratings.append(rating)
     elif can_see:
         ratings = list(
