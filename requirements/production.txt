@@ -16,3 +16,4 @@ responses==0.5.1
 jinja2
 lxml==3.6.*
 raven==6.1.*
+aiohttp==2.2.*
