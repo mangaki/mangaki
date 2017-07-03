@@ -102,7 +102,6 @@
 {% if not is_dpp %}
 <script>
     var category = '{{ category }}';
-
     loadMenu();
     {% if sort_mode == 'mosaic' %}
     new Mosaic('.cards-grid', '{{ category }}');

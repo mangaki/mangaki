@@ -1,5 +1,37 @@
 "use strict";
 
+function debounce(callback, wait) {
+  var timeout;
+  return function () {
+    var ctx = this, args = arguments;
+    var later = function () {
+      timeout = null;
+      callback.apply(ctx, args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+function throttle(callback, threshold) {
+  var last, deferTimer;
+  return function () {
+    var context = this;
+    var now = +new Date, args = arguments;
+
+    if (last && now < last + threshold) {
+      clearTimeout(deferTimer);
+      deferTimer = setTimeout(function () {
+        last = now;
+        callback.apply(context, args);
+      }, threshold);
+    } else {
+      last = now;
+      callback.apply(context, args);
+    }
+  }
+}
+
 $(function () {
   // We need to setup a few things on ratings elements:
   //  - Ensure checkboxes inside a given .ratings are exclusive.
@@ -65,6 +97,7 @@ $(function () {
 function Card(el, category) {
   this.$el = $(el);
   this.category = category;
+  this.work = null;
 
   return this;
 }
@@ -113,6 +146,8 @@ Card.prototype.hydrate = function (work) {
   $el.find('.ratings .rating__checkbox').attr('name', 'rating[' + work.id + ']').each(function () {
     this.checked = false;
   });
+
+  this.work = work;
 
   return Promise.resolve($el.removeClass('work-card_loading').fadeIn().promise());
 };
@@ -165,7 +200,92 @@ Card.prototype.parallelLoad = function (promise) {
       });
     }
   });
-}
+};
+
+/* Convenience method to focus the Card DOM element. */
+Card.prototype.focus = function () {
+  this.$el.focus();
+};
+
+/* Update checkboxes state */
+var TRIGGER_LOAD_NEXT_AFTER = 50;
+Card.prototype.updateCheckboxesState = function (ratingChecked, triggerChange) {
+  // Don't trigger mangaki.loadNext event by default.
+  triggerChange = triggerChange || false;
+
+  var $ratings = this.$el.find('.ratings');
+
+  var checkboxes = $ratings.find('.rating__checkbox');
+  var someCheckbox = null;
+  checkboxes.each(function () {
+    var lastValue = this.checked;
+    this.checked = this.value === ratingChecked;
+    if (lastValue !== this.checked) {
+      someCheckbox = this;
+    }
+  });
+
+  if (triggerChange) {
+      setTimeout(function () {
+        // Bypass UI changes.
+        $(someCheckbox).trigger('mangaki.loadNext');
+      }, TRIGGER_LOAD_NEXT_AFTER);
+    }
+};
+
+/* Vote for this card */
+Card.prototype.vote = function (choice) {
+  var card = this;
+  return function () {
+    var endpoint = card.$el.find('.ratings').data('endpoint') || '/vote';
+
+    $.post(endpoint + '/' + card.work.id, {choice: choice}, function (rating) {
+        card.updateCheckboxesState(rating, true);
+    });
+  }
+};
+
+var CARD_SHORTCUTS = {
+  'e': 'favorite',
+  'r': 'like',
+  't': 'neutral',
+  'y': 'dislike',
+  'g': 'willsee',
+  'h': 'wontsee'
+};
+
+/* Bind shortcuts */
+var DEBOUNCE_VOTE_TIME = 250;
+Card.prototype.bindShortcuts = function () {
+  /* Objective: rating works should be fast.
+     Constraints: 6 votes buttons.
+
+     Strategy: use two columns of the keyboard.
+
+     E: Favorite.
+     R: Like.
+     T: Neutral.
+     Y: Dislike.
+
+     G: Will see.
+     H: Won't see.
+
+     This way, it's AZERTY/QWERTY independent.
+     And permit quick & fast rating when you learn those shortcuts.
+   */
+
+  var card = this;
+  $.each(CARD_SHORTCUTS, function (keystroke, vote_value) {
+    Mousetrap.bind(keystroke, debounce(card.vote(vote_value), DEBOUNCE_VOTE_TIME), 'keypress');
+  });
+};
+
+/* Unbind shortcuts */
+Card.prototype.unbindShortcuts = function () {
+  $.each(CARD_SHORTCUTS, function (keystroke) {
+    Mousetrap.unbind(keystroke);
+  });
+};
 
 /* A Slot is a cache around an endpoint returning works in JSON format as
  * expected by `Card.hydrate`. It provides a simple, Promise-based API for
@@ -214,8 +334,9 @@ function buildSlotURL(category, slot_sort) {
 /* Mosaic takes care of mapping Cards inside an element with Slots pointing to
  * some remote URLs on the server.
  */
-function Mosaic(el, category) {
+function Mosaic(el, category, enable_shortcut) {
   var mosaic = this;
+  this.shortcutsEnabled = enable_shortcut || false;
 
   // Stores the IDs of works this Mosaic has already displayed, to avoid
   // duplication.
@@ -229,7 +350,7 @@ function Mosaic(el, category) {
   this.cards = els.map(function (el, index) {
     var card = new Card(el, category);
 
-    card.$el.find('.rating__checkbox').on('change', function () {
+    card.$el.find('.rating__checkbox').on('mangaki.loadNext change', function () {
       // When someone rates a work on the mosaic, we'll give them the next one.
       mosaic.loadCard(index);
     });
@@ -238,8 +359,18 @@ function Mosaic(el, category) {
   });
 
   // Prepopulate cards. We assume that all the cards start in loading state.
+  var loadingPromises = [];
   for (var i = 0, l = this.cards.length; i < l; ++i) {
-    this.loadCard(i);
+    loadingPromises.push(this.loadCard(i));
+  }
+
+  if (this.shortcutsEnabled) {
+    this.currentFocusedCard = null;
+    Promise.all(loadingPromises)
+      .then(function () {
+        mosaic.focusCard(0);
+        mosaic.bindGlobalShortcuts();
+      });
   }
 
   return this;
@@ -316,7 +447,7 @@ Mosaic.prototype.next = function (index) {
       setTimeout(resolve.bind(null, work), 500);
     });
   });
-}
+};
 
 /* Load the next work from a Slot and displays it on the corresponding Card. */
 Mosaic.prototype.loadCard = function (index) {
@@ -329,6 +460,37 @@ Mosaic.prototype.loadCard = function (index) {
     // undefined.
     return card.hydrate(work);
   });
+};
+
+/* Every two seconds */
+var MOVEMENT_SHORTCUT_WAIT = 100;
+
+/* Bind shortcuts to the mosaic */
+Mosaic.prototype.bindGlobalShortcuts = function () {
+  var mosaic = this;
+  /* Move left and right on the mosaic */
+  Mousetrap.bind('left', throttle(function () {
+    mosaic.focusCard(mosaic.currentFocusedCard - 1);
+  }, MOVEMENT_SHORTCUT_WAIT));
+  Mousetrap.bind('right', throttle(function () {
+    mosaic.focusCard(mosaic.currentFocusedCard + 1);
+  }, MOVEMENT_SHORTCUT_WAIT));
+};
+
+/* Focus on a certain card index and add event listeners.
+   Unbind the shortcuts of the old card. */
+Mosaic.prototype.focusCard = function (index) {
+  if (index < 0 || index >= this.cards.length) {
+    return;
+  }
+
+  if (this.currentFocusedCard) {
+    this.cards[this.currentFocusedCard].unbindShortcuts();
+  }
+
+  this.currentFocusedCard = index;
+  this.cards[index].bindShortcuts();
+  this.cards[index].focus();
 };
 
 function suggestion(mangaki_class) {
