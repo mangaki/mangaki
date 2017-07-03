@@ -5,7 +5,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from mangaki.models import Category, Editor, Studio, Work, Role, Staff, Artist
-from mangaki.utils.anidb import AniDB
+from mangaki.utils.anidb import client, AniDB
 
 
 class AniDBTest(TestCase):
@@ -24,7 +24,7 @@ class AniDBTest(TestCase):
         # exist, or else foreign key constraints fail.
         Editor.objects.create(pk=1)
         # Studio.objects.create(pk=1)
-        self.anidb = AniDB('mangakihttp', 1)
+        self.anidb = client
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
         self.anime_fixture = self.read_fixture('sangatsu_no_lion.xml')
 
@@ -57,14 +57,13 @@ class AniDBTest(TestCase):
         self.assertEqual(anime.nb_episodes, 22)
         self.assertEqual(anime.studio.title, 'Shaft')
 
-        author_ids = [q.artist_id for q in Staff.objects.filter(work_id=anime.pk, role_id=3)]
-        author_names = [Artist.objects.get(pk=at_id).name for at_id in author_ids]
-        self.assertEqual(author_names, ['Umino Chika'])
+        staff = Work.objects.get(pk=anime.pk).staff_set.all()
 
-        composer_ids = [q.artist_id for q in Staff.objects.filter(work_id=anime.pk, role_id=4)]
-        composer_names = [Artist.objects.get(pk=cp_id).name for cp_id in composer_ids]
-        self.assertEqual(composer_names, ['Hashimoto Yukari'])
+        author_names = staff.filter(role__slug='author').values_list('artist__name', flat=True)
+        self.assertCountEqual(author_names, ['Umino Chika'])
 
-        director_ids = [q.artist_id for q in Staff.objects.filter(work_id=anime.pk, role_id=5)]
-        director_names = [Artist.objects.get(pk=dt_id).name for dt_id in director_ids]
-        self.assertEqual(director_names, ['Shinbou Akiyuki', 'Okada Kenjirou'])
+        composer_names = staff.filter(role__slug='composer').values_list('artist__name', flat=True)
+        self.assertCountEqual(composer_names, ['Hashimoto Yukari'])
+
+        director_names = staff.filter(role__slug='director').values_list('artist__name', flat=True)
+        self.assertCountEqual(director_names, ['Shinbou Akiyuki', 'Okada Kenjirou'])

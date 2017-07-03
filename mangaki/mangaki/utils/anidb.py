@@ -183,7 +183,8 @@ class AniDB:
 
         # Handling of staff
         creators = []
-        staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
+        # FIXME: cache this query
+        staff_map = dict(Role.objects.values_list('slug', 'pk'))
         for creator_node in all_creators.find_all('name'):
             creator = str(creator_node.string).strip()
             creator_id = creator_node.get('id')
@@ -206,7 +207,6 @@ class AniDB:
                     "name": creator,
                     "anidb_creator_id": creator_id
                 })
-                artist = Artist.objects.get_or_create(name="Shinbou Akiyuki")
 
         anime = {
             'title': main_title,
