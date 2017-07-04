@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 
 import responses
@@ -51,19 +52,21 @@ class AniDBTest(TestCase):
             status=200,
             content_type='application/xml'
         )
+
         anime = self.anidb.get_or_update_work(11606)
+
+        staff = Work.objects.get(pk=anime.pk).staff_set.all()
+        author_names = staff.filter(role__slug='author').values_list('artist__name', flat=True)
+        composer_names = staff.filter(role__slug='composer').values_list('artist__name', flat=True)
+        director_names = staff.filter(role__slug='director').values_list('artist__name', flat=True)
 
         self.assertEqual(anime.title, 'Sangatsu no Lion')
         self.assertEqual(anime.nb_episodes, 22)
         self.assertEqual(anime.studio.title, 'Shaft')
 
-        staff = Work.objects.get(pk=anime.pk).staff_set.all()
+        self.assertEqual(anime.date, datetime(2016, 10, 8, 0, 0))
+        self.assertEqual(anime.enddate, datetime(2017, 3, 18, 0, 0))
 
-        author_names = staff.filter(role__slug='author').values_list('artist__name', flat=True)
         self.assertCountEqual(author_names, ['Umino Chika'])
-
-        composer_names = staff.filter(role__slug='composer').values_list('artist__name', flat=True)
         self.assertCountEqual(composer_names, ['Hashimoto Yukari'])
-
-        director_names = staff.filter(role__slug='director').values_list('artist__name', flat=True)
         self.assertCountEqual(director_names, ['Shinbou Akiyuki', 'Okada Kenjirou'])
