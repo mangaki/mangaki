@@ -5,9 +5,10 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 from django.utils.functional import cached_property
+from django.db.models import Q
 
 from mangaki import settings
-from mangaki.models import Work, WorkTitle, Category, ExtLanguage
+from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist
 
 
 def to_python_datetime(mal_date):
@@ -159,12 +160,9 @@ class AniDB:
 
         anime = soup.anime
         all_titles = anime.titles
-        # creators = anime.creators # TODO
-        # episodes = anime.episodes
-        # tags = anime.tags
-        # characters = anime.characters
-        # ratings = anime.ratings.{permanent, temporary}
+        all_creators = anime.creators
 
+        # Handling of titles
         main_title = None
         synonyms = {}
         titles = {}
@@ -183,6 +181,33 @@ class AniDB:
             if title_type == 'synonym':
                 synonyms[lang] = title
 
+        # Handling of staff
+        creators = []
+        # FIXME: cache this query
+        staff_map = dict(Role.objects.values_list('slug', 'pk'))
+        for creator_node in all_creators.find_all('name'):
+            creator = str(creator_node.string).strip()
+            creator_id = creator_node.get('id')
+            creator_type = creator_node.get('type')
+            staff_id = None
+
+            if creator_type == 'Direction':
+                staff_id = 'director'
+            elif creator_type == 'Music':
+                staff_id = 'composer'
+            elif creator_type == 'Original Work' or creator_type == 'Story Composition':
+                staff_id = 'author'
+            elif creator_type == 'Animation Work' or creator_type == 'Work':
+                # AniDB marks Studio as such a creator's type
+                studio, s_created = Studio.objects.get_or_create(title=creator)
+
+            if staff_id is not None:
+                creators.append({
+                    "role_id": staff_map[staff_id],
+                    "name": creator,
+                    "anidb_creator_id": creator_id
+                })
+
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
@@ -191,15 +216,30 @@ class AniDB:
             'date': to_python_datetime(anime.startdate.string),
             # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
             'ext_synopsis': str(anime.description.string),
-            # 'artists': ? from anime.creators
             'nb_episodes': int(anime.episodecount.string),
             'anime_type': str(anime.type.string),
-            'anidb_aid': anidb_aid
+            'anidb_aid': anidb_aid,
+            'studio': studio
         }
 
+        # Add or update work
         work, created = Work.objects.update_or_create(category=self.anime_category,
                                                       anidb_aid=anidb_aid,
                                                       defaults=anime)
+
+        # Add new creators
+        for nc in creators:
+            artist = Artist.objects.filter(Q(name=nc["name"]) | Q(anidb_creator_id=nc["anidb_creator_id"])).first()
+
+            if not artist: # This artist does not yet exist
+                artist, a_created = Artist.objects.get_or_create(name=nc["name"], anidb_creator_id=nc["anidb_creator_id"])
+            else: # This artist exists : prevent duplicates by updating with the AniDB id
+                artist.name = nc["name"]
+                artist.anidb_creator_id = nc["anidb_creator_id"]
+                artist.save()
+
+            Staff.objects.update_or_create(work=work, role_id=nc["role_id"], artist=artist)
+
         self._build_work_titles(work, titles, reload_lang_cache)
 
         return work
