@@ -122,6 +122,7 @@ class Work(models.Model):
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
+    enddate = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
     ext_synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)
@@ -572,7 +573,7 @@ class FAQEntry(models.Model):
     def __str__(self):
         return self.question
 
-class Trope(models.Model): 
+class Trope(models.Model):
     trope = models.CharField(max_length=320)
     author = models.CharField(max_length=80)
     origin = models.ForeignKey(Work, on_delete=models.CASCADE)
