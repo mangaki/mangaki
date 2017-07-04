@@ -122,7 +122,7 @@ class Work(models.Model):
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
-    enddate = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
     ext_synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)

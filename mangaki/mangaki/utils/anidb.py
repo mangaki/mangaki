@@ -214,7 +214,7 @@ class AniDB:
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
             # 'nsfw': ?
             'date': to_python_datetime(anime.startdate.string),
-            'enddate': to_python_datetime(anime.enddate.string),
+            'end_date': to_python_datetime(anime.enddate.string),
             # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
             'ext_synopsis': str(anime.description.string),
             'nb_episodes': int(anime.episodecount.string),

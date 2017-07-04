@@ -65,7 +65,7 @@ class AniDBTest(TestCase):
         self.assertEqual(anime.studio.title, 'Shaft')
 
         self.assertEqual(anime.date, datetime(2016, 10, 8, 0, 0))
-        self.assertEqual(anime.enddate, datetime(2017, 3, 18, 0, 0))
+        self.assertEqual(anime.end_date, datetime(2017, 3, 18, 0, 0))
 
         self.assertCountEqual(author_names, ['Umino Chika'])
         self.assertCountEqual(composer_names, ['Hashimoto Yukari'])
