@@ -12,7 +12,7 @@ from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models import CharField, F, Func, Lookup, Value
+from django.db.models import CharField, F, Func, Lookup, Value, Q
 from django.utils.functional import cached_property
 
 from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES
@@ -165,11 +165,14 @@ class Work(models.Model):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
     def retrieve_tags(self, anidb):
-        anidb_tags_list = anidb.get(self.anidb_aid).tags # FIXME: AniDB has no get method
-        anidb_tags = {title: int(weight) for title, weight in anidb_tags_list}
+        # FIXME: should not use get_or_update_work but a simple get function
+        anidb_tags_list = anidb.get_or_update_work(self.anidb_aid).taggedwork_set.all()
+        values = anidb_tags_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
+        anidb_tags = {value[0]: {"weight": value[2], "anidb_tag_id": value[1]} for value in values}
 
-        tag_work = TaggedWork.objects.filter(work=self)
-        current_tags = {tagwork.tag.title: tagwork.weight for tagwork in tag_work}
+        tag_work_list = TaggedWork.objects.filter(work=self).all()
+        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
+        current_tags = {value[0]: {"weight": value[2], "anidb_tag_id": value[1]} for value in values}
 
         deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
         deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
@@ -185,18 +188,30 @@ class Work(models.Model):
 
         return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
 
-    def update_tags(self, deleted_tags, added_tags, updated_tags):
-        for title, weight in added_tags.items():
-            current_tag = Tag.objects.get_or_create(title=title)[0]
-            TaggedWork(tag=current_tag, work=self, weight=weight).save()
+    def update_tags(self, deleted_tags={}, added_tags={}, updated_tags={}):
+        # Add new tags in database and assign them to that work
+        for title, tag_infos in added_tags.items():
+            current_tag = Tag.objects.get_or_create(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])[0]
+            TaggedWork(tag=current_tag, work=self, weight=tag_infos["weight"]).save()
 
-        tags = Tag.objects.filter(title__in=updated_tags.keys())
+        # Update tags and assign them to that work
+        tags = Tag.objects.filter(
+            Q(title__in=updated_tags.keys()) |
+            Q(anidb_tag_id__in=[tag_infos["anidb_tag_id"] for tag_infos in updated_tags.values()])
+        )
+
         for tag in tags:
+            tag.anidb_tag_id = updated_tags[tag.title]["anidb_tag_id"]
+            tag.save()
+
             tagged_work = self.taggedwork_set.get(tag=tag)
-            tagged_work.weight = updated_tags[tag.title][1]
+            tagged_work.weight = updated_tags[tag.title]["weight"]
             tagged_work.save()
 
+        # Remove tags from that work
         TaggedWork.objects.filter(work=self, tag__title__in=deleted_tags.keys()).delete()
+
+    # Should add an update_creators method similar to update_tags
 
     def safe_poster(self, user):
         if self.id is None:

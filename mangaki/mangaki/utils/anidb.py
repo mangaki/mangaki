@@ -264,24 +264,14 @@ class AniDB:
             for title, tag_infos in tags.items():
                 if (not title in in_db_tags_titles and
                     not tag_infos["anidb_tag_id"] in in_db_tags_anidb_id):
-                    tags_to_add.update(tag)
+                    tags_to_add.update({title: tag_infos})
                 else:
-                    tags_to_update.update(tag)
+                    tags_to_update.update({title: tag_infos})
 
-        if tags_to_add:
-            new_tags = [Tag(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])
-                        for title, tag_infos in tags_to_add.items()]
-            Tag.objects.bulk_create(new_tags)
-
-        if tags_to_update:
-            for title, tag_infos in tags_to_update.items():
-                Tag.objects.update(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])
-
-        # Might want to rewrite update_tags and retrieve_tags taking anidb_tag_id into account
         work.update_tags(
             deleted_tags={},
-            added_tags={title: tag_infos["weight"] for title, tag_infos in tags_to_add.items()},
-            updated_tags={title: tag_infos["weight"] for title, tag_infos in tags_to_update.items()},
+            added_tags=tags_to_add,
+            updated_tags=tags_to_update
         )
 
         self._build_work_titles(work, titles, reload_lang_cache)
