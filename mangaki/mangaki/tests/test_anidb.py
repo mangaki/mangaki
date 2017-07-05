@@ -5,7 +5,7 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.models import Category, Editor, Studio, Work, Role, Staff, Artist
+from mangaki.models import Category, Editor, Studio, Work, Role, Staff, Artist, TaggedWork, Tag
 from mangaki.utils.anidb import client, AniDB
 
 
@@ -55,6 +55,9 @@ class AniDBTest(TestCase):
 
         anime = self.anidb.get_or_update_work(11606)
 
+        tags = Work.objects.get(pk=anime.pk).taggedwork_set.all()
+        tag_titles = tags.values_list('tag__title', flat=True)
+
         staff = Work.objects.get(pk=anime.pk).staff_set.all()
         author_names = staff.filter(role__slug='author').values_list('artist__name', flat=True)
         composer_names = staff.filter(role__slug='composer').values_list('artist__name', flat=True)
@@ -70,3 +73,13 @@ class AniDBTest(TestCase):
         self.assertCountEqual(author_names, ['Umino Chika'])
         self.assertCountEqual(composer_names, ['Hashimoto Yukari'])
         self.assertCountEqual(director_names, ['Shinbou Akiyuki', 'Okada Kenjirou'])
+
+        self.assertCountEqual(tag_titles, ['seinen', 'high school', 'dynamic', 'target audience',
+                                           'themes', 'original work', 'setting', 'elements',
+                                           'time', 'place', 'present', 'Earth', 'Japan',
+                                           'Tokyo', 'board games', 'manga', 'Asia', 'comedy',
+                                           'anthropomorphism', 'school life', 'sports',
+                                           'shougi', 'aim for the top', 'funny expressions',
+                                           'male protagonist', 'hard work and guts',
+                                           'dysfunctional family', 'following one`s dream',
+                                           'cast', 'family life'])

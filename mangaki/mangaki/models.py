@@ -186,9 +186,9 @@ class Work(models.Model):
         return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
 
     def update_tags(self, deleted_tags, added_tags, updated_tags):
-        for title, weight in added_tags.items():
+        for title, tag_infos in added_tags.items():
             current_tag = Tag.objects.get_or_create(title=title)[0]
-            TaggedWork(tag=current_tag, work=self, weight=weight).save()
+            TaggedWork(tag=current_tag, work=self, weight=tag_infos["weight"]).save()
 
         tags = Tag.objects.filter(title__in=updated_tags.keys())
         for tag in tags:

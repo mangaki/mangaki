@@ -8,7 +8,7 @@ from django.utils.functional import cached_property
 from django.db.models import Q
 
 from mangaki import settings
-from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist
+from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork
 
 
 def to_python_datetime(mal_date):
@@ -161,6 +161,7 @@ class AniDB:
         anime = soup.anime
         all_titles = anime.titles
         all_creators = anime.creators
+        all_tags = anime.tags
 
         # Handling of titles
         main_title = None
@@ -208,6 +209,17 @@ class AniDB:
                     "anidb_creator_id": creator_id
                 })
 
+        # Handling of tags
+        tags = {}
+        for tag_node in all_tags.find_all('tag'):
+            tag_title = str(tag_node.find('name').string).strip()
+            tag_id = tag_node.get('id')
+            tag_weight = tag_node.get('weight')
+            tag_verified = tag_node.get('verified')
+
+            if tag_verified == 'true':
+                tags[tag_title] = {"weight": tag_weight, "anidb_tag_id": tag_id}
+
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
@@ -215,7 +227,6 @@ class AniDB:
             # 'nsfw': ?
             'date': to_python_datetime(anime.startdate.string),
             'end_date': to_python_datetime(anime.enddate.string),
-            # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
             'ext_synopsis': str(anime.description.string),
             'nb_episodes': int(anime.episodecount.string),
             'anime_type': str(anime.type.string),
@@ -240,6 +251,33 @@ class AniDB:
                 artist.save()
 
             Staff.objects.update_or_create(work=work, role_id=nc["role_id"], artist=artist)
+
+        # Add or update tags
+        in_db_tags = Tag.objects.values_list('title', 'anidb_tag_id')
+        tags_to_add = {}
+        tags_to_update = {}
+        if not in_db_tags: # If there are no tags yet, it's safe to add
+            tags_to_add = tags
+        else: # Tags already exist so we have to prevent duplicates
+            in_db_tags_titles = [elem[0] for elem in in_db_tags]
+            in_db_tags_anidb_id = [elem[1] for elem in in_db_tags]
+            for title, tag_infos in tags.items():
+                if (not title in in_db_tags_titles and
+                    not tag_infos["anidb_tag_id"] in in_db_tags_anidb_id):
+                    tags_to_add.update(tag)
+                else:
+                    tags_to_update.update(tag)
+
+        if tags_to_add:
+            new_tags = [Tag(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])
+                        for title, tag_infos in tags_to_add.items()]
+            Tag.objects.bulk_create(new_tags)
+
+        if tags_to_update:
+            for title, tag_infos in tags_to_update.items():
+                Tag.objects.update(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])
+
+        work.update_tags(deleted_tags={}, added_tags=tags_to_add, updated_tags=tags_to_update)
 
         self._build_work_titles(work, titles, reload_lang_cache)
 
