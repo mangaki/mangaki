@@ -277,7 +277,12 @@ class AniDB:
             for title, tag_infos in tags_to_update.items():
                 Tag.objects.update(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])
 
-        work.update_tags(deleted_tags={}, added_tags=tags_to_add, updated_tags=tags_to_update)
+        # Might want to rewrite update_tags and retrieve_tags taking anidb_tag_id into account
+        work.update_tags(
+            deleted_tags={},
+            added_tags={title: tag_infos["weight"] for title, tag_infos in tags_to_add.items()},
+            updated_tags={title: tag_infos["weight"] for title, tag_infos in tags_to_update.items()},
+        )
 
         self._build_work_titles(work, titles, reload_lang_cache)
 

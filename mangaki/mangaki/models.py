@@ -165,7 +165,7 @@ class Work(models.Model):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
     def retrieve_tags(self, anidb):
-        anidb_tags_list = anidb.get(self.anidb_aid).tags
+        anidb_tags_list = anidb.get(self.anidb_aid).tags # FIXME: AniDB has no get method
         anidb_tags = {title: int(weight) for title, weight in anidb_tags_list}
 
         tag_work = TaggedWork.objects.filter(work=self)
@@ -186,9 +186,9 @@ class Work(models.Model):
         return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
 
     def update_tags(self, deleted_tags, added_tags, updated_tags):
-        for title, tag_infos in added_tags.items():
+        for title, weight in added_tags.items():
             current_tag = Tag.objects.get_or_create(title=title)[0]
-            TaggedWork(tag=current_tag, work=self, weight=tag_infos["weight"]).save()
+            TaggedWork(tag=current_tag, work=self, weight=weight).save()
 
         tags = Tag.objects.filter(title__in=updated_tags.keys())
         for tag in tags:
