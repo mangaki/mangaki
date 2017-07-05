@@ -355,7 +355,8 @@ class Genre(models.Model):
 
 
 class Tag(models.Model):
-    title = models.TextField(unique = True)
+    title = models.CharField(max_length=255)
+    anidb_tag_id = models.IntegerField(null=True, unique=True)
 
     def __str__(self):
         return self.title
