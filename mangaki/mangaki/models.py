@@ -164,6 +164,7 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
+    # TODO: REWRITE
     def retrieve_tags(self, anidb):
         # FIXME: should not use get_or_update_work but a simple get function
         anidb_tags_list = anidb.get_or_update_work(self.anidb_aid).taggedwork_set.all()
@@ -188,28 +189,42 @@ class Work(models.Model):
 
         return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
 
-    def update_tags(self, deleted_tags={}, added_tags={}, updated_tags={}):
-        # Add new tags in database and assign them to that work
-        for title, tag_infos in added_tags.items():
-            current_tag = Tag.objects.get_or_create(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])[0]
-            TaggedWork(tag=current_tag, work=self, weight=tag_infos["weight"]).save()
+    def update_tags(self, anidb_tags):
+        existing_tags = TaggedWork.objects.filter(work=self).all()
+        values = existing_tags.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
+        existing_tags = {value[0]: {"weight": value[2], "anidb_tag_id": value[1]} for value in values}
 
-        # Update tags and assign them to that work
-        tags = Tag.objects.filter(
-            Q(title__in=updated_tags.keys()) |
-            Q(anidb_tag_id__in=[tag_infos["anidb_tag_id"] for tag_infos in updated_tags.values()])
-        )
+        new_tags_keys = anidb_tags.keys() - existing_tags.keys()
+        new_tags = {key: anidb_tags[key] for key in new_tags_keys}
 
-        for tag in tags:
-            tag.anidb_tag_id = updated_tags[tag.title]["anidb_tag_id"]
+        old_tags_keys = list(set(anidb_tags.keys()).intersection(existing_tags.keys()))
+        old_tags = {key: existing_tags[key] for key in old_tags_keys}
+        old_tags_updated = {key: anidb_tags[key] for key in old_tags_keys}
+
+        deleted_tags_keys = existing_tags.keys() - anidb_tags.keys()
+        delete_tags = {key: anidb_tags[key] for key in deleted_tags_keys}
+
+        # New tags have to be added to the database (if they aren't already present)
+        # New tags have to be assigned to that work
+        for title, tag_infos in new_tags.items():
+            tag = Tag(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])
             tag.save()
 
-            tagged_work = self.taggedwork_set.get(tag=tag)
-            tagged_work.weight = updated_tags[tag.title]["weight"]
+            TaggedWork(tag=tag, work=self, weight=tag_infos["weight"]).save()
+
+        # Update tags that were already present in the database
+        # And update the weight of that tag for this anime
+        for title, tag_infos in old_tags.items():
+            tag = Tag.objects.get(title=title, anidb_tag_id__isnull=True)
+            tag.anidb_tag_id = old_tags_updated[title]["anidb_tag_id"]
+            tag.save()
+
+            tagged_work = self.taggedwork_set.get(tag__anidb_title=title)
+            tagged_work.weight = tag_infos["weight"]
             tagged_work.save()
 
-        # Remove tags from that work
-        TaggedWork.objects.filter(work=self, tag__title__in=deleted_tags.keys()).delete()
+        # Finally, remove a tag from a work if it no longer exists on AniDB's side
+        TaggedWork.objects.filter(work=self, tag__title__in=deleted_tags_keys).delete()
 
     # Should add an update_creators method similar to update_tags
 

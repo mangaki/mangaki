@@ -100,7 +100,10 @@ class Command(BaseCommand):
             if choice == 'n':
                 print("\nOk, aucun changement ne va être fait")
             elif choice == 'y':
-                anime.update_tags(deleted_tags, added_tags, updated_tags)
+                tags = deleted_tags
+                tags.update(added_tags)
+                tags.update(updated_tags)
+                anime.update_tags(tags)
 
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
 

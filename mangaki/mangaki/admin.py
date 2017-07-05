@@ -238,7 +238,11 @@ class WorkAdmin(admin.ModelAdmin):
                 added_tags = retrieve_tags["added_tags"]
                 updated_tags = retrieve_tags["updated_tags"]
 
-                anime.update_tags(deleted_tags, added_tags, updated_tags)
+                tags = deleted_tags
+                tags.update(added_tags)
+                tags.update(updated_tags)
+
+                anime.update_tags(tags)
 
             self.message_user(request, "Modifications sur les tags faites")
             return None

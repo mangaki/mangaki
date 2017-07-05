@@ -215,9 +215,9 @@ class AniDB:
             tag_title = str(tag_node.find('name').string).strip()
             tag_id = tag_node.get('id')
             tag_weight = tag_node.get('weight')
-            tag_verified = tag_node.get('verified')
+            tag_verified = tag_node.get('verified') == 'true'
 
-            if tag_verified == 'true':
+            if tag_verified:
                 tags[tag_title] = {"weight": tag_weight, "anidb_tag_id": tag_id}
 
         anime = {
@@ -252,27 +252,8 @@ class AniDB:
 
             Staff.objects.update_or_create(work=work, role_id=nc["role_id"], artist=artist)
 
-        # Add or update tags
-        in_db_tags = Tag.objects.values_list('title', 'anidb_tag_id')
-        tags_to_add = {}
-        tags_to_update = {}
-        if not in_db_tags: # If there are no tags yet, it's safe to add
-            tags_to_add = tags
-        else: # Tags already exist so we have to prevent duplicates
-            in_db_tags_titles = [elem[0] for elem in in_db_tags]
-            in_db_tags_anidb_id = [elem[1] for elem in in_db_tags]
-            for title, tag_infos in tags.items():
-                if (not title in in_db_tags_titles and
-                    not tag_infos["anidb_tag_id"] in in_db_tags_anidb_id):
-                    tags_to_add.update({title: tag_infos})
-                else:
-                    tags_to_update.update({title: tag_infos})
-
-        work.update_tags(
-            deleted_tags={},
-            added_tags=tags_to_add,
-            updated_tags=tags_to_update
-        )
+        # TODO: REWRITE
+        work.update_tags(tags)
 
         self._build_work_titles(work, titles, reload_lang_cache)
 
