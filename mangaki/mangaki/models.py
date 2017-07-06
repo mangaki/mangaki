@@ -439,7 +439,7 @@ class Rating(models.Model):
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
     ))
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('user', 'work')
