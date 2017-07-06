@@ -7,6 +7,9 @@ import numpy as np
 
 
 class MangakiEFA(RecommendationAlgorithm):
+    '''Factor Analysis:
+    See http://scikit-learn.org/stable/modules/decomposition.html#factor-analysis
+    Better way to get interpretable components, see MangakiNMF'''
     M = None
     W = None
     H = None
