@@ -16,13 +16,15 @@ AnonymizedData = namedtuple('AnonymizedData', 'X y nb_users nb_works')
 
 
 class Dataset:
-    anonymized = None
-    encode_user = None
-    decode_user = None
-    encode_work = None
-    decode_work = None
-    interesting_works = None
     def __init__(self):
+        self.anonymized = None
+        self.titles = None
+        self.categories = None
+        self.encode_user = None
+        self.decode_user = None
+        self.encode_work = None
+        self.decode_work = None
+        self.interesting_works = None
         self.datetime = datetime.now()
 
     def save(self, filename):
@@ -33,13 +35,37 @@ class Dataset:
         with open(os.path.join(settings.PICKLE_DIR, filename), 'rb') as f:
             backup = pickle.load(f)
         self.anonymized = backup.anonymized
+        self.titles = backup.titles
+        self.categories = backup.categories
         self.encode_user = backup.encode_user
         self.decode_user = backup.decode_user
         self.encode_work = backup.encode_work
         self.decode_work = backup.decode_work
         self.interesting_works = backup.interesting_works
 
-    def load_csv(self, filename, convert=float):
+    def save_csv(self, suffix=''):
+        ratings_path = os.path.join(settings.DATA_DIR, 'ratings{}.csv'.format(suffix))
+        works_path = os.path.join(settings.DATA_DIR, 'works{}.csv'.format(suffix))
+        confirm = True
+        if os.path.isfile(ratings_path) or os.path.isfile(works_path):
+            confirm = input('Already exists. Continue? [y/n] ') == 'y'
+        if confirm:
+            with open(ratings_path, 'w', newline='') as csvfile:
+                data = csv.writer(csvfile, delimiter=',', quotechar='', quoting=csv.QUOTE_NONE)
+                for (encoded_user_id, encoded_work_id), rating in zip(self.anonymized.X, self.anonymized.y):
+                    data.writerow([encoded_user_id, encoded_work_id, rating])
+            if self.titles and self.categories:
+                with open(works_path, 'w', newline='') as csvfile:
+                    data = csv.writer(csvfile, delimiter=',')
+                    lines = []
+                    for work_id, title in self.titles.items():
+                        if work_id in self.encode_work:
+                            lines.append([self.encode_work[work_id], title, self.categories[work_id]])
+                    lines.sort()
+                    for line in lines:
+                        data.writerow(line)
+
+    def load_csv(self, filename, convert=float, title_filename=None):
         with open(os.path.join(settings.DATA_DIR, filename)) as f:
             triplets = [[int(user_id), int(work_id), convert(rating)] for user_id, work_id, rating in csv.reader(f)]
         triplets = np.array(triplets, dtype=np.object)
@@ -49,8 +75,18 @@ class Dataset:
             nb_users=max(triplets[:, 0]) + 1, 
             nb_works=max(triplets[:, 1]) + 1
         )
+        if title_filename is not None:
+            with open(os.path.join(settings.DATA_DIR, title_filename)) as f:
+                titles = []
+                categories = []
+                for line in csv.reader(f):
+                    titles.append(line[1])
+                    if len(line) > 2:
+                        categories.append(line[2])
+                self.titles = np.array(titles, dtype=np.object)
+                self.categories = np.array(categories, dtype=np.object)
 
-    def make_anonymous_data(self, triplets):
+    def make_anonymous_data(self, triplets, convert=lambda choice: rating_values[choice], ordered=False):
         triplets = list(triplets)
         users = set()
         works = set()
@@ -66,21 +102,24 @@ class Dataset:
         anonymous_u = list(range(len(users)))
         anonymous_w = list(range(len(works)))
         random.shuffle(anonymous_u)
-        random.shuffle(anonymous_w)
+        if ordered:
+            works = sorted(works, key=lambda work_id: nb_ratings[work_id], reverse=True)
+        else:
+            random.shuffle(anonymous_w)
         encode_user = dict(zip(users, anonymous_u))
         encode_work = dict(zip(works, anonymous_w))
         decode_user = dict(zip(anonymous_u, users))
         decode_work = dict(zip(anonymous_w, works))
 
         interesting_works = set()
-        for work_id, _ in nb_ratings.most_common():  # work_id are sorted by decreasing number of ratings
+        for work_id, _ in nb_ratings.most_common():  # work_id values are sorted by decreasing number of ratings
             if nb_ratings[work_id] < RATED_BY_AT_LEAST:
                 break
             interesting_works.add(work_id)
 
         for user_id, work_id, rating in triplets:
             X.append((encode_user[user_id], encode_work[work_id]))
-            y.append(rating_values[rating])
+            y.append(convert(rating))
 
         self.anonymized = AnonymizedData(X=np.array(X), y=np.array(y), nb_users=len(users), nb_works=len(works))
         self.encode_user = encode_user
@@ -94,4 +133,4 @@ class Dataset:
         return [self.decode_user[encoded_user_id] for encoded_user_id in encoded_user_ids]
 
     def encode_works(self, work_ids):
-        return [self.encode_work[work_id] for work_id in work_ids]
+        return [self.encode_work[work_id] for work_id in work_ids if work_id in self.encode_work]

@@ -121,7 +121,8 @@ class Work(models.Model):
     ext_poster = models.CharField(max_length=128, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
-    date = models.DateField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True) # Should be renamed to start_date
+    end_date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
     ext_synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)
@@ -152,13 +153,14 @@ class Work(models.Model):
     title_search = SearchVectorField('title')
 
     class Meta:
+        default_manager_name = 'objects'
         index_together = [
             ['category', 'controversy'],
             ['category', 'nb_ratings'],
         ]
 
-    all_objects = WorkQuerySet.as_manager()  # Equivalent to default_manager_name = 'all_objects', because first in the list
     objects = FilteredWorkManager.from_queryset(WorkQuerySet)()
+    all_objects = WorkQuerySet.as_manager()
 
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
@@ -404,7 +406,7 @@ class Rating(models.Model):
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
     ))
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('user', 'work')
@@ -572,7 +574,7 @@ class FAQEntry(models.Model):
     def __str__(self):
         return self.question
 
-class Trope(models.Model): 
+class Trope(models.Model):
     trope = models.CharField(max_length=320)
     author = models.CharField(max_length=80)
     origin = models.ForeignKey(Work, on_delete=models.CASCADE)

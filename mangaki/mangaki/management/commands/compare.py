@@ -34,12 +34,20 @@ logger = logging.getLogger(__name__)
 class Experiment(object):
     def __init__(self, dataset_name):
         self.algos = [
+            lambda: MangakiALS(10),
             lambda: MangakiALS(20),
-            # lambda: MangakiWALS(20),
+            lambda: MangakiALS(30),
+            lambda: MangakiALS(40),
+            lambda: MangakiWALS(20),
+            lambda: MangakiSVD(10),
             lambda: MangakiSVD(20),
-            # lambda: MangakiPCA(20),
-            # lambda: MangakiKNN(20),
-            # lambda: MangakiZero()
+            lambda: MangakiSVD(30),
+            lambda: MangakiSVD(40),
+            lambda: MangakiSVD(50),
+            lambda: MangakiPCA(20),
+            lambda: MangakiKNN(20),
+            lambda: MangakiKNN(40),
+            lambda: MangakiZero()
         ]
         self.anonymized = None
         self.load_dataset(dataset_name)
