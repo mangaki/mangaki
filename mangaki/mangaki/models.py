@@ -191,30 +191,30 @@ class Work(models.Model):
         return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
 
     def update_tags(self, anidb_tags):
-        existing_tags = TaggedWork.objects.filter(work=self).all()
-        values = existing_tags.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-        existing_tags = {
+        tag_work_list = TaggedWork.objects.filter(work=self).all()
+        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
+        current_tags = {
             value[0]: {
                 "weight": value[2],
                 "anidb_tag_id": value[1]
             } for value in values
         }
-        new_tags_keys = anidb_tags.keys() - existing_tags.keys()
-        new_tags = {key: anidb_tags[key] for key in new_tags_keys}
 
-        old_tags_keys = list(set(anidb_tags.keys()).intersection(existing_tags.keys()))
-        old_tags = {key: existing_tags[key] for key in old_tags_keys}
-        old_tags_updated = {key: anidb_tags[key] for key in old_tags_keys}
+        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
 
-        deleted_tags_keys = existing_tags.keys() - anidb_tags.keys()
+        added_tags_keys = anidb_tags.keys() - current_tags.keys()
+        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
+
+        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
+        updated_tags = {key: anidb_tags[key] for key in remaining_tags_keys if current_tags[key] != anidb_tags[key]}
 
         # New tags have to be added to the database (if they aren't already present)
-        # New tags have to be assigned to that work
+        # And new tags have to be assigned to that work
         tags_weight = {}
         tags_to_add = []
         tagged_works_to_add = []
 
-        for title, tag_infos in new_tags.items():
+        for title, tag_infos in added_tags.items():
             anidb_tag_id = tag_infos["anidb_tag_id"]
             tags_weight[anidb_tag_id] = tag_infos["weight"]
             tag = Tag(title=title, anidb_tag_id=anidb_tag_id)
@@ -227,14 +227,8 @@ class Work(models.Model):
             tagged_works_to_add.append(tagged_work)
         TaggedWork.objects.bulk_create(tagged_works_to_add)
 
-        # Update tags that were already present in the database
-        # And update the weight of that tag for this anime
-        for title, tag_infos in old_tags.items():
-            tag = Tag.objects.filter(title=title, anidb_tag_id__isnull=True).first()
-            if tag is not None:
-                tag.anidb_tag_id = old_tags_updated[title]["anidb_tag_id"]
-                tag.save()
-
+        # Update the weight of tags that already exist (only if the weight changed)
+        for title, tag_infos in updated_tags.items():
             tagged_work = self.taggedwork_set.get(tag__title=title)
             tagged_work.weight = tag_infos["weight"]
             tagged_work.save()
