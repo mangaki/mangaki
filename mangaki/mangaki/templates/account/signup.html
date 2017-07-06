@@ -2,39 +2,72 @@
 
 {% load i18n %}
 {% load account socialaccount %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 
 {% block head_title %}{% trans "Signup" %}{% endblock %}
+{% block anonymous_rating_banner %} {% endblock %}
 
 {% block body %}
-<h1>Rejoignez Mangaki ／人◕ ‿‿ ◕人＼</h1>
-<p>Et participez à la création d'un monde meilleur.</p>
+<h2 class="text-center">Rejoignez Mangaki <span class="text-nowrap">／人◕ ‿‿ ◕人＼</span></h2>
+<p class="text-center">
+  Et participez à la création d'un monde meilleur.  Si vous avez déjà un
+  compte, vous pouvez <a href="{{ login_url }}">vous connecter ici</a>.
+</p>
 
 {% get_providers as socialaccount_providers %}
-
 {% if socialaccount_providers  %}
+  <div class="socialaccount_ballot">
+    <!-- <ul class="socialaccount_providers"> -->
+      {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+    <!-- </ul> -->
+  </div>
 
-    <div class="socialaccount_ballot">
-
-      <!-- <ul class="socialaccount_providers"> -->
-        {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-      <!-- </ul> -->
-
-    </div>
-
-    {% include "socialaccount/snippets/login_extra.html" %}
+  {% include "socialaccount/snippets/login_extra.html" %}
 {% endif %}
 
-<p>Si vous avez déjà un compte, vous pouvez <a href="{{ login_url }}">vous connecter ici</a>.</p>
-
-<form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
-  {% csrf_token %}
-  {{ form|bootstrap }}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+<div class="row">
+  {% if ratings %}
+  <div class="col-xs-12">
+    <div class="alert alert-info" role="alert">
+      Vous avez d&eacute;j&agrave; not&eacute; certaines œuvres. Importez-les
+      automatiquement sur votre nouveau compte en cochant la case "Importer mes
+      notes" ci-dessous&nbsp;!
+    </div>
+  </div>
   {% endif %}
-  <button type="submit" class="btn btn-primary">Inscription &raquo;</button>
-</form>
+  <form 
+      class="col-xs-12 col-sm-6 {% if not ratings %}col-sm-offset-3{% endif %}"
+      id="signup_form"
+      method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
 
+    {% bootstrap_field form.username show_label=False addon_before='<span class="glyphicon glyphicon-user"></span>' %}
+    {% bootstrap_field form.email show_label=False addon_before='<span class="glyphicon glyphicon-envelope"></span>' %}
+    {% bootstrap_field form.password1 show_label=False addon_before='<span class="glyphicon glyphicon-lock"></span>' %}
+    {% bootstrap_field form.password2 show_label=False addon_before='<span class="glyphicon glyphicon-lock"></span>' %}
+    {% if ratings %}
+    <div class="checkbox">
+      <label>
+        {{ form.import_ratings }} Importer <a href="#my-ratings">mes notes</a>
+      </label>
+    </div>
+    {% endif %}
+    {% buttons %}
+    {% bootstrap_button button_type="submit" button_class="btn-primary" extra_classes="btn-block" content="Inscription &raquo;" %}
+    {% endbuttons %}
+  </form>
+  {% if ratings %}
+  <div class="col-xs-12 col-sm-6">
+    <h3 class="text-center" id="my-ratings">Mes notes</h3>
+    {% for category, works in ratings %}
+    <h4>{{ category.name }}</h4>
+    {% include "works_no_poster.html" with works=works category=category.slug only %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
 
 {% endblock %}

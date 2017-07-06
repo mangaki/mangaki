@@ -1,123 +1,124 @@
 from collections import Counter
 from mangaki.models import Rating, ColdStartRating, Work
 from mangaki.utils.chrono import Chrono
-from mangaki.utils.values import rating_values, rating_values_dpp
+from mangaki.utils.data import Dataset
 from django.contrib.auth.models import User
 from django.db.models import Count
-from django.db import connection
+from mangaki.utils.algo import ALGOS, fit_algo, get_algo_backup, get_dataset_backup
+from mangaki.utils.algo import ALGOS, fit_algo
+from mangaki.utils.ratings import current_user_ratings
+import numpy as np
+import json
+import os.path
 
 
-NB_NEIGHBORS = 15
-MIN_RATINGS = 3
-
-CHRONO_ENABLED = False
+NB_RECO = 10
+CHRONO_ENABLED = True
 
 
-def get_recommendations(user, category, editor='unspecified', dpp=False):
-    # What if user is not authenticated? We will see soon.
-    chrono = Chrono(CHRONO_ENABLED)
+def user_exists_in_backup(user, algo_name):
+    try:
+        dataset = get_dataset_backup(algo_name)
+        return user.id in dataset.encode_user
+    except FileNotFoundError:
+        return False
 
-    chrono.save('[%dQ] begin' % len(connection.queries))
 
-    rated_works = {}
-    if dpp:
-        qs = ColdStartRating.objects.filter(user=user).values_list('work_id', 'choice')
-        values = rating_values_dpp
+def get_pos_of_best_works_for_user_via_algo(algo, dataset, user_id, work_ids, limit=None):
+    encoded_user_id = dataset.encode_user[user_id]
+    encoded_works = dataset.encode_works(work_ids)
+    X_test = np.asarray([[encoded_user_id, encoded_work_id] for encoded_work_id in encoded_works])
+    y_pred = algo.predict(X_test)
+    pos_of_best = y_pred.argsort()[::-1]  # Get top work indices in decreasing value
+    if limit is not None:
+        pos_of_best = pos_of_best[:limit]  # Up to some limit
+    return pos_of_best
 
+
+def get_reco_algo(request, algo_name='knn', category='all'):
+    chrono = Chrono(is_enabled=CHRONO_ENABLED)
+    already_rated_works = list(current_user_ratings(request))
+    if request.user.is_anonymous:
+        assert request.user.id is None
+        # We only support KNN for anonymous users, since the offline models did
+        # not learn anything about them.
+        # FIXME: We should also force KNN for new users for which we have no
+        # offline trained model available.
+        algo_name = 'knn'
+
+    chrono.save('get rated works')
+
+    if algo_name == 'knn':
+        queryset = Rating.objects.filter(work__in=already_rated_works)
+        dataset = Dataset()
+        triplets = list(
+            queryset.values_list('user_id', 'work_id', 'choice'))
+        if request.user.is_anonymous:
+            triplets.extend([
+                (request.user.id, work_id, choice)
+                for work_id, choice in current_user_ratings(request).items()
+            ])
+
+        anonymized = dataset.make_anonymous_data(triplets)
+
+        chrono.save('make first anonymous data with {} ratings'.format(len(triplets)))
+
+        algo = ALGOS['knn']()
+        algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
+        algo.fit(anonymized.X, anonymized.y)
+
+        chrono.save('prepare first fit')
+
+        encoded_neighbors = algo.get_neighbors([dataset.encode_user[request.user.id]])
+        neighbors = dataset.decode_users(encoded_neighbors[0])  # We only want for the first user
+
+        chrono.save('get neighbors')
+
+        # Only keep useful ratings for recommendation
+        triplets = list(
+            Rating.objects
+                  .filter(user__id__in=neighbors + [request.user.id])
+                  .exclude(choice__in=['willsee', 'wontsee'])
+                  .values_list('user_id', 'work_id', 'choice')
+        )
+        if request.user.is_anonymous:
+            triplets.extend([
+                (request.user.id, work_id, choice)
+                for work_id, choice in current_user_ratings(request).items()
+                if choice not in ('willsee', 'wontsee')
+            ])
+        dataset, algo = fit_algo(algo_name, triplets)
+    else:  # SVD or ALS, etc.
+        try:
+            algo = get_algo_backup(algo_name)
+            dataset = get_dataset_backup(algo_name)
+        except FileNotFoundError:
+            # Every rating is useful
+            triplets = list(
+                Rating.objects.values_list('user_id', 'work_id', 'choice'))
+            chrono.save('get all %d interesting ratings' % len(triplets))
+            dataset, algo = fit_algo(algo_name, triplets)
+
+    chrono.save('fit %s' % algo.get_shortname())
+
+    if category != 'all':
+        category_filter = set(Work.objects.filter(category__slug=category).values_list('id', flat=True))
     else:
-        qs = Rating.objects.filter(user=user).values_list('work_id', 'choice')
-        values = rating_values
+        category_filter = dataset.interesting_works
 
-    for work_id, choice in qs:
-        rated_works[work_id] = choice
+    filtered_works = list((dataset.interesting_works & category_filter) - set(already_rated_works))
 
-    willsee = set()
-    if user.profile.reco_willsee_ok:
-        banned_works = set()
-        for work_id in rated_works:
-            if rated_works[work_id] != 'willsee':
-                banned_works.add(work_id)
-            else:
-                willsee.add(work_id)
-    else:
-        banned_works = set(rated_works.keys())
+    chrono.save('remove already rated')
 
-    mangas = Work.objects.filter(category__slug='manga')
+    pos_of_best = get_pos_of_best_works_for_user_via_algo(algo, dataset, request.user.id, filtered_works, limit=NB_RECO)
+    best_work_ids = [filtered_works[pos] for pos in pos_of_best]
 
-    if editor == 'otototaifu':
-        mangas = mangas.filter(editor__title__in=['Ototo Manga', 'Taifu comics'])
-    elif editor != 'unspecified':
-        mangas = mangas.filter(editor__title__icontains=editor)
-    manga_ids = mangas.values_list('id', flat=True)
+    chrono.save('compute every prediction')
 
-    kept_works = None
-    if category == 'anime':
-        banned_works |= set(manga_ids)
-    elif category == 'manga':
-        kept_works = set(manga_ids)
+    works = Work.objects.in_bulk(best_work_ids)
+    # Some of the works may have been deleted since the algo backup was created.
+    ranked_work_ids = [work_id for work_id in best_work_ids if work_id in works]
 
-    chrono.save('[%dQ] retrieve her %d ratings' % (len(connection.queries), len(rated_works)))
-    final_works = Counter()
-    nb_ratings = {}
-    c = 0
-    neighbors = Counter()
-    for user_id, work_id, choice in Rating.objects.filter(work__in=rated_works.keys()).values_list('user_id', 'work_id', 'choice'):
-        c += 1
-        neighbors[user_id] += values[rated_works[work_id]] * rating_values[choice]
+    chrono.save('get bulk')
 
-    chrono.save('[%dQ] fill neighbors with %d ratings' % (len(connection.queries), c))
-
-    score_of_neighbor = {}
-    # print('Neighbors:')
-    # nbr = []
-    for user_id, score in neighbors.most_common(NB_NEIGHBORS):
-        # print(User.objects.get(id=user_id).username, score)
-        score_of_neighbor[user_id] = score
-        # nbr.append(user_id)
-    # print(nbr)
-
-    sum_ratings = Counter()
-    nb_ratings = Counter()
-    sum_scores = Counter()
-    i = 0
-    for work_id, user_id, choice in Rating.objects.filter(user__id__in=score_of_neighbor.keys()).exclude(choice__in=['willsee', 'wontsee']).values_list('work_id', 'user_id', 'choice'):
-        i += 1
-        if work_id in banned_works or (kept_works and work_id not in kept_works):
-            continue
-
-        sum_ratings[work_id] += rating_values[choice]
-        nb_ratings[work_id] += 1
-        sum_scores[work_id] += score_of_neighbor[user_id]
-
-    chrono.save('[%dQ] compute and filter all ratings from %d sources' % (len(connection.queries), i))
-
-    i = 0
-    k = 0
-    for work_id in nb_ratings:
-        # Adding interesting works to the arena (rated at least MIN_RATINGS by neighbors)
-        if nb_ratings[work_id] >= MIN_RATINGS:
-            k += 1
-            final_works[(work_id, work_id in manga_ids, work_id in willsee)] = (sum_ratings[work_id] / nb_ratings[work_id], sum_scores[work_id])
-        i += 1
-
-    chrono.save('[%dQ] rank %d %d works' % (len(connection.queries), k, i))
-
-    reco = []
-    rank = 0
-    rank_of = {}
-    for (work_id, is_manga, in_willsee), _ in final_works.most_common(4):  # Retrieving top 4
-        rank_of[work_id] = rank
-        reco.append([work_id, is_manga, in_willsee])
-        rank += 1
-
-    works = Work.objects.filter(id__in=rank_of.keys())
-    for work in works:
-        reco[rank_of[work.id]][0] = work
-
-    # print(len(connection.queries), 'queries')
-    """for line in connection.queries:
-        print(line)"""
-
-    chrono.save('[%dQ] retrieve top 4' % len(connection.queries))
-
-    return reco
+    return {'work_ids': ranked_work_ids, 'works': works}

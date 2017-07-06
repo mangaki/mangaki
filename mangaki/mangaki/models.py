@@ -1,4 +1,4 @@
-# coding=utf8
+# coding=utf-8
 import os.path
 import tempfile
 from urllib.parse import urlparse
@@ -8,18 +8,19 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import CharField, F, Func, Lookup, Value
+from django.utils.functional import cached_property
 
-from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES
-from mangaki.discourse import get_discourse_data
+from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
-from mangaki.utils.dpp import MangakiDPP, SimilarityMatrix
+from mangaki.utils.dpp import MangakiDPP
 from mangaki.utils.ratingsmatrix import RatingsMatrix
 
-NB_POPULAR_WORKS = 1000
+TOP_POPULAR_WORKS_FOR_SAMPLING = 200
 
 
 @CharField.register_lookup
@@ -28,7 +29,7 @@ class SearchLookup(Lookup):
     __search django lookup, but we don't care because it doesn't work for
     PostgreSQL anyways."""
 
-    lookup_name = 'search'
+    lookup_name = 'mangaki_search'
 
     def as_sql(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
@@ -45,6 +46,11 @@ class SearchSimilarity(Func):
 
     def __init__(self, lhs, rhs):
         super().__init__(Func(Func(lhs, function='F_UNACCENT'), function='UPPER'), Func(Func(rhs, function='F_UNACCENT'), function='UPPER'))
+
+
+class FilteredWorkManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(redirect__isnull=True)
 
 
 class WorkQuerySet(models.QuerySet):
@@ -65,23 +71,18 @@ class WorkQuerySet(models.QuerySet):
         # We want to search when the title contains the query or when the
         # similarity between the title and the query is low; we also want to
         # show the relevant results first.
-        return self.filter(title__search=search_text).\
+        return self.filter(title__mangaki_search=search_text).\
             order_by(SearchSimilarity(F('title'), Value(search_text)).desc())
 
-    def dpp(self, nb_points):
+    def dpp(self, nb_works):
         """
         sample "nb_points" popular works which are far from each other (using DPP)
         """
-        ratings_matrix = RatingsMatrix(Rating.objects.values_list('user_id',
-                                                                  'work_id',
-                                                                  'choice'))
-        similarity = SimilarityMatrix(ratings_matrix.matrix, nb_components_svd=70)
-        set_item_id_popular = set(self.popular()[:NB_POPULAR_WORKS].values_list('pk', flat=True))
-        items = [ratings_matrix.item_dict[item] for item in ratings_matrix.item_set if item in set_item_id_popular]
-        dpp = MangakiDPP(items, similarity.similarity_matrix)
-        liste_dpp = dpp.sample_k(nb_points)
-        liste_dpp_work_ids = [ratings_matrix.item_dict_inv[element] for element in liste_dpp]
-        return self.filter(id__in=liste_dpp_work_ids)
+        work_ids = self.popular()[:TOP_POPULAR_WORKS_FOR_SAMPLING].values_list('id', flat=True)
+        dpp = MangakiDPP(work_ids)
+        dpp.load_from_algo('svd')
+        sampled_work_ids = dpp.sample_k(nb_works)
+        return self.filter(id__in=sampled_work_ids)
 
     def random(self):
         return self.filter(
@@ -89,6 +90,21 @@ class WorkQuerySet(models.QuerySet):
             nb_dislikes__lte=RANDOM_MAX_DISLIKES,
             nb_likes__gte=F('nb_dislikes') * RANDOM_RATIO)
 
+    def group_by_category(self):
+        """
+        Groups this queryset by category. This returns a dictionnary mapping
+        categories to the corresponding works in the queryset.
+
+        Returns:
+          by_category -- A mapping from category IDs to the list of works in
+              this queryset in the corresponding category. Order inside a
+              category is preserved.
+        """
+        by_category = {}
+        for work in self:
+            by_category.setdefault(work.category_id, []).append(work)
+
+        return by_category
 
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
@@ -99,13 +115,16 @@ class Category(models.Model):
 
 
 class Work(models.Model):
-    title = models.CharField(max_length=128)
+    redirect = models.ForeignKey('Work', blank=True, null=True)
+    title = models.CharField(max_length=255)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
-    ext_poster = models.CharField(max_length=128)
+    ext_poster = models.CharField(max_length=128, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
-    date = models.DateField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True) # Should be renamed to start_date
+    end_date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
+    ext_synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
 
@@ -130,13 +149,18 @@ class Work(models.Model):
     nb_dislikes = models.IntegerField(blank=True, null=False, default=0)
     controversy = models.FloatField(blank=True, null=False, default=0)
 
+    # Cache fields for the title deduplication
+    title_search = SearchVectorField('title')
+
     class Meta:
+        default_manager_name = 'objects'
         index_together = [
             ['category', 'controversy'],
             ['category', 'nb_ratings'],
         ]
 
-    objects = WorkQuerySet.as_manager()
+    objects = FilteredWorkManager.from_queryset(WorkQuerySet)()
+    all_objects = WorkQuerySet.as_manager()
 
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
@@ -214,31 +238,77 @@ class Work(models.Model):
         return self.title
 
 
-class WorkTitle (models.Model):
+class WorkTitle(models.Model):
     work = models.ForeignKey('Work')
-    title = models.CharField(max_length=128, blank=True, db_index=True)
-    language = models.ForeignKey('Language')
+    # 255 should be safe, we have seen titles of 187 characters in Japanese.
+    # So we could expect longer titles in English.
+    title = models.CharField(max_length=255, blank=True, db_index=True)
+    title_search = SearchVectorField('title')
+    language = models.ForeignKey('Language',
+                                 null=True)
+    ext_language = models.ForeignKey('ExtLanguage',
+                                     null=True)
     type = models.CharField(max_length=9, choices=(
                             ('main', 'principal'),
                             ('official', 'officiel'),
-                            ('synonym', 'synonyme')),
+                            ('synonym', 'synonyme'),
+                            ('short', 'court')),
                             blank=True,
                             db_index=True)
 
+    @cached_property
+    def code(self):
+        return self.language.code if self.language else None
+
+    @cached_property
+    def source(self):
+        return self.ext_language.source if self.ext_language else None
+
     def __str__(self):
-        return ("%s" % self.title)
+        if self.code and self.source:
+            return ("{} - {} (source: {}, type: {}) attached to {}"
+                    .format(self.title, self.code, self.source, self.type, self.work))
+        elif self.source:
+            return ("{} (source: {}, type: {}) attached to {}"
+                    .format(self.title, self.source, self.type, self.work))
+        elif self.code:
+            return ("{} - {} (type: {}) attached to {}"
+                    .format(self.title, self.code, self.type, self.work))
+        else:
+            return ("{} (type: {}) attached to {}"
+                    .format(self.title, self.type, self.work))
+
+
+class ExtLanguage(models.Model):
+    source = models.CharField(max_length=30)
+    ext_lang = models.CharField(
+        null=True,
+        max_length=8,
+        db_index=True
+    )
+    lang = models.ForeignKey('Language')
+
+    class Meta:
+        unique_together = ('ext_lang', 'source')
+
+    def __str__(self):
+        return ('<ExtLanguage: source {}, ext_lang: {}, lang: {}>'
+                .format(self.source,
+                        self.ext_lang,
+                        self.lang.code))
 
 
 class Language(models.Model):
-    anidb_language = models.CharField(max_length=5,
-                                      blank=True,
-                                      db_index=True)
-    iso639 = models.CharField(max_length=2,
-                            unique=True,
-                            db_index=True)
+    code = models.CharField(
+        default=None,
+        null=True,
+        unique=True,
+        max_length=10,
+        db_index=True,
+        help_text="ISO639-1 code or custom (e.g. x-jat, x-kot, x-ins)")
 
     def __str__(self):
-        return "%s : %s" % (self.anidb_language, self.iso639)
+        return self.code if self.code else 'inconnu'
 
 
 class Role(models.Model):
@@ -313,8 +383,6 @@ class Track(models.Model):
 
 
 class Artist(models.Model):
-    first_name = models.CharField(max_length=32, blank=True, null=True)  # No longer used
-    last_name = models.CharField(max_length=32)  # No longer used
     name = models.CharField(max_length=255)
     anidb_creator_id = models.IntegerField(null=True, unique=True)
 
@@ -338,7 +406,7 @@ class Rating(models.Model):
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
     ))
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('user', 'work')
@@ -361,19 +429,12 @@ class Profile(models.Model):
     nsfw_ok = models.BooleanField(default=False)
     newsletter_ok = models.BooleanField(default=True)
     reco_willsee_ok = models.BooleanField(default=False)
+    research_ok = models.BooleanField(default=True)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
-    score = models.IntegerField(default=0)
 
     def get_anime_count(self):
         return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike', 'favorite']).count()
-
-    def get_avatar_url(self):
-        if not self.avatar_url:
-            avatar_url = get_discourse_data(self.user.email)['avatar'].format(size=150)
-            self.avatar_url = avatar_url
-            self.save()
-        return self.avatar_url
 
 
 class Suggestion(models.Model):
@@ -394,21 +455,18 @@ class Suggestion(models.Model):
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
 
-    def update_scores(self):
-        suggestions_score = 5 * Suggestion.objects.filter(user=self.user, is_checked=True).count()
-        recommendations_score = 0
-        reco_list = Recommendation.objects.filter(user=self.user)
-        for reco in reco_list:
-            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='like').count() > 0:
-                recommendations_score += 1
-            if Rating.objects.filter(user=reco.target_user, work=reco.work, choice='favorite').count() > 0:
-                recommendations_score += 5
-        score = suggestions_score + recommendations_score
-        Profile.objects.filter(user=self.user).update(score=score)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        self.update_scores()
+class WorkCluster(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    works = models.ManyToManyField(Work)
+    reported_on = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=11, choices=CLUSTER_CHOICES, default='unprocessed')
+    checker = models.ForeignKey(User, related_name='reported_clusters', on_delete=models.CASCADE, blank=True, null=True)
+    resulting_work = models.ForeignKey(Work, related_name='clusters', blank=True, null=True)
+    merged_on = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])
 
 
 class Neighborship(models.Model):
@@ -516,7 +574,7 @@ class FAQEntry(models.Model):
     def __str__(self):
         return self.question
 
-class Trope(models.Model): 
+class Trope(models.Model):
     trope = models.CharField(max_length=320)
     author = models.CharField(max_length=80)
     origin = models.ForeignKey(Work, on_delete=models.CASCADE)

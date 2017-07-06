@@ -70,8 +70,8 @@ l'application. Pour une installation de développement, il suffit de faire :
     EOF
 
 Si vous souhaitez mettre en production une instance de Mangaki, le fichier de
-configuration est un peu plus complexe - regardez dans `mangaki/settings.py`
-pour un aperçu des options utiles.
+configuration est un peu plus complexe - regardez dans `settings.template.ini`
+et `mangaki/settings.py` pour un aperçu des options utiles.
 
 Remplir la base de données
 --------------------------
@@ -103,7 +103,7 @@ Ceci va lancer les [doctests](https://docs.python.org/3.5/library/doctest.html) 
 
 Pour calculer la couverture de test, il faut plutôt faire:
 
-    coverage run ./mangaki/manage.py test --with-coverage --cover-package=mangaki,irl,discourse --cover-html
+    coverage run ./mangaki/manage.py test --with-coverage --cover-package=mangaki,irl --cover-html
 
 Ainsi, vous aurez un dossier `cover` qui contiendra les informations de couverture en HTML.
 

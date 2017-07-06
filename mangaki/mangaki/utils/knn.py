@@ -1,13 +1,11 @@
-from django.contrib.auth.models import User
-from mangaki.models import Rating, Work
-from mangaki.utils.values import rating_values
+from mangaki.utils.common import RecommendationAlgorithm
 from collections import Counter, defaultdict
-from math import sqrt
 import numpy as np
 from scipy.sparse import lil_matrix
+from sklearn.metrics.pairwise import cosine_similarity
 
 
-class MangakiKNN(object):
+class MangakiKNN(RecommendationAlgorithm):
     NB_NEIGHBORS = None
     closest_neighbors = None
     rated_works = None
@@ -16,8 +14,12 @@ class MangakiKNN(object):
     sum_ratings = None
     nb_ratings = None
     M = None
-    def __init__(self, NB_NEIGHBORS=15):
+    def __init__(self, NB_NEIGHBORS=20, RATED_BY_NEIGHBORS_AT_LEAST=3, missing_is_mean=True, weighted_neighbors=False):
+        super().__init__()
         self.NB_NEIGHBORS = NB_NEIGHBORS
+        self.RATED_BY_NEIGHBORS_AT_LEAST = RATED_BY_NEIGHBORS_AT_LEAST
+        self.missing_is_mean = missing_is_mean
+        self.weighted_neighbors = weighted_neighbors
         self.closest_neighbors = {}
         self.rated_works = {}
         self.mean_score = {}
@@ -25,88 +27,32 @@ class MangakiKNN(object):
         self.sum_ratings = {}
         self.nb_ratings = {}
 
-    def set_parameters(self, nb_users, nb_works):
-        self.nb_users = nb_users
-        self.nb_works = nb_works
-
-    def get_similarity(self, my_user_id, user_id):
-        score = 0
-        for work_id in self.rated_works & set(self.ratings[user_id].keys()):
-            score += self.ratings[my_user_id][work_id] * self.ratings[user_id][work_id]
-        return score
-
-    def get_similarity2(self, my_user_id, user_id):
-        score = self.get_similarity(my_user_id, user_id)
-        my_norm = sqrt(self.get_similarity(my_user_id, my_user_id))
-        their_norm = sqrt(self.get_similarity(user_id, user_id))
-        if my_norm and their_norm:
-            score /= (my_norm * their_norm)
-        return score
-
-    def get_neighbors(self, my_user_id, normalized=False):
-        if normalized:
-            similarity_f = self.get_similarity2
+    def get_neighbors(self, user_ids=None):
+        neighbors = []
+        if user_ids is None:
+            score = cosine_similarity(self.M)  # All pairwise similarities
+            user_ids = range(self.nb_users)
         else:
-            similarity_f = self.get_similarity
-        neighbors = Counter()
-        
-        if my_user_id in self.ratings:
-            self.rated_works = set(self.ratings[my_user_id].keys())
-            for user_id in self.ratings:
-                if user_id != my_user_id:    
-                    neighbors[user_id] = similarity_f(my_user_id, user_id)
-
-        self.closest_neighbors[my_user_id] = {}
-        users = []
-        for user_id, sim_score in neighbors.most_common(self.NB_NEIGHBORS):
-            self.closest_neighbors[my_user_id][user_id] = sim_score
-            users.append(User.objects.get(id=user_id).username)
-        # print(self.closest_neighbors[my_user_id])
-        return users
-
-    def get_all_neighbors(self):
-        score = self.M.dot(self.M.transpose())
-        for user_id in range(self.nb_users):
+            score = cosine_similarity(self.M[user_ids], self.M)
+        for i, user_id in enumerate(user_ids):
+            if self.NB_NEIGHBORS < self.nb_users - 1:
+                score[i][user_id] = float('-inf')  # Do not select the user itself while looking at its potential neighbors
+                # Put top NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
+                neighbor_ids = (
+                    score[i]
+                    .argpartition(-self.NB_NEIGHBORS - 1)
+                    [-self.NB_NEIGHBORS - 1:-1]
+                )
+            else:
+                neighbor_ids = list(range(len(score[i])))
+                neighbor_ids.remove(user_id)
+            neighbors.append(neighbor_ids)
             self.closest_neighbors[user_id] = {}
-            for neighbor_id in score[user_id].toarray()[0].argpartition(-self.NB_NEIGHBORS - 1)[-self.NB_NEIGHBORS - 1:-1]:
-                self.closest_neighbors[user_id][neighbor_id] = score[user_id, neighbor_id]
+            for neighbor_id in neighbor_ids:
+                self.closest_neighbors[user_id][neighbor_id] = score[i, neighbor_id]
+        return neighbors
 
-    def get_common_traits(self, my_username, username):
-        my_user_id = User.objects.get(username=my_username).id
-        user_id = User.objects.get(username=username).id
-        self.rated_works = set(self.ratings[my_user_id].keys())
-        agree = []
-        disagree = []
-        for work_id in self.rated_works & set(self.ratings[user_id].keys()):
-            score = self.ratings[my_user_id][work_id] * self.ratings[user_id][work_id]
-            if self.ratings[my_user_id][work_id] * self.ratings[user_id][work_id] > 0:
-                agree.append((score, work_id, self.ratings[my_user_id][work_id], self.ratings[user_id][work_id]))
-            elif self.ratings[my_user_id][work_id] * self.ratings[user_id][work_id] < 0:
-                disagree.append((score, work_id, self.ratings[my_user_id][work_id], self.ratings[user_id][work_id]))
-        agree.sort(reverse=True)
-        disagree.sort()
-        works = Work.objects.in_bulk(map(lambda x: x[1], agree + disagree))
-        print('Strongly agree: (over %d positive products)' % len(agree))
-        for rank, (_, work_id, my, their) in enumerate(agree, start=1):
-            if abs(my) >= 1 and abs(their) >= 1:
-                print('%d.' % rank, works[work_id].title, my, their, '=', my * their)
-        print('Strongly disagree: (over %d negative products)' % len(disagree))
-        for rank, (_, work_id, my, their) in enumerate(disagree, start=1):
-            if abs(my) >= 1 and abs(their) >= 1:
-                print('%d.' % rank, works[work_id].title, my, their, '=', my * their)
-
-    def fit(self, X=None, y=None, whole_dataset=False):
-        if X is None:
-            X = []
-        if y is None:
-            y = []
-        if whole_dataset:
-            for user_id, work_id, choice in Rating.objects.values_list('user_id', 'work_id', 'choice'):
-                X.append((user_id, work_id))
-                y.append(rating_values[choice])
-                nb_users = max(nb_users, user_id + 1)
-                nb_works = max(nb_works, work_id + 1)
-        self.set_parameters(nb_users, nb_works)
+    def fit(self, X, y, whole_dataset=False):
         self.ratings = defaultdict(dict)
         self.sum_ratings = defaultdict(lambda: 0)
         self.nb_ratings = defaultdict(lambda: 0)
@@ -118,20 +64,34 @@ class MangakiKNN(object):
             self.M[user_id, work_id] = rating
         for work_id in self.nb_ratings:
             self.mean_score[work_id] = self.sum_ratings[work_id] / self.nb_ratings[work_id]
-        self.get_all_neighbors()
 
     def predict(self, X):
+        self.get_neighbors(list(set(X[:, 0])))  # Compute only relevant neighbors
         y = []
         for my_user_id, work_id in X:
-            """if not my_user_id in self.closest_neighbors:
-                self.get_neighbors(my_user_id)"""
             weight = 0
             predicted_rating = 0
+            nb_neighbors_that_rated_it = 0
             for user_id in self.closest_neighbors[my_user_id]:
                 their_sim_score = self.closest_neighbors[my_user_id][user_id]
-                their_rating = self.ratings[user_id].get(work_id, self.mean_score.get(work_id, 0))  # Double fallback
-                predicted_rating += their_sim_score * their_rating
-                weight += their_sim_score
+                if self.missing_is_mean:
+                    if work_id in self.ratings[user_id]:
+                        their_rating = self.ratings[user_id][work_id]
+                        nb_neighbors_that_rated_it += 1
+                    else:
+                        their_rating = self.mean_score.get(work_id, 0)  # In case KNN was not trained on this work
+                else:
+                    their_rating = self.ratings[user_id].get(work_id)
+                    if their_rating is None:
+                        continue  # Skip
+                if self.weighted_neighbors:
+                    predicted_rating += their_sim_score * their_rating
+                    weight += their_sim_score
+                else:
+                    predicted_rating += their_rating
+                    weight += 1
+            if nb_neighbors_that_rated_it < self.RATED_BY_NEIGHBORS_AT_LEAST:
+                predicted_rating = 0
             if weight > 0:
                 predicted_rating /= weight
             y.append(predicted_rating)

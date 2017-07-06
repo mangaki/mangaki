@@ -1,0 +1,101 @@
+---
+- name: Ensure project group exists.
+  group:
+    name: '{{ mangaki_source_group }}'
+    state: 'present'
+
+- name: Ensure project user exists.
+  user:
+    name: '{{ mangaki_source_user }}'
+    group: '{{ mangaki_source_group }}'
+    state: 'present'
+
+- name: Ensure python and virtualenv are installed and up-to-date.
+  apt:
+    name: '{{ item }}'
+    state: 'latest'
+  with_items:
+    - 'python3'
+    - 'python3-virtualenv'
+    - 'virtualenv'
+  become: true
+
+- name: Ensure virtualenv packages are up-to-date.
+  pip:
+    name: '{{ item }}'
+    state: 'latest'
+    virtualenv: '{{ mangaki_source_venv_path }}'
+    virtualenv_python: 'python3'
+  become: true
+  become_user: '{{ mangaki_source_user }}'
+  with_items:
+    - 'pip'
+    - 'setuptools'
+
+- name: Ensure packaged project is present.
+  copy:
+    src: '{{ mangaki_source_package_local }}'
+    dest: '{{ mangaki_source_package }}'
+    owner: '{{ mangaki_source_user }}'
+    group: '{{ mangaki_source_group }}'
+    mode: '0644'
+  when: 'mangaki_source_install_type == "package"'
+
+- name: Ensure system-wide development dependencies are installed.
+  apt:
+    name: '{{ item }}'
+    state: 'latest'
+  become: true
+  when: 'mangaki_source_install_type == "develop"'
+  with_items: ['git', 'tmux']
+
+- name: Ensure debug-mode dependencies are installed.
+  pip:
+    requirements: '{{ mangaki_source_package }}/../requirements/dev.txt'
+    virtualenv: '{{ mangaki_source_venv_path }}'
+  when: 'mangaki_source_debug|bool'
+  become: true
+  become_user: '{{ mangaki_source_user }}'
+
+- name: Ensure project is installed.
+  pip:
+    name: '{{ mangaki_source_package }}'
+    state: 'latest'
+    extra_args: '{{ (mangaki_source_install_type == "develop")|ternary("-e", omit) }}'
+    virtualenv: '{{ mangaki_source_venv_path }}'
+  become: true
+  become_user: '{{ mangaki_source_user }}'
+  register: project_install
+
+- name: Request service reloading.
+  set_fact:
+    mangaki_needs_restart: true
+  when: project_install.changed
+
+- name: Ensure settings.ini is present.
+  template:
+    src: 'settings.ini.j2'
+    dest: '{{ mangaki_source_settings_path }}'
+    owner: '{{ mangaki_source_user }}'
+    group: '{{ mangaki_source_group }}'
+    mode: '0600'
+  register: settings_ini
+
+- name: Request service reloading.
+  set_fact:
+    mangaki_needs_restart: true
+  when: settings_ini.changed
+
+- name: Insert/update virtualenv configuration to bashrc.
+  blockinfile:
+    path: '{{ mangaki_source_home }}/.bashrc'
+    block: |
+      source {{ mangaki_source_venv_path }}/bin/activate
+      export DJANGO_SETTINGS_MODULE=mangaki.settings
+      export MANGAKI_SETTINGS_PATH={{ mangaki_source_settings_path }}
+      cd {{ mangaki_source_package }}
+      tmux new-session -s {{ mangaki_source_name }} '{{ mangaki_source_manage }} runserver 0.0.0.0:8000' 2> /dev/null || true
+      echo "Development server is running on port 8000; attach with 'tmux attach -t mangaki'"
+  when: 'mangaki_source_install_type == "develop"'
+  become: true
+  become_user: '{{ mangaki_source_user }}'

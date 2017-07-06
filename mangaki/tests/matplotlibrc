@@ -1,0 +1,3 @@
+# The default backend is not supported on CircleCI, so we explicitely set a
+# simpler backend.
+backend: Agg

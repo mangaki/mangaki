@@ -1,0 +1,11 @@
+{{ ansible_managed|comment }}
+
+[Unit]
+Description=Weekly check for Let's Encrypt's certificates renewal
+
+[Timer]
+OnCalendar=Sun *-*-* 04:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

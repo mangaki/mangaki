@@ -1,5 +1,0 @@
-upstream {{ application_name }}_servers {
-    {% for app_server in app_servers %}
-    server {{ app_server }} fail_timeout=0;
-    {% endfor %}
-}
