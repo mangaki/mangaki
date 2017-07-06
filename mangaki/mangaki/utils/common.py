@@ -45,8 +45,7 @@ class RecommendationAlgorithm:
         return '%s.pickle' % self.get_shortname()
 
     def compute_rmse(self, y_pred, y_true):
-        y_pred, y_true = zip(*([p, t] for p, t in zip(y_pred, y_true) if t is not None))
-        return mean_squared_error(y_pred, y_true) ** 0.5
+        return mean_squared_error(y_true, y_pred) ** 0.5
 
     def __str__(self):
         return '[%s]' % self.get_shortname().upper()
