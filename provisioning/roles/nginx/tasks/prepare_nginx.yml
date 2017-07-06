@@ -1,0 +1,40 @@
+---
+- block:
+  - name: Install nginx
+    apt: name=nginx state=latest
+    tags: packages
+
+  - name: Create the HTTP NGINX configuration
+    template:
+      src: "http.j2"
+      dest: /etc/nginx/sites-available/{{ application_name }}.http
+      backup: yes
+    notify: reload nginx
+
+  - name: Create the upstream NGINX configuration
+    template:
+      src: "upstreams.j2"
+      dest: /etc/nginx/sites-available/{{ application_name }}.upstream
+      backup: yes
+    notify: reload nginx
+
+  - name: Ensure the default nginx site is disabled
+    file: path=/etc/nginx/sites-enabled/default state=absent
+    notify: reload nginx
+
+  - name: Ensure the HTTP application site is enabled
+    file:
+      src: /etc/nginx/sites-available/{{ application_name }}.http
+      dest: /etc/nginx/sites-enabled/{{ application_name }}.http
+      state: link
+    notify: reload nginx
+
+  - name: Ensure the upstream application is enabled
+    file:
+      src: /etc/nginx/sites-available/{{ application_name }}.upstream
+      dest: /etc/nginx/sites-enabled/{{ application_name }}.upstream
+      state: link
+    notify: restart nginx
+
+  become: true
+  become_user: root

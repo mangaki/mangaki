@@ -1,6 +1,0 @@
----
-mangaki_back_name: '{{ mangaki_source_name }}'
-mangaki_back_user: '{{ mangaki_source_user }}'
-mangaki_back_group: '{{ mangaki_source_group }}'
-mangaki_back_manage: '{{ mangaki_source_manage }}'
-mangaki_back_env: '{{ mangaki_source_env }}'

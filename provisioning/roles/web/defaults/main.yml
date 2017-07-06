@@ -1,0 +1,15 @@
+---
+web_user: "{{ application_name }}"
+web_group: "{{ application_name }}"
+user_root_path: "/home/{{ web_user }}"
+git_repo: "https://github.com/mangaki/mangaki.git"
+git_branch: "master"
+git_dest: "{{ user_root_path }}/{{ application_name }}"
+requirements_file: "{{ git_dest }}/requirements.txt"
+virtualenv_path: "{{ user_root_path }}/{{ application_name }}_env"
+
+email_port: 25
+
+manage_path: "{{ virtualenv_path }}/bin/python {{ git_dest }}/{{ application_name }}/manage.py"
+
+auth_providers: []

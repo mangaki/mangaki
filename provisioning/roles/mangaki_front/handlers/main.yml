@@ -1,7 +1,0 @@
----
-- name: Restart gunicorn.
-  supervisorctl:
-    name: '{{ mangaki_front_name }}'
-    state: restarted
-  listen: Restart Mangaki services.
-  become: true

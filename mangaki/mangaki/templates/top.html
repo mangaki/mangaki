@@ -11,6 +11,18 @@
 {% endfor %}
 </table>
 
+<div id='discourse-comments'></div>
+<script type="text/javascript">
+  DiscourseEmbed = { discourseUrl: 'http://meta.mangaki.fr/',
+                     discourseEmbedUrl: 'http://mangaki.fr/top/{{ category_slug }}/' };
+
+  (function() {
+    var d = document.createElement('script'); d.type = 'text/javascript'; d.async = true;
+    d.src = DiscourseEmbed.discourseUrl + 'javascripts/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(d);
+  })();
+</script>
+
 <br />
 <br />
 <br />

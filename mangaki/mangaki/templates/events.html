@@ -1,44 +1,35 @@
 {% extends "base.html" %}
 
 {% block opengraph %}
-<meta property="og:title" content="Événements - Mangaki" />
+<meta property="og:title" content="Studio Ghibli Party au cinéma Les Fauvettes - Mangaki" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://mangaki.fr/events/" />
-<meta property="og:image" content="http://mangaki.fr/static/img/chiro.png" />
-<meta property="og:description" content="Les derniers événements en date de l'association Mangaki" />
+<meta property="og:image" content="http://mangaki.fr/static/img/ghibli.jpg" />
+<meta property="og:description" content="Le nouveau cinéma Les Fauvettes du quartier des Gobelins à Paris vous offre une sélection de 12 films Ghibli, jusqu'à mardi 9 février !" />
 <meta name="description" content="Événements liés à la japanimation en France. Également des concours organisés par l'association Mangaki." />
 {% endblock %}
 
 {% block twittercard %}
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:site" content="@mangakifr" />
-<meta name="twitter:title" content="Événements - Mangaki" />
-<meta name="twitter:description" content="Les derniers événements en date de l'association Mangaki" />
-<meta name="twitter:image" content="http://mangaki.fr/static/img/chiro.png" />
+<meta name="twitter:title" content="Studio Ghibli Party au cinéma Les Fauvettes - Mangaki" />
+<meta name="twitter:description" content="Le nouveau cinéma Les Fauvettes du quartier des Gobelins à Paris vous offre une sélection de 12 films Ghibli, jusqu'à mardi 9 février !" />
+<meta name="twitter:image" content="http://mangaki.fr/static/img/ghibli.jpg" />
 {% endblock %}
 
 {% block body %}
 <div id="events">
-    <h1>Conférence à l'École polytechnique</h1>
-    <p>Nous avons présenté nos benchmarks d'algorithmes de recommandation à l'École polytechnique, dans le cadre du BADAS (binet algorithmes et data science).</p>
-
-    <h3>La vidéo en français</h3>
-    <iframe style="max-width: 100%" width="560" height="315" src="https://www.youtube.com/embed/rFZVTruB0pM" frameborder="0" allowfullscreen></iframe>
-
-    <h1>Conférence à Hacker News Kansai, Kobé, Japon</h1>
-    <p>De passage à Kobé, nous avons fait coucou au meetup Hacker News local.</p>
-
-    <h3>La vidéo en anglais</h3>
-    <iframe style="max-width: 100%" width="560" height="315" src="https://www.youtube.com/embed/4C5sSgSZNf0" frameborder="0" allowfullscreen></iframe>
-
-    <hr />
-
-    <h2 id="concours-kizumonogatari-lien-en-partenariat-avec-wakanim">Concours Kizumonogatari avec <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}">Wakanim</a> (2016)</h2>
-    <h4 id="deux-albums-utamonogatari-lien-à-gagner">À gagner : deux albums Utamonogatari</h4>
+    <h1 id="concours-kizumonogatari-lien-en-partenariat-avec-wakanim">Concours Kizumonogatari en partenariat avec <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}">Wakanim</a></h1>
+    <h3 id="deux-albums-utamonogatari-lien-à-gagner">Deux albums Utamonogatari à gagner !</h3>
 
     <div class="row">
       <div class="col-lg-9 col-md-8 col-sm-6 col-xs-12">
-        <p>Gagnants : <a href="{% url 'profile' 'KyouyuuSuru' %}">KyouyuuSuru</a> et <a href="{% url 'profile' 'Aldherrian' %}">Aldherrian</a></p>
+        <p>À l'occasion de l'avant-première de Kizumonogatari le <strong>vendredi 29 janvier 2015 à 21 h</strong> au Grand Rex, <img style="margin-bottom: 4px;" height="20" src="/static/img/minilogo.png"> et <a href="http://{{ wakanim.url }}" target="_blank" title="{{ wakanim.name }}"><img height="20" src="/static/img/sponsors/small/{{ wakanim.image }}" alt="{{ wakanim.name }}" /></a> ont fait gagner deux OST de la série.</p>
+
+        <p><strong>Le tirage au sort est terminé !</strong> Merci à tous d'avoir participé, les gagnants sont <a href="{% url 'profile' 'KyouyuuSuru' %}">KyouyuuSuru</a> et <a href="{% url 'profile' 'Aldherrian' %}">Aldherrian</a> !</p>
+
+        <a href="mailto:vie@jill-jenn.net" target="_blank" class="btn btn-primary">Nous contacter</a>
+        <a href="http://meta.mangaki.fr/t/avant-premiere-concours-kizumonogatari-au-grand-rex/645?u=jj" target="_blank" class="btn btn-primary">En discuter sur le forum</a>
 
         <blockquote data-cards="hidden" class="twitter-tweet" lang="fr"><p lang="fr" dir="ltr">Et du coup le loot gagné grâce au concours <a href="https://twitter.com/MangakiFR">@MangakiFR</a>. Merci beaucoup à vous c&#39;est super cool ! &lt;3 <a href="https://t.co/382tVh7g9x">pic.twitter.com/382tVh7g9x</a></p>&mdash; KyouyuuSuru (@KyouyuuSuru) <a href="https://twitter.com/KyouyuuSuru/status/693206533207953409">29 Janvier 2016</a></blockquote>
         <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -46,23 +37,91 @@
 
       <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 manga-sheet text-center">
         <div class="work-sheet data" data-category="album" data-id="{{ utamonogatari.id }}" style="margin: auto">
-          {% include "mangaki/work_rating.html" with category="album" work=utamonogatari rating=utamonogatari_rating show_title=True  %}
+          {% include "work_rating.html" with category="album" work=utamonogatari rating=utamonogatari_rating show_title=True  %}
         </div>
       </div>
 
     </div>
 
-    <h2>Concours Final Symphony II (2015)</h2>
-    <h4>À gagner : une place pour le concert <a href="http://www.barbican.org.uk/music/event-detail.asp?id=17972" target="_blank">Final Symphony II</a> au Barbican à Londres</h4>
+    <h1 id="fauvettes">Studio Ghibli Party au cinéma Les Fauvettes</h1>
+    <h3>Du 6 janvier au 9 février 2016 à Paris, avenue des Gobelins</h3>
+    <hr />
+    <p>Le nouveau cinéma <a href="http://www.cinemalesfauvettes.com/cycle/studio-ghibli-party.html" target="_blank"><strong>Les Fauvettes</strong></a>, ouvert depuis le 6 novembre 2015 dans le quartier des Gobelins à Paris, vous offre une sélection de <strong>films Ghibli</strong> !</p>
 
-    <p>Gagnant : <a href="{% url 'profile' 'linkmauve' %}">linkmauve</a></p>
+    <address><strong>Cinéma Les Fauvettes</strong><br />
+    58 avenue des Gobelins, 75013 Paris</address>
+
+    <h2>Liste des séances</h2>
+
+    <ul>
+    {% for event in screenings %}
+      <li><a href="{{ event.work.get_absolute_url }}">{{ event.work.title }}</a> le {{ event.get_date }}</li>
+    {% endfor %}
+    </ul>
+
+    <h2>Liste des œuvres Ghibli diffusées</h2>
+
+    <p>Cliquez sur les fiches pour obtenir la liste des séances.</p>
+    <div class="row works-list">
+      <div align="center" class="manga-sheet">
+      {% for anime, rating in ghibli %}
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 manga-sheet text-center">
+          <div class="work-sheet data" data-category="anime" data-id="{{ anime.id }}">
+            {% include "work_rating.html" with category="anime" work=anime rating=rating show_title=True %}
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+    
+    <hr />
+
+    <h1>Programmation anime TV en janvier</h1>
+    <hr />
+    <p>Pour l'ajouter à votre calendrier, cliquez sur le bouton <img src="/static/img/agenda.png" alt="Add to calendar" style="vertical-align: middle" /> en bas à droite.
+    <a href="https://www.google.com/calendar/ical/pdel76g7580k0uemfj733qktko%40group.calendar.google.com/public/basic.ics" class="btn btn-primary">Télécharger le .ics</a></p>
+
+    <iframe src="https://www.google.com/calendar/embed?mode=AGENDA&amp;height=600&amp;wkst=1&amp;hl=fr&amp;bgcolor=%23FFFFFF&amp;src=pdel76g7580k0uemfj733qktko%40group.calendar.google.com&amp;color=%238C500B&amp;ctz=Europe%2FParis" style=" border-width:0 " width="1000" height="600" frameborder="0" scrolling="no"></iframe>
+
+    <h2>Événements passés</h2>
+
+    <h3>Concours Mangaki du 7 au 10 septembre</h3>
+    <h4>À gagner : une place pour le concert <a href="http://www.barbican.org.uk/music/event-detail.asp?id=17972" target="_blank">Final Symphony II</a>, samedi 12 septembre à 19 h, au Barbican à Londres</h4>
+    <hr />
+
+    <h3>Palmarès</h3>
+    <p>Le gagnant est <strong><a href="{% url 'profile' 'linkmauve' %}">linkmauve</a></strong>, pour la contribution suivante :<br />
+    <em><a href="https://bitbucket.org/mangaki/mangaki/pull-requests/4/load-other-recommendations-when-a-refresh" target="_blank">Afficher d'autres recommandations lorsqu'un rechargement de la page est demandé</a></em>.
     <div class="thumbnail with-caption">
         <img src="/static/img/sponsors/linkmauve.jpg" width="600" />
         <div class="caption">
             <small><a href="{% url 'profile' 'jj' %}">JJ</a> &amp; <a href="{% url 'profile' 'linkmauve' %}">linkmauve</a> au <a href="https://london.hackspace.org.uk" target="_blank">London Hackerspace</a>, samedi 12 septembre 2015.</small>
         </div>
     </div>
+    <p>Mention spéciale pour <strong><a href="{% url 'profile' 'RaitoBezarius' %}">RaitoBezarius</a></strong> qui a envoyé « <em>ATTENDS LA FIN DU CONCOURS C'EST CE SOIR ?</em> », douze heures avant la deadline, et a quand même participé.</p>
 
+    <h3>Toutes les contributions</h3>
+    <ul>
+        <li><a href="https://bitbucket.org/mangaki/mangaki/pull-requests/4/load-other-recommendations-when-a-refresh" target="_blank"><em>Load other recommendations when a refresh is requested</em></a> par linkmauve</li>
+        <li><a href="https://bitbucket.org/mangaki/mangaki/pull-requests/3/fix-social-auth" target="_blank"><em>Fix Social Auth</em></a> par RaitoBezarius</li>
+        <li><a href="https://bitbucket.org/mangaki/mangaki/pull-requests/2/cleanup-the-code-a-bit" target="_blank"><em>Cleanup the code a bit</em></a> par linkmauve</li>
+    </ul>
+
+    <h3>Règles du concours</h3>
+    <img src="/static/img/fs2.jpg" align="right" /><p>Pour participer, il fallait contribuer au code :</p>
+    <ul>
+        <li>En forkant <a href="https://bitbucket.org/mangaki/mangaki" target="_blank">le repo Bitbucket</a> de Mangaki,</li>
+        <li>Puis en proposant une <a href="https://confluence.atlassian.com/bitbucket/work-with-pull-requests-223220593.html"><em>pull request</em></a> non triviale, <strong>avant jeudi 10 septembre 23 h 42</strong>.</li>
+    </ul>
+    <p>La meilleure contribution remportait la place de concert. Le gagnant a été désigné jeudi minuit.</p>
+    <hr />
+    <p>Nous restons à votre disposition pour toute question, n'hésitez pas à signaler tout problème :</p>
+    <ul>
+        <li>en <a href="https://bitbucket.org/mangaki/mangaki/issues" target="_blank">créant un ticket sur Bitbucket</a> ;</li>
+        <li>ou bien <a href="http://meta.mangaki.fr/t/concours-mangaki-du-7-au-10-septembre/536" target="_blank">sur le forum</a>.</li>
+    </ul>
+    <p><em>Final Symphony II</em> est un concert philharmonique de musiques des jeux <em>Final Fantasy</em>. Le compositeur Nobuo Uematsu était présent.</p>
+    <hr />
 </div>
 <br />
 <br />

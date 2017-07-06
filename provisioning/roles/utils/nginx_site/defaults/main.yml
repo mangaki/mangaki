@@ -1,5 +1,0 @@
----
-nginx_site_name: 'default'
-nginx_site_enabled: true
-nginx_site_use_acme: false
-nginx_site_root: '/var/www/html'

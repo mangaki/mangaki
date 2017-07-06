@@ -2,58 +2,46 @@
 
 {% load i18n %}
 {% load account socialaccount %}
-{% load bootstrap3 %}
+{% load bootstrap %}
 
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
-{% block anonymous_rating_banner %} {% endblock %}
 
 {% block body %}
-<h2 class="text-center">{% trans "Sign In" %}</h1>
+
+<h1>{% trans "Sign In" %}</h1>
 
 {% get_providers as socialaccount_providers %}
+
 {% if socialaccount_providers  %}
 <p>{% blocktrans with site.name as site_name %}Please sign in with one
 of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
 for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
 
 <div class="socialaccount_ballot">
+
   <!-- <ul class="socialaccount_providers"> -->
     {% include "socialaccount/snippets/provider_list.html" with process="login" %}
   <!-- </ul> -->
+
   <div class="login-or">{% trans 'or' %}</div>
+
 </div>
+
 {% include "socialaccount/snippets/login_extra.html" %}
+
 {% else %}
-<p class="text-center">{% blocktrans %}If you have not created an account yet, then please
+<p>{% blocktrans %}If you have not created an account yet, then please
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 {% endif %}
 
-<div class="row">
-  {% if ratings %}
-  <div class="col-xs-12 col-sm-6 col-sm-offset-3">
-    <div class="alert alert-warning" role="alert">
-      Vous avez not&eacute; certaines œuvres anonymement sur cet ordinateur.
-      Ces notes seront perdues si vous vous connectez &agrave; un compte
-      existant ; vous devez <a href="{{ signup_url }}">enregistrer un nouveau
-      compte</a> pour les conserver.
-    </div>
-  </div>
+<form class="login" method="POST" action="{% url 'account_login' %}">
+  {% csrf_token %}
+  {{ form|bootstrap }}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <form class="login col-xs-12 col-sm-6 col-sm-offset-3" method="POST" action="{% url 'account_login' %}">
-    {% csrf_token %}
-    {% if redirect_field_value %}
-    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-    {% endif %}
-
-    {% bootstrap_field form.login show_label=False addon_before='<span class="glyphicon glyphicon-user"></span>' %}
-    {% bootstrap_field form.password show_label=False addon_before='<span class="glyphicon glyphicon-lock"></span>' %}
-    {% bootstrap_field form.remember %}
-
-    {% buttons %}
-      <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
-      <a class="btn btn-link" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-    {% endbuttons %}
-  </form>
-</div>
+  <a class="btn btn-default" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+  <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
+</form>
 
 {% endblock %}

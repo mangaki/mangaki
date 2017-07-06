@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Count
-from mangaki.utils.anidb import client
+from mangaki.utils.anidb import AniDB
 from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling, Language
 from urllib.parse import parse_qs, urlparse
 
@@ -52,7 +52,7 @@ class Command(BaseCommand):
                 .exclude(anidb_aid=0)\
                 .order_by('-rating_count')
 
-        a = client
+        a = AniDB('mangakihttp', 1)
         i = 0
 
         for anime in todo:

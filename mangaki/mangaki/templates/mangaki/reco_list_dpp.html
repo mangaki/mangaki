@@ -14,6 +14,19 @@
         </p>
     </div>
 </div>
+<div class="row">
+        <div class="col-md-12 col-sm-12" align="center">
+            Légende :
+             
+            <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
+            
+            <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+            
+            <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne connais pas</span>
+        </div>
+</div>
+<br />
+
     <ul class="nav nav-tabs">
         <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="/reco_dpp/">Tout</a></li>
         <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="/reco_dpp/?category=anime"><em>Anime</em> seulement</a></li>
@@ -27,20 +40,23 @@
         <a class="btn btn-primary btn-lg" href="/reco_dpp/?category={{ category }}" style="display: block; margin: auto">Plus de recommandations&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
     </div>
 </div>
+    <script>
+    sort_mode = '';
+    $.getJSON('/data/reco_dpp/{{ category }}.json', function(data) {
+        data.forEach(function(work, i) {
+            displayWork(i + 1, work);
+        });
+    });
+    $("[name='reco_willsee_ok']").bootstrapSwitch();
+    $("[name='reco_willsee_ok']").on('switchChange.bootstrapSwitch', function(event, state) {
+       $.post('/reco_willsee/', {reco_willsee_ok: state});
+       setTimeout(function(){
+          location.reload();
+       }, 500);
+    });
+    </script>
 {% else %}
-    <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/dpp/anime/">noté une oeuvre de <em>Découvrir</em></a>&nbsp;!</p>
+    <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="/dpp/anime/">noté une oeuvre de <em>Découvrir</em></a> !</p>
 
-{% endif %}
-{% endblock %}
-
-{% block extrajs %}
-{% if reco_list|length > 0 %}
-<script>
-$.getJSON('/data/reco_dpp/{{ category }}.json', function(data) {
-  data.forEach(function(work, i) {
-    new Card($('.cards-grid .work-card:nth-child(' + (i+1) + ')'), '{{ category }}').hydrate(work);
-  });
-});
-</script>
 {% endif %}
 {% endblock %}

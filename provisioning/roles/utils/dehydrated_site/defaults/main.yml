@@ -1,5 +1,0 @@
----
-dehydrated_site_acme_wellknown: '{{ dehydrated_acme_wellknown }}'
-dehydrated_site_acme_ca: '{{ dehydrated_acme_ca }}'
-dehydrated_site_acme_ca_terms: '{{ dehydrated_acme_ca_terms }}'
-dehydrated_site_root: '{{ dehydrated_root }}/{{ dehydrated_site_name }}'

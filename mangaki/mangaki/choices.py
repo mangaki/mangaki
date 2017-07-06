@@ -38,9 +38,3 @@ TOP_CATEGORY_CHOICES = (
     ("authors", "Auteurs"),
     ("composers", "Compositeurs"),
 )
-
-CLUSTER_CHOICES = (
-    ('unprocessed', 'Non traité'),
-    ('accepted', 'Accepté'),
-    ('rejected', 'Rejeté')
-)

@@ -1,44 +1,53 @@
-from mangaki.utils.common import RecommendationAlgorithm
 from collections import defaultdict, Counter
+from mangaki.utils.chrono import Chrono
 import numpy as np
+import pickle
 
+import tensorflow as tf
+from tensorflow.contrib.factorization.python.ops import factorization_ops
+from tensorflow.python.framework import sparse_tensor
+
+sess = tf.InteractiveSession()
 
 def simple_train(model, inp, num_iterations):
-    """Helper function to train model on inp for num_iterations."""
-    row_update_op = model.update_row_factors(sp_input=inp)[1]
-    col_update_op = model.update_col_factors(sp_input=inp)[1]
+  """Helper function to train model on inp for num_iterations."""
+  row_update_op = model.update_row_factors(sp_input=inp)[1]
+  col_update_op = model.update_col_factors(sp_input=inp)[1]
 
-    model.initialize_op.run()
-    model.worker_init.run()
-    for _ in range(num_iterations):
-        model.row_update_prep_gramian_op.run()
-        model.initialize_row_update_op.run()
-        row_update_op.run()
-        model.col_update_prep_gramian_op.run()
-        model.initialize_col_update_op.run()
-        col_update_op.run()
+  model.initialize_op.run()
+  model.worker_init.run()
+  for _ in range(num_iterations):
+    model.row_update_prep_gramian_op.run()
+    model.initialize_row_update_op.run()
+    row_update_op.run()
+    model.col_update_prep_gramian_op.run()
+    model.initialize_col_update_op.run()
+    col_update_op.run()
 
-
-class MangakiWALS(RecommendationAlgorithm):
+class MangakiWALS(object):
     M = None
     U = None
     VT = None
-
     def __init__(self, NB_COMPONENTS=20):
         """An implementation of the Weighted Alternate Least Squares.
         NB_COMPONENTS: the number of components in the factorization"""
-        import tensorflow as tf
-
-        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
-        self.sess = tf.InteractiveSession()
+        self.chrono = Chrono(True)
+
+    def save(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
 
     def load(self, filename):
-        backup = super().load(filename)
+        with open(filename, 'rb') as f:
+            backup = pickle.load(f)
         self.M = backup.M
         self.U = backup.U
         self.VT = backup.VT
-        self.means = backup.means
+
+    def set_parameters(self, nb_users, nb_works):
+        self.nb_users = nb_users
+        self.nb_works = nb_works
 
     def make_matrix(self, X, y):
         matrix = defaultdict(dict)
@@ -61,9 +70,6 @@ class MangakiWALS(RecommendationAlgorithm):
         return indices, values, means
 
     def factorize(self, indices, values):
-        from tensorflow.contrib.factorization.python.ops import factorization_ops
-        from tensorflow.python.framework import sparse_tensor
-
         rows = self.nb_users
         cols = self.nb_works
         dims = self.NB_COMPONENTS
@@ -75,10 +81,10 @@ class MangakiWALS(RecommendationAlgorithm):
             rows,
             cols,
             dims,
-            unobserved_weight=1,  # .1,
-            regularization=0.001,  # 001,
-            row_weights=None,  # row_wts,
-            col_weights=None,  # col_wts,
+            unobserved_weight=1,#.1,
+            regularization=0.001,#001,
+            row_weights=None,#row_wts,
+            col_weights=None,#col_wts,
             use_factors_weights_cache=use_factors_weights_cache)
         simple_train(model, inp, 25)
         row_factor = model.row_factors[0].eval()
@@ -95,11 +101,14 @@ class MangakiWALS(RecommendationAlgorithm):
         self.chrono.save('fill and center matrix')
 
         self.M = self.factorize(indices, values)
-
+        
         self.chrono.save('factor matrix')
 
     def predict(self, X):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
+
+    def __str__(self):
+        return '[WALS]'
 
     def get_shortname(self):
         return 'wals'

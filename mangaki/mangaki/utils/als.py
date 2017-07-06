@@ -1,24 +1,32 @@
-from mangaki.utils.common import RecommendationAlgorithm
 from collections import defaultdict
+from mangaki.utils.chrono import Chrono
 import numpy as np
+import pickle
 
-
-class MangakiALS(RecommendationAlgorithm):
+class MangakiALS(object):
     M = None
     U = None
     VT = None
     def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10, LAMBDA=0.1):
-        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
         self.NB_ITERATIONS = NB_ITERATIONS
         self.LAMBDA = LAMBDA
+        self.chrono = Chrono(True)
+
+    def save(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
 
     def load(self, filename):
-        backup = super().load(filename)
+        with open(filename, 'rb') as f:
+            backup = pickle.load(f)
         self.M = backup.M
         self.U = backup.U
         self.VT = backup.VT
-        self.means = backup.means
+
+    def set_parameters(self, nb_users, nb_works):
+        self.nb_users = nb_users
+        self.nb_works = nb_works
 
     def make_matrix(self, X, y):
         matrix = defaultdict(dict)
@@ -62,15 +70,13 @@ class MangakiALS(RecommendationAlgorithm):
                 self.fit_work(work, matrixT)
 
     def fit(self, X, y):
-        if self.verbose:
-            print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
+        print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         matrix, self.means = self.make_matrix(X, y)
 
         self.chrono.save('fill and center matrix')
 
         self.factorize(matrix, random_state=42)
-        if self.verbose:
-            print('Shapes', self.U.shape, self.VT.shape)
+        print('Shapes', self.U.shape, self.VT.shape)
         self.M = self.U.dot(self.VT)
 
         #self.save('backup.pickle')
@@ -80,5 +86,8 @@ class MangakiALS(RecommendationAlgorithm):
     def predict(self, X):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
 
+    def __str__(self):
+        return '[ALS]'
+
     def get_shortname(self):
-        return 'als-%d' % self.NB_COMPONENTS
+        return 'als'
