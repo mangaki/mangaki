@@ -210,9 +210,22 @@ class Work(models.Model):
 
         # New tags have to be added to the database (if they aren't already present)
         # New tags have to be assigned to that work
+        tags_weight = {}
+        tags_to_add = []
+        tagged_works_to_add = []
+
         for title, tag_infos in new_tags.items():
-            tag, created = Tag.objects.get_or_create(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])
-            TaggedWork(tag=tag, work=self, weight=tag_infos["weight"]).save()
+            anidb_tag_id = tag_infos["anidb_tag_id"]
+            tags_weight[anidb_tag_id] = tag_infos["weight"]
+            tag = Tag(title=title, anidb_tag_id=anidb_tag_id)
+            tags_to_add.append(tag)
+        Tag.objects.bulk_create(tags_to_add)
+
+        for tag in tags_to_add:
+            tag_weight = tags_weight[tag.anidb_tag_id]
+            tagged_work = TaggedWork(tag=tag, work=self, weight=tag_weight)
+            tagged_works_to_add.append(tagged_work)
+        TaggedWork.objects.bulk_create(tagged_works_to_add)
 
         # Update tags that were already present in the database
         # And update the weight of that tag for this anime
