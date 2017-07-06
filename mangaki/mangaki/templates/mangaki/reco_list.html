@@ -16,19 +16,6 @@
         </p>
     </div>
 </div>
-<div class="row">
-        <div class="col-md-12 col-sm-12" align="center">
-            Légende :
-            <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
-            <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
-            <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
-            <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
-            <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> Je veux lire</span>
-            <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne veux pas lire</span>
-        </div>
-</div>
-<br />
-
     <ul class="nav nav-tabs">
         <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo }}">Tout</a></li>
         <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo }}&amp;category=anime"><em>Anime</em> seulement</a></li>
@@ -42,17 +29,19 @@
         <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}&amp;algo={{ algo }}" style="display: block; margin: auto">Je veux d'autres recommandations&nbsp;! <br class="visible-xs">(Après avoir noté celles-ci.)</a>
     </div>
 </div>
-    <script>
-    sort_mode = '';
-    $.getJSON('{% url 'get-reco-algo-list' algo=algo category=category %}', function(data) {
-        data.forEach(function(work, i) {
-            displayWork(i + 1, work);
-        });
-    });
-    </script>
-
-    <script src="{% url 'js_reverse' %}" type="text/javascript"></script>
 {% else %}
     <p class="well">Pour obtenir une recommandation, il faut au moins avoir <a href="{% url 'work-list' 'anime' %}">noté un <em>anime</em></a>&nbsp;!</p>
+{% endif %}
+{% endblock %}
+
+{% block extrajs %}
+{% if reco_list|length > 0 %}
+<script>
+$.getJSON('{% url 'get-reco-algo-list' algo=algo category=category %}', function(data) {
+  data.forEach(function(work, i) {
+    new Card($('.cards-grid .work-card:nth-child(' + (i+1) + ')'), '{{ category }}').hydrate(work);
+  });
+});
+</script>
 {% endif %}
 {% endblock %}

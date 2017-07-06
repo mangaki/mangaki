@@ -1,4 +1,4 @@
-# coding=utf8
+# coding=utf-8
 import os.path
 import tempfile
 from urllib.parse import urlparse
@@ -13,6 +13,7 @@ from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import CharField, F, Func, Lookup, Value
+from django.utils.functional import cached_property
 
 from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
@@ -115,13 +116,15 @@ class Category(models.Model):
 
 class Work(models.Model):
     redirect = models.ForeignKey('Work', blank=True, null=True)
-    title = models.CharField(max_length=128)
+    title = models.CharField(max_length=255)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
     ext_poster = models.CharField(max_length=128, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
-    date = models.DateField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True) # Should be renamed to start_date
+    end_date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
+    ext_synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
 
@@ -236,31 +239,75 @@ class Work(models.Model):
 
 class WorkTitle(models.Model):
     work = models.ForeignKey('Work')
-    title = models.CharField(max_length=128, blank=True, db_index=True)
+    # 255 should be safe, we have seen titles of 187 characters in Japanese.
+    # So we could expect longer titles in English.
+    title = models.CharField(max_length=255, blank=True, db_index=True)
     title_search = SearchVectorField('title')
     language = models.ForeignKey('Language',
                                  null=True)
+    ext_language = models.ForeignKey('ExtLanguage',
+                                     null=True)
     type = models.CharField(max_length=9, choices=(
                             ('main', 'principal'),
                             ('official', 'officiel'),
-                            ('synonym', 'synonyme')),
+                            ('synonym', 'synonyme'),
+                            ('short', 'court')),
                             blank=True,
                             db_index=True)
 
+    @cached_property
+    def code(self):
+        return self.language.code if self.language else None
+
+    @cached_property
+    def source(self):
+        return self.ext_language.source if self.ext_language else None
+
     def __str__(self):
-        return "%s" % self.title
+        if self.code and self.source:
+            return ("{} - {} (source: {}, type: {}) attached to {}"
+                    .format(self.title, self.code, self.source, self.type, self.work))
+        elif self.source:
+            return ("{} (source: {}, type: {}) attached to {}"
+                    .format(self.title, self.source, self.type, self.work))
+        elif self.code:
+            return ("{} - {} (type: {}) attached to {}"
+                    .format(self.title, self.code, self.type, self.work))
+        else:
+            return ("{} (type: {}) attached to {}"
+                    .format(self.title, self.type, self.work))
+
+
+class ExtLanguage(models.Model):
+    source = models.CharField(max_length=30)
+    ext_lang = models.CharField(
+        null=True,
+        max_length=8,
+        db_index=True
+    )
+    lang = models.ForeignKey('Language')
+
+    class Meta:
+        unique_together = ('ext_lang', 'source')
+
+    def __str__(self):
+        return ('<ExtLanguage: source {}, ext_lang: {}, lang: {}>'
+                .format(self.source,
+                        self.ext_lang,
+                        self.lang.code))
 
 
 class Language(models.Model):
-    anidb_language = models.CharField(max_length=5,
-                                      blank=True,
-                                      db_index=True)
-    iso639 = models.CharField(max_length=2,
-                              unique=True,
-                              db_index=True)
+    code = models.CharField(
+        default=None,
+        null=True,
+        unique=True,
+        max_length=10,
+        db_index=True,
+        help_text="ISO639-1 code or custom (e.g. x-jat, x-kot, x-ins)")
 
     def __str__(self):
-        return "%s : %s" % (self.anidb_language, self.iso639)
+        return self.code if self.code else 'inconnu'
 
 
 class Role(models.Model):
@@ -358,7 +405,7 @@ class Rating(models.Model):
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
     ))
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('user', 'work')
@@ -526,7 +573,7 @@ class FAQEntry(models.Model):
     def __str__(self):
         return self.question
 
-class Trope(models.Model): 
+class Trope(models.Model):
     trope = models.CharField(max_length=320)
     author = models.CharField(max_length=80)
     origin = models.ForeignKey(Work, on_delete=models.CASCADE)

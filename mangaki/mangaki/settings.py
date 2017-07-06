@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import configparser
 import json
 import os
+from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PICKLE_DIR = os.path.join(BASE_DIR, '../pickles')
@@ -51,6 +52,15 @@ INSTALLED_APPS = (
     'django_js_reverse',
 )
 
+if config.has_section('sentry'):
+    import raven
+
+    INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
+
+    RAVEN_CONFIG = {
+        'dsn': config.get('sentry', 'dsn')
+    }
+
 if config.has_section('allauth'):
     INSTALLED_APPS += tuple(
         'allauth.socialaccount.providers.{}'.format(name)
@@ -65,6 +75,7 @@ MIDDLEWARE = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware'
 )
 
 if DEBUG:
@@ -119,6 +130,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.media',
                 'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
                 'django.contrib.messages.context_processors.messages',
                 'django.contrib.auth.context_processors.auth'
             ],
@@ -129,6 +141,10 @@ TEMPLATES = [
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'root': {
+        'level': 'INFO',
+        'handlers': ['console'],
+    },
     'handlers': {
         'console': {
             'level': 'INFO',
@@ -139,9 +155,32 @@ LOGGING = {
         'mangaki': {
             'handlers': ['console'],
             'level': 'DEBUG'
-        }
+        },
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
     },
 }
+
+if config.has_section('sentry'):
+    LOGGING['handlers']['sentry'] = {
+            'level': 'ERROR',
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+    }
+    LOGGING['root']['handlers'].append('sentry')
+    LOGGING['loggers']['raven'] = {
+        'level': 'DEBUG',
+        'handlers': ['console'],
+        'propagate': False,
+    }
+    LOGGING['loggers']['sentry.errors'] = {
+        'level': 'DEBUG',
+        'handlers': ['console'],
+        'propagate': False,
+    }
+
 
 ROOT_URLCONF = 'mangaki.urls'
 WSGI_APPLICATION = 'mangaki.wsgi.application'
@@ -170,11 +209,17 @@ if config.has_section('smtp'):
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
-LANGUAGE_CODE = 'fr-FR'
+LANGUAGE_CODE = 'fr'
+LANGUAGES = [
+    ('fr', _('Français')),
+    ('en', _('English')),
+    ('ja', _('日本語'))
+]
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
@@ -189,6 +234,10 @@ if config.has_section('mal'):
     MAL_USER = config.get('mal', 'MAL_USER')
     MAL_PASS = config.get('secrets', 'MAL_PASS')
     MAL_USER_AGENT = config.get('mal', 'MAL_USER_AGENT')
+
+if config.has_section('anidb'):
+    ANIDB_CLIENT = config.get('anidb', 'ANIDB_CLIENT')
+    ANIDB_VERSION = config.get('anidb', 'ANIDB_VERSION')
 
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 
