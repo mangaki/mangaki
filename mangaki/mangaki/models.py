@@ -164,12 +164,8 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
-    # TODO: REWRITE
     def retrieve_tags(self, anidb):
-        # FIXME: should not use get_or_update_work but a simple get function
-        anidb_tags_list = anidb.get_or_update_work(self.anidb_aid).taggedwork_set.all()
-        values = anidb_tags_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-        anidb_tags = {value[0]: {"weight": value[2], "anidb_tag_id": value[1]} for value in values}
+        anidb_tags = anidb.handle_tags(anidb_aid=self.anidb_aid)
 
         tag_work_list = TaggedWork.objects.filter(work=self).all()
         values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
@@ -181,7 +177,7 @@ class Work(models.Model):
         added_tags_keys = anidb_tags.keys() - current_tags.keys()
         added_tags = {key: anidb_tags[key] for key in added_tags_keys}
 
-        remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
+        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
         remaining_tags = {key: current_tags[key] for key in remaining_tags_keys}
 
         updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
@@ -202,24 +198,22 @@ class Work(models.Model):
         old_tags_updated = {key: anidb_tags[key] for key in old_tags_keys}
 
         deleted_tags_keys = existing_tags.keys() - anidb_tags.keys()
-        delete_tags = {key: anidb_tags[key] for key in deleted_tags_keys}
 
         # New tags have to be added to the database (if they aren't already present)
         # New tags have to be assigned to that work
         for title, tag_infos in new_tags.items():
-            tag = Tag(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])
-            tag.save()
-
+            tag, created = Tag.objects.get_or_create(title=title, anidb_tag_id=tag_infos["anidb_tag_id"])
             TaggedWork(tag=tag, work=self, weight=tag_infos["weight"]).save()
 
         # Update tags that were already present in the database
         # And update the weight of that tag for this anime
         for title, tag_infos in old_tags.items():
-            tag = Tag.objects.get(title=title, anidb_tag_id__isnull=True)
-            tag.anidb_tag_id = old_tags_updated[title]["anidb_tag_id"]
-            tag.save()
+            tag = Tag.objects.filter(title=title, anidb_tag_id__isnull=True).first()
+            if tag is not None:
+                tag.anidb_tag_id = old_tags_updated[title]["anidb_tag_id"]
+                tag.save()
 
-            tagged_work = self.taggedwork_set.get(tag__anidb_title=title)
+            tagged_work = self.taggedwork_set.get(tag__title=title)
             tagged_work.weight = tag_infos["weight"]
             tagged_work.save()
 

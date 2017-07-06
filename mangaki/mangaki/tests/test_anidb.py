@@ -54,11 +54,10 @@ class AniDBTest(TestCase):
         )
 
         anime = self.anidb.get_or_update_work(11606)
+        retrieved_tags = anime.retrieve_tags(self.anidb)
 
         tags = Work.objects.get(pk=anime.pk).taggedwork_set.all()
         tag_titles = tags.values_list('tag__title', flat=True)
-        # TODO: REWRITE
-        # retrieved_tags = anime.retrieve_tags(self.anidb)
 
         staff = Work.objects.get(pk=anime.pk).staff_set.all()
         author_names = staff.filter(role__slug='author').values_list('artist__name', flat=True)
@@ -86,6 +85,7 @@ class AniDBTest(TestCase):
                                            'dysfunctional family', 'following one`s dream',
                                            'cast', 'family life'])
 
-        # TODO: REWRITE
-        # self.assertCountEqual(retrieve_tags["kept_tags"], tag_titles)
-        # self.assertCountEqual(retrieve_tags["deleted_tags"], [])
+        self.assertEqual(len(retrieved_tags["deleted_tags"]), 0)
+        self.assertEqual(len(retrieved_tags["added_tags"]), 0)
+        self.assertEqual(len(retrieved_tags["updated_tags"]), 0)
+        self.assertCountEqual(retrieved_tags["kept_tags"], tag_titles)

@@ -67,11 +67,12 @@ class Command(BaseCommand):
             for worktitle in worktitles:
                 language = Language.objects.get(iso639=worktitle[2])
                 WorkTitle.objects.get_or_create(work=anime, title=worktitle[0], language=language, type=worktitle[1])
-            retrieve_tags = anime.retrieve_tags(a)
-            deleted_tags = retrieve_tags["deleted_tags"]
-            added_tags = retrieve_tags["added_tags"]
-            updated_tags = retrieve_tags["updated_tags"]
-            kept_tags = retrieve_tags["kept_tags"]
+
+            retrieved_tags = anime.retrieve_tags(a)
+            deleted_tags = retrieved_tags["deleted_tags"]
+            added_tags = retrieved_tags["added_tags"]
+            updated_tags = retrieved_tags["updated_tags"]
+            kept_tags = retrieved_tags["kept_tags"]
 
             print(anime.title+":")
             if deleted_tags:
@@ -103,6 +104,7 @@ class Command(BaseCommand):
                 tags = deleted_tags
                 tags.update(added_tags)
                 tags.update(updated_tags)
+                tags.update(kept_tags)
                 anime.update_tags(tags)
 
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))

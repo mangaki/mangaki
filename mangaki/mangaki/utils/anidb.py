@@ -143,7 +143,7 @@ class AniDB:
         return soup.anime
 
     def handle_tags(self, anidb_aid=None, tags_soup=None):
-        if anidb_aid is None:
+        if anidb_aid is not None:
             anime = self.get_XML(anidb_aid)
             tags_soup = anime.tags
 
@@ -151,8 +151,8 @@ class AniDB:
         if tags_soup is not None:
             for tag_node in tags_soup.find_all('tag'):
                 tag_title = str(tag_node.find('name').string).strip()
-                tag_id = tag_node.get('id')
-                tag_weight = tag_node.get('weight')
+                tag_id = int(tag_node.get('id'))
+                tag_weight = int(tag_node.get('weight'))
                 tag_verified = tag_node.get('verified').lower() == 'true'
 
                 if tag_verified:
