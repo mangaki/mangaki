@@ -1,10 +1,8 @@
 {% extends "base.html" %}
 
-{% load anonymous_ratings %}
-
 {% block body %}
 
-{% if not is_dpp and not request|has_anonymous_ratings %}
+{% if not is_dpp %}
 <div class="col-xs-12">
   <p class="alert alert-info">
 {% if user.is_authenticated %}
@@ -71,7 +69,39 @@
 {% endif %}
 </div>
 
+{% if is_dpp %}
+<div class="col-xs-12 text-center" style="padding: 10px 0">
+    
+    <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
+    <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+    <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> Je ne  connais pas</span>
+</div>
+{% else %}
+<div class="col-xs-12 text-center" style="padding: 10px 0">
+    <span class="label label-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
+    <span class="label label-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
+    <span class="label label-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
+    <span class="label label-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+    <span class="label label-primary"><span class="glyphicon glyphicon-eye-open"></span> {% spaceless %}
+      {% if category == 'manga' %}
+      Je veux lire
+      {% else %}
+      Je veux voir
+      {% endif %}
+    {% endspaceless %}</span>
+
+    <span class="label label-info"><span class="glyphicon glyphicon-eye-close"></span> {% spaceless %}
+      {% if category == 'manga' %}
+      Je ne veux pas lire
+      {% else %}
+      Je ne veux pas voir
+      {% endif %}
+    {% endspaceless %}</span>
+</div>
+{% endif %}
+
 {% include "works.html" with works=object_list is_dpp=is_dpp %}
+
 
 {% if user.is_authenticated %}
 
@@ -92,17 +122,16 @@
 <br />
 <br />
 
-{% endblock %}
-
-{% block extrajs %}
 {% if not is_dpp %}
 
 <script>
-var category = '{{ category }}';
 
+category = '{{ category }}';
+sort_mode = '{{ sort_mode }}';
 loadMenu();
 {% if sort_mode == 'mosaic' %}
-new Mosaic('.cards-grid', '{{ category }}');
+for(pos = 1; pos <= 4; pos++)
+    loadCard(pos);
 {% endif %}
 
 

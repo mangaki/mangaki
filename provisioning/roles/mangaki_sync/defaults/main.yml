@@ -1,6 +1,0 @@
----
-mangaki_sync_name: '{{ mangaki_name }}'
-mangaki_sync_migrate: false
-mangaki_sync_collectstatic: false
-mangaki_sync_load_seed: false
-mangaki_sync_load_seed_path: 'seed_data.json'

@@ -1,6 +1,0 @@
----
-mangaki_source_name: '{{ mangaki_name }}'
-mangaki_source_manage: '{{ mangaki_source_venv_path }}/bin/django-admin'
-mangaki_source_env:
-  DJANGO_SETTINGS_MODULE: 'mangaki.settings'
-  MANGAKI_SETTINGS_PATH: '{{ mangaki_source_settings_path }}'

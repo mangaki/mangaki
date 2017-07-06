@@ -5,7 +5,6 @@ from mangaki.models import Profile
 
 
 class UserTest(TestCase):
-    
     def setUp(self):
         self.User = get_user_model()
 

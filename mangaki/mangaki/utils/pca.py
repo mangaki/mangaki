@@ -1,14 +1,20 @@
-from mangaki.utils.common import RecommendationAlgorithm
-from sklearn.decomposition import PCA
 import numpy as np
+from sklearn.decomposition import PCA
+
+from mangaki.utils.chrono import Chrono
 
 
-class MangakiPCA(RecommendationAlgorithm):
+class MangakiPCA(object):
     M = None
+    chrono = None
     def __init__(self, NB_COMPONENTS=10):
-        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
+        self.chrono = Chrono(True)
         self.VT = None
+
+    def set_parameters(self, nb_users, nb_works):
+        self.nb_users = nb_users
+        self.nb_works = nb_works
 
     def make_matrix(self, X, y):
         matrix = np.zeros((self.nb_users, self.nb_works), dtype=np.float64)
@@ -32,6 +38,9 @@ class MangakiPCA(RecommendationAlgorithm):
 
     def predict(self, X):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
+
+    def __str__(self):
+        return '[PCA]'
 
     def get_shortname(self):
         return 'pca'

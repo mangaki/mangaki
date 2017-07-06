@@ -1,5 +1,0 @@
----
-mangaki_front_name: '{{ mangaki_name }}'
-mangaki_front_venv_path: '{{ mangaki_source_venv_path }}'
-mangaki_front_user: '{{ mangaki_source_user }}'
-mangaki_front_settings_path: '{{ mangaki_source_settings_path }}'

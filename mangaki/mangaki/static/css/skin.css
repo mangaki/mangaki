@@ -1,6 +1,4 @@
-html {
-    height: 100%;
-}
+
 
 /*************
  *  GENERAL  *
@@ -8,7 +6,6 @@ html {
 body {
     background: #fdfdfd;
     font-family:'Open Sans', sans-serif;
-    height: 100%;
 }
 
 .jumbotron {
@@ -33,18 +30,9 @@ header nav.navbar {
 
 /* Margin for body to prevent unused space from the header/footer nav menu. */
 body > .container {
-    
-}
+    margin-top: 25px;
+    margin-bottom: 75px;
 
-#wrapper {
-    margin: 0 auto -52px;
-    min-height: 100%;
-    height: auto !important;
-    height: 100%;
-}
-
-footer, #push {
-    height: 52px;
 }
 
 .featured {
@@ -86,6 +74,10 @@ background-image: linear-gradient(to right,rgba(0,0,0,0) 0,rgba(0,0,0,0) 100%);
 color: #fff;
 background-color: #E84C15;
 
+}
+.btn:hover, .btn:focus {
+color: #fff;
+text-decoration: none;
 }
 .btn-lg{
 padding: 25px 25px;
@@ -159,10 +151,9 @@ color: #b2B2B2;
 	-o-filter: grayscale(0%);
 }
 
-/********************
- *  OLD WORK CARDS  *
- ********************/
-/* NOTE: Some of those are actually for events, because why not? */
+/****************
+ *  WORK CARDS  *
+ ****************/
 
 .work-sheet {
     position: relative;
@@ -175,16 +166,115 @@ color: #b2B2B2;
     margin: 0 auto 20px auto;
 }
 
+.work-snapshot {
+    width: 100%;
+    display: block;
+}
+
+.work-snapshot-image {
+    width: 100%;
+    position: relative;
+    opacity: 0.8;
+}
+
+.work-sheet:hover .work-snapshot-image {
+    opacity: 1;
+}
+
+.work-snapshot-image:before {
+    content: "";
+    display: block;
+    /* This is the aspect ratio for the posters. Currently, we force the width
+     * to 225px in .work-sheet above, and we want the corresponding height to
+     * be 321px, so the aspect ratio has to be 321/225 = 142.667%.
+     */
+    padding-top: 142.667%;
+}
+
+.work-snapshot-image.album-image:before {
+    padding-top: 100%;
+}
+
+.work-snapshot-image img {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.work-snapshot-title {
+    width: 100%;
+    height: 4.2em;
+    line-height: 4em;
+    border-radius: 0 0 10px 10px;
+    box-shadow: #e3e4e6 0px 2px 2px;
+}
+
+.work-snapshot-title h4 {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.work-votes {
+    position: absolute;
+    top: 0;
+    right: -20%;
+    margin-right: -2px;
+    width: 20%;
+    height: 100%;
+}
+
+.work-votes .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-top: 1px;
+    position: relative;
+    /* Display the button over sibling posters, if needed */
+    z-index: 64;
+}
+
 .works-list .manga-sheet {
     z-index: 32;
+}
+
+.work-synopsis {
+    position: absolute;
+    bottom: -5px;
+    overflow: auto;
+    line-height: 2.5ex;
+    max-height: 30ex;
+    background-color: #fff;
+    border-radius: 10px 10px 0 0;
+    color: #000;
+    box-shadow: #e3e4e6 0px -2px 2px;
+    padding: 5px 1ex 0px 1ex;
+    background: linear-gradient(to bottom, rgba(253, 253, 253, 0.8) 0%, rgb(253, 253, 253) 100%);
+    display: none;
+    text-align: justify;
+    width: 100%;
+}
+
+.work-snapshot:hover .work-synopsis {
+    display: block;
+}
+
+.work-snapshot:hover .work-synopsis:empty {
+    display: none;
 }
 
 .not-chosen {
     opacity: 0.2;
 }
 
+.another .not-chosen {
+    visibility: hidden;
+}
+
 .flatlist:hover {
-    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+    background: #d9d9d9;
+    /* font-size: 2em; */
 }
 
 .flatlist {
@@ -192,16 +282,20 @@ color: #b2B2B2;
     border-radius: 4px;
 }
 
-.flatlist:after {
-    display: block;
-    content: '';
-    clear: both;
-}
-
 #avatar {
     width: 100%;
     max-width: 150px;
     border-radius: 5px;
+}
+
+.btn-favorite {
+color: #fff;
+background-color: #f8d549;
+border-color: #f8d549;
+
+}
+.label-favorite {
+background-color: #f8d549;
 }
 
 .thumbnail.with-caption {
@@ -266,380 +360,5 @@ ul.checklist .list-icon {
     font-size: 1.15em;
 }
 
-/***********
- * Ratings *
- ***********/
-
-.rating {
-  flex: 0 1 auto;
-  height: 50px;
-  width: 50px;
-  margin: auto 4px auto 0;
-
-  /* Create a stacking context for the position:absolute elements inside the
-   * ratings, i.e. buttons and checkboxes. */
-  position: relative;
-}
-
-.rating:first-child {
-  margin: auto 4px;
-}
-
-.rating_separator {
-  margin-left: auto;
-}
-
-.rating__checkbox {
-  /* We position the checkbox over the button in order for tooltips to properly
-   * be displayed over <used>'d SVGs on Firefox and Edge; see
-   * https://github.com/twbs/bootstrap/issues/19670 and related browser bugs.
-   */
-
-  display: block;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-
-  opacity: 0;
-  z-index: 1;
-  cursor: pointer;
-}
-
-.rating__button {
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  overflow: hidden;
-
-  border-radius: 4px;
-  box-shadow: 0 0 0 1.4px rgba(0, 0, 0, .1) inset;
-}
-
-.rating__icon {
-  width: 50%;
-  height: 50%;
-  position: absolute;
-  top: 25%;
-  left: 25%;
-
-  fill: rgba(255, 255, 255, 1);
-}
-
-.rating__checkbox:not(:checked) + .rating__button {
-  opacity: 0.4;
-}
-
-.rating__checkbox:hover + .rating__button .rating__icon,
-.rating__checkbox:focus + .rating__button .rating__icon {
-  fill: rgb(0, 0, 0);
-}
-
-/* Colors for the various ratings we use. */
-.rating_favorite .rating__button { background-color: #f8d549; }
-.rating_like .rating__button { background-color: #5cb85c; }
-.rating_neutral .rating__button { background-color: #f0ad4e; }
-.rating_dislike .rating__button { background-color: #d9534f; }
-.rating_willsee .rating__button { background-color: #428bca; }
-.rating_wontsee .rating__button { background-color: #5bc0de; }
-.rating_dontknow .rating__button { background-color: #5bc0de; }
-
-.ratings {
-  display: flex;
-  flex-direction: row;
-  flex: 0 0 auto;
-
-  height: 60px;
-}
-
-.ratings_inline {
-  display: inline-flex;
-}
-
-.ratings_small {
-  height: 30px;
-}
-
-.ratings_medium {
-  height: 45px;
-}
-
-.ratings_small .rating {
-  height: 25px;
-  width: 25px;
-}
-
-.ratings_medium .rating {
-  height: 35px;
-  width: 35px;
-}
-
-.ratings_disabled .rating__checkbox:not(:checked) + .rating__button {
-    opacity: 0.1;
-}
-
-/**************
- * WORK CARDS *
- **************/
-
-.work-card {
-  display: flex;
-  flex-direction: column;
-
-  /* Cosmetics */
-  background: #fff;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
-  overflow: hidden;
-
-  /* Create a new stacking context for the work-cover's blurred background. */
-  position: relative;
-  z-index: 0;
-
-  height: 320px;
-  width: 260px;
-
-  max-height: 90vh;
-  max-width: 90vw;
-}
-
-.work-card__title {
-  font-family: 'Economica', 'Open Sans', sans-serif;
-}
-
-.work-card__media {
-  height: 100%;
-  width: 100%;
-}
-
-.work-cover {
-  overflow: hidden;
-
-  position: relative;
-
-  background: center center no-repeat;
-  background-size: 100% auto;
-}
-
-.work-cover_backdrop {
-  background-size: 0;
-}
-
-.work-cover:before, .work-cover_backdrop:after {
-  content: '';
-  display: block;
-
-  background: center center no-repeat;
-  background-image: inherit;
-
-  position: absolute;
-
-  height: 100%;
-  width: 100%;
-}
-
-.work-cover:before {
-  z-index: -1;
-  filter: opacity(50%) blur(10px);
-  background-size: cover;
-}
-
-.work-cover_backdrop:after {
-  background-size: 100% auto;
-  /* transition: filter .5s ease-in; */
-  will-change: filter;
-}
-
-.work-cover__wrapper {
-  position: absolute;
-  color: #fff;
-
-  width: 100%;
-  z-index: 1;
-
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.work-cover__title {
-  flex: 0 0 auto;
-  width: 100%;
-  padding: 8px 12px;
-
-  word-wrap: break-word;
-
-  background: rgba(0, 0, 0, 0.6);
-
-  margin-top: auto;
-}
-
-.work-card__title {
-  margin-top: .2em;
-  margin-bottom: .1em;
-}
-
-.work-cover_backdrop:hover:after {
-  filter: opacity(50%) blur(5px);
-  /* transition: filter .5s ease-out; */
-}
-
-.work-cover__content {
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  flex: 0 1 auto;
-  height: 0;
-  background: rgba(0, 0, 0, 0.6);
-
-  /* transition: height .5s ease-in; */
-  will-change: height;
-}
-
-.work-cover_backdrop:hover .work-cover__content {
-  height: 100%;
-
-  /* transition: height .5s ease-out; */
-}
-
-.work-cover__title_size_small {
-  padding: 0 12px;
-}
-
-.work-cover__wrapper:before {
-  content: attr(data-category);
-  /* Inspired by https://codepen.io/eode9/pen/twkKm */
-  width: 120px;
-  background: #a83333;
-  position: absolute;
-  top: 15px;
-  left: -30px;
-  text-align: center;
-  line-height: 26px;
-  letter-spacing: 1px;
-  color: #f0f0f0;
-  text-transform: capitalize;
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-  font-size: 16px;
-
-  /* The category should be below the content when hovered. */
-  z-index: -1;
-}
-
-.work-cover__wrapper[data-category="manga"]:before {
-  background: #273963;
-}
-
-.work-cover__wrapper[data-category="album"]:before {
-  background: #48912c;
-}
-
-.work-card__content {
-  flex: 0 1 auto;
-  padding: 8px 12px;
-
-  overflow-y: auto;
-}
-
-.work-card__extra {
-  flex: 0 0 auto;
-  height: auto;
-  width: 100%;
-
-  margin-top: auto;
-
-  color: #767676;
-  text-align: center;
-}
-
-.work-card__extra:not(:last-child) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.work-card__content + .work-card__extra:last-child {
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.work-card__content + .work-card__extra {
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.cards-grid {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 260px);
-  grid-gap: 0 10px;
-
-  justify-content: space-around;
-}
-
-.cards-grid > .work-card {
-  margin: 15px auto;
-}
-
-/* This is a ugly hack for properly displaying a grid-like layout for browsers
- * that support flexbox but don't support CSS Grid Layout. It requires a few
- * dummy elements in the HTML, unfortunately. */
-.cards-grid > .work-card:empty {
-  height: 0;
-  box-shadow: none;
-  padding: 0;
-  margin: 0 auto;
-}
-
-.work-card_horizontal {
-  flex-direction: row;
-}
-
-.work-card_horizontal .ratings {
-  flex-direction: column;
-  height: 100%;
-  width: 60px;
-}
-
-.work-card_horizontal .ratings_small {
-  width: 30px;
-}
-
-.work-card_horizontal .ratings_medium {
-  width: 45px;
-}
-
-.work-card_horizontal .rating {
-  margin: 0 auto 5px auto;
-}
-
-.work-card_horizontal .rating:first-child {
-  margin: 5px auto;
-}
-
-.work-card_horizontal .rating_separator {
-  margin-top: auto;
-}
-
-/* On very small devices, we move the buttons to the right. */
-@media (max-width: 576px), (max-width: 768px) and (min-height: 400px) {
-  .work-card {
-    height: 360px;
-    width: 300px;
-  }
-
-  .cards-grid {
-    grid-template-columns: repeat(auto-fill, 300px);
-  }
-}
-
-.work-card_loading:before {
-  content: '';
-  position: absolute;
-  z-index: 100;
-  height: 100%;
-  width: 100%;
-  background: #fff url('/static/img/chiro.gif') center center no-repeat;
-  background-size: 95% 95%;
-}
+/** Anime **/
+/** Manga **/

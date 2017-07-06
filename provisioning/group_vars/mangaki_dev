@@ -1,9 +1,0 @@
----
-mangaki_source_db_host: '127.0.0.1'
-mangaki_source_db_user: '{{ mangaki_db_user }}'
-mangaki_source_db_name: '{{ mangaki_db_name }}'
-mangaki_source_db_password: '{{ mangaki_db_password }}'
-mangaki_source_static_root: '{{ mangaki_source_home }}/www/static'
-mangaki_source_domains: ['mangaki.dev']
-
-# vi: ft=yaml

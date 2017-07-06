@@ -1,0 +1,43 @@
+{% load staticfiles %}
+{% load static %}
+{% load posters %}
+
+<a class="work-snapshot" href="{% if work.id == None %}#{% else %}{% url 'work-detail' work.category.slug work.id %}{% endif %}">
+    <div class="work-snapshot-image {{ work.category.slug }}-image">
+        <img src="{% poster_url work %}" alt="{{ work.title }}">
+
+        {% if not simple %}
+            <div class="work-synopsis">{{ work.synopsis|linebreaksbr }}</div>
+        {% endif %}
+    </div>
+
+    {% if not simple %}
+        <div class="work-snapshot-title">
+            <h4 title="{{ work.title }}">{{ work.title|truncatechars:50 }}</h4>
+        </div>
+    {% endif %}
+</a>
+
+<div class="work-votes"{% if not work.id %} style="display: none;"{%endif %}>
+    <a data-choice='favorite' class="btn btn-favorite btn-block a{% if rating and rating != 'favorite' %} not-chosen{% endif %}" onclick="vote(this)" title="Mettre en favori" >
+        <span class="glyphicon glyphicon-star"></span>
+    </a>
+    <a data-choice='like' class="btn btn-success btn-block{% if rating and rating != 'like' %} not-chosen{% endif %}" onclick="vote(this)" title="J'aime">
+      <span class="glyphicon glyphicon-thumbs-up"></span>
+    </a>
+    <a data-choice='neutral' class="btn btn-warning btn-block{% if rating and rating != 'neutral' %} not-chosen{% endif %}" onclick="vote(this)" title="Neutre">
+      <span class="glyphicon glyphicon-adjust"></span>
+    </a>
+    <a data-choice='dislike' class="btn btn-danger btn-block{% if rating and rating != 'dislike' %} not-chosen{% endif %}" onclick="vote(this)" title="Je n'aime pas">
+      <span class="glyphicon glyphicon-thumbs-down"></span>
+    </a>
+    <a data-choice='willsee' class="btn btn-primary btn-block{% if rating and rating != 'willsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if work.category.slug == 'manga' %}Je veux lire{% else %}Je veux voir{% endif %}">
+      <span class="glyphicon glyphicon-eye-open"></span>
+    </a>
+    <a data-choice='wontsee' class="btn btn-info btn-block{% if rating and rating != 'wontsee' %} not-chosen{% endif %}" onclick="vote(this)" title="{% if work.category.slug == 'manga' %}Je ne veux pas lire{% else %}Je ne veux pas voir{% endif %}">
+      <span class="glyphicon glyphicon-eye-close"></span>
+    </a>
+</div>
+
+
+<script src="{% url 'js_reverse' %}" type="text/javascript"></script>

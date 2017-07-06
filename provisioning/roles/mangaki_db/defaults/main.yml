@@ -1,6 +1,0 @@
----
-mangaki_db_name: '{{ mangaki_name }}'
-mangaki_db_user: '{{ mangaki_name }}'
-
-mangaki_db_dump: false
-mangaki_db_load: false

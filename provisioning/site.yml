@@ -1,34 +1,11 @@
 ---
-- name: Ensure apt cache and packages are up-to-date.
+- name: Setup a single Mangaki server
   hosts: all
-  tasks:
-    - name: "FIX: Ensure aptitude is installed."
-      raw: apt-get install aptitude -y
-      become: true
+  vars_files:
+    - env_vars/secret.yml
 
-    - apt:
-        upgrade: 'yes'
-        update_cache: 'yes'
-        cache_valid_time: 3600
-      become: true
-
-- name: Setup development servers.
-  hosts: mangaki_dev
   roles:
-    - role: mangaki_db
-    - role: mangaki_source
-    - role: mangaki_sync
-    - role: mangaki_back
-
-- name: Setup standalone servers.
-  hosts: mangaki_standalone
-  roles:
-    - role: mangaki_db
-    - role: mangaki_source
-    - role: mangaki_sync
-    - role: mangaki_front
-    - role: mangaki_back
-    - role: utils/nginx
-    - role: utils/dehydrated
-      when: 'mangaki_web_use_acme|bool'
-    - role: mangaki_web
+    - base
+    - db
+    - web
+    - nginx

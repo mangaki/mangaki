@@ -72,7 +72,7 @@ class MangakiNMF(object):
         self.M = self.W.dot(self.H)
 
         self.chrono.save('factor matrix')
-        # self.display_components()
+        self.display_components()
 
     def predict(self, X):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)]
