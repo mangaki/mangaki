@@ -132,7 +132,7 @@ class AniDB:
 
         return missing_titles
 
-    def get_XML(self, anidb_aid):
+    def get_xml(self, anidb_aid: int):
         anidb_aid = int(anidb_aid)
 
         r = self._request("anime", {'aid': anidb_aid})
@@ -144,7 +144,7 @@ class AniDB:
 
     def handle_tags(self, anidb_aid=None, tags_soup=None):
         if anidb_aid is not None:
-            anime = self.get_XML(anidb_aid)
+            anime = self.get_xml(anidb_aid)
             tags_soup = anime.tags
 
         tags = {}
@@ -179,7 +179,7 @@ class AniDB:
         :rtype: a `mangaki.models.Work` object.
         """
 
-        anime = self.get_XML(anidb_aid)
+        anime = self.get_xml(anidb_aid)
         all_titles = anime.titles
         all_creators = anime.creators
         all_tags = anime.tags

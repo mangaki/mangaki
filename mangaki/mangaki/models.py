@@ -169,7 +169,12 @@ class Work(models.Model):
 
         tag_work_list = TaggedWork.objects.filter(work=self).all()
         values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-        current_tags = {value[0]: {"weight": value[2], "anidb_tag_id": value[1]} for value in values}
+        current_tags = {
+            value[0]: {
+                "weight": value[2],
+                "anidb_tag_id": value[1]
+            } for value in values
+        }
 
         deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
         deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
@@ -188,8 +193,12 @@ class Work(models.Model):
     def update_tags(self, anidb_tags):
         existing_tags = TaggedWork.objects.filter(work=self).all()
         values = existing_tags.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-        existing_tags = {value[0]: {"weight": value[2], "anidb_tag_id": value[1]} for value in values}
-
+        existing_tags = {
+            value[0]: {
+                "weight": value[2],
+                "anidb_tag_id": value[1]
+            } for value in values
+        }
         new_tags_keys = anidb_tags.keys() - existing_tags.keys()
         new_tags = {key: anidb_tags[key] for key in new_tags_keys}
 
