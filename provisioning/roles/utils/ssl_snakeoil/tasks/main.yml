@@ -1,0 +1,27 @@
+---
+- name: Ensure openssl is installed and up-to-date.
+  apt:
+    name: "openssl"
+    state: "latest"
+  become: true
+
+- name: Generate self-signed SSL certificates.
+  command: |
+    openssl req
+      -new
+      -days 365
+      -nodes
+      -x509
+      -subj /CN={{ snakeoil_domain|quote }}
+      -keyout /etc/ssl/private/{{ snakeoil_domain|quote }}.key
+      -out /etc/ssl/certs/{{ snakeoil_domain|quote }}.pem
+  args:
+    creates: '/etc/ssl/certs/{{ snakeoil_domain }}.pem'
+  become: true
+
+- name: Copy self-signed certificates to chained locations.
+  file:
+    src: '/etc/ssl/certs/{{ snakeoil_domain }}.pem'
+    dest: '/etc/ssl/certs/{{ snakeoil_domain }}.chained.pem'
+    state: 'link'
+  become: true

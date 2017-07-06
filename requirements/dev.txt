@@ -1,11 +1,8 @@
 -r ./production.txt
 # General development
-django-debug-toolbar==1.6
+django-debug-toolbar==1.8
 django-extensions
 django-nose
-pandas
-scipy
-scikit-learn==0.18.*
 tensorflow
 matplotlib
 flake8
@@ -19,3 +16,4 @@ html-linter
 factory_boy
 coverage
 django_coverage_plugin
+hypothesis

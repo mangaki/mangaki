@@ -1,14 +1,11 @@
+{% load static %}
+{% static 'img/ratings.svg' as rating_svg_link %}
 {% for object in works %}
   {% with work=object.work rating=object.choice %}
-    <div class="row flatlist data" data-category="{{ category }}" data-id="{{ work.id }}">
+    <div class="flatlist">
         <a href="{% url 'work-detail' category work.id %}">{{ work.title }}</a>
-        <div id="votes_{{ work.id }}" style="float: right">
-            <span data-choice='favorite' onclick="vote(this)" class="btn btn-favorite btn-xs a{% if rating and rating != 'favorite' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-star"></span></span>
-            <span data-choice='like' onclick="vote(this)" class="btn btn-success btn-xs{% if rating and rating != 'like' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-thumbs-up"></span></span>
-            <span data-choice='neutral' onclick="vote(this)" class="btn btn-warning btn-xs{% if rating and rating != 'neutral' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-adjust"></span></span>
-            <span data-choice='dislike' onclick="vote(this)" class="btn btn-danger btn-xs{% if rating and rating != 'dislike' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-thumbs-down"></span></span>
-            <span data-choice='willsee' onclick="vote(this)" class="btn btn-primary btn-xs{% if rating and rating != 'willsee' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-eye-open"></span></span>
-            <span data-choice='wontsee' onclick="vote(this)" class="btn btn-info btn-xs{% if rating and rating != 'wontsee' %} not-chosen{% endif %}"><span class="glyphicon glyphicon-eye-close"></span></span>
+        <div class="ratings ratings_small {% if disabled %} ratings_disabled{% endif %}" style="float: right">
+            {% include "mangaki/ratings.html" with config=config.ui rating_svg_link=rating_svg_link rating=rating %}
         </div>
     </div>
   {% endwith %}

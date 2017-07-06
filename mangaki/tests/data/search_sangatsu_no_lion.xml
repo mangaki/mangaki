@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="results.xsl"?>
+<html>
+    <body>
+        <animetitles>
+            <anime aid="1496">
+                <title exact="exact" lang="en" type="official">
+                </title>
+                <title lang="x-jat" type="main">
+                </title>
+                <title lang="ja" type="official">
+                </title>
+                <title lang="en" type="syn">
+                </title>
+                <title lang="en" type="short">
+                </title>
+            </anime>
+            <anime aid="1498">
+                <title exact="exact" lang="en" type="official">
+                </title>
+                <title lang="x-jat" type="main">
+                </title>
+                <title lang="ja" type="official">
+                </title>
+                <title lang="x-jat" type="syn">
+                </title>
+                <title lang="en" type="syn">
+                </title>
+                <title lang="en" type="syn">
+                </title>
+            </anime>
+        </animetitles>
+        <!-- @version v2, $Id: 4d4fa2b9e2f6109271972e2b7d1a72a58c5c73bd $ -->
+        <!-- redacted for test purposes -->
+    </body>
+</html>

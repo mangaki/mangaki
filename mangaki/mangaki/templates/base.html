@@ -1,142 +1,172 @@
 {% load analytical %}
 {% load cookielaw_tags %}
+{% load anonymous_ratings %}
+{% load bootstrap3 %}
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     {% analytical_head_top %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mangaki est un site de recommandation de mangas et d'anime"> 
     {% block opengraph %}{% endblock %}
     {% block twittercard %}{% endblock %}
     <title>{% block title %}Mangaki{% endblock %}</title>
     <link rel="icon" href="/static/img/favicon.png">
     <link rel="apple-touch-icon" href="/static/img/touch-icon-iphone.png">
-    <script src="/static/js/jquery-latest.min.js"></script>
-    <script src="/static/js/bootstrap-switch.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/handlebars.js"></script>
-    <script src="/static/js/csrf.js"></script>
-    <script src="/static/js/skin.js"></script>
-    <script src="/static/js/vote.js"></script>
-    <script src="/static/js/typeahead.bundle.js"></script>
-    <script src="/static/js/autocomplete.js"></script>
-    <script src="/static/js/tooltip.js"></script>
-    <script src="/static/cookielaw/js/cookielaw.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/static/css/bootstrap-switch.min.css" />
-    <link rel="stylesheet" href="/static/css/typeahead.css" />
-    <link rel="stylesheet" href="/static/css/skin.css" />
-    <link rel="stylesheet" href="/static/css/test.css" />
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/css/bootstrap-switch.min.css"/>
+    <link rel="stylesheet" href="/static/css/typeahead.css"/>
+    <link rel="stylesheet" href="/static/css/skin.css"/>
     <!-- Social Share Kit CSS -->
-    <link rel="stylesheet" href="/static/css/social-share-kit.css" />
+    <link rel="stylesheet" href="/static/css/social-share-kit.css"/>
+    <link href="https://fonts.googleapis.com/css?family=Economica|Open+Sans" rel="stylesheet">
     {% analytical_head_bottom %}
 </head>
 
 <body>
-    {% analytical_body_top %}
-    {% cookielaw_banner %}
+{% analytical_body_top %}
+{% cookielaw_banner %}
+
+<div id="wrapper">
     <header class="navbar navbar-default">
         <nav class="navbar navbar-default" role="navigation">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-collapse">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#menu-collapse">
                         <span class="sr-only">Ouvrir le menu</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="{% url 'home' %}">
-                        <img src="/static/img/minilogo.png" style="margin-top: -10px; margin-left: 5px" />
+                        <img src="/static/img/minilogo.png" style="margin-top: -10px; margin-left: 5px"/>
                     </a>
                 </div>
 
                 <div class="collapse navbar-collapse" id="menu-collapse">
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
-                            <a href="{% url 'about' %}">
-                                C'est quoi ?
+                            {% get_current_language as LANGUAGE_CODE %}
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-globe"></span>&nbsp;{{ LANGUAGE_CODE }} <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'about' 'fr' %}">Français</a></li>
+                                <li><a href="{% url 'about' 'en' %}">English</a></li>
+                                <li><a href="{% url 'about' 'ja' %}">日本語</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="{% url 'about' LANGUAGE_CODE %}">
+                                {% trans "C'est quoi ?" %}
                             </a>
                         </li>
                     </ul>
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
                             <a href="{% url 'work-list' 'anime' %}">
-                                Anime
+                                {% trans "Anime" %}
                             </a>
                         </li>
                         <li class="dropdown">
                             <a href="{% url 'work-list' 'manga' %}">
-                                Mangas
+                                {% trans "Mangas" %}
                             </a>
                         </li>
-                    {% if user.is_authenticated %}
                         <li class="dropdown">
                             <a href="{% url 'reco' %}">
-                                Recommandations
+                                {% trans "Recommandations" %}
                             </a>
                         </li>
-                        <li class="dropdown">
-                            <a href="http://meta.mangaki.fr/session/sso" target="_blank">
-                                Forum
-                            </a>
-                        </li>
-                    {% endif %}
                         <li class="dropdown">
                             <a href="{% url 'events' %}">
-                                Événements
+                                {% trans "Événements" %}
                             </a>
                         </li>
                         <li class="dropdown">
                             <a href="{% url 'top' 'directors' %}">
-                                Top 20
+                                {% trans "Top 20" %}
                             </a>
                         </li>
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right">
-                    {% if not user.is_authenticated %}
-                        <li><a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
-                        <li><a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}"><span class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
-                    {% else %}
-                        <li><a href="{% url 'profile' user.username %}">Bienvenue, <strong>{{ user.username }}</strong> !</a></li>
-                        <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Quitter</a></li>
-                    {% endif %}
+                        {% if not user.is_authenticated %}
+                            <li><a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"><span
+                                    class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
+                            <li><a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}"><span
+                                    class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
+                        {% else %}
+                            <li><a href="{% url 'profile' user.username %}">Bienvenue, <strong>{{ user.username }}</strong> !</a>
+                            </li>
+                            <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Quitter</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
-
     <div class="container">
+        {% block anonymous_rating_banner %}
+	  <div class="col-xs-12">
+            {% if request|has_anonymous_ratings %}
+                <div class="alert alert-warning">
+                    Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les
+                    voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les
+                    sauvegarder!
+                </div>
+            {% endif %}
+	  </div>
+        {% endblock %}
         {% block body %}{% endblock %}
     </div>
-
-    <footer>
-        <nav class="navbar navbar-default">
-            <div class="navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="{% url 'about' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le projet</a></li>
-                    <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
-                    <li><a href="{% url 'cgu' %}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
-                    <li><a href="https://twitter.com/mangakifr" target="_blank">@mangakifr</a></li>
-                    <li><a href="mailto:jjv@lri.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Contact : jjv@lri.fr</a></li>
-                    <li><a href="https://github.com/mangaki/mangaki/issues" target="_blank"><span class="glyphicon glyphicon-fire"></span>&nbsp;Signaler un bug</a></li>
-                </ul>
-            </div>
-        </nav>
-    </footer>
-    <script>
-        $("nav [href='{{ request.path }}']").parents("li").addClass('active');
-    </script>
+    <div id="push"></div>
+</div>
     
+<footer>
+    <nav class="navbar navbar-default">
+        <div class="navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{% url 'about' 'fr' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le
+                    projet</a></li>
+                <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
+                <li><a href="{% url 'legal' %}"><span class="glyphicon glyphicon-copyright-mark"></span>&nbsp;Mentions légales</a></li>
+                <li><a href="{% url 'cgu' %}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
+                <li><a href="https://twitter.com/mangakifr" target="_blank">@mangakifr</a></li>
+                <li><a href="mailto:jj@mangaki.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Contact :
+                    jj@mangaki.fr</a></li>
+                <li><a href="https://github.com/mangaki/mangaki/issues" target="_blank"><span
+                        class="glyphicon glyphicon-fire"></span>&nbsp;Signaler un bug</a></li>
+            </ul>
+        </div>
+    </nav>
+</footer>
 
-    <script>
-        $(function () {
-          $('[data-toggle="tooltip"]').tooltip()
-        })
-    </script>
-    {% analytical_body_bottom %}
-    </body>
+<script src="{% url 'js_reverse' %}" type="text/javascript"></script>
+<script src="/static/js/jquery-latest.min.js"></script>
+<script src="/static/js/bootstrap-switch.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/handlebars.js"></script>
+<script src="/static/js/csrf.js"></script>
+<script src="/static/js/skin.js"></script>
+<script src="/static/js/vote.js"></script>
+<script src="/static/js/typeahead.bundle.js"></script>
+<script src="/static/js/autocomplete.js"></script>
+<script src="/static/js/tooltip.js"></script>
+<script src="/static/cookielaw/js/cookielaw.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+<script>
+    $("nav [href='{{ request.path }}']").parent("li").addClass('active');
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+{% block extrajs %}{% endblock %}
+{% analytical_body_bottom %}
+</body>
 </html>

@@ -35,15 +35,6 @@ html {
   color: #333; */
 }
 
-a {
-  color: #03739c;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
 p {
   margin: 0 0 10px 0;
 }
@@ -265,12 +256,6 @@ p {
 .btn-download:active {
   background-color: #03739c;
   background-image: none;
-}
-
-.btn:hover,
-.btn:focus,
-.btn:active {
-    text-decoration: none;
 }
 
 .btn::-moz-focus-inner {

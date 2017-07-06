@@ -75,7 +75,7 @@ class WorkTest(TestCase):
             ('boxers', None),
         ]
         for query, expected in tests:
-            qs = list(Work.objects.filter(title__search=query))
+            qs = list(Work.objects.search(query))
             if expected is None:
                 self.assertFalse(qs)
                 continue
@@ -131,3 +131,45 @@ class WorkTest(TestCase):
         self.assertIn('nsfw', w.safe_poster(AnonymousUser()))
         self.assertIn('nsfw', w.safe_poster(self.fake_user))
         self.assertNotIn('nsfw', w.safe_poster(self.fake_user_with_nsfw))
+
+    def test_work_group_by_category(self):
+        grouped = Work.objects.group_by_category()
+        self.assertIsInstance(grouped, dict)
+        pks = []
+        for category_id, works in grouped.items():
+            self.assertNotEqual(len(works), 0)
+            for work in works:
+                self.assertEqual(work.category_id, category_id)
+                pks.append(work.pk)
+
+        self.assertEqual(len(set(pks)), len(pks))
+        self.assertEqual(set(pks), set(Work.objects.values_list('id', flat=True)))
+
+    def test_work_group_by_category_order(self):
+        anime = Category.objects.get(slug='anime')
+        manga = Category.objects.get(slug='manga')
+
+        works = [
+            Work(title='Anime B', nb_episodes=0, category=anime),
+            Work(title='Anime A', nb_episodes=1, category=anime),
+            Work(title='Manga B', category=manga),
+            Work(title='Manga A', category=manga),
+        ]
+        works = Work.objects.bulk_create(works)
+        works = [work.pk for work in works]
+
+        grouped = Work.objects.filter(pk__in=works).order_by('pk').group_by_category()
+        self.assertEqual(len(grouped), 2)
+        self.assertEqual(len(grouped[anime.id]), 2)
+        self.assertEqual(len(grouped[manga.id]), 2)
+
+        self.assertEqual([work.title for work in grouped[anime.id]], ['Anime B', 'Anime A'])
+        self.assertEqual([work.title for work in grouped[manga.id]], ['Manga B', 'Manga A'])
+       
+        grouped = Work.objects.filter(pk__in=works).order_by('title').group_by_category()
+        self.assertEqual(len(grouped), 2)
+        self.assertEqual(len(grouped[anime.id]), 2)
+        self.assertEqual(len(grouped[manga.id]), 2)
+
+        self.assertEqual([work.title for work in grouped[anime.id]], ['Anime A', 'Anime B'])
+        self.assertEqual([work.title for work in grouped[manga.id]], ['Manga A', 'Manga B'])

@@ -1,0 +1,4 @@
+default ansible_ssh_host=192.168.33.10
+
+[mangaki_dev]
+default

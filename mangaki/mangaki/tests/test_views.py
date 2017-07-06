@@ -174,4 +174,7 @@ class AnonymousViewsTest(WorkFactoryMixin, TestCase):
 
         target = self.User.objects.create_user('dummy')
         response = self.client.get('/u/dummy')
+        self.assertEqual(response.status_code, 301)
+
+        response = self.client.get('/u/dummy/anime/seen')
         self.assertEqual(response.status_code, 200)

@@ -1,0 +1,1933 @@
+<?xml version="1.0" encoding="utf-8"?>
+<anime id="11606" restricted="false">
+    <type>
+        TV Series
+    </type>
+    <episodecount>
+        22
+    </episodecount>
+    <startdate>
+        2016-10-08
+    </startdate>
+    <enddate>
+        2017-03-18
+    </enddate>
+    <titles>
+        <title type="main" xml:lang="x-jat">
+            Sangatsu no Lion
+        </title>
+        <title type="synonym" xml:lang="ru">
+            Мартовский лев
+        </title>
+        <title type="synonym" xml:lang="bg">
+            Март месец те връхлита като лъв
+        </title>
+        <title type="synonym" xml:lang="bg">
+            Март месец връхлита като лъв
+        </title>
+        <title type="synonym" xml:lang="x-jat">
+            3-gatsu no Lion
+        </title>
+        <title type="synonym" xml:lang="x-jat">
+            sangatsu (2016)
+        </title>
+        <title type="synonym" xml:lang="zh-Hans">
+            3月的狮子
+        </title>
+        <title type="official" xml:lang="ja">
+            3月のライオン
+        </title>
+        <title type="official" xml:lang="en">
+            March Comes In Like a Lion
+        </title>
+    </titles>
+    <relatedanime>
+        <anime id="12994" type="Sequel">
+            Sangatsu no Lion (2017)
+        </anime>
+        <anime id="11395" type="Other">
+            Sangatsu no Lion meets Bump of Chicken
+        </anime>
+    </relatedanime>
+    <similaranime>
+        <anime approval="15" id="2835" total="17">
+            Hachimitsu to Clover
+        </anime>
+        <anime approval="6" id="8538" total="12">
+            Chihayafuru
+        </anime>
+        <anime approval="4" id="5223" total="9">
+            Shion no Ou
+        </anime>
+    </similaranime>
+    <recommendations total="1">
+        <recommendation type="Must See" uid="65687">
+            This is not really about shoji, but how to best live the one life you`re given. It is likely my all-time
+            favorite from the last two decades. I wait for each release impatiently and each one stirs special feelings.
+            The story is crafted brilliantly, understated and insightful. It teaches, entertains and never disappoints.
+            The art is also brilliant and expressive. The music a great pleasure. The voicing is every bit as good as
+            the dialog that evokes it. When the series completes I will surely binge it all again.
+        </recommendation>
+    </recommendations>
+    <url>
+        http://3lion-anime.com/
+    </url>
+    <creators>
+        <name id="11940" type="Chief Animation Direction">
+            Shiotsuki Kazuya
+        </name>
+        <name id="59" type="Series Composition">
+            Shinbou Akiyuki
+        </name>
+        <name id="26229" type="Series Composition">
+            Tou Fuyashi
+        </name>
+        <name id="36327" type="Direction">
+            Okada Kenjirou
+        </name>
+        <name id="7770" type="Chief Animation Direction">
+            Sugiyama Nobuhiro
+        </name>
+        <name id="3073" type="Music">
+            Hashimoto Yukari
+        </name>
+        <name id="7770" type="Character Design">
+            Sugiyama Nobuhiro
+        </name>
+        <name id="3031" type="Original Work">
+            Umino Chika
+        </name>
+        <name id="792" type="Animation Work">
+            Shaft
+        </name>
+        <name id="59" type="Direction">
+            Shinbou Akiyuki
+        </name>
+    </creators>
+    <description>
+        This is a gentle tale about people trying to regain something. And it is a tale of battle.
+        http://anidb.net/ch83166 [Kiriyama Rei] had lost his family in an accident when he was young. Now he is a
+        17-year-old pro shogi player who is burdened with deep loneliness. Rei lives alone in an old town in Tokyo, but
+        after becoming acquainted with three sisters, http://anidb.net/ch83163 [Akari], http://anidb.net/ch83164
+        [Hinata] and http://anidb.net/ch83165 [Momo], he begins to change little by little...
+        Source: aniplexusa
+    </description>
+    <ratings>
+        <permanent count="350">
+            7.74
+        </permanent>
+        <temporary count="355">
+            7.60
+        </temporary>
+    </ratings>
+    <picture>
+        189638.jpg
+    </picture>
+    <resources>
+        <resource type="1">
+            <externalentity>
+                <identifier>
+                    18166
+                </identifier>
+            </externalentity>
+        </resource>
+        <resource type="2">
+            <externalentity>
+                <identifier>
+                    31646
+                </identifier>
+            </externalentity>
+        </resource>
+        <resource type="4">
+            <externalentity>
+                <url>
+                    http://www.nhk.or.jp/anime/3lion/
+                </url>
+            </externalentity>
+            <externalentity>
+                <url>
+                    http://3lion-anime.com/
+                </url>
+            </externalentity>
+        </resource>
+        <resource type="6">
+            <externalentity>
+                <identifier>
+                    March_Comes_in_Like_a_Lion
+                </identifier>
+            </externalentity>
+        </resource>
+        <resource type="7">
+            <externalentity>
+                <identifier>
+                    3月のライオン
+                </identifier>
+            </externalentity>
+        </resource>
+        <resource type="8">
+            <externalentity>
+                <identifier>
+                    4295
+                </identifier>
+            </externalentity>
+        </resource>
+        <resource type="9">
+            <externalentity>
+                <identifier>
+                    354204
+                </identifier>
+            </externalentity>
+        </resource>
+        <resource type="10">
+            <externalentity>
+                <identifier>
+                    19512
+                </identifier>
+            </externalentity>
+        </resource>
+        <resource type="28">
+            <externalentity>
+                <identifier>
+                    march-comes-in-like-a-lion
+                </identifier>
+            </externalentity>
+        </resource>
+    </resources>
+    <tags>
+        <tag globalspoiler="false" id="1802" infobox="true" localspoiler="false" parentid="2606" update="2016-01-24"
+             verified="true" weight="0">
+            <name>
+                seinen
+            </name>
+            <description>
+                Seinen, literally "young man", is one of the main demographic classifications applied to manga, and, by
+                extension, to anime, especially manga-based ones. As the name implies, seinen works are marketed
+                primarily to an audience of young men; the age range commonly understood to be the target of such works
+                goes roughly from 17 to somewhere in the 40s.
+            </description>
+            <picurl>
+                181651.jpg
+            </picurl>
+        </tag>
+        <tag globalspoiler="false" id="2043" localspoiler="false" parentid="2869" update="2016-12-07" verified="true"
+             weight="100">
+            <name>
+                high school
+            </name>
+            <description>
+                A secondary school that usually contains grades 10 through 12 in Japan, or 9 through 12 in America.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2605" localspoiler="false" update="2014-09-28" verified="true" weight="0">
+            <name>
+                dynamic
+            </name>
+            <description>
+                Some of the central structural elements in anime are:
+                Plot Continuity
+                How does the plot or several plots unfold. Are they a strictly linear retelling of one big continuing
+                story, a serial, possibly with several side stories, or is the content chopped into a set of unconnected
+                episodes, only sharing the same setting and characters?
+                Stereotype Characters
+                Then there is the question of the character set presentation. Is it completely original, or is it your
+                usual stereotypical character cast. Both choices have their merit, for example it would not really make
+                much sense to reinvent the wheel for a harem anime. Fans of that genre come to expect their favourite
+                stereotype protagonists.
+                Plot Twists
+                Finally there is the question of how complex the plot / the story unfolds. Are there side-plots that
+                merge into the main plot leading to unexpected plot twists, or is the anime quite predictable? The
+                latter would not be appropriate for detective stories. In harem anime on the other hand a foreseeable
+                outcome is actually something the fans will come to expect.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2606" localspoiler="false" update="2014-10-18" verified="true" weight="0">
+            <name>
+                target audience
+            </name>
+            <description>
+                Anime, like everything else in the modern world, is targeted towards specific audiences, both implicitly
+                by the creators and overtly by the marketing. While categories are associated with specific sex and age
+                groups, this is not a bar on the anime being enjoyed by people who don`t fit into that band; not only do
+                crossover titles exist, but the categories also have a considerable following outside their main
+                demographic, and a person might as well enjoy anime from all categories. Still, does not invalidate the
+                usefulness of marking a title as one of the categories; the same themes will likely be treated
+                differently in anime geared for different audiences. Only one should not jump the gun and assume that a
+                title will be more or less serious or present content in this or that way due to its target audience, or
+                conversely assume the target audience on the content and its presentation alone. As such, the audience
+                categories help form a broad impression of how a title might work with the announced themes, but offer
+                little to no in-depth information about specific content or its treatment.
+                The audience categories originate from manga magazines, which group titles of a same intended audience
+                into a magazine that is advertised as belonging to that category, and so manga-based anime will have the
+                category from their parent work. As for anime based on other works, the audience is often debatable, but
+                comparing information such as time slot to the manga-based anime generally helps figure out the most
+                likely possibility.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2607" localspoiler="false" update="2009-04-29" verified="true" weight="0">
+            <name>
+                themes
+            </name>
+            <description>
+                Themes describe the very central elements important to the anime stories. They set the backdrop against
+                which the protagonists must face their challenges. Be it School Life, present Daily Life, Military
+                action, Cyberpunk, Law and Order detective work, Sports, or the Underworld. These are only but a few of
+                the more typical backgrounds for anime plots. Add to that a Conspiracy setting with a possible tragic
+                outcome, the Themes span most of the imaginable subject matter relevant to anime.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2609" localspoiler="false" update="2009-04-22" verified="true" weight="0">
+            <name>
+                original work
+            </name>
+            <description>
+                What the anime is based on! Mostly of academic interest, but a useful bit of info, hinting at the
+                possible depth of story.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2610" localspoiler="false" update="2009-04-22" verified="true" weight="0">
+            <name>
+                setting
+            </name>
+            <description>
+                The setting describes in what time and place an anime takes place. To a certain extent it describes what
+                you can expect from the world in the anime.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2611" localspoiler="false" update="2014-09-08" verified="true" weight="0">
+            <name>
+                elements
+            </name>
+            <description>
+                Next to Themes setting the backdrop for the protagonists in anime, there are the more detailed plot
+                Elements that centre on character interactions: "What do characters do to each other or what is done to
+                them?". Is it violent Action, an awe-inspiring Adventure in a foreign place, the gripping life of a
+                Detective, a slapstick Comedy, an Ecchi Harem anime, a SciFi epic, or some Fantasy travelling adventure?
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2612" localspoiler="false" parentid="2610" update="2016-09-04" verified="true"
+             weight="0">
+            <name>
+                time
+            </name>
+            <description>
+                This placeholder lists different epochs in human history and more vague but important timelines such as
+                the future, the present and the past.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2613" localspoiler="false" parentid="2610" update="2016-09-04" verified="true"
+             weight="0">
+            <name>
+                place
+            </name>
+            <description>
+                The places the anime can take place in. Includes more specific places such as a country on Earth, as
+                well as more general places such as a dystopia or a mirror world.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2624" localspoiler="false" parentid="2612" update="2017-02-20" verified="true"
+             weight="600">
+            <name>
+                present
+            </name>
+            <description>
+                Somewhere between past and future.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2630" localspoiler="false" parentid="2613" update="2012-10-13" verified="true"
+             weight="600">
+            <name>
+                Earth
+            </name>
+            <description>
+                The Earth is the third planet from the Sun, and the densest and fifth-largest of the eight planets in
+                the Solar System. It is in effect a ball of hot mud, but on the surface it`s cold enough, so most of us
+                live on it (or are supposed to). It is circa 4.5 billion years old, and, unless we humans succeed in
+                destroying it over the next couple of centuries, it is expected to last for quite another while, though
+                the changes in the Sun`s emissions due to its aging will likely cause the extinction of everything; the
+                species of earthlings are guaranteed to die, even if we fail to kill them -- unless, of course, we find
+                ourselves another planet and figure out a way to take everything there. Our little planet on a corner of
+                this galaxy may mean nothing in the grand scheme of things, but to its inhabitants it is their home, so,
+                as a species, we cherish it dearly, to the point many cultures even to this day deify it. Being the home
+                to the human civilizations, the Earth is the main setting of most fiction, be it anime or otherwise, but
+                not only are many titles set in other places, such as unrelated fantasy worlds, in a considerable number
+                of fictional titles the Earth is actually destroyed by aggressive alien invaders.
+            </description>
+            <picurl>
+                126792.jpg
+            </picurl>
+        </tag>
+        <tag globalspoiler="false" id="2672" localspoiler="false" parentid="2834" update="2015-05-31" verified="true"
+             weight="600">
+            <name>
+                Japan
+            </name>
+            <description>
+                Last stronghold for humanity. If Tokyo falls, it`s all over. Tokyo Tower will undoubtedly fall anyway.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2676" localspoiler="false" parentid="2672" update="2012-10-22" verified="true"
+             weight="600">
+            <name>
+                Tokyo
+            </name>
+            <description>
+                Tokyo, as real-world location is the backdrop of this anime.
+                Tokyo (東京 Tōkyō, "Eastern Capital") is one of the 47 prefectures of Japan. Tokyo is the capital of
+                Japan, the centre of the Greater Tokyo Area, and the largest metropolitan area of the world. It is the
+                seat of the Japanese government and the Imperial Palace, and the home of the Japanese Imperial Family.
+                Tokyo is in the Kantou region on the south-eastern side of the main island Honshu and includes the Izu
+                Islands and Ogasawara Islands. Tokyo Metropolis was formed in 1943 from the merger of the former Tokyo
+                Prefecture (東京府 Tōkyō-fu) and the city of Tokyo (東京市 Tōkyō-shi).
+                (Source: Wikipedia)
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2756" localspoiler="false" parentid="2881" update="2012-10-08" verified="true"
+             weight="600">
+            <name>
+                board games
+            </name>
+            <description>
+                People here play a board game. It can vary from chess and Go, to Monopoly, to Dungeons and Dragons.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2798" infobox="true" localspoiler="false" parentid="2609" update="2014-09-07"
+             verified="true" weight="0">
+            <name>
+                manga
+            </name>
+            <description>
+                Manga is the lifeblood that drives the anime industry. Everything and its mother is based on manga.
+                However! There are exceptions where the manga was not the basis for the anime.
+                It`s common practice to make manga adaptations of many popular anime, there`s a manga based on
+                Evangelion, and two (one shounen and one shoujo) based on each of Escaflowne and Mahou Tsukai Tai. Also
+                it`s quite common to release manga and anime versions of a story in parallel, for instance Nadesico and
+                Shoujo Kakumei Utena. There are also cases where an anime continues in a manga, as in the case of Angel
+                Beats! and Angel Beats: Heaven`s Door, or reverse.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2834" localspoiler="false" parentid="2630" update="2016-10-04" verified="true"
+             weight="600">
+            <name>
+                Asia
+            </name>
+            <description>
+                Asia is Earth`s largest and most populous continent, located primarily in the eastern and northern
+                hemispheres and sharing the continental landmass of Eurasia with the continent of Europe. Asia covers an
+                area of 44,579,000 square kilometers, about 30% of Earth`s total land area and 8.7% of the Earth`s total
+                surface area. The continent, which has long been home to the majority of the human population, was the
+                site of many of the first civilizations. Asia is notable for not only its overall large size and
+                population, but also dense and large settlements as well as vast barely populated regions within the
+                continent of 4.4 billion people.
+                Source: Wikipedia
+            </description>
+            <picurl>
+                192245.jpg
+            </picurl>
+        </tag>
+        <tag globalspoiler="false" id="2853" localspoiler="false" parentid="2611" update="2017-02-13" verified="true"
+             weight="100">
+            <name>
+                comedy
+            </name>
+            <description>
+                Anime whose central struggle causes hilarious results. These stories are built upon funny characters,
+                situations and events. A comedy anime is laced with humour and sets out to provoke laughter from the
+                audience.
+                Japanese humour can be a bit strange to westerners, so if you`re new to this type of humour, just bear
+                with it; it`ll most likely grow on you if you`re a fan of other kinds of comedy.
+            </description>
+            <picurl>
+                198104.jpg
+            </picurl>
+        </tag>
+        <tag globalspoiler="false" id="2857" localspoiler="false" parentid="2611" update="2016-09-04" verified="true"
+             weight="100">
+            <name>
+                anthropomorphism
+            </name>
+            <description>
+                Anthropomorphism is the attribution of uniquely human characteristics to non-human beings, inanimate
+                objects, or natural or supernatural phenomena. If it`s an animal or an object (AI excluded) and it
+                speaks and/or does other human-like things (dresses up) then we`re dealing with anthropomorphism.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2869" localspoiler="false" parentid="2607" update="2009-04-23" verified="true"
+             weight="100">
+            <name>
+                school life
+            </name>
+            <description>
+                Since a large part of the anime audience still takes part in school life or is visiting college, it is
+                only natural to choose a setting the audience can identify with, be it elementary, middle, or high
+                school. For the older viewers a college setting with more mature real-life problems is appropriate. And
+                since clubs take up so much time in the lives of students, these are obviously also important.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2881" infobox="true" localspoiler="false" parentid="2607" update="2009-04-29"
+             verified="true" weight="600">
+            <name>
+                sports
+            </name>
+            <description>
+                Sports anime revolves around a recreational physical activity or skill. In addition they often adhere to
+                certain genre conventions, the emphasis on training and practice in preparation for competition,
+                characters desire for self improvement, and pursuit of a specific goal.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2916" localspoiler="false" parentid="2756" update="2012-10-12" verified="true"
+             weight="600">
+            <name>
+                shougi
+            </name>
+            <description>
+                Japanese chess.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="2978" localspoiler="false" parentid="5604" update="2009-06-28" verified="true"
+             weight="0">
+            <name>
+                aim for the top
+            </name>
+            <description>
+                This can be a positive or negative plot device. A character may strive to become the best in an
+                altruistic way (e.g. best healer, most widely learned master), or it can be quite banal and primitive
+                (e.g. challenged delinquents wanting to be the strongest fighters).
+                Alas in fighting anime the latter usually prevails.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="3023" localspoiler="false" parentid="2853" update="2012-02-19" verified="true"
+             weight="0">
+            <name>
+                funny expressions
+            </name>
+            <description>
+                The facial expressions of the characters may change so quickly or unexpectedly distort that hilarity
+                will ensue.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="3040" localspoiler="false" parentid="6230" update="2010-08-16" verified="true"
+             weight="0">
+            <name>
+                male protagonist
+            </name>
+            <description>
+                These anime have a male protagonist.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="4198" localspoiler="false" parentid="5604" update="2014-03-14" verified="true"
+             weight="0">
+            <name>
+                hard work and guts
+            </name>
+            <description>
+                One of the character`s motto in the anime. Because there is nothing that cannot be achieved by hard work
+                and guts.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="4455" localspoiler="false" parentid="6249" update="2013-03-15" verified="true"
+             weight="0">
+            <name>
+                dysfunctional family
+            </name>
+            <description>
+                When the nuclear family (Mother, Father and child(ren)) goes boom due to conflicts between family
+                members, sometimes resulting in the breakup of the family or even violence.
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="5604" localspoiler="false" parentid="2607" update="2014-09-04" verified="true"
+             weight="0">
+            <name>
+                following one`s dream
+            </name>
+            <description>
+                No matter what the hardships may be, at least one of the protagonists in this anime is following her/his
+                dream.
+                Examples: To become a professional athlete, a musician, a painter or the ruler of this world!
+            </description>
+        </tag>
+        <tag globalspoiler="false" id="6230" localspoiler="false" parentid="2605" update="2014-10-20" verified="true"
+             weight="0">
+            <name>
+                cast
+            </name>
+        </tag>
+        <tag globalspoiler="false" id="6249" localspoiler="false" parentid="2607" update="2014-10-31" verified="true"
+             weight="0">
+            <name>
+                family life
+            </name>
+        </tag>
+    </tags>
+    <characters>
+        <character id="83163" type="main character in" update="2016-07-23">
+            <rating votes="20">
+                8.06
+            </rating>
+            <name>
+                Kawamoto Akari
+            </name>
+            <gender>
+                female
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                189076.jpg
+            </picture>
+            <seiyuu id="20497" picture="62433.jpg">
+                Kayano Ai
+            </seiyuu>
+        </character>
+        <character id="83164" type="main character in" update="2016-07-23">
+            <rating votes="15">
+                7.82
+            </rating>
+            <name>
+                Kawamoto Hinata
+            </name>
+            <gender>
+                female
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                189077.jpg
+            </picture>
+            <seiyuu id="176" picture="192484.jpg">
+                Hanazawa Kana
+            </seiyuu>
+        </character>
+        <character id="83165" type="main character in" update="2016-07-23">
+            <rating votes="10">
+                6.51
+            </rating>
+            <name>
+                Kawamoto Momo
+            </name>
+            <gender>
+                female
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                189078.jpg
+            </picture>
+            <seiyuu id="20806" picture="182700.jpg">
+                Kuno Misaki
+            </seiyuu>
+        </character>
+        <character id="83166" type="main character in" update="2016-10-10">
+            <rating votes="11">
+                7.78
+            </rating>
+            <name>
+                Kiriyama Rei
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                189079.jpg
+            </picture>
+            <seiyuu id="23686" picture="186146.jpg">
+                Uchiyama Yumi
+            </seiyuu>
+            <seiyuu id="23529" picture="178469.jpg">
+                Kawanishi Kengo
+            </seiyuu>
+        </character>
+        <character id="84162" type="secondary cast in" update="2016-10-23">
+            <rating votes="7">
+                3.58
+            </rating>
+            <name>
+                Nikaidou Harunobu
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193512.jpg
+            </picture>
+            <seiyuu id="390" picture="33609.jpg">
+                Okamoto Nobuhiko
+            </seiyuu>
+            <seiyuu id="81" picture="41282.jpg">
+                Sanpei Yuuko
+            </seiyuu>
+        </character>
+        <character id="84163" type="secondary cast in" update="2016-10-23">
+            <rating votes="6">
+                4.32
+            </rating>
+            <name>
+                Kouda Kyouko
+            </name>
+            <gender>
+                female
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193506.jpg
+            </picture>
+            <seiyuu id="11" picture="32253.jpg">
+                Inoue Marina
+            </seiyuu>
+        </character>
+        <character id="84164" type="secondary cast in" update="2016-10-23">
+            <rating votes="3">
+                9.18
+            </rating>
+            <name>
+                Hayashida Takashi
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193509.jpg
+            </picture>
+            <seiyuu id="225" picture="17044.jpg">
+                Sakurai Takahiro
+            </seiyuu>
+        </character>
+        <character id="84697" type="secondary cast in" update="2016-10-23">
+            <rating votes="4">
+                6.74
+            </rating>
+            <name>
+                Misumi Tatsuyuki
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193511.jpg
+            </picture>
+            <seiyuu id="45" picture="44970.jpg">
+                Sugita Tomokazu
+            </seiyuu>
+        </character>
+        <character id="84698" type="secondary cast in" update="2017-02-07">
+            <rating votes="2">
+                9.07
+            </rating>
+            <name>
+                Shimada Kai
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                197886.jpg
+            </picture>
+            <seiyuu id="233" picture="163932.jpg">
+                Miki Shin`ichirou
+            </seiyuu>
+        </character>
+        <character id="84699" type="secondary cast in" update="2016-10-10">
+            <rating votes="3">
+                7.24
+            </rating>
+            <name>
+                Kawamoto Someji
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                192622.jpg
+            </picture>
+            <seiyuu id="541" picture="26117.jpg">
+                Chiba Shigeru
+            </seiyuu>
+        </character>
+        <character id="84700" type="secondary cast in" update="2016-10-10">
+            <rating votes="2">
+                4.19
+            </rating>
+            <name>
+                Kouda Masachika
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                192623.jpg
+            </picture>
+            <seiyuu id="382" picture="186900.jpg">
+                Ookawa Tooru
+            </seiyuu>
+        </character>
+        <character id="84701" type="secondary cast in" update="2016-10-23">
+            <rating votes="2">
+                5.12
+            </rating>
+            <name>
+                Matsumoto Issa
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193510.jpg
+            </picture>
+            <seiyuu id="25023" picture="70106.jpg">
+                Kimura Subaru
+            </seiyuu>
+        </character>
+        <character id="84702" type="secondary cast in" update="2016-10-31">
+            <rating votes="1">
+                7.58
+            </rating>
+            <name>
+                Takahashi Yuusuke
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193847.jpg
+            </picture>
+            <seiyuu id="3709" picture="84359.jpg">
+                Hosoya Yoshimasa
+            </seiyuu>
+        </character>
+        <character id="85549" type="appears in" update="2016-10-23">
+            <rating votes="1">
+                5.66
+            </rating>
+            <name>
+                Hanaoka
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193508.jpg
+            </picture>
+            <seiyuu id="31" picture="65365.jpg">
+                Ueda Youji
+            </seiyuu>
+        </character>
+        <character id="85550" type="appears in" update="2016-10-16">
+            <rating votes="1">
+                5.66
+            </rating>
+            <name>
+                Kuro-chan
+            </name>
+            <gender>
+                unknown
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                192984.jpg
+            </picture>
+            <seiyuu id="20497" picture="62433.jpg">
+                Kayano Ai
+            </seiyuu>
+        </character>
+        <character id="85551" type="appears in" update="2016-10-16">
+            <rating votes="1">
+                5.66
+            </rating>
+            <name>
+                Mike-chan
+            </name>
+            <gender>
+                unknown
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                192985.jpg
+            </picture>
+            <seiyuu id="176" picture="192484.jpg">
+                Hanazawa Kana
+            </seiyuu>
+        </character>
+        <character id="85788" type="appears in" update="2016-10-23">
+            <rating votes="1">
+                3.82
+            </rating>
+            <name>
+                Nikaidou-ke no Oooku-sama
+            </name>
+            <gender>
+                female
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193514.jpg
+            </picture>
+            <seiyuu id="81" picture="41282.jpg">
+                Sanpei Yuuko
+            </seiyuu>
+        </character>
+        <character id="85910" type="appears in" update="2016-10-31">
+            <rating votes="1">
+                5.66
+            </rating>
+            <name>
+                Shiro-chan
+            </name>
+            <gender>
+                unknown
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193848.jpg
+            </picture>
+            <seiyuu id="20806" picture="182700.jpg">
+                Kuno Misaki
+            </seiyuu>
+        </character>
+        <character id="85911" type="appears in" update="2016-10-31">
+            <rating votes="1">
+                5.66
+            </rating>
+            <name>
+                Tora-chan
+            </name>
+            <gender>
+                unknown
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                193849.jpg
+            </picture>
+            <seiyuu id="176" picture="192484.jpg">
+                Hanazawa Kana
+            </seiyuu>
+        </character>
+        <character id="86046" type="appears in" update="2016-11-07">
+            <rating votes="1">
+                5.66
+            </rating>
+            <name>
+                Inu
+            </name>
+            <gender>
+                unknown
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                194248.jpg
+            </picture>
+            <seiyuu id="79" picture="34814.jpg">
+                Kobayashi Yuu
+            </seiyuu>
+        </character>
+        <character id="86047" type="appears in" update="2016-11-07">
+            <rating votes="1">
+                3.82
+            </rating>
+            <name>
+                Kouda no Tsuma
+            </name>
+            <gender>
+                female
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                194249.jpg
+            </picture>
+            <seiyuu id="28891" picture="66380.jpg">
+                Oofuku Yumiko
+            </seiyuu>
+        </character>
+        <character id="86048" type="appears in" update="2016-11-07">
+            <rating votes="1">
+                5.66
+            </rating>
+            <name>
+                Rei no Chichi
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                194250.jpg
+            </picture>
+            <seiyuu id="3186" picture="171957.jpg">
+                Tone Kentarou
+            </seiyuu>
+        </character>
+        <character id="86049" type="appears in" update="2017-01-13">
+            <rating votes="2">
+                4.52
+            </rating>
+            <name>
+                Misaki
+            </name>
+            <gender>
+                female
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                196843.jpg
+            </picture>
+            <seiyuu id="158" picture="38198.jpg">
+                Neya Michiko
+            </seiyuu>
+        </character>
+        <character id="86050" type="appears in" update="2016-11-07">
+            <rating votes="1">
+                1.59
+            </rating>
+            <name>
+                Kouda Ayumu
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                194252.jpg
+            </picture>
+        </character>
+        <character id="86182" type="secondary cast in" update="2016-11-13">
+            <rating votes="2">
+                8.77
+            </rating>
+            <name>
+                Souya Touji
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                194563.jpg
+            </picture>
+            <seiyuu id="194" picture="130580.jpg">
+                Ishida Akira
+            </seiyuu>
+        </character>
+        <character id="86311" type="appears in" update="2016-11-20">
+            <rating votes="1">
+                3.82
+            </rating>
+            <name>
+                Takahashi no Chichi
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                194916.jpg
+            </picture>
+            <seiyuu id="3186" picture="171957.jpg">
+                Tone Kentarou
+            </seiyuu>
+        </character>
+        <character id="86761" type="appears in" update="2016-12-20">
+            <rating votes="1">
+                5.66
+            </rating>
+            <name>
+                Matsunaga Shouichi
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                196018.jpg
+            </picture>
+            <seiyuu id="2402" picture="186198.jpg">
+                Oka Kazuo
+            </seiyuu>
+        </character>
+        <character id="86763" type="appears in" update="2016-12-20">
+            <rating votes="1">
+                2.42
+            </rating>
+            <name>
+                Yasui Manabu
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                196019.jpg
+            </picture>
+            <seiyuu id="554" picture="17856.jpg">
+                Iwata Mitsuo
+            </seiyuu>
+        </character>
+        <character id="86765" type="appears in" update="2016-12-20">
+            <rating votes="1">
+                1.20
+            </rating>
+            <name>
+                Gotou Masamune
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                196020.jpg
+            </picture>
+            <seiyuu id="451" picture="17347.jpg">
+                Touchi Hiroki
+            </seiyuu>
+        </character>
+        <character id="87089" type="appears in" update="2017-01-13">
+            <rating votes="1">
+                3.82
+            </rating>
+            <name>
+                Tsujii Takeshi
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                196842.jpg
+            </picture>
+            <seiyuu id="345" picture="84834.jpg">
+                Nakamura Yuuichi
+            </seiyuu>
+        </character>
+        <character id="87090" type="appears in" update="2017-01-13">
+            <rating votes="1">
+                3.82
+            </rating>
+            <name>
+                Yokomizo Okuyasu
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                196844.jpg
+            </picture>
+            <seiyuu id="336" picture="17172.jpg">
+                Sakaguchi Daisuke
+            </seiyuu>
+        </character>
+        <character id="87091" type="appears in" update="2017-01-13">
+            <rating votes="1">
+                3.82
+            </rating>
+            <name>
+                Jinguuji Takanori
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                196845.jpg
+            </picture>
+            <seiyuu id="343" picture="140430.jpg">
+                Genda Tesshou
+            </seiyuu>
+        </character>
+        <character id="87525" type="appears in" update="2017-02-07">
+            <rating votes="1">
+                3.82
+            </rating>
+            <name>
+                Ichigo
+            </name>
+            <gender>
+                unknown
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                197887.jpg
+            </picture>
+            <seiyuu id="4616" picture="170439.jpg">
+                Nishi Asuka
+            </seiyuu>
+        </character>
+        <character id="87526" type="secondary cast in" update="2017-02-07">
+            <rating votes="1">
+                5.66
+            </rating>
+            <name>
+                Shigeta Morio
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                197888.jpg
+            </picture>
+            <seiyuu id="592" picture="170729.jpg">
+                Tsuda Kenjirou
+            </seiyuu>
+        </character>
+        <character id="87527" type="appears in" update="2017-02-07">
+            <rating votes="1">
+                9.16
+            </rating>
+            <name>
+                Noguchi Eisaku
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                197889.jpg
+            </picture>
+            <seiyuu id="316" picture="25472.jpg">
+                Ueda Yuuji
+            </seiyuu>
+        </character>
+        <character id="87529" type="appears in" update="2017-02-07">
+            <rating votes="1">
+                7.58
+            </rating>
+            <name>
+                Izumida
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                197896.jpg
+            </picture>
+            <seiyuu id="6942" picture="41078.jpg">
+                Takaoka Binbin
+            </seiyuu>
+        </character>
+        <character id="88125" type="appears in" update="2017-03-08">
+            <rating votes="1">
+                1.59
+            </rating>
+            <name>
+                Fujimoto Raidou
+            </name>
+            <gender>
+                male
+            </gender>
+            <charactertype id="1">
+                Character
+            </charactertype>
+            <picture>
+                199344.jpg
+            </picture>
+            <seiyuu id="286" picture="17117.jpg">
+                Ootsuka Akio
+            </seiyuu>
+        </character>
+    </characters>
+    <episodes>
+        <episode id="180364" update="2016-11-21">
+            <epno type="1">
+                4
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-10-29
+            </airdate>
+            <rating votes="8">
+                6.37
+            </rating>
+            <title xml:lang="ja">
+                ひな / ブイエス
+            </title>
+            <title xml:lang="en">
+                Hina / V.S.
+            </title>
+            <title xml:lang="x-jat">
+                Hina / V.S.
+            </title>
+        </episode>
+        <episode id="180365" update="2017-03-22">
+            <epno type="1">
+                3
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-10-22
+            </airdate>
+            <rating votes="7">
+                5.80
+            </rating>
+            <title xml:lang="ja">
+                晴信 / 夜空のむこう
+            </title>
+            <title xml:lang="en">
+                Harunobu / Beyond the Night Sky
+            </title>
+            <title xml:lang="x-jat">
+                Harunobu / Yozora no Mukou
+            </title>
+        </episode>
+        <episode id="180366" update="2016-11-21">
+            <epno type="1">
+                2
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-10-15
+            </airdate>
+            <rating votes="8">
+                6.24
+            </rating>
+            <title xml:lang="ja">
+                あかり / 橋の向こう
+            </title>
+            <title xml:lang="en">
+                Akari / Beyond the Bridge
+            </title>
+            <title xml:lang="x-jat">
+                Akari / Hashi no Mukou
+            </title>
+        </episode>
+        <episode id="180367" update="2016-11-21">
+            <epno type="1">
+                1
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-10-08
+            </airdate>
+            <rating votes="10">
+                5.97
+            </rating>
+            <title xml:lang="ja">
+                桐山零 / 河沿いの町
+            </title>
+            <title xml:lang="en">
+                Rei Kiriyama / The Town Along the River
+            </title>
+            <title xml:lang="fr">
+                Kiriyama Rei / La ville près de la rivière
+            </title>
+            <title xml:lang="x-jat">
+                Kiriyama Rei / Kawazoi no Machi
+            </title>
+        </episode>
+        <episode id="180905" update="2017-01-13">
+            <epno type="3">
+                C3
+            </epno>
+            <length>
+                2
+            </length>
+            <airdate>
+                2016-10-08
+            </airdate>
+            <title xml:lang="en">
+                Ending 1a
+            </title>
+        </episode>
+        <episode id="180906" update="2016-10-10">
+            <epno type="3">
+                C1
+            </epno>
+            <length>
+                2
+            </length>
+            <airdate>
+                2016-10-08
+            </airdate>
+            <title xml:lang="en">
+                Opening 1
+            </title>
+        </episode>
+        <episode id="181014" update="2016-11-21">
+            <epno type="1">
+                6
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-11-12
+            </airdate>
+            <rating votes="8">
+                6.25
+            </rating>
+            <title xml:lang="ja">
+                神さまの子供 (その①) / 神さまの子供 (その②) / 神さまの子供 (その③)
+            </title>
+            <title xml:lang="en">
+                Child of God (Part One) / Child of God (Part Two) / Child of God (Part Three)
+            </title>
+            <title xml:lang="x-jat">
+                Kamisama no Kodomo (Sono 1) / Kamisama no Kodomo (Sono 2) / Kamisama no Kodomo (Sono 3)
+            </title>
+        </episode>
+        <episode id="181015" update="2016-11-21">
+            <epno type="1">
+                5
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-11-05
+            </airdate>
+            <rating votes="9">
+                7.99
+            </rating>
+            <title xml:lang="ja">
+                契約 / カッコーの巣の上で
+            </title>
+            <title xml:lang="en">
+                Agreement / Over the Cuckoo`s Nest
+            </title>
+            <title xml:lang="x-jat">
+                Keiyaku / Kakkou no Su no Ue de
+            </title>
+        </episode>
+        <episode id="181368" update="2016-12-10">
+            <epno type="1">
+                8
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-12-03
+            </airdate>
+            <rating votes="7">
+                8.18
+            </rating>
+            <title xml:lang="ja">
+                将棋おしえて(承前) / 面影 / 遠雷①
+            </title>
+            <title xml:lang="en">
+                Teach Me How to Play Shogi (Continued) / Image / Distant Thunder (Part 1)
+            </title>
+            <title xml:lang="x-jat">
+                Shougi Oshiete (Shouzen) / Omokage / Enrai 1
+            </title>
+        </episode>
+        <episode id="181369" update="2016-12-10">
+            <epno type="1">
+                7
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-11-19
+            </airdate>
+            <rating votes="7">
+                8.12
+            </rating>
+            <title xml:lang="ja">
+                神さまの子供 (その③)承前 / 大切なもの. 大切なこと. / 将棋おしえて
+            </title>
+            <title xml:lang="en">
+                Child of God (Part Three) Continued / Important Things. Important Matters. / Teach Me How to Play Shogi
+            </title>
+            <title xml:lang="x-jat">
+                Kamisama no Kodomo (Sono 3) Shouzen / Taisetsu na Mono. Taisetsu na Koto. / Shougi Oshiete
+            </title>
+        </episode>
+        <episode id="182481" update="2017-01-13">
+            <epno type="3">
+                C4
+            </epno>
+            <length>
+                2
+            </length>
+            <airdate>
+                2016-11-19
+            </airdate>
+            <title xml:lang="en">
+                Ending 2
+            </title>
+        </episode>
+        <episode id="182638" update="2017-01-08">
+            <epno type="1">
+                12
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-01-07
+            </airdate>
+            <rating votes="8">
+                7.26
+            </rating>
+            <title xml:lang="ja">
+                対岸にあるもの / 黒い河①
+            </title>
+            <title xml:lang="en">
+                What Lies on the Opposite Shore / Black River (Part 1)
+            </title>
+            <title xml:lang="x-jat">
+                Taigan no Aru Mono / Kuroi Kawa 1
+            </title>
+        </episode>
+        <episode id="182639" update="2016-12-25">
+            <epno type="1">
+                11
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-12-24
+            </airdate>
+            <rating votes="7">
+                8.97
+            </rating>
+            <title xml:lang="ja">
+                ゆく年 / くる年
+            </title>
+            <title xml:lang="en">
+                The Old Year / The New Year
+            </title>
+            <title xml:lang="x-jat">
+                Yuku Toshi / Kuru Toshi
+            </title>
+        </episode>
+        <episode id="182640" update="2016-12-18">
+            <epno type="1">
+                10
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-12-17
+            </airdate>
+            <rating votes="7">
+                7.83
+            </rating>
+            <title xml:lang="ja">
+                贈られたもの① / 贈られたもの②
+            </title>
+            <title xml:lang="en">
+                Something Given (Part 1) / Something Given (Part 2)
+            </title>
+            <title xml:lang="x-jat">
+                Okurareta Mono 1 / Okurareta Mono 2
+            </title>
+        </episode>
+        <episode id="182641" update="2016-12-11">
+            <epno type="1">
+                9
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-12-10
+            </airdate>
+            <rating votes="7">
+                5.48
+            </rating>
+            <title xml:lang="ja">
+                遠雷② / 遠雷③
+            </title>
+            <title xml:lang="en">
+                Distant Thunder (Part 2) / Distant Thunder (Part 3)
+            </title>
+            <title xml:lang="x-jat">
+                Enrai 2 / Enrai 3
+            </title>
+        </episode>
+        <episode id="182984" recap="true" update="2017-03-20">
+            <epno type="2">
+                S1
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2016-12-29
+            </airdate>
+            <rating votes="1">
+                5.66
+            </rating>
+            <title xml:lang="ja">
+                前半総集編
+            </title>
+            <title xml:lang="en">
+                Omnibus Special Episode
+            </title>
+            <title xml:lang="x-jat">
+                Zenhan Soushuuhen
+            </title>
+        </episode>
+        <episode id="183088" update="2017-01-22">
+            <epno type="1">
+                14
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-01-21
+            </airdate>
+            <rating votes="7">
+                7.65
+            </rating>
+            <title xml:lang="ja">
+                まぶしい闇 / ほんの少しの水
+            </title>
+            <title xml:lang="en">
+                Blinding Darkness / Just a Little Water
+            </title>
+            <title xml:lang="x-jat">
+                Mabushii Yami / Honno Sukoshi no Mizu
+            </title>
+        </episode>
+        <episode id="183089" update="2017-01-14">
+            <epno type="1">
+                13
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-01-14
+            </airdate>
+            <rating votes="7">
+                7.15
+            </rating>
+            <title xml:lang="ja">
+                黒い河② / 扉の向こう
+            </title>
+            <title xml:lang="en">
+                Black River (Part 2) / Beyond the Door
+            </title>
+            <title xml:lang="x-jat">
+                Kuroi Kawa 2 / Tobira no Mukou
+            </title>
+        </episode>
+        <episode id="183663" update="2017-01-13">
+            <epno type="3">
+                C5
+            </epno>
+            <length>
+                2
+            </length>
+            <airdate>
+                2017-01-07
+            </airdate>
+            <rating votes="1">
+                7.58
+            </rating>
+            <title xml:lang="en">
+                Ending 3
+            </title>
+        </episode>
+        <episode id="183664" update="2017-01-13">
+            <epno type="3">
+                C2
+            </epno>
+            <length>
+                2
+            </length>
+            <airdate>
+                2017-01-07
+            </airdate>
+            <rating votes="2">
+                10.00
+            </rating>
+            <title xml:lang="en">
+                Opening 2
+            </title>
+        </episode>
+        <episode id="183710" update="2017-02-19">
+            <epno type="1">
+                18
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-02-18
+            </airdate>
+            <rating votes="8">
+                7.54
+            </rating>
+            <title xml:lang="ja">
+                奔流 / 経る時
+            </title>
+            <title xml:lang="en">
+                Torrent / Passing Time
+            </title>
+            <title xml:lang="x-jat">
+                Honryuu / Heru Toki
+            </title>
+        </episode>
+        <episode id="183711" update="2017-02-11">
+            <epno type="1">
+                17
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-02-11
+            </airdate>
+            <rating votes="8">
+                7.65
+            </rating>
+            <title xml:lang="ja">
+                銀の糸 / 水面 / 青い夜の底
+            </title>
+            <title xml:lang="en">
+                Silver Thread / Water`s Surface / Base of the Blue Night
+            </title>
+            <title xml:lang="x-jat">
+                Gin no Ito / Suimen / Aoi Yoru no Soko
+            </title>
+        </episode>
+        <episode id="183712" update="2017-02-05">
+            <epno type="1">
+                16
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-02-04
+            </airdate>
+            <rating votes="8">
+                4.99
+            </rating>
+            <title xml:lang="ja">
+                夜を駆ける / 坂の途中
+            </title>
+            <title xml:lang="en">
+                Running Through the Night / Middle of the Slope
+            </title>
+            <title xml:lang="x-jat">
+                Yoru o Kakeru / Saka no Tochuu
+            </title>
+        </episode>
+        <episode id="183713" update="2017-01-28">
+            <epno type="1">
+                15
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-01-28
+            </airdate>
+            <rating votes="8">
+                7.35
+            </rating>
+            <title xml:lang="ja">
+                月光 / 自我のカタマリ
+            </title>
+            <title xml:lang="en">
+                Moonlight / Lump of Ego
+            </title>
+            <title xml:lang="x-jat">
+                Gekkou / Jiga no Katamari
+            </title>
+        </episode>
+        <episode id="184491" update="2017-03-22">
+            <epno type="1">
+                22
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-03-18
+            </airdate>
+            <rating votes="6">
+                6.87
+            </rating>
+            <title xml:lang="ja">
+                新学期 / ファイター
+            </title>
+            <title xml:lang="en">
+                New School Term / Fighter
+            </title>
+            <title xml:lang="x-jat">
+                Shingakki / Fighter
+            </title>
+        </episode>
+        <episode id="184492" update="2017-03-12">
+            <epno type="1">
+                21
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-03-11
+            </airdate>
+            <rating votes="7">
+                7.50
+            </rating>
+            <title xml:lang="ja">
+                桜の花の咲く頃 / 小さなつぶやき
+            </title>
+            <title xml:lang="en">
+                When the Cherry Blossoms Bloom / Small Murmur
+            </title>
+            <title xml:lang="x-jat">
+                Sakura no Hana no Saku Koro / Chiisana Tsubuyaki
+            </title>
+        </episode>
+        <episode id="184493" update="2017-03-05">
+            <epno type="1">
+                20
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-03-04
+            </airdate>
+            <rating votes="8">
+                6.37
+            </rating>
+            <title xml:lang="ja">
+                京都② / 京都③
+            </title>
+            <title xml:lang="en">
+                Kyoto (Part 2) / Kyoto (Part 3)
+            </title>
+            <title xml:lang="x-jat">
+                Kyoto 2 / Kyoto 3
+            </title>
+        </episode>
+        <episode id="184494" update="2017-02-26">
+            <epno type="1">
+                19
+            </epno>
+            <length>
+                25
+            </length>
+            <airdate>
+                2017-02-25
+            </airdate>
+            <rating votes="7">
+                7.43
+            </rating>
+            <title xml:lang="ja">
+                夜を往く / 京都①
+            </title>
+            <title xml:lang="en">
+                Passing the Night / Kyoto (Part 1)
+            </title>
+            <title xml:lang="x-jat">
+                Yoru o Yuku / Kyoto 1
+            </title>
+        </episode>
+        <episode id="186483" update="2017-03-27">
+            <epno type="3">
+                C6
+            </epno>
+            <length>
+                2
+            </length>
+            <airdate>
+                2017-03-18
+            </airdate>
+            <rating votes="1">
+                5.66
+            </rating>
+            <title xml:lang="en">
+                Ending 1b
+            </title>
+        </episode>
+    </episodes>
+</anime>
