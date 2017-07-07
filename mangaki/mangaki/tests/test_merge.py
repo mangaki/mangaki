@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib import admin
 from django.db import connection
 from mangaki.models import Work, Editor, Category, Studio, WorkCluster, Rating, Staff, Role, Artist, Genre
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 
 
 class MergeTest(TestCase):
@@ -20,9 +20,9 @@ class MergeTest(TestCase):
         for username in 'ABCD':
             self.users.append(get_user_model().objects.create_user(username=username, password='test'))
 
-        today = date.today()
-        yesterday = date.today() - timedelta(1)
-        tomorrow = date.today() + timedelta(1)
+        today = datetime.now()
+        yesterday = datetime.now() - timedelta(1)
+        tomorrow = datetime.now() + timedelta(1)
 
         anime = Category.objects.get(slug='anime')
         Work.objects.bulk_create([Work(title='Sangatsu no Lion', category=anime) for _ in range(10)])

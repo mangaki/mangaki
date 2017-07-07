@@ -153,13 +153,14 @@ class Work(models.Model):
     title_search = SearchVectorField('title')
 
     class Meta:
+        default_manager_name = 'objects'
         index_together = [
             ['category', 'controversy'],
             ['category', 'nb_ratings'],
         ]
 
-    all_objects = WorkQuerySet.as_manager()  # Equivalent to default_manager_name = 'all_objects', because first in the list
     objects = FilteredWorkManager.from_queryset(WorkQuerySet)()
+    all_objects = WorkQuerySet.as_manager()
 
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])

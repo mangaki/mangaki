@@ -1,5 +1,5 @@
 from typing import Tuple, List, Any, Dict, Optional
-from collections import Counter
+from collections import Counter, defaultdict
 
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -37,12 +37,7 @@ def get_profile_ratings(request,
             count_key = 'seen_{}' if seen_work else 'unseen_{}'
             counts[count_key.format(rating.work.category.slug)] += 1
 
-            # Proof:
-            # If the work has been seen AND we want seen work, false XOR true = true.
-            # If the work has been unseen AND we want seen work, true XOR true = false.
-            # If the work has been seen AND we want unseen work, false XOR false = false.
-            # If the work has been unseen AND we want unseen work, true XOR false = true.
-            if (not already_seen) ^ seen_work:
+            if already_seen == seen_work and rating.work.category.slug == category:
                 ratings.append(rating)
     elif can_see:
         ratings = list(
@@ -84,7 +79,7 @@ def build_profile_compare_function(algo_name: Optional[str],
             algo = get_algo_backup(algo_name)
             dataset = get_dataset_backup(algo_name)
             best_pos = get_pos_of_best_works_for_user_via_algo(algo, dataset, user.id, work_ids)
-            ranking = {}
+            ranking = defaultdict(lambda: len(ratings))
             for rank, pos in enumerate(best_pos):
                 ranking[ratings[pos].id] = rank
 
