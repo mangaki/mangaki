@@ -1,5 +1,5 @@
 from typing import Tuple, List, Any, Dict, Optional
-from collections import Counter
+from collections import Counter, defaultdict
 
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -79,7 +79,7 @@ def build_profile_compare_function(algo_name: Optional[str],
             algo = get_algo_backup(algo_name)
             dataset = get_dataset_backup(algo_name)
             best_pos = get_pos_of_best_works_for_user_via_algo(algo, dataset, user.id, work_ids)
-            ranking = {}
+            ranking = defaultdict(lambda: len(ratings))
             for rank, pos in enumerate(best_pos):
                 ranking[ratings[pos].id] = rank
 
