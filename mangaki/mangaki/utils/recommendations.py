@@ -5,7 +5,6 @@ from mangaki.utils.data import Dataset
 from django.contrib.auth.models import User
 from django.db.models import Count
 from mangaki.utils.algo import ALGOS, fit_algo, get_algo_backup, get_dataset_backup
-from mangaki.utils.algo import ALGOS, fit_algo
 from mangaki.utils.ratings import current_user_ratings
 import numpy as np
 import json
