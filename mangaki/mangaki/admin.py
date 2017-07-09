@@ -233,12 +233,17 @@ class WorkAdmin(admin.ModelAdmin):
             kept_ids = request.POST.getlist('checks')
             for anime_id in kept_ids:
                 anime = Work.objects.get(id=anime_id)
-                retrieve_tags = anime.retrieve_tags(client)
-                deleted_tags = retrieve_tags["deleted_tags"]
-                added_tags = retrieve_tags["added_tags"]
-                updated_tags = retrieve_tags["updated_tags"]
 
-                anime.update_tags(deleted_tags, added_tags, updated_tags)
+                retrieved_tags = anime.retrieve_tags(client)
+                deleted_tags = retrieved_tags["deleted_tags"]
+                added_tags = retrieved_tags["added_tags"]
+                updated_tags = retrieved_tags["updated_tags"]
+
+                tags = deleted_tags
+                tags.update(added_tags)
+                tags.update(updated_tags)
+
+                anime.update_tags(tags)
 
             self.message_user(request, "Modifications sur les tags faites")
             return None
@@ -261,11 +266,12 @@ class WorkAdmin(admin.ModelAdmin):
 
         all_information = {}
         for anime in queryset:
-            retrieve_tags = anime.retrieve_tags(client)
-            deleted_tags = retrieve_tags["deleted_tags"]
-            added_tags = retrieve_tags["added_tags"]
-            updated_tags = retrieve_tags["updated_tags"]
-            kept_tags = retrieve_tags["kept_tags"]
+            retrieved_tags = anime.retrieve_tags(client)
+            deleted_tags = retrieved_tags["deleted_tags"]
+            added_tags = retrieved_tags["added_tags"]
+            updated_tags = retrieved_tags["updated_tags"]
+            kept_tags = retrieved_tags["kept_tags"]
+
             all_information[anime.id] = {'title': anime.title, 'deleted_tags': deleted_tags.items(),
                                          'added_tags': added_tags.items(), 'updated_tags': updated_tags.items(),
                                          "kept_tags": kept_tags.items()}

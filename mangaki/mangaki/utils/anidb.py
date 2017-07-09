@@ -8,7 +8,7 @@ from django.utils.functional import cached_property
 from django.db.models import Q
 
 from mangaki import settings
-from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist
+from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork
 
 
 def to_python_datetime(mal_date):
@@ -132,6 +132,34 @@ class AniDB:
 
         return missing_titles
 
+    def get_xml(self, anidb_aid: int):
+        anidb_aid = int(anidb_aid)
+
+        r = self._request("anime", {'aid': anidb_aid})
+        soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')
+        if soup.error is not None:
+            raise Exception(soup.error.string)
+
+        return soup.anime
+
+    def handle_tags(self, anidb_aid=None, tags_soup=None):
+        if anidb_aid is not None:
+            anime = self.get_xml(anidb_aid)
+            tags_soup = anime.tags
+
+        tags = {}
+        if tags_soup is not None:
+            for tag_node in tags_soup.find_all('tag'):
+                tag_title = str(tag_node.find('name').string).strip()
+                tag_id = int(tag_node.get('id'))
+                tag_weight = int(tag_node.get('weight'))
+                tag_verified = tag_node.get('verified').lower() == 'true'
+
+                if tag_verified:
+                    tags[tag_title] = {"weight": tag_weight, "anidb_tag_id": tag_id}
+
+        return tags
+
     def get_or_update_work(self,
                            anidb_aid: int,
                            reload_lang_cache: bool = False) -> Work:
@@ -150,17 +178,11 @@ class AniDB:
         :return: the Work object related to the AniDB ID passed in parameter.
         :rtype: a `mangaki.models.Work` object.
         """
-        anidb_aid = int(anidb_aid)
 
-        r = self._request("anime", {'aid': anidb_aid})
-        soup = BeautifulSoup(r.text.encode('utf-8'),
-                             'xml')  # http://stackoverflow.com/questions/31126831/beautifulsoup-with-xml-fails-to-parse-full-unicode-strings#comment50430922_31146912
-        if soup.error is not None:
-            raise Exception(soup.error.string)
-
-        anime = soup.anime
+        anime = self.get_xml(anidb_aid)
         all_titles = anime.titles
         all_creators = anime.creators
+        all_tags = anime.tags
 
         # Handling of titles
         main_title = None
@@ -215,7 +237,6 @@ class AniDB:
             # 'nsfw': ?
             'date': to_python_datetime(anime.startdate.string),
             'end_date': to_python_datetime(anime.enddate.string),
-            # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
             'ext_synopsis': str(anime.description.string),
             'nb_episodes': int(anime.episodecount.string),
             'anime_type': str(anime.type.string),
@@ -240,6 +261,9 @@ class AniDB:
                 artist.save()
 
             Staff.objects.update_or_create(work=work, role_id=nc["role_id"], artist=artist)
+
+        tags = self.handle_tags(tags_soup=all_tags)
+        work.update_tags(tags)
 
         self._build_work_titles(work, titles, reload_lang_cache)
 
