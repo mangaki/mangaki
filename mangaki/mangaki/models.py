@@ -206,6 +206,10 @@ class Work(models.Model):
         added_tags_keys = anidb_tags.keys() - current_tags.keys()
         added_tags = {key: anidb_tags[key] for key in added_tags_keys}
 
+        tags_id = [added_tags[title]["anidb_tag_id"] for title in added_tags]
+        existing_tags = Tag.objects.filter(anidb_tag_id__in=tags_id).all()
+        existing_tags_id = existing_tags.values_list('anidb_tag_id', flat=True)
+
         remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
         updated_tags = {key: anidb_tags[key] for key in remaining_tags_keys if current_tags[key] != anidb_tags[key]}
 
@@ -213,16 +217,21 @@ class Work(models.Model):
         # And new tags have to be assigned to that work
         tags_weight = {}
         tags_to_add = []
+        tags_list = []
         tagged_works_to_add = []
 
         for title, tag_infos in added_tags.items():
             anidb_tag_id = tag_infos["anidb_tag_id"]
             tags_weight[anidb_tag_id] = tag_infos["weight"]
-            tag = Tag(title=title, anidb_tag_id=anidb_tag_id)
-            tags_to_add.append(tag)
+            if anidb_tag_id not in existing_tags_id:
+                tag = Tag(title=title, anidb_tag_id=anidb_tag_id)
+                tags_to_add.append(tag)
+            else:
+                tag = existing_tags.filter(anidb_tag_id=anidb_tag_id).first()
+            tags_list.append(tag)
         Tag.objects.bulk_create(tags_to_add)
 
-        for tag in tags_to_add:
+        for tag in tags_list:
             tag_weight = tags_weight[tag.anidb_tag_id]
             tagged_work = TaggedWork(tag=tag, work=self, weight=tag_weight)
             tagged_works_to_add.append(tagged_work)

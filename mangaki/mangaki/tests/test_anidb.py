@@ -44,6 +44,52 @@ class AniDBTest(TestCase):
         self.assertEqual(len(responses.calls), 1)
 
     @responses.activate
+    def test_anidb_get_multiple_animes(self):
+        with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
+            rsps.add(
+                responses.GET,
+                AniDB.BASE_URL,
+                body=self.read_fixture('sangatsu_no_lion.xml'),
+                status=200,
+                content_type='application/xml'
+            )
+            rsps.add(
+                responses.GET,
+                AniDB.BASE_URL,
+                body=self.read_fixture('hibike_euphonium.xml'),
+                status=200,
+                content_type='application/xml'
+            )
+
+            sangatsu = self.anidb.get_or_update_work(11606)
+            hibike = self.anidb.get_or_update_work(10889)
+
+        tags_sangatsu = Work.objects.get(pk=sangatsu.pk).taggedwork_set.all()
+        tags_sangatsu_titles = tags_sangatsu.values_list('tag__title', flat=True)
+
+        tags_hibike = Work.objects.get(pk=hibike.pk).taggedwork_set.all()
+        tags_hibike_titles = tags_hibike.values_list('tag__title', flat=True)
+
+        shared_tags = list(set(tags_sangatsu_titles).intersection(tags_hibike_titles))
+
+        self.assertEqual(sangatsu.title, 'Sangatsu no Lion')
+        self.assertEqual(sangatsu.nb_episodes, 22)
+        self.assertEqual(sangatsu.studio.title, 'Shaft')
+        self.assertEqual(len(tags_sangatsu_titles), 30)
+
+        self.assertEqual(hibike.title, 'Hibike! Euphonium')
+        self.assertEqual(hibike.nb_episodes, 13)
+        self.assertEqual(hibike.studio.title, 'Kyoto Animation')
+        self.assertEqual(len(tags_hibike_titles), 38)
+
+        self.assertCountEqual(shared_tags, ['Japan', 'time', 'Asia', 'comedy',
+                                            'themes', 'dynamic', 'Earth', 'cast',
+                                            'hard work and guts', 'original work',
+                                            'high school', 'following one`s dream',
+                                            'elements', 'aim for the top', 'setting',
+                                            'school life', 'present', 'place'])
+
+    @responses.activate
     def test_anidb_get(self):
         responses.add(
             responses.GET,
