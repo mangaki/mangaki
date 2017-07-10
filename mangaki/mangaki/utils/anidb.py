@@ -180,6 +180,8 @@ class AniDB:
         """
 
         anime = self.get_xml(anidb_aid)
+
+        anime_restricted = anime.get('restricted') == 'true'
         all_titles = anime.titles
         all_creators = anime.creators
         all_tags = anime.tags
@@ -234,7 +236,7 @@ class AniDB:
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
-            # 'nsfw': ?
+            'nsfw': anime_restricted,
             'date': to_python_datetime(anime.startdate.string),
             'end_date': to_python_datetime(anime.enddate.string),
             'ext_synopsis': str(anime.description.string),
