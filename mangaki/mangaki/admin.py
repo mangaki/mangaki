@@ -160,6 +160,36 @@ def merge_works(request, selected_queryset):
     }
     return len(works_to_merge), None, TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
 
+
+@transaction.atomic  # In case trouble happens
+def change_default_work_title(request, selected_queryset):
+    if request.POST.get('confirm'):  # Changing default title has been confirmed
+        return old_title, updated_work, None
+
+    work_titles = WorkTitle.objects.filter(work__in=selected_queryset.values_list('pk', flat=True))
+
+    titles = {}
+    for work in selected_queryset:
+        work_titles_for_work = work_titles.filter(work=work).exclude(title=work.title)
+        infos = work_titles_for_work.values_list('pk', 'title', 'language', 'type')
+
+        titles[work.id] = {
+            info[0]: {
+                'title': info[1],
+                'language': info[2],
+                'type': info[3]
+            } for info in infos
+        }
+        titles[work.id].update({0: {'title': work.title, 'language': '', 'type': 'current'} })
+
+    context = {
+        'work_titles': titles.items(),
+        'opts': Work._meta,
+        'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+    }
+    return '', None, TemplateResponse(request, 'admin/change_default_work_title.html', context)
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -206,9 +236,9 @@ class FAQAdmin(admin.ModelAdmin):
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'category', 'title', 'nsfw')
-    list_filter = ('category', 'nsfw', AniDBaidListFilter,)
+    list_filter = ('category', 'nsfw', AniDBaidListFilter)
     raw_id_fields = ('redirect',)
-    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge', 'refresh_work', 'update_tags_via_anidb']
+    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge', 'refresh_work', 'update_tags_via_anidb', 'change_title']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
@@ -357,6 +387,15 @@ class WorkAdmin(admin.ModelAdmin):
         return TemplateResponse(request, 'admin/refresh_poster_confirmation.html', context)
 
     refresh_work.short_description = "Mettre à jour la fiche de l'anime (poster)"
+
+    def change_title(self, request, queryset):
+        old_title, final_work, response = change_default_work_title(request, queryset)
+        if response is None:  # Confirmed
+            self.message_user(request, format_html('Le titre par défaut de {:s} a bien été changé en <a href="{:s}">{:s}</a>.'
+                .format(old_title, final_work.get_absolute_url(), final_work.title)))
+        return response
+
+    change_title.short_description = "Changer le titre par défaut"
 
 
 @admin.register(Artist)
