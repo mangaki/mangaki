@@ -76,13 +76,6 @@ def get_reco_algo(request, algo_name='knn', category='all'):
                     self.M[user_id, work_id] = rating
         for work_id in knn.nb_ratings: #refresh mean_score of knn method
             knn.mean_score[work_id] = knn.sum_ratings[work_id] / knn.nb_ratings[work_id]
-        # anonymized = dataset.make_anonymous_data(triplets)
-
-        # chrono.save('make first anonymous data with {} ratings'.format(len(triplets)))
-
-        # algo = ALGOS['knn']()
-        # algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
-        # algo.fit(anonymized.X, anonymized.y)
 
         chrono.save('prepare first fit')
 
