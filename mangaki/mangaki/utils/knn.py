@@ -1,7 +1,7 @@
 from mangaki.utils.common import RecommendationAlgorithm
 from collections import Counter, defaultdict
 import numpy as np
-from scipy.sparse import lil_matrix
+from scipy.sparse import coo_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
 
@@ -54,9 +54,9 @@ class MangakiKNN(RecommendationAlgorithm):
 
     def fit(self, X, y, whole_dataset=False):
         self.ratings = defaultdict(dict)
-        self.sum_ratings = defaultdict(lambda: 0)
-        self.nb_ratings = defaultdict(lambda: 0)
-        self.M = lil_matrix((self.nb_users, self.nb_works))
+        self.sum_ratings = Counter()
+        self.nb_ratings = Counter()
+        self.M = coo_matrix((self.nb_users, self.nb_works))
         for (user_id, work_id), rating in zip(X, y):
             self.ratings[user_id][work_id] = rating
             self.nb_ratings[work_id] += 1
