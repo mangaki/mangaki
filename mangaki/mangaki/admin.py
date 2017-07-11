@@ -160,36 +160,6 @@ def merge_works(request, selected_queryset):
     }
     return len(works_to_merge), None, TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
 
-
-@transaction.atomic  # In case trouble happens
-def change_default_work_title(request, selected_queryset):
-    if request.POST.get('confirm'):  # Changing default title has been confirmed
-        return old_title, updated_work, None
-
-    work_titles = WorkTitle.objects.filter(work__in=selected_queryset.values_list('pk', flat=True))
-
-    titles = {}
-    for work in selected_queryset:
-        work_titles_for_work = work_titles.filter(work=work).exclude(title=work.title)
-        infos = work_titles_for_work.values_list('pk', 'title', 'language', 'type')
-
-        titles[work.id] = {
-            info[0]: {
-                'title': info[1],
-                'language': info[2],
-                'type': info[3]
-            } for info in infos
-        }
-        titles[work.id].update({0: {'title': work.title, 'language': '', 'type': 'current'} })
-
-    context = {
-        'work_titles': titles.items(),
-        'opts': Work._meta,
-        'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
-    }
-    return '', None, TemplateResponse(request, 'admin/change_default_work_title.html', context)
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -389,11 +359,37 @@ class WorkAdmin(admin.ModelAdmin):
     refresh_work.short_description = "Mettre à jour la fiche de l'anime (poster)"
 
     def change_title(self, request, queryset):
-        old_title, final_work, response = change_default_work_title(request, queryset)
-        if response is None:  # Confirmed
-            self.message_user(request, format_html('Le titre par défaut de {:s} a bien été changé en <a href="{:s}">{:s}</a>.'
-                .format(old_title, final_work.get_absolute_url(), final_work.title)))
-        return response
+        if request.POST.get('confirm'):  # Changing default title has been confirmed
+            logger.error('cc',)
+            self.message_user(request, format_html('Les titres ont bien été changés pour les œuvres sélectionnées.'))
+            return None
+
+        work_titles = WorkTitle.objects.filter(work__in=queryset.values_list('pk', flat=True))
+        titles = {}
+
+        for work in queryset:
+            work_titles_for_work = work_titles.filter(work=work)
+            if len(work_titles_for_work) <= 0:
+                continue
+
+            infos = work_titles_for_work.values_list('pk', 'title', 'language', 'type')
+
+            titles[work.id] = {
+                info[0]: {
+                    'title': info[1],
+                    'language': info[2],
+                    'type': info[3] if info[1] != work.title else 'current'
+                } for info in infos
+            }
+
+        context = {
+            'work_titles': titles,
+            'queryset': queryset,
+            'opts': Work._meta,
+            'action': 'change_title',
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+        }
+        return TemplateResponse(request, 'admin/change_default_work_title.html', context)
 
     change_title.short_description = "Changer le titre par défaut"
 
