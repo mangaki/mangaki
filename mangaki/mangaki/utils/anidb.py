@@ -234,7 +234,7 @@ class AniDB:
 
         anime = {
             'title': main_title,
-            'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
+            'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
             'nsfw': anime_restricted,
             'date': to_python_datetime(anime.startdate.string),
@@ -266,6 +266,10 @@ class AniDB:
 
         tags = self.handle_tags(tags_soup=all_tags)
         work.update_tags(tags)
+
+        # Check for NSFW based on tags if this work is new
+        if created:
+            work.is_nsfw_based_on_tags(tags)
 
         self._build_work_titles(work, titles, reload_lang_cache)
 

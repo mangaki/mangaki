@@ -248,6 +248,31 @@ class Work(models.Model):
 
     # Should add an update_creators method similar to update_tags
 
+    def is_nsfw_based_on_tags(self, anidb_tags):
+        # Might want to move this somewhere else ...
+        potentially_nsfw_tags = ['nudity', 'ecchi', 'pantsu', 'breasts', 'sex',
+                                 'large breasts', 'small breasts', 'gigantic breasts',
+                                 'incest', 'pornography', 'shota', 'masturbation',
+                                 'sexual fantasies', 'anal', 'loli']
+
+        if self.nsfw:
+            return
+
+        sum_weight_all_low = sum([infos["weight"] for t, infos in anidb_tags.items()
+                                  if infos["weight"] <= 400])
+        sum_weight_nsfw_low = sum([infos["weight"] for t, infos in anidb_tags.items()
+                                   if t in potentially_nsfw_tags and infos["weight"] <= 400])
+
+        sum_weight_all_high = sum([infos["weight"] for t, infos in anidb_tags.items()
+                                   if infos["weight"] > 400])
+        sum_weight_nsfw_high = sum([infos["weight"] for t, infos in anidb_tags.items()
+                                    if t in potentially_nsfw_tags and infos["weight"] > 400])
+
+        percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
+        percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+
+        self.nsfw = (percent_high_nsfw > 15 or percent_low_nsfw > 30)
+
     def safe_poster(self, user):
         if self.id is None:
             return '{}{}'.format(settings.STATIC_URL, 'img/chiro.gif')
