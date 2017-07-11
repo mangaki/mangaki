@@ -268,8 +268,9 @@ class AniDB:
         work.update_tags(tags)
 
         # Check for NSFW based on tags if this work is new
-        if created:
-            work.is_nsfw_based_on_tags(tags)
+        if created and work.is_nsfw_based_on_tags(tags):
+            work.nsfw = True
+            work.save()
 
         self._build_work_titles(work, titles, reload_lang_cache)
 
