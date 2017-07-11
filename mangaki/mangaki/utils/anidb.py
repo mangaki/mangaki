@@ -87,9 +87,7 @@ class AniDB:
             .select_related('lang')
         )
 
-        return {
-            ext.lang.code: ext for ext in ext_langs
-        }
+        return {ext.lang.code: ext for ext in ext_langs}
 
     @cached_property
     def unknown_language(self) -> ExtLanguage:
@@ -105,16 +103,20 @@ class AniDB:
 
         work_titles = []
         raw_titles = []
-        for lang, title_data in titles.items():
+        for title_info in titles:
+            title = title_info['title']
+            lang = title_info['lang']
+            title_type = title_info['type']
+
             ext_lang_model = self.lang_map.get(lang, self.unknown_language)
-            raw_titles.append(title_data['title'])
+            raw_titles.append(title)
             work_titles.append(
                 WorkTitle(
                     work=work,
-                    title=title_data['title'],
+                    title=title,
                     ext_language=ext_lang_model,
                     language=ext_lang_model.lang if ext_lang_model else None,
-                    type=title_data['type']
+                    type=title_type
                 )
             )
 
@@ -186,22 +188,20 @@ class AniDB:
 
         # Handling of titles
         main_title = None
-        synonyms = {}
-        titles = {}
+        titles = []
         for title_node in all_titles.find_all('title'):
             title = str(title_node.string).strip()
             lang = title_node.get('xml:lang')
             title_type = title_node.get('type')
-            titles[lang] = {
+
+            titles.append({
                 'title': title,
+                'lang': lang,
                 'type': title_type
-            }
+            })
 
             if title_type == 'main':
                 main_title = title
-
-            if title_type == 'synonym':
-                synonyms[lang] = title
 
         # Handling of staff
         creators = []
