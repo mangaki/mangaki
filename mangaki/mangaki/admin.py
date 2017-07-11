@@ -2,6 +2,7 @@ import time
 import logging
 
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -282,7 +283,7 @@ class WorkAdmin(admin.ModelAdmin):
         }
         return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
 
-    update_tags_via_anidb.short_description = "Mise à jour des tags des oeuvres sélectionnées"
+    update_tags_via_anidb.short_description = "Mettre à jour les tags des œuvres depuis AniDB"
 
     def make_sfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=False)
@@ -302,20 +303,22 @@ class WorkAdmin(admin.ModelAdmin):
             offending_works = [work for work in works if not work.anidb_aid]
             self.message_user(request,
                               "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
-                              "Veuillez ne sélectionner que des œuvres ayant un identifiant AniDB. (détails: {})"
-                              .format(",".join(map(lambda w: w.title, offending_works))))
+                              "Leur rafraichissement a été omis. (Détails: {})"
+                              .format(", ".join(map(lambda w: w.title, offending_works))),
+                              level=messages.WARNING)
 
         for index, work in enumerate(works, start=1):
-            logger.info('Refreshing {} from AniDB.'.format(work))
-            client.get_or_update_work(work.anidb_aid)
-            if index % 25 == 0:
-                logger.info('(AniDB refresh): Sleeping...')
-                time.sleep(1)  # Don't spam AniDB.
+            if work.anidb_aid:
+                logger.info('Refreshing {} from AniDB.'.format(work))
+                client.get_or_update_work(work.anidb_aid)
+                if index % 25 == 0:
+                    logger.info('(AniDB refresh): Sleeping...')
+                    time.sleep(1)  # Don't spam AniDB.
 
         self.message_user(request,
                           "Le rafraichissement des œuvres a été effectué avec succès.")
 
-    refresh_work_from_anidb.short_description = "Rapatrie les titres alternatifs et synopsis depuis AniDB"
+    refresh_work_from_anidb.short_description = "Rafraîchir les œuvres depuis AniDB"
 
     def merge(self, request, queryset):
         nb_merged, final_work, response = merge_works(request, queryset)
@@ -373,7 +376,7 @@ class TagAdmin(admin.ModelAdmin):
     def nb_works_linked(self, obj):
         return obj.works_linked
 
-    nb_works_linked.short_description = 'Nombre d\'oeuvres liées au tag'
+    nb_works_linked.short_description = 'Nombre d\'œuvres liées au tag'
 
 
 @admin.register(TaggedWork)

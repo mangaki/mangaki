@@ -93,7 +93,7 @@ class AniDB:
 
     @cached_property
     def unknown_language(self) -> ExtLanguage:
-        return ExtLanguage.objects.get(source='anidb', ext_lang='x-unk')
+        return ExtLanguage.objects.filter(source='anidb', ext_lang='x-unk').first()
 
     def _build_work_titles(self,
                            work: Work,
@@ -205,6 +205,7 @@ class AniDB:
 
         # Handling of staff
         creators = []
+        studio = None
         # FIXME: cache this query
         staff_map = dict(Role.objects.values_list('slug', 'pk'))
         for creator_node in all_creators.find_all('name'):
@@ -229,6 +230,9 @@ class AniDB:
                     "name": creator,
                     "anidb_creator_id": creator_id
                 })
+
+        if studio is None: # If no studio, set it as unknown studio
+            studio = Studio.objects.get(pk=1)
 
         anime = {
             'title': main_title,
