@@ -378,7 +378,7 @@ class WorkAdmin(admin.ModelAdmin):
                 if new_title != current_title:
                     Work.objects.filter(pk=work_id).update(title=new_title)
 
-            self.message_user(request, format_html('Les titres ont bien été changés pour les œuvres sélectionnées.'))
+            self.message_user(request, 'Les titres ont bien été changés pour les œuvres sélectionnées.')
             return None
 
         work_titles = WorkTitle.objects.filter(work__in=queryset.values_list('pk', flat=True))
@@ -389,7 +389,8 @@ class WorkAdmin(admin.ModelAdmin):
             if len(work_titles_for_work) <= 0:
                 continue
 
-            infos = work_titles_for_work.values_list('pk', 'title', 'language', 'type')
+            infos = work_titles_for_work.values_list(
+                'pk', 'title', 'language', 'type').order_by('title').distinct('title')
 
             titles[work.id] = {
                 info[0]: {
@@ -399,14 +400,20 @@ class WorkAdmin(admin.ModelAdmin):
                 } for info in infos
             }
 
-        context = {
-            'work_titles': titles,
-            'queryset': queryset,
-            'opts': Work._meta,
-            'action': 'change_title',
-            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
-        }
-        return TemplateResponse(request, 'admin/change_default_work_title.html', context)
+        if len(titles) > 0:
+            context = {
+                'work_titles': titles,
+                'queryset': queryset,
+                'opts': Work._meta,
+                'action': 'change_title',
+                'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+            }
+            return TemplateResponse(request, 'admin/change_default_work_title.html', context)
+        else:
+            self.message_user(request,
+                              'Aucune des œuvres sélectionnées ne possèdent de titre alternatif.',
+                              level=messages.WARNING)
+            return None
 
     change_title.short_description = "Changer le titre par défaut"
 
