@@ -176,9 +176,11 @@ class AniDBTest(TestCase):
                 animes[filename] = self.anidb.get_or_update_work(infos[0])
 
         for filename in are_nsfw:
-            self.assertEqual(animes[filename].title, animes_sources[filename][1])
-            self.assertTrue(animes[filename].nsfw)
+            with self.subTest('Asserting {} is NSFW.'.format(animes[filename].title)):
+                self.assertEqual(animes[filename].title, animes_sources[filename][1])
+                self.assertTrue(animes[filename].nsfw)
 
         for filename in are_sfw:
-            self.assertEqual(animes[filename].title, animes_sources[filename][1])
-            self.assertFalse(animes[filename].nsfw)
+            with self.subTest('Asserting {} is SFW.'.format(animes[filename].title)):
+                self.assertEqual(animes[filename].title, animes_sources[filename][1])
+                self.assertFalse(animes[filename].nsfw)
