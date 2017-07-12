@@ -91,7 +91,7 @@ class AniDB:
 
     @cached_property
     def unknown_language(self) -> ExtLanguage:
-        return ExtLanguage.objects.filter(source='anidb', ext_lang='x-unk').first()
+        return ExtLanguage.objects.get(source='anidb', ext_lang='x-unk')
 
     def _build_work_titles(self,
                            work: Work,
