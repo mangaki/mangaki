@@ -18,7 +18,8 @@ class MergeTest(TestCase):
         anime = Category.objects.get(slug='anime')
         Work.objects.bulk_create([
             Work(title='Sangatsu no Lion', category=anime),
-            Work(title='Hibike! Euphonium', category=anime)
+            Work(title='Hibike! Euphonium', category=anime),
+            Work(title='Kiznaiver', category=anime)
         ])
         self.work_ids = Work.objects.values_list('pk', flat=True)
 
@@ -31,7 +32,21 @@ class MergeTest(TestCase):
     def test_change_title(self):
         self.client.login(username='test', password='test')
         change_title_url = reverse('admin:mangaki_work_changelist')
-        response = self.client.post(change_title_url, {'action': 'change_title', admin.ACTION_CHECKBOX_NAME: self.work_ids})
+        response = self.client.post(
+            change_title_url,
+            {'action': 'change_title', admin.ACTION_CHECKBOX_NAME: self.work_ids},
+            follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_change_title_no_alternative_titles(self):
+        self.client.login(username='test', password='test')
+        change_title_url = reverse('admin:mangaki_work_changelist')
+        response = self.client.post(
+            change_title_url,
+            {'action': 'change_title', admin.ACTION_CHECKBOX_NAME: self.work_ids[2]},
+            follow=True
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_change_title_confirmed(self):
