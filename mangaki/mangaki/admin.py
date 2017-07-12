@@ -382,25 +382,23 @@ class WorkAdmin(admin.ModelAdmin):
             return None
 
         work_titles = WorkTitle.objects.filter(work__in=queryset.values_list('pk', flat=True))
+        full_infos = work_titles.values(
+            'pk', 'title', 'language', 'type', 'work_id', 'work__title').order_by('title').distinct('title')
         titles = {}
 
-        for work in queryset:
-            work_titles_for_work = work_titles.filter(work=work)
-            if len(work_titles_for_work) <= 0:
-                continue
+        for infos in full_infos:
+            if infos['work_id'] not in titles:
+                titles[infos['work_id']] = {}
 
-            infos = work_titles_for_work.values_list(
-                'pk', 'title', 'language', 'type').order_by('title').distinct('title')
+            titles[infos['work_id']].update({
+                infos['pk']: {
+                    'title': infos['title'],
+                    'language': infos['language'],
+                    'type': infos['type'] if infos['title'] != infos['work__title'] else 'current'
+                }
+            })
 
-            titles[work.id] = {
-                info[0]: {
-                    'title': info[1],
-                    'language': info[2],
-                    'type': info[3] if info[1] != work.title else 'current'
-                } for info in infos
-            }
-
-        if len(titles) > 0:
+        if titles:
             context = {
                 'work_titles': titles,
                 'queryset': queryset,
