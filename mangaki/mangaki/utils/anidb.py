@@ -87,7 +87,9 @@ class AniDB:
             .select_related('lang')
         )
 
-        return {ext.lang.code: ext for ext in ext_langs}
+        return {
+            ext.lang.code: ext for ext in ext_langs
+        }
 
     @cached_property
     def unknown_language(self) -> ExtLanguage:

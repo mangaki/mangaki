@@ -5,7 +5,7 @@ from django.contrib import admin
 from mangaki.models import Work, Category, WorkTitle, Editor, Studio
 
 
-class MergeTest(TestCase):
+class ChangeDefaultTitleTest(TestCase):
 
     def setUp(self):
         # FIXME: The defaults for editor and studio in Work requires those to
@@ -62,5 +62,5 @@ class MergeTest(TestCase):
 
         self.client.post(change_title_url, context)
 
-        self.assertTrue(Work.objects.filter(title='3-gatsu no Lion').count() > 0)
-        self.assertTrue(Work.objects.filter(title='Sound! Euphonium').count() > 0)
+        self.assertTrue(Work.objects.filter(title='3-gatsu no Lion').exists())
+        self.assertTrue(Work.objects.filter(title='Sound! Euphonium').exists())
