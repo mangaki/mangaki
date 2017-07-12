@@ -371,10 +371,10 @@ class WorkAdmin(admin.ModelAdmin):
                         new_titles[work_id] = title_id
 
             titles = WorkTitle.objects.filter(
-                pk__in=new_titles.values()
-            ).values_list('title', 'work__title', 'work__id', 'id')
+                pk__in=new_titles.values(), work__id__in=new_titles.keys()
+            ).values_list('title', 'work__title', 'work__id')
 
-            for new_title, current_title, work_id, title_id in titles:
+            for new_title, current_title, work_id in titles:
                 if new_title != current_title:
                     Work.objects.filter(pk=work_id).update(title=new_title)
 
