@@ -7,6 +7,7 @@ from django.db.models import Count
 from mangaki.utils.algo import ALGOS, fit_algo, get_algo_backup, get_dataset_backup
 from mangaki.utils.algo import ALGOS, fit_algo
 from mangaki.utils.ratings import current_user_ratings
+from scipy.sparse import coo_matrix
 from mangaki.utils.values import rating_values
 import numpy as np
 import json
@@ -51,36 +52,17 @@ def get_reco_algo(request, algo_name='knn', category='all'):
 
     if algo_name == 'knn':
         algo = get_algo_backup(algo_name)
-        queryset = Rating.objects.filter(work__in=already_rated_works)
         dataset = get_dataset_backup(algo_name)
-        triplets = list(
-            queryset.values_list('user_id', 'work_id', 'choice'))
-        if request.user.is_anonymous:
-            triplets.extend([
-                (request.user.id, work_id, choice)
-                for work_id, choice in current_user_ratings(request).items()
-            ])
-        triplets['rating'] = triplets['choice'].map(rating_values)
-        triplets['user_id'] = [dataset.encode_user[user_id] for user_id in triplets]
-        triplets['work_id'] = [dataset.encode_work[work_id] for work_id in triplets]
-        for user_id, work_id, rating in triplets:
-            if knn.M[user_id, work_id]!=rating: #if the user modified his rating
-                if rating == 0: # if the user deleted his rating
-                    knn.ratings[user_id][work_id]=rating
-                    knn.nb_ratings[work_id] -= 1
-                    knn.sum_ratings[work_id] -= knn.M[user_id, work_id]
-                    self.M[user_id, work_id] = rating
-                else: # if the user switched his rating to another one
-                    knn.ratings[user_id][work_id]=rating
-                    knn.sum_ratings[work_id] += rating-knn.M[user_id, work_id]
-                    self.M[user_id, work_id] = rating
-        for work_id in knn.nb_ratings: #refresh mean_score of knn method
-            knn.mean_score[work_id] = knn.sum_ratings[work_id] / knn.nb_ratings[work_id]
+        already_rated_works['rating'] = already_rated_works['choice'].map(rating_values)
+        ratings_from_user = coo_matrix((already_rated_works['rating'],(np.zeros(len(already_rated_works['work_id'])), already_rated_works['work_id'])), shape = (1, knn.nb_works))
+        ratings_from_user = ratings_from_user.tocsr()
+        knn.M = vstack([knn.M, ratings_from_user])
+
 
         chrono.save('prepare first fit')
 
 
-        encoded_neighbors = algo.get_neighbors([dataset.encode_user[request.user.id]])
+        encoded_neighbors = algo.get_neighbors([knn.nb_users]) # Now, current user ratings are in the last row of M
         neighbors = dataset.decode_users(encoded_neighbors[0])  # We only want for the first user
 
         chrono.save('get neighbors')

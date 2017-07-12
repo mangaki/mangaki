@@ -56,12 +56,13 @@ class MangakiKNN(RecommendationAlgorithm):
         self.ratings = defaultdict(dict)
         self.sum_ratings = Counter()
         self.nb_ratings = Counter()
-        self.M = coo_matrix((self.nb_users, self.nb_works))
+        users, works = zip(*list(X))
+        self.M = coo_matrix((y,(users,works)), shape = (self.nb_users, self.nb_works)) # Might take some time, but coo is efficient for creating matrices
+        self.M = M.toscr() # knn.M should be CSR for faster arithmetic operations
         for (user_id, work_id), rating in zip(X, y):
             self.ratings[user_id][work_id] = rating
             self.nb_ratings[work_id] += 1
             self.sum_ratings[work_id] += rating
-            self.M[user_id, work_id] = rating
         for work_id in self.nb_ratings:
             self.mean_score[work_id] = self.sum_ratings[work_id] / self.nb_ratings[work_id]
 
