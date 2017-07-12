@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?><anime id="4544" restricted="true">
+<type>OVA</type>
+<episodecount>3</episodecount>
+<startdate>2006-09-07</startdate>
+<enddate>2008-10-09</enddate>
+<titles>
+<title xml:lang="x-jat" type="main">Boku no Piko</title>
+<title xml:lang="en" type="synonym">My Pico</title>
+<title xml:lang="x-jat" type="synonym">Boku no Pico</title>
+<title xml:lang="uk" type="synonym">Мій піко</title>
+<title xml:lang="ja" type="official">ぼくのぴこ</title>
+</titles>
+<similaranime>
+<anime id="7984" approval="44" total="52">Anime Shounen Maid Curo-kun: Tenshi no Uta</anime>
+<anime id="9699" approval="23" total="24">Natsuyasumi.</anime>
+</similaranime>
+<url>http://www.pico.bz/</url>
+<creators>
+<name id="655" type="Character Design">Yoshiten</name>
+<name id="1743" type="Direction">Yatabe Katsuyoshi</name>
+<name id="16837" type="Music">Shinobi</name>
+<name id="1346" type="Work">SugarBoy</name>
+<name id="1346" type="Animation Work">SugarBoy</name>
+<name id="1367" type="Animation Work">Blue Cat</name>
+<name id="41087" type="Original Work">Natural High</name>
+</creators>
+<description>Summer vacation. http://anidb.net/ch18210 [Tamotsu] meets a http://anidb.net/ch17562 [girl] on the countryside, who was helping out on her http://anidb.net/ch18211 [grandpa]`s coffee shop. While on a trip, the girl`s innocent and defenceless lips approach Tamotsu`s. The girl is actually a boy. "I`m a boy" that`s all he can say, but Tamotsu can`t hold back anymore... A dangerous love between a boy and a young man starts.</description>
+<ratings>
+<permanent count="747">2.82</permanent>
+<temporary count="806">5.43</temporary>
+<review count="2">7.33</review>
+</ratings>
+<picture>10961.jpg</picture>
+<resources>
+<resource type="1">
+<externalentity>
+<identifier>6908</identifier>
+</externalentity>
+<externalentity>
+<identifier>8647</identifier>
+</externalentity>
+<externalentity>
+<identifier>11326</identifier>
+</externalentity>
+</resource>
+<resource type="2">
+<externalentity>
+<identifier>5391</identifier>
+</externalentity>
+<externalentity>
+<identifier>6546</identifier>
+</externalentity>
+<externalentity>
+<identifier>1639</identifier>
+</externalentity>
+<externalentity>
+<identifier>4866</identifier>
+</externalentity>
+</resource>
+<resource type="3">
+<externalentity>
+<identifier>3782</identifier>
+<identifier>kfakvz</identifier>
+</externalentity>
+</resource>
+<resource type="4">
+<externalentity>
+<url>http://www.pico.bz/</url>
+</externalentity>
+</resource>
+<resource type="6">
+<externalentity>
+<identifier>Boku_no_pico</identifier>
+</externalentity>
+</resource>
+<resource type="7">
+<externalentity>
+<identifier>ぼくのぴこ</identifier>
+</externalentity>
+<externalentity>
+<identifier>ぴことちこ</identifier>
+</externalentity>
+<externalentity>
+<identifier>ぴこ×CoCo×ちこ</identifier>
+</externalentity>
+</resource>
+<resource type="10">
+<externalentity>
+<identifier>9495</identifier>
+</externalentity>
+<externalentity>
+<identifier>9496</identifier>
+</externalentity>
+<externalentity>
+<identifier>9879</identifier>
+</externalentity>
+<externalentity>
+<identifier>9494</identifier>
+</externalentity>
+</resource>
+</resources>
+<tags>
+<tag id="618" parentid="2565" infobox="true" weight="500" localspoiler="false" globalspoiler="false" verified="true" update="2017-04-19">
+<name>trap</name>
+<description>A male character often mistaken as a female by other characters and/or the viewer due to his feminine appearance, behaviour, and/or language (regardless of his intention).
+The reverse case is known as a http://anidb.net/t1637 [reverse trap].</description>
+<picurl>161537.jpg</picurl>
+</tag>
+<tag id="1894" parentid="2608" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-04">
+<name>shota</name>
+<description>Shotacon, sometimes shortened to shota, is a Japanese slang portmanteau of the phrase Shoutarou complex and describes an attraction to young boys, or an individual with such an attraction. Outside Japan, the term is less common and most often refers to a genre of manga and anime wherein pre-pubescent or pubescent male characters are depicted in a suggestive or erotic manner.
+In a general sense, this is the same as http://anidb.net/t2566 [loli], just replace young girls with young boys.
+[Source: wiki]</description>
+<picurl>35399.jpg</picurl>
+</tag>
+<tag id="2565" parentid="2608" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2011-04-14">
+<name>cross-dressing</name>
+<description>This character sometimes wears clothes traditionally worn by and associated with the opposite sex.
+Cross-dressers often hide their cross-dressing identity for a long period of time and thus tend to become adept in accurately portraying the opposite sex in terms of voice, movement, behaviour, temperament, etc.</description>
+</tag>
+<tag id="2604" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-04-02">
+<name>content indicators</name>
+<description>The content indicators branch is intended to be a less geographically specific tool than the `age rating` used by convention, for warning about things that might cause offence. Obviously there is still a degree of subjectivity involved, but hopefully it will prove useful for parents with delicate children, or children with delicate parents.</description>
+</tag>
+<tag id="2606" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-18">
+<name>target audience</name>
+<description>Anime, like everything else in the modern world, is targeted towards specific audiences, both implicitly by the creators and overtly by the marketing. While categories are associated with specific sex and age groups, this is not a bar on the anime being enjoyed by people who don`t fit into that band; not only do crossover titles exist, but the categories also have a considerable following outside their main demographic, and a person might as well enjoy anime from all categories. Still, does not invalidate the usefulness of marking a title as one of the categories; the same themes will likely be treated differently in anime geared for different audiences. Only one should not jump the gun and assume that a title will be more or less serious or present content in this or that way due to its target audience, or conversely assume the target audience on the content and its presentation alone. As such, the audience categories help form a broad impression of how a title might work with the announced themes, but offer little to no in-depth information about specific content or its treatment.
+The audience categories originate from manga magazines, which group titles of a same intended audience into a magazine that is advertised as belonging to that category, and so manga-based anime will have the category from their parent work. As for anime based on other works, the audience is often debatable, but comparing information such as time slot to the manga-based anime generally helps figure out the most likely possibility.</description>
+</tag>
+<tag id="2608" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-12-04">
+<name>fetishes</name>
+<description>Everything under fetishes (except for Bishounen and Juujin) is strictly only meant for hentai (18 Restricted) and ecchi anime. In case of ecchi, it must be the main element of the show and not when there`s only some of it, for example, there`s some ecchi in Shinseiki Evangelion, but the fact you get to see Asuka`s pantsu doesn`t warrant it the schoolgirl fetish category. So be careful to which ecchi show you add fetishes; it`s fairly straightforward with hentai, though. Overall, this category tree is to satisfy the needs of people with different fetishes, so they can search for what tingles their tangle; hence why this is restricted to hentai and full ecchi shows. </description>
+</tag>
+<tag id="2609" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-22">
+<name>original work</name>
+<description>What the anime is based on! Mostly of academic interest, but a useful bit of info, hinting at the possible depth of story.</description>
+</tag>
+<tag id="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-22">
+<name>setting</name>
+<description>The setting describes in what time and place an anime takes place. To a certain extent it describes what you can expect from the world in the anime.</description>
+</tag>
+<tag id="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-08">
+<name>elements</name>
+<description>Next to Themes setting the backdrop for the protagonists in anime, there are the more detailed plot Elements that centre on character interactions: "What do characters do to each other or what is done to them?". Is it violent Action, an awe-inspiring Adventure in a foreign place, the gripping life of a Detective, a slapstick Comedy, an Ecchi Harem anime, a SciFi epic, or some Fantasy travelling adventure?</description>
+</tag>
+<tag id="2612" parentid="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>time</name>
+<description>This placeholder lists different epochs in human history and more vague but important timelines such as the future, the present and the past.</description>
+</tag>
+<tag id="2613" parentid="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>place</name>
+<description>The places the anime can take place in. Includes more specific places such as a country on Earth, as well as more general places such as a dystopia or a mirror world.</description>
+</tag>
+<tag id="2615" parentid="2606" infobox="true" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-02-27">
+<name>18 restricted</name>
+<description>This isn`t really an "audience".
+While some anime might feature sexual content they still might not be considered pornography. This category is meant only for when the content is clearly *not* intended for minors. The distinction is made by whether the content is sold only to adults.</description>
+<picurl>10710.gif</picurl>
+</tag>
+<tag id="2624" parentid="2612" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2017-02-20">
+<name>present</name>
+<description>Somewhere between past and future.</description>
+</tag>
+<tag id="2630" parentid="2613" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-13">
+<name>Earth</name>
+<description>The Earth is the third planet from the Sun, and the densest and fifth-largest of the eight planets in the Solar System. It is in effect a ball of hot mud, but on the surface it`s cold enough, so most of us live on it (or are supposed to). It is circa 4.5 billion years old, and, unless we humans succeed in destroying it over the next couple of centuries, it is expected to last for quite another while, though the changes in the Sun`s emissions due to its aging will likely cause the extinction of everything; the species of earthlings are guaranteed to die, even if we fail to kill them -- unless, of course, we find ourselves another planet and figure out a way to take everything there. Our little planet on a corner of this galaxy may mean nothing in the grand scheme of things, but to its inhabitants it is their home, so, as a species, we cherish it dearly, to the point many cultures even to this day deify it. Being the home to the human civilizations, the Earth is the main setting of most fiction, be it anime or otherwise, but not only are many titles set in other places, such as unrelated fantasy worlds, in a considerable number of fictional titles the Earth is actually destroyed by aggressive alien invaders.</description>
+<picurl>126792.jpg</picurl>
+</tag>
+<tag id="2648" parentid="2849" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2014-11-04">
+<name>contemporary fantasy</name>
+<description>Contemporary fantasy, also known as modern fantasy or indigenous fantasy, is a sub-genre of fantasy, set in the present day. It is perhaps most popular for its sub-genre, urban fantasy.
+These terms are used to describe stories set in the putative real world (often referred to as consensus reality) in contemporary times, in which magic and magical creatures exist, either living in the interstices of our world or leaking over from alternate worlds. It thus has much in common with, and sometimes overlaps with secret history; a work of fantasy in which the magic could not remain secret or does not have any known relationship to known history would not fit into this subgenre. Occasionally certain contemporary fantasy novels will make reference to pop culture.
+Novels in which modern characters travel into alternate worlds, and all the magical action takes place there (except for the portal required to transport them), are not considered contemporary fantasy. Thus, C.S. Lewis`s The Lion, the Witch and the Wardrobe, where all fantasy events take place in the land of Narnia which is reached via a magic wardrobe, would not count as contemporary fantasy; on the other hand, the part of The Magician`s Nephew, where the Empress Jadis gets to London, tries to take over the Earth and clashes with police and a crowd of cockneys, would qualify as such.
+Contemporary fantasy is also to be distinguished from horror fiction, which also often has contemporary settings. When encountering magical events and creatures, the protagonist of a horror novel is horrified, while the protagonist of a fantasy novel (contemporary or otherwise) is filled with a sense of joy and wonder. Horrifying events may happen, but the fundamental distinction is vital.
+In his preface to That Hideous Strength, one of the earlier works falling within this sub-genre, C.S. Lewis explained why, when writing a tale about "magicians, devils, pantomime animals and planetary angels", he chose to start it with a detailed depiction of narrow-minded academic politics at a provincial English university and the schemes of crooked real estate developers: "I am following the traditional fairy-tale. We do not always notice its method, because the cottages, castles, woodcutters and petty kings with which a fairy tale opens have become for us as remote as the witches and ogres to which it proceeds. But they were not remote at all to the men who first made and enjoyed the tales". The same is true for many of the later works in the genre, which often begin with a seemingly normal scene of modern daily life to then disclose supernatural and magical beings and events hidden behind the scenes.
+Source: wiki</description>
+</tag>
+<tag id="2672" parentid="2834" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2015-05-31">
+<name>Japan</name>
+<description>Last stronghold for humanity. If Tokyo falls, it`s all over. Tokyo Tower will undoubtedly fall anyway.</description>
+</tag>
+<tag id="2693" parentid="2848" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-20">
+<name>handjob</name>
+<description>Manual stimulation of the penis by another person`s hand.</description>
+</tag>
+<tag id="2696" parentid="2848" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-01-13">
+<name>threesome</name>
+<description>Tag for any scene where sexual acts take place with three people of any gender. Should not be used if more than three.</description>
+<picurl>150774.jpg</picurl>
+</tag>
+<tag id="2697" parentid="2848" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2015-05-05">
+<name>voyeurism</name>
+<description>Voyeurism is the sexual interest in or practice of spying on people engaged in intimate behaviors, such as undressing, sexual activity, or other actions usually considered to be of a private nature. The principal characteristic of voyeurism is that the voyeur does not normally interact directly with the subject of his/her interest, who is often unaware of being observed. The essence of voyeurism is the observing but may also involve the making of a secret photograph or video of the subject during an intimate activity. When the interest in a particular subject is obsessive, the behavior may be described as stalking.
+Source: Wikipedia</description>
+<picurl>162189.jpg</picurl>
+</tag>
+<tag id="2706" parentid="2848" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-20">
+<name>masturbation</name>
+<description>Manual erotic stimulation of the genitals or other erogenous regions, often to orgasm, either by oneself or a partner.</description>
+</tag>
+<tag id="2711" parentid="2848" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-25">
+<name>urination</name>
+<description>Urination, also known as micturition, voiding, peeing, weeing, pissing, and more rarely, emiction, is the ejection of urine from the urinary bladder through the urethra to the outside of the body. In healthy humans the process of urination is under voluntary control. In infants, some elderly individuals, and those with neurological injury or extreme psychological problems, urination may occur as an involuntary reflex. In other animals, in addition to expelling waste material, urination can mark territory or express submissiveness.</description>
+</tag>
+<tag id="2712" parentid="2848" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-22">
+<name>sex toys</name>
+<description>A sex toy is an object or device that is primarily used to facilitate human sexual pleasure, such as a dildo or vibrator.</description>
+</tag>
+<tag id="2713" parentid="2848" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-07">
+<name>oral</name>
+<description>Oral sex is sexual activity involving the stimulation of the genitalia of a sex partner by the use of the mouth, tongue, teeth or throat.</description>
+</tag>
+<tag id="2717" parentid="2848" infobox="true" weight="500" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>anal</name>
+<description>Sodomy, buggery, buttsex, cornholing, or the poop-chute polka. Call it whatever you like, but somebody is getting something stuck where the sun does not shine.</description>
+<picurl>173755.jpg</picurl>
+</tag>
+<tag id="2721" parentid="2848" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2015-07-13">
+<name>public sex</name>
+<description>Public sex refers to sexual acts that take place in public or semi-public places.</description>
+<picurl>175406.jpg</picurl>
+</tag>
+<tag id="2723" parentid="2848" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2015-09-21">
+<name>yaoi</name>
+<description>Yaoi refers to anime that portray gay (male/male) sex. Do not confuse this with the http://anidb.net/t2783 [Shounen Ai] category under Romance, which only portrays male/male relationships, but generally not anything pornographic. This is real male/male porn.
+Yaoi works are generally targeted at a female audience. Females that enjoy Yaoi are oftern referred to as http://anidb.net/t2268 [Fujoshi].
+The female version is http://anidb.net/t2695 [Yuri].</description>
+<picurl>163594.jpg</picurl>
+</tag>
+<tag id="2748" parentid="2604" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-22">
+<name>sex</name>
+<description>Sexual intercourse, the ultimate bond of love and the "Origin of the World" (just think of Gustave Courbet`s painting).</description>
+<picurl>161190.jpg</picurl>
+</tag>
+<tag id="2749" parentid="2604" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2005-05-07">
+<name>nudity</name>
+<description>Nudity is the state of wearing no clothing. The wearing of clothing is exclusively a human characteristic. The amount of clothing worn depends on functional considerations (such as a need for warmth or protection from the elements) and social considerations. In some situations the minimum amount of clothing (i.e. covering of a person`s genitals) may be socially acceptable, while in others much more clothing is expected.
+People, as individuals and in groups, have varying attitudes towards their own nudity. Some people are relaxed about appearing less than fully clothed in front of others, while others are uncomfortable or inhibited in that regard. People are nude in a variety of situations, and whether they are prepared to disrobe in front of others depends on the social context in which the issue arises. For example, people need to bathe without clothing, some people also sleep in the nude, some prefer to sunbathe in the nude or at least topless, while others are nude in other situations. Some people adopt naturism as a lifestyle.
+Though the wearing of clothes is the social norm in most cultures, some cultures, groups and individuals are more relaxed about nudity, though attitudes often depend on context. On the other hand, some people feel uncomfortable in the presence of any nudity, and the presence of a nude person in a public place can give rise to controversy, irrespective of the attitude of the person who is nude. Besides meeting social disapproval, in some places public nudity may constitute a crime of indecent exposure. Many people have strong views on nudity, which to them can involve issues and standards of modesty, decency and morality. Some people have an psychological aversion to nudity, called gymnophobia. Many people regard nudity to be inherently sexual and erotic.
+Nudity is to be found in a multitude of media, including art, photography, film and on the Internet. It is a factor in adult entertainment of various types.
+Especially gratuitous fanservice anime shows tend to show their (usually female) characters frequently without any clothes, though often hiding genitals through the means of additions like steam.
+Source: wiki</description>
+<picurl>60576.jpg</picurl>
+</tag>
+<tag id="2797" parentid="2609" infobox="true" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-05-18">
+<name>new</name>
+<description>Not based on anything, the story is a new work, usually made up by the people involved in creating the anime. Generally if an original work (原作) credit is given, it will be to the studio, or director, or other members of the production team.</description>
+</tag>
+<tag id="2834" parentid="2630" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2016-10-04">
+<name>Asia</name>
+<description>Asia is Earth`s largest and most populous continent, located primarily in the eastern and northern hemispheres and sharing the continental landmass of Eurasia with the continent of Europe. Asia covers an area of 44,579,000 square kilometers, about 30% of Earth`s total land area and 8.7% of the Earth`s total surface area. The continent, which has long been home to the majority of the human population, was the site of many of the first civilizations. Asia is notable for not only its overall large size and population, but also dense and large settlements as well as vast barely populated regions within the continent of 4.4 billion people.
+Source: Wikipedia</description>
+<picurl>192245.jpg</picurl>
+</tag>
+<tag id="2848" parentid="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-03">
+<name>pornography</name>
+<description>Anime clearly marked as "Restricted 18" material centring on all variations of adult sex, some of which can be considered as quite perverted. To certain extent, some of the elements can be seen on late night TV animations.</description>
+</tag>
+<tag id="2849" parentid="2611" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2005-05-07">
+<name>fantasy</name>
+<description>Fantasy is a genre of fiction that uses magic and other supernatural phenomena as a primary element of plot, theme, or setting. Many works within the genre take place in fictional worlds where magic is common. Fantasy is generally distinguished from science fiction and horror by the expectation that it steers clear of (pseudo-)scientific and macabre themes, respectively, though there is a great deal of overlap between the three (which are subgenres of speculative fiction).
+In popular culture, the genre of fantasy is dominated by its medievalist form, especially since the worldwide success of The Lord of the Rings books by J. R. R. Tolkien. In its broadest sense however, fantasy comprises works by many writers, artists, filmmakers, and musicians, from ancient myths and legends to many recent works embraced by a wide audience today.
+Fantasy is a vibrant area of academic study in a number of disciplines (English, cultural studies, comparative literature, history, medieval studies). Work in this area ranges widely, from the structuralist theory of Tzvetan Todorov, which emphasizes the fantastic as a liminal space, to work on the connections (political, historical, literary) between medievalism and popular culture
+Source: Wiki</description>
+<picurl>68768.jpg</picurl>
+</tag>
+<tag id="2900" parentid="2712" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-20">
+<name>dildos - vibrators</name>
+<description>These are toys that are used for sexual pleasure.</description>
+</tag>
+<tag id="3092" parentid="6233" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-03-02">
+<name>important haircut</name>
+<description>When a character cuts off his or her hair, it often symbolizes a rite of passage or bout of character growth. A princess striking out on an adventure, or a new recruit at boot camp, for instance. Hair is something that takes time and effort to grow, so parting with it voluntarily can be a powerful act.
+This is particularly a big deal when women get haircuts. Yet in fiction, even an accidental hair slicing can leave a character with a surprisingly even cut.
+In many religions (Western Christianity, Ancient Egyptian religion, and others) priests and/or monks cut/shave their hair. Roman Catholic nuns also tend to cut and mantain their hair short under their veils when they enter the nunneries. The cutting of one`s own hair is also a part of Buddhist mythology, specifically something done by Siddhartha himself early on in his path to enlightenment, so anime examples might draw from this as an allusion. There are also some cultures, including Native American and many Asians, where a person would cut his or her hair as an act of grief, disgrace, or even rebellion. In the Confucian tradition, hair (like the rest of your body) is considered a gift from your parents and may not be damaged without a very good reason. Furthermore, prisoners and psychiatric patients commonly have their heads shaved, often to prevent the spread of lice, but sometimes also as a demeaning measure.
+Source: TVTRope</description>
+<picurl>169641.jpg</picurl>
+</tag>
+<tag id="3299" parentid="6268" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-11">
+<name>double fellatio</name>
+<description>Double fellatio is when oral sex is performed on the penis simultaneously by two individuals.</description>
+<picurl>168623.jpg</picurl>
+</tag>
+<tag id="4049" parentid="2721" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-07-13">
+<name>outdoor sex</name>
+<description>Popular place for sex in visual novels and manga.</description>
+<picurl>175405.jpg</picurl>
+</tag>
+<tag id="6233" parentid="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-11">
+<name>tropes</name>
+<description>A trope is a commonly recurring literary and rhetorical devices, motifs or clichés in creative works. This use is a broader redefining of a literary trope, the use of figurative language, via word, phrase, or even an image, for artistic effect, such as using a figure of speech.
+Source: Wikipedia</description>
+</tag>
+<tag id="6268" parentid="2713" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-12-03">
+<name>fellatio</name>
+<description>Fellatio is oral sex performed upon the penis. It may be performed to induce male orgasm and ejaculation of semen, or it may be used as foreplay prior to sexual intercourse.</description>
+<picurl>165408.jpg</picurl>
+</tag>
+<tag id="6843" parentid="2696" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2017-01-13">
+<name>MMM threesome</name>
+<description>A threesome with three male partners.</description>
+</tag>
+</tags>
+<characters>
+<character id="17562" type="main character in" update="2011-04-10">
+<rating votes="9">5.29</rating>
+<name>Piko</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<description>Pico is a blonde pre-adolescent boy who works part-time at his http://anidb.net/ch18211 [grandfather]`s bar in the summer. He`s often shown swimming, usually naked or in a blue speedo. He wears girls` clothing after http://anidb.net/ch18210 [Mokkun] suggests it. Later, hurt that Tamotsu wouldn`t define their relationship, he rebels by cutting off most of his hair and runs away. The following summer, he spots http://anidb.net/ch18206 [Chico] swimming nude in a stream while cycling. He soon befriends the other boy, who calls him "oniichan" and forms a sexual relationship with him. In his relationships with both Mokkun and Chico, he is the uke, though the latter is somewhat reversible.
+Source: Wikipedia</description>
+<picture>47837.jpg</picture>
+<seiyuu id="9446">Mikage Yuu</seiyuu>
+</character>
+<character id="18206" type="secondary cast in" update="2011-04-10">
+<rating votes="5">4.31</rating>
+<name>Chiko</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<description>Chico is a brown haired boy who develops a sexual relationship with http://anidb.net/ch17562 [Pico]. He is younger and less sexually experienced than Pico. He often plays outdoors naked and secretly watches his http://anidb.net/ch18208 [older sister] masturbate. In most cases, Chico is the seme, despite his age, though his relationship with Pico is somewhat reversible. He lives with his sister in a large house in a secluded forest area.
+Source: Wikipedia</description>
+<picture>69574.jpg</picture>
+</character>
+<character id="18208" type="appears in" update="2011-04-10">
+<rating votes="5">4.65</rating>
+<name>Onee-san</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<description>`Onee-san` is http://anidb.net/ch18206 [Chico]`s older sister. She is tall, with dark-blue hair. After being seen masturbating by the boys through a crack in the ceiling, she is the indirect cause of their experimentation. She has a large collection of fetish outfits and sex toys that http://anidb.net/ch17562 [Pico] and Chico use without her permission. She later masturbates around a corner from the boys when she finds them sexually engaged upon returning from the grocery store.
+Source: Wikipedia</description>
+<picture>69577.jpg</picture>
+</character>
+<character id="18210" type="appears in" update="2011-04-10">
+<rating votes="3">1.22</rating>
+<name>Tamotsu</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>69576.jpg</picture>
+<seiyuu id="99" picture="139554.jpg">Hirakawa Daisuke</seiyuu>
+</character>
+<character id="18211" type="appears in" update="2011-04-10">
+<rating votes="2">1.07</rating>
+<name>Ojiisan</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>69578.jpg</picture>
+</character>
+<character id="18212" type="appears in" update="2011-04-10">
+<rating votes="5">4.89</rating>
+<name>CoCo</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>69575.jpg</picture>
+</character>
+</characters>
+<episodes>
+<episode id="52905" update="2008-01-22">
+<epno type="4">T1</epno>
+<length>2</length>
+<airdate>2006-06-15</airdate>
+<rating votes="2">3.90</rating>
+<title xml:lang="en">My Pico</title>
+</episode>
+<episode id="62397" update="2007-03-17">
+<epno type="1">1</epno>
+<length>30</length>
+<airdate>2006-09-07</airdate>
+<rating votes="8">6.49</rating>
+<title xml:lang="ja">ぼくのぴこ</title>
+<title xml:lang="en">My Pico</title>
+<title xml:lang="x-jat">Boku no Piko</title>
+</episode>
+<episode id="68526" update="2007-04-22">
+<epno type="1">2</epno>
+<length>30</length>
+<airdate>2007-04-19</airdate>
+<rating votes="11">6.30</rating>
+<title xml:lang="ja">ぴことちこ</title>
+<title xml:lang="en">Pico &amp; Chico</title>
+<title xml:lang="x-jat">Piko to Chico</title>
+</episode>
+<episode id="92825" update="2008-08-30">
+<epno type="1">3</epno>
+<length>30</length>
+<airdate>2008-10-09</airdate>
+<rating votes="6">2.52</rating>
+<title xml:lang="ja">ぴこ×CoCo×ちこ</title>
+<title xml:lang="en">Pico &amp; CoCo &amp; Chico</title>
+<title xml:lang="x-jat">Piko &amp; CoCo &amp; Chico</title>
+</episode>
+<episode id="97454" update="2009-03-19">
+<epno type="2">S1</epno>
+<length>30</length>
+<airdate>2007-11-08</airdate>
+<rating votes="1">1.07</rating>
+<title xml:lang="ja">pico ~ぼくの小さな夏物語~</title>
+<title xml:lang="en">Pico: My Little Summer Story</title>
+<title xml:lang="x-jat">Pico: Boku no Chiisana Natsu Monogatari</title>
+</episode>
+</episodes>
+</anime>

@@ -27,7 +27,7 @@ class AniDBTest(TestCase):
         # Studio.objects.create(pk=1)
         self.anidb = client
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
-        self.anime_fixture = self.read_fixture('sangatsu_no_lion.xml')
+        self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
 
     @responses.activate
     def test_anidb_search(self):
@@ -49,14 +49,14 @@ class AniDBTest(TestCase):
             rsps.add(
                 responses.GET,
                 AniDB.BASE_URL,
-                body=self.read_fixture('sangatsu_no_lion.xml'),
+                body=self.read_fixture('anidb/sangatsu_no_lion.xml'),
                 status=200,
                 content_type='application/xml'
             )
             rsps.add(
                 responses.GET,
                 AniDB.BASE_URL,
-                body=self.read_fixture('hibike_euphonium.xml'),
+                body=self.read_fixture('anidb/hibike_euphonium.xml'),
                 status=200,
                 content_type='application/xml'
             )
@@ -135,3 +135,52 @@ class AniDBTest(TestCase):
         self.assertEqual(len(retrieved_tags["added_tags"]), 0)
         self.assertEqual(len(retrieved_tags["updated_tags"]), 0)
         self.assertCountEqual(retrieved_tags["kept_tags"], tag_titles)
+
+    @responses.activate
+    def test_anidb_nsfw(self):
+        animes = {}
+
+        animes_sources = {
+            # Not NSFW at all
+            'anidb/sangatsu_no_lion.xml': (11606, 'Sangatsu no Lion'),
+            'anidb/hibike_euphonium.xml': (10889, 'Hibike! Euphonium'),
+            # Totally NSFW (restricted on AniDB)
+            'anidb/boku_no_piko.xml': (4544, 'Boku no Piko'),
+            'anidb/bible_black.xml': (528, 'Bible Black'),
+            # Should be marked NSFW
+            'anidb/r15.xml': (8396, 'R-15'),
+            'anidb/astarotte_no_omocha_ex.xml': (8560, 'Astarotte no Omocha! EX'),
+            'anidb/aki_sora.xml': (6782, 'Aki Sora'),
+            # Shouldn't be marked NSFW
+            'anidb/punchline.xml': (10948, 'Punch Line'),
+            'anidb/panty_stocking.xml': (7529, 'Panty & Stocking with Garterbelt'),
+            'anidb/shimoneta.xml': (10888, 'Shimoneta to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai')
+        }
+
+        are_nsfw = ['anidb/boku_no_piko.xml', 'anidb/bible_black.xml',
+                    'anidb/r15.xml', 'anidb/astarotte_no_omocha_ex.xml',
+                    'anidb/aki_sora.xml']
+        are_sfw = ['anidb/sangatsu_no_lion.xml', 'anidb/hibike_euphonium.xml',
+                   'anidb/punchline.xml', 'anidb/panty_stocking.xml',
+                   'anidb/shimoneta.xml']
+
+        with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
+            for filename, infos in animes_sources.items():
+                rsps.add(
+                    responses.GET,
+                    AniDB.BASE_URL,
+                    body=self.read_fixture(filename),
+                    status=200,
+                    content_type='application/xml'
+                )
+                animes[filename] = self.anidb.get_or_update_work(infos[0])
+
+        for filename in are_nsfw:
+            with self.subTest('Asserting NSFW', anime=animes_sources[filename][1]):
+                self.assertEqual(animes[filename].title, animes_sources[filename][1])
+                self.assertTrue(animes[filename].nsfw)
+
+        for filename in are_sfw:
+            with self.subTest('Asserting SFW', anime=animes_sources[filename][1]):
+                self.assertEqual(animes[filename].title, animes_sources[filename][1])
+                self.assertFalse(animes[filename].nsfw)
