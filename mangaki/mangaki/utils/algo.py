@@ -20,7 +20,7 @@ def fit_algo(algo_name, triplets):
     anonymized = dataset.make_anonymous_data(triplets)
     algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
     algo.fit(anonymized.X, anonymized.y)
-    if algo_name in {'svd', 'als'}:  # KNN is constantly refreshed
+    if algo_name in {'svd', 'als', 'knn'}: 
         algo.save(algo.get_backup_filename())
         dataset.save('ratings-' + algo.get_backup_filename())
     return dataset, algo

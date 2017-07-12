@@ -51,15 +51,21 @@ def get_reco_algo(request, algo_name='knn', category='all'):
     chrono.save('get rated works')
 
     if algo_name == 'knn':
-        algo = get_algo_backup(algo_name)
-        dataset = get_dataset_backup(algo_name)
+        try:
+            algo = get_algo_backup(algo_name)
+            dataset = get_dataset_backup(algo_name)
+        except FileNotFoundError:
+            triplets = list(
+                Rating.objects.values_list('user_id', 'work_id', 'choice'))
+            chrono.save('get all %d interesting ratings' % len(triplets))
+            dataset, algo = fit_algo(algo_name, triplets)
         already_rated_works['rating'] = already_rated_works['choice'].map(rating_values)
         ratings_from_user = coo_matrix((already_rated_works['rating'],(np.zeros(len(already_rated_works['work_id'])), already_rated_works['work_id'])), shape = (1, knn.nb_works))
         ratings_from_user = ratings_from_user.tocsr()
         knn.M = vstack([knn.M, ratings_from_user])
 
 
-        chrono.save('prepare first fit')
+        chrono.save('loading knn and expanding with current user ratings')
 
 
         encoded_neighbors = algo.get_neighbors([knn.nb_users]) # Now, current user ratings are in the last row of M
