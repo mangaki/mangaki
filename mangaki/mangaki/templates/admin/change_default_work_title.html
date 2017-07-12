@@ -28,12 +28,12 @@
         </td>
         <td style="vertical-align: middle;">➜</td>
         <td>
-            <select id="{{ work_id }}">
+            <select id="{{ work_id }}" name="{{ work_id }}">
                 {% for id, infos in work_title.items %}
                 {% if infos.type != 'current' %}
                 <option value="{{ id }}">{{ infos.title }} &#60;{{ infos.language }}:{{ infos.type }}&#62;</option>
                 {% else %}
-                <option value="{{ id }}">{{ infos.title }} &#60;{{ infos.type }}&#62;</option>
+                <option value="{{ id }}" selected>{{ infos.title }} &#60;{{ infos.type }}&#62;</option>
                 {% endif %}
                 {% endfor %}
             </select>

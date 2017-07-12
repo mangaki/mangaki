@@ -358,9 +358,26 @@ class WorkAdmin(admin.ModelAdmin):
 
     refresh_work.short_description = "Mettre à jour la fiche de l'anime (poster)"
 
+    @transaction.atomic
     def change_title(self, request, queryset):
         if request.POST.get('confirm'):  # Changing default title has been confirmed
-            logger.error('cc',)
+            new_titles = {}
+
+            for key in request.POST:
+                if key.isnumeric():
+                    work_id = int(key)
+                    if request.POST.get(key).isnumeric():
+                        title_id = int(request.POST.get(key))
+                        new_titles[work_id] = title_id
+
+            titles = WorkTitle.objects.filter(
+                pk__in=new_titles.values()
+            ).values_list('title', 'work__title', 'work__id', 'id')
+
+            for new_title, current_title, work_id, title_id in titles:
+                if new_title != current_title:
+                    Work.objects.filter(pk=work_id).update(title=new_title)
+
             self.message_user(request, format_html('Les titres ont bien été changés pour les œuvres sélectionnées.'))
             return None
 
