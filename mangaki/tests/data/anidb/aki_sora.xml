@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?><anime id="6782" restricted="false">
+<type>OVA</type>
+<episodecount>1</episodecount>
+<startdate>2009-12-18</startdate>
+<enddate>2009-12-18</enddate>
+<titles>
+<title xml:lang="x-jat" type="main">Aki Sora</title>
+<title xml:lang="ja" type="synonym">Aki-Sora</title>
+<title xml:lang="en" type="synonym">Autumn Sky</title>
+<title xml:lang="ko" type="synonym">아키소라</title>
+<title xml:lang="x-jat" type="synonym">Akisora</title>
+<title xml:lang="zh-Hans" type="synonym">秋色之空</title>
+<title xml:lang="zh-Hans" type="synonym">秋日天空</title>
+<title xml:lang="ja" type="official">あきそら</title>
+</titles>
+<relatedanime>
+<anime id="7484" type="Sequel">Aki Sora: Yume no Naka</anime>
+</relatedanime>
+<similaranime>
+<anime id="6083" approval="168" total="196">KissXSis</anime>
+<anime id="7656" approval="77" total="102">Yosuga no Sora: In Solitude, Where We Are Least Alone.</anime>
+<anime id="3318" approval="25" total="39">Boku wa Imouto ni Koi o Suru</anime>
+<anime id="8873" approval="7" total="14">Asa made Jugyou Chu!</anime>
+<anime id="8949" approval="7" total="13">Kagaku na Yatsura</anime>
+<anime id="242" approval="6" total="14">Futari Ecchi</anime>
+<anime id="1675" approval="5" total="13">Koi Kaze</anime>
+<anime id="9353" approval="1" total="6">Rescue Me!</anime>
+</similaranime>
+<recommendations total="1">
+<recommendation type="Recommended" uid="40320">This is not a hentai but it`s very ecchi, I will recommend this to those that love the two mentioned categories above</recommendation>
+</recommendations>
+<url>http://www.akisora.jp/</url>
+<creators>
+<name id="3211" type="Direction">Takahashi Takeo</name>
+<name id="3673" type="Chief Animation Direction">Kuroda Kazuya</name>
+<name id="3673" type="Character Design">Kuroda Kazuya</name>
+<name id="11222" type="Original Work">Itosugi Masahiro</name>
+<name id="11224" type="Music">Asano Akira</name>
+<name id="11225" type="Animation Work">Hoods Entertainment</name>
+</creators>
+<description>* Based on http://anidb.net/cr11222 [Itosugi Masahiro]`s incest themed romantic drama manga Aki Sora serialised in the seinen magazine Champion Red Ichigo.
+Aki Sora revolves around http://anidb.net/ch13158 [Aoi Aki] and http://anidb.net/ch13157 [Aoi Sora], a pair of close siblings who have shared an intimate bond since childhood. During their coming of age, they each come to realise the true depth of the love they feel for each other and consummate that love in secret. They keep their sister, http://anidb.net/ch13159 [Nami], Sora`s twin in the dark about their new relationship. Nami, clueless of what is happening in their household aims to set her brother up with her best friend, http://anidb.net/ch13160 [Sumiya Kana]. Despite these relationships Nami seems to have feelings for someone near to her too, but keeps them secret.
+Note: The OVA was bundled with the manga`s volume 3 limited edition.</description>
+<ratings>
+<permanent count="1695">3.59</permanent>
+<temporary count="1723">6.11</temporary>
+</ratings>
+<picture>33042.jpg</picture>
+<resources>
+<resource type="1">
+<externalentity>
+<identifier>11150</identifier>
+</externalentity>
+</resource>
+<resource type="2">
+<externalentity>
+<identifier>6987</identifier>
+</externalentity>
+</resource>
+<resource type="3">
+<externalentity>
+<identifier>4565</identifier>
+<identifier>hpcoaz</identifier>
+</externalentity>
+</resource>
+<resource type="6">
+<externalentity>
+<identifier>Aki_sora</identifier>
+</externalentity>
+</resource>
+<resource type="7">
+<externalentity>
+<identifier>あきそら</identifier>
+</externalentity>
+</resource>
+<resource type="10">
+<externalentity>
+<identifier>12371</identifier>
+</externalentity>
+</resource>
+<resource type="20">
+<externalentity>
+<identifier>秋日天空</identifier>
+</externalentity>
+</resource>
+</resources>
+<tags>
+<tag id="30" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-10">
+<name>meta tags</name>
+<description>These tags are used for maintenance.</description>
+</tag>
+<tag id="618" parentid="2565" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2017-04-19">
+<name>trap</name>
+<description>A male character often mistaken as a female by other characters and/or the viewer due to his feminine appearance, behaviour, and/or language (regardless of his intention).
+The reverse case is known as a http://anidb.net/t1637 [reverse trap].</description>
+<picurl>161537.jpg</picurl>
+</tag>
+<tag id="1377" parentid="6149" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2009-05-29">
+<name>subservient</name>
+<description>Prepared to obey others unquestioningly.</description>
+</tag>
+<tag id="1802" parentid="2606" infobox="true" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-01-24">
+<name>seinen</name>
+<description>Seinen, literally "young man", is one of the main demographic classifications applied to manga, and, by extension, to anime, especially manga-based ones. As the name implies, seinen works are marketed primarily to an audience of young men; the age range commonly understood to be the target of such works goes roughly from 17 to somewhere in the 40s.</description>
+<picurl>181651.jpg</picurl>
+</tag>
+<tag id="1894" parentid="2608" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-04">
+<name>shota</name>
+<description>Shotacon, sometimes shortened to shota, is a Japanese slang portmanteau of the phrase Shoutarou complex and describes an attraction to young boys, or an individual with such an attraction. Outside Japan, the term is less common and most often refers to a genre of manga and anime wherein pre-pubescent or pubescent male characters are depicted in a suggestive or erotic manner.
+In a general sense, this is the same as http://anidb.net/t2566 [loli], just replace young girls with young boys.
+[Source: wiki]</description>
+<picurl>35399.jpg</picurl>
+</tag>
+<tag id="2043" parentid="2869" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2016-12-07">
+<name>high school</name>
+<description>A secondary school that usually contains grades 10 through 12 in Japan, or 9 through 12 in America.</description>
+</tag>
+<tag id="2565" parentid="2608" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2011-04-14">
+<name>cross-dressing</name>
+<description>This character sometimes wears clothes traditionally worn by and associated with the opposite sex.
+Cross-dressers often hide their cross-dressing identity for a long period of time and thus tend to become adept in accurately portraying the opposite sex in terms of voice, movement, behaviour, temperament, etc.</description>
+</tag>
+<tag id="2604" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-04-02">
+<name>content indicators</name>
+<description>The content indicators branch is intended to be a less geographically specific tool than the `age rating` used by convention, for warning about things that might cause offence. Obviously there is still a degree of subjectivity involved, but hopefully it will prove useful for parents with delicate children, or children with delicate parents.</description>
+</tag>
+<tag id="2606" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-18">
+<name>target audience</name>
+<description>Anime, like everything else in the modern world, is targeted towards specific audiences, both implicitly by the creators and overtly by the marketing. While categories are associated with specific sex and age groups, this is not a bar on the anime being enjoyed by people who don`t fit into that band; not only do crossover titles exist, but the categories also have a considerable following outside their main demographic, and a person might as well enjoy anime from all categories. Still, does not invalidate the usefulness of marking a title as one of the categories; the same themes will likely be treated differently in anime geared for different audiences. Only one should not jump the gun and assume that a title will be more or less serious or present content in this or that way due to its target audience, or conversely assume the target audience on the content and its presentation alone. As such, the audience categories help form a broad impression of how a title might work with the announced themes, but offer little to no in-depth information about specific content or its treatment.
+The audience categories originate from manga magazines, which group titles of a same intended audience into a magazine that is advertised as belonging to that category, and so manga-based anime will have the category from their parent work. As for anime based on other works, the audience is often debatable, but comparing information such as time slot to the manga-based anime generally helps figure out the most likely possibility.</description>
+</tag>
+<tag id="2607" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-29">
+<name>themes</name>
+<description>Themes describe the very central elements important to the anime stories. They set the backdrop against which the protagonists must face their challenges. Be it School Life, present Daily Life, Military action, Cyberpunk, Law and Order detective work, Sports, or the Underworld. These are only but a few of the more typical backgrounds for anime plots. Add to that a Conspiracy setting with a possible tragic outcome, the Themes span most of the imaginable subject matter relevant to anime.</description>
+</tag>
+<tag id="2608" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-12-04">
+<name>fetishes</name>
+<description>Everything under fetishes (except for Bishounen and Juujin) is strictly only meant for hentai (18 Restricted) and ecchi anime. In case of ecchi, it must be the main element of the show and not when there`s only some of it, for example, there`s some ecchi in Shinseiki Evangelion, but the fact you get to see Asuka`s pantsu doesn`t warrant it the schoolgirl fetish category. So be careful to which ecchi show you add fetishes; it`s fairly straightforward with hentai, though. Overall, this category tree is to satisfy the needs of people with different fetishes, so they can search for what tingles their tangle; hence why this is restricted to hentai and full ecchi shows. </description>
+</tag>
+<tag id="2609" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-22">
+<name>original work</name>
+<description>What the anime is based on! Mostly of academic interest, but a useful bit of info, hinting at the possible depth of story.</description>
+</tag>
+<tag id="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-22">
+<name>setting</name>
+<description>The setting describes in what time and place an anime takes place. To a certain extent it describes what you can expect from the world in the anime.</description>
+</tag>
+<tag id="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-08">
+<name>elements</name>
+<description>Next to Themes setting the backdrop for the protagonists in anime, there are the more detailed plot Elements that centre on character interactions: "What do characters do to each other or what is done to them?". Is it violent Action, an awe-inspiring Adventure in a foreign place, the gripping life of a Detective, a slapstick Comedy, an Ecchi Harem anime, a SciFi epic, or some Fantasy travelling adventure?</description>
+</tag>
+<tag id="2612" parentid="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>time</name>
+<description>This placeholder lists different epochs in human history and more vague but important timelines such as the future, the present and the past.</description>
+</tag>
+<tag id="2613" parentid="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>place</name>
+<description>The places the anime can take place in. Includes more specific places such as a country on Earth, as well as more general places such as a dystopia or a mirror world.</description>
+</tag>
+<tag id="2624" parentid="2612" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2017-02-20">
+<name>present</name>
+<description>Somewhere between past and future.</description>
+</tag>
+<tag id="2630" parentid="2613" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-13">
+<name>Earth</name>
+<description>The Earth is the third planet from the Sun, and the densest and fifth-largest of the eight planets in the Solar System. It is in effect a ball of hot mud, but on the surface it`s cold enough, so most of us live on it (or are supposed to). It is circa 4.5 billion years old, and, unless we humans succeed in destroying it over the next couple of centuries, it is expected to last for quite another while, though the changes in the Sun`s emissions due to its aging will likely cause the extinction of everything; the species of earthlings are guaranteed to die, even if we fail to kill them -- unless, of course, we find ourselves another planet and figure out a way to take everything there. Our little planet on a corner of this galaxy may mean nothing in the grand scheme of things, but to its inhabitants it is their home, so, as a species, we cherish it dearly, to the point many cultures even to this day deify it. Being the home to the human civilizations, the Earth is the main setting of most fiction, be it anime or otherwise, but not only are many titles set in other places, such as unrelated fantasy worlds, in a considerable number of fictional titles the Earth is actually destroyed by aggressive alien invaders.</description>
+<picurl>126792.jpg</picurl>
+</tag>
+<tag id="2672" parentid="2834" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2015-05-31">
+<name>Japan</name>
+<description>Last stronghold for humanity. If Tokyo falls, it`s all over. Tokyo Tower will undoubtedly fall anyway.</description>
+</tag>
+<tag id="2693" parentid="2848" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-20">
+<name>handjob</name>
+<description>Manual stimulation of the penis by another person`s hand.</description>
+</tag>
+<tag id="2739" parentid="2842" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-06">
+<name>brother-sister incest</name>
+<description>Immoral or illegal sexual relations between two siblings of opposite sex.</description>
+</tag>
+<tag id="2741" parentid="2891" infobox="true" weight="400" localspoiler="false" globalspoiler="false" verified="true" update="2015-12-14">
+<name>large breasts</name>
+<description>Large breasts are breasts a fair notch larger than average, as found in some adolescent girls or fully grown women; however, as anime has no upper limit to breast size, the definition applies somewhat differently. To be considered large, breasts in anime must be bigger than real-life natural ones or natural-seeming fake ones, to the point they`d appear weirdly or even abnormally large in real-life females. On the high end of the spectrum, breasts that are as big as the character`s head or possibly a bit bigger are still considered large; however, breasts that take at least as much space as the rest of the chest or the abdomen, or that are almost as big but have an absurdly unnatural shape, are the less common http://anidb.net/t1774 [gigantic breasts] instead.</description>
+<picurl>161014.jpg</picurl>
+</tag>
+<tag id="2748" parentid="2604" infobox="true" weight="500" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-22">
+<name>sex</name>
+<description>Sexual intercourse, the ultimate bond of love and the "Origin of the World" (just think of Gustave Courbet`s painting).</description>
+<picurl>161190.jpg</picurl>
+</tag>
+<tag id="2749" parentid="2604" infobox="true" weight="500" localspoiler="false" globalspoiler="false" verified="true" update="2005-05-07">
+<name>nudity</name>
+<description>Nudity is the state of wearing no clothing. The wearing of clothing is exclusively a human characteristic. The amount of clothing worn depends on functional considerations (such as a need for warmth or protection from the elements) and social considerations. In some situations the minimum amount of clothing (i.e. covering of a person`s genitals) may be socially acceptable, while in others much more clothing is expected.
+People, as individuals and in groups, have varying attitudes towards their own nudity. Some people are relaxed about appearing less than fully clothed in front of others, while others are uncomfortable or inhibited in that regard. People are nude in a variety of situations, and whether they are prepared to disrobe in front of others depends on the social context in which the issue arises. For example, people need to bathe without clothing, some people also sleep in the nude, some prefer to sunbathe in the nude or at least topless, while others are nude in other situations. Some people adopt naturism as a lifestyle.
+Though the wearing of clothes is the social norm in most cultures, some cultures, groups and individuals are more relaxed about nudity, though attitudes often depend on context. On the other hand, some people feel uncomfortable in the presence of any nudity, and the presence of a nude person in a public place can give rise to controversy, irrespective of the attitude of the person who is nude. Besides meeting social disapproval, in some places public nudity may constitute a crime of indecent exposure. Many people have strong views on nudity, which to them can involve issues and standards of modesty, decency and morality. Some people have an psychological aversion to nudity, called gymnophobia. Many people regard nudity to be inherently sexual and erotic.
+Nudity is to be found in a multitude of media, including art, photography, film and on the Internet. It is a factor in adult entertainment of various types.
+Especially gratuitous fanservice anime shows tend to show their (usually female) characters frequently without any clothes, though often hiding genitals through the means of additions like steam.
+Source: wiki</description>
+<picurl>60576.jpg</picurl>
+</tag>
+<tag id="2752" parentid="2881" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2009-05-16">
+<name>tennis</name>
+<description>Tennis is yet another sport involving hitting a ball. Were it not for the copious amounts of grass involved in certain varieties, it seems hard to imagine that people would pay it any attention at all.</description>
+</tag>
+<tag id="2782" parentid="2858" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-09-21">
+<name>shoujo ai</name>
+<description>Shoujo Ai means girls love, and thus explores what happens when two girls (or women) fall in love. This is not to be mistaken for http://anidb.net/t2695 [Yuri] which is (or, at least, how this term is often used by the western audience) used in adult works. This is not; that means there is no graphical sex.
+The male version is http://anidb.net/t2783 [Shounen Ai].</description>
+</tag>
+<tag id="2798" parentid="2609" infobox="true" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-07">
+<name>manga</name>
+<description>Manga is the lifeblood that drives the anime industry. Everything and its mother is based on manga. However! There are exceptions where the manga was not the basis for the anime.
+It`s common practice to make manga adaptations of many popular anime, there`s a manga based on Evangelion, and two (one shounen and one shoujo) based on each of Escaflowne and Mahou Tsukai Tai. Also it`s quite common to release manga and anime versions of a story in parallel, for instance Nadesico and Shoujo Kakumei Utena. There are also cases where an anime continues in a manga, as in the case of Angel Beats! and Angel Beats: Heaven`s Door, or reverse.</description>
+</tag>
+<tag id="2826" parentid="2856" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2010-01-27">
+<name>pantsu</name>
+<description>"Panties" in Japanese. Upskirt views in various positions are typical, however all forms of partial or fully exposed panties are accepted. Exposure is usually accidental, but may also be deliberate. Pantsu views may be exclusive to the viewer without impacting any characters. Bikinis are not pantsu.</description>
+<picurl>5721.jpg</picurl>
+</tag>
+<tag id="2828" parentid="2856" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-07">
+<name>borderline porn</name>
+<description>Breaks the bounds of "excessive fanservice".
+While the physical interactions and dialogue between characters may be extremely sexual, the most sexual situations do *not* have sex itself take place.
+Specifically descriptive of containing all the plentiful features of (excessive) fanservice in addition to the interactions between characters being quite sexual — at most, sexual in NATURE only. This means physical touching such as groping, molesting, or bondage will focus primarily on the revealed (i.e. nude) upper portion of the body or through/over clothing on the lower half of the body. This is all WITHOUT actual sex acts (penetration, etc.) taking place.</description>
+</tag>
+<tag id="2834" parentid="2630" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2016-10-04">
+<name>Asia</name>
+<description>Asia is Earth`s largest and most populous continent, located primarily in the eastern and northern hemispheres and sharing the continental landmass of Eurasia with the continent of Europe. Asia covers an area of 44,579,000 square kilometers, about 30% of Earth`s total land area and 8.7% of the Earth`s total surface area. The continent, which has long been home to the majority of the human population, was the site of many of the first civilizations. Asia is notable for not only its overall large size and population, but also dense and large settlements as well as vast barely populated regions within the continent of 4.4 billion people.
+Source: Wikipedia</description>
+<picurl>192245.jpg</picurl>
+</tag>
+<tag id="2842" parentid="2611" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2009-05-18">
+<name>incest</name>
+<description>Involves sexual relations between close relatives.
+In other words, the game the whole family can enjoy!!!</description>
+</tag>
+<tag id="2848" parentid="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-03">
+<name>pornography</name>
+<description>Anime clearly marked as "Restricted 18" material centring on all variations of adult sex, some of which can be considered as quite perverted. To certain extent, some of the elements can be seen on late night TV animations.</description>
+</tag>
+<tag id="2856" parentid="2611" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-05">
+<name>ecchi</name>
+<description>Fan service is found in many anime, in many forms. When the service has a distinctly sexual slant to it, and it appears to be a major focus of the show, then it`s safe to assume you`re watching ecchi.
+The word "ecchi" is used by English-speaking anime fans to refer to refer to soft-core pornographic or sexually suggestive anime and manga. This is a western invention; in Japanese, it is a catch-all term for all things anyhow sexual in nature, not being limited to porn, but also not really considered a "milder" term, as it may also refer to sexual intercourse itself. The term "ecchi" in Japanese comes from the pronunciation of the letter "H" in English, which is rendered into Japanese syllabary as エッチ, which in turn is transliterated in the English alphabet as "ecchi" or "etchi". It is not, as many believe, short for "hentai" -- that, too, seems to be a western invention. It is, however, nearly as misunderstood and misapplied a term as "hentai".
+The line between ecchi and hentai, from the western perspective over these terms, can be hard to draw at times; one good rule of thumb is: if it was aired on Japanese public TV at all, it probably wasn`t hentai. Ecchi usually features all the specifics to human anatomy that can only be found in anime, and generally avoids full nudity, instead abusing of panty shots. Hentai, on the other hand, will usually show full frontal nudity in some explicit form, including genitalia, and full, intimate sex scenes. At its mildest, ecchi is composed of double entendres, big misunderstandings, and sexual farce; at its most explicit, it is still in the realm of softcore pornography, with full breast shots, full back nudity and similar content, but no display of genitalia. Another good way to distinguish the two is looking for animated sex scenes; if one is found, you have generally left the genre entirely, though a few borderline exceptions apply here. For AniDB`s purposes, the distinction between explicit ecchi and actual hentai is simple: if it was sold with a 18+ restriction in its country of origin, it is hentai; if it was sold without it, it is ecchi.
+Source: TV Tropes</description>
+<picurl>32416.jpg</picurl>
+</tag>
+<tag id="2858" parentid="2611" infobox="true" weight="400" localspoiler="false" globalspoiler="false" verified="true" update="2010-09-10">
+<name>romance</name>
+<description>Romance describes a story that deals with love between two or more characters typically also having an optimistic ending. Romance is also a difficulty encountered when creating a harem.</description>
+</tag>
+<tag id="2869" parentid="2607" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-23">
+<name>school life</name>
+<description>Since a large part of the anime audience still takes part in school life or is visiting college, it is only natural to choose a setting the audience can identify with, be it elementary, middle, or high school. For the older viewers a college setting with more mature real-life problems is appropriate. And since clubs take up so much time in the lives of students, these are obviously also important.</description>
+</tag>
+<tag id="2881" parentid="2607" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-29">
+<name>sports</name>
+<description>Sports anime revolves around a recreational physical activity or skill. In addition they often adhere to certain genre conventions, the emphasis on training and practice in preparation for competition, characters desire for self improvement, and pursuit of a specific goal.</description>
+</tag>
+<tag id="2891" parentid="2608" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-12-31">
+<name>breasts</name>
+<description>The female bust size matters! Or does it? The three subcategories spell out the sizes that relate to fetishes, be they gigantic, large or small. Normal sized breasts are not a fetish, it seems. The tag is not only used for ecchi anime, but also for hentai shows as well.</description>
+<picurl>161015.jpg</picurl>
+</tag>
+<tag id="2894" parentid="2608" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2013-03-15">
+<name>female student</name>
+<description>Pretty much exclusive to hentai shows only unless an ecchi show has implied sex and/or a strong indicator of nudity. A character is considered a student if she goes to school, doesn`t matter if it`s high school, college or homeschooling, but she should be of appropriate age for a student; a housewife going to college should not get this category.</description>
+</tag>
+<tag id="2910" parentid="6249" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-08">
+<name>parental abandonment</name>
+<description>In Japan it is a common custom for parents to leave their children alone at home and embark on a lifelong trip around the world once they hit the tender age of 14, sometimes even earlier.
+Of course this is done because the parents believe their children are independent enough to get their act together. But little do they know about the small secrets their offspring has, such as a childhood fiancé(e) or even a forbidden incestuous love between their (often not-blood-related) children.
+Of course aside from having a huge house, financial support is provided as well. Usually through the means of MAGICAL MONEY.
+In rare cases the parents actually die (shortly) before embarking on their world-trip, which is self-evidently used as an important plot device in the development of the child.</description>
+<picurl>38239.jpg</picurl>
+</tag>
+<tag id="3932" parentid="6073" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2013-05-11">
+<name>older female younger male</name>
+<description>This tag indicates that this anime has a male and female lead, and the female is older. If the main cast is greater than two people, then the use of this tag would indicate a romantic relationship between those two.
+In case of harems it translates to:
+a) majority of the girls are older than the guy
+b) the lead girl (or her main rival) is older than the guy</description>
+</tag>
+<tag id="5835" parentid="2856" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-12-18">
+<name>Gainax bounce</name>
+<description>A term that has come to describe often exaggerated, very jiggly, fluid, and painstakingly detailed animation of female characters` bouncing breasts. 
+The term has its roots in http://anidb.net/a185 [Top wo Nerae!] — Gunbuster, Gainax`s first OVA (1988), in which the Gainax bounce is found unabated in the three female characters of Noriko, Kazumi, and Jung.</description>
+<picurl>166074.jpg</picurl>
+</tag>
+<tag id="5873" parentid="2782" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2013-05-24">
+<name>girl kissing girl</name>
+<description>One girl kissing another girl appears in this anime. This may be willing, unwilling, or accidental for one or both participants.</description>
+</tag>
+<tag id="5915" parentid="2856" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2013-11-12">
+<name>French kiss</name>
+<description>A kiss in which the tongue enters the partner`s mouth.</description>
+</tag>
+<tag id="6021" parentid="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-07">
+<name>gender bender</name>
+<description>Term used to refer to a person who takes on the role of their opposite gender. This often only reaches to the extent of cross-dressing (involving physical appearance and clothing only), but in rarer cases, involves a total gender swap (which seems to be more common in anime) - where the willing or unwilling victim receives a body opposite of their original gender (either permanently or temporarily), with all natural parts per their new body fully (or just all-out amply) included.
+Example of cross-dressing gender bender: "Maria+Holic"
+Examples of body-swap gender bender: "Kashimashi: Girl meets Girl", "Birdy the Mighty Decode"</description>
+</tag>
+<tag id="6073" parentid="2858" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2013-11-23">
+<name>age difference romance</name>
+<description>A romance between individuals of significantly different ages is featured. Depending on how big the age gap is and on the society featured, that may be considered taboo.
+While the terms "lolicon" and "shotacon", often used in relation to anime and its fandom, are limited to a physical or erotic attraction to sexually precocious girls or boys respectively, this tag expands into platonic romances and other age ranges.</description>
+</tag>
+<tag id="6149" parentid="30" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-10">
+<name>TO BE MOVED TO CHARACTER</name>
+<description>Tags under this parent tag are going to be moved to character tags and removed from the anime they`re currently assigned to. They will be blocked from the anime system once that move is complete. Please help with that job if you know what characters they should be assigned to.</description>
+</tag>
+<tag id="6249" parentid="2607" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-31">
+<name>family life</name>
+</tag>
+</tags>
+<characters>
+<character id="13157" type="main character in" update="2012-02-05">
+<rating votes="18">4.42</rating>
+<name>Aoi Sora</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<description>Aoi Sora is the protagonist of this story. He studies in the same high school as his sisters, http://anidb.net/ch13158 [Aki] and http://anidb.net/ch13159 [Nami]. Unlike his sisters, he is good at cooking and housework. His effeminate appearance makes him a perfect candidate for cross-dressing, which he finds himself engaging in involuntarily because of Nami`s fetish and Runa`s belief that he enjoys it. His aunt also notes him to be a timid person, and slightly a pushover, which further allows him to be forced to cross-dress. Sora has a low alcohol tolerance, as he falls unconscious by drinking even a little sake. He is deeply in love with Aki, and doesn`t resist her the second time she tries to have sex with him, but he does question himself at times whether their incestuous taboo should be continued. He has also made sexual relationships with other people, such as http://anidb.net/ch13160 [Kana], Runa and Nami, though the latter two he was forced.</description>
+<picture>39061.jpg</picture>
+<seiyuu id="4634" picture="28754.jpg">Kinoshita Sayaka</seiyuu>
+</character>
+<character id="13158" type="main character in" update="2011-04-07">
+<rating votes="48">8.24</rating>
+<name>Aoi Aki</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<description>Aoi Aki is http://anidb.net/ch13157 [Sora]`s elder sister. Attractive, athletic, and intelligent, she`s considered a model student at school. However, at home, she has no culinary talents and fails to keep her own room clean. She is deeply in love with Sora. Unlike the rest of her family, all of whom have blond hair, Aki is a brunette. She first attempts to have sex with Sora in the shower, by giving him a hand-job against his will, but is unsuccessful, as Sora ran out of there in embarrassment after ejaculating. However, her second attempt, in his room, is successful, after she gave him a heart-felt confession of her love towards him. After that, they have engaged in sexual intercourse several times, including in public places, such as the school gym`s storage, an onsen, and on top of a Ferris wheel. She seems to be unaware that Sora had sex with many other women, other than herself.</description>
+<picture>59876.jpg</picture>
+<seiyuu id="1528" picture="19854.jpg">Kawaragi Shiho</seiyuu>
+</character>
+<character id="13159" type="secondary cast in" update="2011-04-07">
+<rating votes="21">6.39</rating>
+<name>Aoi Nami</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<description>Aoi Nami is http://anidb.net/ch13157 [Sora]`s younger twin sister who looks identical to him. Due to their same appearances, Nami ties her hair in pigtails, but her hair is slightly longer than Sora`s when let down. When they were children, she`d often pretend to be Sora. Even through they look alike, their personality are polar opposites. Unlike the quiet and well demeanoured Sora, Nami is a tomboy who has a strong and stubborn attitude. She often forces Sora to cosplay for her own amusement. Like Sora, Nami has a low tolerance to alcohol. She`s secretly in love with http://anidb.net/ch13160 [Kana]. In spite of this, she`s actively trying to get Kana and Sora together.</description>
+<picture>59877.jpg</picture>
+<seiyuu id="210" picture="71057.jpg">Ueda Kana</seiyuu>
+</character>
+<character id="13160" type="secondary cast in" update="2011-04-07">
+<rating votes="18">5.27</rating>
+<name>Sumiya Kana</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<description>Sumiya Kana is http://anidb.net/ch13157 [Sora]`s classmate and http://anidb.net/ch13159 [Nami]`s best friend. Kana and Nami are the only members of the cosplay club. She makes female outfits for Sora and Nami forces these outfits unto her brother. She has feelings for Sora but is too shy to confess them. She is unaware of Nami`s feelings towards her. Even when Nami stated she loved her, Kana believed it meant because they were friends. After a date, at which Kana gave Sora a kiss and a boob-job, Nami, who was witnessing from a cupboard, snapped, leading to her raping Sora.</description>
+<picture>53054.jpg</picture>
+<seiyuu id="618" picture="18140.jpg">Okajima Tae</seiyuu>
+</character>
+</characters>
+<episodes>
+<episode id="111567" update="2009-11-19">
+<epno type="4">T1</epno>
+<length>1</length>
+<title xml:lang="en">Promo</title>
+</episode>
+<episode id="111575" update="2011-11-06">
+<epno type="1">1</epno>
+<length>25</length>
+<airdate>2009-12-18</airdate>
+<rating votes="5">4.50</rating>
+<title xml:lang="en">OVA</title>
+<summary>Sora had become nervous around his older sister Aki, since he had started having lewd thoughts about her. While taking a bath together, Aki masturbated Sora, who runs off in disbelief. The next day, Sora can`t face Aki and runs off, inevitably getting locked in a store room. Aki eventually finds him and the two kiss, later returning home to make love. This episode incorporates Chapters 1 and 3.
+Source: Wiki</summary>
+</episode>
+</episodes>
+</anime>
