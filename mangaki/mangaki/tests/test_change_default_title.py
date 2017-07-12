@@ -1,13 +1,9 @@
 from django.test import TestCase
-from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.contrib import admin
-from django.db import connection
 from mangaki.models import Work, Category, WorkTitle, Editor, Studio
-import logging
 
-logger = logging.getLogger('django_test')
 
 class MergeTest(TestCase):
 
@@ -50,6 +46,6 @@ class MergeTest(TestCase):
         }
 
         self.client.post(change_title_url, context)
-        
+
         self.assertTrue(Work.objects.filter(title='3-gatsu no Lion').count() > 0)
         self.assertTrue(Work.objects.filter(title='Sound! Euphonium').count() > 0)
