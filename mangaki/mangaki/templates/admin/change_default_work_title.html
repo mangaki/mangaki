@@ -28,7 +28,8 @@
         </td>
         <td style="vertical-align: middle;">➜</td>
         <td>
-            <select id="{{ work_id }}" name="{{ work_id }}">
+            <input type="hidden" name="work_ids" value="{{ work_id }}" />
+            <select id="{{ work_id }}" name="title_ids">
                 {% for id, infos in work_title.items %}
                 {% if infos.type != 'current' %}
                 <option value="{{ id }}">{{ infos.title }} &#60;{{ infos.language }}:{{ infos.type }}&#62;</option>

@@ -361,17 +361,11 @@ class WorkAdmin(admin.ModelAdmin):
     @transaction.atomic
     def change_title(self, request, queryset):
         if request.POST.get('confirm'):  # Changing default title has been confirmed
-            new_titles = {}
-
-            for key in request.POST:
-                if key.isnumeric():
-                    work_id = int(key)
-                    if request.POST.get(key).isnumeric():
-                        title_id = int(request.POST.get(key))
-                        new_titles[work_id] = title_id
+            work_ids = request.POST.getlist('work_ids')
+            titles_ids = request.POST.getlist('title_ids')
 
             titles = WorkTitle.objects.filter(
-                pk__in=new_titles.values(), work__id__in=new_titles.keys()
+                pk__in=titles_ids, work__id__in=work_ids
             ).values_list('title', 'work__title', 'work__id')
 
             for new_title, current_title, work_id in titles:
@@ -383,9 +377,10 @@ class WorkAdmin(admin.ModelAdmin):
 
         work_titles = WorkTitle.objects.filter(work__in=queryset.values_list('pk', flat=True))
         full_infos = work_titles.values(
-            'pk', 'title', 'language', 'type', 'work_id', 'work__title').order_by('title').distinct('title')
-        titles = {}
+            'pk', 'title', 'language', 'type', 'work_id', 'work__title'
+        ).order_by('title').distinct('title')
 
+        titles = {}
         for infos in full_infos:
             if infos['work_id'] not in titles:
                 titles[infos['work_id']] = {}
