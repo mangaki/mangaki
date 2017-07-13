@@ -269,8 +269,11 @@ class Work(models.Model):
         sum_weight_nsfw_high = sum(infos["weight"] for t, infos in anidb_tags.items()
                                    if t in potentially_nsfw_tags and infos["weight"] > 400)
 
-        percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
-        percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+        if sum_weight_all_low > 0 and sum_weight_all_high > 0:
+            percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
+            percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+        else:
+            return False
 
         return (percent_high_nsfw > HIGH_NSFW_THRESHOLD or
                 percent_low_nsfw > LOW_NSFW_THRESHOLD)

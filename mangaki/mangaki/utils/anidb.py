@@ -179,11 +179,8 @@ class AniDB:
     def _build_related_animes(self,
                               work: Work,
                               related_animes: Dict[int, str]) -> List[RelatedWork]:
-        anidb_aids = []
-        types = {}
-        for related_anidb_id, related_type in related_animes:
-            anidb_aids.append(related_anidb_id)
-            types[related_anidb_id] = related_type
+        anidb_aids = related_animes.keys()
+        types = related_animes.values()
 
         # Retrieve missing works
         existing_works = Work.objects.filter(anidb_aid__in=anidb_aids)
@@ -202,7 +199,7 @@ class AniDB:
                 RelatedWork(
                     parent_work=work,
                     child_work=child_work,
-                    type=types[child_work.anidb_aid]
+                    type=related_animes[child_work.anidb_aid]
                 )
             )
 
@@ -258,6 +255,7 @@ class AniDB:
 
         # Handling of staff
         creators = []
+        studio = Studio.objects.get(pk=1)
         # FIXME: cache this query
         staff_map = dict(Role.objects.values_list('slug', 'pk'))
         for creator_node in all_creators.find_all('name'):
@@ -323,7 +321,7 @@ class AniDB:
             work.nsfw = True
             work.save()
 
-        related_animes = self.get_related_animes(all_related_animes)
+        related_animes = self.get_related_animes(related_animes_soup=all_related_animes)
 
         self._build_work_titles(work, titles, reload_lang_cache)
         self._build_related_animes(work, related_animes)
