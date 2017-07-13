@@ -5,7 +5,7 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.models import Category, Editor, Studio, Work, Role, Staff, Artist, TaggedWork, Tag
+from mangaki.models import Category, Editor, Studio, Work, RelatedWork, Role, Staff, Artist, TaggedWork, Tag
 from mangaki.utils.anidb import client, AniDB
 
 
@@ -184,3 +184,57 @@ class AniDBTest(TestCase):
             with self.subTest('Asserting SFW', anime=animes_sources[filename][1]):
                 self.assertEqual(animes[filename].title, animes_sources[filename][1])
                 self.assertFalse(animes[filename].nsfw)
+
+    @responses.activate
+    def test_anidb_related_animes(self):
+        animes = {}
+        related_animes = {}
+
+        animes_sources = {
+            'anidb/hibike_euphonium.xml': 10889,
+            'anidb/hibike_euphonium2.xml': 11746,
+            'anidb/hibike_euphonium_movie1.xml': 11747,
+            'anidb/hibike_euphonium_movie2.xml': 12962,
+            'anidb/hibike_euphonium_original_movies.xml': 13207,
+            'anidb/sangatsu_no_lion.xml': 11606
+        }
+
+        with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
+            for filename, anidb_aid in animes_sources.items():
+                for _ in range(2):
+                    rsps.add(
+                        responses.GET,
+                        AniDB.BASE_URL,
+                        body=self.read_fixture(filename),
+                        status=200,
+                        content_type='application/xml'
+                    )
+
+                animes[filename] = self.anidb.get_or_update_work(anidb_aid)
+                related_animes[filename] = self.anidb.get_related_animes(anidb_aid=anidb_aid)
+
+        # Ran once in get_or_update_work but ran again to check that it does not cause errors
+        for filename in animes_sources:
+            self.anidb._build_related_animes(animes[filename], related_animes[filename])
+
+        relations = RelatedWork.objects.filter(
+                        child_work__anidb_aid__in=animes_sources.values(),
+                        parent_work__anidb_aid__in=animes_sources.values()
+                    )
+
+        # Checks that anime are created if missing but not all data is retrieved from AniDB
+        self.assertEqual(Work.objects.get(title='Sangatsu no Lion meets Bump of Chicken').ext_synopsis, '')
+        self.assertNotEqual(Work.objects.get(title='Sangatsu no Lion').ext_synopsis, '')
+
+        # Checks on relations
+        self.assertTrue(relations.filter(child_work__anidb_aid=11746, parent_work__anidb_aid=10889, type='sequel').exists())
+        self.assertTrue(relations.filter(child_work__anidb_aid=10889, parent_work__anidb_aid=11746, type='prequel').exists())
+
+        self.assertTrue(relations.filter(child_work__anidb_aid=11747, parent_work__anidb_aid=10889, type='summary').exists())
+        self.assertTrue(relations.filter(child_work__anidb_aid=10889, parent_work__anidb_aid=11747, type='full_story').exists())
+
+        self.assertTrue(relations.filter(child_work__anidb_aid=13207, parent_work__anidb_aid=11746, type='sequel').exists())
+        self.assertTrue(relations.filter(child_work__anidb_aid=11746, parent_work__anidb_aid=13207, type='prequel').exists())
+
+        self.assertTrue(relations.filter(child_work__anidb_aid=12962, parent_work__anidb_aid=11746, type='summary').exists())
+        self.assertTrue(relations.filter(child_work__anidb_aid=11746, parent_work__anidb_aid=12962, type='full_story').exists())
