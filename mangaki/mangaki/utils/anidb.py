@@ -17,7 +17,9 @@ def to_python_datetime(mal_date):
     >>> to_python_datetime('2015-07-14')
     datetime.datetime(2015, 7, 14, 0, 0)
     """
-    return datetime(*list(map(int, mal_date.split("-"))))
+    date = list(map(int, mal_date.split("-")))
+    date += [1 for _ in range(3-len(date))]
+    return datetime(*date)
 
 
 class AniDB:
