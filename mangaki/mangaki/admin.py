@@ -377,7 +377,7 @@ class WorkAdmin(admin.ModelAdmin):
 
         work_titles = WorkTitle.objects.filter(work__in=queryset.values_list('pk', flat=True))
         full_infos = work_titles.values(
-            'pk', 'title', 'language', 'type', 'work_id', 'work__title'
+            'pk', 'title', 'language__code', 'type', 'work_id', 'work__title'
         ).order_by('title').distinct('title')
 
         titles = {}
@@ -388,7 +388,7 @@ class WorkAdmin(admin.ModelAdmin):
             titles[infos['work_id']].update({
                 infos['pk']: {
                     'title': infos['title'],
-                    'language': infos['language'],
+                    'language': infos['language__code'] if infos['language__code'] else 'inconnu',
                     'type': infos['type'] if infos['title'] != infos['work__title'] else 'current'
                 }
             })
