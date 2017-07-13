@@ -165,31 +165,23 @@ class AniDB:
             anime = self.get_xml(anidb_aid)
             related_animes_soup = anime.relatedanime
 
-        related_animes = []
+        related_animes = {}
         if related_animes_soup is not None:
             for related_node in related_animes_soup.find_all('anime'):
                 related_anidb_id = int(related_node.get('id'))
-                related_title = str(related_node.string).strip()
                 related_type = str(related_node.get('type')).strip()
                 related_type = related_type.lower().replace(" ", "_")
 
-                related_animes.append({
-                    'anidb_id': related_anidb_id,
-                    'title': related_title,
-                    'type': related_type,
-                })
+                related_animes[related_anidb_id] = related_type
 
         return related_animes
 
     def _build_related_animes(self,
                               work: Work,
-                              related_animes: List[Dict[int, str, str]]) -> List[RelatedWork]:
+                              related_animes: Dict[int, str]) -> List[RelatedWork]:
         anidb_aids = []
         types = {}
-        for related_anime in related_animes:
-            related_anidb_id = related_anime['anidb_id']
-            related_type = related_anime['type']
-
+        for related_anidb_id, related_type in related_animes:
             anidb_aids.append(related_anidb_id)
             types[related_anidb_id] = related_type
 
