@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><anime id="13207" restricted="false">
+<type>Movie</type>
+<episodecount>2</episodecount>
+<startdate>2018</startdate>
+<enddate>2018</enddate>
+<titles>
+<title xml:lang="x-jat" type="main">Gekijouban Hibike! Euphonium</title>
+<title xml:lang="ja" type="official">劇場版 響け! ユーフォニアム</title>
+</titles>
+<relatedanime>
+<anime id="11746" type="Prequel">Hibike! Euphonium 2</anime>
+</relatedanime>
+<url>http://anime-eupho.com</url>
+<creators>
+<name id="519" type="Direction">Ishihara Tatsuya</name>
+<name id="1791" type="Direction">Yamada Naoko</name>
+</creators>
+<picture>203513.jpg</picture>
+<resources>
+<resource type="2">
+<externalentity>
+<identifier>35678</identifier>
+</externalentity>
+<externalentity>
+<identifier>35677</identifier>
+</externalentity>
+</resource>
+<resource type="4">
+<externalentity>
+<url>http://anime-eupho.com</url>
+</externalentity>
+</resource>
+<resource type="9">
+<externalentity>
+<identifier>360845</identifier>
+</externalentity>
+<externalentity>
+<identifier>360846</identifier>
+</externalentity>
+</resource>
+<resource type="23">
+<externalentity>
+<identifier>anime_eupho</identifier>
+</externalentity>
+</resource>
+</resources>
+<episodes>
+<episode id="188112" update="2017-06-04">
+<epno type="1">2</epno>
+<length>0</length>
+<title xml:lang="ja">2年生になった久美子たち</title>
+<title xml:lang="en">Movie 2</title>
+<title xml:lang="x-jat">2-Nensei ni Natta Kumiko-tachi</title>
+</episode>
+<episode id="188113" update="2017-06-04">
+<epno type="1">1</epno>
+<length>0</length>
+<title xml:lang="ja">みぞれと希美の物語</title>
+<title xml:lang="en">Movie 1</title>
+<title xml:lang="x-jat">Mizore to Nozomi no Monogatari</title>
+</episode>
+</episodes>
+</anime>

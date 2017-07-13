@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><anime id="12962" restricted="false">
+<type>Movie</type>
+<episodecount>1</episodecount>
+<startdate>2017-09-30</startdate>
+<enddate>2017-09-30</enddate>
+<titles>
+<title xml:lang="x-jat" type="main">Gekijouban Hibike! Euphonium: Todoketai Melody</title>
+<title xml:lang="ja" type="official">劇場版 響け! ユーフォニアム~届けたいメロディ~</title>
+</titles>
+<relatedanime>
+<anime id="11746" type="Full Story">Hibike! Euphonium 2</anime>
+</relatedanime>
+<url>http://anime-eupho.com/</url>
+<creators>
+<name id="36136" type="Music">Matsuda Akito</name>
+<name id="519" type="Chief Direction">Ishihara Tatsuya</name>
+<name id="15009" type="Direction">Ogawa Taichi</name>
+<name id="42570" type="Original Work">Takeda Ayano</name>
+<name id="523" type="Character Design">Ikeda Shouko</name>
+<name id="736" type="Animation Work">Kyoto Animation</name>
+</creators>
+<picture>203508.jpg</picture>
+<resources>
+<resource type="1">
+<externalentity>
+<identifier>19744</identifier>
+</externalentity>
+</resource>
+<resource type="2">
+<externalentity>
+<identifier>35082</identifier>
+</externalentity>
+</resource>
+<resource type="4">
+<externalentity>
+<url>http://anime-eupho.com/</url>
+</externalentity>
+</resource>
+<resource type="9">
+<externalentity>
+<identifier>360031</identifier>
+</externalentity>
+</resource>
+<resource type="23">
+<externalentity>
+<identifier>anime_eupho</identifier>
+</externalentity>
+</resource>
+</resources>
+<characters>
+<character id="72337" type="main character in" update="2014-12-28">
+<rating votes="31">4.52</rating>
+<name>Katou Hazuki</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>166656.jpg</picture>
+<seiyuu id="38232" picture="140073.jpg">Asai Ayaka</seiyuu>
+</character>
+<character id="72338" type="main character in" update="2014-12-28">
+<rating votes="34">4.58</rating>
+<name>Kawashima Sapphire</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>166657.jpg</picture>
+<seiyuu id="37282" picture="136945.jpg">Toyota Moe</seiyuu>
+</character>
+<character id="72339" type="main character in" update="2014-12-28">
+<rating votes="68">7.02</rating>
+<name>Kousaka Reina</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>166658.jpg</picture>
+<seiyuu id="10759" picture="38748.jpg">Anzai Chika</seiyuu>
+</character>
+<character id="72340" type="main character in" update="2014-12-28">
+<rating votes="80">7.62</rating>
+<name>Oumae Kumiko</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>166655.jpg</picture>
+<seiyuu id="16804" picture="178974.jpg">Kurosawa Tomoyo</seiyuu>
+</character>
+<character id="73087" type="secondary cast in" update="2015-02-06">
+<rating votes="20">4.96</rating>
+<name>Nakaseko Kaori</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>168456.jpg</picture>
+<seiyuu id="245" picture="46862.jpg">Chihara Minori</seiyuu>
+</character>
+<character id="73088" type="secondary cast in" update="2015-04-16">
+<rating votes="15">2.36</rating>
+<name>Tsukamoto Shuuichi</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>168457.jpg</picture>
+<seiyuu id="39260" picture="150015.jpg">Ishiya Haruki</seiyuu>
+</character>
+<character id="73089" type="secondary cast in" update="2015-02-06">
+<rating votes="24">5.08</rating>
+<name>Ogasawara Haruka</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>168455.jpg</picture>
+<seiyuu id="2296" picture="189623.jpg">Hayami Saori</seiyuu>
+</character>
+<character id="73090" type="secondary cast in" update="2015-02-06">
+<rating votes="27">5.33</rating>
+<name>Taki Noboru</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>168458.jpg</picture>
+<seiyuu id="225" picture="17044.jpg">Sakurai Takahiro</seiyuu>
+</character>
+<character id="73091" type="secondary cast in" update="2015-04-28">
+<rating votes="61">6.82</rating>
+<name>Tanaka Asuka</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<description>Likes: Cats, Coffee and Bitter Chocolate.
+Dislikes: Dogs, Cocoa, Milk chocolate and useless people.
+Vice president of concert band club.
+Plays the Euphonium.</description>
+<picture>168454.jpg</picture>
+<seiyuu id="1798" picture="20493.jpg">Kotobuki Minako</seiyuu>
+</character>
+<character id="73769" type="secondary cast in" update="2015-03-14">
+<rating votes="10">3.27</rating>
+<name>Oumae Mamiko</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>170063.jpg</picture>
+<seiyuu id="17069" picture="80944.jpg">Numakura Manami</seiyuu>
+</character>
+</characters>
+<episodes>
+<episode id="188111" update="2017-06-04">
+<epno type="1">1</epno>
+<length>0</length>
+<airdate>2017-09-30</airdate>
+<title xml:lang="en">Complete Movie</title>
+</episode>
+</episodes>
+</anime>

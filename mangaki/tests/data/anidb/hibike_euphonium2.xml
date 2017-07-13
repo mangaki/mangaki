@@ -1,0 +1,787 @@
+<?xml version="1.0" encoding="UTF-8"?><anime id="11746" restricted="false">
+<type>TV Series</type>
+<episodecount>13</episodecount>
+<startdate>2016-10-06</startdate>
+<enddate>2016-12-29</enddate>
+<titles>
+<title xml:lang="x-jat" type="main">Hibike! Euphonium 2</title>
+<title xml:lang="ru" type="synonym">Играй, эуфониум! 2</title>
+<title xml:lang="ja" type="official">響け! ユーフォニアム 2</title>
+<title xml:lang="en" type="official">Sound! Euphonium 2</title>
+</titles>
+<relatedanime>
+<anime id="13207" type="Sequel">Gekijouban Hibike! Euphonium</anime>
+<anime id="10889" type="Prequel">Hibike! Euphonium</anime>
+<anime id="12962" type="Summary">Gekijouban Hibike! Euphonium: Todoketai Melody</anime>
+</relatedanime>
+<url>http://anime-eupho.com/</url>
+<creators>
+<name id="523" type="Chief Animation Direction">Ikeda Shouko</name>
+<name id="1775" type="Series Composition">Hanada Jukki</name>
+<name id="36136" type="Music">Matsuda Akito</name>
+<name id="519" type="Direction">Ishihara Tatsuya</name>
+<name id="42570" type="Original Work">Takeda Ayano</name>
+<name id="523" type="Character Design">Ikeda Shouko</name>
+<name id="736" type="Animation Work">Kyoto Animation</name>
+</creators>
+<description>Spring in the first year of high school. Kumiko, a member of the brass band in junior high school, visits the high school brass band club with classmates Hazuki and Sapphire. There, she comes across Reina, her former classmate from junior high. Hazuki and Sapphire decide to join the club, but Kumiko can`t make up her mind. She recollects her experience with Reina at a competition in junior high school.
+Source: crunchyroll</description>
+<ratings>
+<permanent count="508">8.24</permanent>
+<temporary count="511">7.91</temporary>
+<review count="1">7.33</review>
+</ratings>
+<picture>189320.jpg</picture>
+<resources>
+<resource type="1">
+<externalentity>
+<identifier>18558</identifier>
+</externalentity>
+</resource>
+<resource type="2">
+<externalentity>
+<identifier>31988</identifier>
+</externalentity>
+</resource>
+<resource type="4">
+<externalentity>
+<url>http://anime-eupho.com/</url>
+</externalentity>
+</resource>
+<resource type="6">
+<externalentity>
+<identifier>Sound!_Euphonium</identifier>
+</externalentity>
+</resource>
+<resource type="7">
+<externalentity>
+<identifier>響け!_ユーフォニアム</identifier>
+</externalentity>
+</resource>
+<resource type="8">
+<externalentity>
+<identifier>4283</identifier>
+</externalentity>
+</resource>
+<resource type="9">
+<externalentity>
+<identifier>354656</identifier>
+</externalentity>
+</resource>
+<resource type="10">
+<externalentity>
+<identifier>19516</identifier>
+</externalentity>
+</resource>
+<resource type="28">
+<externalentity>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+<tags>
+<tag id="2043" parentid="2869" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2016-12-07">
+<name>high school</name>
+<description>A secondary school that usually contains grades 10 through 12 in Japan, or 9 through 12 in America.</description>
+</tag>
+<tag id="2605" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-28">
+<name>dynamic</name>
+<description>Some of the central structural elements in anime are: 
+Plot Continuity 
+How does the plot or several plots unfold. Are they a strictly linear retelling of one big continuing story, a serial, possibly with several side stories, or is the content chopped into a set of unconnected episodes, only sharing the same setting and characters?
+Stereotype Characters
+Then there is the question of the character set presentation. Is it completely original, or is it your usual stereotypical character cast. Both choices have their merit, for example it would not really make much sense to reinvent the wheel for a harem anime. Fans of that genre come to expect their favourite stereotype protagonists.
+Plot Twists
+Finally there is the question of how complex the plot / the story unfolds. Are there side-plots that merge into the main plot leading to unexpected plot twists, or is the anime quite predictable? The latter would not be appropriate for detective stories. In harem anime on the other hand a foreseeable outcome is actually something the fans will come to expect.</description>
+</tag>
+<tag id="2607" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-29">
+<name>themes</name>
+<description>Themes describe the very central elements important to the anime stories. They set the backdrop against which the protagonists must face their challenges. Be it School Life, present Daily Life, Military action, Cyberpunk, Law and Order detective work, Sports, or the Underworld. These are only but a few of the more typical backgrounds for anime plots. Add to that a Conspiracy setting with a possible tragic outcome, the Themes span most of the imaginable subject matter relevant to anime.</description>
+</tag>
+<tag id="2609" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-22">
+<name>original work</name>
+<description>What the anime is based on! Mostly of academic interest, but a useful bit of info, hinting at the possible depth of story.</description>
+</tag>
+<tag id="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-22">
+<name>setting</name>
+<description>The setting describes in what time and place an anime takes place. To a certain extent it describes what you can expect from the world in the anime.</description>
+</tag>
+<tag id="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-08">
+<name>elements</name>
+<description>Next to Themes setting the backdrop for the protagonists in anime, there are the more detailed plot Elements that centre on character interactions: "What do characters do to each other or what is done to them?". Is it violent Action, an awe-inspiring Adventure in a foreign place, the gripping life of a Detective, a slapstick Comedy, an Ecchi Harem anime, a SciFi epic, or some Fantasy travelling adventure?</description>
+</tag>
+<tag id="2612" parentid="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>time</name>
+<description>This placeholder lists different epochs in human history and more vague but important timelines such as the future, the present and the past.</description>
+</tag>
+<tag id="2613" parentid="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>place</name>
+<description>The places the anime can take place in. Includes more specific places such as a country on Earth, as well as more general places such as a dystopia or a mirror world.</description>
+</tag>
+<tag id="2624" parentid="2612" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2017-02-20">
+<name>present</name>
+<description>Somewhere between past and future.</description>
+</tag>
+<tag id="2630" parentid="2613" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-13">
+<name>Earth</name>
+<description>The Earth is the third planet from the Sun, and the densest and fifth-largest of the eight planets in the Solar System. It is in effect a ball of hot mud, but on the surface it`s cold enough, so most of us live on it (or are supposed to). It is circa 4.5 billion years old, and, unless we humans succeed in destroying it over the next couple of centuries, it is expected to last for quite another while, though the changes in the Sun`s emissions due to its aging will likely cause the extinction of everything; the species of earthlings are guaranteed to die, even if we fail to kill them -- unless, of course, we find ourselves another planet and figure out a way to take everything there. Our little planet on a corner of this galaxy may mean nothing in the grand scheme of things, but to its inhabitants it is their home, so, as a species, we cherish it dearly, to the point many cultures even to this day deify it. Being the home to the human civilizations, the Earth is the main setting of most fiction, be it anime or otherwise, but not only are many titles set in other places, such as unrelated fantasy worlds, in a considerable number of fictional titles the Earth is actually destroyed by aggressive alien invaders.</description>
+<picurl>126792.jpg</picurl>
+</tag>
+<tag id="2669" parentid="2869" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-23">
+<name>school clubs</name>
+<description>Even though school clubs in Japan are not mandatory, there is some pressure from the social grid (e.g. fellow students, teachers) to participate in some kind of after-school activity, be it in sports or arts. Colleges also have clubs.
+As a comedy element in anime, some students have joined too many clubs, and are thus constantly stressed out. There is also the element of social commentary, making it clear that you have to join a club, if you want to be part of the class. Since self-founded clubs need at least 3 members, the desperate search and advertising for new members can be cause for hilarity in anime.</description>
+</tag>
+<tag id="2672" parentid="2834" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2015-05-31">
+<name>Japan</name>
+<description>Last stronghold for humanity. If Tokyo falls, it`s all over. Tokyo Tower will undoubtedly fall anyway.</description>
+</tag>
+<tag id="2782" parentid="2858" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2015-09-21">
+<name>shoujo ai</name>
+<description>Shoujo Ai means girls love, and thus explores what happens when two girls (or women) fall in love. This is not to be mistaken for http://anidb.net/t2695 [Yuri] which is (or, at least, how this term is often used by the western audience) used in adult works. This is not; that means there is no graphical sex.
+The male version is http://anidb.net/t2783 [Shounen Ai].</description>
+</tag>
+<tag id="2785" parentid="2858" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2014-02-27">
+<name>unrequited love</name>
+<description>At least one character has a romantic interest in another one, but the feelings are not returned. 
+This is the cornerstone of all love triangles or love polygons.</description>
+</tag>
+<tag id="2786" parentid="2858" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2009-05-15">
+<name>love polygon</name>
+<description>A love polygon refers to a romantic relationship involving n people. Although a love triangle is not limited to just heterosexual relationships, in anime, it usually deals with two females liking one male and vice versa.</description>
+</tag>
+<tag id="2793" parentid="2883" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-07">
+<name>performance</name>
+<description>The song performance on stage or acting in a theatre is a central part of the character`s life in this anime type.</description>
+</tag>
+<tag id="2794" parentid="2883" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2015-02-23">
+<name>music</name>
+<description>Music anime generally revolves around people concerned with music in their everyday lives. In addition they often adhere to certain genre conventions, the emphasis on training and practice in preparation for competitions, characters desire for self improvement, and pursuit of a specific goal. This is not unlike the Sports category.</description>
+<picurl>169131.jpg</picurl>
+</tag>
+<tag id="2799" parentid="2609" infobox="true" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2010-05-14">
+<name>novel</name>
+<description>Note that novel means book with words in paper, so no comics and no "visual novels", which should go under manga and dating-sim - visual Novel/erotic game respectively.
+Note that it can be applied to novels as we know them but also the typical light novels for teens and young adults, which are common in Japan and aside from being short include a number of illustrations.</description>
+</tag>
+<tag id="2834" parentid="2630" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2016-10-04">
+<name>Asia</name>
+<description>Asia is Earth`s largest and most populous continent, located primarily in the eastern and northern hemispheres and sharing the continental landmass of Eurasia with the continent of Europe. Asia covers an area of 44,579,000 square kilometers, about 30% of Earth`s total land area and 8.7% of the Earth`s total surface area. The continent, which has long been home to the majority of the human population, was the site of many of the first civilizations. Asia is notable for not only its overall large size and population, but also dense and large settlements as well as vast barely populated regions within the continent of 4.4 billion people.
+Source: Wikipedia</description>
+<picurl>192245.jpg</picurl>
+</tag>
+<tag id="2844" parentid="2611" infobox="true" weight="400" localspoiler="false" globalspoiler="false" verified="true" update="2014-05-07">
+<name>angst</name>
+<description>A feeling of general discomfort and uneasiness is present due to either trivial or more serious reasons, often accompanied by depression.
+Warning: may contain copious amounts of brooding and sighing.
+Etymology: "Angst" is a German word meaning fear or anxiety.</description>
+</tag>
+<tag id="2853" parentid="2611" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2017-02-13">
+<name>comedy</name>
+<description>Anime whose central struggle causes hilarious results. These stories are built upon funny characters, situations and events. A comedy anime is laced with humour and sets out to provoke laughter from the audience.
+Japanese humour can be a bit strange to westerners, so if you`re new to this type of humour, just bear with it; it`ll most likely grow on you if you`re a fan of other kinds of comedy.</description>
+<picurl>198104.jpg</picurl>
+</tag>
+<tag id="2858" parentid="2611" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2010-09-10">
+<name>romance</name>
+<description>Romance describes a story that deals with love between two or more characters typically also having an optimistic ending. Romance is also a difficulty encountered when creating a harem.</description>
+</tag>
+<tag id="2869" parentid="2607" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-23">
+<name>school life</name>
+<description>Since a large part of the anime audience still takes part in school life or is visiting college, it is only natural to choose a setting the audience can identify with, be it elementary, middle, or high school. For the older viewers a college setting with more mature real-life problems is appropriate. And since clubs take up so much time in the lives of students, these are obviously also important.</description>
+</tag>
+<tag id="2883" parentid="2607" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-07">
+<name>the arts</name>
+<description>The arts represent an outlet of human expression, usually influenced by culture, and driven by human creative impulse. Major constituents of the arts include literature – including poetry, novels and short stories, and epics; performing arts – among them music, dance, and theatre; culinary arts such as baking, chocolatiering, and winemaking; media arts like photography and film, and visual arts – including drawing, painting, and sculpting. Some art forms combine a visual element with performance (e.g. film) and the written word (e.g. comics).
+From prehistoric cave paintings to modern day films, art serves as a vessel for storytelling and conveying mankind`s relationship with its environment.
+Source: Wiki</description>
+</tag>
+<tag id="2978" parentid="5604" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-06-28">
+<name>aim for the top</name>
+<description>This can be a positive or negative plot device. A character may strive to become the best in an altruistic way (e.g. best healer, most widely learned master), or it can be quite banal and primitive (e.g. challenged delinquents wanting to be the strongest fighters).
+Alas in fighting anime the latter usually prevails.</description>
+</tag>
+<tag id="3759" parentid="2607" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2010-04-11">
+<name>teamwork</name>
+<description>A cooperative effort by the members of a group or team to achieve a common goal.</description>
+</tag>
+<tag id="3831" parentid="2607" weight="400" localspoiler="false" globalspoiler="false" verified="true" update="2015-05-13">
+<name>training</name>
+<description>Training is extensive, serious practising a person undergoes in order to develop skills and abilities, such as handling weapons, playing instruments, playing sports, and so on.</description>
+</tag>
+<tag id="3863" parentid="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2008-07-05">
+<name>competition</name>
+<description>Some sort of confrontation occurs in this show. The protagonists "duke it out" via various competitions.</description>
+</tag>
+<tag id="4022" parentid="6230" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2010-11-29">
+<name>strong female lead</name>
+<description>The lead female character has a strong personality and plays a part that is not the typical damsel-in-distress role. 
+This is the exact opposite of the “damsel in distress” tag.</description>
+</tag>
+<tag id="4198" parentid="5604" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-03-14">
+<name>hard work and guts</name>
+<description>One of the character`s motto in the anime. Because there is nothing that cannot be achieved by hard work and guts.</description>
+</tag>
+<tag id="4333" parentid="6230" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-07-06">
+<name>predominantly female cast</name>
+<description>A show with a predominantly female cast has mostly females as main and secondary cast members while few if any male characters have major roles. This also applies when a male lead is surrounded by females of lesser individual plot relevance, such as in a harem setting.</description>
+<picurl>70752.jpg</picurl>
+</tag>
+<tag id="5355" parentid="3863" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-07">
+<name>tournament</name>
+<description>A competition involving a large number or participants. Such competitions may range from friendly, moderated sporting events to anything-goes, all-out fights to the death.
+All participants take part in the tournament in want or need of the final goal and possible prizes; which depending on genre, may range from a boastful record at school to great riches and/or the granting of a wish. 
+Depending on the type of tournament, contestants will either act alone, be permitted a team, or construct a team of chance throughout the ongoing competition.</description>
+</tag>
+<tag id="5604" parentid="2607" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-04">
+<name>following one`s dream</name>
+<description>No matter what the hardships may be, at least one of the protagonists in this anime is following her/his dream.
+Examples: To become a professional athlete, a musician, a painter or the ruler of this world!</description>
+</tag>
+<tag id="5826" parentid="2607" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2011-04-12">
+<name>rivalry</name>
+<description>Quite broadly used term describing a conflict, contest, struggle, or opposition of some sort.
+Typical examples: The mostly comedic rivalry for the love of a protagonist in a harem anime (love polygon), the more "mindless" battles between wannabe delinquents in a school fighting anime, or the struggle between good &amp; evil in an epic conflict for world domination.</description>
+</tag>
+<tag id="5851" parentid="6230" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2010-08-16">
+<name>female protagonist</name>
+<description>These anime have a female protagonist.</description>
+</tag>
+<tag id="5917" parentid="2794" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-24">
+<name>classical music</name>
+<description>Classical music is art music produced or rooted in the traditions of Western music (both liturgical and secular). It encompasses a broad span of time from roughly the 11th century to the present day.
+Anime tagged have classical music as a central theme.</description>
+<picurl>169132.jpg</picurl>
+</tag>
+<tag id="6230" parentid="2605" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-20">
+<name>cast</name>
+</tag>
+</tags>
+<characters>
+<character id="72337" type="main character in" update="2014-12-28">
+<rating votes="31">4.52</rating>
+<name>Katou Hazuki</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>166656.jpg</picture>
+<seiyuu id="38232" picture="140073.jpg">Asai Ayaka</seiyuu>
+</character>
+<character id="72338" type="main character in" update="2014-12-28">
+<rating votes="34">4.58</rating>
+<name>Kawashima Sapphire</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>166657.jpg</picture>
+<seiyuu id="37282" picture="136945.jpg">Toyota Moe</seiyuu>
+</character>
+<character id="72339" type="main character in" update="2014-12-28">
+<rating votes="68">7.02</rating>
+<name>Kousaka Reina</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>166658.jpg</picture>
+<seiyuu id="10759" picture="38748.jpg">Anzai Chika</seiyuu>
+</character>
+<character id="72340" type="main character in" update="2014-12-28">
+<rating votes="80">7.62</rating>
+<name>Oumae Kumiko</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>166655.jpg</picture>
+<seiyuu id="16804" picture="178974.jpg">Kurosawa Tomoyo</seiyuu>
+</character>
+<character id="73087" type="secondary cast in" update="2015-02-06">
+<rating votes="20">4.96</rating>
+<name>Nakaseko Kaori</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>168456.jpg</picture>
+<seiyuu id="245" picture="46862.jpg">Chihara Minori</seiyuu>
+</character>
+<character id="73088" type="secondary cast in" update="2015-04-16">
+<rating votes="15">2.36</rating>
+<name>Tsukamoto Shuuichi</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>168457.jpg</picture>
+<seiyuu id="39260" picture="150015.jpg">Ishiya Haruki</seiyuu>
+</character>
+<character id="73089" type="secondary cast in" update="2015-02-06">
+<rating votes="24">5.08</rating>
+<name>Ogasawara Haruka</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>168455.jpg</picture>
+<seiyuu id="2296" picture="189623.jpg">Hayami Saori</seiyuu>
+</character>
+<character id="73090" type="secondary cast in" update="2015-02-06">
+<rating votes="27">5.33</rating>
+<name>Taki Noboru</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>168458.jpg</picture>
+<seiyuu id="225" picture="17044.jpg">Sakurai Takahiro</seiyuu>
+</character>
+<character id="73091" type="secondary cast in" update="2015-04-28">
+<rating votes="61">6.82</rating>
+<name>Tanaka Asuka</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<description>Likes: Cats, Coffee and Bitter Chocolate.
+Dislikes: Dogs, Cocoa, Milk chocolate and useless people.
+Vice president of concert band club.
+Plays the Euphonium.</description>
+<picture>168454.jpg</picture>
+<seiyuu id="1798" picture="20493.jpg">Kotobuki Minako</seiyuu>
+</character>
+<character id="73763" type="secondary cast in" update="2016-12-15">
+<rating votes="35">6.95</rating>
+<name>Nakagawa Natsuki</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>170060.jpg</picture>
+<seiyuu id="33790" picture="93020.jpg">Fujimura Konomi</seiyuu>
+</character>
+<character id="73764" type="secondary cast in" update="2015-03-14">
+<rating votes="24">3.17</rating>
+<name>Yoshikawa Yuuko</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>170061.jpg</picture>
+<seiyuu id="9405" picture="137968.jpg">Yamaoka Yuri</seiyuu>
+</character>
+<character id="73765" type="secondary cast in" update="2015-03-14">
+<rating votes="7">5.61</rating>
+<name>Gotou Takuya</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>170058.jpg</picture>
+<seiyuu id="592" picture="170729.jpg">Tsuda Kenjirou</seiyuu>
+</character>
+<character id="73766" type="appears in" update="2015-03-14">
+<rating votes="6">5.59</rating>
+<name>Saitou Aoi</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>170062.jpg</picture>
+<seiyuu id="1799" picture="156027.jpg">Hikasa Youko</seiyuu>
+</character>
+<character id="73767" type="secondary cast in" update="2015-03-14">
+<rating votes="11">2.19</rating>
+<name>Matsumoto Michie</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>170064.jpg</picture>
+<seiyuu id="360" picture="171401.jpg">Hisakawa Aya</seiyuu>
+</character>
+<character id="73768" type="secondary cast in" update="2015-03-14">
+<rating votes="14">4.84</rating>
+<name>Nagase Riko</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>170059.jpg</picture>
+<seiyuu id="38169" picture="139881.jpg">Kobori Miyuki</seiyuu>
+</character>
+<character id="73769" type="secondary cast in" update="2015-03-14">
+<rating votes="10">3.27</rating>
+<name>Oumae Mamiko</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>170063.jpg</picture>
+<seiyuu id="17069" picture="80944.jpg">Numakura Manami</seiyuu>
+</character>
+<character id="74453" type="appears in" update="2016-11-24">
+<rating votes="1">2.33</rating>
+<name>Oumae Akiko</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<description>Kumiko and Mamiko`s mother.</description>
+<picture>195050.jpg</picture>
+<seiyuu id="40833" picture="198636.jpg">Nanao Haruhi</seiyuu>
+</character>
+<character id="75440" type="appears in" update="2015-05-28">
+<rating votes="1">6.20</rating>
+<name>Kawashima Kohaku</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<description>Midori`s little sister.</description>
+<picture>173915.jpg</picture>
+</character>
+<character id="76146" type="appears in" update="2016-12-29">
+<name>Kitauji Koukou Suisougaku Bu</name>
+<gender>unknown</gender>
+<charactertype id="3">Organization</charactertype>
+<description>Kitauji High School Wind Ensemble</description>
+<picture>196313.jpg</picture>
+</character>
+<character id="82351" type="secondary cast in" update="2016-10-05">
+<rating votes="3">5.98</rating>
+<name>Kasaki Nozomi</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>192384.jpg</picture>
+<seiyuu id="21312" picture="152762.jpg">Touyama Nao</seiyuu>
+</character>
+<character id="82352" type="secondary cast in" update="2016-10-05">
+<rating votes="8">5.44</rating>
+<name>Yoroizuka Mizore</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>192383.jpg</picture>
+<seiyuu id="32751" picture="157891.jpg">Tanezaki Atsumi</seiyuu>
+</character>
+<character id="84714" type="secondary cast in" update="2016-10-05">
+<rating votes="2">4.74</rating>
+<name>Niiyama Satomi</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>192382.jpg</picture>
+<seiyuu id="166" picture="23196.jpg">Kuwashima Houko</seiyuu>
+</character>
+<character id="84715" type="secondary cast in" update="2016-10-05">
+<rating votes="2">7.30</rating>
+<name>Hashimoto Masahiro</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>192381.jpg</picture>
+<seiyuu id="345" picture="84834.jpg">Nakamura Yuuichi</seiyuu>
+</character>
+<character id="85383" type="appears in" update="2016-10-07">
+<name>Sasaki Azusa</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>192461.jpg</picture>
+<seiyuu id="33509" picture="204529.jpg">Tadokoro Azusa</seiyuu>
+</character>
+<character id="86065" type="appears in" update="2016-11-24">
+<name>Oumae Kentarou</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>195049.jpg</picture>
+<seiyuu id="2340" picture="151335.jpg">Naka Hiroshi</seiyuu>
+</character>
+<character id="86319" type="appears in" update="2016-11-21">
+<name>Tanaka Asumi</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<description>Asuka`s mother.</description>
+<picture>194945.jpg</picture>
+<seiyuu id="3130" picture="186156.jpg">Watanabe Kumiko</seiyuu>
+</character>
+</characters>
+<episodes>
+<episode id="180662" update="2016-12-31">
+<epno type="1">1</epno>
+<length>50</length>
+<airdate>2016-10-06</airdate>
+<rating votes="11">7.86</rating>
+<title xml:lang="ja">まなつのファンファーレ</title>
+<title xml:lang="en">Mid-summer Fanfare</title>
+<title xml:lang="x-jat">Manatsu no Fanfare</title>
+<summary>Having won first place at the Kyoto competition, Kumiko and the band are preparing to compete in the Kansai competition. A shadow looms over them when an old member, Nozomi Kasaki, enters the picture.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721567</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="180811" update="2016-12-31">
+<epno type="1">4</epno>
+<length>25</length>
+<airdate>2016-10-27</airdate>
+<rating votes="10">7.76</rating>
+<title xml:lang="ja">めざめるオーボエ</title>
+<title xml:lang="en">Awakening Oboe</title>
+<title xml:lang="x-jat">Mezameru Oboe</title>
+<summary>Nozomi finally meets Mizore. She learns, the hard way, why Asuka had been keeping her away.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721573</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="180812" update="2016-12-31">
+<epno type="1">3</epno>
+<length>25</length>
+<airdate>2016-10-20</airdate>
+<rating votes="10">6.92</rating>
+<title xml:lang="ja">なやめるノクターン</title>
+<title xml:lang="en">Troubled Nocturnes</title>
+<title xml:lang="x-jat">Nayameru Nocturne</title>
+<summary>One time at band camp, Kumiko confronts Asuka about her problem with Nozomi. Meanwhile, Reina works up the courage to ask Taki-sensei if he`s dating Niiyama-sensei.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721571</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="180813" update="2016-12-31">
+<epno type="1">2</epno>
+<length>25</length>
+<airdate>2016-10-13</airdate>
+<rating votes="10">7.01</rating>
+<title xml:lang="ja">とまどいフルート</title>
+<title xml:lang="en">Hesitation Flute</title>
+<title xml:lang="x-jat">Tomadoi Flute</title>
+<summary>Kumiko and her buddies head to the pool for one last breath of freedom before their grueling concert band training. There, Nozomi reveals some of what had happened the year before.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721569</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="180817" update="2016-10-06">
+<epno type="3">C2</epno>
+<length>2</length>
+<airdate>2016-10-05</airdate>
+<title xml:lang="en">Ending</title>
+</episode>
+<episode id="180818" update="2016-10-06">
+<epno type="3">C1</epno>
+<length>2</length>
+<airdate>2016-10-05</airdate>
+<rating votes="1">4.40</rating>
+<title xml:lang="en">Opening</title>
+</episode>
+<episode id="180989" update="2016-12-31">
+<epno type="1">5</epno>
+<length>25</length>
+<airdate>2016-11-03</airdate>
+<rating votes="12">9.62</rating>
+<title xml:lang="ja">きせきのハーモニー</title>
+<title xml:lang="en">Miraculous Harmony</title>
+<title xml:lang="x-jat">Kiseki no Harmony</title>
+<summary>Only three schools will be selected at the Kansai Concert Band Competition to compete in the Nationals. Will Kitauji High School be one of them?
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721575</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="181334" update="2016-12-31">
+<epno type="1">8</epno>
+<length>25</length>
+<airdate>2016-11-24</airdate>
+<rating votes="9">5.61</rating>
+<title xml:lang="ja">かぜひきラプソディー</title>
+<title xml:lang="en">Rhapsody in Flu</title>
+<title xml:lang="x-jat">Kazehiki Rhapsody</title>
+<summary>Asuka invites Kumiko over for a study party. With Kumiko`s sister quitting college and Asuka`s band membership uncertain, Kumiko and Reina are forced to contemplate the role of music in their lives.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721581</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="181335" update="2016-12-31">
+<epno type="1">7</epno>
+<length>25</length>
+<airdate>2016-11-17</airdate>
+<rating votes="10">6.13</rating>
+<title xml:lang="ja">えきびるコンサート</title>
+<title xml:lang="en">Station Concert</title>
+<title xml:lang="x-jat">Ekibiru Concert</title>
+<summary>Asuka`s mother wants her to quit the concert band. This upsets everyone -- including her mother.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721579</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="181336" update="2016-12-31">
+<epno type="1">6</epno>
+<length>25</length>
+<airdate>2016-11-10</airdate>
+<rating votes="10">6.76</rating>
+<title xml:lang="ja">あめふりコンダクター</title>
+<title xml:lang="en">Rainy Conductor</title>
+<title xml:lang="x-jat">Amefuri Conductor</title>
+<summary>It`s the school festival at Kitauji High School. Kumiko`s sister insists on quitting college, while Taki reveals some things about his past with his wife.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721577</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="182183" update="2017-01-09">
+<epno type="1">13</epno>
+<length>25</length>
+<airdate>2016-12-29</airdate>
+<rating votes="10">8.95</rating>
+<title xml:lang="ja">はるさきエピローグ</title>
+<title xml:lang="en">Early-Spring Epilogue</title>
+<title xml:lang="x-jat">Harusaki Epilogue</title>
+<summary>With the competition over and the third-years graduating, Kumiko is left to sort through her feelings: Is it a love of concert band, of the euphonium, or of something else?
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721591</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="182184" update="2017-01-09">
+<epno type="1">12</epno>
+<length>25</length>
+<airdate>2016-12-22</airdate>
+<rating votes="9">7.51</rating>
+<title xml:lang="ja">さいごのコンクール</title>
+<title xml:lang="en">The Last Competition</title>
+<title xml:lang="x-jat">Saigo no Concours</title>
+<summary>It`s the big day: the All Japan Concert Band Competition Nationals.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721589</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="182185" update="2016-12-31">
+<epno type="1">11</epno>
+<length>25</length>
+<airdate>2016-12-15</airdate>
+<rating votes="9">8.80</rating>
+<title xml:lang="ja">はつこいトランペット</title>
+<title xml:lang="en">First Love Trumpet</title>
+<title xml:lang="x-jat">Hatsukoi Trumpet</title>
+<summary>With Asuka back in the competition, the orchestra is just about set for the Nationals. Meanwhile, Kumiko tries to understand why Reina is upset at her.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721587</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="182186" update="2016-12-31">
+<epno type="1">10</epno>
+<length>25</length>
+<airdate>2016-12-08</airdate>
+<rating votes="10">8.86</rating>
+<title xml:lang="ja">ほうかごオベリガート</title>
+<title xml:lang="en">After-school Obbligato</title>
+<title xml:lang="x-jat">Houkago Obbligato</title>
+<summary>Taki`s deadline for Asuka draws near. She refuses to admit that she wants, more than anyone, to compete in the Nationals.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721585</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="182187" update="2016-12-31">
+<epno type="1">9</epno>
+<length>25</length>
+<airdate>2016-12-01</airdate>
+<rating votes="11">8.69</rating>
+<title xml:lang="ja">ひびけ! ユーフォニアム</title>
+<title xml:lang="en">Sound! Euphonium</title>
+<title xml:lang="x-jat">Hibike! Euphonium</title>
+<summary>Asuka is about to lose her seat competing in the Nationals. But that might not be why she invited Kumiko over.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>721583</identifier>
+<identifier>sound-euphonium</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="183085" update="2016-12-24">
+<epno type="2">S1</epno>
+<length>3</length>
+<airdate>2016-12-21</airdate>
+<title xml:lang="ja">花火大会キッスへようこそ!</title>
+<title xml:lang="en">Welcome to the Fireworks Festival Kiss!</title>
+<title xml:lang="x-jat">Hanabi Taikai Kiss e Youkoso!</title>
+</episode>
+<episode id="183814" update="2017-01-19">
+<epno type="2">S2</epno>
+<length>4</length>
+<airdate>2017-01-18</airdate>
+<title xml:lang="ja">プールへようこそ!</title>
+<title xml:lang="en">Welcome to the Pool!</title>
+<title xml:lang="x-jat">Pool e Youkoso!</title>
+</episode>
+<episode id="184788" update="2017-02-19">
+<epno type="2">S3</epno>
+<length>4</length>
+<airdate>2017-02-15</airdate>
+<title xml:lang="ja">メイド服へようこそ!</title>
+<title xml:lang="en">Welcome to Maid Outfit!</title>
+<title xml:lang="x-jat">Maid Fuku e Youkoso!</title>
+</episode>
+<episode id="186193" update="2017-03-19">
+<epno type="2">S4</epno>
+<length>3</length>
+<airdate>2017-03-18</airdate>
+<title xml:lang="ja">バトル文化祭へようこそ!</title>
+<title xml:lang="en">Welcome to the Festival Battle!</title>
+<title xml:lang="x-jat">Battle Bunkasai e Youkoso!</title>
+</episode>
+<episode id="187218" update="2017-04-21">
+<epno type="2">S5</epno>
+<length>3</length>
+<airdate>2017-04-19</airdate>
+<title xml:lang="ja">フライング滝へようこそ!</title>
+<title xml:lang="en">Welcome to the Flying Taki!</title>
+</episode>
+<episode id="187920" update="2017-05-22">
+<epno type="2">S6</epno>
+<length>4</length>
+<airdate>2017-05-17</airdate>
+<title xml:lang="ja">画伯へようこそ!</title>
+<title xml:lang="en">Welcome to the Artist!</title>
+</episode>
+<episode id="188645" update="2017-06-24">
+<epno type="2">S7</epno>
+<length>4</length>
+<airdate>2017-06-21</airdate>
+<title xml:lang="ja">安眠へようこそ!</title>
+<title xml:lang="en">Welcome to Sleep!</title>
+</episode>
+</episodes>
+</anime>
