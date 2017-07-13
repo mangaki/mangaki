@@ -160,6 +160,28 @@ class AniDB:
 
         return tags
 
+
+    def get_related_animes(self, anidb_aid=None, related_animes_soup=None):
+        if anidb_aid is not None:
+            anime = self.get_xml(anidb_aid)
+            related_animes_soup = anime.relatedanime
+
+        related_animes = []
+        if related_animes_soup is not None:
+            for related_node in related_animes_soup.find_all('anime'):
+                related_anidb_id = int(related_node.get('id'))
+                related_title = str(related_node.string).strip()
+                related_type = str(related_node.get('type')).strip()
+                related_type = related_type.lower().replace(" ", "_")
+
+                related_animes.append({
+                    'anidb_id': related_anidb_id,
+                    'title': related_title,
+                    'type': related_type,
+                })
+
+        return related_animes
+
     def get_or_update_work(self,
                            anidb_aid: int,
                            reload_lang_cache: bool = False) -> Work:
@@ -185,6 +207,7 @@ class AniDB:
         all_titles = anime.titles
         all_creators = anime.creators
         all_tags = anime.tags
+        all_related_animes = anime.relatedanime
 
         # Handling of titles
         main_title = None
