@@ -8,7 +8,7 @@ from django.utils.functional import cached_property
 from django.db.models import Q
 
 from mangaki import settings
-from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork
+from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork, RelatedWork
 
 
 def to_python_datetime(mal_date):
@@ -160,7 +160,6 @@ class AniDB:
 
         return tags
 
-
     def get_related_animes(self, anidb_aid=None, related_animes_soup=None):
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
@@ -181,6 +180,43 @@ class AniDB:
                 })
 
         return related_animes
+
+    def _build_related_animes(self,
+                              work: Work,
+                              related_animes: List[Dict[int, str, str]]) -> List[RelatedWork]:
+        anidb_aids = []
+        types = {}
+        for related_anime in related_animes:
+            related_anidb_id = related_anime['anidb_id']
+            related_type = related_anime['type']
+
+            anidb_aids.append(related_anidb_id)
+            types[related_anidb_id] = related_type
+
+        # Retrieve missing works
+        existing_works = Work.objects.filter(anidb_aid__in=anidb_aids)
+        existing_anidb_aids = existing_works.values_list('anidb_aid', flat=True)
+        works = [work for work in existing_works]
+        for anidb_aid in anidb_aids:
+            if anidb_aid not in existing_anidb_aids:
+                # FIXME: Should be careful, this might spam AniDB
+                works.append(self.get_or_update_work(anidb_aid=anidb_aid))
+
+        # And create appropriate relations in the database
+        # Should skip already existing relations (next commit)
+        new_relations = []
+        for child_work in works:
+            new_relations.append(
+                RelatedWork(
+                    parent_work=work,
+                    child_work=child_work,
+                    type=types[child_work.anidb_aid]
+                )
+            )
+
+        RelatedWork.objects.bulk_create(new_relations)
+
+        return new_relations
 
     def get_or_update_work(self,
                            anidb_aid: int,
@@ -295,7 +331,10 @@ class AniDB:
             work.nsfw = True
             work.save()
 
+        related_animes = self.get_related_animes(all_related_animes)
+
         self._build_work_titles(work, titles, reload_lang_cache)
+        self._build_related_animes(work, related_animes)
 
         return work
 
