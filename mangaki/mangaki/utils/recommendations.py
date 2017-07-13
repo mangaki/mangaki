@@ -10,9 +10,9 @@ from mangaki.utils.ratings import current_user_ratings
 from scipy.sparse import coo_matrix, vstack
 from mangaki.utils.values import rating_values
 import numpy as np
+import pandas as pd
 import json
 import os.path
-
 
 NB_RECO = 10
 CHRONO_ENABLED = True
@@ -59,16 +59,17 @@ def get_reco_algo(request, algo_name='knn', category='all'):
                 Rating.objects.values_list('user_id', 'work_id', 'choice'))
             chrono.save('get all %d interesting ratings' % len(triplets))
             dataset, algo = fit_algo(algo_name, triplets)
-        already_rated_works['rating'] = already_rated_works['choice'].map(rating_values)
-        ratings_from_user = coo_matrix((already_rated_works['rating'],(np.zeros(len(already_rated_works['work_id'])), already_rated_works['work_id'])), shape = (1, knn.nb_works))
+        framed_rated_works = pd.DataFrame(list(current_user_ratings(request).items()), columns = ['work_id', 'choice'])
+        framed_rated_works['rating'] = framed_rated_works['choice'].map(rating_values)
+        ratings_from_user = coo_matrix((framed_rated_works['rating'],(np.zeros(len(framed_rated_works['work_id'])), framed_rated_works['work_id'])), shape = (1, algo.nb_works))
         ratings_from_user = ratings_from_user.tocsr()
-        knn.M = vstack([knn.M, ratings_from_user])
+        algo.M = vstack([algo.M, ratings_from_user])
 
 
         chrono.save('loading knn and expanding with current user ratings')
 
 
-        encoded_neighbors = algo.get_neighbors([knn.nb_users]) # Now, current user ratings are in the last row of M
+        encoded_neighbors = algo.get_neighbors([algo.nb_users]) # Now, current user ratings are in the last row of M
         neighbors = dataset.decode_users(encoded_neighbors[0])  # We only want for the first user
 
         chrono.save('get neighbors')

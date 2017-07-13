@@ -13,14 +13,18 @@ ALGOS = {
 }
 
 
-def fit_algo(algo_name, triplets):
+def fit_algo(algo_name, triplets, titles=None, categories=None):
     algo = ALGOS[algo_name]()
     dataset = Dataset()
 
+    if titles is not None:
+        dataset.titles = dict(titles)
+    if categories is not None:
+        dataset.categories = dict(categories)
     anonymized = dataset.make_anonymous_data(triplets)
     algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
     algo.fit(anonymized.X, anonymized.y)
-    if algo_name in {'svd', 'als', 'knn'}: 
+    if algo_name in {'svd', 'als', 'knn'}:
         algo.save(algo.get_backup_filename())
         dataset.save('ratings-' + algo.get_backup_filename())
     return dataset, algo
