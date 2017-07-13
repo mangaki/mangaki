@@ -39,6 +39,7 @@ def get_pos_of_best_works_for_user_via_algo(algo, dataset, user_id, work_ids, li
 
 def get_reco_algo(request, algo_name='knn', category='all'):
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
+    dataset = Dataset()
     already_rated_works = list(current_user_ratings(request))
     if request.user.is_anonymous:
         assert request.user.id is None
@@ -59,9 +60,10 @@ def get_reco_algo(request, algo_name='knn', category='all'):
                 Rating.objects.values_list('user_id', 'work_id', 'choice'))
             chrono.save('get all %d interesting ratings' % len(triplets))
             dataset, algo = fit_algo(algo_name, triplets)
-        framed_rated_works = pd.DataFrame(list(current_user_ratings(request).items()), columns = ['work_id', 'choice'])
+        framed_rated_works = pd.DataFrame(list(current_user_ratings(request).items()), columns=['work_id', 'choice'])
+        framed_rated_works['work_id'] = dataset.encode_works(framed_rated_works['work_id'])
         framed_rated_works['rating'] = framed_rated_works['choice'].map(rating_values)
-        ratings_from_user = coo_matrix((framed_rated_works['rating'],(np.zeros(len(framed_rated_works['work_id'])), framed_rated_works['work_id'])), shape = (1, algo.nb_works))
+        ratings_from_user = coo_matrix((framed_rated_works['rating'],(np.zeros(len(framed_rated_works['work_id'])), framed_rated_works['work_id'])), shape=(1, algo.nb_works))
         ratings_from_user = ratings_from_user.tocsr()
         algo.M = vstack([algo.M, ratings_from_user])
 

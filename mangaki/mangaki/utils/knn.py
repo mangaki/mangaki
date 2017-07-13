@@ -27,6 +27,17 @@ class MangakiKNN(RecommendationAlgorithm):
         self.sum_ratings = {}
         self.nb_ratings = {}
 
+    def load(self, filename):
+        backup = super().load(filename)
+        self.NB_NEIGHBORS = backup.NB_NEIGHBORS
+        self.closest_neighbors = backup.closest_neighbors
+        self.rated_works = backup.rated_works
+        self.mean_score = backup.mean_score
+        self.ratings = backup.ratings
+        self.sum_ratings = backup.sum_ratings
+        self.nb_ratings = backup.nb_ratings
+        self.M = backup.M
+
     def get_neighbors(self, user_ids=None):
         neighbors = []
         if user_ids is None:
@@ -57,7 +68,7 @@ class MangakiKNN(RecommendationAlgorithm):
         self.sum_ratings = Counter()
         self.nb_ratings = Counter()
         users, works = zip(*list(X))
-        self.M = coo_matrix((y,(users,works)), shape = (self.nb_users, self.nb_works)) # Might take some time, but coo is efficient for creating matrices
+        self.M = coo_matrix((y,(users,works)), shape=(self.nb_users, self.nb_works)) # Might take some time, but coo is efficient for creating matrices
         self.M = self.M.tocsr() # knn.M should be CSR for faster arithmetic operations
         for (user_id, work_id), rating in zip(X, y):
             self.ratings[user_id][work_id] = rating
