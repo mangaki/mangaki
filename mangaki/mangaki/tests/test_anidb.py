@@ -24,7 +24,7 @@ class AniDBTest(TestCase):
         # FIXME: The defaults for editor and studio in Work requires those to
         # exist, or else foreign key constraints fail.
         Editor.objects.create(pk=1)
-        # Studio.objects.create(pk=1)
+        Studio.objects.create(pk=1)
         self.anidb = client
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
         self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
