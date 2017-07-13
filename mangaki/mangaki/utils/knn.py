@@ -37,6 +37,8 @@ class MangakiKNN(RecommendationAlgorithm):
         self.sum_ratings = backup.sum_ratings
         self.nb_ratings = backup.nb_ratings
         self.M = backup.M
+        self.nb_works = backup.nb_works
+        self.nb_users = backup.nb_users
 
     def get_neighbors(self, user_ids=None):
         neighbors = []
