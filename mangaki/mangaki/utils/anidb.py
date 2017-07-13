@@ -255,7 +255,7 @@ class AniDB:
 
         # Handling of staff
         creators = []
-        studio = Studio.objects.get(pk=1)
+        studio = None
         # FIXME: cache this query
         staff_map = dict(Role.objects.values_list('slug', 'pk'))
         for creator_node in all_creators.find_all('name'):
@@ -291,9 +291,10 @@ class AniDB:
             'ext_synopsis': str(anime.description.string),
             'nb_episodes': int(anime.episodecount.string),
             'anime_type': str(anime.type.string),
-            'anidb_aid': anidb_aid,
-            'studio': studio
+            'anidb_aid': anidb_aid
         }
+        if studio is not None:
+            anime['studio'] = studio
 
         # Add or update work
         work, created = Work.objects.update_or_create(category=self.anime_category,
