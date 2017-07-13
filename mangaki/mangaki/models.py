@@ -15,7 +15,7 @@ from django.db import models
 from django.db.models import CharField, F, Func, Lookup, Value, Q
 from django.utils.functional import cached_property
 
-from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES
+from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES, RELATION_TYPE_CHOICES
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 from mangaki.utils.dpp import MangakiDPP
 from mangaki.utils.ratingsmatrix import RatingsMatrix
@@ -449,6 +449,23 @@ class TaggedWork(models.Model):
 
     def __str__(self):
         return "%s %s %s" % (self.work, self.tag, self.weight)
+
+
+class RelatedWork(models.Model):
+    parent_work = models.ForeignKey('Work', on_delete=models.CASCADE, related_name='parent_work')
+    child_work = models.ForeignKey('Work', on_delete=models.CASCADE, related_name='child_work')
+    type = models.CharField(
+        verbose_name='Type de relation',
+        max_length=20,
+        choices=RELATION_TYPE_CHOICES,
+        default=''
+    )
+
+    class Meta:
+        unique_together = ('parent_work', 'child_work', 'type')
+
+    def __str__(self):
+        return "%s : %s de %s" % (self.child_work, self.type, self.parent_work)
 
 
 class Track(models.Model):
