@@ -8,11 +8,6 @@ from mangaki.models import Work, Category, WorkTitle, Editor, Studio
 class ChangeDefaultTitleTest(TestCase):
 
     def setUp(self):
-        # FIXME: The defaults for editor and studio in Work requires those to
-        # exist, or else foreign key constraints fail.
-        Editor.objects.create(pk=1)
-        Studio.objects.create(pk=1)
-
         self.user = get_user_model().objects.create_superuser(username='test', password='test', email='email@email.email')
 
         anime = Category.objects.get(slug='anime')

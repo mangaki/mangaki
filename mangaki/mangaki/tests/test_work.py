@@ -21,11 +21,6 @@ class WorkTest(TestCase):
         return Work.objects.create(category=album, **kwargs)
 
     def setUp(self):
-        # FIXME: The defaults for editor and studio in Work requires those to
-        # exist, or else foreign key constraints fail.
-        Editor.objects.create(pk=1)
-        Studio.objects.create(pk=1)
-
         self.anime = self.create_anime(title='STEINS;GATE',
             source='Ryan',
             ext_poster='ryan.png',

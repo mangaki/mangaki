@@ -13,8 +13,6 @@ class WorkFactoryMixin:
         self.User = get_user_model()
         self.client = Client()
 
-        Editor.objects.create(pk=1)
-        Studio.objects.create(pk=1)
         anime = Category.objects.get(slug='anime')
 
         self.anime = Work.objects.create(
