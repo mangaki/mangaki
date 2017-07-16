@@ -17,9 +17,7 @@ def to_python_datetime(mal_date):
     >>> to_python_datetime('2015-07-14')
     datetime.datetime(2015, 7, 14, 0, 0)
     """
-    date = list(map(int, mal_date.split("-")))
-    date += [1 for _ in range(3-len(date))]
-    return datetime(*date)
+    return datetime(*list(map(int, mal_date.split("-"))))
 
 
 class AniDB:
@@ -204,7 +202,7 @@ class AniDB:
                 )
 
         works = [work for work in existing_works]
-        works += Work.objects.bulk_create(new_works)
+        works.extend(Work.objects.bulk_create(new_works))
 
         # Add relations between works if they don't yet exist
         existing_relations = RelatedWork.objects.filter(child_work__in=works, parent_work=work)
@@ -274,7 +272,6 @@ class AniDB:
 
         # Handling of staff
         creators = []
-        studio = None
         # FIXME: cache this query
         staff_map = dict(Role.objects.values_list('slug', 'pk'))
         for creator_node in all_creators.find_all('name'):
@@ -303,17 +300,16 @@ class AniDB:
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
-            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
+            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
             'nsfw': anime_restricted,
             'date': to_python_datetime(anime.startdate.string),
             'end_date': to_python_datetime(anime.enddate.string),
-            'ext_synopsis': str(anime.description.string) if anime.description else '',
-            'nb_episodes': int(anime.episodecount.string) if anime.episodecount else 0,
-            'anime_type': str(anime.type.string) if anime.type else '',
-            'anidb_aid': anidb_aid
+            'ext_synopsis': str(anime.description.string),
+            'nb_episodes': int(anime.episodecount.string),
+            'anime_type': str(anime.type.string),
+            'anidb_aid': anidb_aid,
+            'studio:': studio
         }
-        if studio is not None:
-            anime['studio'] = studio
 
         # Add or update work
         work, created = Work.objects.update_or_create(category=self.anime_category,
