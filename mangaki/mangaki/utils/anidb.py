@@ -241,13 +241,13 @@ class AniDB:
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
-            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
+            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
             'nsfw': anime_restricted,
             'date': to_python_datetime(anime.startdate.string),
             'end_date': to_python_datetime(anime.enddate.string),
-            'ext_synopsis': str(anime.description.string),
-            'nb_episodes': int(anime.episodecount.string),
-            'anime_type': str(anime.type.string),
+            'ext_synopsis': str(anime.description.string) if anime.description else '',
+            'nb_episodes': int(anime.episodecount.string) if anime.episodecount else None,
+            'anime_type': str(anime.type.string) if anime.type else None,
             'anidb_aid': anidb_aid,
             'studio': studio
         }
