@@ -308,7 +308,7 @@ class AniDB:
             'nb_episodes': int(anime.episodecount.string),
             'anime_type': str(anime.type.string),
             'anidb_aid': anidb_aid,
-            'studio:': studio
+            'studio': studio
         }
 
         # Add or update work
