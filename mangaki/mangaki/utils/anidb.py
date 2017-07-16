@@ -11,13 +11,23 @@ from mangaki import settings
 from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork
 
 
-def to_python_datetime(mal_date):
+def to_python_datetime(date):
     """
-    Converts myAnimeList's XML date YYYY-MM-DD to Python datetime format.
+    Converts AniDB's XML date YYYY-MM-DD to Python datetime format.
     >>> to_python_datetime('2015-07-14')
     datetime.datetime(2015, 7, 14, 0, 0)
+    >>> to_python_datetime('2015-07')
+    datetime.datetime(2015, 7, 1, 0, 0)
+    >>> to_python_datetime('2015')
+    datetime.datetime(2015, 1, 1, 0, 0)
     """
-    return datetime(*list(map(int, mal_date.split("-"))))
+    date = date.strip()
+    for fmt in ('%Y-%m-%d', '%Y-%m', '%Y'):
+        try:
+            return datetime.strptime(date, fmt)
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found for {}'.format(date))
 
 
 class AniDB:
