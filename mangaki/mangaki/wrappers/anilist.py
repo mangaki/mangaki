@@ -26,7 +26,7 @@ def to_python_datetime(date):
 
 
 class AniList:
-    BASE_URL = "https://anilist.co/api"
+    BASE_URL = "https://anilist.co/api/"
     AUTH_PATH = "auth/access_token"
 
     def __init__(self,
@@ -58,7 +58,7 @@ class AniList:
         r.raise_for_status()
 
         self._auth = r.json()
-        self._session.headers['access_token'] = self._auth['access_token']
+        self._session.headers['Authorization'] = 'Bearer ' + self._auth['access_token']
 
         return self._auth
 
@@ -71,20 +71,23 @@ class AniList:
         else:
             return self._auth["expires"] > time.time()
 
-    def _request(self, datapage, params=None):
+    def _request(self,
+                 datapage: str,
+                 params: Optional[Dict[str, str]] = None):
+        """
+        Request an Anilist API's page (see https://anilist-api.readthedocs.io/en/latest/)
+        >>> self._request("anime/{id}", {"id": "5"})
+        Returns a series model as a JSON.
+        """
         if not self._is_authenticated():
             self._authenticate()
 
         if params is None:
             params = {}
 
-        r = requests.get(urljoin(self.BASE_URL, datapage), params=params)
+        r = self._session.get(urljoin(self.BASE_URL, datapage.format(**params)))
         r.raise_for_status()
-        return r
-
-    @cached_property
-    def anime_category(self) -> Category:
-        return Category.objects.get(slug='anime')
+        return r.json()
 
 client = AniList(
     getattr(settings, 'ANILIST_CLIENT', None),
