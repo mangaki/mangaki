@@ -53,6 +53,7 @@ from irl.models import Event, Partner, Attendee
 NB_POINTS_DPP = 10
 RATINGS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
+POSTERS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
