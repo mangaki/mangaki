@@ -6,7 +6,7 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.wrappers.anilist import to_python_datetime, client, AniList, AniListWorks
+from mangaki.wrappers.anilist import to_python_datetime, AniList, AniListWorks
 
 
 class AniListTest(TestCase):
@@ -16,7 +16,7 @@ class AniListTest(TestCase):
             return f.read()
 
     def setUp(self):
-        self.anilist = client
+        self.anilist = AniList('client', 'secret')
         self.no_anilist = AniList()
         self.fake_auth_json = '{"access_token":"fake_token","token_type":"Bearer","expires_in":3600,"expires":946684800}'
 
