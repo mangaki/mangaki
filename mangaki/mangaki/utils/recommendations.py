@@ -7,12 +7,13 @@ from django.db.models import Count
 from mangaki.utils.algo import ALGOS, fit_algo, get_algo_backup, get_dataset_backup
 from mangaki.utils.algo import ALGOS, fit_algo
 from mangaki.utils.ratings import current_user_ratings
-from scipy.sparse import coo_matrix, vstack
+from scipy.sparse import coo_matrix
 from mangaki.utils.values import rating_values
 import numpy as np
 import pandas as pd
 import json
 import os.path
+from sklearn.metrics.pairwise import cosine_similarity
 
 NB_RECO = 10
 CHRONO_ENABLED = True
@@ -27,7 +28,10 @@ def user_exists_in_backup(user, algo_name):
 
 
 def get_pos_of_best_works_for_user_via_algo(algo, dataset, user_id, work_ids, limit=None):
-    encoded_user_id = dataset.encode_user[user_id]
+    if algo.get_shortname().startswith("knn"):
+        encoded_user_id = algo.nb_users
+    else:
+        encoded_user_id = dataset.encode_user[user_id]
     encoded_works = dataset.encode_works(work_ids)
     X_test = np.asarray([[encoded_user_id, encoded_work_id] for encoded_work_id in encoded_works])
     y_pred = algo.predict(X_test)
@@ -35,7 +39,6 @@ def get_pos_of_best_works_for_user_via_algo(algo, dataset, user_id, work_ids, li
     if limit is not None:
         pos_of_best = pos_of_best[:limit]  # Up to some limit
     return pos_of_best
-
 
 def get_reco_algo(request, algo_name='knn', category='all'):
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
@@ -63,33 +66,18 @@ def get_reco_algo(request, algo_name='knn', category='all'):
         framed_rated_works = pd.DataFrame(list(current_user_ratings(request).items()), columns=['work_id', 'choice'])
         framed_rated_works['work_id'] = dataset.encode_works(framed_rated_works['work_id'])
         framed_rated_works['rating'] = framed_rated_works['choice'].map(rating_values)
-        ratings_from_user = coo_matrix((framed_rated_works['rating'],(np.zeros(len(framed_rated_works['work_id'])), framed_rated_works['work_id'])), shape=(1, algo.nb_works))
+        nb_rated_works = len(framed_rated_works['work_id'])
+        ratings_from_user = coo_matrix((framed_rated_works['rating'],([0.] * nb_rated_works, framed_rated_works['work_id'])), shape=(1, algo.nb_works))
         ratings_from_user = ratings_from_user.tocsr()
-        algo.M = vstack([algo.M, ratings_from_user])
 
+        #Expands knn.M with current user ratings (vstack is too slow)
+        algo.M.data = np.hstack((algo.M.data, ratings_from_user.data))
+        algo.M.indices = np.hstack((algo.M.indices, ratings_from_user.indices))
+        algo.M.indptr = np.hstack((algo.M.indptr, (ratings_from_user.indptr + algo.M.nnz)[1:]))
+        algo.M._shape = (algo.M.shape[0] + ratings_from_user.shape[0], ratings_from_user.shape[1])
 
         chrono.save('loading knn and expanding with current user ratings')
 
-
-        encoded_neighbors = algo.get_neighbors([algo.nb_users]) # Now, current user ratings are in the last row of M
-        neighbors = dataset.decode_users(encoded_neighbors[0])  # We only want for the first user
-
-        chrono.save('get neighbors')
-
-        # Only keep useful ratings for recommendation
-        triplets = list(
-            Rating.objects
-                  .filter(user__id__in=neighbors + [request.user.id])
-                  .exclude(choice__in=['willsee', 'wontsee'])
-                  .values_list('user_id', 'work_id', 'choice')
-        )
-        if request.user.is_anonymous:
-            triplets.extend([
-                (request.user.id, work_id, choice)
-                for work_id, choice in current_user_ratings(request).items()
-                if choice not in ('willsee', 'wontsee')
-            ])
-        dataset, algo = fit_algo(algo_name, triplets)
     else:  # SVD or ALS, etc.
         try:
             algo = get_algo_backup(algo_name)
@@ -109,7 +97,6 @@ def get_reco_algo(request, algo_name='knn', category='all'):
         category_filter = dataset.interesting_works
 
     filtered_works = list((dataset.interesting_works & category_filter) - set(already_rated_works))
-
     chrono.save('remove already rated')
 
     pos_of_best = get_pos_of_best_works_for_user_via_algo(algo, dataset, request.user.id, filtered_works, limit=NB_RECO)
