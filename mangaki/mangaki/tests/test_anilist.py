@@ -5,12 +5,12 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.wrappers.anilist import to_python_datetime, client, AniList
+from mangaki.wrappers.anilist import to_python_datetime, AniList
 
 
 class AniListTest(TestCase):
     def setUp(self):
-        self.anilist = client
+        self.anilist = AniList('test_client', 'client_secret')
         self.no_anilist = AniList()
 
     def test_to_python_datetime(self):
@@ -32,7 +32,7 @@ class AniListTest(TestCase):
             status=200,
             content_type='application/json'
         )
-        
+
         self.assertFalse(self.anilist._is_authenticated())
 
         auth = self.anilist._authenticate()
