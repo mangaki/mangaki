@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Dict, List, Optional
 from urllib.parse import urljoin
+import time
 
 import requests
 from django.utils.functional import cached_property
@@ -34,12 +35,14 @@ class AniList:
         if not client_id and client_secret:
             self.is_available = False
         else:
+            self.is_available = True
+
             self.client_id = client_id
             self.client_secret = client_secret
+
             self._cache = {}
-            self._auth = None
             self._session = requests.Session()
-            self.is_available = True
+            self._auth = None
 
     def _authenticate(self):
         if not self.is_available:
@@ -57,8 +60,18 @@ class AniList:
 
         return self._auth
 
+    def _is_authenticated(self):
+        if not self.is_available:
+            raise RuntimeError('AniList API is not available!')
+
+        if self._auth is None:
+            return False
+        else:
+            return self._auth["expires"] <= time.time()
+
+
     def _request(self, datapage, params=None):
-        if not self._auth:
+        if not self._is_authenticated():
             self._authenticate()
 
         if not self.is_available:
