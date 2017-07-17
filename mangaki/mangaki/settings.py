@@ -239,6 +239,10 @@ if config.has_section('anidb'):
     ANIDB_CLIENT = config.get('anidb', 'ANIDB_CLIENT')
     ANIDB_VERSION = config.get('anidb', 'ANIDB_VERSION')
 
+if config.has_section('anilist'):
+    ANILIST_CLIENT = config.get('anilist', 'ANILIST_CLIENT')
+    ANILIST_SECRET = config.get('anilist', 'ANILIST_SECRET')
+
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 
 JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'
