@@ -68,20 +68,21 @@ class AniList:
 
     def _is_authenticated(self):
         if not self.is_available:
-            raise RuntimeError('AniList API is not available!')
-
+            return False
         if self._auth is None:
             return False
-        else:
-            return self._auth["expires"] > time.time()
+        return self._auth["expires"] > time.time()
 
     def _request(self,
                  datapage: str,
-                 params: Optional[Dict[str, str]] = None):
+                 params: Optional[Dict[str, str]] = None,
+                 query_params: Optional[Dict[str, str]] = None):
         """
-        Request an Anilist API's page (see https://anilist-api.readthedocs.io/en/latest/)
-        >>> self._request("anime/{id}", {"id": "5"})
+        Request an Anilist API's page (see https://anilist-api.readthedocs.io/en/latest/ for more)
+        >>> self._request("{series_type}/{id}", params={"series_type": "anime", "id": "5"})
         Returns a series model as a JSON.
+        >>> self._request("browse/{series_type}", params={"series_type": "anime"}, query_params={"year": "2017"})
+        Returns up to 40 small series models where year is 2017 as a JSON.
         """
         if not self._is_authenticated():
             self._authenticate()
@@ -89,7 +90,10 @@ class AniList:
         if params is None:
             params = {}
 
-        r = self._session.get(urljoin(self.BASE_URL, datapage.format(**params)))
+        if query_params is None:
+            query_params = {}
+
+        r = self._session.get(urljoin(self.BASE_URL, datapage.format(**params)), params=query_params)
         r.raise_for_status()
         return r.json()
 
