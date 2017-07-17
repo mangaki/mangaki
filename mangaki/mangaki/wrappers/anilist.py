@@ -15,14 +15,18 @@ def to_python_datetime(date):
     Converts AniList's fuzzydate to Python datetime format.
     >>> to_python_datetime('20150714')
     datetime.datetime(2015, 7, 14, 0, 0)
+    >>> to_python_datetime('20150700')
+    datetime.datetime(2015, 7, 1, 0, 0)
+    >>> to_python_datetime('20150000')
+    datetime.datetime(2015, 1, 1, 0, 0)
     """
     date = date.strip()
-
-    year = int(date[0:4])
-    month = int(date[4:6])
-    day = int(date[6:8])
-
-    return datetime(year, month, day)
+    for fmt in ('%Y%m%d', '%Y%m00', '%Y0000'):
+        try:
+            return datetime.strptime(date, fmt)
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found for {}'.format(date))
 
 
 class AniList:
