@@ -36,7 +36,7 @@ class AniList:
     def __init__(self,
                  client_id: Optional[str] = None,
                  client_secret: Optional[str] = None):
-        if not client_id and client_secret:
+        if not client_id or not client_secret:
             self.is_available = False
         else:
             self.is_available = True

@@ -26,6 +26,7 @@ class AniDBTest(TestCase):
         Editor.objects.create(pk=1)
         # Studio.objects.create(pk=1)
         self.anidb = client
+        self.no_anidb = AniDB()
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
         self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
 
@@ -34,6 +35,10 @@ class AniDBTest(TestCase):
         self.assertEqual(to_python_datetime('2017-12'), datetime(2017, 12, 1, 0, 0))
         self.assertEqual(to_python_datetime('2017'), datetime(2017, 1, 1, 0, 0))
         self.assertRaises(ValueError, to_python_datetime, '2017-25')
+
+    def test_missing_client(self):
+        self.assertRaises(RuntimeError, self.no_anidb._request, 'dummypage')
+        self.assertFalse(self.no_anidb.is_available)
 
     @responses.activate
     def test_anidb_search(self):
