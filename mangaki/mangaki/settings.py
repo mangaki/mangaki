@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     'analytical',
     'cookielaw',
     'django_js_reverse',
+    'rest_framework'
 )
 
 if config.has_section('sentry'):
@@ -188,12 +189,21 @@ WSGI_APPLICATION = 'mangaki.wsgi.application'
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_SIGNUP_FORM_CLASS= 'mangaki.forms.SignupForm'
+ACCOUNT_SIGNUP_FORM_CLASS = 'mangaki.forms.SignupForm'
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend"
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'mosaic_slot_card': '4/sec'
+    }
+}
 
 EMAIL_BACKEND = config.get('email', 'EMAIL_BACKEND', fallback='django.core.mail.backends.smtp.EmailBackend')
 if config.has_section('smtp'):
