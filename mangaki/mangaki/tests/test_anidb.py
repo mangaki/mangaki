@@ -6,7 +6,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from mangaki.models import Category, Editor, Studio, Work, Role, Staff, Artist, TaggedWork, Tag
-from mangaki.utils.anidb import client, AniDB
+from mangaki.utils.anidb import to_python_datetime, client, AniDB
 
 
 class AniDBTest(TestCase):
@@ -28,6 +28,12 @@ class AniDBTest(TestCase):
         self.anidb = client
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
         self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
+
+    def test_to_python_datetime(self):
+        self.assertEqual(to_python_datetime('2017-12-25'), datetime(2017, 12, 25, 0, 0))
+        self.assertEqual(to_python_datetime('2017-12'), datetime(2017, 12, 1, 0, 0))
+        self.assertEqual(to_python_datetime('2017'), datetime(2017, 1, 1, 0, 0))
+        self.assertRaises(ValueError, to_python_datetime, '2017-25')
 
     @responses.activate
     def test_anidb_search(self):

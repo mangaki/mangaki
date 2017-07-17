@@ -1,15 +1,22 @@
+from datetime import datetime
 from urllib.parse import urljoin
 
 import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.wrappers.anilist import client, AniList
+from mangaki.wrappers.anilist import to_python_datetime, client, AniList
 
 
 class AniListTest(TestCase):
     def setUp(self):
         self.anilist = client
+
+    def test_to_python_datetime(self):
+        self.assertEqual(to_python_datetime('20171225'), datetime(2017, 12, 25, 0, 0))
+        self.assertEqual(to_python_datetime('20171200'), datetime(2017, 12, 1, 0, 0))
+        self.assertEqual(to_python_datetime('20170000'), datetime(2017, 1, 1, 0, 0))
+        self.assertRaises(ValueError, to_python_datetime, '2017')
 
     @responses.activate
     def test_authentication(self):
