@@ -11,13 +11,23 @@ from mangaki import settings
 from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork
 
 
-def to_python_datetime(mal_date):
+def to_python_datetime(date):
     """
-    Converts myAnimeList's XML date YYYY-MM-DD to Python datetime format.
+    Converts AniDB's XML date YYYY-MM-DD to Python datetime format.
     >>> to_python_datetime('2015-07-14')
     datetime.datetime(2015, 7, 14, 0, 0)
+    >>> to_python_datetime('2015-07')
+    datetime.datetime(2015, 7, 1, 0, 0)
+    >>> to_python_datetime('2015')
+    datetime.datetime(2015, 1, 1, 0, 0)
     """
-    return datetime(*list(map(int, mal_date.split("-"))))
+    date = date.strip()
+    for fmt in ('%Y-%m-%d', '%Y-%m', '%Y'):
+        try:
+            return datetime.strptime(date, fmt)
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found for {}'.format(date))
 
 
 class AniDB:
@@ -241,13 +251,13 @@ class AniDB:
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
-            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
+            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
             'nsfw': anime_restricted,
             'date': to_python_datetime(anime.startdate.string),
             'end_date': to_python_datetime(anime.enddate.string),
-            'ext_synopsis': str(anime.description.string),
-            'nb_episodes': int(anime.episodecount.string),
-            'anime_type': str(anime.type.string),
+            'ext_synopsis': str(anime.description.string) if anime.description else '',
+            'nb_episodes': int(anime.episodecount.string) if anime.episodecount else None,
+            'anime_type': str(anime.type.string) if anime.type else None,
             'anidb_aid': anidb_aid,
             'studio': studio
         }
