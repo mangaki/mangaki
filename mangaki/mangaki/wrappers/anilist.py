@@ -56,7 +56,9 @@ class AniList:
 
         r = self._session.post(urljoin(self.BASE_URL, self.AUTH_PATH), data=params)
         r.raise_for_status()
+
         self._auth = r.json()
+        self._session.headers['access_token'] = self._auth['access_token']
 
         return self._auth
 
@@ -67,18 +69,18 @@ class AniList:
         if self._auth is None:
             return False
         else:
-            return self._auth["expires"] <= time.time()
-
+            return self._auth["expires"] > time.time()
 
     def _request(self, datapage, params=None):
         if not self._is_authenticated():
             self._authenticate()
 
-        if not self.is_available:
-            raise RuntimeError('AniDB API is not available!')
-
         if params is None:
             params = {}
+
+        r = requests.get(urljoin(self.BASE_URL, datapage), params=params)
+        r.raise_for_status()
+        return r
 
     @cached_property
     def anime_category(self) -> Category:
