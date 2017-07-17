@@ -224,7 +224,7 @@ function Mosaic(el, category) {
   var els = $(el).find('.work-card').toArray();
 
   this.slots = els.map(function (el) {
-    return new Slot(buildSlotURL(category, $(el).data('slot-sort')));
+    return new Slot(buildSlotURL(category, el.getAttribute('data-slot-sort')));
   });
   this.cards = els.map(function (el, index) {
     var card = new Card(el, category);
