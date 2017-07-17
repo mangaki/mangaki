@@ -466,11 +466,15 @@ class WorkClusterAdmin(admin.ModelAdmin):
         cluster_works = list(Work.all_objects.filter(workcluster=obj))
         if cluster_works:
             def get_admin_url(work):
-                return reverse('admin:mangaki_work_change', args=(work.id,))
+                if work.redirect is None:
+                    return reverse('admin:mangaki_work_change', args=(work.id,))
+                else:
+                    return '#'
             return (
                 '<ul>' +
-                format_html_join('', '<li>{} (<a href="{}">{}</a>)</li>',
-                    ((work.title, get_admin_url(work), work.id) for work in cluster_works)) +
+                format_html_join('', '<li>{} ({}<a href="{}">{}</a>)</li>',
+                    ((work.title, 'was ' if work.redirect is not None else '',
+                      get_admin_url(work), work.id) for work in cluster_works)) +
                 '</ul>'
             )
         else:
