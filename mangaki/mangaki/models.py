@@ -138,7 +138,6 @@ class Work(models.Model):
     manga_type = models.TextField(max_length=16, choices=TYPE_CHOICES, blank=True)
     catalog_number = models.CharField(max_length=20, blank=True)
     anidb_aid = models.IntegerField(default=0, blank=True)
-    anilist_id = models.IntegerField(default=0, blank=True)
     vgmdb_aid = models.IntegerField(blank=True, null=True)
     editor = models.ForeignKey('Editor', default=1, on_delete=models.PROTECT)
     studio = models.ForeignKey('Studio', default=1, on_delete=models.PROTECT)
