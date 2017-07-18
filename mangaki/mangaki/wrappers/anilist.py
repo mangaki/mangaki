@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, Optional, Generator
 from urllib.parse import urljoin
 import time
 
@@ -45,11 +45,20 @@ def to_anime_season(date):
         return 'fall'
 
 
+class AniListWorks(Enum):
+    animes = 'anime'
+    mangas = 'manga'
+
+
 class AniListAiringStatus(Enum):
     aired = 'finished airing'
     airing = 'currently airing'
     coming = 'not yet aired'
     cancelled = 'cancelled'
+
+
+class AniListEntry:
+    pass
 
 
 class AniList:
@@ -119,6 +128,20 @@ class AniList:
         r = self._session.get(urljoin(self.BASE_URL, datapage.format(**params)), params=query_params)
         r.raise_for_status()
         return r.json()
+
+    def list_seasonal_animes(self) -> Generator[AniListEntry, None, None]:
+        now = datetime.now()
+        data = self._request(
+            'browse/anime',
+            query_params={
+                'year': now.year,
+                'season': to_anime_season(now),
+                'status': AniListAiringStatus.airing.value
+            }
+        )
+
+        for anime_info in data:
+            yield AniListEntry(anime_info, AniListWorks.animes)
 
 client = AniList(
     getattr(settings, 'ANILIST_CLIENT', None),
