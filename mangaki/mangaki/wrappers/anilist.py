@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import Dict, List, Optional
 from urllib.parse import urljoin
 import time
@@ -42,6 +43,13 @@ def to_anime_season(date):
         return 'summer'
     else:
         return 'fall'
+
+
+class AniListAiringStatus(Enum):
+    aired = 'finished airing'
+    airing = 'currently airing'
+    coming = 'not yet aired'
+    cancelled = 'cancelled'
 
 
 class AniList:
