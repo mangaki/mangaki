@@ -56,6 +56,9 @@ class AniDBTest(TestCase):
 
     @responses.activate
     def test_anidb_get_animes(self):
+        # Fake an artist entry with no AniDB creator ID that will be filled by retrieving Sangatsu
+        artist = Artist(name="Shinbou Akiyuki").save()
+
         filenames = ['anidb/sangatsu_no_lion.xml', 'anidb/sangatsu_no_lion.xml', 'anidb/hibike_euphonium.xml']
         with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
             for filename in filenames:
@@ -97,6 +100,11 @@ class AniDBTest(TestCase):
         self.assertEqual(len(retrieved_tags_sangatsu["added_tags"]), 0)
         self.assertEqual(len(retrieved_tags_sangatsu["updated_tags"]), 0)
         self.assertEqual(len(retrieved_tags_sangatsu["kept_tags"]), len(tags_sangatsu))
+
+        # Check for no artist duplication
+        artist = Artist.objects.filter(name="Shinbou Akiyuki")
+        self.assertEqual(artist.count(), 1)
+        self.assertEqual(artist.first().anidb_creator_id, 59)
 
     @responses.activate
     def test_anidb_nsfw(self):
