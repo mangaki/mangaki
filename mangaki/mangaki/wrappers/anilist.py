@@ -94,7 +94,7 @@ class AniList:
             return False
         if self._auth is None:
             return False
-        return self._auth['expires'] > time.time()
+        return self._auth["expires"] > time.time()
 
     def _request(self,
                  datapage: str,
