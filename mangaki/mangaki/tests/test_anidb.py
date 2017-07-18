@@ -55,97 +55,48 @@ class AniDBTest(TestCase):
         self.assertEqual(len(responses.calls), 1)
 
     @responses.activate
-    def test_anidb_get_multiple_animes(self):
+    def test_anidb_get_animes(self):
+        filenames = ['anidb/sangatsu_no_lion.xml', 'anidb/sangatsu_no_lion.xml', 'anidb/hibike_euphonium.xml']
         with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
-            rsps.add(
-                responses.GET,
-                AniDB.BASE_URL,
-                body=self.read_fixture('anidb/sangatsu_no_lion.xml'),
-                status=200,
-                content_type='application/xml'
-            )
-            rsps.add(
-                responses.GET,
-                AniDB.BASE_URL,
-                body=self.read_fixture('anidb/hibike_euphonium.xml'),
-                status=200,
-                content_type='application/xml'
-            )
+            for filename in filenames:
+                rsps.add(
+                    responses.GET,
+                    AniDB.BASE_URL,
+                    body=self.read_fixture(filename),
+                    status=200,
+                    content_type='application/xml'
+                )
 
             sangatsu = self.anidb.get_or_update_work(11606)
+            retrieved_tags_sangatsu = sangatsu.retrieve_tags(self.anidb)
             hibike = self.anidb.get_or_update_work(10889)
 
-        tags_sangatsu = Work.objects.get(pk=sangatsu.pk).taggedwork_set.all()
-        tags_sangatsu_titles = tags_sangatsu.values_list('tag__title', flat=True)
+        # Retrieve tags
+        tags_sangatsu = set(Work.objects.get(pk=sangatsu.pk).taggedwork_set.all().values_list('tag__title', flat=True))
+        tags_hibike = set(Work.objects.get(pk=hibike.pk).taggedwork_set.all().values_list('tag__title', flat=True))
+        shared_tags = tags_sangatsu.intersection(tags_hibike)
 
-        tags_hibike = Work.objects.get(pk=hibike.pk).taggedwork_set.all()
-        tags_hibike_titles = tags_hibike.values_list('tag__title', flat=True)
+        # Checks on tags
+        self.assertEqual(len(tags_sangatsu), 30)
+        self.assertEqual(len(tags_hibike), 38)
+        self.assertEqual(len(shared_tags), 18)
 
-        shared_tags = list(set(tags_sangatsu_titles).intersection(tags_hibike_titles))
-
+        # Check for Sangatsu's informations
         self.assertEqual(sangatsu.title, 'Sangatsu no Lion')
         self.assertEqual(sangatsu.nb_episodes, 22)
         self.assertEqual(sangatsu.studio.title, 'Shaft')
-        self.assertEqual(len(tags_sangatsu_titles), 30)
+        self.assertEqual(sangatsu.date, datetime(2016, 10, 8, 0, 0))
+        self.assertEqual(sangatsu.end_date, datetime(2017, 3, 18, 0, 0))
 
-        self.assertEqual(hibike.title, 'Hibike! Euphonium')
-        self.assertEqual(hibike.nb_episodes, 13)
-        self.assertEqual(hibike.studio.title, 'Kyoto Animation')
-        self.assertEqual(len(tags_hibike_titles), 38)
+        # Check for Sangatsu's staff
+        staff_sangatsu = Work.objects.get(pk=sangatsu.pk).staff_set.all().values_list('artist__name', flat=True)
+        self.assertCountEqual(staff_sangatsu, ['Umino Chika', 'Hashimoto Yukari', 'Shinbou Akiyuki', 'Okada Kenjirou'])
 
-        self.assertCountEqual(shared_tags, ['Japan', 'time', 'Asia', 'comedy',
-                                            'themes', 'dynamic', 'Earth', 'cast',
-                                            'hard work and guts', 'original work',
-                                            'high school', 'following one`s dream',
-                                            'elements', 'aim for the top', 'setting',
-                                            'school life', 'present', 'place'])
-
-    @responses.activate
-    def test_anidb_get(self):
-        responses.add(
-            responses.GET,
-            AniDB.BASE_URL,
-            body=self.anime_fixture,
-            status=200,
-            content_type='application/xml'
-        )
-
-        anime = self.anidb.get_or_update_work(11606)
-        retrieved_tags = anime.retrieve_tags(self.anidb)
-
-        tags = Work.objects.get(pk=anime.pk).taggedwork_set.all()
-        tag_titles = tags.values_list('tag__title', flat=True)
-
-        staff = Work.objects.get(pk=anime.pk).staff_set.all()
-        author_names = staff.filter(role__slug='author').values_list('artist__name', flat=True)
-        composer_names = staff.filter(role__slug='composer').values_list('artist__name', flat=True)
-        director_names = staff.filter(role__slug='director').values_list('artist__name', flat=True)
-
-        self.assertEqual(anime.title, 'Sangatsu no Lion')
-        self.assertEqual(anime.nb_episodes, 22)
-        self.assertEqual(anime.studio.title, 'Shaft')
-
-        self.assertEqual(anime.date, datetime(2016, 10, 8, 0, 0))
-        self.assertEqual(anime.end_date, datetime(2017, 3, 18, 0, 0))
-
-        self.assertCountEqual(author_names, ['Umino Chika'])
-        self.assertCountEqual(composer_names, ['Hashimoto Yukari'])
-        self.assertCountEqual(director_names, ['Shinbou Akiyuki', 'Okada Kenjirou'])
-
-        self.assertCountEqual(tag_titles, ['seinen', 'high school', 'dynamic', 'target audience',
-                                           'themes', 'original work', 'setting', 'elements',
-                                           'time', 'place', 'present', 'Earth', 'Japan',
-                                           'Tokyo', 'board games', 'manga', 'Asia', 'comedy',
-                                           'anthropomorphism', 'school life', 'sports',
-                                           'shougi', 'aim for the top', 'funny expressions',
-                                           'male protagonist', 'hard work and guts',
-                                           'dysfunctional family', 'following one`s dream',
-                                           'cast', 'family life'])
-
-        self.assertEqual(len(retrieved_tags["deleted_tags"]), 0)
-        self.assertEqual(len(retrieved_tags["added_tags"]), 0)
-        self.assertEqual(len(retrieved_tags["updated_tags"]), 0)
-        self.assertCountEqual(retrieved_tags["kept_tags"], tag_titles)
+        # Check retrieved tags from AniDB
+        self.assertEqual(len(retrieved_tags_sangatsu["deleted_tags"]), 0)
+        self.assertEqual(len(retrieved_tags_sangatsu["added_tags"]), 0)
+        self.assertEqual(len(retrieved_tags_sangatsu["updated_tags"]), 0)
+        self.assertEqual(len(retrieved_tags_sangatsu["kept_tags"]), len(tags_sangatsu))
 
     @responses.activate
     def test_anidb_nsfw(self):
