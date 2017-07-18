@@ -132,12 +132,13 @@ def merge_works(request, selected_queryset):
         works_to_merge = list(works_to_merge_qs)
     else:  # Author is merging those works from a Work queryset
         from_cluster = False
-        cluster = WorkCluster(user=request.user, checker=request.user)
-        cluster.save()  # Otherwise we cannot add works
         works_to_merge_qs = selected_queryset.prefetch_related('rating_set', 'genre')
         works_to_merge = list(works_to_merge_qs)
-        cluster.works.add(*works_to_merge)
     if request.POST.get('confirm'):  # Merge has been confirmed
+        if not from_cluster:
+            cluster = WorkCluster(user=request.user, checker=request.user)
+            cluster.save()  # Otherwise we cannot add works
+            cluster.works.add(*works_to_merge)
         final_id = int(request.POST.get('id'))
         final_work = Work.objects.get(id=final_id)
         overwrite_fields(final_work, request)
