@@ -1,5 +1,6 @@
 from datetime import datetime
 from urllib.parse import urljoin
+import doctest
 
 import responses
 from django.conf import settings
@@ -15,10 +16,7 @@ class AniListTest(TestCase):
         self.fake_auth_json = '{"access_token":"fake_token","token_type":"Bearer","expires_in":3600,"expires":946684800}'
 
     def test_to_python_datetime(self):
-        self.assertEqual(to_python_datetime('20171225'), datetime(2017, 12, 25, 0, 0))
-        self.assertEqual(to_python_datetime('20171200'), datetime(2017, 12, 1, 0, 0))
-        self.assertEqual(to_python_datetime('20170000'), datetime(2017, 1, 1, 0, 0))
-        self.assertRaises(ValueError, to_python_datetime, '2017')
+        doctest.run_docstring_examples(to_python_datetime, globs=None)
 
     def test_missing_client(self):
         self.assertRaises(RuntimeError, self.no_anilist._authenticate)

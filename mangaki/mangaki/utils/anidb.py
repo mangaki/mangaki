@@ -20,6 +20,10 @@ def to_python_datetime(date):
     datetime.datetime(2015, 7, 1, 0, 0)
     >>> to_python_datetime('2015')
     datetime.datetime(2015, 1, 1, 0, 0)
+    >>> to_python_datetime('2015-25')
+    Traceback (most recent call last):
+     ...
+    ValueError: no valid date format found for 2015-25
     """
     date = date.strip()
     for fmt in ('%Y-%m-%d', '%Y-%m', '%Y'):
