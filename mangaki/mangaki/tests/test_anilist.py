@@ -38,7 +38,7 @@ class AniListTest(TestCase):
         responses.add(
             responses.POST,
             urljoin(AniList.BASE_URL, AniList.AUTH_PATH),
-            body=self.fake_auth_json,
+            body='{"access_token":"OMtDiKBVBwe1CRAjge91mMuSzLFG6ChTgRx9LjhO","token_type":"Bearer","expires_in":3600,"expires":1500289907}',
             status=200, content_type='application/json'
         )
         responses.add(
@@ -56,7 +56,7 @@ class AniListTest(TestCase):
 
         anime_list = self.anilist.get_user_list(AniListWorks.animes, 'mrsalixor')
         animes = set(anime_list)
-        self.assertEqual(len(animes), 360)
+        self.assertEqual(len(animes), 263)
 
         manga_list = self.anilist.get_user_list(AniListWorks.mangas, 'mrsalixor')
         mangas = set(manga_list)
