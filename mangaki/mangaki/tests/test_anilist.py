@@ -1,15 +1,22 @@
+from datetime import datetime
 from urllib.parse import urljoin
 
 import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.wrappers.anilist import client, AniList
+from mangaki.wrappers.anilist import to_anime_season, client, AniList
 
 
 class AniListTest(TestCase):
     def setUp(self):
         self.anilist = client
+
+    def test_to_anime_season(self):
+        self.assertEqual(to_anime_season(datetime(2017, 1, 1, 0, 0)), 'winter')
+        self.assertEqual(to_anime_season(datetime(2017, 4, 1, 0, 0)), 'spring')
+        self.assertEqual(to_anime_season(datetime(2017, 7, 1, 0, 0)), 'summer')
+        self.assertEqual(to_anime_season(datetime(2017, 10, 1, 0, 0)), 'fall')
 
     @responses.activate
     def test_authentication(self):

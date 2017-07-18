@@ -28,6 +28,21 @@ def to_python_datetime(date):
             pass
     raise ValueError('no valid date format found for {}'.format(date))
 
+def to_anime_season(date):
+    """
+    Return the season corresponding to a date
+    >>> to_anime_season(datetime.datetime(2017, 3, 3, 0, 0))
+    'winter'
+    """
+    if 1 <= date.month <= 3:
+        return 'winter'
+    elif 4 <= date.month <= 6:
+        return 'spring'
+    elif 7 <= date.month <= 9:
+        return 'summer'
+    else:
+        return 'fall'
+
 
 class AniList:
     BASE_URL = "https://anilist.co/api/"
