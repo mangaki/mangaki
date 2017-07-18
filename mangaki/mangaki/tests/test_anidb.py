@@ -1,6 +1,5 @@
 from datetime import datetime
 import os
-import doctest
 
 import responses
 from django.conf import settings
@@ -32,7 +31,10 @@ class AniDBTest(TestCase):
         self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
 
     def test_to_python_datetime(self):
-        doctest.run_docstring_examples(to_python_datetime, globs=None)
+        self.assertEqual(to_python_datetime('2017-12-25'), datetime(2017, 12, 25, 0, 0))
+        self.assertEqual(to_python_datetime('2017-12'), datetime(2017, 12, 1, 0, 0))
+        self.assertEqual(to_python_datetime('2017'), datetime(2017, 1, 1, 0, 0))
+        self.assertRaises(ValueError, to_python_datetime, '2017-25')
 
     def test_missing_client(self):
         self.assertRaises(RuntimeError, self.no_anidb._request, 'dummypage')
