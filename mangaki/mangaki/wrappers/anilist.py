@@ -20,6 +20,10 @@ def to_python_datetime(date):
     datetime.datetime(2015, 7, 1, 0, 0)
     >>> to_python_datetime('20150000')
     datetime.datetime(2015, 1, 1, 0, 0)
+    >>> to_python_datetime('2015')
+    Traceback (most recent call last):
+     ...
+    ValueError: no valid date format found for 2015
     """
     date = date.strip()
     for fmt in ('%Y%m%d', '%Y%m00', '%Y0000'):
@@ -59,7 +63,7 @@ class AniList:
     def __init__(self,
                  client_id: Optional[str] = None,
                  client_secret: Optional[str] = None):
-        if not client_id and client_secret:
+        if not client_id or not client_secret:
             self.is_available = False
         else:
             self.is_available = True
@@ -94,7 +98,7 @@ class AniList:
             return False
         if self._auth is None:
             return False
-        return self._auth["expires"] > time.time()
+        return self._auth['expires'] > time.time()
 
     def _request(self,
                  datapage: str,
