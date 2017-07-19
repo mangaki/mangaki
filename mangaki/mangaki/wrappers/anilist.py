@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Generator
+from typing import Dict, List, Optional, Any, Generator
 from urllib.parse import urljoin
 import time
 
@@ -87,7 +87,9 @@ class AniListEntry:
     def __init__(self, anime_info, work_type: AniListWorks):
         self.anime_info = anime_info
         self.work_type = work_type
-        assert self.anime_info['series_type'] == work_type.value
+
+        if self.anime_info['series_type'] != work_type.value:
+            raise ValueError('AniList data not from {}'.format(work_type.value))
 
     @property
     def anilist_id(self) -> int:
@@ -140,13 +142,13 @@ class AniListEntry:
     @property
     def nb_episodes(self) -> Optional[int]:
         if self.work_type == AniListWorks.animes:
-            return int(self.anime_info['total_episodes'])
+            return self.anime_info['total_episodes']
         return None
 
     @property
     def nb_chapters(self) -> Optional[int]:
         if self.work_type == AniListWorks.mangas:
-            return int(self.anime_info['total_chapters'])
+            return self.anime_info['total_chapters']
         return None
 
     @property
@@ -159,8 +161,14 @@ class AniListEntry:
             return None
 
     @property
-    def tags(self):
-        pass
+    def tags(self) -> List[Dict[str, Any]]:
+        return [
+            {
+                'name': tag['name'],
+                'anilist_tag_id': tag['id'],
+                'spoiler': tag['spoiler'] or tag['series_spoiler']
+            } for tag in self.anime_info['tags']
+        ]
 
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
@@ -240,6 +248,7 @@ class AniList:
         return r.json()
 
     def list_seasonal_animes(self,
+                             *,
                              only_airing: Optional[bool] = True,
                              year: Optional[int] = None,
                              season: Optional[str] = None) -> Generator[AniListEntry, None, None]:
