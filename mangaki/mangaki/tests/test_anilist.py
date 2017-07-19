@@ -6,7 +6,7 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.wrappers.anilist import to_anime_season, client, AniList, AniListAiringStatus
+from mangaki.wrappers.anilist import to_anime_season, client, AniList, AniListStatus
 
 
 class AniListTest(TestCase):
@@ -69,5 +69,5 @@ class AniListTest(TestCase):
                 self.assertFalse(anime.is_nsfw)
                 self.assertEqual(anime.poster_url, 'https://cdn.anilist.co/img/dir/anime/reg/97986-ZL0DkAyNWyxG.jpg')
                 self.assertEqual(anime.nb_episodes, 13)
-                self.assertEqual(anime.airing_status, AniListAiringStatus.airing)
+                self.assertEqual(anime.status, AniListStatus.airing)
                 break

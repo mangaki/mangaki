@@ -50,10 +50,13 @@ class AniListWorks(Enum):
     mangas = 'manga'
 
 
-class AniListAiringStatus(Enum):
+class AniListStatus(Enum):
     aired = 'finished airing'
     airing = 'currently airing'
-    coming = 'not yet aired'
+    published = 'finished publishing'
+    publishing = 'publishing'
+    anime_coming = 'not yet aired'
+    manga_coming = 'not yet published'
     cancelled = 'cancelled'
 
 
@@ -135,19 +138,32 @@ class AniListEntry:
         return self.anime_info['image_url_lge']
 
     @property
-    def nb_episodes(self) -> int:
-        return int(self.anime_info['total_episodes'])
+    def nb_episodes(self) -> Optional[int]:
+        if self.work_type == AniListWorks.animes:
+            return int(self.anime_info['total_episodes'])
+        return None
 
     @property
-    def airing_status(self) -> AniListAiringStatus:
-        return AniListAiringStatus(self.anime_info['airing_status'])
+    def nb_chapters(self) -> Optional[int]:
+        if self.work_type == AniListWorks.mangas:
+            return int(self.anime_info['total_chapters'])
+        return None
+
+    @property
+    def status(self) -> Optional[AniListStatus]:
+        if self.work_type == AniListWorks.animes:
+            return AniListStatus(self.anime_info['airing_status'])
+        elif self.work_type == AniListWorks.mangas:
+            return AniListStatus(self.anime_info['publishing_status'])
+        else:
+            return None
 
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
             self.work_type.value,
             self.anilist_id,
             self.title,
-            self.airing_status.value
+            self.status.value
         )
 
 
@@ -232,7 +248,7 @@ class AniList:
             query_params={
                 'year': year,
                 'season': season,
-                'status': AniListAiringStatus.airing.value
+                'status': AniListStatus.airing.value
             }
         )
 
