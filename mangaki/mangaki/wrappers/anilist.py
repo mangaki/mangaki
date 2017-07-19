@@ -57,6 +57,29 @@ class AniListAiringStatus(Enum):
     cancelled = 'cancelled'
 
 
+ANILIST_MEDIA_TYPES = ['TV',  'TV Short', 'Movie', 'Special', 'OVA', 'ONA', 'Music',
+                       'Manga', 'Novel', 'One Shot', 'Doujin', 'Manhua', 'Manhwa']
+
+
+class AniListMediaType(Enum):
+    tv = 0
+    tv_short = 1
+    movie = 2
+    special = 3
+    ova = 4
+    ona = 5
+    music = 6
+    manga = 7
+    novel = 8
+    one_shot = 9
+    doujin = 10
+    manhua = 11
+    manhwa = 12
+
+    def __str__(self):
+        return LIST_TYPES[self.value]
+
+
 class AniListEntry:
     pass
 
