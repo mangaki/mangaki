@@ -132,12 +132,13 @@ def merge_works(request, selected_queryset):
         works_to_merge = list(works_to_merge_qs)
     else:  # Author is merging those works from a Work queryset
         from_cluster = False
-        cluster = WorkCluster(user=request.user, checker=request.user)
-        cluster.save()  # Otherwise we cannot add works
         works_to_merge_qs = selected_queryset.prefetch_related('rating_set', 'genre')
         works_to_merge = list(works_to_merge_qs)
-        cluster.works.add(*works_to_merge)
     if request.POST.get('confirm'):  # Merge has been confirmed
+        if not from_cluster:
+            cluster = WorkCluster(user=request.user, checker=request.user)
+            cluster.save()  # Otherwise we cannot add works
+            cluster.works.add(*works_to_merge)
         final_id = int(request.POST.get('id'))
         final_work = Work.objects.get(id=final_id)
         overwrite_fields(final_work, request)
@@ -466,11 +467,15 @@ class WorkClusterAdmin(admin.ModelAdmin):
         cluster_works = list(Work.all_objects.filter(workcluster=obj))
         if cluster_works:
             def get_admin_url(work):
-                return reverse('admin:mangaki_work_change', args=(work.id,))
+                if work.redirect is None:
+                    return reverse('admin:mangaki_work_change', args=(work.id,))
+                else:
+                    return '#'
             return (
                 '<ul>' +
-                format_html_join('', '<li>{} (<a href="{}">{}</a>)</li>',
-                    ((work.title, get_admin_url(work), work.id) for work in cluster_works)) +
+                format_html_join('', '<li>{} ({}<a href="{}">{}</a>)</li>',
+                    ((work.title, 'was ' if work.redirect is not None else '',
+                      get_admin_url(work), work.id) for work in cluster_works)) +
                 '</ul>'
             )
         else:
