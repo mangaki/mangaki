@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Optional, Generator
+from typing import Dict, List, Optional, Generator
 from urllib.parse import urljoin
 import time
 
@@ -21,7 +21,7 @@ def to_python_datetime(date):
     >>> to_python_datetime('20150000')
     datetime.datetime(2015, 1, 1, 0, 0)
     """
-    date = date.strip()
+    date = str(date).strip()
     for fmt in ('%Y%m%d', '%Y%m00', '%Y0000'):
         try:
             return datetime.strptime(date, fmt)
@@ -81,7 +81,74 @@ class AniListMediaType(Enum):
 
 
 class AniListEntry:
-    pass
+    def __init__(self, anime_info, work_type: AniListWorks):
+        self.anime_info = anime_info
+        self.work_type = work_type
+        assert self.anime_info['series_type'] == work_type.value
+
+    @property
+    def anilist_id(self) -> int:
+        return self.anime_info['id']
+
+    @property
+    def title(self) -> str:
+        return self.anime_info['title_romaji']
+
+    @property
+    def english_title(self) -> str:
+        return self.anime_info['title_english']
+
+    @property
+    def japanese_title(self) -> str:
+        return self.anime_info['title_japanese']
+
+    @property
+    def media_type(self) -> str:
+        return self.anime_info['type']
+
+    @property
+    def start_date(self) -> Optional[datetime]:
+        if self.anime_info['start_date_fuzzy']:
+            return to_python_datetime(self.anime_info['start_date_fuzzy'])
+        return None
+
+    @property
+    def end_date(self) -> Optional[datetime]:
+        if self.anime_info['end_date_fuzzy']:
+            return to_python_datetime(self.anime_info['end_date_fuzzy'])
+        return None
+
+    @property
+    def synonyms(self) -> List[str]:
+        return list(filter(None, self.anime_info['synonyms']))
+
+    @property
+    def genres(self) -> List[str]:
+        return list(filter(None, self.anime_info['genres']))
+
+    @property
+    def is_nsfw(self) -> bool:
+        return self.anime_info['adult']
+
+    @property
+    def poster_url(self) -> str:
+        return self.anime_info['image_url_lge']
+
+    @property
+    def nb_episodes(self) -> int:
+        return int(self.anime_info['total_episodes'])
+
+    @property
+    def airing_status(self) -> AniListAiringStatus:
+        return AniListAiringStatus(self.anime_info['airing_status'])
+
+    def __str__(self) -> str:
+        return '<AniListEntry {}#{} : {} - {}>'.format(
+            self.work_type.value,
+            self.anilist_id,
+            self.title,
+            self.airing_status.value
+        )
 
 
 class AniList:
@@ -152,13 +219,19 @@ class AniList:
         r.raise_for_status()
         return r.json()
 
-    def list_seasonal_animes(self) -> Generator[AniListEntry, None, None]:
-        now = datetime.now()
+    def list_seasonal_animes(self,
+                             year: Optional[int] = None,
+                             season: Optional[str] = None) -> Generator[AniListEntry, None, None]:
+        if not year or not season:
+            now = datetime.now()
+            year = now.year
+            season = to_anime_season(now)
+
         data = self._request(
             'browse/anime',
             query_params={
-                'year': now.year,
-                'season': to_anime_season(now),
+                'year': year,
+                'season': season,
                 'status': AniListAiringStatus.airing.value
             }
         )
