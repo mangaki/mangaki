@@ -158,6 +158,10 @@ class AniListEntry:
         else:
             return None
 
+    @property
+    def tags(self):
+        pass
+
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
             self.work_type.value,
@@ -236,6 +240,7 @@ class AniList:
         return r.json()
 
     def list_seasonal_animes(self,
+                             only_airing: Optional[bool] = True,
                              year: Optional[int] = None,
                              season: Optional[str] = None) -> Generator[AniListEntry, None, None]:
         if not year or not season:
@@ -243,15 +248,12 @@ class AniList:
             year = now.year
             season = to_anime_season(now)
 
-        data = self._request(
-            'browse/anime',
-            query_params={
-                'year': year,
-                'season': season,
-                'status': AniListStatus.airing.value
-            }
-        )
+        query_params = {'year': year, 'season': season, 'full_page': 'true'}
 
+        if only_airing:
+            query_params.update({'status': AniListStatus.airing.value})
+
+        data = self._request('browse/anime', query_params=query_params)
         for anime_info in data:
             yield AniListEntry(anime_info, AniListWorks.animes)
 
