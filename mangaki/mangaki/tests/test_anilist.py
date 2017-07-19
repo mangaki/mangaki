@@ -56,7 +56,7 @@ class AniListTest(TestCase):
 
         anime_list = self.anilist.get_user_list(AniListWorks.animes, 'mrsalixor')
         animes = set(anime_list)
-        self.assertEqual(len(animes), 263)
+        self.assertEqual(len(animes), 52)
 
         manga_list = self.anilist.get_user_list(AniListWorks.mangas, 'mrsalixor')
         mangas = set(manga_list)
