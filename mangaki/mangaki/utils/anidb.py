@@ -8,7 +8,7 @@ from django.utils.functional import cached_property
 from django.db.models import Q
 
 from mangaki import settings
-from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork
+from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork, RelatedWork
 
 
 def to_python_datetime(date):
@@ -178,6 +178,70 @@ class AniDB:
 
         return tags
 
+    def get_related_animes(self, anidb_aid=None, related_animes_soup=None):
+        if anidb_aid is not None:
+            anime = self.get_xml(anidb_aid)
+            related_animes_soup = anime.relatedanime
+
+        related_animes = {}
+        if related_animes_soup is not None:
+            for related_node in related_animes_soup.find_all('anime'):
+                related_anidb_id = int(related_node.get('id'))
+                related_title = str(related_node.string).strip()
+                related_type = str(related_node.get('type')).strip()
+                related_type = related_type.lower().replace(" ", "_")
+
+                related_animes[related_anidb_id] = {
+                    'title': related_title,
+                    'type': related_type
+                }
+
+        return related_animes
+
+    def _build_related_animes(self,
+                              work: Work,
+                              related_animes: Dict[int, Dict[str, str]]) -> List[RelatedWork]:
+        anidb_aids = related_animes.keys()
+
+        # Fill the Work database with missing work items and retrieve existing ones
+        # Note : these works won't be filled with data, they'll have to be updated afterwards
+        existing_works = Work.objects.filter(anidb_aid__in=anidb_aids)
+        existing_anidb_aids = set(existing_works.values_list('anidb_aid', flat=True))
+
+        new_works = []
+        for anidb_aid in anidb_aids:
+            if anidb_aid not in existing_anidb_aids:
+                new_works.append(
+                    Work(
+                        title=related_animes[anidb_aid]['title'],
+                        category=self.anime_category,
+                        anidb_aid=anidb_aid
+                    )
+                )
+
+        works = [work for work in existing_works]
+        works.extend(Work.objects.bulk_create(new_works))
+
+        # Add relations between works if they don't yet exist
+        existing_relations = RelatedWork.objects.filter(child_work__in=works, parent_work=work)
+        existing_child_works = set(existing_relations.values_list('child_work__pk', flat=True))
+        existing_parent_works = set(existing_relations.values_list('parent_work__pk', flat=True))
+
+        new_relations = []
+        for child_work in works:
+            if child_work.pk not in existing_child_works and work.pk not in existing_parent_works:
+                new_relations.append(
+                    RelatedWork(
+                        parent_work=work,
+                        child_work=child_work,
+                        type=related_animes[child_work.anidb_aid]['type']
+                    )
+                )
+
+        RelatedWork.objects.bulk_create(new_relations)
+
+        return new_relations
+
     def get_or_update_work(self,
                            anidb_aid: int,
                            reload_lang_cache: bool = False) -> Work:
@@ -203,6 +267,7 @@ class AniDB:
         all_titles = anime.titles
         all_creators = anime.creators
         all_tags = anime.tags
+        all_related_animes = anime.relatedanime
 
         # Handling of titles
         main_title = None
@@ -249,9 +314,6 @@ class AniDB:
                     "anidb_creator_id": creator_id
                 })
 
-        if studio is None: # If no studio, set it as unknown studio
-            studio = Studio.objects.get(pk=1)
-
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
@@ -292,7 +354,13 @@ class AniDB:
             work.nsfw = True
             work.save()
 
+        # Add alternative titles for this work to the database
         self._build_work_titles(work, titles, reload_lang_cache)
+
+        # Add the correct relations to this work in the database
+        if created:
+            related_animes = self.get_related_animes(related_animes_soup=all_related_animes)
+            self._build_related_animes(work, related_animes)
 
         return work
 
