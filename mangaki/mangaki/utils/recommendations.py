@@ -42,7 +42,6 @@ def get_pos_of_best_works_for_user_via_algo(algo, dataset, user_id, work_ids, li
 
 def get_reco_algo(request, algo_name='knn', category='all'):
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
-    dataset = Dataset()
     already_rated_works = list(current_user_ratings(request))
     if request.user.is_anonymous:
         assert request.user.id is None
