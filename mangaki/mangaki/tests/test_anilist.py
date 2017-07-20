@@ -92,8 +92,8 @@ class AniListTest(TestCase):
         for work_type in AniListWorks:
             responses.add(
                 responses.GET,
-                urljoin(AniList.BASE_URL, "user/mrsalixor/{}list".format(work_type.value),
-                body=self.read_fixture('anilist/mrsalixor_anilist_{}list.json').format(work_type.value),
+                urljoin(AniList.BASE_URL, 'user/mrsalixor/{}list'.format(work_type.value)),
+                body=self.read_fixture('anilist/mrsalixor_anilist_{}list.json'.format(work_type.value)),
                 status=200, content_type='application/json'
             )
 

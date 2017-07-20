@@ -273,7 +273,6 @@ class AniList:
         r.raise_for_status()
         return r.json()
 
-
     def list_seasonal_animes(self,
                              *,
                              only_airing: Optional[bool] = True,
