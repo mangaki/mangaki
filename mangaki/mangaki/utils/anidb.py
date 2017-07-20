@@ -314,9 +314,6 @@ class AniDB:
                     "anidb_creator_id": creator_id
                 })
 
-        if studio is None: # If no studio, set it as unknown studio
-            studio = Studio.objects.get(pk=1)
-
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
