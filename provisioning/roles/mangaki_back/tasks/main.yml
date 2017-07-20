@@ -1,4 +1,30 @@
 ---
+- name: Setup Redis.
+  include_role:
+    name: utils/redis
+  vars:
+    # Database index is 0-indexed, this is the amount of databases.
+    # FIXME: that's not a good way to do this. We should not touch Redis's amount of databases.
+    redis_databases: '{{ mangaki_back_redis_database|int + 1 }}'
+    redis_bind: ['{{ mangaki_back_redis_host }}']
+    redis_port: '{{ mangaki_back_redis_port }}'
+    redis_password: '{{ mangaki_back_redis_password }}'
+
+- name: Setup Celery.
+  include_role:
+    name: utils/celery
+  vars:
+    # We don't want to start Celery if we are going to start it in tmux (dev mode).
+    start: start_celery
+    celery_name: '{{ mangaki_back_celery_name }}'
+    celery_user: '{{ mangaki_back_user }}'
+    celery_app_module: 'mangaki'
+    celery_app_name: 'celery_app'
+    celery_venv_path: '{{ mangaki_back_venv_path }}'
+    celery_env:
+      DJANGO_SETTINGS_MODULE: 'mangaki.settings'
+      MANGAKI_SETTINGS_PATH: '{{ mangaki_back_settings_path }}'
+
 - name: Setup rankings cron.
   include_role:
     name: utils/cron

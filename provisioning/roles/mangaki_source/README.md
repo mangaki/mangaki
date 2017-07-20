@@ -106,6 +106,22 @@ mangaki_source_db_name: 'mangaki'
 mangaki_source_db_password: 'tuturuu'
 
 #######################
+# Redis configuration #
+#######################
+
+# Redis host to connect to.
+mangaki_source_redis_host: '127.0.0.1'
+
+# Redis port to connect to.
+mangaki_source_redis_port: 6379
+
+# Redis database index (default to 0)
+mangaki_source_redis_database: 0
+
+# Redis password (not required, if Redis does not have password)
+mangaki_source_redis_password: 'madscientist'
+
+#######################
 # Email configuration #
 #######################
 
