@@ -4,7 +4,7 @@ looking for anime and finding URL of posters.
 """
 
 import xml.etree.ElementTree as ET
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Optional, List, Generator
 
 import requests
@@ -61,22 +61,34 @@ class MALWorks(Enum):
     novels = 'novel'
 
 
+# MAL status
+class MALStatus(IntEnum):
+    watching = 1  # ignored during import.
+    completed = 2  # compute rating from score.
+    on_hold = 3  # ignored during import.
+    dropped = 4  # i.e. wontsee
+    plan_to_watch = 6  # i.e. willsee
+
+
 SUPPORTED_MANGAKI_WORKS = [MALWorks.animes, MALWorks.mangas]
 
 
 class MALUserWork:
-    __slots__ = ['title', 'synonyms', 'poster', 'mal_id', 'score']
+    __slots__ = ['title', 'synonyms', 'poster', 'mal_id', 'score',
+                 'status']
 
     def __init__(self,
                  title: str,
                  synonyms: List[str],
                  poster: str,
                  mal_id: str,
-                 score: float):
+                 score: float,
+                 status: int):
         self.title = title
         self.synonyms = synonyms
         self.poster = poster
         self.mal_id = mal_id
+        self.status = MALStatus(status)
         self.score = score
 
     def __hash__(self):
@@ -219,6 +231,7 @@ class MALClient:
                 poster = entry.find('series_image').text
                 score = int(entry.find('my_score').text)
                 mal_id = entry.find('series_{}db_id'.format(work_type.value)).text
+                status = int(entry.find('my_status').text)
             except AttributeError:
                 logger.exception('Malformed XML response (or MAL changed its API!)')
                 continue
@@ -228,7 +241,8 @@ class MALClient:
                 synonyms=synonyms,
                 poster=poster,
                 mal_id=mal_id,
-                score=score)
+                score=score,
+                status=status)
 
     def _search_api(self, work_type: MALWorks, query: str) -> requests.Response:
         return self.session.get(
@@ -498,6 +512,8 @@ def import_mal(mal_username: str, mangaki_username: str):
         MALWorks.mangas: Work.objects.filter(category__slug='manga')
     }
     scores = {}
+    willsee = set()
+    wontsee = set()
 
     for work_type in SUPPORTED_MANGAKI_WORKS:
         user_works = set(
@@ -513,8 +529,14 @@ def import_mal(mal_username: str, mangaki_username: str):
                     user_work.synonyms,
                     user_work.poster)
 
-                if work:
-                    scores[work.id] = user_work.score
+                if (work and
+                        not any(work.id in container for container in (scores, wontsee, willsee))):
+                    if user_work.status == MALStatus.completed:
+                        scores[work.id] = user_work.score
+                    elif user_work.status == MALStatus.dropped:
+                        wontsee.add(work.id)
+                    elif user_work.status == MALStatus.plan_to_watch:
+                        willsee.add(work.id)
             except Exception:
                 logger.exception('Failure to fetch the work from MAL and import it into the Mangaki database.')
                 SearchIssue(
@@ -541,6 +563,22 @@ def import_mal(mal_username: str, mangaki_username: str):
             raise RuntimeError('No choice was deduced from MAL score!')
 
         rating = Rating(user=user, choice=choice, work_id=work_id)
+        ratings.append(rating)
+
+    for work_id in willsee:
+        rating = Rating(
+            user=user,
+            choice='willsee',
+            work_id=work_id
+        )
+        ratings.append(rating)
+
+    for work_id in wontsee:
+        rating = Rating(
+            user=user,
+            choice='wontsee',
+            work_id=work_id
+        )
         ratings.append(rating)
 
     Rating.objects.bulk_create(ratings)
