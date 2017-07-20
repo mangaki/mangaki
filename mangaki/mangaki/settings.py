@@ -205,6 +205,13 @@ REST_FRAMEWORK = {
     }
 }
 
+########################
+# Celery configuration #
+########################
+
+CELERY_BROKER_URL = config.get('celery', 'broker_url', fallback='redis://')
+CELERY_RESULT_BACKEND = config.get('celery', 'result_backend', fallback='redis://')
+
 EMAIL_BACKEND = config.get('email', 'EMAIL_BACKEND', fallback='django.core.mail.backends.smtp.EmailBackend')
 if config.has_section('smtp'):
     EMAIL_HOST = config.get('smtp', 'EMAIL_HOST', fallback='localhost')

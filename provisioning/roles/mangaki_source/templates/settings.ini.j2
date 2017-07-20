@@ -31,6 +31,10 @@ DB_USER = {{ mangaki_source_db_user }}
 DSN = {{ mangaki_source_sentry_dsn }}
 {% endif %}
 
+[celery]
+BROKER_URL = redis://:{{ mangaki_source_redis_password }}@{{ mangaki_source_redis_host }}:{{ mangaki_source_redis_port }}/{{ mangaki_source_redis_database }}
+RESULT_BACKEND = redis://:{{ mangaki_source_redis_password }}@{{ mangaki_source_redis_host }}:{{ mangaki_source_redis_port }}/{{ mangaki_source_redis_database }}
+
 [email]
 {% if mangaki_source_has_email|bool %}
 EMAIL_BACKEND = django.core.mail.backends.smtp.EmailBackend

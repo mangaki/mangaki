@@ -1,0 +1,6 @@
+---
+celery_env: {}
+celery_autoscale_min: 3
+celery_autoscale_max: 10
+celery_log_level: 'INFO'
+start: true
