@@ -11,10 +11,6 @@ class RatingTest(TestCase):
         return Work.objects.create(category=anime_category, **kwargs)
 
     def setUp(self):
-        # FIXME: The defaults for editor and studio in Work requires those to
-        # exist, or else foreign key constraints fail.
-        Editor.objects.create(pk=1)
-        Studio.objects.create(pk=1)
         get_user_model().objects.create_user(username='test', password='test')
         self.anime = self.create_anime(title='La Mélancolie de Haruhi Suzumiya')
 

@@ -5,11 +5,6 @@ from mangaki.models import Work, Category, Trope, Editor, Studio
 class ErrorPageTest(TestCase):
 
     def setUp(self):
-        # FIXME: The defaults for editor and studio in Work requires those to
-        # exist, or else foreign key constraints fail.
-        Editor.objects.create(pk=1)
-        Studio.objects.create(pk=1)
-
         self.client = Client()
         anime = Category.objects.get(slug='anime')
         work = Work.objects.create(

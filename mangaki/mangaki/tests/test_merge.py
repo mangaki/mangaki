@@ -10,11 +10,6 @@ from datetime import datetime, timedelta
 class MergeTest(TestCase):
 
     def setUp(self):
-        # FIXME: The defaults for editor and studio in Work requires those to
-        # exist, or else foreign key constraints fail.
-        Editor.objects.create(pk=1)
-        Studio.objects.create(pk=1)
-
         self.user = get_user_model().objects.create_superuser(username='test', password='test', email='steins@gate.co.jp')
         self.users = []
         for username in 'ABCD':
