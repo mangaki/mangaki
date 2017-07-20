@@ -26,6 +26,8 @@ setup(
         'typing>=3.6<3.7',
         'tensorflow>=1.1.0<1.2',
         'raven>=6.1.0',
+        'djangorestframework>=3.6<3.7',
+        'coreapi>=2.3<2.4',
     ],
     packages=find_packages(),
     include_package_data=True,
