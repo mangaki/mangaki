@@ -1,7 +1,7 @@
 from mangaki.utils.common import RecommendationAlgorithm
 from collections import Counter, defaultdict
 import numpy as np
-from scipy.sparse import lil_matrix
+from scipy.sparse import coo_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
 
@@ -26,6 +26,19 @@ class MangakiKNN(RecommendationAlgorithm):
         self.ratings = {}
         self.sum_ratings = {}
         self.nb_ratings = {}
+
+    def load(self, filename):
+        backup = super().load(filename)
+        self.NB_NEIGHBORS = backup.NB_NEIGHBORS
+        self.closest_neighbors = backup.closest_neighbors
+        self.rated_works = backup.rated_works
+        self.mean_score = backup.mean_score
+        self.ratings = backup.ratings
+        self.sum_ratings = backup.sum_ratings
+        self.nb_ratings = backup.nb_ratings
+        self.M = backup.M
+        self.nb_works = backup.nb_works
+        self.nb_users = backup.nb_users
 
     def get_neighbors(self, user_ids=None):
         neighbors = []
@@ -54,14 +67,15 @@ class MangakiKNN(RecommendationAlgorithm):
 
     def fit(self, X, y, whole_dataset=False):
         self.ratings = defaultdict(dict)
-        self.sum_ratings = defaultdict(lambda: 0)
-        self.nb_ratings = defaultdict(lambda: 0)
-        self.M = lil_matrix((self.nb_users, self.nb_works))
+        self.sum_ratings = Counter()
+        self.nb_ratings = Counter()
+        users, works = zip(*list(X))
+        self.M = coo_matrix((y,(users,works)), shape=(self.nb_users, self.nb_works)) # Might take some time, but coo is efficient for creating matrices
+        self.M = self.M.tocsr() # knn.M should be CSR for faster arithmetic operations
         for (user_id, work_id), rating in zip(X, y):
             self.ratings[user_id][work_id] = rating
             self.nb_ratings[work_id] += 1
             self.sum_ratings[work_id] += rating
-            self.M[user_id, work_id] = rating
         for work_id in self.nb_ratings:
             self.mean_score[work_id] = self.sum_ratings[work_id] / self.nb_ratings[work_id]
 
