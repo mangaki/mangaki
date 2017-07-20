@@ -1,0 +1,6 @@
+---
+redis_databases: 1
+redis_bind: ['127.0.0.1']
+redis_port: 6379
+redis_password: ''  # no password
+redis_data_directory: '/var/lib/redis'

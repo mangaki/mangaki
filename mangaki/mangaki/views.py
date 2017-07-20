@@ -262,8 +262,8 @@ class WorkListMixin:
         context['object_list'] = [
             {
                 'work': work
-                for work in context['object_list']
             }
+            for work in context['object_list']
         ]
 
         return context

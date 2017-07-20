@@ -18,7 +18,8 @@
     - role: mangaki_db
     - role: mangaki_source
     - role: mangaki_sync
-    - role: mangaki_back
+    # In development mode, we start Celery through tmux rather than supervisor (by default, start_celery: true).
+    - { role: mangaki_back, start_celery: false }
 
 - name: Setup standalone servers.
   hosts: mangaki_standalone

@@ -6,7 +6,7 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, client, AniList, AniListStatus
+from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks
 
 
 class AniListTest(TestCase):
@@ -84,3 +84,23 @@ class AniListTest(TestCase):
                 self.assertEqual(anime.status, AniListStatus.airing)
                 self.assertEqual(anime.tags[1], {'anilist_tag_id': 175, 'name': 'Robots', 'spoiler': False})
                 break
+
+    @responses.activate
+    def test_get_userlist(self):
+        self.add_fake_auth()
+
+        for work_type in AniListWorks:
+            responses.add(
+                responses.GET,
+                urljoin(AniList.BASE_URL, "user/mrsalixor/{}list".format(work_type.value),
+                body=self.read_fixture('anilist/mrsalixor_anilist_{}list.json').format(work_type.value),
+                status=200, content_type='application/json'
+            )
+
+        anime_list = self.anilist.get_user_list(AniListWorks.animes, 'mrsalixor')
+        animes = set(anime_list)
+        self.assertEqual(len(animes), 52)
+
+        manga_list = self.anilist.get_user_list(AniListWorks.mangas, 'mrsalixor')
+        mangas = set(manga_list)
+        self.assertEqual(len(mangas), 57)

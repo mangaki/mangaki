@@ -6,3 +6,11 @@
   with_items: ['ranking', 'top-directors']
   become: true
   listen: Restart Mangaki services.
+
+- name: Restart Celery.
+  supervisorctl:
+    name: '{{ mangaki_back_celery_name }}'
+    state: restarted
+  when: start_celery
+  listen: Restart Mangaki services.
+  become: true

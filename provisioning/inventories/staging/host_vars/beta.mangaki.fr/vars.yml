@@ -11,6 +11,9 @@ mangaki_web_use_acme: true
 # Database configuration
 mangaki_db_password: '{{ vault_mangaki_db_password }}'
 
+# Redis configuration
+mangaki_redis_password: '{{ vault_mangaki_redis_password }}'
+
 # Django configuration
 mangaki_source_secret_key: '{{ vault_mangaki_source_secret_key }}'
 

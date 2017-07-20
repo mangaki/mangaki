@@ -183,6 +183,28 @@ class AniListEntry:
         )
 
 
+class AniListWorks(Enum):
+    animes = 'anime'
+    mangas = 'manga'
+
+
+class AniListUserWork:
+    __slots__ = ['title', 'poster', 'anilist_id', 'score']
+
+    def __init__(self,
+                 title: str,
+                 poster: str,
+                 anilist_id: int,
+                 score: int):
+        self.title = title
+        self.poster = poster
+        self.anilist_id = anilist_id
+        self.score = score
+
+    def __hash__(self):
+        return hash(self.anilist_id)
+
+
 class AniList:
     BASE_URL = "https://anilist.co/api/"
     AUTH_PATH = "auth/access_token"
@@ -251,6 +273,7 @@ class AniList:
         r.raise_for_status()
         return r.json()
 
+
     def list_seasonal_animes(self,
                              *,
                              only_airing: Optional[bool] = True,
@@ -269,6 +292,26 @@ class AniList:
         data = self._request('browse/anime', query_params=query_params)
         for anime_info in data:
             yield AniListEntry(anime_info, AniListWorks.animes)
+
+    def get_user_list(self,
+                      worktype: AniListWorks,
+                      username: str) -> Generator[AniListUserWork, None, None]:
+        data = self._request(
+            'user/{username}/{worktype}list',
+            {'username': username, 'worktype': worktype.value}
+        )
+
+        for list_type in data['lists']:
+            for list_entry in data['lists'][list_type]:
+                try:
+                    yield AniListUserWork(
+                        anilist_id=int(list_entry['series_id']),
+                        title=list_entry[worktype.value]['title_romaji'],
+                        poster=list_entry[worktype.value]['image_url_lge'],
+                        score=int(list_entry['score'])
+                    )
+                except KeyError:
+                    raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
 client = AniList(
     getattr(settings, 'ANILIST_CLIENT', None),
