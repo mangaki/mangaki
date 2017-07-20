@@ -1,8 +1,9 @@
 # Mangaki backend role
 
-This role configures a server for running Mangaki backend services. For now,
-those "services" are limited to a couple of cron tasks; in the future they may
-become more complex with and be replaced e.g. with a Celery setup.
+This role configures a server for running Mangaki backend services:
+
+- crons for top / director refresh.
+- Celery workers.
 
 ## Dependencies
 
@@ -12,5 +13,7 @@ server; as such, it should always be used in conjunction with the
 
 ## Role variables
 
-This role does not define any specific parameters; it infers all its
-configuration from its dependent roles.
+```
+# Start Celery through supervisord (disabled in development, default: true)
+start_celery: true
+```
