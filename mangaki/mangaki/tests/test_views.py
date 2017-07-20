@@ -1,4 +1,5 @@
 import json
+import time
 
 from django.contrib.auth import get_user_model
 from django.db.models import Max
@@ -12,8 +13,6 @@ class WorkFactoryMixin:
         self.User = get_user_model()
         self.client = Client()
 
-        Editor.objects.create(pk=1)
-        Studio.objects.create(pk=1)
         anime = Category.objects.get(slug='anime')
 
         self.anime = Work.objects.create(
@@ -138,18 +137,33 @@ class AnonymousViewsTest(WorkFactoryMixin, TestCase):
         self.assertEqual(data[0]['id'], self.anime.pk)
 
     def test_get_card(self):
-        response = self.client.get('/data/card/anime/1.json')
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get('/data/card/anime/2.json')
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get('/data/card/anime/3.json')
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get('/data/card/anime/4.json')
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get('/data/card/anime/0.json')
-        self.assertEqual(response.status_code, 404)
-        response = self.client.get('/data/card/anime/lol.json')
-        self.assertEqual(response.status_code, 404)
+        with self.subTest('Popularity slot sort'):
+            response = self.client.get('/api/cards/anime/popularity')
+            self.assertEqual(response.status_code, 200)
+
+        with self.subTest('Controversy slot sort'):
+            response = self.client.get('/api/cards/anime/controversy')
+            self.assertEqual(response.status_code, 200)
+
+        with self.subTest('Top slot sort'):
+            response = self.client.get('/api/cards/anime/top')
+            self.assertEqual(response.status_code, 200)
+
+        with self.subTest('Random slot sort'):
+            response = self.client.get('/api/cards/anime/random')
+            self.assertEqual(response.status_code, 200)
+
+        # 4 requests have been previously sent.
+        with self.subTest('Rate limit'):
+            response = self.client.get('/api/cards/anime/black_magic')
+            self.assertEqual(response.status_code, 429)
+
+        # Let's recover.
+        time.sleep(1)
+
+        with self.subTest('Inexistent slot sort'):
+            response = self.client.get('/api/cards/anime/!!!!!')
+            self.assertEqual(response.status_code, 404)
 
     def _test_static_view(self, url):
         response = self.client.get('/{:s}'.format(url))

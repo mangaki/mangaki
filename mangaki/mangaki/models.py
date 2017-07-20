@@ -139,8 +139,8 @@ class Work(models.Model):
     catalog_number = models.CharField(max_length=20, blank=True)
     anidb_aid = models.IntegerField(default=0, blank=True)
     vgmdb_aid = models.IntegerField(blank=True, null=True)
-    editor = models.ForeignKey('Editor', default=1, on_delete=models.PROTECT)
-    studio = models.ForeignKey('Studio', default=1, on_delete=models.PROTECT)
+    editor = models.ForeignKey('Editor', null=True, on_delete=models.PROTECT)
+    studio = models.ForeignKey('Studio', null=True, on_delete=models.PROTECT)
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -153,7 +153,6 @@ class Work(models.Model):
     title_search = SearchVectorField('title')
 
     class Meta:
-        default_manager_name = 'objects'
         index_together = [
             ['category', 'controversy'],
             ['category', 'nb_ratings'],
@@ -269,8 +268,11 @@ class Work(models.Model):
         sum_weight_nsfw_high = sum(infos["weight"] for t, infos in anidb_tags.items()
                                    if t in potentially_nsfw_tags and infos["weight"] > 400)
 
-        percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
-        percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+        if sum_weight_all_low > 0 and sum_weight_all_high > 0:
+            percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
+            percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+        else:
+            return False
 
         return (percent_high_nsfw > HIGH_NSFW_THRESHOLD or
                 percent_low_nsfw > LOW_NSFW_THRESHOLD)

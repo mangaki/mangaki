@@ -2,6 +2,7 @@ import time
 import logging
 
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -131,12 +132,13 @@ def merge_works(request, selected_queryset):
         works_to_merge = list(works_to_merge_qs)
     else:  # Author is merging those works from a Work queryset
         from_cluster = False
-        cluster = WorkCluster(user=request.user, checker=request.user)
-        cluster.save()  # Otherwise we cannot add works
         works_to_merge_qs = selected_queryset.prefetch_related('rating_set', 'genre')
         works_to_merge = list(works_to_merge_qs)
-        cluster.works.add(*works_to_merge)
     if request.POST.get('confirm'):  # Merge has been confirmed
+        if not from_cluster:
+            cluster = WorkCluster(user=request.user, checker=request.user)
+            cluster.save()  # Otherwise we cannot add works
+            cluster.works.add(*works_to_merge)
         final_id = int(request.POST.get('id'))
         final_work = Work.objects.get(id=final_id)
         overwrite_fields(final_work, request)
@@ -205,9 +207,9 @@ class FAQAdmin(admin.ModelAdmin):
 class WorkAdmin(admin.ModelAdmin):
     search_fields = ('id', 'title')
     list_display = ('id', 'category', 'title', 'nsfw')
-    list_filter = ('category', 'nsfw', AniDBaidListFilter,)
+    list_filter = ('category', 'nsfw', AniDBaidListFilter)
     raw_id_fields = ('redirect',)
-    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge', 'refresh_work', 'update_tags_via_anidb']
+    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge', 'refresh_work', 'update_tags_via_anidb', 'change_title']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
@@ -282,7 +284,7 @@ class WorkAdmin(admin.ModelAdmin):
         }
         return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
 
-    update_tags_via_anidb.short_description = "Mise à jour des tags des oeuvres sélectionnées"
+    update_tags_via_anidb.short_description = "Mettre à jour les tags des œuvres depuis AniDB"
 
     def make_sfw(self, request, queryset):
         rows_updated = queryset.update(nsfw=False)
@@ -302,20 +304,22 @@ class WorkAdmin(admin.ModelAdmin):
             offending_works = [work for work in works if not work.anidb_aid]
             self.message_user(request,
                               "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
-                              "Veuillez ne sélectionner que des œuvres ayant un identifiant AniDB. (détails: {})"
-                              .format(",".join(map(lambda w: w.title, offending_works))))
+                              "Leur rafraichissement a été omis. (Détails: {})"
+                              .format(", ".join(map(lambda w: w.title, offending_works))),
+                              level=messages.WARNING)
 
         for index, work in enumerate(works, start=1):
-            logger.info('Refreshing {} from AniDB.'.format(work))
-            client.get_or_update_work(work.anidb_aid)
-            if index % 25 == 0:
-                logger.info('(AniDB refresh): Sleeping...')
-                time.sleep(1)  # Don't spam AniDB.
+            if work.anidb_aid:
+                logger.info('Refreshing {} from AniDB.'.format(work))
+                client.get_or_update_work(work.anidb_aid)
+                if index % 25 == 0:
+                    logger.info('(AniDB refresh): Sleeping...')
+                    time.sleep(1)  # Don't spam AniDB.
 
         self.message_user(request,
                           "Le rafraichissement des œuvres a été effectué avec succès.")
 
-    refresh_work_from_anidb.short_description = "Rapatrie les titres alternatifs et synopsis depuis AniDB"
+    refresh_work_from_anidb.short_description = "Rafraîchir les œuvres depuis AniDB"
 
     def merge(self, request, queryset):
         nb_merged, final_work, response = merge_works(request, queryset)
@@ -355,6 +359,58 @@ class WorkAdmin(admin.ModelAdmin):
 
     refresh_work.short_description = "Mettre à jour la fiche de l'anime (poster)"
 
+    @transaction.atomic
+    def change_title(self, request, queryset):
+        if request.POST.get('confirm'):  # Changing default title has been confirmed
+            work_ids = request.POST.getlist('work_ids')
+            titles_ids = request.POST.getlist('title_ids')
+
+            titles = WorkTitle.objects.filter(
+                pk__in=titles_ids, work__id__in=work_ids
+            ).values_list('title', 'work__title', 'work__id')
+
+            for new_title, current_title, work_id in titles:
+                if new_title != current_title:
+                    Work.objects.filter(pk=work_id).update(title=new_title)
+
+            self.message_user(request, 'Les titres ont bien été changés pour les œuvres sélectionnées.')
+            return None
+
+        work_titles = WorkTitle.objects.filter(work__in=queryset.values_list('pk', flat=True))
+        full_infos = work_titles.values(
+            'pk', 'title', 'language__code', 'type', 'work_id', 'work__title'
+        ).order_by('title').distinct('title')
+
+        titles = {}
+        for infos in full_infos:
+            if infos['work_id'] not in titles:
+                titles[infos['work_id']] = {}
+
+            titles[infos['work_id']].update({
+                infos['pk']: {
+                    'title': infos['title'],
+                    'language': infos['language__code'] if infos['language__code'] else 'inconnu',
+                    'type': infos['type'] if infos['title'] != infos['work__title'] else 'current'
+                }
+            })
+
+        if titles:
+            context = {
+                'work_titles': titles,
+                'queryset': queryset,
+                'opts': Work._meta,
+                'action': 'change_title',
+                'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+            }
+            return TemplateResponse(request, 'admin/change_default_work_title.html', context)
+        else:
+            self.message_user(request,
+                              'Aucune des œuvres sélectionnées ne possèdent de titre alternatif.',
+                              level=messages.WARNING)
+            return None
+
+    change_title.short_description = "Changer le titre par défaut"
+
 
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
@@ -373,7 +429,7 @@ class TagAdmin(admin.ModelAdmin):
     def nb_works_linked(self, obj):
         return obj.works_linked
 
-    nb_works_linked.short_description = 'Nombre d\'oeuvres liées au tag'
+    nb_works_linked.short_description = 'Nombre d\'œuvres liées au tag'
 
 
 @admin.register(TaggedWork)
@@ -411,11 +467,15 @@ class WorkClusterAdmin(admin.ModelAdmin):
         cluster_works = list(Work.all_objects.filter(workcluster=obj))
         if cluster_works:
             def get_admin_url(work):
-                return reverse('admin:mangaki_work_change', args=(work.id,))
+                if work.redirect is None:
+                    return reverse('admin:mangaki_work_change', args=(work.id,))
+                else:
+                    return '#'
             return (
                 '<ul>' +
-                format_html_join('', '<li>{} (<a href="{}">{}</a>)</li>',
-                    ((work.title, get_admin_url(work), work.id) for work in cluster_works)) +
+                format_html_join('', '<li>{} ({}<a href="{}">{}</a>)</li>',
+                    ((work.title, 'was ' if work.redirect is not None else '',
+                      get_admin_url(work), work.id) for work in cluster_works)) +
                 '</ul>'
             )
         else:

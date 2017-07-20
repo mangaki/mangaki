@@ -1,0 +1,34 @@
+---
+- name: Ensure Redis is installed.
+  apt:
+    name: redis-server
+    state: latest
+  become: true
+
+- name: Ensure Redis' data directory exists.
+  file:
+    path: '{{ redis_data_directory }}'
+    owner: 'redis'
+    group: 'redis'
+    mode: '0755'
+  become: true
+
+- name: Configure Redis' overrides.
+  template:
+    src: 'etc/redis/redis.conf'
+    dest: '/etc/redis/redis.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0640'
+  become: true
+  notify: Restart redis.
+
+- name: Copy Redis' core configuration.
+  template:
+    src: 'etc/redis/core.conf'
+    dest: '/etc/redis/core.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  become: true
+  notify: Restart redis.
