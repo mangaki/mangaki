@@ -8,16 +8,30 @@ from django.utils.functional import cached_property
 from django.db.models import Q
 
 from mangaki import settings
-from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist
+from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork
 
 
-def to_python_datetime(mal_date):
+def to_python_datetime(date):
     """
-    Converts myAnimeList's XML date YYYY-MM-DD to Python datetime format.
+    Converts AniDB's XML date YYYY-MM-DD to Python datetime format.
     >>> to_python_datetime('2015-07-14')
     datetime.datetime(2015, 7, 14, 0, 0)
+    >>> to_python_datetime('2015-07')
+    datetime.datetime(2015, 7, 1, 0, 0)
+    >>> to_python_datetime('2015')
+    datetime.datetime(2015, 1, 1, 0, 0)
+    >>> to_python_datetime('2015-25')
+    Traceback (most recent call last):
+     ...
+    ValueError: no valid date format found for 2015-25
     """
-    return datetime(*list(map(int, mal_date.split("-"))))
+    date = date.strip()
+    for fmt in ('%Y-%m-%d', '%Y-%m', '%Y'):
+        try:
+            return datetime.strptime(date, fmt)
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found for {}'.format(date))
 
 
 class AniDB:
@@ -28,7 +42,7 @@ class AniDB:
     def __init__(self,
                  client_id: Optional[str] = None,
                  client_ver: Optional[int] = None):
-        if not client_id and client_ver:
+        if not client_id or not client_ver:
             self.is_available = False
         else:
             self.client_id = client_id
@@ -105,16 +119,20 @@ class AniDB:
 
         work_titles = []
         raw_titles = []
-        for lang, title_data in titles.items():
+        for title_info in titles:
+            title = title_info['title']
+            lang = title_info['lang']
+            title_type = title_info['type']
+
             ext_lang_model = self.lang_map.get(lang, self.unknown_language)
-            raw_titles.append(title_data['title'])
+            raw_titles.append(title)
             work_titles.append(
                 WorkTitle(
                     work=work,
-                    title=title_data['title'],
+                    title=title,
                     ext_language=ext_lang_model,
                     language=ext_lang_model.lang if ext_lang_model else None,
-                    type=title_data['type']
+                    type=title_type
                 )
             )
 
@@ -131,6 +149,34 @@ class AniDB:
         WorkTitle.objects.bulk_create(missing_titles)
 
         return missing_titles
+
+    def get_xml(self, anidb_aid: int):
+        anidb_aid = int(anidb_aid)
+
+        r = self._request("anime", {'aid': anidb_aid})
+        soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')
+        if soup.error is not None:
+            raise Exception(soup.error.string)
+
+        return soup.anime
+
+    def handle_tags(self, anidb_aid=None, tags_soup=None):
+        if anidb_aid is not None:
+            anime = self.get_xml(anidb_aid)
+            tags_soup = anime.tags
+
+        tags = {}
+        if tags_soup is not None:
+            for tag_node in tags_soup.find_all('tag'):
+                tag_title = str(tag_node.find('name').string).strip()
+                tag_id = int(tag_node.get('id'))
+                tag_weight = int(tag_node.get('weight'))
+                tag_verified = tag_node.get('verified').lower() == 'true'
+
+                if tag_verified:
+                    tags[tag_title] = {"weight": tag_weight, "anidb_tag_id": tag_id}
+
+        return tags
 
     def get_or_update_work(self,
                            anidb_aid: int,
@@ -150,39 +196,34 @@ class AniDB:
         :return: the Work object related to the AniDB ID passed in parameter.
         :rtype: a `mangaki.models.Work` object.
         """
-        anidb_aid = int(anidb_aid)
 
-        r = self._request("anime", {'aid': anidb_aid})
-        soup = BeautifulSoup(r.text.encode('utf-8'),
-                             'xml')  # http://stackoverflow.com/questions/31126831/beautifulsoup-with-xml-fails-to-parse-full-unicode-strings#comment50430922_31146912
-        if soup.error is not None:
-            raise Exception(soup.error.string)
+        anime = self.get_xml(anidb_aid)
 
-        anime = soup.anime
+        anime_restricted = anime.get('restricted') == 'true'
         all_titles = anime.titles
         all_creators = anime.creators
+        all_tags = anime.tags
 
         # Handling of titles
         main_title = None
-        synonyms = {}
-        titles = {}
+        titles = []
         for title_node in all_titles.find_all('title'):
             title = str(title_node.string).strip()
             lang = title_node.get('xml:lang')
             title_type = title_node.get('type')
-            titles[lang] = {
+
+            titles.append({
                 'title': title,
+                'lang': lang,
                 'type': title_type
-            }
+            })
 
             if title_type == 'main':
                 main_title = title
 
-            if title_type == 'synonym':
-                synonyms[lang] = title
-
         # Handling of staff
         creators = []
+        studio = None
         # FIXME: cache this query
         staff_map = dict(Role.objects.values_list('slug', 'pk'))
         for creator_node in all_creators.find_all('name'):
@@ -208,17 +249,19 @@ class AniDB:
                     "anidb_creator_id": creator_id
                 })
 
+        if studio is None: # If no studio, set it as unknown studio
+            studio = Studio.objects.get(pk=1)
+
         anime = {
             'title': main_title,
-            'source': 'AniDB: ' + str(anime.url.string) if anime.url else None,
-            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)),
-            # 'nsfw': ?
+            'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
+            'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
+            'nsfw': anime_restricted,
             'date': to_python_datetime(anime.startdate.string),
             'end_date': to_python_datetime(anime.enddate.string),
-            # not yet in model: 'enddate': to_python_datetime(anime.enddate.string),
-            'ext_synopsis': str(anime.description.string),
-            'nb_episodes': int(anime.episodecount.string),
-            'anime_type': str(anime.type.string),
+            'ext_synopsis': str(anime.description.string) if anime.description else '',
+            'nb_episodes': int(anime.episodecount.string) if anime.episodecount else None,
+            'anime_type': str(anime.type.string) if anime.type else None,
             'anidb_aid': anidb_aid,
             'studio': studio
         }
@@ -240,6 +283,14 @@ class AniDB:
                 artist.save()
 
             Staff.objects.update_or_create(work=work, role_id=nc["role_id"], artist=artist)
+
+        tags = self.handle_tags(tags_soup=all_tags)
+        work.update_tags(tags)
+
+        # Check for NSFW based on tags if this work is new
+        if created and work.is_nsfw_based_on_tags(tags):
+            work.nsfw = True
+            work.save()
 
         self._build_work_titles(work, titles, reload_lang_cache)
 

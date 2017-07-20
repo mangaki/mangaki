@@ -12,7 +12,7 @@ from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models import CharField, F, Func, Lookup, Value
+from django.db.models import CharField, F, Func, Lookup, Value, Q
 from django.utils.functional import cached_property
 
 from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES
@@ -139,8 +139,8 @@ class Work(models.Model):
     catalog_number = models.CharField(max_length=20, blank=True)
     anidb_aid = models.IntegerField(default=0, blank=True)
     vgmdb_aid = models.IntegerField(blank=True, null=True)
-    editor = models.ForeignKey('Editor', default=1, on_delete=models.PROTECT)
-    studio = models.ForeignKey('Studio', default=1, on_delete=models.PROTECT)
+    editor = models.ForeignKey('Editor', null=True, on_delete=models.PROTECT)
+    studio = models.ForeignKey('Studio', null=True, on_delete=models.PROTECT)
 
     # Cache fields for the rankings
     sum_ratings = models.FloatField(blank=True, null=False, default=0)
@@ -158,18 +158,23 @@ class Work(models.Model):
             ['category', 'nb_ratings'],
         ]
 
-    all_objects = WorkQuerySet.as_manager()  # Equivalent to default_manager_name = 'all_objects', because first in the list
     objects = FilteredWorkManager.from_queryset(WorkQuerySet)()
+    all_objects = WorkQuerySet.as_manager()
 
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
     def retrieve_tags(self, anidb):
-        anidb_tags_list = anidb.get(self.anidb_aid).tags
-        anidb_tags = {title: int(weight) for title, weight in anidb_tags_list}
+        anidb_tags = anidb.handle_tags(anidb_aid=self.anidb_aid)
 
-        tag_work = TaggedWork.objects.filter(work=self)
-        current_tags = {tagwork.tag.title: tagwork.weight for tagwork in tag_work}
+        tag_work_list = TaggedWork.objects.filter(work=self).all()
+        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
+        current_tags = {
+            value[0]: {
+                "weight": value[2],
+                "anidb_tag_id": value[1]
+            } for value in values
+        }
 
         deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
         deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
@@ -177,7 +182,7 @@ class Work(models.Model):
         added_tags_keys = anidb_tags.keys() - current_tags.keys()
         added_tags = {key: anidb_tags[key] for key in added_tags_keys}
 
-        remaining_tags_keys = anidb_tags.keys() & current_tags.keys()
+        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
         remaining_tags = {key: current_tags[key] for key in remaining_tags_keys}
 
         updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
@@ -185,18 +190,92 @@ class Work(models.Model):
 
         return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
 
-    def update_tags(self, deleted_tags, added_tags, updated_tags):
-        for title, weight in added_tags.items():
-            current_tag = Tag.objects.get_or_create(title=title)[0]
-            TaggedWork(tag=current_tag, work=self, weight=weight).save()
+    def update_tags(self, anidb_tags):
+        tag_work_list = TaggedWork.objects.filter(work=self).all()
+        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
+        current_tags = {
+            value[0]: {
+                "weight": value[2],
+                "anidb_tag_id": value[1]
+            } for value in values
+        }
 
-        tags = Tag.objects.filter(title__in=updated_tags.keys())
-        for tag in tags:
-            tagged_work = self.taggedwork_set.get(tag=tag)
-            tagged_work.weight = updated_tags[tag.title][1]
+        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
+
+        added_tags_keys = anidb_tags.keys() - current_tags.keys()
+        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
+
+        tags_id = [added_tags[title]["anidb_tag_id"] for title in added_tags]
+        existing_tags = Tag.objects.filter(anidb_tag_id__in=tags_id).all()
+        existing_tags_id = existing_tags.values_list('anidb_tag_id', flat=True)
+
+        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
+        updated_tags = {key: anidb_tags[key] for key in remaining_tags_keys if current_tags[key] != anidb_tags[key]}
+
+        # New tags have to be added to the database (if they aren't already present)
+        # And new tags have to be assigned to that work
+        tags_weight = {}
+        tags_to_add = []
+        tags_list = []
+        tagged_works_to_add = []
+
+        for title, tag_infos in added_tags.items():
+            anidb_tag_id = tag_infos["anidb_tag_id"]
+            tags_weight[anidb_tag_id] = tag_infos["weight"]
+            if anidb_tag_id not in existing_tags_id:
+                tag = Tag(title=title, anidb_tag_id=anidb_tag_id)
+                tags_to_add.append(tag)
+            else:
+                tag = existing_tags.filter(anidb_tag_id=anidb_tag_id).first()
+            tags_list.append(tag)
+        Tag.objects.bulk_create(tags_to_add)
+
+        for tag in tags_list:
+            tag_weight = tags_weight[tag.anidb_tag_id]
+            tagged_work = TaggedWork(tag=tag, work=self, weight=tag_weight)
+            tagged_works_to_add.append(tagged_work)
+        TaggedWork.objects.bulk_create(tagged_works_to_add)
+
+        # Update the weight of tags that already exist (only if the weight changed)
+        for title, tag_infos in updated_tags.items():
+            tagged_work = self.taggedwork_set.get(tag__title=title)
+            tagged_work.weight = tag_infos["weight"]
             tagged_work.save()
 
-        TaggedWork.objects.filter(work=self, tag__title__in=deleted_tags.keys()).delete()
+        # Finally, remove a tag from a work if it no longer exists on AniDB's side
+        TaggedWork.objects.filter(work=self, tag__title__in=deleted_tags_keys).delete()
+
+    # Should add an update_creators method similar to update_tags
+
+    def is_nsfw_based_on_tags(self, anidb_tags):
+        # FIXME: potentially NSFW tags should be stored somewhere else
+        potentially_nsfw_tags = ['nudity', 'ecchi', 'pantsu', 'breasts', 'sex',
+                                 'large breasts', 'small breasts', 'gigantic breasts',
+                                 'incest', 'pornography', 'shota', 'masturbation',
+                                 'sexual fantasies', 'anal', 'loli']
+
+         # FIXME: these should be configurable constants
+        HIGH_NSFW_THRESHOLD = 15
+        LOW_NSFW_THRESHOLD = 30
+
+        sum_weight_all_low = sum(infos["weight"] for infos in anidb_tags.values()
+                                 if infos["weight"] <= 400)
+        sum_weight_nsfw_low = sum(infos["weight"] for t, infos in anidb_tags.items()
+                                  if t in potentially_nsfw_tags and infos["weight"] <= 400)
+
+        sum_weight_all_high = sum(infos["weight"] for infos in anidb_tags.values()
+                                  if infos["weight"] > 400)
+        sum_weight_nsfw_high = sum(infos["weight"] for t, infos in anidb_tags.items()
+                                   if t in potentially_nsfw_tags and infos["weight"] > 400)
+
+        if sum_weight_all_low > 0 and sum_weight_all_high > 0:
+            percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
+            percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+        else:
+            return False
+
+        return (percent_high_nsfw > HIGH_NSFW_THRESHOLD or
+                percent_low_nsfw > LOW_NSFW_THRESHOLD)
 
     def safe_poster(self, user):
         if self.id is None:
@@ -355,7 +434,8 @@ class Genre(models.Model):
 
 
 class Tag(models.Model):
-    title = models.TextField(unique = True)
+    title = models.CharField(max_length=255)
+    anidb_tag_id = models.IntegerField(unique=True)
 
     def __str__(self):
         return self.title
@@ -405,7 +485,7 @@ class Rating(models.Model):
         ('willsee', 'Je veux voir'),
         ('wontsee', 'Je ne veux pas voir')
     ))
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('user', 'work')

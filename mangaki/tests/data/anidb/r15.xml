@@ -1,0 +1,1548 @@
+<?xml version="1.0" encoding="UTF-8"?><anime id="8396" restricted="false">
+<type>TV Series</type>
+<episodecount>12</episodecount>
+<startdate>2011-07-10</startdate>
+<enddate>2011-09-25</enddate>
+<titles>
+<title xml:lang="x-jat" type="main">R-15</title>
+<title xml:lang="ru" type="synonym">Р-15</title>
+<title xml:lang="x-jat" type="short">r15</title>
+<title xml:lang="ja" type="official">R-15</title>
+<title xml:lang="en" type="official">R-15</title>
+</titles>
+<relatedanime>
+<anime id="8515" type="Sequel">R-15: R15 Shounen Hyouryuuki</anime>
+</relatedanime>
+<recommendations total="2">
+<recommendation type="For Fans" uid="534909">Entertaining and fun! And lots of fan service of course! If you want a deep story, this is nothing for you. If you into ecchi, it`s a must!</recommendation>
+<recommendation type="Recommended" uid="85705">No more than that fanservice</recommendation>
+</recommendations>
+<url>http://kadokawa-anime.jp/R-15/</url>
+<creators>
+<name id="732" type="Animation Work">AIC</name>
+<name id="6028" type="Character Design">Fujita Mariko</name>
+<name id="3656" type="Series Composition">Uetake Sumio</name>
+<name id="11103" type="Original Work">Fujima Takuya</name>
+<name id="25113" type="Original Work">Fushimi Hiroyuki</name>
+<name id="581" type="Direction">Nawa Munenori</name>
+<name id="10201" type="Music">Nonaka Yuuichi</name>
+<name id="12882" type="Chief Animation Direction">Tani Takuya</name>
+<name id="11842" type="Chief Animation Direction">Furukawa Hideki</name>
+<name id="6028" type="Chief Animation Direction">Fujita Mariko</name>
+<name id="888" type="Animation Work">Remic</name>
+</creators>
+<description>* Based on a series of light novels by http://anidb.net/cr11103 [Fujima Takuya] and http://anidb.net/cr25113 [Fushimi Hiroyuki].
+http://anidb.net/ch31733 [Akutagawa Takuto] is a teenage porn novel writer. He enters Hirameki Gakuen, which accepts only geniuses with outstanding talents, leading his classmates with his unusual writing skills to win the interclass competition.</description>
+<ratings>
+<permanent count="1091">3.27</permanent>
+<temporary count="1103">6.02</temporary>
+<review count="1">5.16</review>
+</ratings>
+<picture>75027.jpg</picture>
+<resources>
+<resource type="1">
+<externalentity>
+<identifier>12895</identifier>
+</externalentity>
+</resource>
+<resource type="2">
+<externalentity>
+<identifier>10611</identifier>
+</externalentity>
+</resource>
+<resource type="3">
+<externalentity>
+<identifier>4998</identifier>
+<identifier>wqakbl</identifier>
+</externalentity>
+</resource>
+<resource type="4">
+<externalentity>
+<url>http://kadokawa-anime.jp/R-15/</url>
+</externalentity>
+</resource>
+<resource type="6">
+<externalentity>
+<identifier>R-15_(light_novels)</identifier>
+</externalentity>
+</resource>
+<resource type="7">
+<externalentity>
+<identifier>R-15_(小説)</identifier>
+</externalentity>
+</resource>
+<resource type="8">
+<externalentity>
+<identifier>2217</identifier>
+</externalentity>
+</resource>
+<resource type="9">
+<externalentity>
+<identifier>339720</identifier>
+</externalentity>
+</resource>
+<resource type="10">
+<externalentity>
+<identifier>13593</identifier>
+</externalentity>
+</resource>
+<resource type="11">
+<externalentity>
+<identifier>mediadb/media/2851</identifier>
+</externalentity>
+</resource>
+<resource type="15">
+<externalentity>
+<identifier>2011/r15</identifier>
+</externalentity>
+</resource>
+<resource type="28">
+<externalentity>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+<tags>
+<tag id="30" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-10">
+<name>meta tags</name>
+<description>These tags are used for maintenance.</description>
+</tag>
+<tag id="308" parentid="2611" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2017-04-17">
+<name>detective</name>
+<description>A detective is an investigator, generally either a member of a law enforcement agency or as an individual working in the capacity of private investigators, tasked with solving crimes and other mysteries, such as disappearances, by examining and evaluating clues and records in order to solve the mystery; for a crime, this would mean uncovering the criminal`s identity and/or whereabouts. In some police systems, a detective position is achieved by passing a written test after a person completes the requirements for being a police officer; in others, detectives are college graduates who join directly from civilian life without first serving as uniformed officers.
+Source: Wikipedia</description>
+</tag>
+<tag id="520" parentid="6149" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2014-10-14">
+<name>nopan</name>
+<description>The character foregoes underwear.</description>
+<picurl>162753.jpg</picurl>
+</tag>
+<tag id="569" parentid="6149" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2015-11-18">
+<name>clumsy</name>
+<description>A clumsy person is one lacking in coordination, and as such prone to often having accidents such as tripping, bumping into objects, or dropping things. In female characters, this is often thought of as endearing.</description>
+<picurl>63355.png</picurl>
+</tag>
+<tag id="760" parentid="2274" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2015-09-14">
+<name>robot helper</name>
+<description>In a science fiction setting the robot helper, in a comedic sense, is pretty much what the "cute comic relief animal sidekick" is in a fantasy setting. The usually small machine has artificial intelligence, enabling it to support their owner / master with advice or help with menial tasks.
+Androids should not be considered robot helpers, since these are far more complex, and there already is a tag for androids.</description>
+</tag>
+<tag id="1157" parentid="2653" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-03-04">
+<name>horny nosebleed</name>
+<description>In Japanese media, healthy young men who have no other sexual outlet will often suffer nosebleeds upon seeing the naked female body, or even just a pair of well-filled panties.
+The nosebleed is, of course, a visual shorthand/euphemism for sexual arousal. It is commonly interpreted that way for males and females, with little trickles of blood indicating mild arousal, and gushing fountains of blood indicating erection/extreme arousal in both sexes. It can also be interpreted as shorthand strictly for erections in males. In that case, when blood shoots from the nose explosively, and in ridiculous quantity, the implication would be an ejaculation.
+Source: TVTrope</description>
+</tag>
+<tag id="1363" parentid="2856" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-01-14">
+<name>breast fondling</name>
+</tag>
+<tag id="1802" parentid="2606" infobox="true" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-01-24">
+<name>seinen</name>
+<description>Seinen, literally "young man", is one of the main demographic classifications applied to manga, and, by extension, to anime, especially manga-based ones. As the name implies, seinen works are marketed primarily to an audience of young men; the age range commonly understood to be the target of such works goes roughly from 17 to somewhere in the 40s.</description>
+<picurl>181651.jpg</picurl>
+</tag>
+<tag id="2008" parentid="2891" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-05">
+<name>small breasts</name>
+<description>This character has a bust size that is considered small. 
+The small size is usually a bust that would use a bra which is A or B. In anime, C may rarely enter this category.</description>
+<picurl>162720.jpg</picurl>
+</tag>
+<tag id="2056" parentid="2607" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2013-09-13">
+<name>cosplaying</name>
+<description>This character likes to cosplay.</description>
+</tag>
+<tag id="2274" parentid="2638" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-07-04">
+<name>robot</name>
+<description>A robot is an automatically guided machine, able to do tasks on its own. Another common characteristic is that by its appearance or movements, a robot often conveys a sense that it has intent or agency of its own.
+Not to be confused with android (human-like robot).</description>
+</tag>
+<tag id="2396" parentid="6149" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2014-02-08">
+<name>swimsuit</name>
+<description>A swimsuit is one of several kinds of garments designed to be worn by people engaging in water-based activities or sports or during certain activities under sunlight. Most kinds of swimsuit reveal a large portion of the body surface area, but exceptions exist. The more revealing kinds may also be worn as undergarment in sports that require wetsuits, or when there is a need to display the body, as in the case of beauty pageants or bodybuilding contests.
+There is a very wide range of styles of modern swimsuits, which vary in relation to body coverage and materials. The choice of style of swimsuit is dependent on current fashions, community standards of modesty, and plain personal preference. Swimsuits for men usually expose the chest, while those for women do not usually do so; however, many women prefer to engage in water or sun activities with their torso uncovered, in a practice commonly described as toplessness or topfreedom. Since the early twentieth century a naturist movement has developed in western countries that seeks a return to non-sexual nakedness when swimming and during other appropriate activities; in some places around the world, nude beaches have been set aside for people who choose to engage in normal beach activities in the nude, and such beaches may or may not enforce nudity onto their goers.
+In anime, it is common for at least one episode to feature the characters in swimsuits, usually as an excuse for gratuitous fanservice; when that happens, the episode is usually labeled a pool or beach episode, after the place the characters went to. Swimsuits, and in particular one-piece swimsuits, are a very common fetish in Japan; while the reason for that is uncertain, a common folk explanation is the fact that boys throughout their entire adolescence are commonly exposed to their female classmates wearing them, in what might be called an experiment in sexual discovery waiting to happen.</description>
+<picurl>149786.jpg</picurl>
+</tag>
+<tag id="2438" parentid="2794" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2008-12-16">
+<name>idol</name>
+<description>In Japanese culture, idols (アイドル) are media personalities in their teens and early twenties who are considered particularly cute and cuddly and who will, for a period ranging from several months to a few years, regularly appear in the mass media, e.g. as singers for J-pop groups, bit-part actors, TV personalities, models in photo spreads published in magazines, advertisements, etc.
+Source: wiki</description>
+<picurl>63097.jpg</picurl>
+</tag>
+<tag id="2455" parentid="6149" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2016-09-04">
+<name>tsundere</name>
+<description>Tsundere (ツンデレ) (pronounced /(t)sʌnˈdɪə(r)/ in English or /t͡sun.de.ɽe/ in Japanese) is a Japanese concept of a character archetype which describes a person with a conceited, irritable, and/or violent personality that suddenly becomes modest and loving when triggered by some sort of cause (such as being alone with someone). The inverse scenario, where a modest and loving person becomes conceited/irritable/violent, is also a tsundere.
+The default state does not matter. The character can default to "tsuntsun" or "deredere"; the key concept is the fact that there`s a (generally very quick) flip from one mode to the other.
+It can also describe a contradictory personality which is good-willed on the inside, but with a harsh attitude on the outside. Originally found in Japanese bishoujo games, the word is now part of the otaku moe phenomenon, reaching into other media such as anime, manga, novels, and even mass media.
+Tsundere is a portmanteau of the two words tsuntsun (ツンツン), and deredere (デレデレ). Tsuntsun is defined as "aloof, morose, pointed", and deredere is defined as "exhausted, lovestruck". Tsunderekko (ツンデレっ娘) is a related noun, referring to a girl with a tsundere personality. Like nekomimi, tsundere is considered a moe-inspiring character trait. The concept has received increasing attention in Japan, with a tsundere cafe opened in Akihabara and tsundere-themed products released (like Tomy Co.`s portable television set), and the concept increasingly reflected in recent anime, from an extended discussion of the meaning of the concept and its origin on the internet in http://anidb.net/a4777 [Lucky Star]`s Lucky Channel segment to merchandise for http://anidb.net/a3651 [The Melancholy of Haruhi Suzumiya] classifying the characters according to tsundere-ness. Another accepted definition of tsundere is a girl who has a combative attitude toward others but is also kind on the inside. She usually plays out as having an attitude toward the main character, usually a male, and often criticizing him in one way or another, but as the series progresses she eventually warms up to him and sometimes even falls in love with him.</description>
+<picurl>30388.jpg</picurl>
+</tag>
+<tag id="2604" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-04-02">
+<name>content indicators</name>
+<description>The content indicators branch is intended to be a less geographically specific tool than the `age rating` used by convention, for warning about things that might cause offence. Obviously there is still a degree of subjectivity involved, but hopefully it will prove useful for parents with delicate children, or children with delicate parents.</description>
+</tag>
+<tag id="2605" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-28">
+<name>dynamic</name>
+<description>Some of the central structural elements in anime are: 
+Plot Continuity 
+How does the plot or several plots unfold. Are they a strictly linear retelling of one big continuing story, a serial, possibly with several side stories, or is the content chopped into a set of unconnected episodes, only sharing the same setting and characters?
+Stereotype Characters
+Then there is the question of the character set presentation. Is it completely original, or is it your usual stereotypical character cast. Both choices have their merit, for example it would not really make much sense to reinvent the wheel for a harem anime. Fans of that genre come to expect their favourite stereotype protagonists.
+Plot Twists
+Finally there is the question of how complex the plot / the story unfolds. Are there side-plots that merge into the main plot leading to unexpected plot twists, or is the anime quite predictable? The latter would not be appropriate for detective stories. In harem anime on the other hand a foreseeable outcome is actually something the fans will come to expect.</description>
+</tag>
+<tag id="2606" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-18">
+<name>target audience</name>
+<description>Anime, like everything else in the modern world, is targeted towards specific audiences, both implicitly by the creators and overtly by the marketing. While categories are associated with specific sex and age groups, this is not a bar on the anime being enjoyed by people who don`t fit into that band; not only do crossover titles exist, but the categories also have a considerable following outside their main demographic, and a person might as well enjoy anime from all categories. Still, does not invalidate the usefulness of marking a title as one of the categories; the same themes will likely be treated differently in anime geared for different audiences. Only one should not jump the gun and assume that a title will be more or less serious or present content in this or that way due to its target audience, or conversely assume the target audience on the content and its presentation alone. As such, the audience categories help form a broad impression of how a title might work with the announced themes, but offer little to no in-depth information about specific content or its treatment.
+The audience categories originate from manga magazines, which group titles of a same intended audience into a magazine that is advertised as belonging to that category, and so manga-based anime will have the category from their parent work. As for anime based on other works, the audience is often debatable, but comparing information such as time slot to the manga-based anime generally helps figure out the most likely possibility.</description>
+</tag>
+<tag id="2607" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-29">
+<name>themes</name>
+<description>Themes describe the very central elements important to the anime stories. They set the backdrop against which the protagonists must face their challenges. Be it School Life, present Daily Life, Military action, Cyberpunk, Law and Order detective work, Sports, or the Underworld. These are only but a few of the more typical backgrounds for anime plots. Add to that a Conspiracy setting with a possible tragic outcome, the Themes span most of the imaginable subject matter relevant to anime.</description>
+</tag>
+<tag id="2608" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-12-04">
+<name>fetishes</name>
+<description>Everything under fetishes (except for Bishounen and Juujin) is strictly only meant for hentai (18 Restricted) and ecchi anime. In case of ecchi, it must be the main element of the show and not when there`s only some of it, for example, there`s some ecchi in Shinseiki Evangelion, but the fact you get to see Asuka`s pantsu doesn`t warrant it the schoolgirl fetish category. So be careful to which ecchi show you add fetishes; it`s fairly straightforward with hentai, though. Overall, this category tree is to satisfy the needs of people with different fetishes, so they can search for what tingles their tangle; hence why this is restricted to hentai and full ecchi shows. </description>
+</tag>
+<tag id="2609" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-22">
+<name>original work</name>
+<description>What the anime is based on! Mostly of academic interest, but a useful bit of info, hinting at the possible depth of story.</description>
+</tag>
+<tag id="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-22">
+<name>setting</name>
+<description>The setting describes in what time and place an anime takes place. To a certain extent it describes what you can expect from the world in the anime.</description>
+</tag>
+<tag id="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-08">
+<name>elements</name>
+<description>Next to Themes setting the backdrop for the protagonists in anime, there are the more detailed plot Elements that centre on character interactions: "What do characters do to each other or what is done to them?". Is it violent Action, an awe-inspiring Adventure in a foreign place, the gripping life of a Detective, a slapstick Comedy, an Ecchi Harem anime, a SciFi epic, or some Fantasy travelling adventure?</description>
+</tag>
+<tag id="2612" parentid="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>time</name>
+<description>This placeholder lists different epochs in human history and more vague but important timelines such as the future, the present and the past.</description>
+</tag>
+<tag id="2613" parentid="2610" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>place</name>
+<description>The places the anime can take place in. Includes more specific places such as a country on Earth, as well as more general places such as a dystopia or a mirror world.</description>
+</tag>
+<tag id="2624" parentid="2612" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2017-02-20">
+<name>present</name>
+<description>Somewhere between past and future.</description>
+</tag>
+<tag id="2630" parentid="2613" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-13">
+<name>Earth</name>
+<description>The Earth is the third planet from the Sun, and the densest and fifth-largest of the eight planets in the Solar System. It is in effect a ball of hot mud, but on the surface it`s cold enough, so most of us live on it (or are supposed to). It is circa 4.5 billion years old, and, unless we humans succeed in destroying it over the next couple of centuries, it is expected to last for quite another while, though the changes in the Sun`s emissions due to its aging will likely cause the extinction of everything; the species of earthlings are guaranteed to die, even if we fail to kill them -- unless, of course, we find ourselves another planet and figure out a way to take everything there. Our little planet on a corner of this galaxy may mean nothing in the grand scheme of things, but to its inhabitants it is their home, so, as a species, we cherish it dearly, to the point many cultures even to this day deify it. Being the home to the human civilizations, the Earth is the main setting of most fiction, be it anime or otherwise, but not only are many titles set in other places, such as unrelated fantasy worlds, in a considerable number of fictional titles the Earth is actually destroyed by aggressive alien invaders.</description>
+<picurl>126792.jpg</picurl>
+</tag>
+<tag id="2638" parentid="2846" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2005-05-07">
+<name>mecha</name>
+<description>Mecha in Japanese basically means mechanical things; everything from an electric whisk or a car to a spaceship or a robot. Here however we limit it to the more exotic things usually referred to as mecha anime: robots, whether controlled by a human or not, and their ilk. See Androids, Piloted Robots, Power Suits, Robot Helpers, Transforming Robots for a more specific classification.</description>
+<picurl>42077.jpg</picurl>
+</tag>
+<tag id="2653" parentid="2853" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2009-05-04">
+<name>slapstick</name>
+<description>Slapstick humour is generally recognized by lots of physical abuse, horseplay and practical jokes. Also often seen are impossible situations, using sounds to illustrate impossible stunts that aren`t shown on-screen and to create tension for audience anticipation.</description>
+</tag>
+<tag id="2672" parentid="2834" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2015-05-31">
+<name>Japan</name>
+<description>Last stronghold for humanity. If Tokyo falls, it`s all over. Tokyo Tower will undoubtedly fall anyway.</description>
+</tag>
+<tag id="2741" parentid="2891" infobox="true" weight="500" localspoiler="false" globalspoiler="false" verified="true" update="2015-12-14">
+<name>large breasts</name>
+<description>Large breasts are breasts a fair notch larger than average, as found in some adolescent girls or fully grown women; however, as anime has no upper limit to breast size, the definition applies somewhat differently. To be considered large, breasts in anime must be bigger than real-life natural ones or natural-seeming fake ones, to the point they`d appear weirdly or even abnormally large in real-life females. On the high end of the spectrum, breasts that are as big as the character`s head or possibly a bit bigger are still considered large; however, breasts that take at least as much space as the rest of the chest or the abdomen, or that are almost as big but have an absurdly unnatural shape, are the less common http://anidb.net/t1774 [gigantic breasts] instead.</description>
+<picurl>161014.jpg</picurl>
+</tag>
+<tag id="2748" parentid="2604" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-22">
+<name>sex</name>
+<description>Sexual intercourse, the ultimate bond of love and the "Origin of the World" (just think of Gustave Courbet`s painting).</description>
+<picurl>161190.jpg</picurl>
+</tag>
+<tag id="2749" parentid="2604" infobox="true" weight="500" localspoiler="false" globalspoiler="false" verified="true" update="2005-05-07">
+<name>nudity</name>
+<description>Nudity is the state of wearing no clothing. The wearing of clothing is exclusively a human characteristic. The amount of clothing worn depends on functional considerations (such as a need for warmth or protection from the elements) and social considerations. In some situations the minimum amount of clothing (i.e. covering of a person`s genitals) may be socially acceptable, while in others much more clothing is expected.
+People, as individuals and in groups, have varying attitudes towards their own nudity. Some people are relaxed about appearing less than fully clothed in front of others, while others are uncomfortable or inhibited in that regard. People are nude in a variety of situations, and whether they are prepared to disrobe in front of others depends on the social context in which the issue arises. For example, people need to bathe without clothing, some people also sleep in the nude, some prefer to sunbathe in the nude or at least topless, while others are nude in other situations. Some people adopt naturism as a lifestyle.
+Though the wearing of clothes is the social norm in most cultures, some cultures, groups and individuals are more relaxed about nudity, though attitudes often depend on context. On the other hand, some people feel uncomfortable in the presence of any nudity, and the presence of a nude person in a public place can give rise to controversy, irrespective of the attitude of the person who is nude. Besides meeting social disapproval, in some places public nudity may constitute a crime of indecent exposure. Many people have strong views on nudity, which to them can involve issues and standards of modesty, decency and morality. Some people have an psychological aversion to nudity, called gymnophobia. Many people regard nudity to be inherently sexual and erotic.
+Nudity is to be found in a multitude of media, including art, photography, film and on the Internet. It is a factor in adult entertainment of various types.
+Especially gratuitous fanservice anime shows tend to show their (usually female) characters frequently without any clothes, though often hiding genitals through the means of additions like steam.
+Source: wiki</description>
+<picurl>60576.jpg</picurl>
+</tag>
+<tag id="2750" parentid="2604" weight="100" localspoiler="false" globalspoiler="false" verified="true" update="2009-07-28">
+<name>violence</name>
+<description>Physical force against self or other, compelling action against one`s will on pain of being hurt.</description>
+</tag>
+<tag id="2770" parentid="2653" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2009-05-25">
+<name>violent retribution for accidental infringement</name>
+<description>A comedy / slapstick element often found in Ecchi anime: The hilarity derives from spontaneous embarrassment, overreaction of the "victim" (girl), immediate retribution for a seemingly inappropriate act, and a sense of pity with the supposed "aggressor" (boy).
+Typically a boy will - through no fault of his own - stumble into a girl, thus invading her personal space. In the process the boy may e.g. pull down her skirt, grab the girl`s breasts, or accidentally kiss her. Any level-headed girl would see the accident just for what it is. Not so the girl with an overly developed sense of modesty, and a thing for violence. She - often a tsundere - will clobber the boy with excessive brutality.</description>
+</tag>
+<tag id="2780" parentid="6148" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2014-09-06">
+<name>indirect kiss</name>
+<description>Comedy element: Especially in a school setting the character who has fallen for a fellow student, but has not yet confessed his/her love, will be desperate for any sign of "closeness".
+The indirect kiss: Anything the adored person touches with his/her lips — e.g. a used glass of lemonade, some half-eaten food, a half-emptied can of soda — the love struck will want to touch with her/his own lips.</description>
+</tag>
+<tag id="2782" parentid="2858" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2015-09-21">
+<name>shoujo ai</name>
+<description>Shoujo Ai means girls love, and thus explores what happens when two girls (or women) fall in love. This is not to be mistaken for http://anidb.net/t2695 [Yuri] which is (or, at least, how this term is often used by the western audience) used in adult works. This is not; that means there is no graphical sex.
+The male version is http://anidb.net/t2783 [Shounen Ai].</description>
+</tag>
+<tag id="2786" parentid="2858" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2009-05-15">
+<name>love polygon</name>
+<description>A love polygon refers to a romantic relationship involving n people. Although a love triangle is not limited to just heterosexual relationships, in anime, it usually deals with two females liking one male and vice versa.</description>
+</tag>
+<tag id="2791" parentid="6230" weight="400" localspoiler="false" globalspoiler="false" verified="true" update="2011-12-25">
+<name>stereotypes</name>
+<description>This show presents stereotypes, which are generalizations about a group of people. Examples would be saying that people from a certain country or with a certain hair color are stupid. If the show deals with comedy, the stereotypes are likely to be played on for laughs; if the show is a parody, the stereotypes will be exaggerated to have their flaws exposed and may be used as a form of social commentary.</description>
+</tag>
+<tag id="2793" parentid="2883" infobox="true" weight="500" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-07">
+<name>performance</name>
+<description>The song performance on stage or acting in a theatre is a central part of the character`s life in this anime type.</description>
+</tag>
+<tag id="2794" parentid="2883" infobox="true" weight="400" localspoiler="false" globalspoiler="false" verified="true" update="2015-02-23">
+<name>music</name>
+<description>Music anime generally revolves around people concerned with music in their everyday lives. In addition they often adhere to certain genre conventions, the emphasis on training and practice in preparation for competitions, characters desire for self improvement, and pursuit of a specific goal. This is not unlike the Sports category.</description>
+<picurl>169131.jpg</picurl>
+</tag>
+<tag id="2799" parentid="2609" infobox="true" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2010-05-14">
+<name>novel</name>
+<description>Note that novel means book with words in paper, so no comics and no "visual novels", which should go under manga and dating-sim - visual Novel/erotic game respectively.
+Note that it can be applied to novels as we know them but also the typical light novels for teens and young adults, which are common in Japan and aside from being short include a number of illustrations.</description>
+</tag>
+<tag id="2815" parentid="6148" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2015-09-10">
+<name>boobs in your face</name>
+<description>The character`s face is pressed into a female`s cleavage. This may be accidental or actually intended by the female character, or even a result of a device by the other character. This action is generally seen as sexually charged by the viewers and often also by the cast, so it will usually happen in an ecchi context; as such, something such as a mother hugging her child won`t generally count.</description>
+</tag>
+<tag id="2816" parentid="2856" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-06">
+<name>sexual fantasies</name>
+<description>One or more characters in this anime let their imaginations run wild thinking about another character.
+Yes, they are thinking about sex, and in an ecchi anime these thoughts are often perverted, leading to a nosebleed. But it may also be romanticising simply being husband and wife, and everything that implies.</description>
+</tag>
+<tag id="2817" parentid="2856" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-08">
+<name>skimpy clothing</name>
+<description>When a job needs to get done you need the appropriate clothing on the appropriate persons. That calls for preferably scantily clad young ladies. Spies will dress in sexy outfits, even when the mission explicitly calls for them to not to be noticed. Female warriors will charge into battle wearing armour that does not protect the vital organs. Bridge officers on a military starship will be issued go-go boots with their uniforms. Examples are the women in VanDread, AIKa or the most famous incarnation of that tag, the Strike Witches and their precursor the Sky Girls.</description>
+</tag>
+<tag id="2823" parentid="2856" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2012-10-06">
+<name>paper clothes</name>
+<description>Worn clothing appears paper-thin and takes little abuse to be shredded or torn from the body. This is common in ecchi anime where the main storyline involves some type of fighting but consists primarily of dialogue and fanservice (Ikkitousen and Platonic Heart). Various girls’ clothing exploding as if made of rice paper is a very enticing prospect.</description>
+<picurl>150776.jpg</picurl>
+</tag>
+<tag id="2824" parentid="6148" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2014-09-10">
+<name>pseudo tentacle rape scene</name>
+<description>If this was porn she (or rather the audience) would have even more fun!</description>
+<picurl>160554.jpg</picurl>
+</tag>
+<tag id="2826" parentid="2856" infobox="true" weight="500" localspoiler="false" globalspoiler="false" verified="true" update="2010-01-27">
+<name>pantsu</name>
+<description>"Panties" in Japanese. Upskirt views in various positions are typical, however all forms of partial or fully exposed panties are accepted. Exposure is usually accidental, but may also be deliberate. Pantsu views may be exclusive to the viewer without impacting any characters. Bikinis are not pantsu.</description>
+<picurl>5721.jpg</picurl>
+</tag>
+<tag id="2828" parentid="2856" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-07">
+<name>borderline porn</name>
+<description>Breaks the bounds of "excessive fanservice".
+While the physical interactions and dialogue between characters may be extremely sexual, the most sexual situations do *not* have sex itself take place.
+Specifically descriptive of containing all the plentiful features of (excessive) fanservice in addition to the interactions between characters being quite sexual — at most, sexual in NATURE only. This means physical touching such as groping, molesting, or bondage will focus primarily on the revealed (i.e. nude) upper portion of the body or through/over clothing on the lower half of the body. This is all WITHOUT actual sex acts (penetration, etc.) taking place.</description>
+</tag>
+<tag id="2834" parentid="2630" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2016-10-04">
+<name>Asia</name>
+<description>Asia is Earth`s largest and most populous continent, located primarily in the eastern and northern hemispheres and sharing the continental landmass of Eurasia with the continent of Europe. Asia covers an area of 44,579,000 square kilometers, about 30% of Earth`s total land area and 8.7% of the Earth`s total surface area. The continent, which has long been home to the majority of the human population, was the site of many of the first civilizations. Asia is notable for not only its overall large size and population, but also dense and large settlements as well as vast barely populated regions within the continent of 4.4 billion people.
+Source: Wikipedia</description>
+<picurl>192245.jpg</picurl>
+</tag>
+<tag id="2844" parentid="2611" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2014-05-07">
+<name>angst</name>
+<description>A feeling of general discomfort and uneasiness is present due to either trivial or more serious reasons, often accompanied by depression.
+Warning: may contain copious amounts of brooding and sighing.
+Etymology: "Angst" is a German word meaning fear or anxiety.</description>
+</tag>
+<tag id="2846" parentid="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>science fiction</name>
+<description>Science fiction stories usually focus on how situations could be different in the future when we are more technologically advanced; due to either our own achievements or having met with other civilizations whom we have learned from.</description>
+</tag>
+<tag id="2853" parentid="2611" infobox="true" weight="400" localspoiler="false" globalspoiler="false" verified="true" update="2017-02-13">
+<name>comedy</name>
+<description>Anime whose central struggle causes hilarious results. These stories are built upon funny characters, situations and events. A comedy anime is laced with humour and sets out to provoke laughter from the audience.
+Japanese humour can be a bit strange to westerners, so if you`re new to this type of humour, just bear with it; it`ll most likely grow on you if you`re a fan of other kinds of comedy.</description>
+<picurl>198104.jpg</picurl>
+</tag>
+<tag id="2856" parentid="2611" infobox="true" weight="600" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-05">
+<name>ecchi</name>
+<description>Fan service is found in many anime, in many forms. When the service has a distinctly sexual slant to it, and it appears to be a major focus of the show, then it`s safe to assume you`re watching ecchi.
+The word "ecchi" is used by English-speaking anime fans to refer to refer to soft-core pornographic or sexually suggestive anime and manga. This is a western invention; in Japanese, it is a catch-all term for all things anyhow sexual in nature, not being limited to porn, but also not really considered a "milder" term, as it may also refer to sexual intercourse itself. The term "ecchi" in Japanese comes from the pronunciation of the letter "H" in English, which is rendered into Japanese syllabary as エッチ, which in turn is transliterated in the English alphabet as "ecchi" or "etchi". It is not, as many believe, short for "hentai" -- that, too, seems to be a western invention. It is, however, nearly as misunderstood and misapplied a term as "hentai".
+The line between ecchi and hentai, from the western perspective over these terms, can be hard to draw at times; one good rule of thumb is: if it was aired on Japanese public TV at all, it probably wasn`t hentai. Ecchi usually features all the specifics to human anatomy that can only be found in anime, and generally avoids full nudity, instead abusing of panty shots. Hentai, on the other hand, will usually show full frontal nudity in some explicit form, including genitalia, and full, intimate sex scenes. At its mildest, ecchi is composed of double entendres, big misunderstandings, and sexual farce; at its most explicit, it is still in the realm of softcore pornography, with full breast shots, full back nudity and similar content, but no display of genitalia. Another good way to distinguish the two is looking for animated sex scenes; if one is found, you have generally left the genre entirely, though a few borderline exceptions apply here. For AniDB`s purposes, the distinction between explicit ecchi and actual hentai is simple: if it was sold with a 18+ restriction in its country of origin, it is hentai; if it was sold without it, it is ecchi.
+Source: TV Tropes</description>
+<picurl>32416.jpg</picurl>
+</tag>
+<tag id="2858" parentid="2611" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2010-09-10">
+<name>romance</name>
+<description>Romance describes a story that deals with love between two or more characters typically also having an optimistic ending. Romance is also a difficulty encountered when creating a harem.</description>
+</tag>
+<tag id="2859" parentid="2611" infobox="true" weight="400" localspoiler="false" globalspoiler="false" verified="true" update="2016-09-04">
+<name>harem</name>
+<description>Harem is an entertainment-related trope which is characterized by three or more characters, normally female, who for some reason are in the presence and under the influence of one character, generally male, according to a few genre-defining guidelines; here it will be assumed, for simplicity of language, that the harem lead is a male character and the members are female characters. Though that is the rule, there are exceptions; a story in which there is one female character and several male characters is normally called a "http://anidb.net/t2792 [reverse harem]", or sometimes also "male harem". Aside from the swapping of the characters` genders, the trope`s details are mostly the same, with the majority of the changes relating to the differences in behavior between men and women of the characters` age range. It is also possible to create harems with homosexual relationships, again with very few changes to the main antics themselves. The harem may not have more than only one lead, as that would be a love polygon, or less than three members, as one would form a couple and two would make a love triangle.
+As a defining rule of harem, the interactions between the lead and each of the individual members are filled with romantically or sexually loaded content, either implicitly, through innuendo or subtext, or explicitly, through text or actions, and those actions are a key plot element. Generally, the female characters` looks and personalities will vary a lot among the ones present in one single series, but quite rarely will they actually differ from the common stock archetypes, which are known, well-defined, and easy to copy; for this reason, the genre as a whole is often considered repetitive. Usually, the characters involved directly in this trope are in the late teenager to young adult age range, but that is not mandatory. Sexually charged behavior on the lead`s part pretty much can`t be avoided, and it`s typical to see him stamped as a pervert by some or all of the members, regardless of whether he is one; the sexual tones also applies to the depiction of the harem members, often leading the genre to labeled sexist. The lead will often suffer very violent retribution for his behavior, which has attracted criticism of gratuitous violence as well.
+Most of the harem members will be romantically or sometimes sexually interested in the one male character, and in him alone; that, however, is not an absolute rule, and indeed sometimes none of the female characters are really interested at first, so the protagonist has to build relationships with them from scratch. That idea comes in large part from visual novels; it is quite common for visual novels to revolve around controlling the male lead and have him build relationships with either as many female characters as possible or with one of them, the latter being more common for visual novels with branched story paths; a large portion of those visual novels also feature erotic content, which may be hard to adapt to TV series. It may be also possible that the harem is only a support to the existing or predictable relationship between the lead and the most important member; additionally, the lead may end up in relationships with most or all of the harem members, with the agreement of all, in a setting normally called "harem ending".</description>
+<picurl>94602.jpg</picurl>
+</tag>
+<tag id="2861" parentid="2846" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2009-05-16">
+<name>cyberpunk</name>
+<description>Cyberpunk focuses on computers or information technology, usually coupled with some degree of breakdown in social order. The plot often centres on a conflict among hackers, artificial intelligences, and mega corporations, tending to be set within a near-future dystopian Earth.</description>
+</tag>
+<tag id="2869" parentid="2607" infobox="true" weight="400" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-23">
+<name>school life</name>
+<description>Since a large part of the anime audience still takes part in school life or is visiting college, it is only natural to choose a setting the audience can identify with, be it elementary, middle, or high school. For the older viewers a college setting with more mature real-life problems is appropriate. And since clubs take up so much time in the lives of students, these are obviously also important.</description>
+</tag>
+<tag id="2878" parentid="2607" weight="200" localspoiler="false" globalspoiler="false" verified="true" update="2009-04-29">
+<name>conspiracy</name>
+<description>The conspiracy thriller (or paranoid thriller) is a sub-genre of the thriller which flourished in the 1970s in the US (and was echoed in other parts of the world) in the wake of a number of high-profile scandals and controversies (most notably Vietnam, the assassination of President Kennedy, Chappaquiddick and Watergate), and which exposed what many people regarded as the clandestine machinations and conspiracies beneath the orderly fabric of political life.
+The protagonists of conspiracy thrillers are often journalists or amateur investigators who find themselves (often inadvertently) pulling on a small thread which unravels a vast conspiracy that ultimately goes "all the way to the top".</description>
+</tag>
+<tag id="2883" parentid="2607" infobox="true" weight="500" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-07">
+<name>the arts</name>
+<description>The arts represent an outlet of human expression, usually influenced by culture, and driven by human creative impulse. Major constituents of the arts include literature – including poetry, novels and short stories, and epics; performing arts – among them music, dance, and theatre; culinary arts such as baking, chocolatiering, and winemaking; media arts like photography and film, and visual arts – including drawing, painting, and sculpting. Some art forms combine a visual element with performance (e.g. film) and the written word (e.g. comics).
+From prehistoric cave paintings to modern day films, art serves as a vessel for storytelling and conveying mankind`s relationship with its environment.
+Source: Wiki</description>
+</tag>
+<tag id="2888" parentid="2607" weight="300" localspoiler="false" globalspoiler="false" verified="true" update="2009-05-16">
+<name>coming of age</name>
+<description>In the strict sense the Coming of age describes a young person`s transition from adolescence to adulthood. In anime the term is used in a more general sense where the protagonists have to face a challenge, make an important decision in their life, take on responsibility, or learn a lesson, and by overcoming these obstacles they reach a higher level of maturity.</description>
+</tag>
+<tag id="2891" parentid="2608" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-12-31">
+<name>breasts</name>
+<description>The female bust size matters! Or does it? The three subcategories spell out the sizes that relate to fetishes, be they gigantic, large or small. Normal sized breasts are not a fetish, it seems. The tag is not only used for ecchi anime, but also for hentai shows as well.</description>
+<picurl>161015.jpg</picurl>
+</tag>
+<tag id="2931" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2016-12-04">
+<name>unsorted</name>
+<description>a bunch of tags that still need to be either deleted or moved into proper places.</description>
+</tag>
+<tag id="3108" parentid="2931" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2011-07-20">
+<name>catastrophic gadgets</name>
+<description>Comedy element: One of the characters in the anime tends to "invent", "create", or "call into existence" all sorts of wacky gadgets. The intent is to help the other protagonists in some way. Only that this fails every single time, ending in a catastrophe.</description>
+</tag>
+<tag id="3444" parentid="6148" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2014-09-15">
+<name>hot springs visit</name>
+<description>An onsen is a term for hot springs in the Japanese language, though the term is often used to describe the bathing facilities and inns around the hot springs. Often the cast of a show somehow ends up going to an onsen because of various reasons, such as winning a lottery ticket. 
+Usually used for fanservice purpose as it gives the staff the opportunity to draw the characters nude and raise the DVD sales.
+Another cheap variant is the http://anidb.net/t4290 [sentou episode].
+See also http://anidb.net/t2830 [furo scene], http://anidb.net/t5846 [beach episode], and http://anidb.net/t6046 [pool episode].</description>
+<picurl>160784.jpg</picurl>
+</tag>
+<tag id="3795" parentid="6151" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-25">
+<name>full HD version available</name>
+<description>This anime has been released in high definition formats such as HD DVD or Blu-ray Disc, and as such a full HD (1080p) version is available. This is irrespective of whether specific groups have released rips of such formats to the internet. Note that HDTV is not considered a full HD source!</description>
+</tag>
+<tag id="3842" parentid="6151" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2010-10-31">
+<name>TV censoring</name>
+<description>The TV version is censored and later DVD/BD releases are uncensored, so the money-grubbing capitalists can make a couple more bucks at our expense.</description>
+</tag>
+<tag id="3863" parentid="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2008-07-05">
+<name>competition</name>
+<description>Some sort of confrontation occurs in this show. The protagonists "duke it out" via various competitions.</description>
+</tag>
+<tag id="4112" parentid="3842" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2011-07-14">
+<name>excessive censoring</name>
+<description>There are basically two cases to which this term can be applied to:
+1) creative censorship
+The TV station airing the anime does its best to remove most ecchi parts from the show, using various and original methods. Usually, an uncensored BD/DVD is released later. Apart from the publisher`s greed - sometimes the censorship is used intentionally to make a scene look more obscene than it actually is.
+2) convenient censorship
+Another case of it - more often known under the term of "convenient censoring/ship" - is a blatant substitute for mosaic/steam/etc. over nether regions. This applies both to normal shows with occasional nudity as a normal part of human life (or just occasional flash of fanservice), as well as to heavy ecchi / borderline hentai shows where /literally/ everything is a fair (and far more "obscene" no matter how to look at it) game, except that misinterpreted taboo nonsense coming from §175 of JPC.</description>
+<picurl>169459.jpg</picurl>
+</tag>
+<tag id="4323" parentid="2931" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2009-02-04">
+<name>spacing out</name>
+<description>A comedy element: The character starts to daydream or fantasize about some topic. The typical complete lack of reality makes the spacing out funny. Especially when the protagonist mumbles to himself / herself and friends hear this. Promptly teasing the possibly lovestruck and very embarrassed protagonist.</description>
+</tag>
+<tag id="4405" parentid="2931" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2009-06-26">
+<name>vulgar at times</name>
+<description>Dialogues turn from banal daily trivia to vulgar adult (usually sexual) themes. Could also be applied to the actions of the characters, e.g. "mooning".</description>
+</tag>
+<tag id="5835" parentid="2856" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-12-18">
+<name>Gainax bounce</name>
+<description>A term that has come to describe often exaggerated, very jiggly, fluid, and painstakingly detailed animation of female characters` bouncing breasts. 
+The term has its roots in http://anidb.net/a185 [Top wo Nerae!] — Gunbuster, Gainax`s first OVA (1988), in which the Gainax bounce is found unabated in the three female characters of Noriko, Kazumi, and Jung.</description>
+<picurl>166074.jpg</picurl>
+</tag>
+<tag id="5882" parentid="6149" weight="0" localspoiler="false" globalspoiler="false" verified="false" update="2009-06-01">
+<name>secret identity</name>
+<description>The (usually main) protagonist has a secret identity that he or she desperately tries to keep secret.
+This can lead to all sorts of amusing misunderstandings, thus is used as comedy element in some anime.</description>
+</tag>
+<tag id="6029" parentid="6233" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-02-02">
+<name>mundane made awesome</name>
+<description>Sometimes normal just doesn`t cut it. Eating: you put food in your month and chew. Playing sports: you throw a ball around. You need to make it awesome, no matter how mundane it is.
+Let`s throw in some gripping orchestral music, lighting changes, different camera angles, something! Don`t write like a man, write like an evil overlord! Exaggerate your expressions and gestures, speak with excessive intonation, and if all else fails, throw in some close-ups, slow motion, and ominous Latin chanting! With practice, even you can turn something like eating chips into an epic battle of light and dark, blinding the viewer with sheer awesomeness.
+[Source: TV Tropes]</description>
+<picurl>149443.jpg</picurl>
+</tag>
+<tag id="6148" parentid="30" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-10">
+<name>TO BE MOVED TO EPISODE</name>
+<description>Tags under this parent tag are going to be moved to episode tags and removed from the anime they`re currently assigned to. They will be blocked from the anime system once that move is complete. Please help with that job if you know what episodes they should be assigned to.</description>
+</tag>
+<tag id="6149" parentid="30" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-10">
+<name>TO BE MOVED TO CHARACTER</name>
+<description>Tags under this parent tag are going to be moved to character tags and removed from the anime they`re currently assigned to. They will be blocked from the anime system once that move is complete. Please help with that job if you know what characters they should be assigned to.</description>
+</tag>
+<tag id="6151" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-09-10">
+<name>technical aspects</name>
+<description>It may sometimes be useful to know about technical aspects of a show, such as information about its broadcasting or censorship. Such information can be found here.</description>
+</tag>
+<tag id="6230" parentid="2605" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2014-10-20">
+<name>cast</name>
+</tag>
+<tag id="6233" parentid="2611" weight="0" localspoiler="false" globalspoiler="false" verified="true" update="2015-08-11">
+<name>tropes</name>
+<description>A trope is a commonly recurring literary and rhetorical devices, motifs or clichés in creative works. This use is a broader redefining of a literary trope, the use of figurative language, via word, phrase, or even an image, for artistic effect, such as using a figure of speech.
+Source: Wikipedia</description>
+</tag>
+</tags>
+<characters>
+<character id="31729" type="secondary cast in" update="2011-07-19">
+<rating votes="18">4.25</rating>
+<name>Kurabu Katsuyo</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75785.jpg</picture>
+<seiyuu id="27065" picture="87901.jpg">Murai Risako</seiyuu>
+</character>
+<character id="31730" type="secondary cast in" update="2011-07-19">
+<rating votes="14">2.20</rating>
+<name>Enshuu Ritsu</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75783.jpg</picture>
+<seiyuu id="27066" picture="73528.jpg">Murakami Madoka</seiyuu>
+</character>
+<character id="31731" type="secondary cast in" update="2011-07-19">
+<rating votes="36">5.74</rating>
+<name>Meiki Raika</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75786.jpg</picture>
+<seiyuu id="27062" picture="73529.jpg">Komatsu Mana</seiyuu>
+</character>
+<character id="31732" type="secondary cast in" update="2011-07-19">
+<rating votes="31">8.66</rating>
+<name>Sonokoe Utae</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75788.jpg</picture>
+<seiyuu id="27064" picture="73526.jpg">Kashiyama Nanami</seiyuu>
+</character>
+<character id="31733" type="main character in" update="2011-07-19">
+<rating votes="14">5.92</rating>
+<name>Akutagawa Taketo</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75779.jpg</picture>
+<seiyuu id="9865" picture="37436.jpg">Gouda Aya</seiyuu>
+</character>
+<character id="31734" type="secondary cast in" update="2011-07-19">
+<rating votes="28">3.54</rating>
+<name>Musen Ran</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75787.jpg</picture>
+<seiyuu id="27068" picture="73524.jpg">Tsumita Kayoko</seiyuu>
+</character>
+<character id="31735" type="secondary cast in" update="2011-07-19">
+<rating votes="24">4.96</rating>
+<name>Kagaku Tsukuru</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75784.jpg</picture>
+<seiyuu id="23589" picture="127456.jpg">Tsukimiya Midori</seiyuu>
+</character>
+<character id="31736" type="main character in" update="2011-07-19">
+<rating votes="30">3.78</rating>
+<name>Narukara Fukune</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75780.jpg</picture>
+<seiyuu id="27063" picture="73525.jpg">Fukuhara Yurina</seiyuu>
+</character>
+<character id="33246" type="secondary cast in" update="2011-07-19">
+<rating votes="9">4.26</rating>
+<name>Beni Batan</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75781.jpg</picture>
+<seiyuu id="5886" picture="30429.jpg">Nomizu Iori</seiyuu>
+</character>
+<character id="33247" type="secondary cast in" update="2011-07-19">
+<rating votes="26">7.16</rating>
+<name>Buchou</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75782.jpg</picture>
+<seiyuu id="2235" picture="21801.jpg">Ariga Yui</seiyuu>
+</character>
+<character id="33248" type="secondary cast in" update="2011-07-19">
+<rating votes="17">6.44</rating>
+<name>Yosano Aki</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75789.jpg</picture>
+<seiyuu id="8843" picture="33258.jpg">Sakakibara Naoko</seiyuu>
+</character>
+<character id="33462" type="appears in" update="2011-07-19">
+<rating votes="3">3.91</rating>
+<name>Tetsubou Meguru</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75791.jpg</picture>
+<seiyuu id="16610" picture="45564.jpg">Nagashima "Jien`otsu" Yuuichirou</seiyuu>
+</character>
+<character id="33463" type="appears in" update="2011-07-19">
+<rating votes="4">6.61</rating>
+<name>Kuroki Suiboku</name>
+<gender>male</gender>
+<charactertype id="1">Character</charactertype>
+<picture>75790.jpg</picture>
+<seiyuu id="10832" picture="38939.jpg">Nakamura Koutarou</seiyuu>
+</character>
+<character id="35898" type="appears in" update="2011-08-22">
+<rating votes="4">4.32</rating>
+<name>Kiya Star</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>48523.jpg</picture>
+<seiyuu id="24067" picture="67787.jpg">Sadohara Kaori</seiyuu>
+</character>
+<character id="35899" type="secondary cast in" update="2011-08-22">
+<rating votes="9">5.55</rating>
+<name>Yoruno Misa</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>48526.jpg</picture>
+<seiyuu id="9113" picture="124968.jpg">Itou Kumiko</seiyuu>
+</character>
+<character id="35900" type="appears in" update="2011-08-22">
+<rating votes="4">2.25</rating>
+<name>Mei Choushi</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>48529.jpg</picture>
+<seiyuu id="1611" picture="70006.jpg">Horikawa Chika</seiyuu>
+</character>
+<character id="35930" type="appears in" update="2011-08-24">
+<rating votes="6">4.87</rating>
+<name>Saint Maria</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>49084.jpg</picture>
+<seiyuu id="5888" picture="30435.jpg">Kirihara Akira</seiyuu>
+</character>
+<character id="35932" type="appears in" update="2011-08-24">
+<rating votes="5">5.78</rating>
+<name>Kagura Mai</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>49085.jpg</picture>
+<seiyuu id="27194" picture="123676.jpg">Hirosaka Ai</seiyuu>
+</character>
+<character id="35933" type="appears in" update="2011-08-24">
+<rating votes="4">4.14</rating>
+<name>Tegakari Shimon</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>49086.jpg</picture>
+<seiyuu id="10391" picture="38277.jpg">Zougou Saeko</seiyuu>
+</character>
+<character id="55577" type="appears in" update="2013-05-04">
+<rating votes="5">3.78</rating>
+<name>Iikyoku Kanade</name>
+<gender>female</gender>
+<charactertype id="1">Character</charactertype>
+<picture>136225.jpg</picture>
+<seiyuu id="28855" picture="68927.jpg">Maruyama Yukino</seiyuu>
+</character>
+</characters>
+<episodes>
+<episode id="130726" update="2017-01-04">
+<epno type="1">1</epno>
+<length>25</length>
+<airdate>2011-07-10</airdate>
+<rating votes="8">3.01</rating>
+<title xml:lang="ja">ようこそ閃学園へ!</title>
+<title xml:lang="en">Welcome to Inspiration Academy!</title>
+<title xml:lang="x-jat">Youkoso Hirameki Gakuen e!</title>
+<summary>Taketo Akutagawa is a high schooler who`s also a genius erotic writer whose work is serialized in the newspaper. He goes to a school where only people with a unique talent (Geniuses) are allowed, Inspiration Academy! A genius clarinet player, a genus mathmatician, a genius hacker and a genius idol, he gets in all kinds of sexy trouble thisthese crazy people. His fantasies never stop! And what about the love that`s starting to grow there? A taboo crazy academic life is about to start!
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="131015" update="2011-06-18">
+<epno type="4">T1</epno>
+<length>1</length>
+<title xml:lang="en">PV 1</title>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="131663" update="2017-01-04">
+<epno type="1">5</epno>
+<length>25</length>
+<airdate>2011-08-07</airdate>
+<rating votes="5">2.27</rating>
+<title xml:lang="ja">イカセ愛のムコウに</title>
+<title xml:lang="en">Beyond Friends with Benefits</title>
+<title xml:lang="x-jat">Ikase Ai no Mukou ni</title>
+<summary>Genius Artist Beni Botan has caused a ream of "painted uniform" incidents.  This dastardly deed involves painting a uniform onto a girl`s body and making her barely able to stand.  And she`s decided on Fukune as her next target!  When Musen Ran, who`s in love with Fukune, finds this out, she declares war, and an extreme yuri XXX battle begins!  Where will this battle lead, and how will our hero Takuto get involved with it?
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="131664" update="2017-01-04">
+<epno type="1">4</epno>
+<length>25</length>
+<airdate>2011-07-31</airdate>
+<rating votes="5">2.79</rating>
+<title xml:lang="ja">写真奇談</title>
+<title xml:lang="en">Photo Stories</title>
+<title xml:lang="x-jat">Shashin Kidan</title>
+<summary>Raika`s been asked to make a promotional poster for the school, and has decided to follow Takuto more than usual in hopes of getting a truly ugly picture.  Takuto is caught up in all kinds of erotic trouble she causes, and is desperate to find a way out.  Things get out of control fast, and start going in a direction neither of them expected.  When Takuto`s fantasies are unleashed at last, a dazzling turnabout begins!
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="131665" update="2017-01-04">
+<epno type="1">3</epno>
+<length>25</length>
+<airdate>2011-07-24</airdate>
+<rating votes="7">3.81</rating>
+<title xml:lang="ja">離れない, 離さない</title>
+<title xml:lang="en">I Won`t Go Away, I Won`t Let You Go</title>
+<title xml:lang="x-jat">Hanarenai, Hanasanai</title>
+<summary>Raika`s photos lead to suspicions of Taketo being a molester. He tries to prove his innocence, but he ends conjoined at the back with Fukune.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="131666" update="2017-01-04">
+<epno type="1">2</epno>
+<length>25</length>
+<airdate>2011-07-17</airdate>
+<rating votes="7">3.71</rating>
+<title xml:lang="ja">脱いだってあいどる!</title>
+<title xml:lang="en">An Idol, Even If I Strip!</title>
+<title xml:lang="x-jat">Nuidatte Idol!</title>
+<summary>Sonokoe Utae is a talented singer and the top idol in the school. She`s cheerful, polite, and popular, and she looks like she has it all. But she has a secret problem that she can`t tell anyone about. When Taketo goes to interview her for the Newspaper circle, he swears to himself that he`ll solve her problem. And then the two of them endup in a dark room together! Taketo`s talent goes out of control, and unlocks a new door for the pure idol!
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="131795" update="2011-07-10">
+<epno type="3">C2</epno>
+<length>2</length>
+<airdate>2011-07-10</airdate>
+<rating votes="1">9.03</rating>
+<title xml:lang="en">Ending</title>
+</episode>
+<episode id="131796" update="2011-07-10">
+<epno type="3">C1</epno>
+<length>2</length>
+<airdate>2011-07-10</airdate>
+<title xml:lang="en">Opening</title>
+</episode>
+<episode id="132299" update="2017-01-04">
+<epno type="1">10</epno>
+<length>25</length>
+<airdate>2011-09-11</airdate>
+<rating votes="3">3.38</rating>
+<title xml:lang="ja">湯の町エレジー</title>
+<title xml:lang="en">Steamy Town Elegy</title>
+<title xml:lang="x-jat">Yu no Machi Elegy</title>
+<summary>Hot springs have been found on Inspiration School Grounds, and a giant
+hot springs town has been built!
+But there`s only a moment`s rest to be had before the third year
+students have the first years hold an orientation tournament between
+classes!
+The first round is to plan an event in the hot springs down.
+Way behind after class 2 holds an Utae concert, Taketo fights back with a series of erotic carnival games! And amidst the chaos, the girls start to come to terms with their
+feelings for Taketo...
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="132300" update="2017-01-04">
+<epno type="1">9</epno>
+<length>25</length>
+<airdate>2011-09-04</airdate>
+<rating votes="3">5.98</rating>
+<title xml:lang="ja">部長Xファイル</title>
+<title xml:lang="en">Director of X-Files</title>
+<title xml:lang="x-jat">Buchou X-Files</title>
+<summary>Nothing is known about the chief of the newspaper circle, not her name, or her talent.  Taketo starts an investigation to find out who she is.  But the more he looks, the stranger things get, and he starts to think she might be a ghost or even an alien.  But Utae agrees to help, and the two of them start tailing the chief.  She`s appearing and disappearing everywhere, making her impossible to follow, but in the process there are ero-happenings and fantasies, and the two of them get closer... Will they find out who the chief is?
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="132301" update="2017-01-04">
+<epno type="1">8</epno>
+<length>25</length>
+<airdate>2011-08-28</airdate>
+<rating votes="3">5.11</rating>
+<title xml:lang="ja">ひらめきの休日</title>
+<title xml:lang="en">Holiday Inspiration</title>
+<title xml:lang="x-jat">Hirameki no Kyuujitsu</title>
+<summary>Everyone at Inspiration Academy is excited for their day off and making plans for dates and fun.  Takuto decides to go to town with Ritsu, but ends up going with Fukune instead.  Taketo is excited by the innocent and defenseless Fukune.  And then it starts raining suddenly, and Taketo and Fukune have to take refuge in a hotel! Taketo`s excitement reaches its peak as she takes a shower and changes...  What will happen to them, and what secret will Fukune tell?
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="132302" update="2017-01-04">
+<epno type="1">7</epno>
+<length>25</length>
+<airdate>2011-08-21</airdate>
+<rating votes="3">2.64</rating>
+<title xml:lang="ja">女子寮物語</title>
+<title xml:lang="en">Story of the Girl`s Dormitory</title>
+<title xml:lang="x-jat">Joshi Ryou Monogatari</title>
+<summary>As part of an article for the newspaper circle, Taketo sneaks into the girl`s dorm in a stealth suit.  Excited by seeing how open the girls are when there`s no men around, Taketo bleeds nosebleeds everywhere and terrifies the dorm.  The girls use every talent at their disposal to attempt to eliminate this invisible enemy.  Even amidst the danger, Taketo can`t stop his fantasies, and a panicked battle begins!  It`s going to be a crazy day!
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="132303" update="2017-01-04">
+<epno type="1">6</epno>
+<length>25</length>
+<airdate>2011-08-14</airdate>
+<rating votes="4">1.15</rating>
+<title xml:lang="ja">もしも閃学園の天才マネージャーが...</title>
+<title xml:lang="en">Genius Manager Moshimo</title>
+<title xml:lang="x-jat">Moshimo Hirameki Gakuen no Tensai Manager ga...</title>
+<summary>Taketo is in a slump. He can`t fantasize anymore.  Unable to write his porno, he`s missing his deadlines.  To help him, the chief of the newspaper circle sends him to the genius manager Kurabu Katsuyo.  And the two of them are locked up in a room together!  But Katsuyo`s
+natural clumsiness only makes the situation worse... What will Katsuyo do to bring back his fantasies?  Will he make his deadlines!?
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="132896" update="2017-01-04">
+<epno type="1">11</epno>
+<length>25</length>
+<airdate>2011-09-18</airdate>
+<rating votes="3">2.75</rating>
+<title xml:lang="ja">ボクたちのサマータイムブルー</title>
+<title xml:lang="en">Our Summertime Blue</title>
+<title xml:lang="x-jat">Bokutachi no Summer Time Blue</title>
+<summary>With Fukune staying at Taketo`s home, but despite his excitement, he`s unable to talk to her about what`s troubling her.
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+<episode id="132931" update="2017-01-04">
+<epno type="1">12</epno>
+<length>25</length>
+<airdate>2011-09-25</airdate>
+<rating votes="3">5.28</rating>
+<title xml:lang="ja">大好きだ!!</title>
+<title xml:lang="en">I Love You!</title>
+<title xml:lang="x-jat">Daisuki Da!!</title>
+<summary>Taketo swears that he`ll put everything he has into his lyrics.  It`s time for the final round of the Orientation Tournament.  Each of the characters let go of everything they`ve been storing up inside them in one last, shocking song.
+It`s a burning, passionate, and yet sweet melody of youth.  Everybody feels something different, but they all want to say the same thing.  "I love you!"
+Source: crunchyroll</summary>
+<resources>
+<resource type="28">
+<externalentity>
+<identifier>580788</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580790</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580792</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580798</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580752</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580754</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580774</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580776</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580778</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580780</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580782</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580784</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+<externalentity>
+<identifier>580786</identifier>
+<identifier>r-15</identifier>
+</externalentity>
+</resource>
+</resources>
+</episode>
+</episodes>
+</anime>

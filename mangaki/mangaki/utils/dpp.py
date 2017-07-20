@@ -26,10 +26,10 @@ class MangakiDPP:
         available_work_ids = list(set(self.work_ids) & set(dataset.encode_work.keys()))
         self.work_ids = np.array(available_work_ids)
         self.vectors = algo.VT.T[dataset.encode_works(available_work_ids)]
-        self.compute_similarity()
         self.preprocess()
 
     def preprocess(self, indices=None):
+        self.compute_similarity()
         if indices is None:
             indices = list(range(len(self.vectors)))
         D, V = np.linalg.eig(self.L[np.ix_(indices, indices)])
