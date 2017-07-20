@@ -19,6 +19,7 @@ setup(
         'django-analytical',
         'django-cookie-law',
         'django-js-reverse',
+        'djangorestframework',
         'scikit-learn>=0.18<0.19',
         'scipy',
         'pandas',

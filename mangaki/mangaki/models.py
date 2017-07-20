@@ -153,7 +153,6 @@ class Work(models.Model):
     title_search = SearchVectorField('title')
 
     class Meta:
-        default_manager_name = 'objects'
         index_together = [
             ['category', 'controversy'],
             ['category', 'nb_ratings'],
