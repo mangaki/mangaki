@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; Changer le titre par défaut
+</div>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+{% csrf_token %}
+<p>Choisissez les nouveaux titres par défaut pour les œuvres sélectionnées.</p>
+<table>
+    {% for work_id, work_title in work_titles.items %}
+    <tr>
+        <td style="vertical-align: middle;">
+            {% for id, infos in work_title.items %}
+            {% if infos.type == 'current' %}
+                <label for="{{ work_id }}"><strong>{{ infos.title }}</strong></label>
+            {% endif %}
+            {% endfor %}
+        </td>
+        <td style="vertical-align: middle;">➜</td>
+        <td>
+            <input type="hidden" name="work_ids" value="{{ work_id }}" />
+            <select id="{{ work_id }}" name="title_ids">
+                {% for id, infos in work_title.items %}
+                {% if infos.type != 'current' %}
+                <option value="{{ id }}">{{ infos.title }} &#60;{{ infos.language }}:{{ infos.type }}&#62;</option>
+                {% else %}
+                <option value="{{ id }}" selected>{{ infos.title }} &#60;{{ infos.type }}&#62;</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br/>
+
+<p>Souhaitez-vous réellement modifier ces titres ?</p>
+<div>
+    {% for obj in queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+    {% endfor %}
+    <input type="hidden" name="action" value="{{ action }}" />
+    <input type="hidden" name="confirm" value="yes" />
+    <input type="submit" value="{% trans "Yes, I'm sure" %}" />
+    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
+</div>
+</form>
+{% endblock %}

@@ -5,8 +5,8 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.models import Category, Editor, Studio, Work, Role, Staff, Artist
-from mangaki.utils.anidb import client, AniDB
+from mangaki.models import Category, Editor, Studio, Work, RelatedWork, Role, Staff, Artist, TaggedWork, Tag
+from mangaki.utils.anidb import to_python_datetime, AniDB
 
 
 class AniDBTest(TestCase):
@@ -21,13 +21,20 @@ class AniDBTest(TestCase):
             return f.read()
 
     def setUp(self):
-        # FIXME: The defaults for editor and studio in Work requires those to
-        # exist, or else foreign key constraints fail.
-        Editor.objects.create(pk=1)
-        # Studio.objects.create(pk=1)
-        self.anidb = client
+        self.anidb = AniDB('test_client', 1)
+        self.no_anidb = AniDB()
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
-        self.anime_fixture = self.read_fixture('sangatsu_no_lion.xml')
+        self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
+
+    def test_to_python_datetime(self):
+        self.assertEqual(to_python_datetime('2017-12-25'), datetime(2017, 12, 25, 0, 0))
+        self.assertEqual(to_python_datetime('2017-12'), datetime(2017, 12, 1, 0, 0))
+        self.assertEqual(to_python_datetime('2017'), datetime(2017, 1, 1, 0, 0))
+        self.assertRaises(ValueError, to_python_datetime, '2017-25')
+
+    def test_missing_client(self):
+        self.assertRaises(RuntimeError, self.no_anidb._request, 'dummypage')
+        self.assertFalse(self.no_anidb.is_available)
 
     @responses.activate
     def test_anidb_search(self):
@@ -44,29 +51,156 @@ class AniDBTest(TestCase):
         self.assertEqual(len(responses.calls), 1)
 
     @responses.activate
-    def test_anidb_get(self):
-        responses.add(
-            responses.GET,
-            AniDB.BASE_URL,
-            body=self.anime_fixture,
-            status=200,
-            content_type='application/xml'
-        )
+    def test_anidb_get_animes(self):
+        # Fake an artist entry with no AniDB creator ID that will be filled by retrieving Sangatsu
+        artist = Artist(name="Shinbou Akiyuki").save()
 
-        anime = self.anidb.get_or_update_work(11606)
+        filenames = ['anidb/sangatsu_no_lion.xml', 'anidb/sangatsu_no_lion.xml', 'anidb/hibike_euphonium.xml']
+        with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
+            for filename in filenames:
+                rsps.add(
+                    responses.GET,
+                    AniDB.BASE_URL,
+                    body=self.read_fixture(filename),
+                    status=200,
+                    content_type='application/xml'
+                )
 
-        staff = Work.objects.get(pk=anime.pk).staff_set.all()
-        author_names = staff.filter(role__slug='author').values_list('artist__name', flat=True)
-        composer_names = staff.filter(role__slug='composer').values_list('artist__name', flat=True)
-        director_names = staff.filter(role__slug='director').values_list('artist__name', flat=True)
+            sangatsu = self.anidb.get_or_update_work(11606)
+            retrieved_tags_sangatsu = sangatsu.retrieve_tags(self.anidb)
+            hibike = self.anidb.get_or_update_work(10889)
 
-        self.assertEqual(anime.title, 'Sangatsu no Lion')
-        self.assertEqual(anime.nb_episodes, 22)
-        self.assertEqual(anime.studio.title, 'Shaft')
+        # Retrieve tags
+        tags_sangatsu = set(Work.objects.get(pk=sangatsu.pk).taggedwork_set.all().values_list('tag__title', flat=True))
+        tags_hibike = set(Work.objects.get(pk=hibike.pk).taggedwork_set.all().values_list('tag__title', flat=True))
+        shared_tags = tags_sangatsu.intersection(tags_hibike)
 
-        self.assertEqual(anime.date, datetime(2016, 10, 8, 0, 0))
-        self.assertEqual(anime.end_date, datetime(2017, 3, 18, 0, 0))
+        # Checks on tags
+        self.assertEqual(len(tags_sangatsu), 30)
+        self.assertEqual(len(tags_hibike), 38)
+        self.assertEqual(len(shared_tags), 18)
 
-        self.assertCountEqual(author_names, ['Umino Chika'])
-        self.assertCountEqual(composer_names, ['Hashimoto Yukari'])
-        self.assertCountEqual(director_names, ['Shinbou Akiyuki', 'Okada Kenjirou'])
+        # Check for Sangatsu's informations
+        self.assertEqual(sangatsu.title, 'Sangatsu no Lion')
+        self.assertEqual(sangatsu.nb_episodes, 22)
+        self.assertEqual(sangatsu.studio.title, 'Shaft')
+        self.assertEqual(sangatsu.date, datetime(2016, 10, 8, 0, 0))
+        self.assertEqual(sangatsu.end_date, datetime(2017, 3, 18, 0, 0))
+
+        # Check for Sangatsu's staff
+        staff_sangatsu = Work.objects.get(pk=sangatsu.pk).staff_set.all().values_list('artist__name', flat=True)
+        self.assertCountEqual(staff_sangatsu, ['Umino Chika', 'Hashimoto Yukari', 'Shinbou Akiyuki', 'Okada Kenjirou'])
+
+        # Check retrieved tags from AniDB
+        self.assertEqual(len(retrieved_tags_sangatsu["deleted_tags"]), 0)
+        self.assertEqual(len(retrieved_tags_sangatsu["added_tags"]), 0)
+        self.assertEqual(len(retrieved_tags_sangatsu["updated_tags"]), 0)
+        self.assertEqual(len(retrieved_tags_sangatsu["kept_tags"]), len(tags_sangatsu))
+
+        # Check for no artist duplication
+        artist = Artist.objects.filter(name="Shinbou Akiyuki")
+        self.assertEqual(artist.count(), 1)
+        self.assertEqual(artist.first().anidb_creator_id, 59)
+
+    @responses.activate
+    def test_anidb_nsfw(self):
+        animes = {}
+
+        animes_sources = {
+            # Not NSFW at all
+            'anidb/sangatsu_no_lion.xml': (11606, 'Sangatsu no Lion'),
+            'anidb/hibike_euphonium.xml': (10889, 'Hibike! Euphonium'),
+            # Totally NSFW (restricted on AniDB)
+            'anidb/boku_no_piko.xml': (4544, 'Boku no Piko'),
+            'anidb/bible_black.xml': (528, 'Bible Black'),
+            # Should be marked NSFW
+            'anidb/r15.xml': (8396, 'R-15'),
+            'anidb/astarotte_no_omocha_ex.xml': (8560, 'Astarotte no Omocha! EX'),
+            'anidb/aki_sora.xml': (6782, 'Aki Sora'),
+            # Shouldn't be marked NSFW
+            'anidb/punchline.xml': (10948, 'Punch Line'),
+            'anidb/panty_stocking.xml': (7529, 'Panty & Stocking with Garterbelt'),
+            'anidb/shimoneta.xml': (10888, 'Shimoneta to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai')
+        }
+
+        are_nsfw = ['anidb/boku_no_piko.xml', 'anidb/bible_black.xml',
+                    'anidb/r15.xml', 'anidb/astarotte_no_omocha_ex.xml',
+                    'anidb/aki_sora.xml']
+        are_sfw = ['anidb/sangatsu_no_lion.xml', 'anidb/hibike_euphonium.xml',
+                   'anidb/punchline.xml', 'anidb/panty_stocking.xml',
+                   'anidb/shimoneta.xml']
+
+        with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
+            for filename, infos in animes_sources.items():
+                rsps.add(
+                    responses.GET,
+                    AniDB.BASE_URL,
+                    body=self.read_fixture(filename),
+                    status=200,
+                    content_type='application/xml'
+                )
+                animes[filename] = self.anidb.get_or_update_work(infos[0])
+
+        for filename in are_nsfw:
+            with self.subTest('Asserting NSFW', anime=animes_sources[filename][1]):
+                self.assertEqual(animes[filename].title, animes_sources[filename][1])
+                self.assertTrue(animes[filename].nsfw)
+
+        for filename in are_sfw:
+            with self.subTest('Asserting SFW', anime=animes_sources[filename][1]):
+                self.assertEqual(animes[filename].title, animes_sources[filename][1])
+                self.assertFalse(animes[filename].nsfw)
+
+    @responses.activate
+    def test_anidb_related_animes(self):
+        animes = {}
+        related_animes = {}
+
+        animes_sources = {
+            'anidb/hibike_euphonium.xml': 10889,
+            'anidb/hibike_euphonium2.xml': 11746,
+            'anidb/hibike_euphonium_movie1.xml': 11747,
+            'anidb/hibike_euphonium_movie2.xml': 12962,
+            'anidb/hibike_euphonium_original_movies.xml': 13207,
+            'anidb/sangatsu_no_lion.xml': 11606
+        }
+
+        with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
+            for filename, anidb_aid in animes_sources.items():
+                for _ in range(2):
+                    rsps.add(
+                        responses.GET,
+                        AniDB.BASE_URL,
+                        body=self.read_fixture(filename),
+                        status=200,
+                        content_type='application/xml'
+                    )
+
+                animes[filename] = self.anidb.get_or_update_work(anidb_aid)
+                related_animes[filename] = self.anidb.get_related_animes(anidb_aid=anidb_aid)
+
+        # Ran once in get_or_update_work but ran again to check that it does not cause errors
+        for filename in animes_sources:
+            self.anidb._build_related_animes(animes[filename], related_animes[filename])
+
+        relations = RelatedWork.objects.filter(
+                        child_work__anidb_aid__in=animes_sources.values(),
+                        parent_work__anidb_aid__in=animes_sources.values()
+                    )
+
+        # Checks that anime are created if missing but not all data is retrieved from AniDB
+        self.assertEqual(Work.objects.get(title='Sangatsu no Lion meets Bump of Chicken').ext_synopsis, '')
+        self.assertNotEqual(Work.objects.get(title='Sangatsu no Lion').ext_synopsis, '')
+
+        # Checks on relations
+        self.assertTrue(relations.filter(child_work__anidb_aid=11746, parent_work__anidb_aid=10889, type='sequel').exists())
+        self.assertTrue(relations.filter(child_work__anidb_aid=10889, parent_work__anidb_aid=11746, type='prequel').exists())
+
+        self.assertTrue(relations.filter(child_work__anidb_aid=11747, parent_work__anidb_aid=10889, type='summary').exists())
+        self.assertTrue(relations.filter(child_work__anidb_aid=10889, parent_work__anidb_aid=11747, type='full_story').exists())
+
+        self.assertTrue(relations.filter(child_work__anidb_aid=13207, parent_work__anidb_aid=11746, type='sequel').exists())
+        self.assertTrue(relations.filter(child_work__anidb_aid=11746, parent_work__anidb_aid=13207, type='prequel').exists())
+
+        self.assertTrue(relations.filter(child_work__anidb_aid=12962, parent_work__anidb_aid=11746, type='summary').exists())
+        self.assertTrue(relations.filter(child_work__anidb_aid=11746, parent_work__anidb_aid=12962, type='full_story').exists())

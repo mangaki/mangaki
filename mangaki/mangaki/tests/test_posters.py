@@ -10,11 +10,6 @@ from mangaki.utils.db import get_potential_posters
 class PostersTest(TestCase):
 
     def setUp(self):
-        # FIXME: The defaults for editor and studio in Work requires those to
-        # exist, or else foreign key constraints fail.
-        Editor.objects.create(pk=1)
-        Studio.objects.create(pk=1)
-
         anime = Category.objects.get(slug='anime')
 
         self.kiznaiver = Work.objects.create(

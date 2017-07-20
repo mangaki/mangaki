@@ -44,3 +44,15 @@ CLUSTER_CHOICES = (
     ('accepted', 'Accepté'),
     ('rejected', 'Rejeté')
 )
+
+RELATION_TYPE_CHOICES = (
+    ('', 'Inconnu'),
+    ('prequel', 'Préquelle'),
+    ('sequel', 'Suite'),
+    ('summary', 'Résumé'),
+    ('side_story', 'Histoire parallèle'),
+    ('parent_story', 'Histoire mère'),
+    ('alternative_setting', 'Univers alternatif'),
+    ('same_setting', 'Univers commun'),
+    ('other', 'Spécial')
+)
