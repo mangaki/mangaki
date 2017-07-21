@@ -13,7 +13,7 @@ ALGOS = {
 }
 
 
-def fit_algo(algo_name, triplets, titles=None, categories=None):
+def fit_algo(algo_name, triplets, titles=None, categories=None, output_csv=False):
     algo = ALGOS[algo_name]()
     dataset = Dataset()
 
@@ -27,6 +27,8 @@ def fit_algo(algo_name, triplets, titles=None, categories=None):
     if algo_name in {'svd', 'als', 'knn'}:
         algo.save(algo.get_backup_filename())
         dataset.save('ratings-' + algo.get_backup_filename())
+        if output_csv:
+            dataset.save_csv()
     return dataset, algo
 
 def get_algo_backup(algo_name):
