@@ -172,6 +172,9 @@ if config.has_section('sentry'):
             'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
     }
     LOGGING['root']['handlers'].append('sentry')
+    for logger in ('mangaki', 'django.db.backends'):
+        LOGGING['loggers'][logger]['handlers'].append('sentry')
+
     LOGGING['loggers']['raven'] = {
         'level': 'DEBUG',
         'handlers': ['console'],
