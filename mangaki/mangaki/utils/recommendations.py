@@ -1,18 +1,11 @@
-from collections import Counter
-from mangaki.models import Rating, ColdStartRating, Work
+from mangaki.models import Rating, Work
 from mangaki.utils.chrono import Chrono
-from mangaki.utils.data import Dataset
-from django.contrib.auth.models import User
-from django.db.models import Count
-from mangaki.utils.algo import ALGOS, fit_algo, get_algo_backup, get_dataset_backup
+from mangaki.utils.algos.fit_algo import fit_algo, get_algo_backup, get_dataset_backup
 from mangaki.utils.ratings import current_user_ratings
 from scipy.sparse import coo_matrix
 from mangaki.utils.values import rating_values
 import numpy as np
 import pandas as pd
-import json
-import os.path
-from sklearn.metrics.pairwise import cosine_similarity
 
 NB_RECO = 10
 CHRONO_ENABLED = True

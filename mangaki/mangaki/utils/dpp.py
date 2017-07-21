@@ -1,5 +1,5 @@
 from mangaki.utils import dpplib
-from mangaki.utils.algo import get_algo_backup, get_dataset_backup
+from mangaki.utils.algos.fit_algo import get_algo_backup, get_dataset_backup
 from random import sample
 import numpy as np
 

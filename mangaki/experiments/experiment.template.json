@@ -1,23 +1,23 @@
 {
   "algos": [
     {
-      "class": "mangaki.utils.als.MangakiALS",
+      "class": "mangaki.utils.algos.MangakiALS",
       "short_name": "als"
     },
     {
-      "class": "mangaki.utils.svd.MangakiSVD"
+      "class": "mangaki.utils.algos.MangakiSVD"
     },
     {
-      "class": "mangaki.utils.knn.MangakiKNN"
+      "class": "mangaki.utils.algos.MangakiKNN"
     },
     {
-      "class": "mangaki.utils.pca.MangakiPCA"
+      "class": "mangaki.utils.algos.MangakiPCA"
     },
     {
-      "class": "mangaki.utils.wals.MangakiWALS"
+      "class": "mangaki.utils.algos.MangakiWALS"
     },
     {
-      "class": "mangaki.utils.zero.MangakiZero"
+      "class": "mangaki.utils.algos.MangakiZero"
     }
   ],
   "configurations": [

@@ -1,6 +1,4 @@
-from mangaki.utils.common import RecommendationAlgorithm
-from django.conf import settings
-from mangaki.utils.chrono import Chrono
+from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
 from sklearn.decomposition import FactorAnalysis
 from scipy.sparse import csr_matrix
 import numpy as np
@@ -14,8 +12,8 @@ class MangakiEFA(RecommendationAlgorithm):
     W = None
     H = None
     def __init__(self, NB_COMPONENTS=20):
+        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
-        self.chrono = Chrono(True)
 
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users

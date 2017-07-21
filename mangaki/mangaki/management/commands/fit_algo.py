@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from mangaki.utils.algo import fit_algo
+from mangaki.utils.algos.fit_algo import fit_algo
 from mangaki.models import Rating, Work
 
 

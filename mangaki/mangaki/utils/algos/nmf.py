@@ -1,5 +1,6 @@
 from django.conf import settings
-from mangaki.utils.chrono import Chrono
+
+from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
 from sklearn.decomposition import NMF
 from scipy.sparse import lil_matrix
 import numpy as np
@@ -41,13 +42,13 @@ explanation = {
 }
 
 
-class MangakiNMF(object):
+class MangakiNMF(RecommendationAlgorithm):
     M = None
     W = None
     H = None
     def __init__(self, NB_COMPONENTS=10):
+        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
-        self.chrono = Chrono(True)
         with open(os.path.join(settings.BASE_DIR, '../data/works.csv')) as f:
             self.works = [x for _, x in csv.reader(f)]
 

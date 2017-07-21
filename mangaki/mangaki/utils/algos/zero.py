@@ -1,4 +1,4 @@
-from mangaki.utils.common import RecommendationAlgorithm
+from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
 
 
 class MangakiZero(RecommendationAlgorithm):
