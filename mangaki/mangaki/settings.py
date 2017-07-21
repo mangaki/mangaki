@@ -142,6 +142,7 @@ TEMPLATES = [
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    # In order for Sentry to catch exceptions and report them.
     'root': {
         'level': 'INFO',
         'handlers': ['console'],
