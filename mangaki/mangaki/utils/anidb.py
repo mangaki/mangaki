@@ -338,13 +338,16 @@ class AniDB:
             artist = Artist.objects.filter(Q(name=nc["name"]) | Q(anidb_creator_id=nc["anidb_creator_id"])).first()
 
             if not artist: # This artist does not yet exist
-                artist, a_created = Artist.objects.get_or_create(name=nc["name"], anidb_creator_id=nc["anidb_creator_id"])
+                artist = Artist(name=nc["name"], anidb_creator_id=nc["anidb_creator_id"])
             else: # This artist exists : prevent duplicates by updating with the AniDB id
                 artist.name = nc["name"]
                 artist.anidb_creator_id = nc["anidb_creator_id"]
-                artist.save()
+            artist.save()
 
-            Staff.objects.update_or_create(work=work, role_id=nc["role_id"], artist=artist)
+            staff = Staff.objects.filter(work=work, role_id=nc["role_id"], artist=artist).first()
+            if not staff: # This staff does not yet exist so we create it
+                staff = Staff(work=work, role_id=nc["role_id"], artist=artist)
+                staff.save()
 
         tags = self.handle_tags(tags_soup=all_tags)
         work.update_tags(tags)
