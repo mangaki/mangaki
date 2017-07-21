@@ -32,10 +32,12 @@ class RefreshFromAniDBTest(TestCase):
         self.user = get_user_model().objects.create_superuser(username='test', password='test', email='email@email.email')
         client.__init__('test', 1)
 
-        anime = Category.objects.get(slug='anime')
+        self.anime = Category.objects.get(slug='anime')
         Work.objects.bulk_create([
-            Work(title='Hibike! Euphonium', anidb_aid=10889, category=anime),
-            Work(title='Punchline', category=anime),
+            Work(title='Hibike! Euphonium', anidb_aid=10889, category=self.anime),
+            Work(title='Punchline', category=self.anime),
+            Work(title='Kiznaiver', anidb_aid=11692, category=self.anime),
+            Work(title='Kiznaiver Duplicate', anidb_aid=11692, category=self.anime)
         ])
         self.work_ids = Work.objects.values_list('pk', flat=True)
 

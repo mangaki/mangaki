@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
+from django.core.exceptions import MultipleObjectsReturned
 from django.utils.functional import cached_property
 from django.db.models import Q
 
