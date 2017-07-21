@@ -165,7 +165,7 @@ class Work(models.Model):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
     def retrieve_tags(self, anidb):
-        anidb_tags = anidb.handle_tags(anidb_aid=self.anidb_aid)
+        anidb_tags = anidb.get_tags(anidb_aid=self.anidb_aid)
 
         tag_work_list = TaggedWork.objects.filter(work=self).all()
         values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')

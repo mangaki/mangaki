@@ -248,7 +248,7 @@ class AniDB:
 
         Staff.objects.bulk_create(staffs_to_add)
 
-    def handle_tags(self, anidb_aid=None, tags_soup=None):
+    def get_tags(self, anidb_aid=None, tags_soup=None):
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
             tags_soup = anime.tags
@@ -442,7 +442,7 @@ class AniDB:
         self._build_staff(work, creators)
 
         # Add tags for this work to the database
-        tags = self.handle_tags(tags_soup=all_tags)
+        tags = self.get_tags(tags_soup=all_tags)
         self.update_tags(work, tags)
 
         # Check for NSFW based on tags if this work is new
