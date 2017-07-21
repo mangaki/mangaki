@@ -160,6 +160,29 @@ class AniDB:
 
         return soup.anime
 
+    def get_titles(self, anidb_aid=None, titles_soup=None):
+        if anidb_aid is not None:
+            anime = self.get_xml(anidb_aid)
+            titles_soup = anime.titles
+
+        main_title = None
+        titles = []
+        for title_node in titles_soup.find_all('title'):
+            title = str(title_node.string).strip()
+            lang = title_node.get('xml:lang')
+            title_type = title_node.get('type')
+
+            titles.append({
+                'title': title,
+                'lang': lang,
+                'type': title_type
+            })
+
+            if title_type == 'main':
+                main_title = title
+
+        return titles, main_title
+
     def get_creators(self, anidb_aid=None, creators_soup=None):
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
@@ -307,21 +330,7 @@ class AniDB:
         all_related_animes = anime.relatedanime
 
         # Handling of titles
-        main_title = None
-        titles = []
-        for title_node in all_titles.find_all('title'):
-            title = str(title_node.string).strip()
-            lang = title_node.get('xml:lang')
-            title_type = title_node.get('type')
-
-            titles.append({
-                'title': title,
-                'lang': lang,
-                'type': title_type
-            })
-
-            if title_type == 'main':
-                main_title = title
+        titles, main_title = self.get_titles(titles_soup=all_titles)
 
         # Handling of staff and studio
         creators, studio = self.get_creators(creators_soup=all_creators)
