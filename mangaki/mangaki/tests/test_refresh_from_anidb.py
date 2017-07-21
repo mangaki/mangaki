@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.contrib import admin
 
 from mangaki.models import Work, Category
-from mangaki.utils.anidb import AniDB
+from mangaki.utils.anidb import AniDB, client
 
 
 class RefreshFromAniDBTest(TestCase):
@@ -30,6 +30,7 @@ class RefreshFromAniDBTest(TestCase):
 
     def setUp(self):
         self.user = get_user_model().objects.create_superuser(username='test', password='test', email='email@email.email')
+        client.__init__('test', 1)
 
         anime = Category.objects.get(slug='anime')
         Work.objects.bulk_create([
