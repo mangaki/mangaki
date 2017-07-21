@@ -20,7 +20,6 @@ def fit_algo(algo_name, triplets, titles=None, categories=None, output_csv=False
         dataset.save('ratings-' + algo.get_backup_filename())
         if output_csv:
             dataset.save_csv()
-
     return dataset, algo
 
 def get_algo_backup(algo_name):
