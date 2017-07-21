@@ -1,6 +1,5 @@
-from mangaki.utils.common import RecommendationAlgorithm
-from mangaki.utils.data import Dataset
-
+from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
+from mangaki.utils.algos.dataset import Dataset
 
 def fit_algo(algo_name, triplets, titles=None, categories=None, output_csv=False):
     algo = RecommendationAlgorithm.instantiate_algorithm(algo_name)
@@ -23,10 +22,12 @@ def fit_algo(algo_name, triplets, titles=None, categories=None, output_csv=False
 
     return dataset, algo
 
+
 def get_algo_backup(algo_name):
     algo = RecommendationAlgorithm.instantiate_algorithm(algo_name)
     algo.load(algo.get_backup_filename())
     return algo
+
 
 def get_dataset_backup(algo_name):
     algo = RecommendationAlgorithm.instantiate_algorithm(algo_name)

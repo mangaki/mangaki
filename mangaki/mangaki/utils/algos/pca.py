@@ -1,6 +1,7 @@
-from mangaki.utils.common import RecommendationAlgorithm
 from sklearn.decomposition import PCA
 import numpy as np
+
+from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
 
 
 class MangakiPCA(RecommendationAlgorithm):

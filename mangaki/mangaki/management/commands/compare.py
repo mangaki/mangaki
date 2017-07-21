@@ -8,8 +8,8 @@ from collections import defaultdict
 from sklearn.model_selection import ShuffleSplit
 import numpy as np
 
-from mangaki.utils.common import RecommendationAlgorithm
-from mangaki.utils.data import Dataset
+from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
+from mangaki.utils.algos.dataset import Dataset
 from mangaki.utils.values import rating_values
 import logging
 

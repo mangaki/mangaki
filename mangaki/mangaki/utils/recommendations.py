@@ -1,6 +1,6 @@
 from mangaki.models import Rating, Work
 from mangaki.utils.chrono import Chrono
-from mangaki.utils.algo import fit_algo, get_algo_backup, get_dataset_backup
+from mangaki.utils.algos.fit_algo import fit_algo, get_algo_backup, get_dataset_backup
 from mangaki.utils.ratings import current_user_ratings
 from scipy.sparse import coo_matrix
 from mangaki.utils.values import rating_values

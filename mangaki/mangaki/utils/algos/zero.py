@@ -1,4 +1,4 @@
-from mangaki.utils.common import RecommendationAlgorithm, register_algorithm
+from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 
 @register_algorithm('zero')
