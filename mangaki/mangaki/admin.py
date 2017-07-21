@@ -300,26 +300,27 @@ class WorkAdmin(admin.ModelAdmin):
     def refresh_work_from_anidb(self, request, queryset):
         works = queryset.all()
 
+        # Check for works with missing AniDB AID
+        if not all(work.anidb_aid for work in works):
+            offending_works = [work for work in works if not work.anidb_aid]
+            self.message_user(request,
+            "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
+            "Leur rafraichissement a été omis. (Détails: {})"
+            .format(", ".join(map(lambda w: w.title, offending_works))),
+            level=messages.WARNING)
+
         # Check for works that have a duplicate AniDB AID
         anidb_aids = set(works.values_list('anidb_aid', flat=True))
         potential_duplicates = Work.objects.filter(anidb_aid__in=anidb_aids)
         works_with_conflicting_anidb_aid = [work for work in works
-                                            if potential_duplicates.filter(anidb_aid=work.anidb_aid).count() > 1]
+                                            if potential_duplicates.filter(anidb_aid=work.anidb_aid).count() > 1
+                                            and work not in offending_works]
 
         if works_with_conflicting_anidb_aid:
             self.message_user(request,
                               "Certains de vos choix présentent des conflits d'identifiant AniDB. "
                               "Leur rafraichissement a été omis. (Détails: {})"
                               .format(", ".join(map(lambda w: w.title, works_with_conflicting_anidb_aid))),
-                              level=messages.WARNING)
-
-        # Check for works with missing AniDB AID
-        if not all(work.anidb_aid for work in works):
-            offending_works = [work for work in works if not work.anidb_aid]
-            self.message_user(request,
-                              "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
-                              "Leur rafraichissement a été omis. (Détails: {})"
-                              .format(", ".join(map(lambda w: w.title, offending_works))),
                               level=messages.WARNING)
 
         # Refresh works from AniDB
