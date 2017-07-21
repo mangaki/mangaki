@@ -327,11 +327,11 @@ class WorkAdmin(admin.ModelAdmin):
         refreshed = 0
         for index, work in enumerate(works, start=1):
             if work.anidb_aid and work not in works_with_conflicting_anidb_aid:
-                logging.info('Refreshing {} from AniDB.'.format(work))
+                logger.info('Refreshing {} from AniDB.'.format(work))
                 if client.get_or_update_work(work.anidb_aid) is not None:
                     refreshed += 1
                 if index % 25 == 0:
-                    logging.info('(AniDB refresh): Sleeping...')
+                    logger.info('(AniDB refresh): Sleeping...')
                     time.sleep(1)  # Don't spam AniDB.
 
         if refreshed > 0:
