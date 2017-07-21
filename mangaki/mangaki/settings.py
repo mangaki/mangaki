@@ -155,7 +155,8 @@ LOGGING = {
     'loggers': {
         'mangaki': {
             'handlers': ['console'],
-            'level': 'DEBUG'
+            'level': 'DEBUG',
+            'propagate': False,
         },
         'django.db.backends': {
             'level': 'ERROR',
