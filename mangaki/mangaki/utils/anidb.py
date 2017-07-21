@@ -258,7 +258,8 @@ class AniDB:
         :param reload_lang_cache: forcefully reload the ExtLanguage cache,
             if it has changed since the instantiation of the AniDB client (default: false).
         :type reload_lang_cache: boolean
-        :return: the Work object related to the AniDB ID passed in parameter.
+        :return: the Work object related to the AniDB ID passed in parameter,
+            None if two or more Work objects match the AniDB ID provided.
         :rtype: a `mangaki.models.Work` object.
         """
 
