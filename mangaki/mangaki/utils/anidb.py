@@ -160,6 +160,43 @@ class AniDB:
 
         return soup.anime
 
+    def get_creators(self, anidb_aid=None, creators_soup=None):
+        if anidb_aid is not None:
+            anime = self.get_xml(anidb_aid)
+            creators_soup = anime.creators
+
+        creators = []
+        studio = None
+        # FIXME: cache this query
+        staff_map = dict(Role.objects.values_list('slug', 'pk'))
+        for creator_node in creators_soup.find_all('name'):
+            creator = str(creator_node.string).strip()
+            creator_id = creator_node.get('id')
+            creator_type = creator_node.get('type')
+            staff_id = None
+
+            if creator_type == 'Direction':
+                staff_id = 'director'
+            elif creator_type == 'Music':
+                staff_id = 'composer'
+            elif creator_type == 'Original Work' or creator_type == 'Story Composition':
+                staff_id = 'author'
+            elif creator_type == 'Animation Work' or creator_type == 'Work':
+                # AniDB marks Studio as such a creator's type
+                studio = Studio.objects.filter(title=creator).first()
+                if studio is None:
+                    studio = Studio(title=creator)
+                    studio.save()
+
+            if staff_id is not None:
+                creators.append({
+                    "role_id": staff_map[staff_id],
+                    "name": creator,
+                    "anidb_creator_id": creator_id
+                })
+
+        return creators, studio
+
     def handle_tags(self, anidb_aid=None, tags_soup=None):
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
@@ -286,33 +323,8 @@ class AniDB:
             if title_type == 'main':
                 main_title = title
 
-        # Handling of staff
-        creators = []
-        studio = None
-        # FIXME: cache this query
-        staff_map = dict(Role.objects.values_list('slug', 'pk'))
-        for creator_node in all_creators.find_all('name'):
-            creator = str(creator_node.string).strip()
-            creator_id = creator_node.get('id')
-            creator_type = creator_node.get('type')
-            staff_id = None
-
-            if creator_type == 'Direction':
-                staff_id = 'director'
-            elif creator_type == 'Music':
-                staff_id = 'composer'
-            elif creator_type == 'Original Work' or creator_type == 'Story Composition':
-                staff_id = 'author'
-            elif creator_type == 'Animation Work' or creator_type == 'Work':
-                # AniDB marks Studio as such a creator's type
-                studio, s_created = Studio.objects.get_or_create(title=creator)
-
-            if staff_id is not None:
-                creators.append({
-                    "role_id": staff_map[staff_id],
-                    "name": creator,
-                    "anidb_creator_id": creator_id
-                })
+        # Handling of staff and studio
+        creators, studio = self.get_creators(creators_soup=all_creators)
 
         anime = {
             'title': main_title,
