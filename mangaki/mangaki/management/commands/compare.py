@@ -121,7 +121,6 @@ class Experiment(object):
         for i_train, i_test in k_fold.split(self.anonymized.X):
             for algo in self.algos:
                 model = algo.make_instance()
-                logger.info('{}'.format(model))
                 logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), NB_SPLIT, pass_index + 1))
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
