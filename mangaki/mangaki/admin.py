@@ -245,7 +245,7 @@ class WorkAdmin(admin.ModelAdmin):
                 tags.update(added_tags)
                 tags.update(updated_tags)
 
-                anime.update_tags(tags)
+                client.update_tags(anime, tags)
 
             self.message_user(request, "Modifications sur les tags faites")
             return None

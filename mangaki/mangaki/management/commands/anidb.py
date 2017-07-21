@@ -105,7 +105,7 @@ class Command(BaseCommand):
                 tags.update(added_tags)
                 tags.update(updated_tags)
                 tags.update(kept_tags)
-                anime.update_tags(tags)
+                client.update_tags(anime, tags)
 
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
 

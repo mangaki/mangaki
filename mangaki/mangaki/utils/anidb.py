@@ -266,6 +266,62 @@ class AniDB:
 
         return tags
 
+    def update_tags(self,
+                    work: Work,
+                    anidb_tags: Dict[str, Dict[str, Any]]):
+        tag_work_list = TaggedWork.objects.filter(work=work).all()
+        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
+        current_tags = {
+            value[0]: {
+                "weight": value[2],
+                "anidb_tag_id": value[1]
+            } for value in values
+        }
+
+        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
+
+        added_tags_keys = anidb_tags.keys() - current_tags.keys()
+        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
+
+        tags_id = [added_tags[title]["anidb_tag_id"] for title in added_tags]
+        existing_tags = Tag.objects.filter(anidb_tag_id__in=tags_id).all()
+        existing_tags_id = existing_tags.values_list('anidb_tag_id', flat=True)
+
+        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
+        updated_tags = {key: anidb_tags[key] for key in remaining_tags_keys if current_tags[key] != anidb_tags[key]}
+
+        # New tags have to be added to the database (if they aren't already present)
+        tags_weight = {}
+        tags_to_add = []
+        tags_list = []
+        for title, tag_infos in added_tags.items():
+            anidb_tag_id = tag_infos["anidb_tag_id"]
+            tags_weight[anidb_tag_id] = tag_infos["weight"]
+            if anidb_tag_id not in existing_tags_id:
+                tag = Tag(title=title, anidb_tag_id=anidb_tag_id)
+                tags_to_add.append(tag)
+            else:
+                tag = existing_tags.filter(anidb_tag_id=anidb_tag_id).first()
+            tags_list.append(tag)
+        Tag.objects.bulk_create(tags_to_add)
+
+        # Assign tags to the work via TaggedWork
+        tagged_works_to_add = []
+        for tag in tags_list:
+            tag_weight = tags_weight[tag.anidb_tag_id]
+            tagged_work = TaggedWork(tag=tag, work=work, weight=tag_weight)
+            tagged_works_to_add.append(tagged_work)
+        TaggedWork.objects.bulk_create(tagged_works_to_add)
+
+        # Update the weight of tags that already exist (only if the weight changed)
+        for title, tag_infos in updated_tags.items():
+            tagged_work = work.taggedwork_set.get(tag__title=title)
+            tagged_work.weight = tag_infos["weight"]
+            tagged_work.save()
+
+        # Finally, remove a tag from a work if it no longer exists on AniDB's side
+        TaggedWork.objects.filter(work=work, tag__title__in=deleted_tags_keys).delete()
+
     def get_related_animes(self, anidb_aid=None, related_animes_soup=None):
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
@@ -387,7 +443,7 @@ class AniDB:
 
         # Add tags for this work to the database
         tags = self.handle_tags(tags_soup=all_tags)
-        work.update_tags(tags)
+        self.update_tags(work, tags)
 
         # Check for NSFW based on tags if this work is new
         if created and work.is_nsfw_based_on_tags(tags):
