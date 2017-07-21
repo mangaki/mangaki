@@ -30,7 +30,10 @@ class RefreshFromAniDBTest(TestCase):
 
     def setUp(self):
         self.user = get_user_model().objects.create_superuser(username='test', password='test', email='email@email.email')
-        client.__init__('test', 1)
+        
+        client.client_id = 'fake'
+        client.client_ver = 1
+        client.is_available = True
 
         self.anime = Category.objects.get(slug='anime')
         Work.objects.bulk_create([
