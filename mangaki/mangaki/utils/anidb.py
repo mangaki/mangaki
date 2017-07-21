@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from urllib.parse import urljoin
 
 import requests
@@ -220,6 +220,34 @@ class AniDB:
 
         return creators, studio
 
+    def _build_staff(self,
+                     work: Work,
+                     creators: List[Dict[str, Any]]) -> List[Staff]:
+        artists_to_add = []
+        artists_list = []
+        for nc in creators:
+            artist = Artist.objects.filter(Q(name=nc["name"]) | Q(anidb_creator_id=nc["anidb_creator_id"])).first()
+
+            if not artist: # This artist does not yet exist : will be bulk created
+                artist = Artist(name=nc["name"], anidb_creator_id=nc["anidb_creator_id"])
+                artists_to_add.append(artist)
+            else: # This artist exists : prevent duplicates by updating with the AniDB id
+                artist.name = nc["name"]
+                artist.anidb_creator_id = nc["anidb_creator_id"]
+                artist.save()
+            artists_list.append(artist)
+
+        Artist.objects.bulk_create(artists_to_add)
+
+        staffs_to_add = []
+        for index, nc in enumerate(creators):
+            staff = Staff.objects.filter(work=work, role_id=nc["role_id"], artist=artists_list[index]).first()
+            if not staff: # This staff does not yet exist : will be bulk created
+                new_staff = Staff(work=work, role_id=nc["role_id"], artist=artists_list[index])
+                staffs_to_add.append(new_staff)
+
+        Staff.objects.bulk_create(staffs_to_add)
+
     def handle_tags(self, anidb_aid=None, tags_soup=None):
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
@@ -354,22 +382,10 @@ class AniDB:
                                                       anidb_aid=anidb_aid,
                                                       defaults=anime)
 
-        # Add new creators
-        for nc in creators:
-            artist = Artist.objects.filter(Q(name=nc["name"]) | Q(anidb_creator_id=nc["anidb_creator_id"])).first()
+        # Add staff for this work to the database
+        self._build_staff(work, creators)
 
-            if not artist: # This artist does not yet exist
-                artist = Artist(name=nc["name"], anidb_creator_id=nc["anidb_creator_id"])
-            else: # This artist exists : prevent duplicates by updating with the AniDB id
-                artist.name = nc["name"]
-                artist.anidb_creator_id = nc["anidb_creator_id"]
-            artist.save()
-
-            staff = Staff.objects.filter(work=work, role_id=nc["role_id"], artist=artist).first()
-            if not staff: # This staff does not yet exist so we create it
-                staff = Staff(work=work, role_id=nc["role_id"], artist=artist)
-                staff.save()
-
+        # Add tags for this work to the database
         tags = self.handle_tags(tags_soup=all_tags)
         work.update_tags(tags)
 
