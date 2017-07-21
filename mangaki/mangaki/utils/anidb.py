@@ -329,9 +329,12 @@ class AniDB:
         }
 
         # Add or update work
-        work, created = Work.objects.update_or_create(category=self.anime_category,
-                                                      anidb_aid=anidb_aid,
-                                                      defaults=anime)
+        try:
+            work, created = Work.objects.update_or_create(category=self.anime_category,
+                                                          anidb_aid=anidb_aid,
+                                                          defaults=anime)
+        except MultipleObjectsReturned:
+            return None
 
         # Add new creators
         for nc in creators:

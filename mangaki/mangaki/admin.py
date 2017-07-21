@@ -300,6 +300,20 @@ class WorkAdmin(admin.ModelAdmin):
     def refresh_work_from_anidb(self, request, queryset):
         works = queryset.all()
 
+        # Check for works that have a duplicate AniDB AID
+        anidb_aids = set(works.values_list('anidb_aid', flat=True))
+        potential_duplicates = Work.objects.filter(anidb_aid__in=anidb_aids)
+        works_with_conflicting_anidb_aid = [work for work in works
+                                            if potential_duplicates.filter(anidb_aid=work.anidb_aid).count() > 1]
+
+        if works_with_conflicting_anidb_aid:
+            self.message_user(request,
+                              "Certains de vos choix présentent des conflits d'identifiant AniDB. "
+                              "Leur rafraichissement a été omis. (Détails: {})"
+                              .format(", ".join(map(lambda w: w.title, works_with_conflicting_anidb_aid))),
+                              level=messages.WARNING)
+
+        # Check for works with missing AniDB AID
         if not all(work.anidb_aid for work in works):
             offending_works = [work for work in works if not work.anidb_aid]
             self.message_user(request,
@@ -308,16 +322,21 @@ class WorkAdmin(admin.ModelAdmin):
                               .format(", ".join(map(lambda w: w.title, offending_works))),
                               level=messages.WARNING)
 
+        # Refresh works from AniDB
+        refreshed = 0
         for index, work in enumerate(works, start=1):
-            if work.anidb_aid:
-                logger.info('Refreshing {} from AniDB.'.format(work))
-                client.get_or_update_work(work.anidb_aid)
+            if work.anidb_aid and work not in works_with_conflicting_anidb_aid:
+                logging.info('Refreshing {} from AniDB.'.format(work))
+                if client.get_or_update_work(work.anidb_aid) is not None:
+                    refreshed += 1
                 if index % 25 == 0:
-                    logger.info('(AniDB refresh): Sleeping...')
+                    logging.info('(AniDB refresh): Sleeping...')
                     time.sleep(1)  # Don't spam AniDB.
 
-        self.message_user(request,
-                          "Le rafraichissement des œuvres a été effectué avec succès.")
+        if refreshed > 0:
+            self.message_user(request,
+                              "Le rafraichissement de {} œuvre(s) a été effectué avec succès."
+                              .format(refreshed))
 
     refresh_work_from_anidb.short_description = "Rafraîchir les œuvres depuis AniDB"
 
