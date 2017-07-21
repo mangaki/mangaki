@@ -301,6 +301,7 @@ class WorkAdmin(admin.ModelAdmin):
         works = queryset.all()
 
         # Check for works with missing AniDB AID
+        offending_works = []
         if not all(work.anidb_aid for work in works):
             offending_works = [work for work in works if not work.anidb_aid]
             self.message_user(request,
