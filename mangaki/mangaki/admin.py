@@ -311,18 +311,32 @@ class WorkAdmin(admin.ModelAdmin):
             level=messages.WARNING)
 
         # Check for works that have a duplicate AniDB AID
-        anidb_aids = set(works.values_list('anidb_aid', flat=True))
-        potential_duplicates = Work.objects.filter(anidb_aid__in=anidb_aids)
-        works_with_conflicting_anidb_aid = [work for work in works
-                                            if potential_duplicates.filter(anidb_aid=work.anidb_aid).count() > 1
-                                            and work not in offending_works]
+        aids_with_works = defaultdict(list)
+        for work in works:
+            if work.anidb_aid:
+                aids_with_works[work.anidb_aid].append(work)
 
-        if works_with_conflicting_anidb_aid:
-            self.message_user(request,
-                              "Certains de vos choix présentent des conflits d'identifiant AniDB. "
-                              "Leur rafraichissement a été omis. (Détails: {})"
-                              .format(", ".join(map(lambda w: w.title, works_with_conflicting_anidb_aid))),
-                              level=messages.WARNING)
+        aids_with_potdupe_works = defaultdict(list)
+        for work in Work.objects.filter(anidb_aid__in=aids_with_works.keys()):
+            aids_with_potdupe_works[work.anidb_aid].append(work)
+
+        works_with_conflicting_anidb_aid = []
+        for anidb_aid, potdupe_works in aids_with_potdupe_works.items():
+            if len(potdupe_works) > 1:
+                works_with_conflicting_anidb_aid.extend(aids_with_works[anidb_aid])
+
+                # Alert the user for each work he selected that has a duplicate AniDB ID
+                self.message_user(
+                    request,
+                    """Le rafraichissement de {} a été omis car d'autres œuvres possèdent
+                    le même identifiant AniDB #{}. (Œuvres en conflit : {})"""
+                    .format(
+                        ", ".join(map(lambda w: w.title, aids_with_works[anidb_aid])),
+                        anidb_aid,
+                        ", ".join(map(lambda w: w.title, aids_with_potdupe_works[anidb_aid]))
+                    ),
+                    level=messages.WARNING
+                )
 
         # Refresh works from AniDB
         refreshed = 0
