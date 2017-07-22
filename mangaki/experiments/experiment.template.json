@@ -18,9 +18,13 @@
     },
     {
       "class": "mangaki.utils.algos.MangakiZero"
+    },
+    {
+      "class": "mangaki.utils.algos.MangakiXGB"
     }
   ],
   "configurations": [
-    ["zero"]
+    ["svd", 10],
+    ["xgb", "gbtree", "reg:logistic"]
   ]
 }

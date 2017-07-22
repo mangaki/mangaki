@@ -20,3 +20,4 @@ djangorestframework==3.6.*
 coreapi==2.3.*
 celery==4.0.*
 redis==2.10.*
+xgboost==0.6.*

@@ -5,4 +5,5 @@ from .knn import MangakiKNN
 from .efa import MangakiEFA
 from .pca import MangakiPCA
 from .nmf import MangakiNMF
+from .xgb import MangakiXGB
 from .zero import MangakiZero

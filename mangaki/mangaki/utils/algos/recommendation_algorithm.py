@@ -34,6 +34,13 @@ class RecommendationAlgorithm:
             backup = pickle.load(f)
         return backup
 
+    def fit(self, X, y):
+        raise NotImplementedError
+
+    # noinspection PyUnusedLocal
+    def train(self, X, y, X_test, y_test):
+        self.fit(X, y)
+
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users
         self.nb_works = nb_works

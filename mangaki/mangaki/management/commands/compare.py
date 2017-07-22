@@ -122,7 +122,10 @@ class Experiment(object):
                 model = algo.make_instance()
                 logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), NB_SPLIT, pass_index + 1))
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
-                model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
+                model.train(self.anonymized.X[i_train],
+                          self.anonymized.y[i_train],
+                          self.anonymized.X[i_test],
+                          self.anonymized.y[i_test])
                 y_pred = model.predict(self.anonymized.X[i_test])
                 if model.verbose:
                     logger.info('Predicted: %s' % y_pred[:5])
