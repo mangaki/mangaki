@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
+from django.core.exceptions import MultipleObjectsReturned
 from django.utils.functional import cached_property
 from django.db.models import Q
 
@@ -257,7 +258,8 @@ class AniDB:
         :param reload_lang_cache: forcefully reload the ExtLanguage cache,
             if it has changed since the instantiation of the AniDB client (default: false).
         :type reload_lang_cache: boolean
-        :return: the Work object related to the AniDB ID passed in parameter.
+        :return: the Work object related to the AniDB ID passed in parameter,
+            None if two or more Work objects match the AniDB ID provided.
         :rtype: a `mangaki.models.Work` object.
         """
 
@@ -329,9 +331,12 @@ class AniDB:
         }
 
         # Add or update work
-        work, created = Work.objects.update_or_create(category=self.anime_category,
-                                                      anidb_aid=anidb_aid,
-                                                      defaults=anime)
+        try:
+            work, created = Work.objects.update_or_create(category=self.anime_category,
+                                                          anidb_aid=anidb_aid,
+                                                          defaults=anime)
+        except MultipleObjectsReturned:
+            return None
 
         # Add new creators
         for nc in creators:
