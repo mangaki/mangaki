@@ -408,11 +408,12 @@ class AniDB:
 
     def get_or_update_work(self,
                            anidb_aid: int,
-                           reload_lang_cache: bool = False) -> Work:
+                           reload_lang_cache: bool = False,
+                           reload_role_cache: bool = False) -> Work:
         """
         Use `get_dict` internally to create (in the database) the bunch of objects you need to create a work.
 
-        Cache internally intermediate models objects (e.g. Language, ExtLanguage, Category)
+        Cache internally intermediate models objects (e.g. Language, ExtLanguage, Category, Role)
 
         This won't return already existing WorkTitle attached to the Work object.
 
@@ -420,30 +421,26 @@ class AniDB:
         :type anidb_aid: integer
         :param reload_lang_cache: forcefully reload the ExtLanguage cache,
             if it has changed since the instantiation of the AniDB client (default: false).
+        :param reload_role_cache: forcefully reload the Role cache,
+            if it has changed since the instantiation of the AniDB client (default: false).
         :type reload_lang_cache: boolean
+        :type reload_role_cache: boolean
         :return: the Work object related to the AniDB ID passed in parameter.
         :rtype: a `mangaki.models.Work` object.
         """
 
         anime = self.get_xml(anidb_aid)
 
-        anime_restricted = anime.get('restricted') == 'true'
-        all_titles = anime.titles
-        all_creators = anime.creators
-        all_tags = anime.tags
-        all_related_animes = anime.relatedanime
-
-        # Handling of titles
-        titles, main_title = self.get_titles(titles_soup=all_titles)
-
-        # Handling of staff and studio
-        creators, studio = self.get_creators(creators_soup=all_creators)
+        titles, main_title = self.get_titles(titles_soup=anime.titles)
+        creators, studio = self.get_creators(creators_soup=anime.creators)
+        tags = self.get_tags(tags_soup=anime.tags)
+        related_animes = self.get_related_animes(related_animes_soup=anime.relatedanime)
 
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
-            'nsfw': anime_restricted,
+            'nsfw': anime.get('restricted') == 'true',
             'date': to_python_datetime(anime.startdate.string),
             'end_date': to_python_datetime(anime.enddate.string),
             'ext_synopsis': str(anime.description.string) if anime.description else '',
@@ -453,33 +450,24 @@ class AniDB:
             'studio': studio
         }
 
-        # Add or update work
         work, created = Work.objects.update_or_create(category=self.anime_category,
                                                       anidb_aid=anidb_aid,
                                                       defaults=anime)
 
-        # Add staff for this work to the database
-        self._build_staff(work, creators)
-
-        # Add tags for this work to the database
-        tags = self.get_tags(tags_soup=all_tags)
+        self._build_work_titles(work, titles, reload_lang_cache)
+        self._build_staff(work, creators, reload_role_cache)
         self.update_tags(work, tags)
 
-        # Check for NSFW based on tags if this work is new
         if created and work.is_nsfw_based_on_tags(tags):
             work.nsfw = True
             work.save()
 
-        # Add alternative titles for this work to the database
-        self._build_work_titles(work, titles, reload_lang_cache)
-
-        # Add the correct relations to this work in the database
         if created:
-            related_animes = self.get_related_animes(related_animes_soup=all_related_animes)
             self._build_related_animes(work, related_animes)
 
         return work
 
 client = AniDB(
     getattr(settings, 'ANIDB_CLIENT', None),
-    getattr(settings, 'ANIDB_VERSION', None))
+    getattr(settings, 'ANIDB_VERSION', None)
+)
