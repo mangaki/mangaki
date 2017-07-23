@@ -212,20 +212,16 @@ class AniListWorks(Enum):
 
 
 class AniListUserWork:
-    __slots__ = ['title', 'poster', 'anilist_id', 'score']
+    __slots__ = ['work', 'score']
 
     def __init__(self,
-                 title: str,
-                 poster: str,
-                 anilist_id: int,
+                 work: AniListEntry,
                  score: int):
-        self.title = title
-        self.poster = poster
-        self.anilist_id = anilist_id
+        self.work = work
         self.score = score
 
     def __hash__(self):
-        return hash(self.anilist_id)
+        return hash(self.work.anilist_id)
 
 
 class AniList:
@@ -375,9 +371,7 @@ class AniList:
             for list_entry in data['lists'][list_type]:
                 try:
                     yield AniListUserWork(
-                        anilist_id=int(list_entry['series_id']),
-                        title=list_entry[worktype.value]['title_romaji'],
-                        poster=list_entry[worktype.value]['image_url_lge'],
+                        work=AniListEntry(list_entry[worktype.value], worktype),
                         score=int(list_entry['score'])
                     )
                 except KeyError:
