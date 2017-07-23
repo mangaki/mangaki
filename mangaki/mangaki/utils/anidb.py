@@ -106,6 +106,10 @@ class AniDB:
         }
 
     @cached_property
+    def role_map(self) -> Dict[str, Role]:
+        return {role.slug: role for role in Role.objects.all()}
+
+    @cached_property
     def unknown_language(self) -> ExtLanguage:
         return ExtLanguage.objects.get(source='anidb', ext_lang='x-unk')
 
@@ -114,7 +118,6 @@ class AniDB:
                            titles: Dict[str, Dict[str, str]],
                            reload_lang_cache: bool = False) -> List[WorkTitle]:
         if reload_lang_cache:
-            # noinspection PyPropertyAccess
             del self.lang_map
 
         work_titles = []
@@ -190,20 +193,18 @@ class AniDB:
 
         creators = []
         studio = None
-        # FIXME: cache this query
-        staff_map = dict(Role.objects.values_list('slug', 'pk'))
         for creator_node in creators_soup.find_all('name'):
             creator = str(creator_node.string).strip()
             creator_id = creator_node.get('id')
             creator_type = creator_node.get('type')
-            staff_id = None
+            role_slug = None
 
             if creator_type == 'Direction':
-                staff_id = 'director'
+                role_slug = 'director'
             elif creator_type == 'Music':
-                staff_id = 'composer'
+                role_slug = 'composer'
             elif creator_type == 'Original Work' or creator_type == 'Story Composition':
-                staff_id = 'author'
+                role_slug = 'author'
             elif creator_type == 'Animation Work' or creator_type == 'Work':
                 # AniDB marks Studio as such a creator's type
                 studio = Studio.objects.filter(title=creator).first()
@@ -211,9 +212,9 @@ class AniDB:
                     studio = Studio(title=creator)
                     studio.save()
 
-            if staff_id is not None:
+            if role_slug is not None:
                 creators.append({
-                    "role_id": staff_map[staff_id],
+                    "role_id": self.role_map.get(role_slug),
                     "name": creator,
                     "anidb_creator_id": creator_id
                 })
@@ -222,7 +223,11 @@ class AniDB:
 
     def _build_staff(self,
                      work: Work,
-                     creators: List[Dict[str, Any]]) -> List[Staff]:
+                     creators: List[Dict[str, Any]],
+                     reload_role_cache: bool = False) -> List[Staff]:
+        if reload_role_cache:
+            del self.role_map
+
         artists_to_add = []
         artists_list = []
         for nc in creators:
