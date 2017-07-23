@@ -181,7 +181,6 @@ class AniListRichEntry(AniListEntry):
     def studio(self) -> Optional[str]:
         if self.work_info.get('studio'):
             for studio in self.work_info.get('studio'):
-                # FIXME: Mangaki should handle animes with more than 1 studio
                 if studio['main_studio'] == 1:
                     return studio['studio_name']
         return None
@@ -297,7 +296,17 @@ class AniList:
         if r.status_code == 404:
             return None
         r.raise_for_status()
-        return r.json()
+
+        data = r.json()
+        # Check if data is a list of JSON objects
+        if isinstance(data, list):
+            return data
+        # Check if data is a single JSON object
+        else:
+            # Check that the JSON return is not an error (eg. No Results)
+            if data.get('error'):
+                return None
+        return data
 
     def list_seasonal_animes(self,
                              *,
@@ -334,6 +343,24 @@ class AniList:
 
         if data:
             return AniListRichEntry(data, AniListWorks.animes)
+        return None
+
+    def get_work_by_title(self,
+                          worktype: AniListWorks,
+                          title: str) -> AniListEntry:
+        """
+        Search a work by title on AniList and returns the first result if there
+        are results, or None if there are no results.
+        AniList searches a work by romaji, English or Japanese title and even
+        by synonym titles.
+        """
+        data = self._request(
+            '{worktype}/search/{title}',
+            {'worktype': worktype.value, 'title': title}
+        )
+
+        if data:
+            return AniListEntry(data[0], AniListWorks.animes)
         return None
 
     def get_user_list(self,

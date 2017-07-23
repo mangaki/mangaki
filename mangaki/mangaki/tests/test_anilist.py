@@ -76,6 +76,7 @@ class AniListTest(TestCase):
                 self.assertEqual(anime.media_type, 'TV')
                 self.assertEqual(anime.start_date, datetime(2017, 7, 7))
                 self.assertIsNone(anime.end_date)
+                self.assertIsNone(anime.description)
                 self.assertEqual(anime.synonyms, [])
                 self.assertEqual(anime.genres, ['Adventure', 'Fantasy', 'Sci-Fi'])
                 self.assertFalse(anime.is_nsfw)
@@ -116,7 +117,33 @@ class AniListTest(TestCase):
         )
 
         inexistant_work = self.anilist.get_work_by_id(AniListWorks.animes, 99999999999)
-        self.assertIs(inexistant_work, None)
+        self.assertIsNone(inexistant_work)
+
+    @responses.activate
+    def test_get_work_by_title(self):
+        self.add_fake_auth()
+
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'anime/search/Hibike!'),
+            body=self.read_fixture('anilist/hibike_euphonium_search.json'),
+            status=200, content_type='application/json'
+        )
+
+        hibike = self.anilist.get_work_by_title(AniListWorks.animes, 'Hibike!')
+
+        self.assertEqual(hibike.english_title, 'Sound! Euphonium')
+        self.assertEqual(hibike.japanese_title, '響け！ユーフォニアム')
+
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'anime/search/no%20such%20anime'),
+            body='',
+            status=404, content_type='application/json'
+        )
+
+        inexistant_work = self.anilist.get_work_by_title(AniListWorks.animes, 'no such anime')
+        self.assertIsNone(inexistant_work)
 
     @responses.activate
     def test_get_userlist(self):
