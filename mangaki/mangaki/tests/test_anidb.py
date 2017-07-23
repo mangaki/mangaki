@@ -103,6 +103,23 @@ class AniDBTest(TestCase):
         self.assertEqual(artist.first().anidb_creator_id, 59)
 
     @responses.activate
+    def test_anidb_duplicate_anime_id(self):
+        for _ in range(2):
+            responses.add(
+                responses.GET,
+                AniDB.BASE_URL,
+                body=self.read_fixture('anidb/hibike_euphonium.xml'),
+                status=200,
+                content_type='application/xml'
+            )
+
+        self.create_anime(title='Hibike! Euphonium', anidb_aid=10889)
+        self.create_anime(title='Hibike! Euphonium Duplicate', anidb_aid=10889)
+
+        self.anidb.get_or_update_work(10889)
+        self.assertIs(self.anidb.get_or_update_work(10889), None)
+
+    @responses.activate
     def test_anidb_nsfw(self):
         animes = {}
 
