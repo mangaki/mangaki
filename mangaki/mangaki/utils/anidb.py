@@ -113,6 +113,39 @@ class AniDB:
     def unknown_language(self) -> ExtLanguage:
         return ExtLanguage.objects.get(source='anidb', ext_lang='x-unk')
 
+    def get_xml(self, anidb_aid: int):
+        anidb_aid = int(anidb_aid)
+
+        r = self._request("anime", {'aid': anidb_aid})
+        soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')
+        if soup.error is not None:
+            raise Exception(soup.error.string)
+
+        return soup.anime
+
+    def get_titles(self, anidb_aid=None, titles_soup=None):
+        if anidb_aid is not None:
+            anime = self.get_xml(anidb_aid)
+            titles_soup = anime.titles
+
+        main_title = None
+        titles = []
+        for title_node in titles_soup.find_all('title'):
+            title = str(title_node.string).strip()
+            lang = title_node.get('xml:lang')
+            title_type = title_node.get('type')
+
+            titles.append({
+                'title': title,
+                'lang': lang,
+                'type': title_type
+            })
+
+            if title_type == 'main':
+                main_title = title
+
+        return titles, main_title
+
     def _build_work_titles(self,
                            work: Work,
                            titles: Dict[str, Dict[str, str]],
@@ -152,39 +185,6 @@ class AniDB:
         WorkTitle.objects.bulk_create(missing_titles)
 
         return missing_titles
-
-    def get_xml(self, anidb_aid: int):
-        anidb_aid = int(anidb_aid)
-
-        r = self._request("anime", {'aid': anidb_aid})
-        soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')
-        if soup.error is not None:
-            raise Exception(soup.error.string)
-
-        return soup.anime
-
-    def get_titles(self, anidb_aid=None, titles_soup=None):
-        if anidb_aid is not None:
-            anime = self.get_xml(anidb_aid)
-            titles_soup = anime.titles
-
-        main_title = None
-        titles = []
-        for title_node in titles_soup.find_all('title'):
-            title = str(title_node.string).strip()
-            lang = title_node.get('xml:lang')
-            title_type = title_node.get('type')
-
-            titles.append({
-                'title': title,
-                'lang': lang,
-                'type': title_type
-            })
-
-            if title_type == 'main':
-                main_title = title
-
-        return titles, main_title
 
     def get_creators(self, anidb_aid=None, creators_soup=None):
         if anidb_aid is not None:
