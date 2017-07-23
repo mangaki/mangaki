@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Tuple, Optional, Any
 from urllib.parse import urljoin
 
 import requests
@@ -97,14 +97,8 @@ class AniDB:
 
     @cached_property
     def lang_map(self) -> Dict[str, ExtLanguage]:
-        ext_langs = (
-            ExtLanguage.objects.filter(source='anidb')
-            .select_related('lang')
-        )
-
-        return {
-            ext.lang.code: ext for ext in ext_langs
-        }
+        ext_langs = ExtLanguage.objects.filter(source='anidb').select_related('lang')
+        return {ext.lang.code: ext for ext in ext_langs}
 
     @cached_property
     def role_map(self) -> Dict[str, Role]:
@@ -115,6 +109,7 @@ class AniDB:
         return ExtLanguage.objects.get(source='anidb', ext_lang='x-unk')
 
     def get_xml(self, anidb_aid: int):
+        """Return the XML file for an anime from AniDB given its AniDB ID"""
         anidb_aid = int(anidb_aid)
 
         r = self._request("anime", {'aid': anidb_aid})
@@ -124,7 +119,14 @@ class AniDB:
 
         return soup.anime
 
-    def get_titles(self, anidb_aid=None, titles_soup=None):
+    def get_titles(self,
+                   anidb_aid: Optional[int] = None,
+                   titles_soup: Optional[str] = None) -> Tuple[List[Dict[str, str]], str]:
+        """ Get the list of titles and the main title for an anime given the the
+        AniDB ID or the XML string containing titles.
+
+        Return : List[{'title': str, 'lang': str, 'type': str}], str
+        """
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
             titles_soup = anime.titles
@@ -187,38 +189,46 @@ class AniDB:
 
         return missing_titles
 
-    def get_creators(self, anidb_aid=None, creators_soup=None):
+    def get_creators(self,
+                     anidb_aid: Optional[int] = None,
+                     creators_soup: Optional[str] = None) -> Tuple[List[Dict[str, Any]], Studio]:
+        """ Get the list of staff and the studio for an anime given the the
+        AniDB ID or the XML string containing creators.
+
+        Return : List[{'role': Role, 'name': str, 'anidb_creator_id': int}], Studio
+        """
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
             creators_soup = anime.creators
 
         creators = []
         studio = None
-        for creator_node in creators_soup.find_all('name'):
-            creator = str(creator_node.string).strip()
-            creator_id = creator_node.get('id')
-            creator_type = creator_node.get('type')
-            role_slug = None
+        if creators_soup is not None:
+            for creator_node in creators_soup.find_all('name'):
+                creator_name = str(creator_node.string).strip()
+                creator_id = creator_node.get('id')
+                creator_type = creator_node.get('type')
+                role_slug = None
 
-            if creator_type == 'Direction':
-                role_slug = 'director'
-            elif creator_type == 'Music':
-                role_slug = 'composer'
-            elif creator_type == 'Original Work' or creator_type == 'Story Composition':
-                role_slug = 'author'
-            elif creator_type == 'Animation Work' or creator_type == 'Work':
-                # AniDB marks Studio as such a creator's type
-                studio = Studio.objects.filter(title=creator).first()
-                if studio is None:
-                    studio = Studio(title=creator)
-                    studio.save()
+                if creator_type == 'Direction':
+                    role_slug = 'director'
+                elif creator_type == 'Music':
+                    role_slug = 'composer'
+                elif creator_type == 'Original Work' or creator_type == 'Story Composition':
+                    role_slug = 'author'
+                elif creator_type == 'Animation Work' or creator_type == 'Work':
+                    # AniDB marks Studio as such a creator's type
+                    studio = Studio.objects.filter(title=creator_name).first()
+                    if studio is None:
+                        studio = Studio(title=creator_name)
+                        studio.save()
 
-            if role_slug is not None:
-                creators.append({
-                    "role": self.role_map.get(role_slug),
-                    "name": creator,
-                    "anidb_creator_id": creator_id
-                })
+                if role_slug is not None:
+                    creators.append({
+                        'role': self.role_map.get(role_slug),
+                        'name': creator_name,
+                        'anidb_creator_id': creator_id
+                    })
 
         return creators, studio
 
@@ -269,7 +279,14 @@ class AniDB:
         Staff.objects.bulk_create(missing_staff)
         return missing_staff
 
-    def get_tags(self, anidb_aid=None, tags_soup=None):
+    def get_tags(self,
+                 anidb_aid: Optional[int] = None,
+                 tags_soup: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+        """ Get the list of tags for an anime given the the AniDB ID or the XML
+        string containing tags.
+
+        Return : Dict[tag_title: {'weight': int, 'anidb_tag_id': int}]
+        """
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
             tags_soup = anime.tags
@@ -283,7 +300,7 @@ class AniDB:
                 tag_verified = tag_node.get('verified').lower() == 'true'
 
                 if tag_verified:
-                    tags[tag_title] = {"weight": tag_weight, "anidb_tag_id": tag_id}
+                    tags[tag_title] = {'weight': tag_weight, 'anidb_tag_id': tag_id}
 
         return tags
 
@@ -343,7 +360,17 @@ class AniDB:
         # Finally, remove a tag from a work if it no longer exists on AniDB's side
         TaggedWork.objects.filter(work=work, tag__title__in=deleted_tags_keys).delete()
 
-    def get_related_animes(self, anidb_aid=None, related_animes_soup=None):
+    def get_related_animes(self,
+                           anidb_aid: Optional[int] = None,
+                           related_animes_soup: Optional[str] = None) -> Dict[int, Dict[str, str]]:
+        """ Get the list of related animes given the the AniDB ID or the XML
+        string containing related animes.
+
+        Return : Dict[related_anime_id: {'title': str, 'type': str}]
+
+        relation type is one of 'prequel', 'sequel', 'summary', 'side_story',
+        'parent_story', 'alternative_setting', 'same_setting' or 'other'
+        """
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
             related_animes_soup = anime.relatedanime
