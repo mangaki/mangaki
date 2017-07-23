@@ -214,7 +214,7 @@ class AniDB:
 
             if role_slug is not None:
                 creators.append({
-                    "role_id": self.role_map.get(role_slug),
+                    "role": self.role_map.get(role_slug),
                     "name": creator,
                     "anidb_creator_id": creator_id
                 })
@@ -229,7 +229,7 @@ class AniDB:
             del self.role_map
 
         artists_to_add = []
-        artists_list = []
+        artists = []
         for nc in creators:
             artist = Artist.objects.filter(Q(name=nc["name"]) | Q(anidb_creator_id=nc["anidb_creator_id"])).first()
 
@@ -240,18 +240,33 @@ class AniDB:
                 artist.name = nc["name"]
                 artist.anidb_creator_id = nc["anidb_creator_id"]
                 artist.save()
-            artists_list.append(artist)
+                artists.append(artist)
 
-        Artist.objects.bulk_create(artists_to_add)
+        artists.extend(Artist.objects.bulk_create(artists_to_add))
 
-        staffs_to_add = []
+        staffs = []
         for index, nc in enumerate(creators):
-            staff = Staff.objects.filter(work=work, role_id=nc["role_id"], artist=artists_list[index]).first()
-            if not staff: # This staff does not yet exist : will be bulk created
-                new_staff = Staff(work=work, role_id=nc["role_id"], artist=artists_list[index])
-                staffs_to_add.append(new_staff)
+            staffs.append(
+                Staff(
+                    work=work,
+                    role=nc["role"],
+                    artist=artists[index]
+                )
+            )
 
-        Staff.objects.bulk_create(staffs_to_add)
+        existing_staff = set(Staff.objects
+                            .filter(work=work,
+                                    role__in=[nc["role"] for nc in creators],
+                                    artist__in=[artist for artist in artists])
+                            .values_list('work', 'role', 'artist'))
+
+        missing_staff = [
+            staff for staff in staffs
+            if (staff.work, staff.role, staff.artist) not in existing_staff
+        ]
+
+        Staff.objects.bulk_create(missing_staff)
+        return missing_staff
 
     def get_tags(self, anidb_aid=None, tags_soup=None):
         if anidb_aid is not None:
