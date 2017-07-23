@@ -86,6 +86,39 @@ class AniListTest(TestCase):
                 break
 
     @responses.activate
+    def test_get_work_by_id(self):
+        self.add_fake_auth()
+
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'anime/20912/page'),
+            body=self.read_fixture('anilist/hibike_euphonium.json'),
+            status=200, content_type='application/json'
+        )
+
+        hibike = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
+
+        self.assertEqual(hibike.english_title, 'Sound! Euphonium')
+        self.assertEqual(hibike.japanese_title, '響け！ユーフォニアム')
+        self.assertEqual(hibike.studio, 'Kyoto Animation')
+        self.assertEqual(hibike.episode_length, 24)
+
+        self.assertEqual(hibike.youtube_url, 'https://www.youtube.com/watch?v=r_Kk9xhVkB8')
+        self.assertEqual(hibike.crunchyroll_url, 'http://www.crunchyroll.com/sound-euphonium')
+        self.assertEqual(hibike.twitter_url, 'https://twitter.com/anime_eupho')
+        self.assertEqual(hibike.official_url, 'http://anime-eupho.com/')
+
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'anime/99999999999/page'),
+            body='',
+            status=404, content_type='application/json'
+        )
+
+        inexistant_work = self.anilist.get_work_by_id(AniListWorks.animes, 99999999999)
+        self.assertIs(inexistant_work, None)
+
+    @responses.activate
     def test_get_userlist(self):
         self.add_fake_auth()
 

@@ -173,6 +173,10 @@ class AniListEntry:
 
 
 class AniListRichEntry(AniListEntry):
+    def __init__(self, work_info, work_type: AniListWorks):
+        super().__init__(work_info, work_type)
+        self._build_external_links()
+
     @property
     def studio(self) -> Optional[str]:
         if self.work_info.get('studio'):
@@ -188,8 +192,7 @@ class AniListRichEntry(AniListEntry):
             return 'https://www.youtube.com/watch?v={}'.format(self.work_info['youtube_id'])
         return None
 
-    @property
-    def external_links(self) -> Optional[str]:
+    def _build_external_links(self):
         if self.work_info.get('external_links'):
             for link in self.work_info.get('external_links'):
                 if link['site'] == 'Crunchyroll':
@@ -198,7 +201,6 @@ class AniListRichEntry(AniListEntry):
                     self.twitter_url = link['url']
                 elif link['site'] == 'Official Site':
                     self.official_url = link['url']
-        return None
 
     @property
     def relations(self):
@@ -292,6 +294,8 @@ class AniList:
             query_params = {}
 
         r = self._session.get(urljoin(self.BASE_URL, datapage.format(**params)), params=query_params)
+        if r.status_code == 404:
+            return None
         r.raise_for_status()
         return r.json()
 
@@ -313,6 +317,24 @@ class AniList:
         data = self._request('browse/anime', query_params=query_params)
         for anime_info in data:
             yield AniListEntry(anime_info, AniListWorks.animes)
+
+    def get_work_by_id(self,
+                       worktype: AniListWorks,
+                       id: int) -> AniListRichEntry:
+        """
+        Search a work by ID on AniList and returns a rich entry if the ID exists,
+        or None if there are no results.
+        A rich entry has informations about characters, staff, studio and even
+        related works.
+        """
+        data = self._request(
+            '{worktype}/{id}/page',
+            {'worktype': worktype.value, 'id': id}
+        )
+
+        if data:
+            return AniListRichEntry(data, AniListWorks.animes)
+        return None
 
     def get_user_list(self,
                       worktype: AniListWorks,
