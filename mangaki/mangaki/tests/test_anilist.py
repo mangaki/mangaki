@@ -82,7 +82,7 @@ class AniListTest(TestCase):
                 self.assertEqual(anime.poster_url, 'https://cdn.anilist.co/img/dir/anime/reg/97986-ZL0DkAyNWyxG.jpg')
                 self.assertEqual(anime.nb_episodes, 13)
                 self.assertEqual(anime.status, AniListStatus.airing)
-                self.assertEqual(anime.tags[1], {'anilist_tag_id': 175, 'name': 'Robots', 'spoiler': False})
+                self.assertEqual(anime.tags[1], {'anilist_tag_id': 175, 'name': 'Robots', 'spoiler': False, 'votes': 53})
                 break
 
     @responses.activate

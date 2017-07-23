@@ -65,91 +65,103 @@ class AniListStatus(Enum):
 
 
 class AniListEntry:
-    def __init__(self, anime_info, work_type: AniListWorks):
-        self.anime_info = anime_info
+    def __init__(self, work_info, work_type: AniListWorks):
+        self.work_info = work_info
         self.work_type = work_type
 
-        if self.anime_info['series_type'] != work_type.value:
+        if self.work_info['series_type'] != work_type.value:
             raise ValueError('AniList data not from {}'.format(work_type.value))
 
     @property
     def anilist_id(self) -> int:
-        return self.anime_info['id']
+        return self.work_info['id']
 
     @property
     def title(self) -> str:
-        return self.anime_info['title_romaji']
+        return self.work_info['title_romaji']
 
     @property
     def english_title(self) -> str:
-        return self.anime_info['title_english']
+        return self.work_info['title_english']
 
     @property
     def japanese_title(self) -> str:
-        return self.anime_info['title_japanese']
+        return self.work_info['title_japanese']
 
     @property
     def media_type(self) -> str:
-        return self.anime_info['type']
+        return self.work_info['type']
 
     @property
     def start_date(self) -> Optional[datetime]:
-        if self.anime_info['start_date_fuzzy']:
-            return to_python_datetime(self.anime_info['start_date_fuzzy'])
+        if self.work_info['start_date_fuzzy']:
+            return to_python_datetime(self.work_info['start_date_fuzzy'])
         return None
 
     @property
     def end_date(self) -> Optional[datetime]:
-        if self.anime_info['end_date_fuzzy']:
-            return to_python_datetime(self.anime_info['end_date_fuzzy'])
+        if self.work_info['end_date_fuzzy']:
+            return to_python_datetime(self.work_info['end_date_fuzzy'])
         return None
 
     @property
+    def description(self) -> Optional[str]:
+        return self.work_info.get('description')
+
+    @property
     def synonyms(self) -> List[str]:
-        return list(filter(None, self.anime_info['synonyms']))
+        return list(filter(None, self.work_info['synonyms']))
 
     @property
     def genres(self) -> List[str]:
-        return list(filter(None, self.anime_info['genres']))
+        return list(filter(None, self.work_info['genres']))
 
     @property
     def is_nsfw(self) -> bool:
-        return self.anime_info['adult']
+        return self.work_info['adult']
 
     @property
     def poster_url(self) -> str:
-        return self.anime_info['image_url_lge']
+        return self.work_info['image_url_lge']
 
     @property
     def nb_episodes(self) -> Optional[int]:
         if self.work_type == AniListWorks.animes:
-            return self.anime_info['total_episodes']
+            return self.work_info['total_episodes']
+        return None
+
+    @property
+    def episode_length(self) -> Optional[int]:
+        if self.work_type == AniListWorks.animes:
+            return self.work_info.get('duration')
         return None
 
     @property
     def nb_chapters(self) -> Optional[int]:
         if self.work_type == AniListWorks.mangas:
-            return self.anime_info['total_chapters']
+            return self.work_info['total_chapters']
         return None
 
     @property
     def status(self) -> Optional[AniListStatus]:
         if self.work_type == AniListWorks.animes:
-            return AniListStatus(self.anime_info['airing_status'])
+            return AniListStatus(self.work_info['airing_status'])
         elif self.work_type == AniListWorks.mangas:
-            return AniListStatus(self.anime_info['publishing_status'])
-        else:
-            return None
+            return AniListStatus(self.work_info['publishing_status'])
+        return None
 
     @property
-    def tags(self) -> List[Dict[str, Any]]:
-        return [
-            {
-                'name': tag['name'],
-                'anilist_tag_id': tag['id'],
-                'spoiler': tag['spoiler'] or tag['series_spoiler']
-            } for tag in self.anime_info['tags']
-        ]
+    def tags(self) -> Optional[List[Dict[str, Any]]]:
+        if self.work_info.get('tags'):
+            return [
+                {
+                    'name': tag['name'],
+                    'anilist_tag_id': tag['id'],
+                    'spoiler': tag['spoiler'] or tag['series_spoiler'],
+                    'votes': tag['votes']
+                } for tag in self.work_info['tags']
+            ]
+        return None
 
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
@@ -158,6 +170,39 @@ class AniListEntry:
             self.title,
             self.status.value
         )
+
+
+class AniListRichEntry(AniListEntry):
+    @property
+    def studio(self) -> Optional[str]:
+        if self.work_info.get('studio'):
+            for studio in self.work_info.get('studio'):
+                # FIXME: Mangaki should handle animes with more than 1 studio
+                if studio['main_studio'] == 1:
+                    return studio['studio_name']
+        return None
+
+    @property
+    def youtube_url(self) -> Optional[str]:
+        if self.work_info.get('youtube_id'):
+            return 'https://www.youtube.com/watch?v={}'.format(self.work_info['youtube_id'])
+        return None
+
+    @property
+    def external_links(self) -> Optional[str]:
+        if self.work_info.get('external_links'):
+            for link in self.work_info.get('external_links'):
+                if link['site'] == 'Crunchyroll':
+                    self.crunchyroll_url = link['url']
+                elif link['site'] == 'Twitter':
+                    self.twitter_url = link['url']
+                elif link['site'] == 'Official Site':
+                    self.official_url = link['url']
+        return None
+
+    @property
+    def relations(self):
+        pass
 
 
 class AniListWorks(Enum):
