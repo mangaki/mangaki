@@ -13,6 +13,7 @@ from mangaki.utils.als import MangakiALS
 from mangaki.utils.knn import MangakiKNN
 from mangaki.utils.svd import MangakiSVD
 from mangaki.utils.pca import MangakiPCA
+from mangaki.utils.gbr import MangakiGBR
 from mangaki.utils.zero import MangakiZero
 from mangaki.utils.values import rating_values
 import logging
@@ -47,6 +48,7 @@ class Experiment(object):
             lambda: MangakiPCA(20),
             lambda: MangakiKNN(20),
             lambda: MangakiKNN(40),
+            lambda: MangakiGBR(20),
             lambda: MangakiZero()
         ]
         self.anonymized = None
