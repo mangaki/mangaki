@@ -18,15 +18,25 @@ class Command(BaseCommand):
     Le format du JSON est le même que pour illustration2vec !
     """
 
-    args = ''
     help = 'AniDB tags to JSON'
 
+    def add_arguments(self, parser):
+        parser.add_argument('work_id', nargs='+', type=int)
+
     def handle(self, *args, **options):
-        works = Work.objects.all().order_by('pk')
+        if options['work_id']:
+            works = Work.objects.filter(pk__in=options['work_id']).order_by('pk')
+        else:
+            works = Work.objects.all().order_by('pk')
+
+        if works.count() == 0:
+            logging.info('No works to process ...')
+            return
+
         final_tags = {}
         all_tags = set()
 
-        count = Work.objects.exclude(anidb_aid=0).count()
+        count = works.exclude(anidb_aid=0).count()
         logging.info('Number of works with AniDB AID : '+str(count)+'\n')
 
         for work in works:
