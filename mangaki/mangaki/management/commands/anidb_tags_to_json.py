@@ -21,7 +21,7 @@ class Command(BaseCommand):
     help = 'AniDB tags to JSON'
 
     def add_arguments(self, parser):
-        parser.add_argument('work_id', nargs='+', type=int)
+        parser.add_argument('work_id', nargs='*', type=int)
 
     def handle(self, *args, **options):
         if options['work_id']:
