@@ -86,9 +86,14 @@
                             </a>
                         </li>
                         <li class="dropdown">
-                            <a href="{% url 'top' 'directors' %}">
-                                {% trans "Top 20" %}
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                {% trans "Top 20" %} <span class="caret"></span>
                             </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'top' 'directors' %}">{% trans "Directeurs" %}</a></li>
+                                <li><a href="{% url 'top' 'composers' %}">{% trans "Compositeurs" %}</a></li>
+                                <li><a href="{% url 'top' 'authors' %}">{% trans "Auteurs" %}</a></li>
+                            </ul>
                         </li>
                     </ul>
 
