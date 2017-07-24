@@ -338,7 +338,7 @@ class AniList:
         )
 
         if data:
-            return AniListRichEntry(data, AniListWorks.animes)
+            return AniListRichEntry(data, worktype)
         return None
 
     def get_work_by_title(self,
@@ -356,7 +356,7 @@ class AniList:
         )
 
         if data:
-            return AniListEntry(data[0], AniListWorks.animes)
+            return AniListEntry(data[0], worktype)
         return None
 
     def get_user_list(self,
