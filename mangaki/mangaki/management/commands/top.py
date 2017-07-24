@@ -1,5 +1,4 @@
 from collections import Counter
-import logging
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -29,7 +28,7 @@ class Command(BaseCommand):
             categories = {'director', 'composer', 'author'}
 
         for category in categories:
-            logging.info('Refreshing top for {}s'.format(category))
+            self.stdout.write('Refreshing top for {}s'.format(category))
 
             c = Counter()
             values = {'favorite': 10, 'like': 2, 'neutral': 0.5, 'dislike': -1}
@@ -64,3 +63,5 @@ class Command(BaseCommand):
                 ) for (artist_id, score) in c.most_common(20)
             ])
             chrono.save('get results')
+
+            self.stdout.write(self.style.SUCCESS('Refreshed top for {}s'.format(category)))
