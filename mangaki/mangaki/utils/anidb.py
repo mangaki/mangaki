@@ -110,7 +110,6 @@ class AniDB:
 
     def get_xml(self, anidb_aid: int):
         """Return the XML file for an anime from AniDB given its AniDB ID"""
-        anidb_aid = int(anidb_aid)
 
         r = self._request("anime", {'aid': anidb_aid})
         soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')
