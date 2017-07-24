@@ -289,19 +289,18 @@ class AniList:
             query_params = {}
 
         r = self._session.get(urljoin(self.BASE_URL, datapage.format(**params)), params=query_params)
-        if r.status_code == 404:
-            return None
-        r.raise_for_status()
-
         data = r.json()
-        # Check if data is a list of JSON objects
-        if isinstance(data, list):
-            return data
-        # Check if data is a single JSON object
-        else:
-            # Check that the JSON return is not an error (eg. No Results)
-            if data.get('error'):
-                return None
+
+        if r.status_code == 200 or r.status_code == 404:
+            if not isinstance(data, list):
+                if data.get('error'):
+                    if data['error'].get('messages'):
+                        for message in data['error'].get('messages'):
+                            message = message.lower()
+                            if 'no query results' in message or 'no results' in message:
+                                return None
+
+        r.raise_for_status()
         return data
 
     def list_seasonal_animes(self,
@@ -367,15 +366,18 @@ class AniList:
             {'username': username, 'worktype': worktype.value}
         )
 
-        for list_type in data['lists']:
-            for list_entry in data['lists'][list_type]:
-                try:
-                    yield AniListUserWork(
-                        work=AniListEntry(list_entry[worktype.value], worktype),
-                        score=int(list_entry['score'])
-                    )
-                except KeyError:
-                    raise RuntimeError('Malformed JSON, or AniList changed their API.')
+        if not data:
+            yield None
+        else:
+            for list_type in data['lists']:
+                for list_entry in data['lists'][list_type]:
+                    try:
+                        yield AniListUserWork(
+                            work=AniListEntry(list_entry[worktype.value], worktype),
+                            score=int(list_entry['score'])
+                        )
+                    except KeyError:
+                        raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
 client = AniList(
     getattr(settings, 'ANILIST_CLIENT', None),

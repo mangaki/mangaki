@@ -112,7 +112,7 @@ class AniListTest(TestCase):
         responses.add(
             responses.GET,
             urljoin(AniList.BASE_URL, 'anime/99999999999/page'),
-            body='',
+            body='{"error":{"status":404,"messages":["No query results for model [App/AniList/v1/Series/Series] 99999999999"]}}',
             status=404, content_type='application/json'
         )
 
@@ -138,8 +138,8 @@ class AniListTest(TestCase):
         responses.add(
             responses.GET,
             urljoin(AniList.BASE_URL, 'anime/search/no%20such%20anime'),
-            body='',
-            status=404, content_type='application/json'
+            body='{"error":{"status":200,"messages":["No Results."]}}',
+            status=200, content_type='application/json'
         )
 
         inexistant_work = self.anilist.get_work_by_title(AniListWorks.animes, 'no such anime')
@@ -164,3 +164,16 @@ class AniListTest(TestCase):
         manga_list = self.anilist.get_user_list(AniListWorks.mangas, 'mrsalixor')
         mangas = set(manga_list)
         self.assertEqual(len(mangas), 57)
+
+        for work_type in AniListWorks:
+            responses.add(
+                responses.GET,
+                urljoin(AniList.BASE_URL, 'user/aaaaaaaaaaaaa/{}list'.format(work_type.value)),
+                body='{"error":{"status":404,"messages":["No query results for model [App/AniList/v1/User/User] aaaaaaaaaaaaa"]}}',
+                status=404, content_type='application/json'
+            )
+
+        inexistant_user_animelist = set(self.anilist.get_user_list(AniListWorks.animes, 'aaaaaaaaaaaaa'))
+        inexistant_user_mangalist = set(self.anilist.get_user_list(AniListWorks.mangas, 'aaaaaaaaaaaaa'))
+        self.assertCountEqual(inexistant_user_animelist, {None})
+        self.assertCountEqual(inexistant_user_mangalist, {None})
