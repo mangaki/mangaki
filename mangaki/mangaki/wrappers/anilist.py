@@ -81,6 +81,7 @@ def is_token_error(anilist_error):
 
 class AniListException(Exception):
     def __init__(self, error):
+        super().__init__()
         if isinstance(error, dict):
             self.args = ['{} - {}'.format(k, v) for k, v in error.items()]
         else:
