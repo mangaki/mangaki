@@ -48,6 +48,47 @@ def to_anime_season(date):
     else:
         return 'fall'
 
+def is_no_results(anilist_error):
+    """
+    Return True is the error is a 'no results' error, False else
+    """
+    if isinstance(anilist_error, dict) and anilist_error.get('messages'):
+        for message in anilist_error['messages']:
+            message = message.lower()
+            if 'no query results' in message or 'no results' in message:
+                return True
+
+    return False
+
+def is_route_not_found(anilist_error):
+    """
+    Return True is the error is a 'no such API route found' error, False else
+    """
+    if isinstance(anilist_error, dict) and anilist_error.get('messages'):
+        for message in anilist_error['messages']:
+            message = message.lower()
+            if 'api route not found' in message:
+                return True
+
+    return False
+
+def is_token_error(anilist_error):
+    """
+    Return True is the error is a 'no token or token expired' error, False else
+    """
+    return anilist_error in ('unauthorized', 'access_denied')
+
+
+class AniListException(Exception):
+    def __init__(self, error):
+        if isinstance(error, dict):
+            self.args = ['{} - {}'.format(k, v) for k, v in error.items()]
+        else:
+            self.args = [error]
+
+    def __str__(self):
+        return ', '.join(self.args)
+
 
 class AniListWorks(Enum):
     animes = 'anime'
@@ -291,14 +332,15 @@ class AniList:
         r = self._session.get(urljoin(self.BASE_URL, datapage.format(**params)), params=query_params)
         data = r.json()
 
-        if r.status_code == 200 or r.status_code == 404:
-            if not isinstance(data, list):
-                if data.get('error'):
-                    if data['error'].get('messages'):
-                        for message in data['error'].get('messages'):
-                            message = message.lower()
-                            if 'no query results' in message or 'no results' in message:
-                                return None
+        if not isinstance(data, list) and data.get('error'):
+            if is_no_results(data['error']):
+                return None
+            elif is_route_not_found(data['error']):
+                raise AniListException('"{}" API route does not exist'.format(datapage))
+            elif is_token_error(data['error']):
+                raise AniListException('token no longer valid or not found')
+            else:
+                raise AniListException(data['error'])
 
         r.raise_for_status()
         return data

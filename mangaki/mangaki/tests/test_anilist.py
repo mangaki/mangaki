@@ -6,7 +6,7 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks
+from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks, AniListException
 
 
 class AniListTest(TestCase):
@@ -56,6 +56,40 @@ class AniListTest(TestCase):
         self.assertEqual(auth["token_type"], "Bearer")
         self.assertEqual(auth["expires_in"], 3600)
         self.assertEqual(auth["expires"], 946684800)
+
+    @responses.activate
+    def test_api_errors(self):
+        self.add_fake_auth()
+
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'unknown_route'),
+            body='{"error":{"status":404,"messages":["API route not found."]}}',
+            status=404, content_type='application/json'
+        )
+
+        with self.assertRaisesRegexp(AniListException, '"unknown_route" API route does not exist'):
+            self.anilist._request('unknown_route')
+
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'token_expired'),
+            body='{"error":"access_denied","error_description":"The resource owner or authorization server denied the request."}',
+            status=200, content_type='application/json'
+        )
+
+        with self.assertRaisesRegexp(AniListException, 'token no longer valid or not found'):
+            self.anilist._request('token_expired')
+
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'token_missing'),
+            body='{"status":401,"error":"unauthorized","error_message":"Access token is missing"}',
+            status=401, content_type='application/json'
+        )
+
+        with self.assertRaisesRegexp(AniListException, 'token no longer valid or not found'):
+            self.anilist._request('token_missing')
 
     @responses.activate
     def test_get_seasonal_anime(self):
