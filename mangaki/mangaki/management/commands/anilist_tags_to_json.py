@@ -3,9 +3,8 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from mangaki.wrappers.anilist import client, AniListWorks, AniListRichEntry
-from mangaki.models import Work, Tag, TaggedWork
-import logging
+from mangaki.wrappers.anilist import client, AniListWorks
+from mangaki.models import Work
 
 
 class Command(BaseCommand):
@@ -33,38 +32,41 @@ class Command(BaseCommand):
             works = Work.objects.all().order_by('pk')
 
         if works.count() == 0:
-            logging.info('No works to process ...')
+            self.stdout.write(self.style.WARNING('No works to process ...'))
             return
 
         final_tags = {}
         all_tags = set()
         missed_titles = {}
 
+        count = works.count()
+        self.stdout.write('Number of works : '+str(count)+'\n\n')
+
         for work in works:
             try:
-                if str(work.category) == 'Anime':
-                    anilist_search = client.get_work_by_title(AniListWorks.animes, work.title)
-                elif str(work.category) == 'Manga':
-                    anilist_search = client.get_work_by_title(AniListWorks.mangas, work.title)
-                else:
-                    missed_titles[work.id] = work.title
-                    logging.info('--- Could not match "'+str(work.title)+'" on AniList ---')
-                    continue
+                anilist_search = None
 
-                if str(work.category) == 'Anime' and anilist_search:
+                # Search the work by title on AniList
+                if work.category.slug == 'anime':
+                    anilist_search = client.get_work_by_title(AniListWorks.animes, work.title)
+                elif work.category.slug == 'manga':
+                    anilist_search = client.get_work_by_title(AniListWorks.mangas, work.title)
+
+                # Then seek the whole information of the work thanks to its ID, if possible
+                if work.category.slug == 'anime' and anilist_search:
                     anilist_result = client.get_work_by_id(AniListWorks.animes, anilist_search.anilist_id)
-                elif str(work.category) == 'Manga' and anilist_search:
+                elif work.category.slug == 'manga' and anilist_search:
                     anilist_result = client.get_work_by_id(AniListWorks.mangas, anilist_search.anilist_id)
                 else:
                     missed_titles[work.id] = work.title
-                    logging.info('--- Could not match "'+str(work.title)+'" on AniList ---')
+                    self.stdout.write(self.style.WARNING('Could not match "'+str(work.title)+'" on AniList'))
                     continue
             except Exception:
-                logging.error('--- Probably banned from AniList ---')
-                logging.error('--- Latest Work ID : '+str(work.pk)+' ---')
+                self.stderr.write(self.style.ERROR('Banned from AniList ...'))
+                self.stderr.write(self.style.ERROR('--- Latest Work ID : '+str(work.pk)+' ---'))
                 break
 
-            logging.info('> Working on : '+str(anilist_result.title))
+            self.stdout.write('> Working on : '+str(anilist_result.title))
 
             dict_key = '{}.jpg'.format(work.pk)
             tags_list = []
@@ -75,20 +77,21 @@ class Command(BaseCommand):
             for tag in anilist_result.tags:
                 tag_name = tag['name']
                 tag_weight = tag['votes']/100
-                tags_list.append([tag_name, tag_weight])
-                all_tags.add(tag_name)
+                if tag_weight != 0:
+                    tags_list.append([tag_name, tag_weight])
+                    all_tags.add(tag_name)
 
             final_tags[dict_key] = tags_list
 
-            logging.info('> Sleeping')
+            self.stdout.write('> Sleeping')
             sleep(1)
 
-        logging.info('\n--- Writing tags to anilist_tags.json ---')
+        self.stdout.write(self.style.SUCCESS('\n--- Writing tags to anilist_tags.json ---'))
         with open('anilist_tags.json', 'w', encoding='utf-8') as f:
             json.dump(final_tags, f)
 
-        logging.info('--- Writing missed titles to missed_anilist_titles.json ---')
+        self.stdout.write(self.style.SUCCESS('--- Writing missed titles to missed_anilist_titles.json ---'))
         with open('missed_anilist_titles.json', 'w', encoding='utf-8') as f:
             json.dump(missed_titles, f)
 
-        logging.info('\nNumber of different tags : '+str(len(all_tags)))
+        self.stdout.write(self.style.SUCCESS('--- Number of different tags : '+str(len(all_tags))+' ---'))

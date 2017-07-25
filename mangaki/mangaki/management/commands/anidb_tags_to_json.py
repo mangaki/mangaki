@@ -4,8 +4,7 @@ import json
 from django.core.management.base import BaseCommand
 
 from mangaki.utils.anidb import client
-from mangaki.models import Work, Tag, TaggedWork
-import logging
+from mangaki.models import Work
 
 
 class Command(BaseCommand):
@@ -25,36 +24,38 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['work_id']:
-            works = Work.objects.filter(pk__in=options['work_id']).order_by('pk')
+            works = Work.objects.exclude(anidb_aid=0).filter(pk__in=options['work_id']).order_by('pk')
         else:
-            works = Work.objects.all().order_by('pk')
+            works = Work.objects.exclude(anidb_aid=0).all().order_by('pk')
 
         if works.count() == 0:
-            logging.info('No works to process ...')
+            self.stdout.write(self.style.WARNING('No works to process ...'))
             return
 
         final_tags = {}
         all_tags = set()
 
-        count = works.exclude(anidb_aid=0).count()
-        logging.info('Number of works with AniDB AID : '+str(count)+'\n')
+        count = works.count()
+        self.stdout.write('Number of works : '+str(count)+'\n\n')
 
         for work in works:
             if not work.anidb_aid:
                 continue
 
-            logging.info('> Working on : '+str(work))
+            self.stdout.write('> Working on : '+str(work))
 
             dict_key = '{}.jpg'.format(work.pk)
             tags_list = []
 
             try:
-                # Ou handle_tags à la place de get_tags si pas encore renommé
                 work_tags = client.get_tags(anidb_aid=work.anidb_aid)
             except Exception:
-                logging.error('--- Banned from AniDB ---')
-                logging.error('--- Latest Work ID : '+str(work.pk)+' ---')
+                self.stderr.write(self.style.ERROR('Banned from AniDB ...'))
+                self.stderr.write(self.style.ERROR('--- Latest Work ID : '+str(work.pk)+' ---'))
                 break
+
+            if not work_tags:
+                continue
 
             for tag_title, tag_infos in work_tags.items():
                 weight = tag_infos['weight']/600
@@ -64,11 +65,11 @@ class Command(BaseCommand):
 
             final_tags[dict_key] = tags_list
 
-            logging.info('> Sleeping')
+            self.stdout.write('> Sleeping')
             sleep(1)
 
-        logging.info('\n--- Writing tags to anidb_tags.json ---')
+        self.stdout.write(self.style.SUCCESS('\n--- Writing tags to anidb_tags.json ---'))
         with open('anidb_tags.json', 'w', encoding='utf-8') as f:
             json.dump(final_tags, f)
 
-        logging.info('\nNumber of different tags : '+str(len(all_tags)))
+        self.stdout.write(self.style.SUCCESS('--- Number of different tags : '+str(len(all_tags))+' ---'))
