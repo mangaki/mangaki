@@ -7,6 +7,9 @@ from mangaki.wrappers.anilist import client, AniListWorks
 from mangaki.models import Work
 
 
+ATTEMPS = 5
+BACKOFF_DELAY = 2
+
 class Command(BaseCommand):
     """
     Recherche par titre chaque Work sur AniList puis récupère l'ID du Work
@@ -45,28 +48,43 @@ class Command(BaseCommand):
         for work in works:
             title_display = work.title.encode('utf8').decode(self.stdout.encoding)
 
-            try:
-                anilist_search = None
+            anilist_search = None
+            anilist_result = None
+            worktype = None
 
-                # Search the work by title on AniList
-                if work.category.slug == 'anime':
-                    anilist_search = client.get_work_by_title(AniListWorks.animes, work.title)
-                elif work.category.slug == 'manga':
-                    anilist_search = client.get_work_by_title(AniListWorks.mangas, work.title)
+            # Associate the right worktype or exit if not correct
+            if work.category.slug == 'anime':
+                worktype = AniListWorks.animes
+            elif work.category.slug == 'manga':
+                worktype = AniListWorks.mangas
+            else:
+                continue
 
-                # Then seek the whole information of the work thanks to its ID, if possible
-                if work.category.slug == 'anime' and anilist_search:
-                    anilist_result = client.get_work_by_id(AniListWorks.animes, anilist_search.anilist_id)
-                elif work.category.slug == 'manga' and anilist_search:
-                    anilist_result = client.get_work_by_id(AniListWorks.mangas, anilist_search.anilist_id)
-                else:
-                    missed_titles[work.id] = work.title
-                    self.stdout.write(self.style.WARNING('Could not match "'+str(title_display)+'" on AniList'))
+            # Try to fetch data from AniList with an exponential backoff
+            for tries in range(ATTEMPS):
+                try:
+                    # Search the work by title on AniList and then by ID if possible
+                    anilist_search = client.get_work_by_title(worktype, work.title)
+                    if anilist_search:
+                        anilist_result = client.get_work_by_id(worktype, anilist_search.anilist_id)
+                    break
+                except:
+                    delay = BACKOFF_DELAY**tries
+                    self.stdout.write(self.style.WARNING('Sleep : Retrying {} in {} seconds ...'.format(title_display, delay)))
+                    sleep(delay)
                     continue
-            except Exception:
-                self.stderr.write(self.style.ERROR('Banned from AniList ...'))
+
+            # Couldn't fetch data even after retrying : exit
+            if tries >= ATTEMPS - 1:
+                self.stderr.write(self.style.ERROR('\nBanned from AniList ...'))
                 self.stderr.write(self.style.ERROR('--- Latest Work ID : '+str(work.pk)+' ---'))
                 break
+
+            # Work couldn't be found on Anilist
+            if not anilist_result:
+                missed_titles[work.id] = work.title
+                self.stdout.write(self.style.WARNING('Could not match "'+str(title_display)+'" on AniList'))
+                continue
 
             self.stdout.write('> Working on : '+str(title_display))
 
@@ -84,9 +102,6 @@ class Command(BaseCommand):
                     all_tags.add(tag_name)
 
             final_tags[dict_key] = tags_list
-
-            self.stdout.write('> Sleeping')
-            sleep(1)
 
         self.stdout.write(self.style.SUCCESS('\n--- Writing tags to anilist_tags.json ---'))
         with open('anilist_tags.json', 'w', encoding='utf-8') as f:

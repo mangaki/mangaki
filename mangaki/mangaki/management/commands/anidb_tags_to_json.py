@@ -7,6 +7,9 @@ from mangaki.utils.anidb import client
 from mangaki.models import Work
 
 
+ATTEMPS = 5
+BACKOFF_DELAY = 2
+
 class Command(BaseCommand):
     """
     Utilise les valeurs d'AniDB ID déjà présentes dans la base de données
@@ -39,20 +42,33 @@ class Command(BaseCommand):
         self.stdout.write('Number of works : '+str(count)+'\n\n')
 
         for work in works:
+            title_display = work.title.encode('utf8').decode(self.stdout.encoding)
+
             if not work.anidb_aid:
                 continue
 
-            self.stdout.write('> Working on : '+str(work))
+            # Try to fetch data from AniDB with an exponential backoff
+            for tries in range(ATTEMPS):
+                try:
+                    # Retrieve tags for the current Work
+                    work_tags = client.get_tags(anidb_aid=work.anidb_aid)
+                    break
+                except:
+                    delay = BACKOFF_DELAY**tries
+                    self.stdout.write(self.style.WARNING('Sleep : Retrying {} in {} seconds ...'.format(title_display, delay)))
+                    sleep(delay)
+                    continue
+
+            # Couldn't fetch data even after retrying : exit
+            if tries >= ATTEMPS - 1:
+                self.stderr.write(self.style.ERROR('\nBanned from AniDB ...'))
+                self.stderr.write(self.style.ERROR('--- Latest Work ID : '+str(work.pk)+' ---'))
+                break
+
+            self.stdout.write('> Working on : '+str(title_display))
 
             dict_key = '{}.jpg'.format(work.pk)
             tags_list = []
-
-            try:
-                work_tags = client.get_tags(anidb_aid=work.anidb_aid)
-            except Exception:
-                self.stderr.write(self.style.ERROR('Banned from AniDB ...'))
-                self.stderr.write(self.style.ERROR('--- Latest Work ID : '+str(work.pk)+' ---'))
-                break
 
             if not work_tags:
                 continue
@@ -64,9 +80,6 @@ class Command(BaseCommand):
                     all_tags.add(tag_title)
 
             final_tags[dict_key] = tags_list
-
-            self.stdout.write('> Sleeping')
-            sleep(1)
 
         self.stdout.write(self.style.SUCCESS('\n--- Writing tags to anidb_tags.json ---'))
         with open('anidb_tags.json', 'w', encoding='utf-8') as f:
