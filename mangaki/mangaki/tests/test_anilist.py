@@ -204,7 +204,7 @@ class AniListTest(TestCase):
                 status=404, content_type='application/json'
             )
 
-        inexistant_user_animelist = set(self.anilist.get_user_list(AniListWorks.animes, 'aaaaaaaaaaaaa'))
-        inexistant_user_mangalist = set(self.anilist.get_user_list(AniListWorks.mangas, 'aaaaaaaaaaaaa'))
-        self.assertCountEqual(inexistant_user_animelist, {None})
-        self.assertCountEqual(inexistant_user_mangalist, {None})
+        inexistant_user_animelist = list(self.anilist.get_user_list(AniListWorks.animes, 'aaaaaaaaaaaaa'))
+        inexistant_user_mangalist = list(self.anilist.get_user_list(AniListWorks.mangas, 'aaaaaaaaaaaaa'))
+        self.assertCountEqual(inexistant_user_animelist, [])
+        self.assertCountEqual(inexistant_user_mangalist, [])

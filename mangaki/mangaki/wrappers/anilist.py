@@ -193,16 +193,15 @@ class AniListEntry:
 
     @property
     def tags(self) -> Optional[List[Dict[str, Any]]]:
-        if self.work_info.get('tags'):
-            return [
-                {
-                    'name': tag['name'],
-                    'anilist_tag_id': tag['id'],
-                    'spoiler': tag['spoiler'] or tag['series_spoiler'],
-                    'votes': tag['votes']
-                } for tag in self.work_info['tags']
-            ]
-        return None
+        if not self.work_info.get('tags'):
+            return []
+
+        return [{
+            'name': tag['name'],
+            'anilist_tag_id': tag['id'],
+            'spoiler': tag['spoiler'] or tag['series_spoiler'],
+            'votes': tag['votes']
+        } for tag in self.work_info['tags']]
 
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
@@ -409,17 +408,17 @@ class AniList:
         )
 
         if not data:
-            yield None
-        else:
-            for list_type in data['lists']:
-                for list_entry in data['lists'][list_type]:
-                    try:
-                        yield AniListUserWork(
-                            work=AniListEntry(list_entry[worktype.value], worktype),
-                            score=int(list_entry['score'])
-                        )
-                    except KeyError:
-                        raise RuntimeError('Malformed JSON, or AniList changed their API.')
+            raise StopIteration
+
+        for list_type in data['lists']:
+            for list_entry in data['lists'][list_type]:
+                try:
+                    yield AniListUserWork(
+                        work=AniListEntry(list_entry[worktype.value], worktype),
+                        score=int(list_entry['score'])
+                    )
+                except KeyError:
+                    raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
 client = AniList(
     getattr(settings, 'ANILIST_CLIENT', None),
