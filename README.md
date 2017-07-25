@@ -80,7 +80,7 @@ Remplir la base de données
     ./manage.py migrate
     ./manage.py loaddata ../fixtures/{partners,seed_data}.json
     ./manage.py ranking # Compute cached ranking information. This should be done regularly.
-    ./manage.py top director # Store data for the Top20 page. This should be done regularly.
+    ./manage.py top --all # Store data for the Top20 page. This should be done regularly.
 
 Voilà ! Vous avez une installation de Mangaki fonctionnelle.
 
