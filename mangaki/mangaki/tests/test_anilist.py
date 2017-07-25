@@ -61,35 +61,32 @@ class AniListTest(TestCase):
     def test_api_errors(self):
         self.add_fake_auth()
 
-        responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'unknown_route'),
-            body='{"error":{"status":404,"messages":["API route not found."]}}',
-            status=404, content_type='application/json'
-        )
+        error_tests = [{
+            'route': 'unknown_route', 'status': 404, 'exception': '"unknown_route" API route does not exist',
+            'body': '{"error":{"status":404,"messages":["API route not found."]}}'
+        },
+        {
+            'route': 'token_expired', 'status': 200, 'exception': 'token no longer valid or not found',
+            'body': '{"error":"access_denied","error_description":"The resource owner or authorization server denied the request."}'
+        },
+        {
+            'route': 'token_missing', 'status': 401, 'exception': 'token no longer valid or not found',
+            'body': '{"status":401,"error":"unauthorized","error_message":"Access token is missing"}'
+        },
+        {
+            'route': 'other_error', 'status': 404, 'exception': 'unknown_error - handle too',
+            'body': '{"status":404,"error":{"unknown_error":"handle too"}}'
+        }]
 
-        with self.assertRaisesRegexp(AniListException, '"unknown_route" API route does not exist'):
-            self.anilist._request('unknown_route')
+        for error_test in error_tests:
+            with self.subTest(error_test['route'], exception=error_test['exception']):
+                responses.add(
+                    responses.GET, urljoin(AniList.BASE_URL, error_test['route']),
+                    body=error_test['body'], status=error_test['status'], content_type='application/json'
+                )
 
-        responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'token_expired'),
-            body='{"error":"access_denied","error_description":"The resource owner or authorization server denied the request."}',
-            status=200, content_type='application/json'
-        )
-
-        with self.assertRaisesRegexp(AniListException, 'token no longer valid or not found'):
-            self.anilist._request('token_expired')
-
-        responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'token_missing'),
-            body='{"status":401,"error":"unauthorized","error_message":"Access token is missing"}',
-            status=401, content_type='application/json'
-        )
-
-        with self.assertRaisesRegexp(AniListException, 'token no longer valid or not found'):
-            self.anilist._request('token_missing')
+                with self.assertRaisesRegexp(AniListException, error_test['exception']):
+                    self.anilist._request(error_test['route'])
 
     @responses.activate
     def test_get_seasonal_anime(self):
