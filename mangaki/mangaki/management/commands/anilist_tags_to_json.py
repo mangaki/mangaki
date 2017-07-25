@@ -43,6 +43,8 @@ class Command(BaseCommand):
         self.stdout.write('Number of works : '+str(count)+'\n\n')
 
         for work in works:
+            title_display = work.title.encode('utf8').decode(self.stdout.encoding)
+
             try:
                 anilist_search = None
 
@@ -59,14 +61,14 @@ class Command(BaseCommand):
                     anilist_result = client.get_work_by_id(AniListWorks.mangas, anilist_search.anilist_id)
                 else:
                     missed_titles[work.id] = work.title
-                    self.stdout.write(self.style.WARNING('Could not match "'+str(work.title)+'" on AniList'))
+                    self.stdout.write(self.style.WARNING('Could not match "'+str(title_display)+'" on AniList'))
                     continue
             except Exception:
                 self.stderr.write(self.style.ERROR('Banned from AniList ...'))
                 self.stderr.write(self.style.ERROR('--- Latest Work ID : '+str(work.pk)+' ---'))
                 break
 
-            self.stdout.write('> Working on : '+str(anilist_result.title))
+            self.stdout.write('> Working on : '+str(title_display))
 
             dict_key = '{}.jpg'.format(work.pk)
             tags_list = []
