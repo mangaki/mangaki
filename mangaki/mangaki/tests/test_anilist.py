@@ -6,7 +6,7 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks
+from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks, AniListException
 
 
 class AniListTest(TestCase):
@@ -56,6 +56,37 @@ class AniListTest(TestCase):
         self.assertEqual(auth["token_type"], "Bearer")
         self.assertEqual(auth["expires_in"], 3600)
         self.assertEqual(auth["expires"], 946684800)
+
+    @responses.activate
+    def test_api_errors(self):
+        self.add_fake_auth()
+
+        error_tests = [{
+            'route': 'unknown_route', 'status': 404, 'exception': '"unknown_route" API route does not exist',
+            'body': '{"error":{"status":404,"messages":["API route not found."]}}'
+        },
+        {
+            'route': 'token_expired', 'status': 200, 'exception': 'token no longer valid or not found',
+            'body': '{"error":"access_denied","error_description":"The resource owner or authorization server denied the request."}'
+        },
+        {
+            'route': 'token_missing', 'status': 401, 'exception': 'token no longer valid or not found',
+            'body': '{"status":401,"error":"unauthorized","error_message":"Access token is missing"}'
+        },
+        {
+            'route': 'other_error', 'status': 404, 'exception': 'unknown_error - handle too',
+            'body': '{"status":404,"error":{"unknown_error":"handle too"}}'
+        }]
+
+        for error_test in error_tests:
+            with self.subTest(error_test['route'], exception=error_test['exception']):
+                responses.add(
+                    responses.GET, urljoin(AniList.BASE_URL, error_test['route']),
+                    body=error_test['body'], status=error_test['status'], content_type='application/json'
+                )
+
+                with self.assertRaisesRegexp(AniListException, error_test['exception']):
+                    self.anilist._request(error_test['route'])
 
     @responses.activate
     def test_get_seasonal_anime(self):
@@ -173,7 +204,7 @@ class AniListTest(TestCase):
                 status=404, content_type='application/json'
             )
 
-        inexistant_user_animelist = set(self.anilist.get_user_list(AniListWorks.animes, 'aaaaaaaaaaaaa'))
-        inexistant_user_mangalist = set(self.anilist.get_user_list(AniListWorks.mangas, 'aaaaaaaaaaaaa'))
-        self.assertCountEqual(inexistant_user_animelist, {None})
-        self.assertCountEqual(inexistant_user_mangalist, {None})
+        inexistant_user_animelist = list(self.anilist.get_user_list(AniListWorks.animes, 'aaaaaaaaaaaaa'))
+        inexistant_user_mangalist = list(self.anilist.get_user_list(AniListWorks.mangas, 'aaaaaaaaaaaaa'))
+        self.assertCountEqual(inexistant_user_animelist, [])
+        self.assertCountEqual(inexistant_user_mangalist, [])
