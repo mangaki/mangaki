@@ -7,7 +7,7 @@ from mangaki.utils.anidb import client
 from mangaki.models import Work
 
 
-ATTEMPS = 5
+ATTEMPTS_THRESHOLD = 5
 BACKOFF_DELAY = 2
 
 class Command(BaseCommand):
@@ -43,27 +43,32 @@ class Command(BaseCommand):
 
         for work in works:
             title_display = work.title.encode('utf8').decode(self.stdout.encoding)
+            tries = 0
+            delay = 0
 
             if not work.anidb_aid:
                 continue
 
             # Try to fetch data from AniDB with an exponential backoff
-            for tries in range(ATTEMPS):
+            while 1:
                 try:
                     # Retrieve tags for the current Work
                     work_tags = client.get_tags(anidb_aid=work.anidb_aid)
                     break
                 except:
                     delay = BACKOFF_DELAY**tries
-                    self.stdout.write(self.style.WARNING('Sleep : Retrying {} in {} seconds ...'.format(title_display, delay)))
-                    sleep(delay)
-                    continue
 
-            # Couldn't fetch data even after retrying : exit
-            if tries >= ATTEMPS - 1:
-                self.stderr.write(self.style.ERROR('\nBanned from AniDB ...'))
-                self.stderr.write(self.style.ERROR('--- Latest Work ID : '+str(work.pk)+' ---'))
-                break
+                    message = 'Sleep : Retrying {} in {} seconds ...'.format(title_display, delay)
+                    style = self.style.WARNING
+
+                    if tries > ATTEMPTS_THRESHOLD:
+                        message += ' [Might be banned]'
+                        style = self.style.ERROR
+
+                    self.stdout.write(style(message))
+                    sleep(delay)
+                    tries += 1
+                    continue
 
             self.stdout.write('> Working on : '+str(title_display))
 

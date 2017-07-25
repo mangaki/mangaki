@@ -7,7 +7,7 @@ from mangaki.wrappers.anilist import client, AniListWorks
 from mangaki.models import Work
 
 
-ATTEMPS = 5
+MAX_ATTEMPTS = 5
 BACKOFF_DELAY = 2
 
 class Command(BaseCommand):
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 continue
 
             # Try to fetch data from AniList with an exponential backoff
-            for tries in range(ATTEMPS):
+            for tries in range(MAX_ATTEMPTS):
                 try:
                     # Search the work by title on AniList and then by ID if possible
                     anilist_search = client.get_work_by_title(worktype, work.title)
@@ -75,7 +75,7 @@ class Command(BaseCommand):
                     continue
 
             # Couldn't fetch data even after retrying : exit
-            if tries >= ATTEMPS - 1:
+            if tries >= MAX_ATTEMPTS - 1:
                 self.stderr.write(self.style.ERROR('\nBanned from AniList ...'))
                 self.stderr.write(self.style.ERROR('--- Latest Work ID : '+str(work.pk)+' ---'))
                 break
