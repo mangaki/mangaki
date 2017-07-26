@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 continue
 
             # Try to fetch data from AniDB with an exponential backoff
-            while 1:
+            while True:
                 try:
                     # Retrieve tags for the current Work
                     work_tags = client.get_tags(anidb_aid=work.anidb_aid)
