@@ -11,6 +11,7 @@ from mangaki.models import Work
 import numpy as np
 import pandas as pd
 from scipy.spatial.distance import pdist, squareform
+from sklearn.metrics.pairwise import euclidean_distances
 from PIL import Image, ImageFont, ImageDraw
 
 
@@ -86,22 +87,25 @@ class Command(BaseCommand):
                         tags_dict[tag] = weight * CATEGORY_WEIGHTS[category]
                 processed_data[poster_id] = tags_dict
 
+            if not id_wanted in processed_data:
+                self.stdout.write('Could not find {} ...'.format(id_wanted))
+                return
+
             # Calculate euclidean distances poster to poster
             self.stdout.write('Calculating matrix of euclidean distances ...')
             start_time = time.time()
             df = pd.DataFrame(processed_data).fillna(0).transpose()
-            q = squareform(pdist(df, 'euclidean'))
-            neighborship = pd.DataFrame(q, index=df.index, columns=df.index)
-            self.stdout.write('Compute time : '+str(time.time()-start_time))
+            t = euclidean_distances(df.loc[id_wanted].values.reshape(1, -1), df)
+            neighborship = pd.DataFrame(t, index=[id_wanted], columns=df.index)
+            # self.stdout.write('Compute time : '+str(time.time()-start_time))
 
             # And finally save those for later
             # neighborship.to_pickle(SAVE_FILE)
             # self.stdout.write('Saved neighborship data to pickle\n')
 
         # Make a collage of images for each poster passed as an argument
-
         if id_wanted in neighborship:
-            closests = neighborship[id_wanted].sort_values('index').axes[0].tolist()[1:NUMBER_CLOSESTS+1]
+            closests = neighborship.loc[id_wanted].sort_values('index').axes[0].tolist()[1:NUMBER_CLOSESTS+1]
             self.stdout.write('Closest to {} : {}'.format(id_wanted, ', '.join(list(map(str, closests)))))
 
             # listofimages = ['posters/'+str(name)+'.jpg' for name in closests]
