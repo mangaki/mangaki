@@ -61,11 +61,11 @@ class Command(BaseCommand):
     help = 'Find closest neighbors to a poster for a work'
 
     def add_arguments(self, parser):
-        parser.add_argument('poster', nargs='+', type=int)
+        parser.add_argument('poster_id', nargs=1, type=int)
 
     def handle(self, *args, **options):
-        ids_wanted = options['poster']
-        posters_wanted = ['{}.jpg'.format(id_wanted) for id_wanted in ids_wanted]
+        id_wanted = options['poster_id'][0]
+        poster_wanted = '{}.jpg'.format(id_wanted)
 
         # Try to retrieve already saved neighborship information
         if os.path.isfile(SAVE_FILE):
@@ -99,15 +99,12 @@ class Command(BaseCommand):
             # self.stdout.write('Saved neighborship data to pickle\n')
 
         # Make a collage of images for each poster passed as an argument
-        for poster_id in ids_wanted:
-            curr_poster_filename = '{}.jpg'.format(poster_id)
 
-            try:
-                closests = neighborship[poster_id].sort_values('index').axes[0].tolist()[1:NUMBER_CLOSESTS+1]
-                self.stdout.write('Closest to {} : {}'.format(poster_id, ', '.join(list(map(str, closests)))))
+        if id_wanted in neighborship:
+            closests = neighborship[id_wanted].sort_values('index').axes[0].tolist()[1:NUMBER_CLOSESTS+1]
+            self.stdout.write('Closest to {} : {}'.format(id_wanted, ', '.join(list(map(str, closests)))))
 
-                # listofimages = ['posters/'+str(name)+'.jpg' for name in closests]
-                # create_collage(90, 150, listofimages)
-            except:
-                self.stdout.write('Could not find {} ...'.format(poster_id))
-                continue
+            # listofimages = ['posters/'+str(name)+'.jpg' for name in closests]
+            # create_collage(90, 150, listofimages)
+        else:
+            self.stdout.write('Could not find {} ...'.format(id_wanted))
