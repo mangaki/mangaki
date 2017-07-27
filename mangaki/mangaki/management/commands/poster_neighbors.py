@@ -1,8 +1,7 @@
-from collections import Counter
 import json
 import time
 import os
-import argparse
+import gc
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -56,7 +55,6 @@ from PIL import Image, ImageFont, ImageDraw
 
 NUMBER_CLOSESTS = 5
 CATEGORY_WEIGHTS = {'character': 1, 'rating': 1, 'general': 1, 'copyright': 1}
-SAVE_FILE = 'posters_neighborships.pkl'
 
 class Command(BaseCommand):
     help = 'Find closest neighbors to a poster for a work'
@@ -68,45 +66,36 @@ class Command(BaseCommand):
         id_wanted = options['poster_id'][0]
         poster_wanted = '{}.jpg'.format(id_wanted)
 
-        # Try to retrieve already saved neighborship information
-        if os.path.isfile(SAVE_FILE):
-            neighborship = pd.read_pickle(SAVE_FILE)
-            self.stdout.write('Loaded neighborship data from pickle\n')
-        else:
-            # Open the JSON i2v file
-            with open(os.path.join(settings.DATA_DIR, 'mangaki_i2v.json'), encoding='utf-8') as f_i2v:
-                i2v = json.load(f_i2v)
+        # Open the JSON i2v file
+        with open(os.path.join(settings.DATA_DIR, 'mangaki_i2v.json'), encoding='utf-8') as f_i2v:
+            i2v = json.load(f_i2v)
 
-            # Let's make a {poster_id: tags} dict to simplify things up
-            processed_data = {}
-            for poster in i2v:
-                tags_dict = {}
-                poster_id = int(os.path.splitext(poster)[0])
-                for category, tags in i2v[poster].items():
-                    for tag, weight in tags:
-                        tags_dict[tag] = weight * CATEGORY_WEIGHTS[category]
-                processed_data[poster_id] = tags_dict
+        # Let's make a {poster_id: tags} dict to simplify things up
+        processed_data = {}
+        for poster in i2v:
+            tags_dict = {}
+            poster_id = int(os.path.splitext(poster)[0])
+            for category, tags in i2v[poster].items():
+                for tag, weight in tags:
+                    tags_dict[tag] = weight * CATEGORY_WEIGHTS[category]
+            processed_data[poster_id] = tags_dict
 
-            if not id_wanted in processed_data:
-                self.stdout.write('Could not find {} ...'.format(id_wanted))
-                return
+        if not id_wanted in processed_data:
+            self.stdout.write('Could not find {} ...'.format(id_wanted))
+            return
 
-            # Calculate euclidean distances poster to poster
-            self.stdout.write('Calculating matrix of euclidean distances ...')
-            start_time = time.time()
-            df = pd.DataFrame(processed_data).fillna(0).transpose()
-            t = euclidean_distances(df.loc[id_wanted].values.reshape(1, -1), df)
-            neighborship = pd.DataFrame(t, index=[id_wanted], columns=df.index)
-            # self.stdout.write('Compute time : '+str(time.time()-start_time))
-
-            # And finally save those for later
-            # neighborship.to_pickle(SAVE_FILE)
-            # self.stdout.write('Saved neighborship data to pickle\n')
+        # Calculate euclidean distances from the wanted poster to all other posters
+        # self.stdout.write('Calculating matrix of euclidean distances ...')
+        start_time = time.time()
+        df = pd.DataFrame(processed_data).fillna(0).transpose()
+        distances = euclidean_distances(df.loc[id_wanted].values.reshape(1, -1), df)
+        neighborship = pd.DataFrame(distances, index=[id_wanted], columns=df.index)
+        # self.stdout.write(self.style.SUCCESS('Compute time : '+str(time.time()-start_time)))
 
         # Make a collage of images for each poster passed as an argument
         if id_wanted in neighborship:
             closests = neighborship.loc[id_wanted].sort_values('index').axes[0].tolist()[1:NUMBER_CLOSESTS+1]
-            self.stdout.write('Closest to {} : {}'.format(id_wanted, ', '.join(list(map(str, closests)))))
+            self.stdout.write(', '.join(list(map(str, closests))))
 
             # listofimages = ['posters/'+str(name)+'.jpg' for name in closests]
             # create_collage(90, 150, listofimages)
