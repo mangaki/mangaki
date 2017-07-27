@@ -1,7 +1,19 @@
+from mangaki.utils.wals import MangakiWALS
+from mangaki.utils.als import MangakiALS
+from mangaki.utils.knn import MangakiKNN
+from mangaki.utils.svd import MangakiSVD
 from django.core.management.base import BaseCommand
 
 from mangaki.models import Rating, Work
 from mangaki.algo import fit_algo
+
+
+ALGOS = {
+    'knn': lambda: MangakiKNN(),
+    'svd': lambda: MangakiSVD(20),
+    'als': lambda: MangakiALS(20),
+    'wals': lambda: MangakiWALS(20),
+}
 
 
 class Command(BaseCommand):

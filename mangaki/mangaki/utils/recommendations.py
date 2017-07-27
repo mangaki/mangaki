@@ -10,11 +10,17 @@ from mangaki.utils.values import rating_values
 
 NB_RECO = 10
 CHRONO_ENABLED = True
+ALGOS = {
+    'knn': lambda: MangakiKNN(),
+    'svd': lambda: MangakiSVD(20),
+    'als': lambda: MangakiALS(20),
+    'wals': lambda: MangakiWALS(20),
+}
 
 
 def user_exists_in_backup(user, algo_name):
     try:
-        dataset = get_dataset_backup(algo_name)
+        dataset = get_dataset_backup(ALGOS[algo_name]())
         return user.id in dataset.encode_user
     except FileNotFoundError:
         return False
@@ -46,15 +52,17 @@ def get_reco_algo(request, algo_name='knn', category='all'):
 
     chrono.save('get rated works')
 
+    try:
+        algo = ALGOS[algo_name]()
+        algo = get_algo_backup(algo)
+        dataset = get_dataset_backup(algo)
+    except FileNotFoundError:
+        triplets = list(
+            Rating.objects.values_list('user_id', 'work_id', 'choice'))
+        chrono.save('get all %d interesting ratings' % len(triplets))
+        dataset, algo = fit_algo(algo_name, triplets)
+
     if algo_name == 'knn':
-        try:
-            algo = get_algo_backup(algo_name)
-            dataset = get_dataset_backup(algo_name)
-        except FileNotFoundError:
-            triplets = list(
-                Rating.objects.values_list('user_id', 'work_id', 'choice'))
-            chrono.save('get all %d interesting ratings' % len(triplets))
-            dataset, algo = fit_algo(algo_name, triplets)
         framed_rated_works = pd.DataFrame(list(current_user_ratings(request).items()), columns=['work_id', 'choice'])
         framed_rated_works['work_id'] = dataset.encode_works(framed_rated_works['work_id'])
         framed_rated_works['rating'] = framed_rated_works['choice'].map(rating_values)
@@ -69,17 +77,6 @@ def get_reco_algo(request, algo_name='knn', category='all'):
         algo.M._shape = (algo.M.shape[0] + ratings_from_user.shape[0], ratings_from_user.shape[1])
 
         chrono.save('loading knn and expanding with current user ratings')
-
-    else:  # SVD or ALS, etc.
-        try:
-            algo = get_algo_backup(algo_name)
-            dataset = get_dataset_backup(algo_name)
-        except FileNotFoundError:
-            # Every rating is useful
-            triplets = list(
-                Rating.objects.values_list('user_id', 'work_id', 'choice'))
-            chrono.save('get all %d interesting ratings' % len(triplets))
-            dataset, algo = fit_algo(algo_name, triplets)
 
     chrono.save('fit %s' % algo.get_shortname())
 
