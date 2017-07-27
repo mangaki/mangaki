@@ -4,11 +4,9 @@ import os
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from mangaki.models import Work
 
 import numpy as np
 import pandas as pd
-from scipy.spatial.distance import pdist, squareform
 from sklearn.metrics.pairwise import euclidean_distances
 from PIL import Image, ImageFont, ImageDraw
 
@@ -75,7 +73,7 @@ class Command(BaseCommand):
         with open(os.path.join(settings.DATA_DIR, 'mangaki_i2v.json'), encoding='utf-8') as f_i2v:
             i2v = json.load(f_i2v)
 
-            # Let's make a {poster_id: tags} dict to simplify things up
+            # Let's make a {poster_id: tags} dict
             for poster in i2v:
                 tags_dict = {}
                 poster_id = int(os.path.splitext(poster)[0])
@@ -93,12 +91,9 @@ class Command(BaseCommand):
             return
 
         # Calculate euclidean distances from the wanted poster to all other posters
-        # self.stdout.write('Calculating matrix of euclidean distances ...')
-        # start_time = time.time()
         distances = euclidean_distances(df.loc[id_wanted].values.reshape(1, -1), df)
         neighborship = pd.DataFrame(distances, index=[id_wanted], columns=df.index)
         distances = None
-        # self.stdout.write(self.style.SUCCESS('Compute time : '+str(time.time()-start_time)))
 
         # Display ID of neighbors for a poster and make a collage if flag passed as argument
         if id_wanted in neighborship:
