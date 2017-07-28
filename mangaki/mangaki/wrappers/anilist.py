@@ -8,7 +8,7 @@ import requests
 from django.utils.functional import cached_property
 
 from mangaki import settings
-from mangaki.models import Work, WorkTitle, Category, ExtLanguage
+from mangaki.models import Work, WorkTitle, Reference, Category, ExtLanguage
 
 
 def to_python_datetime(date):
@@ -155,6 +155,10 @@ class AniListEntry:
     @property
     def anilist_id(self) -> int:
         return self.work_info['id']
+
+    @property
+    def anilist_url(self) -> int:
+        return 'https://anilist.co/{}/{}/'.format(self.work_type.value, self.anilist_id)
 
     @property
     def title(self) -> str:
@@ -504,6 +508,9 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
             manga_type=manga_type
         )
         new_works.append(work)
+
+        # Add a Reference for this work
+        Reference.objects.create(work=work, url=entry.anilist_url)
 
         # Create WorkTitle entries in the database for this Work
         current_work_titles = [

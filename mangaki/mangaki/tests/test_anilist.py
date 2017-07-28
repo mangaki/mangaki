@@ -7,7 +7,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from mangaki.models import Work, Language, ExtLanguage
-from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks, AniListException, insert_into_database_from_anilist
+from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks, AniListException, insert_works_into_database_from_anilist
 
 
 class AniListTest(TestCase):
