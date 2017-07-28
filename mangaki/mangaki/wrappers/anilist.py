@@ -8,7 +8,8 @@ import requests
 from django.utils.functional import cached_property
 
 from mangaki import settings
-from mangaki.models import Work, WorkTitle, Reference, Category, ExtLanguage
+from mangaki.models import (Work, WorkTitle, Reference, Category, ExtLanguage,
+                            Studio)
 
 
 def to_python_datetime(date):
@@ -469,6 +470,14 @@ client = AniList(
 )
 
 def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Optional[List[Work]]:
+    """
+    Insert works into Mangaki database from AniList data, and return Works added.
+    Alternative WorkTitle are also added to the database, as well as a Reference.
+    :param entries: a list of entries from AniList to insert if not present in the database
+    :type entries: List[AniListEntry]
+    :return: a list of works effectively added in the Mangaki database
+    :rtype: Optional[List[Work]]
+    """
     new_works = []
 
     for entry in entries:
@@ -479,6 +488,8 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
 
         anime_type = entry.media_type if entry.work_type == AniListWorks.animes else ''
         manga_type = entry.media_type if entry.work_type == AniListWorks.mangas else ''
+
+        studio = None
 
         category = (
             work_categories.anime if entry.work_type == AniListWorks.animes else
@@ -491,8 +502,13 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
             title__in=titles
         )
 
+        # If one of this entry's title match in the database, skip it
         if work_present_in_db:
             continue
+
+        # Link Studio and Work [AniListRichEntry only]
+        if isinstance(entry, AniListRichEntry) and entry.studio:
+            studio, created = studio.objects.get_or_create(title=entry.studio)
 
         # Create the Work entry in the database
         work = Work.objects.create(
@@ -505,7 +521,8 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
             ext_synopsis=(entry.description if entry.description else ''),
             nb_episodes=(entry.nb_episodes or entry.nb_chapters),
             anime_type=anime_type,
-            manga_type=manga_type
+            manga_type=manga_type,
+            studio=studio
         )
         new_works.append(work)
 
@@ -524,6 +541,8 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
         ]
         WorkTitle.objects.bulk_create(current_work_titles)
 
-        # Here, should build related works too !
+        # Here, should build staff too ! [AniListRichEntry]
+        # Here, should build genres too !
+        # Here, should build related works too ! [AniListRichEntry]
 
     return new_works
