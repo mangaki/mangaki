@@ -65,7 +65,7 @@ class Experiment(object):
         Populate the `self.algos` list with wrappers.
 
         May raise ValueError or KeyError if the experiment file is malformed or invalid.
-        Also, if the algorithms does not exists (import failure).
+        Also, if the algorithms does not exist (import failure).
 
         Returns: None.
 
@@ -137,7 +137,7 @@ class Experiment(object):
 
         logger.info('Final results')
         for metric_name, algos in metrics.items():
-            logger.info('Evaluation metric with {} results:'.format(metric_name))
+            logger.info('Evaluation of {}:'.format(metric_name.upper()))
             for algo_name in algos.keys():
                 mean = np.mean(algos[algo_name])
                 var = np.var(algos[algo_name])

@@ -12,7 +12,7 @@ import csv
 RATED_BY_AT_LEAST = 2
 
 
-AnonymizedData = namedtuple('AnonymizedData', 'X y original_y nb_users nb_works')
+AnonymizedData = namedtuple('AnonymizedData', 'X y y_text nb_users nb_works')
 
 
 class Dataset:
@@ -53,7 +53,7 @@ class Dataset:
         if confirm:
             with open(ratings_path, 'w', newline='') as csvfile:
                 data = csv.writer(csvfile, delimiter=',', quotechar='', quoting=csv.QUOTE_NONE)
-                for (encoded_user_id, encoded_work_id), rating in zip(self.anonymized.X, self.anonymized.original_y):
+                for (encoded_user_id, encoded_work_id), rating in zip(self.anonymized.X, self.anonymized.y_text):
                     data.writerow([encoded_user_id, encoded_work_id, rating])
             if self.titles and self.categories:
                 with open(works_path, 'w', newline='') as csvfile:
@@ -75,7 +75,7 @@ class Dataset:
         self.anonymized = AnonymizedData(
             X=triplets[:, 0:2],
             y=vectorized_convert(triplets[:, 2]),
-            original_y=triplets[:, 2],
+            y_text=triplets[:, 2],
             nb_users=max(triplets[:, 0]) + 1,
             nb_works=max(triplets[:, 1]) + 1
         )
@@ -97,7 +97,7 @@ class Dataset:
         nb_ratings = Counter()
         X = []
         y = []
-        original_y = []
+        y_text = []
         for user_id, work_id, rating in triplets:
             users.add(user_id)
             works.add(work_id)
@@ -125,12 +125,12 @@ class Dataset:
         for user_id, work_id, rating in triplets:
             X.append((encode_user[user_id], encode_work[work_id]))
             y.append(convert(rating))
-            original_y.append(rating)
+            y_text.append(rating)
 
         self.anonymized = AnonymizedData(
             X=np.array(X),
             y=np.array(y),
-            original_y=np.array(original_y),
+            y_text=np.array(y_text),
             nb_users=len(users),
             nb_works=len(works)
         )
