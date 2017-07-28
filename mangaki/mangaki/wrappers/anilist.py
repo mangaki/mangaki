@@ -8,7 +8,7 @@ import requests
 from django.utils.functional import cached_property
 
 from mangaki import settings
-from mangaki.models import Category
+from mangaki.models import Work, Category, ExtLanguage
 
 
 def to_python_datetime(date):
@@ -91,6 +91,24 @@ class AniListException(Exception):
         return ', '.join(self.args)
 
 
+class AniListLanguages:
+    @cached_property
+    def romaji_ext_lang(self):
+        return ExtLanguage.objects.select_related('lang').get(source='anilist', ext_lang='romaji')
+
+    @cached_property
+    def english_ext_lang(self):
+        return ExtLanguage.objects.select_related('lang').get(source='anilist', ext_lang='english')
+
+    @cached_property
+    def japanese_ext_lang(self):
+        return ExtLanguage.objects.select_related('lang').get(source='anilist', ext_lang='japanese')
+
+    @cached_property
+    def unknown_ext_lang(self):
+        return ExtLanguage.objects.select_related('lang').get(source='anilist', ext_lang='unknown')
+
+
 class AniListWorks(Enum):
     animes = 'anime'
     mangas = 'manga'
@@ -167,10 +185,10 @@ class AniListEntry:
         return self.work_info['image_url_lge']
 
     @property
-    def nb_episodes(self) -> Optional[int]:
+    def nb_episodes(self) -> int:
         if self.work_type == AniListWorks.animes:
             return self.work_info['total_episodes']
-        return None
+        return 0
 
     @property
     def episode_length(self) -> Optional[int]:
@@ -179,10 +197,10 @@ class AniListEntry:
         return None
 
     @property
-    def nb_chapters(self) -> Optional[int]:
+    def nb_chapters(self) -> int:
         if self.work_type == AniListWorks.mangas:
             return self.work_info['total_chapters']
-        return None
+        return 0
 
     @property
     def status(self) -> Optional[AniListStatus]:
