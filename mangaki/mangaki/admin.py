@@ -245,7 +245,7 @@ class WorkAdmin(admin.ModelAdmin):
                 tags.update(added_tags)
                 tags.update(updated_tags)
 
-                anime.update_tags(tags)
+                client.update_tags(anime, tags)
 
             self.message_user(request, "Modifications sur les tags faites")
             return None
@@ -300,24 +300,59 @@ class WorkAdmin(admin.ModelAdmin):
     def refresh_work_from_anidb(self, request, queryset):
         works = queryset.all()
 
+        # Check for works with missing AniDB AID
+        offending_works = []
         if not all(work.anidb_aid for work in works):
             offending_works = [work for work in works if not work.anidb_aid]
             self.message_user(request,
-                              "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
-                              "Leur rafraichissement a été omis. (Détails: {})"
-                              .format(", ".join(map(lambda w: w.title, offending_works))),
-                              level=messages.WARNING)
+            "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
+            "Leur rafraichissement a été omis. (Détails: {})"
+            .format(", ".join(map(lambda w: w.title, offending_works))),
+            level=messages.WARNING)
 
-        for index, work in enumerate(works, start=1):
+        # Check for works that have a duplicate AniDB AID
+        aids_with_works = defaultdict(list)
+        for work in works:
             if work.anidb_aid:
+                aids_with_works[work.anidb_aid].append(work)
+
+        aids_with_potdupe_works = defaultdict(list)
+        for work in Work.objects.filter(anidb_aid__in=aids_with_works.keys()):
+            aids_with_potdupe_works[work.anidb_aid].append(work)
+
+        works_with_conflicting_anidb_aid = []
+        for anidb_aid, potdupe_works in aids_with_potdupe_works.items():
+            if len(potdupe_works) > 1:
+                works_with_conflicting_anidb_aid.extend(aids_with_works[anidb_aid])
+
+                # Alert the user for each work he selected that has a duplicate AniDB ID
+                self.message_user(
+                    request,
+                    """Le rafraichissement de {} a été omis car d'autres œuvres possèdent
+                    le même identifiant AniDB #{}. (Œuvres en conflit : {})"""
+                    .format(
+                        ", ".join(map(lambda w: w.title, aids_with_works[anidb_aid])),
+                        anidb_aid,
+                        ", ".join(map(lambda w: w.title, aids_with_potdupe_works[anidb_aid]))
+                    ),
+                    level=messages.WARNING
+                )
+
+        # Refresh works from AniDB
+        refreshed = 0
+        for index, work in enumerate(works, start=1):
+            if work.anidb_aid and work not in works_with_conflicting_anidb_aid:
                 logger.info('Refreshing {} from AniDB.'.format(work))
-                client.get_or_update_work(work.anidb_aid)
+                if client.get_or_update_work(work.anidb_aid) is not None:
+                    refreshed += 1
                 if index % 25 == 0:
                     logger.info('(AniDB refresh): Sleeping...')
                     time.sleep(1)  # Don't spam AniDB.
 
-        self.message_user(request,
-                          "Le rafraichissement des œuvres a été effectué avec succès.")
+        if refreshed > 0:
+            self.message_user(request,
+                              "Le rafraichissement de {} œuvre(s) a été effectué avec succès."
+                              .format(refreshed))
 
     refresh_work_from_anidb.short_description = "Rafraîchir les œuvres depuis AniDB"
 

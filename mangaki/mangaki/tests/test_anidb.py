@@ -24,7 +24,6 @@ class AniDBTest(TestCase):
         self.anidb = AniDB('test_client', 1)
         self.no_anidb = AniDB()
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
-        self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
 
     def test_to_python_datetime(self):
         self.assertEqual(to_python_datetime('2017-12-25'), datetime(2017, 12, 25, 0, 0))
@@ -49,6 +48,28 @@ class AniDBTest(TestCase):
         results = self.anidb.search(q=anime_query)
         self.assertEqual(len(results), 2)
         self.assertEqual(len(responses.calls), 1)
+
+    @responses.activate
+    def test_anidb_get_methods(self):
+        responses.add(
+            responses.GET,
+            AniDB.BASE_URL,
+            body=self.read_fixture('anidb/sangatsu_no_lion.xml'),
+            status=200,
+            content_type='application/xml'
+        )
+
+        titles, main_title = self.anidb.get_titles(anidb_aid=11606)
+        creators, studio = self.anidb.get_creators(anidb_aid=11606)
+        tags = self.anidb.get_tags(anidb_aid=11606)
+        related_animes = self.anidb.get_related_animes(anidb_aid=11606)
+
+        self.assertEqual(len(titles), 9)
+        self.assertEqual(main_title, 'Sangatsu no Lion')
+        self.assertEqual(len(creators), 4)
+        self.assertEqual(studio.title, 'Shaft')
+        self.assertEqual(len(tags), 30)
+        self.assertEqual(len(related_animes), 2)
 
     @responses.activate
     def test_anidb_get_animes(self):
@@ -101,6 +122,23 @@ class AniDBTest(TestCase):
         artist = Artist.objects.filter(name="Shinbou Akiyuki")
         self.assertEqual(artist.count(), 1)
         self.assertEqual(artist.first().anidb_creator_id, 59)
+
+    @responses.activate
+    def test_anidb_duplicate_anime_id(self):
+        for _ in range(2):
+            responses.add(
+                responses.GET,
+                AniDB.BASE_URL,
+                body=self.read_fixture('anidb/hibike_euphonium.xml'),
+                status=200,
+                content_type='application/xml'
+            )
+
+        self.create_anime(title='Hibike! Euphonium', anidb_aid=10889)
+        self.create_anime(title='Hibike! Euphonium Duplicate', anidb_aid=10889)
+
+        self.anidb.get_or_update_work(10889)
+        self.assertIs(self.anidb.get_or_update_work(10889), None)
 
     @responses.activate
     def test_anidb_nsfw(self):
