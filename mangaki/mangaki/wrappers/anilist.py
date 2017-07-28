@@ -8,7 +8,7 @@ import requests
 from django.utils.functional import cached_property
 
 from mangaki import settings
-from mangaki.models import Work, Category, ExtLanguage
+from mangaki.models import Work, WorkTitle, Category, ExtLanguage
 
 
 def to_python_datetime(date):
@@ -93,20 +93,40 @@ class AniListException(Exception):
 
 class AniListLanguages:
     @cached_property
-    def romaji_ext_lang(self):
+    def romaji_ext_lang(self) -> ExtLanguage:
         return ExtLanguage.objects.select_related('lang').get(source='anilist', ext_lang='romaji')
 
     @cached_property
-    def english_ext_lang(self):
+    def english_ext_lang(self) -> ExtLanguage:
         return ExtLanguage.objects.select_related('lang').get(source='anilist', ext_lang='english')
 
     @cached_property
-    def japanese_ext_lang(self):
+    def japanese_ext_lang(self) -> ExtLanguage:
         return ExtLanguage.objects.select_related('lang').get(source='anilist', ext_lang='japanese')
 
     @cached_property
-    def unknown_ext_lang(self):
+    def unknown_ext_lang(self) -> ExtLanguage:
         return ExtLanguage.objects.select_related('lang').get(source='anilist', ext_lang='unknown')
+
+anilist_langs = AniListLanguages()
+language_map = {
+    'english': anilist_langs.english_ext_lang,
+    'romaji': anilist_langs.romaji_ext_lang,
+    'japanese': anilist_langs.japanese_ext_lang,
+    'unknown': anilist_langs.unknown_ext_lang,
+}
+
+
+class WorkCategories:
+    @cached_property
+    def anime(self) -> Category:
+        return Category.objects.get(slug=AniListWorks.animes.value)
+
+    @cached_property
+    def manga(self) -> Category:
+        return Category.objects.get(slug=AniListWorks.mangas.value)
+
+work_categories = WorkCategories()
 
 
 class AniListWorks(Enum):
@@ -443,3 +463,60 @@ client = AniList(
     getattr(settings, 'ANILIST_CLIENT', None),
     getattr(settings, 'ANILIST_SECRET', None)
 )
+
+def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Optional[List[Work]]:
+    new_works = []
+
+    for entry in entries:
+        titles = {synonym: ('unknown', 'synonym') for synonym in entry.synonyms}
+        titles.update({entry.title: ('romaji', 'official')})
+        titles.update({entry.english_title: ('english', 'main')})
+        titles.update({entry.japanese_title: ('japanese', 'official')})
+
+        anime_type = entry.media_type if entry.work_type == AniListWorks.animes else ''
+        manga_type = entry.media_type if entry.work_type == AniListWorks.mangas else ''
+
+        category = (
+            work_categories.anime if entry.work_type == AniListWorks.animes else
+            work_categories.manga if entry.work_type == AniListWorks.mangas else
+            None
+        )
+
+        work_present_in_db = Work.objects.filter(
+            category__slug=entry.work_type.value,
+            title__in=titles
+        )
+
+        if work_present_in_db:
+            continue
+
+        # Create the Work entry in the database
+        work = Work.objects.create(
+            category=category,
+            title=entry.title,
+            ext_poster=entry.poster_url,
+            nsfw=entry.is_nsfw,
+            date=entry.start_date,
+            end_date=entry.end_date,
+            ext_synopsis=(entry.description if entry.description else ''),
+            nb_episodes=(entry.nb_episodes or entry.nb_chapters),
+            anime_type=anime_type,
+            manga_type=manga_type
+        )
+        new_works.append(work)
+
+        # Create WorkTitle entries in the database for this Work
+        current_work_titles = [
+            WorkTitle(
+                work=work,
+                title=title,
+                ext_language=language_map[language],
+                language=language_map[language].lang,
+                type=title_type
+            ) for title, (language, title_type) in titles.items()
+        ]
+        WorkTitle.objects.bulk_create(current_work_titles)
+
+        # Here, should build related works too !
+
+    return new_works

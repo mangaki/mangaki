@@ -6,7 +6,8 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks, AniListException
+from mangaki.models import Work, Language, ExtLanguage
+from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks, AniListException, insert_into_database_from_anilist
 
 
 class AniListTest(TestCase):
@@ -208,3 +209,17 @@ class AniListTest(TestCase):
         inexistant_user_mangalist = list(self.anilist.get_user_list(AniListWorks.mangas, 'aaaaaaaaaaaaa'))
         self.assertCountEqual(inexistant_user_animelist, [])
         self.assertCountEqual(inexistant_user_mangalist, [])
+
+    @responses.activate
+    def test_insert_into_database(self):
+        self.add_fake_auth()
+
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'browse/anime'),
+            body=self.read_fixture('anilist/airing_summer_2017_trimmed.json'),
+            status=200, content_type='application/json'
+        )
+
+        seasonal = list(self.anilist.list_seasonal_animes(year=2017, season='summer'))
+        self.assertEqual(len(insert_works_into_database_from_anilist(seasonal)), 7)
