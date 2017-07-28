@@ -1,7 +1,7 @@
 from mangaki.utils.common import RecommendationAlgorithm
 from mangaki.utils.algo import get_algo_backup, get_dataset_backup
 from mangaki.utils.als import MangakiALS
-from scipy.sparse import coo_matrix
+from scipy.sparse import coo_matrix, load_npz
 from sklearn.linear_model import LinearRegression
 from collections import defaultdict
 import numpy as np
@@ -24,14 +24,13 @@ class MangakiBALSE(RecommendationAlgorithm):
     def load_tags(self, T=None):
         # From file
         if T is None:
-            with open(self.get_backup_path('tags.npy'), 'rb') as f:
-                T = np.load(f)
+            T = load_npz('data/balse/tag-matrix.npz').toarray()
         _, self.nb_tags = T.shape
         self.T = T
 
     def fit(self, X, y):
         self.load_tags()
-        self.als = MangakiALS(1)
+        self.als = MangakiALS(10)
         self.als.set_parameters(self.nb_users, self.nb_works)
         self.als.fit(X, y)
         y_pred = self.als.predict(X)

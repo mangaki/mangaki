@@ -16,7 +16,8 @@ from mangaki.utils.values import rating_values
 
 FILENAMES = {
     'movies': 'ratings-ml.csv',
-    'mangas': 'ratings.csv'
+    'mangas': 'ratings.csv',
+    'balse': 'balse/ratings.csv'
 }
 CONVERT_FUNCTIONS = {
     'movies': float,
