@@ -6,7 +6,7 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.models import Work, Language, ExtLanguage
+from mangaki.models import Work, RelatedWork, Language, ExtLanguage
 from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks, AniListException, insert_works_into_database_from_anilist
 
 
@@ -140,6 +140,7 @@ class AniListTest(TestCase):
         self.assertEqual(hibike.crunchyroll_url, 'http://www.crunchyroll.com/sound-euphonium')
         self.assertEqual(hibike.twitter_url, 'https://twitter.com/anime_eupho')
         self.assertEqual(hibike.official_url, 'http://anime-eupho.com/')
+        self.assertEqual(len(hibike.relations), 4)
 
         responses.add(
             responses.GET,
@@ -214,6 +215,7 @@ class AniListTest(TestCase):
     def test_insert_into_database(self):
         self.add_fake_auth()
 
+        # Test insert AniListEntry into database
         responses.add(
             responses.GET,
             urljoin(AniList.BASE_URL, 'browse/anime'),
@@ -223,3 +225,16 @@ class AniListTest(TestCase):
 
         seasonal = list(self.anilist.list_seasonal_animes(year=2017, season='summer'))
         self.assertEqual(len(insert_works_into_database_from_anilist(seasonal)), 7)
+
+        # Test insert AniListRichEntry into database
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'anime/20912/page'),
+            body=self.read_fixture('anilist/hibike_euphonium.json'),
+            status=200, content_type='application/json'
+        )
+
+        hibike = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
+        added_hibike = insert_works_into_database_from_anilist([hibike])[0]
+        related_hibike = RelatedWork.objects.filter(parent_work=added_hibike)
+        self.assertEqual(len(related_hibike), 4)

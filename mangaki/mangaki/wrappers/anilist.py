@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Any, Generator
+from typing import Dict, List, Tuple, Optional, Any, Generator
 from urllib.parse import urljoin
 import time
 
@@ -8,8 +8,8 @@ import requests
 from django.utils.functional import cached_property
 
 from mangaki import settings
-from mangaki.models import (Work, WorkTitle, Reference, Category, ExtLanguage,
-                            Studio)
+from mangaki.models import (Work, RelatedWork, WorkTitle, Reference, Category,
+                            ExtLanguage, Studio)
 
 
 def to_python_datetime(date):
@@ -81,6 +81,10 @@ def is_token_error(anilist_error):
 
 
 class AniListException(Exception):
+    """
+    This class defines a custom Exception for errors with the AniList's API
+    """
+
     def __init__(self, error):
         super().__init__()
         if isinstance(error, dict):
@@ -109,14 +113,6 @@ class AniListLanguages:
     def unknown_ext_lang(self) -> ExtLanguage:
         return ExtLanguage.objects.select_related('lang').get(source='anilist', ext_lang='unknown')
 
-anilist_langs = AniListLanguages()
-language_map = {
-    'english': anilist_langs.english_ext_lang,
-    'romaji': anilist_langs.romaji_ext_lang,
-    'japanese': anilist_langs.japanese_ext_lang,
-    'unknown': anilist_langs.unknown_ext_lang,
-}
-
 
 class WorkCategories:
     @cached_property
@@ -127,15 +123,22 @@ class WorkCategories:
     def manga(self) -> Category:
         return Category.objects.get(slug=AniListWorks.mangas.value)
 
-work_categories = WorkCategories()
-
 
 class AniListWorks(Enum):
+    """
+    This class enumerates the different kinds of works found on AniList
+    """
+
     animes = 'anime'
     mangas = 'manga'
 
 
 class AniListStatus(Enum):
+    """
+    This class enumerates the different kinds of airing (or publising) statuses
+    for animes (or mangas) on AniList
+    """
+
     aired = 'finished airing'
     airing = 'currently airing'
     published = 'finished publishing'
@@ -145,7 +148,28 @@ class AniListStatus(Enum):
     cancelled = 'cancelled'
 
 
+class AniListRelationType(Enum):
+    """
+    This class enumerates the different kinds of relations between works found
+    on AniList
+    """
+
+    sequel = 'sequel'
+    prequel = 'prequel'
+    side_story = 'side story'
+    parent_story = 'parent'
+    summary = 'summary'
+    adaptation = 'adaptation'
+
+
 class AniListEntry:
+    """
+    This class stores informations for AniList entries given a JSON for this
+    entry. This is useful for every entry on AniList since it retrieves the
+    more basic informations given by AniList's series models.
+    Sometimes, tags are also included and are stored in this class too.
+    """
+
     def __init__(self, work_info, work_type: AniListWorks):
         self.work_info = work_info
         self.work_type = work_type
@@ -257,6 +281,13 @@ class AniListEntry:
 
 
 class AniListRichEntry(AniListEntry):
+    """
+    This class stores more informations for AniList entries, when such
+    additional information is available. It's most useful when retrieving an
+    entry by its AniList ID : characters, staff, reviews, relations, anime or
+    manga relations, studios and even external links are provided in that case.
+    """
+
     def __init__(self, work_info, work_type: AniListWorks):
         super().__init__(work_info, work_type)
         self._build_external_links()
@@ -286,16 +317,23 @@ class AniListRichEntry(AniListEntry):
                     self.official_url = link['url']
 
     @property
-    def relations(self):
-        pass
+    def relations(self) -> List[Tuple[AniListEntry, str]]:
+        related_works = []
+        if self.work_info.get('relations'):
+            for relation in self.work_info['relations']:
+                related_works.append((
+                    AniListEntry(relation, self.work_type),
+                    AniListRelationType(relation['relation_type'])
+                ))
+        return related_works
 
 
-class AniListWorks(Enum):
-    animes = 'anime'
-    mangas = 'manga'
+class AniListUserEntry:
+    """
+    This class makes it possible to store a user's score alongside the AniList
+    entry, regardless of the entry being an AniListEntry or an AniListRichEntry.
+    """
 
-
-class AniListUserWork:
     __slots__ = ['work', 'score']
 
     def __init__(self,
@@ -445,7 +483,7 @@ class AniList:
 
     def get_user_list(self,
                       worktype: AniListWorks,
-                      username: str) -> Generator[AniListUserWork, None, None]:
+                      username: str) -> Generator[AniListUserEntry, None, None]:
         data = self._request(
             'user/{username}/{worktype}list',
             {'username': username, 'worktype': worktype.value}
@@ -457,17 +495,32 @@ class AniList:
         for list_type in data['lists']:
             for list_entry in data['lists'][list_type]:
                 try:
-                    yield AniListUserWork(
+                    yield AniListUserEntry(
                         work=AniListEntry(list_entry[worktype.value], worktype),
                         score=int(list_entry['score'])
                     )
                 except KeyError:
                     raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
+
 client = AniList(
     getattr(settings, 'ANILIST_CLIENT', None),
     getattr(settings, 'ANILIST_SECRET', None)
 )
+
+anilist_langs = AniListLanguages()
+language_map = {
+    'english': anilist_langs.english_ext_lang,
+    'romaji': anilist_langs.romaji_ext_lang,
+    'japanese': anilist_langs.japanese_ext_lang,
+    'unknown': anilist_langs.unknown_ext_lang,
+}
+
+work_categories = WorkCategories()
+category_map = {
+    AniListWorks.animes: work_categories.anime,
+    AniListWorks.mangas: work_categories.manga
+}
 
 def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Optional[List[Work]]:
     """
@@ -491,11 +544,7 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
 
         studio = None
 
-        category = (
-            work_categories.anime if entry.work_type == AniListWorks.animes else
-            work_categories.manga if entry.work_type == AniListWorks.mangas else
-            None
-        )
+        category = category_map.get(entry.work_type, None)
 
         work_present_in_db = Work.objects.filter(
             category__slug=entry.work_type.value,
@@ -508,7 +557,7 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
 
         # Link Studio and Work [AniListRichEntry only]
         if isinstance(entry, AniListRichEntry) and entry.studio:
-            studio, created = studio.objects.get_or_create(title=entry.studio)
+            studio, created = Studio.objects.get_or_create(title=entry.studio)
 
         # Create the Work entry in the database
         work = Work.objects.create(
@@ -541,8 +590,26 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
         ]
         WorkTitle.objects.bulk_create(current_work_titles)
 
-        # Here, should build staff too ! [AniListRichEntry]
+        # Build RelatedWorks (and add those Works too) [AniListRichEntry only]
+        if isinstance(entry, AniListRichEntry) and entry.relations:
+            new_relations = []
+
+            for work_related, relation_type in entry.relations:
+                added_work = insert_works_into_database_from_anilist([work_related])
+                if not added_work:
+                    continue
+
+                new_relations.append(
+                    RelatedWork(
+                        parent_work=work,
+                        child_work=added_work[0],
+                        type=relation_type.name
+                    )
+                )
+
+            RelatedWork.objects.bulk_create(new_relations)
+
+        # Here, should build staff too ! [AniListRichEntry only]
         # Here, should build genres too !
-        # Here, should build related works too ! [AniListRichEntry]
 
     return new_works
