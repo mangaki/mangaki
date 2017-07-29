@@ -61,10 +61,13 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('poster_id', nargs=1, type=int)
         parser.add_argument('--collage', dest='collage', action='store_true')
+        parser.add_argument('--limit', dest='limit', type=int)
 
     def handle(self, *args, **options):
         id_wanted = options['poster_id'][0]
         poster_wanted = '{}.jpg'.format(id_wanted)
+
+        number_neighbors = options['limit'] if options['limit'] else NUMBER_CLOSESTS
 
         processed_data = {}
         df = None
@@ -97,7 +100,7 @@ class Command(BaseCommand):
 
         # Display ID of neighbors for a poster and make a collage if flag passed as argument
         if id_wanted in neighborship:
-            closests = neighborship.loc[id_wanted].sort_values('index').axes[0].tolist()[1:NUMBER_CLOSESTS+1]
+            closests = neighborship.loc[id_wanted].sort_values('index').axes[0].tolist()[1:number_neighbors+1]
             self.stdout.write(', '.join(list(map(str, closests))))
 
             if options['collage']:
