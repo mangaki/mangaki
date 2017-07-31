@@ -230,42 +230,57 @@ class WorkAdmin(admin.ModelAdmin):
 
     make_nsfw.short_description = "Rendre NSFW les œuvres sélectionnées"
 
-    # FIXME : https://github.com/mangaki/mangaki/issues/205
     def update_tags_via_anidb(self, request, queryset):
-        if request.POST.get('confirm'):
-            kept_ids = request.POST.getlist('checks')
-            for anime_id in kept_ids:
-                anime = Work.objects.get(id=anime_id)
-
-                #FIXME: Should be retrieved thanks to the form !
-                anidb_tags = client.get_tags(anidb_aid=anime.anidb_aid)
-                tags_diff = diff_between_anidb_and_local_tags(anime, anidb_tags)
-
-                deleted_tags = tags_diff["deleted_tags"]
-                added_tags = tags_diff["added_tags"]
-                updated_tags = tags_diff["updated_tags"]
-
-                tags = deleted_tags
-                tags.update(added_tags)
-                tags.update(updated_tags)
-
-                client.update_tags(anime, tags)
-
-            self.message_user(request, "Modifications sur les tags faites")
-            return None
-
         works = queryset.all()
+
+        if request.POST.get('confirm'): # Updating tags has been confirmed
+            to_update_work_ids = set(list(map(int, request.POST.getlist('to_update_work_ids'))))
+            work_ids = list(map(int, request.POST.getlist('work_ids')))
+            nb_updates = len(to_update_work_ids)
+            tag_titles = request.POST.getlist('tag_titles')
+            tag_weights = request.POST.getlist('weights')
+            tag_anidb_tag_ids = request.POST.getlist('anidb_tag_ids')
+
+            # Build a dict that links a work ID and the dict of tags
+            final_tags_with_work_id = {}
+            for index, work_id in enumerate(work_ids):
+                if not final_tags_with_work_id.get(work_id):
+                    final_tags_with_work_id[work_id] = {}
+                final_tags_with_work_id[work_id].update({
+                    tag_titles[index]: {
+                        'weight': tag_weights[index],
+                        'anidb_tag_id': tag_anidb_tag_ids[index]
+                    }
+                })
+
+            # Update tags for works that have been marked to be updated
+            for work in works:
+                if work.id in to_update_work_ids:
+                    client.update_tags(work, final_tags_with_work_id[work.id])
+
+            if nb_updates == 0:
+                self.message_user(request,
+                                  "Aucune oeuvre n'a été marquée comme devant être mise à jour.",
+                                  level=messages.WARNING)
+            elif nb_updates == 1:
+                self.message_user(request,
+                                  "Mise à jour des tags effectuée pour 1 œuvre.")
+            else:
+                self.message_user(request,
+                                  "Mise à jour des tags effectuée pour {} œuvres.".format(nb_updates))
+            return None
 
         # Check for works with missing AniDB AID
         offending_works = []
         if not all(work.anidb_aid for work in works):
             offending_works = [work for work in works if not work.anidb_aid]
             self.message_user(request,
-            "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
-            "Le rafraichissement de leurs tags a été omis. (Détails: {})"
+            """Certains de vos choix ne possèdent pas d'identifiant AniDB.
+            Le rafraichissement de leurs tags a été omis. (Détails: {})"""
             .format(", ".join(map(lambda w: w.title, offending_works))),
             level=messages.WARNING)
 
+        # Retrieve and send tags information to the appropriate form
         all_information = {}
         for index, work in enumerate(works, start=1):
             if work.anidb_aid:

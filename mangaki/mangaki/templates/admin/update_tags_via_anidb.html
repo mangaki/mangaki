@@ -29,6 +29,7 @@
             <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
             <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
             <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
+            <input type="hidden" value="{{ work_id }}" name="work_ids" />
         </p>
     {% endfor %}
 {% else %}
@@ -45,6 +46,7 @@
             <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
             <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
             <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
+            <input type="hidden" value="{{ work_id }}" name="work_ids" />
         </p>
     {% endfor %}
 {% else %}
@@ -61,6 +63,7 @@
             <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
             <input type="text" style="max-width: 70px" value="{{ tag_infos.1.weight }}" id="{{ tag_title }}_{{ tag_infos.1.anidb_tag_id }}" name="weights" />
             <input type="hidden" value="{{ tag_infos.1.anidb_tag_id }}" name="anidb_tag_ids" />
+            <input type="hidden" value="{{ work_id }}" name="work_ids" />
         </p>
     {% endfor %}
 {% else %}
@@ -77,6 +80,7 @@
             <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
             <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
             <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
+            <input type="hidden" value="{{ work_id }}" name="work_ids" />
         </p>
     {% endfor %}
 {% else %}
@@ -89,7 +93,7 @@
 <p>Quelles sont les œuvres dont vous souhaitez mettre les tags à jour ?</p>
 <div>
     {% for work_id, value in all_information %}
-    <p><label><input type="checkbox" name="checks" value="{{ work_id }}" /> {{ value.title }} </label></p>
+    <p><label><input type="checkbox" name="to_update_work_ids" value="{{ work_id }}" /> {{ value.title }} </label></p>
     {% endfor %}
 
     {% for obj in queryset %}
