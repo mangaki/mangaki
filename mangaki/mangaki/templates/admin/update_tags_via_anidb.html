@@ -16,44 +16,80 @@
 <form method="post">
 {% csrf_token %}
 
-{% for key, value in all_information %}
+{% for work_id, value in all_information %}
 
-<strong>{{value.title}}</strong>
+<h1>(#{{ work_id }}) {{ value.title }}</h1>
 
 <div>
-    <p style="color: red;">Tags supprimés&nbsp;:</p>
-    {% for tag, weight in value.deleted_tags %}
-        <p>{{tag}} : {{weight}} </p>
+<p style="color: red;"><strong>Tags supprimés&nbsp;:</strong></p>
+{% if value.deleted_tags %}
+    {% for tag_title, tag_infos in value.deleted_tags %}
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;
+            <strong><label for="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}">{{ tag_title }}</label></strong>, avec un poids de&nbsp;
+            <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
+            <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
+            <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
+        </p>
     {% endfor %}
+{% else %}
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;Aucun tag n'a été supprimé.</p>
+{% endif %}
 </div>
 
 <div>
-    <p style="color: green;">Tags ajoutés&nbsp;:</p>
-    {% for tag, weight in value.added_tags %}
-        <p>{{tag}} :  {{weight}} </p>
+<p style="color: green;"><strong>Tags ajoutés&nbsp;:</strong></p>
+{% if value.added_tags %}
+    {% for tag_title, tag_infos in value.added_tags %}
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;
+            <strong><label for="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}">{{ tag_title }}</label></strong>, avec un poids de&nbsp;
+            <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
+            <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
+            <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
+        </p>
     {% endfor %}
+{% else %}
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;Aucun tag n'a été ajouté.</p>
+{% endif %}
 </div>
 
 <div>
-    <p style="color: orange;">Tags modifiés&nbsp;:</p>
-    {% for tag, weight in value.updated_tags %}
-        <p>{{tag}} : {{weight.0}} -> {{weight.1}} </p>
+<p style="color: orange;"><strong>Tags modifiés&nbsp;:</strong></p>
+{% if value.updated_tags %}
+    {% for tag_title, tag_infos in value.updated_tags %}
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;
+            <strong><label for="{{ tag_title }}_{{ tag_infos.1.anidb_tag_id }}">{{ tag_title }}</label></strong>, dont le poids passe de {{ tag_infos.0.weight }} à&nbsp;
+            <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
+            <input type="text" style="max-width: 70px" value="{{ tag_infos.1.weight }}" id="{{ tag_title }}_{{ tag_infos.1.anidb_tag_id }}" name="weights" />
+            <input type="hidden" value="{{ tag_infos.1.anidb_tag_id }}" name="anidb_tag_ids" />
+        </p>
     {% endfor %}
+{% else %}
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;Aucun tag n'a été modifié.</p>
+{% endif %}
 </div>
 
 <div>
-    <p>Tags conservés&nbsp;:</p>
-    {% for tag, weight in value.kept_tags %}
-        <p>{{tag}} : {{weight}} </p>
+<p><strong>Tags conservés&nbsp;:</strong></p>
+{% if value.kept_tags %}
+    {% for tag_title, tag_infos in value.kept_tags %}
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;
+            <strong><label for="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}">{{ tag_title }}</label></strong>, avec un poids de&nbsp;
+            <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
+            <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
+            <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
+        </p>
     {% endfor %}
+{% else %}
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;Aucun tag n'a été conservé.</p>
+{% endif %}
 </div>
 
 {% endfor %}
 
 <p>Quelles sont les œuvres dont vous souhaitez mettre les tags à jour ?</p>
 <div>
-    {% for key, value in all_information %}
-    <p><label><input type="checkbox" name="checks" value="{{ key }}" /> {{ value.title }} </label></p>
+    {% for work_id, value in all_information %}
+    <p><label><input type="checkbox" name="checks" value="{{ work_id }}" /> {{ value.title }} </label></p>
     {% endfor %}
 
     {% for obj in queryset %}
