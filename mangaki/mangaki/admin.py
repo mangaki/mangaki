@@ -235,25 +235,38 @@ class WorkAdmin(admin.ModelAdmin):
 
         if request.POST.get('confirm'): # Updating tags has been confirmed
             to_update_work_ids = set(list(map(int, request.POST.getlist('to_update_work_ids'))))
-            work_ids = list(map(int, request.POST.getlist('work_ids')))
             nb_updates = len(to_update_work_ids)
+
+            work_ids = list(map(int, request.POST.getlist('work_ids')))
             tag_titles = request.POST.getlist('tag_titles')
-            tag_weights = request.POST.getlist('weights')
-            tag_anidb_tag_ids = request.POST.getlist('anidb_tag_ids')
+            tag_weights = list(map(int, request.POST.getlist('weights')))
+            tag_anidb_tag_ids = list(map(int, request.POST.getlist('anidb_tag_ids')))
+            tag_operations = request.POST.getlist('tag_operations')
+
+            # These checkboxes make it possible to know which tags should be added, kept, modified or removed
+            tag_checkboxes = request.POST.getlist('tag_checkboxes')
+            tags_to_process = [list(map(int, tag_checkbox.split(':'))) for tag_checkbox in tag_checkboxes]
 
             # Build a dict that links a work ID and the dict of tags
             final_tags_with_work_id = {}
             for index, work_id in enumerate(work_ids):
+                process = [work_id, tag_anidb_tag_ids[index]] in tags_to_process
+                to_delete = tag_operations[index] == 'deleted'
+                to_add_or_update_or_keep = tag_operations[index] in ('added', 'modified', 'kept')
+
                 if not final_tags_with_work_id.get(work_id):
                     final_tags_with_work_id[work_id] = {}
-                final_tags_with_work_id[work_id].update({
-                    tag_titles[index]: {
-                        'weight': tag_weights[index],
-                        'anidb_tag_id': tag_anidb_tag_ids[index]
-                    }
-                })
 
-            # Update tags for works that have been marked to be updated
+                # Only add this tag to the list of tags to process if it has been checked
+                if (process and to_add_or_update_or_keep) or (not process and to_delete):
+                    final_tags_with_work_id[work_id].update({
+                        tag_titles[index]: {
+                            'weight': tag_weights[index],
+                            'anidb_tag_id': tag_anidb_tag_ids[index]
+                        }
+                    })
+
+            # Process selected tags for works that have been selected
             for work in works:
                 if work.id in to_update_work_ids:
                     client.update_tags(work, final_tags_with_work_id[work.id])
