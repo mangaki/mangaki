@@ -1,65 +1,68 @@
 {% extends "admin/base_site.html" %}
-{% load staticfiles %} 
+{% load i18n l10n admin_urls %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; Mettre à jour les tags depuis AniDB
+</div>
+{% endblock %}
 
 {% block content %}
+<form method="post">
+{% csrf_token %}
 
 {% for key, value in all_information %}
 
-{{value.title}}
-    
-    <p>Les tags enlevés sont:</p>
+<strong>{{value.title}}</strong>
+
+<div>
+    <p style="color: red;">Tags supprimés&nbsp;:</p>
     {% for tag, weight in value.deleted_tags %}
-        <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
+        <p>{{tag}} : {{weight}} </p>
     {% endfor %}
+</div>
 
-    <p></p>
-    
-    <p>Les tous nouveaux tags sont:</p>
+<div>
+    <p style="color: green;">Tags ajoutés&nbsp;:</p>
     {% for tag, weight in value.added_tags %}
-        <p> &nbsp;&nbsp;&nbsp; {{tag}} :  {{weight}} </p>
+        <p>{{tag}} :  {{weight}} </p>
     {% endfor %}
+</div>
 
-    <p></p>
-    
-    <p>Les tags modifiés sont :</p>
-    {% for tag, weight in value.updated_tags %}            
-        <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight.0}} -> {{weight.1}} </p>
+<div>
+    <p style="color: orange;">Tags modifiés&nbsp;:</p>
+    {% for tag, weight in value.updated_tags %}
+        <p>{{tag}} : {{weight.0}} -> {{weight.1}} </p>
     {% endfor %}
+</div>
 
-    <p></p>
-
-    <p>Les tags non modifiés/restés identiques sont:</p>
+<div>
+    <p>Tags conservés&nbsp;:</p>
     {% for tag, weight in value.kept_tags %}
-        <p> &nbsp;&nbsp;&nbsp; {{tag}} : {{weight}} </p>
+        <p>{{tag}} : {{weight}} </p>
+    {% endfor %}
+</div>
+
+{% endfor %}
+
+<p>Quelles sont les œuvres dont vous souhaitez mettre les tags à jour ?</p>
+<div>
+    {% for key, value in all_information %}
+    <p><label><input type="checkbox" name="checks" value="{{ key }}" /> {{ value.title }} </label></p>
     {% endfor %}
 
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-{% endfor %}
-
-<form action="" method="post">{% csrf_token %}
-<ul>
-{% for key, value in all_information %}
-<li><label><input type="checkbox" name="checks" value="{{ key }}" /> {{ value.title }} </label></li>
-
-{% endfor %}
-</ul>
-
-{% for key, value in all_information %}
-<input type="hidden" name="{{ action_checkbox_name }}" value="{{ key }}" />
-{% endfor %}
-
-<input type="hidden" name="action" value="update_tags_via_anidb" />
-<input type="hidden" name="post" value="yes" />
-<input type="submit" value="faire les modifications sur les oeuvres sélectionnées" />
+    {% for obj in queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+    {% endfor %}
+    <input type="hidden" name="action" value="{{ action }}" />
+    <input type="hidden" name="confirm" value="yes" />
+    <input type="submit" value="{% trans "Yes, I'm sure" %}" />
+    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
 </div>
 </form>
-
 {% endblock %}

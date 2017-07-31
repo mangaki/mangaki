@@ -232,7 +232,7 @@ class WorkAdmin(admin.ModelAdmin):
 
     # FIXME : https://github.com/mangaki/mangaki/issues/205
     def update_tags_via_anidb(self, request, queryset):
-        if request.POST.get("post"):
+        if request.POST.get('confirm'):
             kept_ids = request.POST.getlist('checks')
             for anime_id in kept_ids:
                 anime = Work.objects.get(id=anime_id)
@@ -254,41 +254,51 @@ class WorkAdmin(admin.ModelAdmin):
             self.message_user(request, "Modifications sur les tags faites")
             return None
 
-        for anime in queryset.select_related("category"):
-            if anime.category.slug != 'anime':
-                self.message_user(request,
-                                  "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les "
-                                  "animes " % anime.title)
-                self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
-                return None
-            elif not anime.anidb_aid:
-                self.message_user(
-                    request,
-                    "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" % anime.title)
-                self.message_user(
-                    request,
-                    "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
-                return None
+        works = queryset.all()
+
+        # Check for works with missing AniDB AID
+        offending_works = []
+        if not all(work.anidb_aid for work in works):
+            offending_works = [work for work in works if not work.anidb_aid]
+            self.message_user(request,
+            "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
+            "Le rafraichissement de leurs tags a été omis. (Détails: {})"
+            .format(", ".join(map(lambda w: w.title, offending_works))),
+            level=messages.WARNING)
 
         all_information = {}
-        for anime in queryset:
-            anidb_tags = client.get_tags(anidb_aid=anime.anidb_aid)
-            tags_diff = diff_between_anidb_and_local_tags(anime, anidb_tags)
+        for index, work in enumerate(works, start=1):
+            if work.anidb_aid:
+                if index % 25 == 0:
+                    logger.info('(AniDB refresh): Sleeping...')
+                    time.sleep(1)  # Don't spam AniDB.
 
-            deleted_tags = tags_diff["deleted_tags"]
-            added_tags = tags_diff["added_tags"]
-            updated_tags = tags_diff["updated_tags"]
-            kept_tags = tags_diff["kept_tags"]
+                anidb_tags = client.get_tags(anidb_aid=work.anidb_aid)
+                tags_diff = diff_between_anidb_and_local_tags(work, anidb_tags)
 
-            all_information[anime.id] = {'title': anime.title, 'deleted_tags': deleted_tags.items(),
-                                         'added_tags': added_tags.items(), 'updated_tags': updated_tags.items(),
-                                         "kept_tags": kept_tags.items()}
+                deleted_tags = tags_diff["deleted_tags"]
+                added_tags = tags_diff["added_tags"]
+                updated_tags = tags_diff["updated_tags"]
+                kept_tags = tags_diff["kept_tags"]
 
-        context = {
-            'all_information': all_information.items(),
-            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-        }
-        return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
+                all_information[work.id] = {
+                    'title': work.title,
+                    'deleted_tags': deleted_tags.items(),
+                    'added_tags': added_tags.items(),
+                    'updated_tags': updated_tags.items(),
+                    'kept_tags': kept_tags.items()
+                }
+
+        if all_information:
+            context = {
+                'all_information': all_information.items(),
+                'queryset': queryset,
+                'opts': Tag._meta,
+                'action': 'update_tags_via_anidb',
+                'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+            }
+            return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
+        return None
 
     update_tags_via_anidb.short_description = "Mettre à jour les tags des œuvres depuis AniDB"
 
