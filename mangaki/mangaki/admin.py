@@ -277,7 +277,7 @@ class WorkAdmin(admin.ModelAdmin):
                                   level=messages.WARNING)
             elif nb_updates == 1:
                 self.message_user(request,
-                                  "Mise à jour des tags effectuée pour 1 œuvre.")
+                                  "Mise à jour des tags effectuée pour une œuvre.")
             else:
                 self.message_user(request,
                                   "Mise à jour des tags effectuée pour {} œuvres.".format(nb_updates))
