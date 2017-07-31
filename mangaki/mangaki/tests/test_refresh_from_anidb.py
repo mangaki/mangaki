@@ -30,7 +30,7 @@ class RefreshFromAniDBTest(TestCase):
 
     def setUp(self):
         self.user = get_user_model().objects.create_superuser(username='test', password='test', email='email@email.email')
-        
+
         client.client_id = 'fake'
         client.client_ver = 1
         client.is_available = True
@@ -87,6 +87,6 @@ class RefreshFromAniDBTest(TestCase):
         }
 
         response = self.client.post(refresh_tags_from_anidb_url, context)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         tags = set(Work.objects.get(anidb_aid=10889).taggedwork_set.all().values_list('tag__title', flat=True))
