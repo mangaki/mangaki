@@ -19,7 +19,7 @@ from mangaki.models import (
     FAQEntry, ColdStartRating, Trope, Language,
     ExtLanguage, WorkCluster
 )
-from mangaki.utils.anidb import client
+from mangaki.utils.anidb import client, diff_between_anidb_and_local_tags
 from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
@@ -209,7 +209,8 @@ class WorkAdmin(admin.ModelAdmin):
     list_display = ('id', 'category', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter)
     raw_id_fields = ('redirect',)
-    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge', 'refresh_work', 'update_tags_via_anidb', 'change_title']
+    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge',
+               'refresh_work', 'update_tags_via_anidb', 'change_title']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
@@ -236,10 +237,13 @@ class WorkAdmin(admin.ModelAdmin):
             for anime_id in kept_ids:
                 anime = Work.objects.get(id=anime_id)
 
-                retrieved_tags = anime.retrieve_tags(client)
-                deleted_tags = retrieved_tags["deleted_tags"]
-                added_tags = retrieved_tags["added_tags"]
-                updated_tags = retrieved_tags["updated_tags"]
+                #FIXME: Should be retrieved thanks to the form !
+                anidb_tags = client.get_tags(anidb_aid=anime.anidb_aid)
+                tags_diff = diff_between_anidb_and_local_tags(anime, anidb_tags)
+
+                deleted_tags = tags_diff["deleted_tags"]
+                added_tags = tags_diff["added_tags"]
+                updated_tags = tags_diff["updated_tags"]
 
                 tags = deleted_tags
                 tags.update(added_tags)
@@ -268,11 +272,13 @@ class WorkAdmin(admin.ModelAdmin):
 
         all_information = {}
         for anime in queryset:
-            retrieved_tags = anime.retrieve_tags(client)
-            deleted_tags = retrieved_tags["deleted_tags"]
-            added_tags = retrieved_tags["added_tags"]
-            updated_tags = retrieved_tags["updated_tags"]
-            kept_tags = retrieved_tags["kept_tags"]
+            anidb_tags = client.get_tags(anidb_aid=anime.anidb_aid)
+            tags_diff = diff_between_anidb_and_local_tags(anime, anidb_tags)
+
+            deleted_tags = tags_diff["deleted_tags"]
+            added_tags = tags_diff["added_tags"]
+            updated_tags = tags_diff["updated_tags"]
+            kept_tags = tags_diff["kept_tags"]
 
             all_information[anime.id] = {'title': anime.title, 'deleted_tags': deleted_tags.items(),
                                          'added_tags': added_tags.items(), 'updated_tags': updated_tags.items(),

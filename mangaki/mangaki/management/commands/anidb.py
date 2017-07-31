@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Count
-from mangaki.utils.anidb import client
+from mangaki.utils.anidb import client, diff_between_anidb_and_local_tags
 from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling, Language
 from urllib.parse import parse_qs, urlparse
 
@@ -68,11 +68,13 @@ class Command(BaseCommand):
                 language = Language.objects.get(iso639=worktitle[2])
                 WorkTitle.objects.get_or_create(work=anime, title=worktitle[0], language=language, type=worktitle[1])
 
-            retrieved_tags = anime.retrieve_tags(a)
-            deleted_tags = retrieved_tags["deleted_tags"]
-            added_tags = retrieved_tags["added_tags"]
-            updated_tags = retrieved_tags["updated_tags"]
-            kept_tags = retrieved_tags["kept_tags"]
+            anidb_tags = client.get_tags(anidb_aid=anime.anidb_aid)
+            tags_diff = diff_between_anidb_and_local_tags(anime, anidb_tags)
+
+            deleted_tags = tags_diff["deleted_tags"]
+            added_tags = tags_diff["added_tags"]
+            updated_tags = tags_diff["updated_tags"]
+            kept_tags = tags_diff["kept_tags"]
 
             print(anime.title+":")
             if deleted_tags:

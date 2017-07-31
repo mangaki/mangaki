@@ -164,32 +164,6 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
-    def retrieve_tags(self, anidb):
-        anidb_tags = anidb.get_tags(anidb_aid=self.anidb_aid)
-
-        tag_work_list = TaggedWork.objects.filter(work=self).all()
-        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-        current_tags = {
-            value[0]: {
-                "weight": value[2],
-                "anidb_tag_id": value[1]
-            } for value in values
-        }
-
-        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
-        deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
-
-        added_tags_keys = anidb_tags.keys() - current_tags.keys()
-        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
-
-        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
-        remaining_tags = {key: current_tags[key] for key in remaining_tags_keys}
-
-        updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
-        kept_tags = {title: current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
-
-        return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
-
     def is_nsfw_based_on_tags(self, anidb_tags):
         # FIXME: potentially NSFW tags should be stored somewhere else
         potentially_nsfw_tags = ['nudity', 'ecchi', 'pantsu', 'breasts', 'sex',
