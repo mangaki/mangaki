@@ -16,86 +16,95 @@
 <form method="post">
 {% csrf_token %}
 
+<p>Veuillez vérifier que les modifications sur les tags vous conviennent, et valider ces modifications.</p>
+<p>Vous pouvez aussi mettre à jour le poids des tags manuellement.</p>
+<p><strong>Liste des œuvres sélectionnées à traiter :</strong>
+    {% for work_id, value in all_information %}
+    <a href="#work_{{ work_id }}">{{ value.title }}</a>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+<hr/><br/>
+
 {% for work_id, value in all_information %}
 
-<h1>(#{{ work_id }}) {{ value.title }}</h1>
+<h1 id="work_{{ work_id }}">(<a href="#work_{{ work_id }}">#{{ work_id }}</a>) {{ value.title }}</h1>
 
+{% if value.deleted_tags %}
 <div>
 <p style="color: red;"><strong>Tags supprimés&nbsp;:</strong></p>
-{% if value.deleted_tags %}
+    <ul>
     {% for tag_title, tag_infos in value.deleted_tags %}
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;
+        <li>
             <strong><label for="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}">{{ tag_title }}</label></strong>, avec un poids de&nbsp;
             <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
             <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
             <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
-        </p>
+        </li>
     {% endfor %}
-{% else %}
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;Aucun tag n'a été supprimé.</p>
-{% endif %}
+    </ul>
 </div>
+{% endif %}
 
+{% if value.added_tags %}
 <div>
 <p style="color: green;"><strong>Tags ajoutés&nbsp;:</strong></p>
-{% if value.added_tags %}
+    <ul>
     {% for tag_title, tag_infos in value.added_tags %}
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;
+        <li>
             <strong><label for="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}">{{ tag_title }}</label></strong>, avec un poids de&nbsp;
             <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
             <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
             <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
-        </p>
+        </li>
     {% endfor %}
-{% else %}
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;Aucun tag n'a été ajouté.</p>
-{% endif %}
+    </ul>
 </div>
+{% endif %}
 
+{% if value.updated_tags %}
 <div>
 <p style="color: orange;"><strong>Tags modifiés&nbsp;:</strong></p>
-{% if value.updated_tags %}
+    <ul>
     {% for tag_title, tag_infos in value.updated_tags %}
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;
+        <li>
             <strong><label for="{{ tag_title }}_{{ tag_infos.1.anidb_tag_id }}">{{ tag_title }}</label></strong>, dont le poids passe de {{ tag_infos.0.weight }} à&nbsp;
             <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
             <input type="text" style="max-width: 70px" value="{{ tag_infos.1.weight }}" id="{{ tag_title }}_{{ tag_infos.1.anidb_tag_id }}" name="weights" />
             <input type="hidden" value="{{ tag_infos.1.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
-        </p>
+        </li>
     {% endfor %}
-{% else %}
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;Aucun tag n'a été modifié.</p>
-{% endif %}
+    </ul>
 </div>
+{% endif %}
 
+{% if value.kept_tags %}
 <div>
 <p><strong>Tags conservés&nbsp;:</strong></p>
-{% if value.kept_tags %}
+    <ul>
     {% for tag_title, tag_infos in value.kept_tags %}
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;
+        <li>
             <strong><label for="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}">{{ tag_title }}</label></strong>, avec un poids de&nbsp;
             <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
             <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
             <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
-        </p>
+        </li>
     {% endfor %}
-{% else %}
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;Aucun tag n'a été conservé.</p>
-{% endif %}
+    </ul>
 </div>
+{% endif %}
+
+<p><strong><label>Mettre à jour les tags de cette œuvre ?&nbsp;&nbsp;<input type="checkbox" name="to_update_work_ids" value="{{ work_id }}" /> </label></strong></p>
+
+<hr/><br/>
 
 {% endfor %}
 
-<p>Quelles sont les œuvres dont vous souhaitez mettre les tags à jour ?</p>
+<p><strong>Êtes-vous certains de vos choix (et éventuelles modifications sur les poids) ?</strong></p>
 <div>
-    {% for work_id, value in all_information %}
-    <p><label><input type="checkbox" name="to_update_work_ids" value="{{ work_id }}" /> {{ value.title }} </label></p>
-    {% endfor %}
-
     {% for obj in queryset %}
     <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
     {% endfor %}

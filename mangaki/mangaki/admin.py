@@ -308,7 +308,7 @@ class WorkAdmin(admin.ModelAdmin):
             context = {
                 'all_information': all_information.items(),
                 'queryset': queryset,
-                'opts': Tag._meta,
+                'opts': TaggedWork._meta,
                 'action': 'update_tags_via_anidb',
                 'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
             }
