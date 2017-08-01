@@ -164,34 +164,6 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
-    def is_nsfw_based_on_tags(self, anidb_tags):
-        # FIXME: potentially NSFW tags should be stored somewhere else
-        potentially_nsfw_tags = ['nudity', 'ecchi', 'pantsu', 'breasts', 'sex',
-                                 'large breasts', 'small breasts', 'gigantic breasts',
-                                 'incest', 'pornography', 'shota', 'masturbation',
-                                 'sexual fantasies', 'anal', 'loli']
-
-         # FIXME: these should be configurable constants
-        HIGH_NSFW_THRESHOLD = 15
-        LOW_NSFW_THRESHOLD = 30
-
-        sum_weight_all_low = sum(tag.weight for tag in anidb_tags if tag.weight <= 400)
-        sum_weight_nsfw_low = sum(tag.weight for tag in anidb_tags
-                                  if tag.title in potentially_nsfw_tags and tag.weight <= 400)
-
-        sum_weight_all_high = sum(tag.weight for tag in anidb_tags if tag.weight > 400)
-        sum_weight_nsfw_high = sum(tag.weight for tag in anidb_tags
-                                   if tag.title in potentially_nsfw_tags and tag.weight > 400)
-
-        if sum_weight_all_low > 0 and sum_weight_all_high > 0:
-            percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
-            percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
-        else:
-            return False
-
-        return (percent_high_nsfw > HIGH_NSFW_THRESHOLD or
-                percent_low_nsfw > LOW_NSFW_THRESHOLD)
-
     def safe_poster(self, user):
         if self.id is None:
             return '{}{}'.format(settings.STATIC_URL, 'img/chiro.gif')

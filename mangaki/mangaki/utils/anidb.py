@@ -490,7 +490,7 @@ class AniDB:
         self._build_staff(work, creators, reload_role_cache)
         self.update_tags(work, tags)
 
-        if created and work.is_nsfw_based_on_tags(tags):
+        if created and is_nsfw_based_on_anidb_tags(tags):
             work.nsfw = True
             work.save()
 
@@ -541,3 +541,30 @@ def diff_between_anidb_and_local_tags(work: Work,
         'updated_tags': updated_tags,
         'kept_tags': kept_tags
     }
+
+def is_nsfw_based_on_anidb_tags(anidb_tags: List[AniDBTag]) -> bool:
+    # FIXME: potentially NSFW tags should be stored somewhere else
+    potentially_nsfw_tags = ['nudity', 'ecchi', 'pantsu', 'breasts', 'sex',
+                             'large breasts', 'small breasts', 'gigantic breasts',
+                             'incest', 'pornography', 'shota', 'masturbation',
+                             'sexual fantasies', 'anal', 'loli']
+
+     # FIXME: these should be configurable constants
+    HIGH_NSFW_THRESHOLD = 15
+    LOW_NSFW_THRESHOLD = 30
+
+    sum_weight_all_low = sum(tag.weight for tag in anidb_tags if tag.weight <= 400)
+    sum_weight_nsfw_low = sum(tag.weight for tag in anidb_tags
+                              if tag.title in potentially_nsfw_tags and tag.weight <= 400)
+
+    sum_weight_all_high = sum(tag.weight for tag in anidb_tags if tag.weight > 400)
+    sum_weight_nsfw_high = sum(tag.weight for tag in anidb_tags
+                               if tag.title in potentially_nsfw_tags and tag.weight > 400)
+
+    if sum_weight_all_low > 0 and sum_weight_all_high > 0:
+        percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
+        percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+    else:
+        return False
+
+    return (percent_high_nsfw > HIGH_NSFW_THRESHOLD or percent_low_nsfw > LOW_NSFW_THRESHOLD)
