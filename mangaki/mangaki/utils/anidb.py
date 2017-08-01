@@ -311,16 +311,12 @@ class AniDB:
     def update_tags(self,
                     work: Work,
                     anidb_tags: List[AniDBTag]):
-        tag_work_list = TaggedWork.objects.filter(work=work).all()
-        values = tag_work_list.values_list('tag__title', 'weight', 'tag__anidb_tag_id')
-        current_tags = [AniDBTag(title=v[0], weight=v[1], anidb_tag_id=v[2]) for v in values]
+        tags_diff = diff_between_anidb_and_local_tags(work, anidb_tags)
 
-        all_tags = current_tags + anidb_tags
-
-        deleted_tags = list(set(current_tags) - set(anidb_tags))
-        added_tags = list(set(anidb_tags) - set(current_tags))
-        kept_tags = list(set.intersection(set(anidb_tags), set(current_tags)))
-        updated_tags = list(set(all_tags) - set(kept_tags))
+        deleted_tags = tags_diff['deleted_tags']
+        added_tags = tags_diff['added_tags']
+        updated_tags = tags_diff['updated_tags']
+        kept_tags = tags_diff['kept_tags']
 
         deleted_tags_titles = [tag.title for tag in deleted_tags]
         added_tags_id = [tag.anidb_tag_id for tag in added_tags]
