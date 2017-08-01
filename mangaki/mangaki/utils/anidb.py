@@ -503,8 +503,10 @@ client = AniDB(
     getattr(settings, 'ANIDB_VERSION', None)
 )
 
+AniDBTag = Dict[str, Any]
+
 def diff_between_anidb_and_local_tags(work: Work,
-                                      anidb_tags: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Dict[str, Any]]]:
+                                      anidb_tags: Dict[str, AniDBTag]) -> Dict[str, Dict[str, AniDBTag]]:
     """
     Return a Dict containing the difference (ie. added, updated, deleted or kept
     tags) between AniDB's tags and local tags.
