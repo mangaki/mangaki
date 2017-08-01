@@ -79,35 +79,35 @@ class Command(BaseCommand):
             print(anime.title+":")
             if deleted_tags:
                 print("\n\tLes tags enlevés sont :")
-                for tag, tag_infos in deleted_tags.items():
-                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag_infos["anidb_tag_id"], tag, tag_infos["weight"]))
+                for tag in deleted_tags:
+                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag.anidb_tag_id, tag.title, tag.weight))
 
             if added_tags:
                 print("\n\tLes tags totalement nouveaux sont :")
-                for tag, tag_infos in added_tags.items():
-                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag_infos["anidb_tag_id"], tag, tag_infos["weight"]))
+                for tag in added_tags:
+                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag.anidb_tag_id, tag.title, tag.weight))
 
             if updated_tags:
                 print("\n\tLes tags modifiés sont :")
-                for tag, tag_infos in updated_tags.items():
-                    print('\t\t[AniDB Tag ID #{} -> #{}] {}: {} -> {}'.format(
-                        tag_infos[0]["anidb_tag_id"], tag_infos[1]["anidb_tag_id"], tag, tag_infos[0]["weight"], tag_infos[1]["weight"]))
-
+                for tag in updated_tags:
+                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag.anidb_tag_id, tag.title, tag.weight))
 
             if kept_tags:
-                print("\n\tLes tags non modifiés/restés identiques sont :")
-                for tag, tag_infos in kept_tags.items():
-                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag_infos["anidb_tag_id"], tag, tag_infos["weight"]))
+                print("\n\tLes tags identiques sont :")
+                for tag in kept_tags:
+                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag.anidb_tag_id, tag.title, tag.weight))
 
             choice = input("Voulez-vous réaliser ces changements [y/n] : ")
             if choice == 'n':
                 print("\nOk, aucun changement ne va être fait")
             elif choice == 'y':
-                tags = deleted_tags
-                tags.update(added_tags)
-                tags.update(updated_tags)
-                tags.update(kept_tags)
-                client.update_tags(anime, tags)
+                all_tags = []
+                all_tags.extend(deleted_tags)
+                all_tags.extend(added_tags)
+                all_tags.extend(updated_tags)
+                all_tags.extend(kept_tags)
+
+                client.update_tags(anime, all_tags)
 
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
 
