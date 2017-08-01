@@ -1,4 +1,5 @@
 from datetime import datetime
+from collections import namedtuple
 from typing import Dict, List, Tuple, Optional, Any
 from urllib.parse import urljoin
 
@@ -33,6 +34,8 @@ def to_python_datetime(date):
         except ValueError:
             pass
     raise ValueError('no valid date format found for {}'.format(date))
+
+AniDBTag = namedtuple('AniDBTag', ['title', 'weight', 'anidb_tag_id'])
 
 
 class AniDB:
@@ -280,66 +283,64 @@ class AniDB:
 
     def get_tags(self,
                  anidb_aid: Optional[int] = None,
-                 tags_soup: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+                 tags_soup: Optional[str] = None) -> List[AniDBTag]:
         """ Get the list of tags for an anime given the the AniDB ID or the XML
         string containing tags.
 
-        Return : Dict[tag_title: {'weight': int, 'anidb_tag_id': int}]
+        Return : List[AniDBTag]
         """
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
             tags_soup = anime.tags
 
-        tags = {}
-        if tags_soup is not None:
-            for tag_node in tags_soup.find_all('tag'):
-                tag_title = str(tag_node.find('name').string).strip()
-                tag_id = int(tag_node.get('id'))
-                tag_weight = int(tag_node.get('weight'))
-                tag_verified = tag_node.get('verified').lower() == 'true'
+        if tags_soup is None:
+            return []
 
-                if tag_verified:
-                    tags[tag_title] = {'weight': tag_weight, 'anidb_tag_id': tag_id}
+        tags = []
+        for tag_node in tags_soup.find_all('tag'):
+            tag_title = str(tag_node.find('name').string).strip()
+            tag_id = int(tag_node.get('id'))
+            tag_weight = int(tag_node.get('weight'))
+            tag_verified = tag_node.get('verified').lower() == 'true'
+
+            if tag_verified:
+                tags.append( AniDBTag(title=tag_title, weight=tag_weight, anidb_tag_id=tag_id) )
 
         return tags
 
     def update_tags(self,
                     work: Work,
-                    anidb_tags: Dict[str, Dict[str, Any]]):
+                    anidb_tags: List[AniDBTag]):
         tag_work_list = TaggedWork.objects.filter(work=work).all()
-        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-        current_tags = {
-            value[0]: {
-                "weight": value[2],
-                "anidb_tag_id": value[1]
-            } for value in values
-        }
+        values = tag_work_list.values_list('tag__title', 'weight', 'tag__anidb_tag_id')
+        current_tags = [AniDBTag(title=v[0], weight=v[1], anidb_tag_id=v[2]) for v in values]
 
-        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
+        all_tags = current_tags + anidb_tags
 
-        added_tags_keys = anidb_tags.keys() - current_tags.keys()
-        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
+        deleted_tags = list(set(current_tags) - set(anidb_tags))
+        added_tags = list(set(anidb_tags) - set(current_tags))
+        kept_tags = list(set.intersection(set(anidb_tags), set(current_tags)))
+        updated_tags = list(set(all_tags) - set(kept_tags))
 
-        tags_id = [added_tags[title]["anidb_tag_id"] for title in added_tags]
-        existing_tags = Tag.objects.filter(anidb_tag_id__in=tags_id).all()
-        existing_tags_id = existing_tags.values_list('anidb_tag_id', flat=True)
+        deleted_tags_titles = [tag.title for tag in deleted_tags]
+        added_tags_id = [tag.anidb_tag_id for tag in added_tags]
 
-        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
-        updated_tags = {key: anidb_tags[key] for key in remaining_tags_keys if current_tags[key] != anidb_tags[key]}
+        existing_tags = Tag.objects.filter(anidb_tag_id__in=added_tags_id).all()
+        existing_tags_id = set(existing_tags.values_list('anidb_tag_id', flat=True))
 
         # New tags have to be added to the database (if they aren't already present)
         tags_weight = {}
         tags_to_add = []
         tags_list = []
-        for title, tag_infos in added_tags.items():
-            anidb_tag_id = tag_infos["anidb_tag_id"]
-            tags_weight[anidb_tag_id] = tag_infos["weight"]
-            if anidb_tag_id not in existing_tags_id:
-                tag = Tag(title=title, anidb_tag_id=anidb_tag_id)
-                tags_to_add.append(tag)
+        for tag in added_tags:
+            tags_weight[tag.anidb_tag_id] = tag.weight
+            if tag.anidb_tag_id not in existing_tags_id:
+                tag_to_add = Tag(title=tag.title, anidb_tag_id=tag.anidb_tag_id)
+                tags_to_add.append(tag_to_add)
+                tags_list.append(tag_to_add)
             else:
-                tag = existing_tags.filter(anidb_tag_id=anidb_tag_id).first()
-            tags_list.append(tag)
+                existing_tag = existing_tags.filter(anidb_tag_id=tag.anidb_tag_id).first()
+                tags_list.append(existing_tag)
         Tag.objects.bulk_create(tags_to_add)
 
         # Assign tags to the work via TaggedWork
@@ -351,13 +352,13 @@ class AniDB:
         TaggedWork.objects.bulk_create(tagged_works_to_add)
 
         # Update the weight of tags that already exist (only if the weight changed)
-        for title, tag_infos in updated_tags.items():
-            tagged_work = work.taggedwork_set.get(tag__title=title)
-            tagged_work.weight = tag_infos["weight"]
+        for tag in updated_tags:
+            tagged_work = work.taggedwork_set.get(tag__title=tag.title)
+            tagged_work.weight = tag.weight
             tagged_work.save()
 
         # Finally, remove a tag from a work if it no longer exists on AniDB's side
-        TaggedWork.objects.filter(work=work, tag__title__in=deleted_tags_keys).delete()
+        TaggedWork.objects.filter(work=work, tag__title__in=deleted_tags_titles).delete()
 
     def get_related_animes(self,
                            anidb_aid: Optional[int] = None,
@@ -503,35 +504,36 @@ client = AniDB(
     getattr(settings, 'ANIDB_VERSION', None)
 )
 
-AniDBTag = Dict[str, Any]
-
 def diff_between_anidb_and_local_tags(work: Work,
-                                      anidb_tags: Dict[str, AniDBTag]) -> Dict[str, Dict[str, AniDBTag]]:
+                                      anidb_tags: List[AniDBTag]) -> Dict[str, List[AniDBTag]]:
     """
     Return a Dict containing the difference (ie. added, updated, deleted or kept
     tags) between AniDB's tags and local tags.
     """
 
     tag_work_list = TaggedWork.objects.filter(work=work).all()
-    values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-    current_tags = {
-        value[0]: {
-            'weight': value[2],
-            'anidb_tag_id': value[1]
-        } for value in values
-    }
+    values = tag_work_list.values_list('tag__title', 'weight', 'tag__anidb_tag_id')
+    current_tags = [AniDBTag(title=v[0], weight=v[1], anidb_tag_id=v[2]) for v in values]
 
-    deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
-    deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
+    all_tags = current_tags + anidb_tags
 
-    added_tags_keys = anidb_tags.keys() - current_tags.keys()
-    added_tags = {key: anidb_tags[key] for key in added_tags_keys}
-
-    remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
-    remaining_tags = {key: current_tags[key] for key in remaining_tags_keys}
-
-    updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
-    kept_tags = {title: current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
+    deleted_tags = list(set(current_tags) - set(anidb_tags))
+    added_tags = list(set(anidb_tags) - set(current_tags))
+    kept_tags = list(set.intersection(set(anidb_tags), set(current_tags)))
+    updated_tags = list(set(all_tags) - set(kept_tags))
+    #
+    #
+    # deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
+    # deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
+    #
+    # added_tags_keys = anidb_tags.keys() - current_tags.keys()
+    # added_tags = {key: anidb_tags[key] for key in added_tags_keys}
+    #
+    # remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
+    # remaining_tags = {key: current_tags[key] for key in remaining_tags_keys}
+    #
+    # updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
+    # kept_tags = {title: current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
 
     return {
         'deleted_tags': deleted_tags,

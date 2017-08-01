@@ -19,7 +19,7 @@ from mangaki.models import (
     FAQEntry, ColdStartRating, Trope, Language,
     ExtLanguage, WorkCluster
 )
-from mangaki.utils.anidb import client, diff_between_anidb_and_local_tags
+from mangaki.utils.anidb import AniDBTag, client, diff_between_anidb_and_local_tags
 from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
@@ -309,10 +309,10 @@ class WorkAdmin(admin.ModelAdmin):
                 if tags_count > 0:
                     all_information[work.id] = {
                         'title': work.title,
-                        'deleted_tags': tags_diff["deleted_tags"].items(),
-                        'added_tags': tags_diff["added_tags"].items(),
-                        'updated_tags': tags_diff["updated_tags"].items(),
-                        'kept_tags': tags_diff["kept_tags"].items()
+                        'deleted_tags': tags_diff["deleted_tags"],
+                        'added_tags': tags_diff["added_tags"],
+                        'updated_tags': tags_diff["updated_tags"],
+                        'kept_tags': tags_diff["kept_tags"]
                     }
 
         if all_information:

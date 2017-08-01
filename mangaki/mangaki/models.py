@@ -175,15 +175,13 @@ class Work(models.Model):
         HIGH_NSFW_THRESHOLD = 15
         LOW_NSFW_THRESHOLD = 30
 
-        sum_weight_all_low = sum(infos["weight"] for infos in anidb_tags.values()
-                                 if infos["weight"] <= 400)
-        sum_weight_nsfw_low = sum(infos["weight"] for t, infos in anidb_tags.items()
-                                  if t in potentially_nsfw_tags and infos["weight"] <= 400)
+        sum_weight_all_low = sum(tag.weight for tag in anidb_tags if tag.weight <= 400)
+        sum_weight_nsfw_low = sum(tag.weight for tag in anidb_tags
+                                  if tag.title in potentially_nsfw_tags and tag.weight <= 400)
 
-        sum_weight_all_high = sum(infos["weight"] for infos in anidb_tags.values()
-                                  if infos["weight"] > 400)
-        sum_weight_nsfw_high = sum(infos["weight"] for t, infos in anidb_tags.items()
-                                   if t in potentially_nsfw_tags and infos["weight"] > 400)
+        sum_weight_all_high = sum(tag.weight for tag in anidb_tags if tag.weight > 400)
+        sum_weight_nsfw_high = sum(tag.weight for tag in anidb_tags
+                                   if tag.title in potentially_nsfw_tags and tag.weight > 400)
 
         if sum_weight_all_low > 0 and sum_weight_all_high > 0:
             percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100

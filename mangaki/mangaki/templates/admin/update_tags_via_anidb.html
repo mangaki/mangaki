@@ -36,14 +36,14 @@
 <div>
 <p style="color: red;"><strong>Tags supprimés&nbsp;:</strong></p>
     <ul>
-    {% for tag_title, tag_infos in value.deleted_tags %}
+    {% for tag in value.deleted_tags %}
         <li>
-            <strong>{{ tag_title }}</strong>, avec un poids de {{ tag_infos.weight }}&nbsp;
-            <input type="hidden" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
-            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag_infos.anidb_tag_id }}" checked />
+            <strong>{{ tag.title }}</strong>, avec un poids de {{ tag.weight }}&nbsp;
+            <input type="hidden" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />
+            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked />
 
-            <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
-            <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
+            <input type="hidden" value="{{ tag.title }}" name="tag_titles" />
+            <input type="hidden" value="{{ tag.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
             <input type="hidden" value="deleted" name="tag_operations" />
         </li>
@@ -56,14 +56,14 @@
 <div>
 <p style="color: green;"><strong>Tags ajoutés&nbsp;:</strong></p>
     <ul>
-    {% for tag_title, tag_infos in value.added_tags %}
+    {% for tag in value.added_tags %}
         <li>
-            <strong><label for="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}">{{ tag_title }}</label></strong>, avec un poids de&nbsp;
-            <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />
-            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag_infos.anidb_tag_id }}" checked />
+            <strong><label for="{{ tag.title }}_{{ tag.anidb_tag_id }}">{{ tag.title }}</label></strong>, avec un poids de&nbsp;
+            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />
+            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked />
 
-            <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
-            <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
+            <input type="hidden" value="{{ tag.title }}" name="tag_titles" />
+            <input type="hidden" value="{{ tag.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
             <input type="hidden" value="added" name="tag_operations" />
         </li>
@@ -76,14 +76,14 @@
 <div>
 <p style="color: orange;"><strong>Tags modifiés&nbsp;:</strong></p>
     <ul>
-    {% for tag_title, tag_infos in value.updated_tags %}
+    {% for tag in value.updated_tags %}
         <li>
-            <strong><label for="{{ tag_title }}_{{ tag_infos.1.anidb_tag_id }}">{{ tag_title }}</label></strong>, dont le poids passe de {{ tag_infos.0.weight }} à&nbsp;
-            <input type="text" style="max-width: 70px" value="{{ tag_infos.1.weight }}" id="{{ tag_title }}_{{ tag_infos.1.anidb_tag_id }}" name="weights" />&nbsp;
-            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag_infos.1.anidb_tag_id }}" checked />
+            <strong><label for="{{ tag.title }}_{{ tag.anidb_tag_id }}">{{ tag.title }}</label></strong>, avec un poids de&nbsp;
+            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />&nbsp;
+            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked />
 
-            <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
-            <input type="hidden" value="{{ tag_infos.1.anidb_tag_id }}" name="anidb_tag_ids" />
+            <input type="hidden" value="{{ tag.title }}" name="tag_titles" />
+            <input type="hidden" value="{{ tag.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
             <input type="hidden" value="modified" name="tag_operations" />
         </li>
@@ -96,14 +96,14 @@
 <div>
 <p><strong>Tags conservés&nbsp;:</strong></p>
     <ul>
-    {% for tag_title, tag_infos in value.kept_tags %}
+    {% for tag in value.kept_tags %}
         <li>
-            <strong><label for="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}">{{ tag_title }}</label></strong>, avec un poids de&nbsp;
-            <input type="text" style="max-width: 70px" value="{{ tag_infos.weight }}" id="{{ tag_title }}_{{ tag_infos.anidb_tag_id }}" name="weights" />&nbsp;
-            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag_infos.anidb_tag_id }}" checked />
+            <strong><label for="{{ tag.title }}_{{ tag.anidb_tag_id }}">{{ tag.title }}</label></strong>, avec un poids de&nbsp;
+            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />&nbsp;
+            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked />
 
-            <input type="hidden" value="{{ tag_title }}" name="tag_titles" />
-            <input type="hidden" value="{{ tag_infos.anidb_tag_id }}" name="anidb_tag_ids" />
+            <input type="hidden" value="{{ tag.title }}" name="tag_titles" />
+            <input type="hidden" value="{{ tag.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
             <input type="hidden" value="kept" name="tag_operations" />
         </li>
