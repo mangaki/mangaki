@@ -38,14 +38,14 @@
     <ul>
     {% for tag in value.deleted_tags %}
         <li>
-            <strong>{{ tag.title }}</strong>, avec un poids de {{ tag.weight }}&nbsp;
+            <strong>{{ tag.title }}</strong>, avec un poids de&nbsp;
+            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" name="fake_weights" disabled />&nbsp;&nbsp;&nbsp;—
             <input type="hidden" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />
-            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked />
+            <strong><label>Conserver ?&nbsp;&nbsp;<input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" /></label></strong>
 
             <input type="hidden" value="{{ tag.title }}" name="tag_titles" />
             <input type="hidden" value="{{ tag.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
-            <input type="hidden" value="deleted" name="tag_operations" />
         </li>
     {% endfor %}
     </ul>
@@ -59,13 +59,12 @@
     {% for tag in value.added_tags %}
         <li>
             <strong><label for="{{ tag.title }}_{{ tag.anidb_tag_id }}">{{ tag.title }}</label></strong>, avec un poids de&nbsp;
-            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />
-            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked />
+            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />&nbsp;&nbsp;&nbsp;—
+            <strong><label>Ajouter ?&nbsp;&nbsp;<input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked /></label></strong>
 
             <input type="hidden" value="{{ tag.title }}" name="tag_titles" />
             <input type="hidden" value="{{ tag.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
-            <input type="hidden" value="added" name="tag_operations" />
         </li>
     {% endfor %}
     </ul>
@@ -78,14 +77,13 @@
     <ul>
     {% for tag in value.updated_tags %}
         <li>
-            <strong><label for="{{ tag.title }}_{{ tag.anidb_tag_id }}">{{ tag.title }}</label></strong>, avec un poids de&nbsp;
-            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />&nbsp;
-            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked />
+            <strong><label for="{{ tag.title }}_{{ tag.anidb_tag_id }}">{{ tag.title }}</label></strong>, avec un nouveau poids de&nbsp;
+            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />&nbsp;&nbsp;&nbsp;—
+            <strong><label>Modifier ?&nbsp;&nbsp;<input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked /></label></strong>
 
             <input type="hidden" value="{{ tag.title }}" name="tag_titles" />
             <input type="hidden" value="{{ tag.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
-            <input type="hidden" value="modified" name="tag_operations" />
         </li>
     {% endfor %}
     </ul>
@@ -99,13 +97,12 @@
     {% for tag in value.kept_tags %}
         <li>
             <strong><label for="{{ tag.title }}_{{ tag.anidb_tag_id }}">{{ tag.title }}</label></strong>, avec un poids de&nbsp;
-            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />&nbsp;
-            <input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked />
+            <input type="text" style="max-width: 70px" value="{{ tag.weight }}" id="{{ tag.title }}_{{ tag.anidb_tag_id }}" name="weights" />&nbsp;&nbsp;&nbsp;—
+            <strong><label>Conserver ?&nbsp;&nbsp;<input type="checkbox" name="tag_checkboxes" value="{{ work_id }}:{{ tag.anidb_tag_id }}" checked /></label></strong>
 
             <input type="hidden" value="{{ tag.title }}" name="tag_titles" />
             <input type="hidden" value="{{ tag.anidb_tag_id }}" name="anidb_tag_ids" />
             <input type="hidden" value="{{ work_id }}" name="work_ids" />
-            <input type="hidden" value="kept" name="tag_operations" />
         </li>
     {% endfor %}
     </ul>

@@ -237,37 +237,31 @@ class WorkAdmin(admin.ModelAdmin):
             to_update_work_ids = set(map(int, request.POST.getlist('to_update_work_ids')))
             nb_updates = len(to_update_work_ids)
 
-            work_ids = map(int, request.POST.getlist('work_ids'))
+            work_ids = list(map(int, request.POST.getlist('work_ids')))
+
             tag_titles = request.POST.getlist('tag_titles')
             tag_weights = list(map(int, request.POST.getlist('weights')))
             tag_anidb_tag_ids = list(map(int, request.POST.getlist('anidb_tag_ids')))
-            tag_operations = request.POST.getlist('tag_operations')
+            tags = list(map(AniDBTag, tag_titles, tag_weights, tag_anidb_tag_ids))
 
-            # These checkboxes make it possible to know which tags should be added, kept, modified or removed
+            # Checkboxes to know which tags have to be kept regardless of their pending status
             tag_checkboxes = request.POST.getlist('tag_checkboxes')
             tags_to_process = [tuple(map(int, tag_checkbox.split(':'))) for tag_checkbox in tag_checkboxes]
 
-            # Build a dict that links a work ID and the dict of tags
-            final_tags_with_work_id = {}
+            # Make a dict with work_id -> tags to keep
+            tags_final = {}
             for index, work_id in enumerate(work_ids):
-                process = (work_id, tag_anidb_tag_ids[index]) in tags_to_process
-                to_delete = tag_operations[index] == 'deleted'
-                to_add_or_update_or_keep = not to_delete or tag_operations[index] in ('added', 'modified', 'kept')
-
-                if work_id not in final_tags_with_work_id:
-                    final_tags_with_work_id[work_id] = {}
-
-                # Only add this tag to the list of tags to process if it has been checked
-                if (process and to_add_or_update_or_keep) or (not process and to_delete):
-                    final_tags_with_work_id[work_id][tag_titles[index]] = {
-                        'weight': tag_weights[index],
-                        'anidb_tag_id': tag_anidb_tag_ids[index]
-                    }
+                if work_id not in to_update_work_ids:
+                    continue
+                if work_id not in tags_final:
+                    tags_final[work_id] = []
+                if (work_id, tags[index].anidb_tag_id) in tags_to_process:
+                    tags_final[work_id].append(tags[index])
 
             # Process selected tags for works that have been selected
             for work in works:
                 if work.id in to_update_work_ids:
-                    client.update_tags(work, final_tags_with_work_id[work.id])
+                    client.update_tags(work, tags_final[work.id])
 
             if nb_updates == 0:
                 self.message_user(request,
