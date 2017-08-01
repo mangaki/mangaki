@@ -303,19 +303,19 @@ class WorkAdmin(admin.ModelAdmin):
 
                 anidb_tags = client.get_tags(anidb_aid=work.anidb_aid)
                 tags_diff = diff_between_anidb_and_local_tags(work, anidb_tags)
+                tags_count = 0
 
-                deleted_tags = tags_diff["deleted_tags"]
-                added_tags = tags_diff["added_tags"]
-                updated_tags = tags_diff["updated_tags"]
-                kept_tags = tags_diff["kept_tags"]
+                for tags_info in tags_diff.values():
+                    tags_count += len(tags_info)
 
-                all_information[work.id] = {
-                    'title': work.title,
-                    'deleted_tags': deleted_tags.items(),
-                    'added_tags': added_tags.items(),
-                    'updated_tags': updated_tags.items(),
-                    'kept_tags': kept_tags.items()
-                }
+                if tags_count > 0:
+                    all_information[work.id] = {
+                        'title': work.title,
+                        'deleted_tags': tags_diff["deleted_tags"].items(),
+                        'added_tags': tags_diff["added_tags"].items(),
+                        'updated_tags': tags_diff["updated_tags"].items(),
+                        'kept_tags': tags_diff["kept_tags"].items()
+                    }
 
         if all_information:
             context = {
@@ -326,7 +326,11 @@ class WorkAdmin(admin.ModelAdmin):
                 'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
             }
             return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
-        return None
+        else:
+            self.message_user(request,
+                              "Aucune des œuvres sélectionnées n'a subit de mise à jour des tags chez AniDB",
+                              level=messages.WARNING)
+            return None
 
     update_tags_via_anidb.short_description = "Mettre à jour les tags des œuvres depuis AniDB"
 

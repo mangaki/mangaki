@@ -20,12 +20,15 @@
 <p>Vous pouvez aussi mettre à jour le poids des tags manuellement.</p>
 <p><strong>Liste des œuvres sélectionnées à traiter :</strong>
     {% for work_id, value in all_information %}
+    {% if value.deleted_tags or value.added_tags or value.updated_tags or value.kept_tags %}
     <a href="#work_{{ work_id }}">{{ value.title }}</a>{% if not forloop.last %}, {% endif %}
+    {% endif %}
     {% endfor %}
 </p>
 <hr/><br/>
 
 {% for work_id, value in all_information %}
+{% if value.deleted_tags or value.added_tags or value.updated_tags or value.kept_tags %}
 
 <h1 id="work_{{ work_id }}">(<a href="#work_{{ work_id }}">#{{ work_id }}</a>) {{ value.title }}</h1>
 
@@ -113,6 +116,7 @@
 
 <hr/><br/>
 
+{% endif %}
 {% endfor %}
 
 <p><strong>Êtes-vous certains de vos choix (et éventuelles modifications sur les poids) ?</strong></p>
