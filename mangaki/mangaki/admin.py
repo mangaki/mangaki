@@ -37,8 +37,8 @@ class MergeType(Enum):
 
 
 def overwrite_fields(final_work, request):
-    fields_to_choose = set(request.POST.get('fields_to_choose').split(','))
-    fields_required = set(request.POST.get('fields_required').split(','))
+    fields_to_choose = set(filter(None, request.POST.get('fields_to_choose').split(',')))
+    fields_required = set(filter(None, request.POST.get('fields_required').split(',')))
     missing_required_fields = []
 
     for field in fields_to_choose:
