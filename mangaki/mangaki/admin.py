@@ -36,6 +36,12 @@ class MergeType(Enum):
         self.row_color = row_color
 
 
+class MergeErrors(Enum):
+    NO_ID = 'no ID'
+    FIELDS_MISSING = 'fields missings'
+    NOT_ENOUGH_WORKS = 'not enough works'
+
+
 def overwrite_fields(final_work, request):
     fields_to_choose = set(filter(None, request.POST.get('fields_to_choose').split(',')))
     fields_required = set(filter(None, request.POST.get('fields_required').split(',')))
@@ -158,7 +164,7 @@ def merge_works(request, selected_queryset):
 
         # Happens when no ID was provided
         if not request.POST.get('id'):
-            return None, None, 'no ID'
+            return None, None, MergeErrors.NO_ID
 
         final_id = int(request.POST.get('id'))
         final_work = Work.objects.get(id=final_id)
@@ -167,7 +173,7 @@ def merge_works(request, selected_queryset):
 
         # Happens when a required field was left empty
         if missing_required_fields:
-            return None, missing_required_fields, 'fields missing'
+            return None, missing_required_fields, MergeErrors.FIELDS_MISSING
 
         redirect_ratings(works_to_merge, final_work)
         redirect_staff(works_to_merge, final_work)
@@ -178,7 +184,7 @@ def merge_works(request, selected_queryset):
 
     # Just show a warning if only one work was checked
     if len(works_to_merge) < 2:
-        return None, None, 'not enough works checked'
+        return None, None, MergeErrors.NOT_ENOUGH_WORKS
 
     fields_to_choose, fields_required, template_rows, rating_samples = create_merge_form(works_to_merge_qs)
     context = {
@@ -390,16 +396,16 @@ class WorkAdmin(admin.ModelAdmin):
 
     def merge(self, request, queryset):
         nb_merged, final_work, response = merge_works(request, queryset)
-        if response == 'no ID':
+        if response == MergeErrors.NO_ID:
             self.message_user(request,
                               "Aucun ID n'a été fourni pour la fusion.",
                               level=messages.ERROR)
-        if response == 'fields missing':
+        if response == MergeErrors.FIELDS_MISSING:
             self.message_user(request,
                               """Un ou plusieurs des champs requis n'ont pas été remplis.
                               (Détails: {})""".format(", ".join(final_work)),
                               level=messages.ERROR)
-        if response == 'not enough works checked':
+        if response == MergeErrors.NOT_ENOUGH_WORKS:
             self.message_user(request,
                               "Veuillez sélectionner au moins 2 œuvres à fusionner.",
                               level=messages.WARNING)
