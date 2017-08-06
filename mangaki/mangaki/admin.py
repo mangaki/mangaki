@@ -36,11 +36,27 @@ class MergeType(Enum):
         self.row_color = row_color
 
 
+class MergeErrors(Enum):
+    NO_ID = 'no ID'
+    FIELDS_MISSING = 'fields missings'
+    NOT_ENOUGH_WORKS = 'not enough works'
+
+
 def overwrite_fields(final_work, request):
-    for field in request.POST.get('fields_to_choose').split(','):
-        if request.POST.get(field) != 'None':
-            setattr(final_work, field, request.POST.get(field))
-    final_work.save()
+    fields_to_choose = set(filter(None, request.POST.get('fields_to_choose').split(',')))
+    fields_required = set(filter(None, request.POST.get('fields_required').split(',')))
+    missing_required_fields = []
+
+    for field in fields_to_choose:
+        curr_field = request.POST.get(field)
+        if curr_field != 'None' and curr_field is not None:
+            setattr(final_work, field, curr_field)
+        if (curr_field == 'None' or curr_field is None) and field in fields_required:
+            missing_required_fields.append(field)
+
+    if not missing_required_fields:
+        final_work.save()
+    return missing_required_fields  # Return the list of missing required fields
 
 
 def redirect_ratings(works_to_merge, final_work):
@@ -93,7 +109,9 @@ def create_merge_form(works_to_merge_qs):
     for work_dict in work_dicts_to_merge:
         for field in work_dict:
             rows[field].append(work_dict[field])
+
     fields_to_choose = []
+    fields_required = []
     template_rows = []
     for field in rows:
         choices = rows[field]
@@ -117,10 +135,13 @@ def create_merge_form(works_to_merge_qs):
         })
         if field != 'id' and merge_type != MergeType.INFO_ONLY:
             fields_to_choose.append(field)
+        if merge_type == MergeType.CHOICE_REQUIRED:
+            fields_required.append(field)
+
     template_rows.sort(key=lambda row: row['merge_type'].priority, reverse=True)
     rating_samples = [(Rating.objects.filter(work_id=work_dict['id']).count(),
                        Rating.objects.filter(work_id=work_dict['id'])[:10]) for work_dict in work_dicts_to_merge]
-    return fields_to_choose, template_rows, rating_samples
+    return fields_to_choose, fields_required, template_rows, rating_samples
 
 
 @transaction.atomic  # In case trouble happens
@@ -134,14 +155,26 @@ def merge_works(request, selected_queryset):
         from_cluster = False
         works_to_merge_qs = selected_queryset.prefetch_related('rating_set', 'genre')
         works_to_merge = list(works_to_merge_qs)
+
     if request.POST.get('confirm'):  # Merge has been confirmed
         if not from_cluster:
             cluster = WorkCluster(user=request.user, checker=request.user)
             cluster.save()  # Otherwise we cannot add works
             cluster.works.add(*works_to_merge)
+
+        # Happens when no ID was provided
+        if not request.POST.get('id'):
+            return None, None, MergeErrors.NO_ID
+
         final_id = int(request.POST.get('id'))
         final_work = Work.objects.get(id=final_id)
-        overwrite_fields(final_work, request)
+
+        missing_required_fields = overwrite_fields(final_work, request)
+
+        # Happens when a required field was left empty
+        if missing_required_fields:
+            return None, missing_required_fields, MergeErrors.FIELDS_MISSING
+
         redirect_ratings(works_to_merge, final_work)
         redirect_staff(works_to_merge, final_work)
         redirect_related_objects(works_to_merge, final_work)
@@ -149,9 +182,14 @@ def merge_works(request, selected_queryset):
             checker=request.user, resulting_work=final_work, merged_on=timezone.now(), status='accepted')
         return len(works_to_merge), final_work, None
 
-    fields_to_choose, template_rows, rating_samples = create_merge_form(works_to_merge_qs)
+    # Just show a warning if only one work was checked
+    if len(works_to_merge) < 2:
+        return None, None, MergeErrors.NOT_ENOUGH_WORKS
+
+    fields_to_choose, fields_required, template_rows, rating_samples = create_merge_form(works_to_merge_qs)
     context = {
         'fields_to_choose': ','.join(fields_to_choose),
+        'fields_required': ','.join(fields_required),
         'template_rows': template_rows,
         'rating_samples': rating_samples,
         'queryset': selected_queryset,
@@ -397,6 +435,19 @@ class WorkAdmin(admin.ModelAdmin):
 
     def merge(self, request, queryset):
         nb_merged, final_work, response = merge_works(request, queryset)
+        if response == MergeErrors.NO_ID:
+            self.message_user(request,
+                              "Aucun ID n'a été fourni pour la fusion.",
+                              level=messages.ERROR)
+        if response == MergeErrors.FIELDS_MISSING:
+            self.message_user(request,
+                              """Un ou plusieurs des champs requis n'ont pas été remplis.
+                              (Détails: {})""".format(", ".join(final_work)),
+                              level=messages.ERROR)
+        if response == MergeErrors.NOT_ENOUGH_WORKS:
+            self.message_user(request,
+                              "Veuillez sélectionner au moins 2 œuvres à fusionner.",
+                              level=messages.WARNING)
         if response is None:  # Confirmed
             self.message_user(request, format_html('La fusion de {:d} œuvres vers <a href="{:s}">{:s}</a> a bien été effectuée.'
                 .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
