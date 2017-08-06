@@ -246,7 +246,7 @@ class WorkAdmin(admin.ModelAdmin):
 
             # Checkboxes to know which tags have to be kept regardless of their pending status
             tag_checkboxes = request.POST.getlist('tag_checkboxes')
-            tags_to_process = [tuple(map(int, tag_checkbox.split(':'))) for tag_checkbox in tag_checkboxes]
+            tags_to_process = set(tuple(map(int, tag_checkbox.split(':'))) for tag_checkbox in tag_checkboxes)
 
             # Make a dict with work_id -> tags to keep
             tags_final = {}
@@ -276,13 +276,12 @@ class WorkAdmin(admin.ModelAdmin):
             return None
 
         # Check for works with missing AniDB AID
-        offending_works = []
         if not all(work.anidb_aid for work in works):
-            offending_works = [work for work in works if not work.anidb_aid]
             self.message_user(request,
             """Certains de vos choix ne possèdent pas d'identifiant AniDB.
             Le rafraichissement de leurs tags a été omis. (Détails: {})"""
-            .format(", ".join(map(lambda w: w.title, offending_works))),
+            .format(", ".join(map(lambda w: w.title,
+                                  filter(lambda w: not w.anidb_aid, works)))),
             level=messages.WARNING)
 
         # Retrieve and send tags information to the appropriate form
@@ -320,7 +319,7 @@ class WorkAdmin(admin.ModelAdmin):
             return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
         else:
             self.message_user(request,
-                              "Aucune des œuvres sélectionnées n'a subit de mise à jour des tags chez AniDB",
+                              "Aucune des œuvres sélectionnées n'a subit de mise à jour des tags chez AniDB.",
                               level=messages.WARNING)
             return None
 

@@ -304,7 +304,13 @@ class AniDB:
             tag_verified = tag_node.get('verified').lower() == 'true'
 
             if tag_verified:
-                tags.append( AniDBTag(title=tag_title, weight=tag_weight, anidb_tag_id=tag_id) )
+                tags.append(
+                    AniDBTag(
+                        title=tag_title,
+                        weight=tag_weight,
+                        anidb_tag_id=tag_id
+                    )
+                )
 
         return tags
 
@@ -317,8 +323,9 @@ class AniDB:
         added_tags = tags_diff['added_tags']
         updated_tags = tags_diff['updated_tags']
         kept_tags = tags_diff['kept_tags']
+        all_tags = deleted_tags + added_tags + updated_tags + kept_tags
 
-        tags_ids = [tag.anidb_tag_id for tag in deleted_tags+added_tags+updated_tags+kept_tags]
+        tags_ids = [tag.anidb_tag_id for tag in all_tags]
         deleted_tags_ids = [tag.anidb_tag_id for tag in deleted_tags]
 
         existing_tags = Tag.objects.filter(anidb_tag_id__in=tags_ids).all()
