@@ -30,7 +30,7 @@ class RefreshFromAniDBTest(TestCase):
 
     def setUp(self):
         self.user = get_user_model().objects.create_superuser(username='test', password='test', email='email@email.email')
-        
+
         client.client_id = 'fake'
         client.client_ver = 1
         client.is_available = True
@@ -77,13 +77,20 @@ class RefreshFromAniDBTest(TestCase):
     def test_refresh_tags_from_anidb_confirmed(self):
         self.add_to_responses('hibike_euphonium.xml')
         self.client.login(username='test', password='test')
+        hibike = Work.objects.get(title='Hibike! Euphonium')
 
         refresh_tags_from_anidb_url = reverse('admin:mangaki_work_changelist')
         context = {
             'action': 'update_tags_via_anidb',
             admin.ACTION_CHECKBOX_NAME: self.work_ids,
-            'post': 1,
-            'checks': [Work.objects.get(title='Hibike! Euphonium').pk]
+            'confirm': 1,
+            'to_update_work_ids': [str(hibike.pk)],
+            'work_ids': [str(hibike.pk), str(hibike.pk), str(hibike.pk)],
+            'tag_titles': ['female protagonist', 'facial distortion', 'training'],
+            'weights': ['0', '0', '400'],
+            'anidb_tag_ids': ['5851', '4055', '3831'],
+            'tag_operations': ['added', 'added', 'added'],
+            'tag_checkboxes': [str(hibike.pk)+':5851', str(hibike.pk)+':4055', str(hibike.pk)+':3831']
         }
 
         response = self.client.post(refresh_tags_from_anidb_url, context)
