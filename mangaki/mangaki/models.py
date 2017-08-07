@@ -439,6 +439,13 @@ class Suggestion(models.Model):
     is_checked = models.BooleanField(default=False)
 
 
+class Evidence(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    suggestion = models.ForeignKey(Suggestion, on_delete=models.CASCADE)
+    agrees = models.BooleanField(default=False)
+    needs_help = models.BooleanField(default=False)
+
+
 class WorkCluster(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     works = models.ManyToManyField(Work)
