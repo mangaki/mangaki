@@ -9,10 +9,12 @@
 {% for suggestion in suggestions %}
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Suggestion #{{ suggestion.id }}</h3>
+            <h3 class="panel-title">
+                <a href="/fix/suggestion/{{ suggestion.id }}">Suggestion #{{ suggestion.id }}</a>
+            </h3>
         </div>
         <ul class="list-group">
-            <li class="list-group-item"><strong>Problème :</strong> {{ suggestion.problem }}
+            <li class="list-group-item"><strong>Problème :</strong> {{ suggestion.get_problem_display }}
             <li class="list-group-item"><strong>Suggestion émise le</strong> {{ suggestion.date }}
             <li class="list-group-item"><strong>Utilisateur :</strong>
                 <a href="/u/{{ suggestion.user.username }}">
@@ -32,7 +34,7 @@
 <nav aria-label="Navigation de la page" class="text-center">
     <ul class="pagination">
         <li {% if not suggestions.has_previous %} class="disabled" {% endif %}>
-            <a {% if suggestions.has_previous %} href="?page={{ rating.previous_page_number }}" {% endif %}
+            <a {% if suggestions.has_previous %} href="?page={{ suggestions.previous_page_number }}" {% endif %}
                 aria-label="Précédent">
                 <span aria-hidden="true">&laquo;</span>
             </a>
@@ -52,7 +54,7 @@
             {% endif %}
         {% endfor %}
         <li {% if not suggestions.has_next %} class="disabled" {% endif %}>
-            <a {% if suggestions.has_next %} href="?page={{ ratings.next_page_number }}" {% endif %}
+            <a {% if suggestions.has_next %} href="?page={{ suggestions.next_page_number }}" {% endif %}
                 aria-label="Suivant">
                 <span aria-hidden="true">&raquo;</span>
             </a>
@@ -61,7 +63,5 @@
 </nav>
 
 </div>
-
-
 
 {% endblock %}

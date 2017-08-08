@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load posters %}
+
+{% block body %}
+
+<h1>Suggestion #{{ suggestion.pk }}</h1>
+
+<div class="well well-lg">
+    <div class="media">
+        <div class="media-left">
+            <img class="media-object" src="{% poster_url suggestion.work %}" alt="{{ suggestion.work.title }}">
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading">{{ suggestion.work.title }}</h4>
+            stylé
+        </div>
+    </div>
+    <ul>
+        <li>Problème: {{ suggestion.get_problem_display }}</li>
+    </ul>
+    Approuvez-vous cette suggestions ? &nbsp;toggle&nbsp;
+</div>
+
+<nav aria-label="Navigation dans les suggestions de fix">
+    <ul class="pager">
+        <li class="previous {% if not previous_id %} disabled {% endif %}">
+            <a href="{% if previous_id %} /fix/suggestion/{{ previous_id }} {% else %} # {% endif %}">
+                <span aria-hidden="true">&larr;</span> Suggestion précédente
+            </a>
+        </li>
+        <li class="next {% if not next_id %} disabled {% endif %}">
+            <a href="{% if next_id %} /fix/suggestion/{{ next_id }} {% else %} # {% endif %}">
+                Suggestion suivante <span aria-hidden="true">&rarr;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+{% endblock %}

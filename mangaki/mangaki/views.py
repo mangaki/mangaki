@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When
+from django.db.models import Case, IntegerField, Sum, Value, When, Max, Min
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -826,6 +826,32 @@ def fix(request):
     }
 
     return render(request, 'fix/fix_index.html', context)
+
+
+def fix_suggestion(request, suggestion_id):
+    if request.user.is_authenticated and suggestion_id:
+        suggestion = get_object_or_404(Suggestion, id=suggestion_id)
+
+        try:
+            next_id = Suggestion.objects.filter(id__gt=suggestion_id).order_by("id")[0:1].get().id
+        except Suggestion.DoesNotExist:
+            next_id = None
+            # next_id = Suggestion.objects.aggregate(Min("id"))['id__min']
+
+        try:
+            previous_id = Suggestion.objects.filter(id__lt=suggestion_id).order_by("-id")[0:1].get().id
+        except Suggestion.DoesNotExist:
+            previous_id = None
+            # previous_id = Suggestion.objects.aggregate(Max("id"))['id__max']
+
+        context = {
+            'suggestion': suggestion,
+            'next_id': next_id,
+            'previous_id': previous_id
+        }
+
+        return render(request, 'fix/fix_suggestion.html', context)
+
 
 
 def generic_error_view(error, error_code):
