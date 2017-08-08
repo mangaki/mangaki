@@ -56,13 +56,15 @@ urlpatterns = [
     url(r'^legal/$', views.legal_mentions, name='legal'),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}, name='cgu'),
     url(r'^events/$', views.events, name='events'),
+    
+    url(r'^fix/$', views.fix, name='fix'),
+
     # url(r'^lookup/$', views.lookup_work'),
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top, name='top'),
     url(r'^event/(?P<pk>\d+)$', views.EventDetail.as_view(), name='event-detail'),
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
     url(r'^dpp/(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='dpp-works', kwargs={'dpp': True})
-
 ]
 
 handler404 = views.generic_error_view("Le contenu que tu cherches est introuvable.", 404)

@@ -55,6 +55,8 @@ RATINGS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
+FIXES_PER_PAGE = 5
+
 REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
     ('http://animeka.com', 'Animeka'),
@@ -805,6 +807,25 @@ def faq_index(request):
 
 def legal_mentions(request):
     return render(request, 'mangaki/legal.html')
+
+
+def fix(request):
+    suggestion_list = Suggestion.objects.all()
+    paginator = Paginator(suggestion_list, FIXES_PER_PAGE)
+    page = request.GET.get('page')
+
+    try:
+        suggestions = paginator.page(page)
+    except PageNotAnInteger:
+        suggestions = paginator.page(1)
+    except EmptyPage:
+        suggestions = paginator.page(paginator.num_pages)
+
+    context = {
+        'suggestions': suggestions
+    }
+
+    return render(request, 'fix/fix_index.html', context)
 
 
 def generic_error_view(error, error_code):
