@@ -35,7 +35,7 @@ from mangaki.choices import TOP_CATEGORY_CHOICES
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
-                            Recommendation, Staff, Suggestion, Top, Trope, Work)
+                            Recommendation, Staff, Suggestion, Top, Trope, Work, WorkCluster)
 from mangaki.utils.mal import import_mal, client
 from mangaki.utils.profile import (
     get_profile_ratings,
@@ -831,6 +831,10 @@ def fix(request):
 def fix_suggestion(request, suggestion_id):
     if request.user.is_authenticated and suggestion_id:
         suggestion = get_object_or_404(Suggestion, id=suggestion_id)
+        cluster = WorkCluster.objects.filter(origin=suggestion_id).first()
+        related_cluster = None
+        if cluster:
+            related_cluster = cluster.works.all()
 
         try:
             next_id = Suggestion.objects.filter(id__gt=suggestion_id).order_by("id")[0:1].get().id
@@ -846,6 +850,7 @@ def fix_suggestion(request, suggestion_id):
 
         context = {
             'suggestion': suggestion,
+            'related_cluster': related_cluster,
             'next_id': next_id,
             'previous_id': previous_id
         }

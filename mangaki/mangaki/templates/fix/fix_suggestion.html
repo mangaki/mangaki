@@ -54,9 +54,34 @@
                     <small>({{ suggestion.date }})</small>
                 </h5>
             </p>
+            {% if suggestion.message %}
             <hr/>
             <p class="text-muted">{{ suggestion.message }}</p>
+            {% endif %}
+            {% if related_cluster %}
             <hr/>
+            <p><strong>Doublon de&nbsp;:</strong></p>
+            {% for work in related_cluster %}
+            <p align="center">
+                {% if work != suggestion.work %}
+                    <div class="work-sheet data" data-category="{{ work.category|lower }}" data-id="{{ work.id }}" style="float: left; margin-right: 12px;">
+                    <div class="work-card work-card_horizontal" style="width: 190px; height: 283px;">
+                    <div class="work-card__media work-cover" style="background-image: url('{% poster_url work %}');">
+                        <div class="work-cover__wrapper" data-category="{{ work.category|lower }}">
+                            <div class="work-cover__title">
+                                <h2 class="work-card__title" style="font-size: 1.3em;">
+                                    {{ work.title|truncatechars:50 }}
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                {% endif %}
+            </p>
+            {% endfor %}
+            {% endif %}
+            <hr style="clear: both;"/>
             <p align="right">
                 Approuvez-vous cette suggestion&nbsp;?&nbsp;
                 <input type="checkbox" name="agrees" />
