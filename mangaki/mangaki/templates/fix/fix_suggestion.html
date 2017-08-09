@@ -12,8 +12,8 @@
 <div class="row">
 
     <div class="col-sm-4 col-md-3" align="center">
-        <div class="work-sheet data" data-category="{{ suggestion.work.category__slug }}" data-id="{{ suggestion.work.id }}">
-            {% include "mangaki/work_rating.html" with category=suggestion.work.category__slug work=suggestion.work config=config simple=True %}
+        <div class="work-sheet data" data-category="{{ suggestion.work.category.slug }}" data-id="{{ suggestion.work.id }}">
+            {% include "mangaki/work_rating.html" with category=suggestion.work.category.slug work=suggestion.work simple=True %}
         </div>
     </div>
 
@@ -54,18 +54,9 @@
             {% for work in related_cluster %}
             <p align="center">
                 {% if work != suggestion.work %}
-                    <div class="work-sheet data" data-category="{{ work.category|lower }}" data-id="{{ work.id }}" style="float: left; margin-right: 12px;">
-                    <div class="work-card work-card_horizontal" style="width: 190px; height: 283px;">
-                    <div class="work-card__media work-cover" style="background-image: url('{% poster_url work %}');">
-                        <div class="work-cover__wrapper" data-category="{{ work.category|lower }}">
-                            <div class="work-cover__title">
-                                <h2 class="work-card__title" style="font-size: 1.3em;">
-                                    {{ work.title|truncatechars:50 }}
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
+                    <div class="work-sheet data" data-category="{{ work.category.slug }}" data-id="{{ work.id }}"
+                        style="float: left; margin-right: 10px;">
+                        {% include "mangaki/work_rating.html" with category=work.category.slug work=work simple=True %}
                     </div>
                 {% endif %}
             </p>
