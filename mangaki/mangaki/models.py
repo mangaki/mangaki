@@ -440,7 +440,7 @@ class Suggestion(models.Model):
 
     def __str__(self):
         return 'Suggestion#{} de {} : {} - {}'.format(
-            self.pk, self.user.username, self.work.title, self.get_problem_display()
+            self.pk, self.user, self.work.title, self.get_problem_display()
         )
 
 

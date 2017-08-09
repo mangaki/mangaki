@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When, Max, Min
+from django.db.models import Case, IntegerField, Sum, Value, When
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -35,7 +35,7 @@ from mangaki.choices import TOP_CATEGORY_CHOICES
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
-                            Recommendation, Staff, Suggestion, Top, Trope, Work, WorkCluster)
+                            Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
 from mangaki.utils.mal import import_mal, client
 from mangaki.utils.profile import (
     get_profile_ratings,
@@ -809,7 +809,7 @@ def legal_mentions(request):
     return render(request, 'mangaki/legal.html')
 
 
-def fix(request):
+def fix_index(request):
     suggestion_list = Suggestion.objects.all()
     paginator = Paginator(suggestion_list, FIXES_PER_PAGE)
     page = request.GET.get('page')
@@ -831,6 +831,7 @@ def fix(request):
 def fix_suggestion(request, suggestion_id):
     if request.user.is_authenticated and suggestion_id:
         suggestion = get_object_or_404(Suggestion, id=suggestion_id)
+        evidence = Evidence.objects.filter(user=request.user, suggestion=suggestion).first()
         cluster = WorkCluster.objects.filter(origin=suggestion_id).first()
         related_cluster = None
         if cluster:
@@ -840,23 +841,36 @@ def fix_suggestion(request, suggestion_id):
             next_id = Suggestion.objects.filter(id__gt=suggestion_id).order_by("id")[0:1].get().id
         except Suggestion.DoesNotExist:
             next_id = None
-            # next_id = Suggestion.objects.aggregate(Min("id"))['id__min']
 
         try:
             previous_id = Suggestion.objects.filter(id__lt=suggestion_id).order_by("-id")[0:1].get().id
         except Suggestion.DoesNotExist:
             previous_id = None
-            # previous_id = Suggestion.objects.aggregate(Max("id"))['id__max']
 
         context = {
             'suggestion': suggestion,
             'related_cluster': related_cluster,
+            'evidence': evidence,
             'next_id': next_id,
             'previous_id': previous_id
         }
 
         return render(request, 'fix/fix_suggestion.html', context)
 
+
+def update_evidence(request):
+    agrees = request.POST.get('agrees')
+    needs_help = request.POST.get('needs_help')
+
+    if request.user.is_authenticated and request.method == 'POST':
+        evidence, created = Evidence.objects.get_or_create(
+            user=request.user,
+            suggestion=Suggestion.objects.get(pk=request.POST['suggestion'])
+        )
+        evidence.agrees = agrees == 'true' if agrees else evidence.agrees
+        evidence.needs_help = needs_help == 'true' if needs_help else evidence.needs_help
+        evidence.save()
+    return HttpResponse()
 
 
 def generic_error_view(error, error_code):

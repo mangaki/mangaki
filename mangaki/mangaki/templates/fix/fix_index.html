@@ -10,18 +10,18 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">
-                <a href="/fix/suggestion/{{ suggestion.id }}">Suggestion #{{ suggestion.id }}</a>
+                <a href="{% url "fix-suggestion" suggestion.id %}">Suggestion #{{ suggestion.id }}</a>
             </h3>
         </div>
         <ul class="list-group">
             <li class="list-group-item"><strong>Problème :</strong> {{ suggestion.get_problem_display }}
             <li class="list-group-item"><strong>Suggestion émise le</strong> {{ suggestion.date }}
             <li class="list-group-item"><strong>Utilisateur :</strong>
-                <a href="/u/{{ suggestion.user.username }}">
+                <a href="{% url "profile" suggestion.user %}">
                     {{ suggestion.user.username }}</a>
             </li>
             <li class="list-group-item"><strong>Œuvre :</strong>
-                <a href="/{{ suggestion.work.category__slug }}/{{ suggestion.work.pk }}">
+                <a href="{% url "work-detail" suggestion.work.category.slug suggestion.work.pk %}">
                     {{ suggestion.work.title }}</a> ({{ suggestion.work.category }})
             </li>
         </ul>
