@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block title %}Liste des suggestions - Page {{ suggestions.number }} - Mangaki{% endblock %}
+
 {% block body %}
 
-<h1>Fix</h1>
+<h1>Liste des suggestions</h1><br/>
 
 <div class="container">
 {% for suggestion in suggestions %}
@@ -15,19 +17,15 @@
         </div>
         <ul class="list-group">
             <li class="list-group-item"><strong>Problème :</strong> {{ suggestion.get_problem_display }}
-            <li class="list-group-item"><strong>Suggestion émise le</strong> {{ suggestion.date }}
-            <li class="list-group-item"><strong>Utilisateur :</strong>
+            <li class="list-group-item"><strong>Envoyé par :</strong>
                 <a href="{% url "profile" suggestion.user %}">
-                    {{ suggestion.user.username }}</a>
+                    {{ suggestion.user.username }}</a> <small>({{ suggestion.date }})</small>
             </li>
             <li class="list-group-item"><strong>Œuvre :</strong>
                 <a href="{% url "work-detail" suggestion.work.category.slug suggestion.work.pk %}">
-                    {{ suggestion.work.title }}</a> ({{ suggestion.work.category }})
+                    {{ suggestion.work.title }}</a> <small>({{ suggestion.work.category }})</small>
             </li>
         </ul>
-        <div class="panel-body" id="{{ suggestion.id }}">
-            {{ suggestion.message }}
-        </div>
     </div>
 {% endfor %}
 
