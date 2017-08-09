@@ -25,6 +25,21 @@
                 <a href="{% url "work-detail" suggestion.work.category.slug suggestion.work.pk %}">
                     {{ suggestion.work.title }}</a> <small>({{ suggestion.work.category }})</small>
             </li>
+            {% for evidence in suggestion.evidence_set.all %}
+                {% if request.user == evidence.user %}
+                <li class="list-group-item"><small>Vous avez
+                    {% if evidence.agrees %}
+                    <span style="color: green"><strong>approuvé</strong></span>
+                    {% else %}
+                    <span style="color: red"><strong>rejeté</strong></span>
+                    {% endif %}
+                    cette suggestion
+                    {% if evidence.needs_help %}
+                    et avez indiqué qu'il y a <strong>besoin d'un administrateur</strong>.
+                    {% endif %}
+                </small></li>
+                {% endif %}
+            {% endfor %}
         </ul>
     </div>
 {% endfor %}

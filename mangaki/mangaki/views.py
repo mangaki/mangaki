@@ -810,7 +810,9 @@ def legal_mentions(request):
 
 
 def fix_index(request):
-    suggestion_list = Suggestion.objects.select_related('work', 'user').all().prefetch_related('work__category').order_by('-date')
+    suggestion_list = Suggestion.objects.select_related('work', 'user').all().prefetch_related(
+        'work__category', 'evidence_set__user').order_by('-date')
+
     paginator = Paginator(suggestion_list, FIXES_PER_PAGE)
     page = request.GET.get('page')
 
@@ -855,7 +857,7 @@ def fix_suggestion(request, suggestion_id):
             'suggestion': suggestion,
             'related_cluster': cluster,
             'cluster_works': cluster_works,
-            'cluster_colors': cluster_colors[cluster.status],
+            'cluster_colors': cluster_colors[cluster.status] if cluster else None,
             'evidence': evidence,
             'next_id': next_id,
             'previous_id': previous_id
