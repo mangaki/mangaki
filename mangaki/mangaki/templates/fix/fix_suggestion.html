@@ -48,10 +48,10 @@
             <hr/>
             <p class="text-muted">{{ suggestion.message }}</p>
             {% endif %}
-            {% if related_cluster %}
+            {% if related_cluster and cluster_works %}
             <hr/>
             <p><strong>Doublon de&nbsp;:</strong></p>
-            {% for work in related_cluster %}
+            {% for work in cluster_works %}
             <p align="center">
                 {% if work != suggestion.work %}
                     <div class="work-sheet data" data-category="{{ work.category.slug }}" data-id="{{ work.id }}"
@@ -61,8 +61,22 @@
                 {% endif %}
             </p>
             {% endfor %}
+            <p style="clear: both;">Ce cluster est&nbsp;:
+                <strong><span style="color: {{ cluster_colors }}">
+                    {{ related_cluster.get_status_display }}
+                </span></strong>
+                {% if related_cluster.checker %} par {{ related_cluster.checker }} {% endif %}
+            </p>
+            {% if related_cluster.resulting_work %}
+            <p>
+                Ce cluster a résulté en l'œuvre&nbsp;:
+                <a href="{% url "work-detail" related_cluster.resulting_work.category.slug related_cluster.resulting_work.pk %}">{{ related_cluster.resulting_work }}</a>
+                <small>({{ related_cluster.merged_on }})</small>
+            </p>
             {% endif %}
-            <hr style="clear: both;"/>
+
+            {% endif %}
+            <hr/>
             <p align="right">
                 Approuvez-vous cette suggestion&nbsp;?&nbsp;
                 <input type="checkbox" name="agrees" data-suggestion="{{ suggestion.pk }}" {% if evidence.agrees %}checked{% endif %} />

@@ -829,11 +829,17 @@ def fix_index(request):
 
 
 def fix_suggestion(request, suggestion_id):
+    cluster_colors = {
+        'unprocessed': 'black',
+        'accepted': 'green',
+        'rejected': 'red'
+    }
+
     if request.user.is_authenticated and suggestion_id:
         suggestion = get_object_or_404(Suggestion.objects.select_related('work', 'user'), id=suggestion_id)
         evidence = Evidence.objects.filter(user=request.user, suggestion=suggestion).first()
         cluster = WorkCluster.objects.filter(origin=suggestion_id).first()
-        related_cluster = cluster.works.all().prefetch_related('category') if cluster else None
+        cluster_works = cluster.works.all().prefetch_related('category') if cluster else None
 
         try:
             next_id = Suggestion.objects.filter(id__gt=suggestion_id).order_by("id")[0:1].get().id
@@ -847,7 +853,9 @@ def fix_suggestion(request, suggestion_id):
 
         context = {
             'suggestion': suggestion,
-            'related_cluster': related_cluster,
+            'related_cluster': cluster,
+            'cluster_works': cluster_works,
+            'cluster_colors': cluster_colors[cluster.status],
             'evidence': evidence,
             'next_id': next_id,
             'previous_id': previous_id
