@@ -7,74 +7,46 @@
 
 <h1>Liste des suggestions</h1><br/>
 
-<div class="container">
-{% for suggestion in suggestions %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">
-                <a href="{% url "fix-suggestion" suggestion.id %}">Suggestion #{{ suggestion.id }}</a>
-            </h3>
-        </div>
-        <ul class="list-group">
-            <li class="list-group-item"><strong>Problème :</strong> {{ suggestion.get_problem_display }}
-            <li class="list-group-item"><strong>Envoyé par :</strong>
-                <a href="{% url "profile" suggestion.user %}">
-                    {{ suggestion.user.username }}</a> <small>({{ suggestion.date }})</small>
-            </li>
-            <li class="list-group-item"><strong>Œuvre :</strong>
-                <a href="{% url "work-detail" suggestion.work.category.slug suggestion.work.pk %}">
-                    {{ suggestion.work.title }}</a> <small>({{ suggestion.work.category }})</small>
-            </li>
-            {% for evidence in suggestion.evidence_set.all %}
-                {% if request.user == evidence.user %}
-                <li class="list-group-item"><small>Vous avez
-                    {% if evidence.agrees %}
-                    <span style="color: green"><strong>approuvé</strong></span>
-                    {% else %}
-                    <span style="color: red"><strong>rejeté</strong></span>
-                    {% endif %}
-                    cette suggestion
-                    {% if evidence.needs_help %}
-                    et avez indiqué qu'il y a <strong>besoin d'un administrateur</strong>.
-                    {% endif %}
-                </small></li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
-{% endfor %}
-
-<nav aria-label="Navigation de la page" class="text-center">
-    <ul class="pagination">
-        <li {% if not suggestions.has_previous %} class="disabled" {% endif %}>
-            <a {% if suggestions.has_previous %} href="?page={{ suggestions.previous_page_number }}" {% endif %}
-                aria-label="Précédent">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        {% for page in suggestions.paginator.page_range %}
-            {% if page <= suggestions.number|add:2 and page >= suggestions.number|add:-2 %}
-                <li {% if page == suggestions.number %} class="active" {% endif %}>
-                    <a
-                        {% if page == suggestions.number %}
-                            href="#"
-                        {% else %}
-                            href="?page={{ page }}"
-                        {% endif %}>
-                        {{ page }} <span class="sr-only">(courante)</span>
-                    </a>
+<div class="row">
+    {% for suggestion in suggestions %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a href="{% url "fix-suggestion" suggestion.id %}">Suggestion #{{ suggestion.id }}</a>
+                </h3>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Problème :</strong> {{ suggestion.get_problem_display }}
+                <li class="list-group-item"><strong>Envoyé par :</strong>
+                    <a href="{% url "profile" suggestion.user %}">
+                        {{ suggestion.user.username }}</a> <small>({{ suggestion.date }})</small>
                 </li>
-            {% endif %}
-        {% endfor %}
-        <li {% if not suggestions.has_next %} class="disabled" {% endif %}>
-            <a {% if suggestions.has_next %} href="?page={{ suggestions.next_page_number }}" {% endif %}
-                aria-label="Suivant">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
-    </ul>
-</nav>
+                <li class="list-group-item"><strong>Œuvre :</strong>
+                    <a href="{% url "work-detail" suggestion.work.category.slug suggestion.work.pk %}">
+                        {{ suggestion.work.title }}</a> <small>({{ suggestion.work.category }})</small>
+                </li>
+                {% for evidence in suggestion.evidence_set.all %}
+                    {% if request.user == evidence.user %}
+                    <li class="list-group-item"><small>Vous avez
+                        {% if evidence.agrees %}
+                        <span style="color: green"><strong>approuvé</strong></span>
+                        {% else %}
+                        <span style="color: red"><strong>rejeté</strong></span>
+                        {% endif %}
+                        cette suggestion
+                        {% if evidence.needs_help %}
+                        et avez indiqué qu'il y a <strong>besoin d'un administrateur</strong>.
+                        {% endif %}
+                    </small></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+</div>
 
+<div class="row">
+    {% include "pagination.html" with page_obj=suggestions paginator=suggestions.paginator %}
 </div>
 
 {% endblock %}
