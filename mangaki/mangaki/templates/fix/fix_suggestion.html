@@ -8,107 +8,111 @@
 
 <h1>Suggestion #{{ suggestion.pk }}</h1><br/>
 
-<div class="container">
 <div class="row">
 
-    <div class="col-sm-4 col-md-3" align="center">
-        <div class="work-sheet data" data-category="{{ suggestion.work.category.slug }}" data-id="{{ suggestion.work.id }}">
-            {% include "mangaki/work_rating.html" with category=suggestion.work.category.slug work=suggestion.work simple=True %}
-        </div>
-    </div>
+<div class="col-sm-4 col-md-3" align="center">
+    {% include "mangaki/work_rating.html" with category=suggestion.work.category.slug work=suggestion.work simple=True %}
+</div>
 
-    <div class="col-sm-8 col-md-9">
-        <br/>
+<div class="col-sm-8 col-md-9">
+    <br/>
+    <div class="row">
+    <div class="col-md-push-1 col-sm-push-1 col-lg-10 col-sm-10">
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon2">
+                <span class="glyphicon glyphicon-link"></span> Lien de partage
+            </span>
+            <input type="text" class="form-control" value="{{ request.build_absolute_uri }}">
+        </div>
+        <form>
+    </div>
+    </div>
+    <br/>
+
+    <div class="well">
+        <p>
+            <h4><strong>Problème&nbsp;:</strong>
+                {{ suggestion.get_problem_display }}
+            </h4>
+        </p>
+        <p>
+            <h5><strong>Envoyé par&nbsp;:</strong>
+                <a href="{% url "profile" suggestion.user %}">{{ suggestion.user }}</a>
+                <small>({{ suggestion.date }})</small>
+            </h5>
+        </p>
+        {% if suggestion.message %}
+        <hr/>
+        <p class="text-muted">{{ suggestion.message }}</p>
+        {% endif %}
+        {% if related_cluster and cluster_works %}
+        <hr/>
+        <p><strong>Doublon de&nbsp;:</strong></p>
         <div class="row">
-        <div class="col-md-push-1 col-sm-push-1 col-lg-10 col-sm-10">
-            <div class="input-group">
-                <span class="input-group-addon" id="basic-addon2">
-                    <span class="glyphicon glyphicon-link"></span> Lien de partage
-                </span>
-                <input type="text" class="form-control" value="{{ request.build_absolute_uri }}">
-            </div>
-            <form>
-        </div>
-        </div>
-        <br/>
-
-        <div class="well">
-            <p>
-                <h4><strong>Problème&nbsp;:</strong>
-                    {{ suggestion.get_problem_display }}
-                </h4>
-            </p>
-            <p>
-                <h5><strong>Envoyé par&nbsp;:</strong>
-                    <a href="{% url "profile" suggestion.user %}">{{ suggestion.user }}</a>
-                    <small>({{ suggestion.date }})</small>
-                </h5>
-            </p>
-            {% if suggestion.message %}
-            <hr/>
-            <p class="text-muted">{{ suggestion.message }}</p>
-            {% endif %}
-            {% if related_cluster and cluster_works %}
-            <hr/>
-            <p><strong>Doublon de&nbsp;:</strong></p>
-            {% for work in cluster_works %}
-            <p align="center">
+        <div class="cards-grid no-rating">
+        {% for work in cluster_works %}
+        <!-- <p align="center"> -->
                 {% if work != suggestion.work %}
-                    <div class="work-sheet data" data-category="{{ work.category.slug }}" data-id="{{ work.id }}"
-                        style="float: left; margin-right: 10px;">
-                        {% include "mangaki/work_rating.html" with category=work.category.slug work=work simple=True %}
-                    </div>
+                    <!-- <div style="float: left; margin-right: 10px;"> -->
+                    {% include "mangaki/work_rating.html" with category=work.category.slug work=work %}
+                    <!-- </div> -->
                 {% endif %}
-            </p>
-            {% endfor %}
-            <p style="clear: both;">Ce cluster est&nbsp;:
-                <strong><span style="color: {{ cluster_colors }}">
-                    {{ related_cluster.get_status_display }}
-                </span></strong>
-                {% if related_cluster.checker %} par {{ related_cluster.checker }} {% endif %}
-            </p>
-            {% if related_cluster.resulting_work %}
-            <p>
-                Ce cluster a résulté en l'œuvre&nbsp;:
-                <a href="{% url "work-detail" related_cluster.resulting_work.category.slug related_cluster.resulting_work.pk %}">{{ related_cluster.resulting_work }}</a>
-                <small>({{ related_cluster.merged_on }})</small>
-            </p>
-            {% endif %}
-
-            {% endif %}
-            <hr/>
-            <p align="right">
-                Approuvez-vous cette suggestion&nbsp;?&nbsp;
-                <input type="checkbox" name="agrees" data-suggestion="{{ suggestion.pk }}" {% if evidence.agrees %}checked{% endif %} />
-            </p>
-            <p align="right">
-                Demander de l'aide à un administrateur&nbsp;?&nbsp;
-                <input type="checkbox" name="needs_help" data-suggestion="{{ suggestion.pk }}" {% if evidence.needs_help %}checked{% endif %} />
-            </p>
+        <!-- </div> -->
+        <!-- </p> -->
+        {% endfor %}
         </div>
+        </div>
+        <p style="clear: both;">Ce cluster est&nbsp;:
+            <strong><span style="color: {{ cluster_colors }}">
+                {{ related_cluster.get_status_display }}
+            </span></strong>
+            {% if related_cluster.checker %} par {{ related_cluster.checker }} {% endif %}
+        </p>
+        {% if related_cluster.resulting_work %}
+        <p>
+            Ce cluster a résulté en l'œuvre&nbsp;:
+            <a href="{% url "work-detail" related_cluster.resulting_work.category.slug related_cluster.resulting_work.pk %}">{{ related_cluster.resulting_work }}</a>
+            <small>({{ related_cluster.merged_on }})</small>
+        </p>
+        {% endif %}
+
+        {% endif %}
+        <hr/>
+        <p align="right">
+            Approuvez-vous cette suggestion&nbsp;?&nbsp;
+            <input type="checkbox" name="agrees" data-suggestion="{{ suggestion.pk }}" {% if evidence.agrees %}checked{% endif %} />
+        </p>
+        <p align="right">
+            Demander de l'aide à un administrateur&nbsp;?&nbsp;
+            <input type="checkbox" name="needs_help" data-suggestion="{{ suggestion.pk }}" {% if evidence.needs_help %}checked{% endif %} />
+        </p>
     </div>
+</div>
+
 </div>
 
 <hr/>
 
-<nav aria-label="Navigation dans les suggestions de fix">
-    <ul class="pager">
-        <li class="previous {% if not previous_id %} disabled {% endif %}">
-            <a href="{% if previous_id %} {% url "fix-suggestion" previous_id %} {% else %} # {% endif %}">
-                <span aria-hidden="true">&larr;</span> Précédent
-            </a>
-        </li>
-        <li>
-            <a href="/fix/">Retour</a>
-        </li>
-        <li class="next {% if not next_id %} disabled {% endif %}">
-            <a href="{% if next_id %} {% url "fix-suggestion" next_id %} {% else %} # {% endif %}">
-                Suivant <span aria-hidden="true">&rarr;</span>
-            </a>
-        </li>
-    </ul>
-</nav>
+<div class="row">
+    <nav aria-label="Navigation dans les suggestions de fix">
+        <ul class="pager">
+            <li class="previous {% if not previous_id %} disabled {% endif %}">
+                <a href="{% if previous_id %} {% url "fix-suggestion" previous_id %} {% else %} # {% endif %}">
+                    <span aria-hidden="true">&larr;</span> Précédent
+                </a>
+            </li>
+            <li>
+                <a href="/fix/">Retour</a>
+            </li>
+            <li class="next {% if not next_id %} disabled {% endif %}">
+                <a href="{% if next_id %} {% url "fix-suggestion" next_id %} {% else %} # {% endif %}">
+                    Suivant <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
+
 
 {% endblock %}
 
