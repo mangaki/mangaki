@@ -60,7 +60,6 @@ urlpatterns = [
     url(r'^fix/$', views.fix_index, name='fix-index'),
     url(r'^fix/suggestion/(?P<suggestion_id>\d+)$', views.fix_suggestion, name='fix-suggestion'),
     url(r'^evidence/$', views.update_evidence, name='update-evidence'),
-    url(r'^grid/nsfw/$', views.nsfw_grid, name='nsfw-grid'),
 
     # url(r'^lookup/$', views.lookup_work'),
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top, name='top'),
