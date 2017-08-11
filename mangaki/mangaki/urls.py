@@ -56,6 +56,9 @@ urlpatterns = [
     url(r'^legal/$', views.legal_mentions, name='legal'),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}, name='cgu'),
     url(r'^events/$', views.events, name='events'),
+
+    url(r'^grid/nsfw/$', views.nsfw_grid, name='nsfw-grid'),
+
     # url(r'^lookup/$', views.lookup_work'),
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top, name='top'),
     url(r'^event/(?P<pk>\d+)$', views.EventDetail.as_view(), name='event-detail'),

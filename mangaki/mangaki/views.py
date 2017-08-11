@@ -55,6 +55,8 @@ RATINGS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
+NSFW_GRID_PER_PAGE = 10
+
 REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
     ('http://animeka.com', 'Animeka'),
@@ -805,6 +807,46 @@ def faq_index(request):
 
 def legal_mentions(request):
     return render(request, 'mangaki/legal.html')
+
+
+def nsfw_grid(request):
+    #FIXME: remove duplicate suggestions OR group by work ID
+    #TODO: prevent non authentificated and non NSFW users seeing NSFW posters, but let them choose to see them
+    nsfw_suggestion_list = Suggestion.objects.select_related('work', 'user').filter(
+        problem__in=['nsfw', 'n_nsfw']).prefetch_related('work__category',
+        'evidence_set__user').order_by('-work__nb_ratings')
+
+    paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
+    page = request.GET.get('page')
+
+    try:
+        suggestions = paginator.page(page)
+    except PageNotAnInteger:
+        suggestions = paginator.page(1)
+    except EmptyPage:
+        suggestions = paginator.page(paginator.num_pages)
+
+    evidences_nsfw = []
+    for index, suggestion in enumerate(suggestions):
+        evidences_nsfw.append(None)
+        supposed_nsfw = suggestion.problem == 'nsfw'
+        for evidence in suggestion.evidence_set.all():
+            if evidence.user_id != request.user.id:
+                continue
+
+            agrees_with_problem = evidence.agrees
+            agrees = ((agrees_with_problem and supposed_nsfw)
+                   or (not agrees_with_problem and not supposed_nsfw))
+            evidences_nsfw[index] = agrees
+
+    suggestions_with_nsfw_states = zip(suggestions, evidences_nsfw)
+
+    context = {
+        'suggestions_with_nsfw_states': suggestions_with_nsfw_states,
+        'suggestions': suggestions
+    }
+
+    return render(request, 'fix/nsfw_grid.html', context)
 
 
 def generic_error_view(error, error_code):

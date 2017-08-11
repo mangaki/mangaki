@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load posters %}
+
+{% block title %}Grille NSFW - Page {{ suggestions.number }} - Mangaki{% endblock %}
+
+{% block body %}
+
+<h1>Grille NSFW</h1>
+
+<div class="row">
+<div class="cards-grid no-rating">
+{% for suggestion, evidence_nsfw in suggestions_with_nsfw_states %}
+<div>
+    <p>
+        {% include "mangaki/work_rating.html" with category=suggestion.work.category.slug work=suggestion.work %}
+    </p>
+    <p class="list-group-item" align="center">
+        Cette oeuvre est-elle NSFW ?
+    </p>
+    <p>
+        <div class="btn-group btn-group-justified">
+            {% if evidence_nsfw is not None %}
+            <div class="btn-group btn-group-sm">
+                <button type="button" name="nsfw-button" data-suggestion="{{ suggestion.id }}"
+                        data-problem="{{ suggestion.problem }}"
+                        data-nsfw="{% if evidence_nsfw %}yes{% else %}no{% endif %}"
+                        class="btn {% if evidence_nsfw %}btn-success{% else %}btn-danger{% endif %}">
+                        {% if evidence_nsfw %}Oui{% else %}Non{% endif %}
+                </button>
+            </div>
+            {% else %}
+            <div class="btn-group btn-group-sm">
+                <button type="button" data-suggestion="{{ suggestion.id }}" data-state="not-toggled"
+                        data-problem="{{ suggestion.problem }}" data-nsfw="yes"
+                        name="nsfw-button" class="btn btn-success">Oui</button>
+            </div>
+            <div class="btn-group btn-group-sm">
+                <button type="button" data-suggestion="{{ suggestion.id }}" data-state="not-toggled"
+                        data-problem="{{ suggestion.problem }}" data-nsfw="no"
+                        name="nsfw-button" class="btn btn-danger">Non</button>
+            </div>
+            {% endif %}
+        </div>
+    </p>
+</div>
+{% endfor %}
+</div>
+</div>
+
+<div class="row">
+    {% include "pagination.html" with page_obj=suggestions paginator=suggestions.paginator %}
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $.fn.extend({
+        toggleText: function(a, b) {
+            return this.text(this.text().trim() == b ? a : b);
+        }
+    });
+
+    $("[name='nsfw-button']").on("click", function() {
+        if($(this).attr('data-state')) {
+            $(this).parent().siblings('div').remove();
+            $(this).removeAttr('data-state');
+        }
+        else {
+            $(this).toggleClass('btn-danger btn-success');
+            $(this).toggleText('Oui', 'Non');
+            $(this).data('nsfw', $(this).data('nsfw') == 'yes' ? 'no' : 'yes');
+        }
+
+        var says_is_nsfw = $(this).data('nsfw') == 'yes';
+        var supposed_nsfw = $(this).data('problem') == 'nsfw';
+        var agrees = (says_is_nsfw && supposed_nsfw) || (!says_is_nsfw && !supposed_nsfw);
+
+        $.post(Urls['update-evidence'](), {agrees: agrees, suggestion: $(this).data("suggestion")});
+    });
+</script>
+{% endblock %}
