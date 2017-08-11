@@ -51,14 +51,9 @@
         <div class="row">
         <div class="cards-grid no-rating">
         {% for work in cluster_works %}
-        <!-- <p align="center"> -->
-                {% if work != suggestion.work %}
-                    <!-- <div style="float: left; margin-right: 10px;"> -->
-                    {% include "mangaki/work_rating.html" with category=work.category.slug work=work %}
-                    <!-- </div> -->
-                {% endif %}
-        <!-- </div> -->
-        <!-- </p> -->
+            {% if work != suggestion.work %}
+            {% include "mangaki/work_rating.html" with category=work.category.slug work=work %}
+            {% endif %}
         {% endfor %}
         </div>
         </div>
@@ -112,7 +107,6 @@
         </ul>
     </nav>
 </div>
-
 
 {% endblock %}
 
