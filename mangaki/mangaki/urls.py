@@ -58,6 +58,7 @@ urlpatterns = [
     url(r'^events/$', views.events, name='events'),
 
     url(r'^fix/$', views.fix_index, name='fix-index'),
+    url(r'^fix/suggestion/$', views.fix_index, name='fix-index'),
     url(r'^fix/suggestion/(?P<suggestion_id>\d+)$', views.fix_suggestion, name='fix-suggestion'),
     url(r'^evidence/$', views.update_evidence, name='update-evidence'),
 

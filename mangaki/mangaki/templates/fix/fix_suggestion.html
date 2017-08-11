@@ -35,43 +35,48 @@
                 {{ suggestion.get_problem_display }}
             </h4>
         </p>
+
         <p>
             <h5><strong>Envoyé par&nbsp;:</strong>
                 <a href="{% url "profile" suggestion.user %}">{{ suggestion.user }}</a>
                 <small>({{ suggestion.date }})</small>
             </h5>
         </p>
+
         {% if suggestion.message %}
         <hr/>
         <p class="text-muted">{{ suggestion.message }}</p>
         {% endif %}
+
         {% if related_cluster and cluster_works %}
-        <hr/>
-        <p><strong>Doublon de&nbsp;:</strong></p>
-        <div class="row">
-        <div class="cards-grid no-rating">
-        {% for work in cluster_works %}
-            {% if work != suggestion.work %}
-            {% include "mangaki/work_rating.html" with category=work.category.slug work=work %}
+            <hr/>
+            <p><strong>Doublon de&nbsp;:</strong></p>
+            <div class="row">
+            <div class="cards-grid no-rating">
+            {% for work in cluster_works %}
+                {% if work != suggestion.work %}
+                {% include "mangaki/work_rating.html" with category=work.category.slug work=work %}
+                {% endif %}
+            {% endfor %}
+            </div>
+            </div>
+            <p style="clear: both;">Ce cluster est&nbsp;:
+                <strong><span style="color: {{ cluster_colors }}">
+                    {{ related_cluster.get_status_display }}
+                </span></strong>
+                {% if related_cluster.checker %} par
+                <a href="{% url "profile" related_cluster.checker %}">{{ related_cluster.checker }}</a>{% endif %}
+            </p>
+            {% if related_cluster.resulting_work %}
+            <p>
+                Ce cluster a résulté en l'œuvre&nbsp;:
+                <a href="{% url "work-detail" related_cluster.resulting_work.category.slug related_cluster.resulting_work.pk %}">{{ related_cluster.resulting_work }}</a>
+                <small>({{ related_cluster.merged_on }})</small>
+            </p>
             {% endif %}
-        {% endfor %}
-        </div>
-        </div>
-        <p style="clear: both;">Ce cluster est&nbsp;:
-            <strong><span style="color: {{ cluster_colors }}">
-                {{ related_cluster.get_status_display }}
-            </span></strong>
-            {% if related_cluster.checker %} par {{ related_cluster.checker }} {% endif %}
-        </p>
-        {% if related_cluster.resulting_work %}
-        <p>
-            Ce cluster a résulté en l'œuvre&nbsp;:
-            <a href="{% url "work-detail" related_cluster.resulting_work.category.slug related_cluster.resulting_work.pk %}">{{ related_cluster.resulting_work }}</a>
-            <small>({{ related_cluster.merged_on }})</small>
-        </p>
         {% endif %}
 
-        {% endif %}
+        {% if request.user.is_authenticated %}
         <hr/>
         <p align="right">
             Approuvez-vous cette suggestion&nbsp;?&nbsp;
@@ -81,6 +86,7 @@
             Demander de l'aide à un administrateur&nbsp;?&nbsp;
             <input type="checkbox" name="needs_help" data-suggestion="{{ suggestion.pk }}" {% if evidence.needs_help %}checked{% endif %} />
         </p>
+        {% endif %}
     </div>
 </div>
 

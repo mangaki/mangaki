@@ -810,8 +810,8 @@ def legal_mentions(request):
 
 
 def fix_index(request):
-    suggestion_list = Suggestion.objects.select_related('work', 'user').all().prefetch_related(
-        'work__category', 'evidence_set__user').order_by('-date')
+    suggestion_list = Suggestion.objects.select_related('work', 'user').prefetch_related(
+        'work__category', 'evidence_set__user').all().order_by('-date')
 
     paginator = Paginator(suggestion_list, FIXES_PER_PAGE)
     page = request.GET.get('page')
@@ -837,33 +837,39 @@ def fix_suggestion(request, suggestion_id):
         'rejected': 'red'
     }
 
-    if request.user.is_authenticated and suggestion_id:
-        suggestion = get_object_or_404(Suggestion.objects.select_related('work', 'user'), id=suggestion_id)
+    if not suggestion_id:
+        return redirect('fix-index')
+
+    suggestion = get_object_or_404(Suggestion.objects.select_related('work', 'user'), id=suggestion_id)
+
+    evidence = None
+    if request.user.is_authenticated:
         evidence = Evidence.objects.filter(user=request.user, suggestion=suggestion).first()
-        cluster = WorkCluster.objects.filter(origin=suggestion_id).first()
-        cluster_works = cluster.works.all().prefetch_related('category') if cluster else None
 
-        try:
-            next_id = Suggestion.objects.filter(id__gt=suggestion_id).order_by("id")[0:1].get().id
-        except Suggestion.DoesNotExist:
-            next_id = None
+    cluster = WorkCluster.objects.filter(origin=suggestion_id).first()
+    cluster_works = cluster.works.all().prefetch_related('category') if cluster else None
 
-        try:
-            previous_id = Suggestion.objects.filter(id__lt=suggestion_id).order_by("-id")[0:1].get().id
-        except Suggestion.DoesNotExist:
-            previous_id = None
+    try:
+        next_id = Suggestion.objects.filter(id__gt=suggestion_id).order_by("id")[0:1].get().id
+    except Suggestion.DoesNotExist:
+        next_id = None
 
-        context = {
-            'suggestion': suggestion,
-            'related_cluster': cluster,
-            'cluster_works': cluster_works,
-            'cluster_colors': cluster_colors[cluster.status] if cluster else None,
-            'evidence': evidence,
-            'next_id': next_id,
-            'previous_id': previous_id
-        }
+    try:
+        previous_id = Suggestion.objects.filter(id__lt=suggestion_id).order_by("-id")[0:1].get().id
+    except Suggestion.DoesNotExist:
+        previous_id = None
 
-        return render(request, 'fix/fix_suggestion.html', context)
+    context = {
+        'suggestion': suggestion,
+        'related_cluster': cluster,
+        'cluster_works': cluster_works,
+        'cluster_colors': cluster_colors[cluster.status] if cluster else None,
+        'evidence': evidence,
+        'next_id': next_id,
+        'previous_id': previous_id
+    }
+
+    return render(request, 'fix/fix_suggestion.html', context)
 
 
 def update_evidence(request):
