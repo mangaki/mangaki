@@ -8,13 +8,19 @@
 
 <h1>Suggestion #{{ suggestion.pk }}</h1><br/>
 
+{% if suggestion.is_checked %}
+<div class="alert alert-info">
+    <span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Ce problème a été marqué comme résolu !
+</div>
+{% endif %}
+
 <div class="row">
 
-<div class="col-sm-4 col-md-3" align="center">
+<div class="col-md-3" align="center">
     {% include "mangaki/work_rating.html" with category=suggestion.work.category.slug work=suggestion.work simple=True %}
 </div>
 
-<div class="col-sm-8 col-md-9">
+<div class="col-md-9">
     <br/>
     <div class="row">
     <div class="col-md-push-1 col-sm-push-1 col-lg-10 col-sm-10">
@@ -51,41 +57,47 @@
         {% if related_cluster and cluster_works %}
             <hr/>
             <p><strong>Doublon de&nbsp;:</strong></p>
-            <div class="row">
             <div class="cards-grid no-rating">
-            {% for work in cluster_works %}
-                {% if work != suggestion.work %}
-                {% include "mangaki/work_rating.html" with category=work.category.slug work=work %}
-                {% endif %}
-            {% endfor %}
+                {% for work in cluster_works %}
+                    {% if work != suggestion.work %}
+                    {% include "mangaki/work_rating.html" with category=work.category.slug work=work %}
+                    {% endif %}
+                {% endfor %}
             </div>
-            </div>
-            <p style="clear: both;">Ce cluster est&nbsp;:
-                <strong><span style="color: {{ cluster_colors }}">
-                    {{ related_cluster.get_status_display }}
-                </span></strong>
-                {% if related_cluster.checker %} par
-                <a href="{% url "profile" related_cluster.checker %}">{{ related_cluster.checker }}</a>{% endif %}
+            <hr/>
+            <p>
+                Ce cluster est <strong><span class="{{ cluster_colors }}">{{ related_cluster.get_status_display.lower }}</span></strong>
+                {% if related_cluster.checker %} par <a href="{% url "profile" related_cluster.checker %}">{{ related_cluster.checker }}</a>{% endif %}.
             </p>
             {% if related_cluster.resulting_work %}
             <p>
-                Ce cluster a résulté en l'œuvre&nbsp;:
-                <a href="{% url "work-detail" related_cluster.resulting_work.category.slug related_cluster.resulting_work.pk %}">{{ related_cluster.resulting_work }}</a>
+                Ce cluster a résulté en l'œuvre
+                <a href="{% url "work-detail" related_cluster.resulting_work.category.slug related_cluster.resulting_work.pk %}">{{ related_cluster.resulting_work }}</a>.
                 <small>({{ related_cluster.merged_on }})</small>
             </p>
             {% endif %}
         {% endif %}
 
-        {% if request.user.is_authenticated %}
-        <hr/>
-        <p align="right">
-            Approuvez-vous cette suggestion&nbsp;?&nbsp;
-            <input type="checkbox" name="agrees" data-suggestion="{{ suggestion.pk }}" {% if evidence.agrees %}checked{% endif %} />
-        </p>
-        <p align="right">
-            Demander de l'aide à un administrateur&nbsp;?&nbsp;
-            <input type="checkbox" name="needs_help" data-suggestion="{{ suggestion.pk }}" {% if evidence.needs_help %}checked{% endif %} />
-        </p>
+        {% if request.user.is_authenticated and not suggestion.is_checked %}
+            <hr/>
+            <p align="right">
+                Approuvez-vous cette suggestion&nbsp;?&nbsp;
+                <input type="checkbox" name="agrees" data-suggestion="{{ suggestion.pk }}" {% if evidence.agrees %}checked{% endif %} />
+            </p>
+            <p align="right">
+                Demander de l'aide à un administrateur&nbsp;?&nbsp;
+                <input type="checkbox" name="needs_help" data-suggestion="{{ suggestion.pk }}" {% if evidence.needs_help %}checked{% endif %} />
+            </p>
+        {% elif suggestion.is_checked and evidence %}
+            <hr/>
+            <p align="right">
+                Vous avez <strong><span class="{% if evidence.agrees %}text-success">approuvé{% else %}text-danger">rejeté{% endif %}</span></strong> cette suggestion.
+            </p>
+            {% if evidence.needs_help %}
+            <p align="right">
+                Vous avez indiqué qu'il y a <strong>besoin d'un administrateur</strong>.
+            </p>
+            {% endif %}
         {% endif %}
     </div>
 </div>
@@ -95,23 +107,23 @@
 <hr/>
 
 <div class="row">
-    <nav aria-label="Navigation dans les suggestions de fix">
-        <ul class="pager">
-            <li class="previous {% if not previous_id %} disabled {% endif %}">
-                <a href="{% if previous_id %} {% url "fix-suggestion" previous_id %} {% else %} # {% endif %}">
-                    <span aria-hidden="true">&larr;</span> Précédent
-                </a>
-            </li>
-            <li>
-                <a href="/fix/">Retour</a>
-            </li>
-            <li class="next {% if not next_id %} disabled {% endif %}">
-                <a href="{% if next_id %} {% url "fix-suggestion" next_id %} {% else %} # {% endif %}">
-                    Suivant <span aria-hidden="true">&rarr;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+<nav aria-label="Navigation dans les suggestions de fix">
+    <ul class="pager">
+        <li class="previous {% if not previous_id %} disabled {% endif %}">
+            <a {% if previous_id %}href="{% url "fix-suggestion" previous_id %}"{% endif %}>
+                <span aria-hidden="true">&larr;</span> Précédent
+            </a>
+        </li>
+        <li>
+            <a href="/fix/">Retour</a>
+        </li>
+        <li class="next {% if not next_id %} disabled {% endif %}">
+            <a {% if next_id %}href="{% url "fix-suggestion" next_id %}"{% endif %}>
+                Suivant <span aria-hidden="true">&rarr;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 </div>
 
 {% endblock %}

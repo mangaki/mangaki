@@ -1,20 +1,22 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
-{% block title %}Liste des suggestions - Page {{ suggestions.number }} - Mangaki{% endblock %}
+{% block title %}Liste des suggestions {% if suggestions.paginator.page_range|length > 1 %}- Page {{ suggestions.number }} {% endif %}- Mangaki{% endblock %}
 
 {% block body %}
 
 <h1>Liste des suggestions</h1><br/>
 
-<div class="row">
 {% for suggestion in suggestions %}
+<div class="row">
 <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            <a href="{% url "fix-suggestion" suggestion.id %}">Suggestion #{{ suggestion.id }}</a>
-        </h3>
-    </div>
+    <h3 class="panel-heading panel-title">
+        <a href="{% url "fix-suggestion" suggestion.id %}" class="text-primary">Suggestion #{{ suggestion.id }}</a>
+        <span class="small font-weight-bold">
+            &nbsp;&nbsp;<span class="glyphicon glyphicon-{% if suggestion.is_checked %}lock{% else %}flag{% endif %}" aria-hidden="true"></span>
+            Ce problème est {% if suggestion.is_checked %}fermé{% else %}en cours{% endif %}
+        </span>
+    </h3>
     <ul class="list-group">
         <li class="list-group-item"><strong>Problème :</strong> {{ suggestion.get_problem_display }}
 
@@ -31,24 +33,17 @@
         {% if request.user.is_authenticated %}
         {% for evidence in suggestion.evidence_set.all %}
             {% if request.user == evidence.user %}
-            <li class="list-group-item"><small>Vous avez
-                {% if evidence.agrees %}
-                <span style="color: green"><strong>approuvé</strong></span>
-                {% else %}
-                <span style="color: red"><strong>rejeté</strong></span>
-                {% endif %}
-                cette suggestion
-                {% if evidence.needs_help %}
-                et avez indiqué qu'il y a <strong>besoin d'un administrateur</strong>.
-                {% endif %}
-            </small></li>
+            <li class="list-group-item small">
+            Vous avez <strong><span class="{% if evidence.agrees %}text-success">approuvé{% else %}text-danger">rejeté{% endif %}</span></strong> cette suggestion.<br/>
+            {% if evidence.needs_help %}Vous avez indiqué qu'il y a <strong>besoin d'un administrateur</strong>.{% endif %}
+            </li>
             {% endif %}
         {% endfor %}
         {% endif %}
     </ul>
 </div>
-{% endfor %}
 </div>
+{% endfor %}
 
 <div class="row">
     {% include "pagination.html" with page_obj=suggestions paginator=suggestions.paginator %}

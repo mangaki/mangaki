@@ -811,7 +811,7 @@ def legal_mentions(request):
 
 def fix_index(request):
     suggestion_list = Suggestion.objects.select_related('work', 'user').prefetch_related(
-        'work__category', 'evidence_set__user').all().order_by('-date')
+        'work__category', 'evidence_set__user').all().order_by('is_checked', '-date')
 
     paginator = Paginator(suggestion_list, FIXES_PER_PAGE)
     page = request.GET.get('page')
@@ -832,9 +832,9 @@ def fix_index(request):
 
 def fix_suggestion(request, suggestion_id):
     cluster_colors = {
-        'unprocessed': 'black',
-        'accepted': 'green',
-        'rejected': 'red'
+        'unprocessed': 'text-info',
+        'accepted': 'text-success',
+        'rejected': 'text-danger'
     }
 
     if not suggestion_id:
@@ -849,15 +849,21 @@ def fix_suggestion(request, suggestion_id):
     cluster = WorkCluster.objects.filter(origin=suggestion_id).first()
     cluster_works = cluster.works.all().prefetch_related('category') if cluster else None
 
-    try:
-        next_id = Suggestion.objects.filter(id__gt=suggestion_id).order_by("id")[0:1].get().id
-    except Suggestion.DoesNotExist:
-        next_id = None
+    # Get the previous suggestion, ie. more recent and of the same checked status
+    previous_suggestion = Suggestion.objects.filter(date__gt=suggestion.date,
+        is_checked=suggestion.is_checked).order_by('date').first()
 
-    try:
-        previous_id = Suggestion.objects.filter(id__lt=suggestion_id).order_by("-id")[0:1].get().id
-    except Suggestion.DoesNotExist:
-        previous_id = None
+    # If there is no more recent suggestion, and was checked, just pick from not checked suggestions
+    if not previous_suggestion and suggestion.is_checked:
+        previous_suggestion = Suggestion.objects.filter(is_checked=False).order_by('date').first()
+
+    # Get the next suggestion, ie. less recent and of the same checked status
+    next_suggestion = Suggestion.objects.filter(date__lt=suggestion.date,
+        is_checked=suggestion.is_checked).order_by('-date').first()
+
+    # If there is no less recent suggestion, and wasn't checked, just pick from checked suggestions
+    if not next_suggestion and not suggestion.is_checked:
+        next_suggestion = Suggestion.objects.filter(is_checked=True).order_by('-date').first()
 
     context = {
         'suggestion': suggestion,
@@ -865,8 +871,8 @@ def fix_suggestion(request, suggestion_id):
         'cluster_works': cluster_works,
         'cluster_colors': cluster_colors[cluster.status] if cluster else None,
         'evidence': evidence,
-        'next_id': next_id,
-        'previous_id': previous_id
+        'next_id': next_suggestion.id if next_suggestion else None,
+        'previous_id': previous_suggestion.id if previous_suggestion else None
     }
 
     return render(request, 'fix/fix_suggestion.html', context)
