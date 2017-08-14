@@ -30,7 +30,6 @@
             </span>
             <input type="text" class="form-control" value="{{ request.build_absolute_uri }}">
         </div>
-        <form>
     </div>
     </div>
     <br/>
@@ -80,14 +79,11 @@
 
         {% if request.user.is_authenticated and not suggestion.is_checked %}
             <hr/>
-            <p align="right">
-                Approuvez-vous cette suggestion&nbsp;?&nbsp;
-                <input type="checkbox" name="agrees" data-suggestion="{{ suggestion.pk }}" {% if evidence.agrees %}checked{% endif %} />
-            </p>
-            <p align="right">
-                Demander de l'aide à un administrateur&nbsp;?&nbsp;
-                <input type="checkbox" name="needs_help" data-suggestion="{{ suggestion.pk }}" {% if evidence.needs_help %}checked{% endif %} />
-            </p>
+            <form id="evidence_form" action="{% url "update-evidence" %}" method="POST" align="right">
+                {% csrf_token %}
+                {{ evidence_form.as_p }}
+                <input type="submit" class="btn btn-primary" value="Envoyer" name="submit_evidence_form">
+            </form>
         {% elif suggestion.is_checked and evidence %}
             <hr/>
             <p align="right">
@@ -136,14 +132,12 @@
     $.fn.bootstrapSwitch.defaults.onColor = 'success';
     $.fn.bootstrapSwitch.defaults.offColor = 'danger';
 
-    $("[name='agrees']").bootstrapSwitch();
-    $("[name='agrees']").on('switchChange.bootstrapSwitch', function (event, state) {
-        $.post(Urls['update-evidence'](), {agrees: state, suggestion: $(this).data("suggestion")});
-    });
+    $("[name='submit_evidence_form']").remove();
 
-    $("[name='needs_help']").bootstrapSwitch();
-    $("[name='needs_help']").on('switchChange.bootstrapSwitch', function (event, state) {
-        $.post(Urls['update-evidence'](), {needs_help: state, suggestion: $(this).data("suggestion")});
+    $("[name='agrees'], [name='needs_help']").bootstrapSwitch();
+    $("[name='agrees'], [name='needs_help']").on('switchChange.bootstrapSwitch', function(event, state) {
+        var form = $(this).closest("form");
+        $.ajax({type: "POST", url: form.attr('action'), data: form.serialize()});
     });
 </script>
 {% endblock %}

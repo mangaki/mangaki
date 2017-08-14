@@ -1,5 +1,5 @@
 from django import forms
-from mangaki.models import Suggestion, Rating
+from mangaki.models import Suggestion, Evidence, Rating
 from mangaki.utils.ratings import get_anonymous_ratings, clear_anonymous_ratings
 
 
@@ -21,3 +21,18 @@ class SignupForm(forms.Form):
                 Rating(user=user, work_id=work_id, choice=choice)
                 for work_id, choice in ratings.items()
             ])
+
+
+class EvidenceForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Evidence
+        fields = ['agrees', 'needs_help', 'suggestion']
+        labels = {
+            'agrees': 'Approuvez-vous cette suggestion ?  ',
+            'needs_help': 'Demander de l\'aide à un administrateur ?  '
+        }
+        widgets = {'suggestion': forms.HiddenInput()}

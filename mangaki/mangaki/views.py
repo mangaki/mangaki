@@ -32,7 +32,7 @@ from markdown import markdown
 from natsort import natsorted
 
 from mangaki.choices import TOP_CATEGORY_CHOICES
-from mangaki.forms import SuggestionForm
+from mangaki.forms import SuggestionForm, EvidenceForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
@@ -878,25 +878,29 @@ def fix_suggestion(request, suggestion_id):
         'clusters': zip(clusters, colors) if clusters and colors else None,
         'evidence': evidence,
         'next_id': next_suggestions_ids[0] if next_suggestions_ids else None,
-        'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None
+        'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None,
+        'evidence_form': EvidenceForm(instance=evidence)
     }
 
     return render(request, 'fix/fix_suggestion.html', context)
 
 
 def update_evidence(request):
-    agrees = request.POST.get('agrees')
-    needs_help = request.POST.get('needs_help')
+    suggestion_id = None
+    if request.method == 'POST':
+        agrees = 'agrees' in request.POST
+        needs_help = 'needs_help' in request.POST
+        suggestion_id = request.POST.get('suggestion')
 
-    if request.user.is_authenticated and request.method == 'POST':
+    if request.user.is_authenticated and suggestion_id:
         evidence, created = Evidence.objects.get_or_create(
             user=request.user,
-            suggestion=Suggestion.objects.get(pk=request.POST['suggestion'])
+            suggestion=Suggestion.objects.get(pk=suggestion_id)
         )
-        evidence.agrees = agrees == 'true' if agrees else evidence.agrees
-        evidence.needs_help = needs_help == 'true' if needs_help else evidence.needs_help
+        evidence.agrees = agrees
+        evidence.needs_help = needs_help
         evidence.save()
-    return HttpResponse()
+    return HttpResponsePermanentRedirect(request.META.get('HTTP_REFERER'))
 
 
 def generic_error_view(error, error_code):
