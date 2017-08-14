@@ -14,7 +14,7 @@
         <a href="{% url "fix-suggestion" suggestion.id %}" class="text-primary">Suggestion #{{ suggestion.id }}</a>
         <span class="small font-weight-bold">
             &nbsp;&nbsp;<span class="glyphicon glyphicon-{% if suggestion.is_checked %}lock{% else %}flag{% endif %}" aria-hidden="true"></span>
-            Ce problème est {% if suggestion.is_checked %}fermé{% else %}en cours{% endif %}
+            Ce problème est {% if suggestion.is_checked %}résolu{% else %}en cours{% endif %}
         </span>
     </h3>
     <ul class="list-group">

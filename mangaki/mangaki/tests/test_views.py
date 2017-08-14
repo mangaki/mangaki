@@ -30,6 +30,7 @@ class AuthenticatedMixin:
 class SuggestionFactoryMixin:
     def setUp(self):
         self.user = get_user_model().objects.create_user(username='test', password='test')
+        self.user_with_no_evidence = get_user_model().objects.create_user(username='noevidence', password='pwd')
         self.client = Client()
 
         self.anime = Work.objects.create(
@@ -238,26 +239,41 @@ class SuggestionViewsTest(SuggestionFactoryMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_suggestion_view(self):
-        with self.subTest('Existing suggestion'):
+        with self.subTest('Existing suggestion, with evidence'):
+            self.client.force_login(self.user)
             response = self.client.get('/fix/suggestion/{:d}'.format(self.suggestion.pk))
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.context['suggestion'], self.suggestion)
+            self.assertEqual(response.context['evidence'], self.evidence)
+
+        with self.subTest('Existing suggestion, with no evidence'):
+            self.client.force_login(self.user_with_no_evidence)
+            response = self.client.get('/fix/suggestion/{:d}'.format(self.suggestion.pk))
+            self.assertEqual(response.status_code, 200)
+            self.assertIsNone(response.context.get('evidence'))
 
         with self.subTest('Non existing suggestion'):
             invalid_pk = self.get_invalid_pk(Suggestion)
             response = self.client.get('/fix/suggestion/{:d}'.format(invalid_pk))
             self.assertEqual(response.status_code, 404)
 
-    def test_update_evidence(self):
-        self.client.force_login(self.user)
+    def test_update_or_create_evidence(self):
+        users = {
+            'User with Evidence': self.user,
+            'User with no Evidence': self.user_with_no_evidence
+        }
 
-        response = self.client.post('/evidence/', {
-            'agrees': 'on',
-            'suggestion': self.suggestion.pk
-        })
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/fix/suggestion/{:d}'.format(self.suggestion.pk))
+        for label, user in users.items():
+            with self.subTest(label, user=user):
+                self.client.force_login(user)
 
-        evidence_updated = Evidence.objects.get(user=self.user, suggestion=self.suggestion)
-        self.assertTrue(evidence_updated.agrees)
-        self.assertFalse(evidence_updated.needs_help)
+                response = self.client.post('/evidence/', {
+                    'agrees': 'on',
+                    'suggestion': self.suggestion.pk
+                })
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.url, '/fix/suggestion/{:d}'.format(self.suggestion.pk))
+
+                evidence_updated = Evidence.objects.get(user=user, suggestion=self.suggestion)
+                self.assertTrue(evidence_updated.agrees)
+                self.assertFalse(evidence_updated.needs_help)

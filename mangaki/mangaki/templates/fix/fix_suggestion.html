@@ -25,10 +25,13 @@
     <div class="row">
     <div class="col-md-push-1 col-sm-push-1 col-lg-10 col-sm-10">
         <div class="input-group">
-            <span class="input-group-addon" id="basic-addon2">
-                <span class="glyphicon glyphicon-link"></span> Lien de partage
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="button" id="copy-share-link" data-toggle="tooltip"
+                        data-placement="top" data-copy="{{ request.build_absolute_uri }}" title="Copier">
+                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Lien de partage
+                </button>
             </span>
-            <input type="text" class="form-control" value="{{ request.build_absolute_uri }}">
+            <input type="text" class="form-control" id="input-share-link" value="{{ request.build_absolute_uri }}">
         </div>
     </div>
     </div>
@@ -70,7 +73,7 @@
             </p>
             {% if cluster.resulting_work %}
             <p>
-                Ce cluster a résulté en l'œuvre
+                Ce cluster a été fusionné :
                 <a href="{% url "work-detail" cluster.resulting_work.category.slug cluster.resulting_work.pk %}">{{ cluster.resulting_work }}</a>.
                 <small>({{ cluster.merged_on }})</small>
             </p>
@@ -126,6 +129,35 @@
 
 {% block extrajs %}
 <script>
+    // https://codepen.io/nathanlong/pen/ZpAmjv
+    function copyToClipboard(text, el) {
+        var elOriginalText = el.attr('data-original-title');
+
+        if (document.queryCommandSupported('copy')) {
+            var copyTextArea = document.createElement("textarea");
+            copyTextArea.value = text;
+            document.body.appendChild(copyTextArea);
+            copyTextArea.select();
+            try {
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'Lien copié !' : 'Lien non copié …';
+                el.attr('data-original-title', msg).tooltip('show');
+            } catch (err) {
+                console.log('Le lien n\'a pas pu être copié …');
+            }
+            document.body.removeChild(copyTextArea);
+            el.attr('data-original-title', elOriginalText);
+        }
+        else {
+            window.prompt("Pour copier, Ctrl+C ou Command+C, Entrée", text);
+        }
+    }
+
+    $('button#copy-share-link').tooltip({trigger : 'hover'});
+    $('button#copy-share-link').click(function() {
+        copyToClipboard($(this).attr('data-copy'), $(this));
+    });
+
     $.fn.bootstrapSwitch.defaults.size = 'mini';
     $.fn.bootstrapSwitch.defaults.onText = 'OUI';
     $.fn.bootstrapSwitch.defaults.offText = 'NON';
