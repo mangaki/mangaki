@@ -54,11 +54,11 @@
         <p class="text-muted">{{ suggestion.message }}</p>
         {% endif %}
 
-        {% if related_cluster and cluster_works %}
+        {% for cluster, color in clusters %}
             <hr/>
-            <p><strong>Doublon de&nbsp;:</strong></p>
+            <p><strong>Cette œuvre est présente dans ce cluster&nbsp;:</strong></p>
             <div class="cards-grid no-rating">
-                {% for work in cluster_works %}
+                {% for work in cluster.works.all %}
                     {% if work != suggestion.work %}
                     {% include "mangaki/work_rating.html" with category=work.category.slug work=work %}
                     {% endif %}
@@ -66,17 +66,17 @@
             </div>
             <hr/>
             <p>
-                Ce cluster est <strong><span class="{{ cluster_colors }}">{{ related_cluster.get_status_display.lower }}</span></strong>
-                {% if related_cluster.checker %} par <a href="{% url "profile" related_cluster.checker %}">{{ related_cluster.checker }}</a>{% endif %}.
+                Ce cluster est <strong><span class="{{ color }}">{{ cluster.get_status_display.lower }}</span></strong>
+                {% if cluster.checker %} par <a href="{% url "profile" cluster.checker %}">{{ cluster.checker }}</a>{% endif %}.
             </p>
-            {% if related_cluster.resulting_work %}
+            {% if cluster.resulting_work %}
             <p>
                 Ce cluster a résulté en l'œuvre
-                <a href="{% url "work-detail" related_cluster.resulting_work.category.slug related_cluster.resulting_work.pk %}">{{ related_cluster.resulting_work }}</a>.
-                <small>({{ related_cluster.merged_on }})</small>
+                <a href="{% url "work-detail" cluster.resulting_work.category.slug cluster.resulting_work.pk %}">{{ cluster.resulting_work }}</a>.
+                <small>({{ cluster.merged_on }})</small>
             </p>
             {% endif %}
-        {% endif %}
+        {% endfor %}
 
         {% if request.user.is_authenticated and not suggestion.is_checked %}
             <hr/>

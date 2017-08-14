@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
 from django.db.models import Case, IntegerField, Sum, Value, When
@@ -837,42 +837,48 @@ def fix_suggestion(request, suggestion_id):
         'rejected': 'text-danger'
     }
 
-    if not suggestion_id:
-        return redirect('fix-index')
+    # Retrieve the Suggestion object if it exists else raise a 404 error
+    suggestion = get_object_or_404(
+        Suggestion.objects.select_related('work', 'user', 'work__category'),
+        id=suggestion_id
+    )
 
-    suggestion = get_object_or_404(Suggestion.objects.select_related('work', 'user'), id=suggestion_id)
-
+    # Retrieve the Evidence object if it exists
     evidence = None
     if request.user.is_authenticated:
-        evidence = Evidence.objects.filter(user=request.user, suggestion=suggestion).first()
+        try:
+            evidence = Evidence.objects.get(user=request.user, suggestion=suggestion)
+        except ObjectDoesNotExist:
+            evidence = None
 
-    cluster = WorkCluster.objects.filter(origin=suggestion_id).first()
-    cluster_works = cluster.works.all().prefetch_related('category') if cluster else None
+    # Retrieve related clusters
+    clusters = WorkCluster.objects.select_related(
+        'resulting_work', 'resulting_work__category').prefetch_related(
+        'works', 'works__category', 'checker').filter(origin=suggestion_id).all()
+    colors = [cluster_colors[cluster.status] for cluster in clusters]
 
     # Get the previous suggestion, ie. more recent and of the same checked status
-    previous_suggestion = Suggestion.objects.filter(date__gt=suggestion.date,
-        is_checked=suggestion.is_checked).order_by('date').first()
+    previous_suggestions_ids = Suggestion.objects.filter(date__gt=suggestion.date,
+        is_checked=suggestion.is_checked).order_by('date').values_list('id', flat=True)
 
     # If there is no more recent suggestion, and was checked, just pick from not checked suggestions
-    if not previous_suggestion and suggestion.is_checked:
-        previous_suggestion = Suggestion.objects.filter(is_checked=False).order_by('date').first()
+    if not previous_suggestions_ids and suggestion.is_checked:
+        previous_suggestions_ids = Suggestion.objects.filter(is_checked=False).order_by('date').values_list('id', flat=True)
 
     # Get the next suggestion, ie. less recent and of the same checked status
-    next_suggestion = Suggestion.objects.filter(date__lt=suggestion.date,
-        is_checked=suggestion.is_checked).order_by('-date').first()
+    next_suggestions_ids = Suggestion.objects.filter(date__lt=suggestion.date,
+        is_checked=suggestion.is_checked).order_by('-date').values_list('id', flat=True)
 
     # If there is no less recent suggestion, and wasn't checked, just pick from checked suggestions
-    if not next_suggestion and not suggestion.is_checked:
-        next_suggestion = Suggestion.objects.filter(is_checked=True).order_by('-date').first()
+    if not next_suggestions_ids and not suggestion.is_checked:
+        next_suggestions_ids = Suggestion.objects.filter(is_checked=True).order_by('-date').values_list('id', flat=True)
 
     context = {
         'suggestion': suggestion,
-        'related_cluster': cluster,
-        'cluster_works': cluster_works,
-        'cluster_colors': cluster_colors[cluster.status] if cluster else None,
+        'clusters': zip(clusters, colors) if clusters and colors else None,
         'evidence': evidence,
-        'next_id': next_suggestion.id if next_suggestion else None,
-        'previous_id': previous_suggestion.id if previous_suggestion else None
+        'next_id': next_suggestions_ids[0] if next_suggestions_ids else None,
+        'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None
     }
 
     return render(request, 'fix/fix_suggestion.html', context)
