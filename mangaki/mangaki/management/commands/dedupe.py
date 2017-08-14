@@ -21,8 +21,6 @@ class Command(BaseCommand):
             data = {}
             for work in Work.objects.filter(category__slug='manga'):
                 data[work.id] = {'title': work.title, 'vo_title': work.vo_title}
-                print(work.id)
-                print(data[work.id]['title'])
                 for field in ['title', 'vo_title']:
                    if not data[work.id][field]:
                         data[work.id][field] = None
@@ -31,9 +29,9 @@ class Command(BaseCommand):
                 {'field': 'vo_title', 'type': 'String'},
             ]
 
-            output_file = 'mangas_output.csv'
-            settings_file = 'mangas_learned_settings'
-            training_file = 'mangas_training.json'
+            output_file = 'dedupe/mangas_output.csv'
+            settings_file = 'dedupe/mangas_learned_settings'
+            training_file = 'dedupe/mangas_training.json'
 
             deduper = Dedupe(fields)
             deduper.sample(data)
@@ -58,7 +56,7 @@ class Command(BaseCommand):
             clustered_dupes = deduper.match(data, threshold)
 
             print('# duplicate sets', len(clustered_dupes))
-            input_file = '.csv'
+            input_file = 'dedupe/mangas.csv'
             with open(input_file, 'w') as f:
                 writer = csv.writer(f)
                 writer.writerow(['id', 'title', 'vo_title'])
@@ -75,8 +73,6 @@ class Command(BaseCommand):
             data = {}
             for work in Work.objects.filter(category__slug='anime'):
                 data[work.id] = {'title': work.title, 'vo_title': work.vo_title}
-                print(work.id)
-                print(data[work.id]['title'])
                 for field in ['title', 'vo_title']:
                     if not data[work.id][field]:
                         data[work.id][field] = None
@@ -85,9 +81,9 @@ class Command(BaseCommand):
                 {'field': 'vo_title', 'type': 'String'},
             ]
 
-            output_file = 'animes_output.csv'
-            settings_file = 'animes_learned_settings'
-            training_file = 'animes_training.json'
+            output_file = 'dedupe/animes_output.csv'
+            settings_file = 'dedupe/animes_learned_settings'
+            training_file = 'dedupe/animes_training.json'
 
             deduper = Dedupe(fields)
             deduper.sample(data)
@@ -112,7 +108,7 @@ class Command(BaseCommand):
             clustered_dupes = deduper.match(data, threshold)
 
             print('# duplicate sets', len(clustered_dupes))
-            input_file = 'animes.csv'
+            input_file = 'dedupe/animes.csv'
             with open(input_file, 'w') as f:
                 writer = csv.writer(f)
                 writer.writerow(['id', 'title', 'vo_title'])
