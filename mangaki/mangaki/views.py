@@ -14,7 +14,7 @@ from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
 from django.db.models import Case, IntegerField, Sum, Value, When
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone, translation
@@ -900,7 +900,10 @@ def update_evidence(request):
         evidence.agrees = agrees
         evidence.needs_help = needs_help
         evidence.save()
-    return HttpResponsePermanentRedirect(request.META.get('HTTP_REFERER'))
+
+    if suggestion_id:
+        return redirect('fix-suggestion', suggestion_id)
+    return redirect('fix-index')
 
 
 def generic_error_view(error, error_code):
