@@ -39,6 +39,17 @@
 
     <div class="well">
         <p>
+            <div class="pull-right"><strong>
+                <span class="text-success" title="Nombre de personnes approuvant">
+                    <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+                    <span id="agrees_count" {% if not evidence %}data-has-evidence="false"{% endif %}>{{suggestion.count_agrees}}</span>
+                </span>
+                &nbsp;
+                <span class="text-danger" title="Nombre de personnes n'approuvant pas">
+                    <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+                    <span id="disagrees_count">{{ suggestion.count_disagrees }}</span>
+                </span>
+            </strong></div>
             <h4><strong>Problème&nbsp;:</strong>
                 {{ suggestion.get_problem_display }}
             </h4>
@@ -53,7 +64,7 @@
 
         {% if suggestion.message %}
         <hr/>
-        <p class="text-muted">{{ suggestion.message }}</p>
+        <p class="text-muted">{{ suggestion.message|urlize }}</p>
         {% endif %}
 
         {% for cluster, color in clusters %}
@@ -85,6 +96,7 @@
             <form id="evidence_form" action="{% url "update-evidence" %}" method="POST" align="right">
                 {% csrf_token %}
                 {{ evidence_form.as_p }}
+                <input type="hidden" name="suggestion" id="id_suggestion" value="{{ suggestion.pk }}">
                 <input type="submit" class="btn btn-primary" value="Envoyer" name="submit_evidence_form">
             </form>
         {% elif suggestion.is_checked and evidence %}
@@ -164,12 +176,35 @@
     $.fn.bootstrapSwitch.defaults.onColor = 'success';
     $.fn.bootstrapSwitch.defaults.offColor = 'danger';
 
+    // Make the form dynamic
     $("[name='submit_evidence_form']").remove();
-
     $("[name='agrees'], [name='needs_help']").bootstrapSwitch();
+
     $("[name='agrees'], [name='needs_help']").on('switchChange.bootstrapSwitch', function(event, state) {
         var form = $(this).closest("form");
-        $.ajax({type: "POST", url: form.attr('action'), data: form.serialize()});
+        var el = $(this);
+        $.ajax({
+            type: "POST",
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(data) {
+                if (el.attr('name') != 'agrees') return;
+
+                // Update agrees/disagrees count on toggle (and success)
+                var has_evidence = $('#agrees_count').attr('data-has-evidence') != 'false';
+                $('#agrees_count').removeAttr('data-has-evidence');
+
+                var agrees_count = parseInt($('#agrees_count').html());
+                var disagrees_count = parseInt($('#disagrees_count').html());
+                var decrement = has_evidence ? 1 : 0;
+
+                agrees_count = state ? agrees_count+1 : agrees_count-decrement;
+                disagrees_count = state ? disagrees_count-decrement : disagrees_count+1;
+
+                $('#agrees_count').html(agrees_count);
+                $('#disagrees_count').html(disagrees_count);
+            }
+        });
     });
 </script>
 {% endblock %}

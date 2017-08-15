@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When
+from django.db.models import Case, IntegerField, Sum, Value, When, Count
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -811,7 +811,10 @@ def legal_mentions(request):
 
 def fix_index(request):
     suggestion_list = Suggestion.objects.select_related('work', 'user').prefetch_related(
-        'work__category', 'evidence_set__user').all().order_by('is_checked', '-date')
+        'work__category', 'evidence_set__user').annotate(
+            count_agrees=Count(Case(When(evidence__agrees=True, then=1))),
+            count_disagrees=Count(Case(When(evidence__agrees=False, then=1)))
+        ).all().order_by('is_checked', '-date')
 
     paginator = Paginator(suggestion_list, FIXES_PER_PAGE)
     page = request.GET.get('page')
@@ -839,7 +842,10 @@ def fix_suggestion(request, suggestion_id):
 
     # Retrieve the Suggestion object if it exists else raise a 404 error
     suggestion = get_object_or_404(
-        Suggestion.objects.select_related('work', 'user', 'work__category'),
+        Suggestion.objects.select_related('work', 'user', 'work__category').annotate(
+            count_agrees=Count(Case(When(evidence__agrees=True, then=1))),
+            count_disagrees=Count(Case(When(evidence__agrees=False, then=1)))
+        ),
         id=suggestion_id
     )
 

@@ -16,6 +16,15 @@
             &nbsp;&nbsp;<span class="glyphicon glyphicon-{% if suggestion.is_checked %}lock{% else %}flag{% endif %}" aria-hidden="true"></span>
             Ce problème est {% if suggestion.is_checked %}résolu{% else %}en cours{% endif %}
         </span>
+        &nbsp;
+        &nbsp;
+        <span class="text-success" title="Nombre de personnes approuvant">
+            <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> {{suggestion.count_agrees}}
+        </span>
+        &nbsp;
+        <span class="text-danger" title="Nombre de personnes n'approuvant pas">
+            <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> {{ suggestion.count_disagrees }}
+        </span>
     </h3>
     <ul class="list-group">
         <li class="list-group-item"><strong>Problème :</strong> {{ suggestion.get_problem_display }}

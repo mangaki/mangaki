@@ -30,9 +30,8 @@ class EvidenceForm(forms.ModelForm):
 
     class Meta:
         model = Evidence
-        fields = ['agrees', 'needs_help', 'suggestion']
+        fields = ['agrees', 'needs_help']
         labels = {
             'agrees': 'Approuvez-vous cette suggestion ?  ',
             'needs_help': 'Demander de l\'aide à un administrateur ?  '
         }
-        widgets = {'suggestion': forms.HiddenInput()}

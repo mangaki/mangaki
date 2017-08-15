@@ -450,6 +450,14 @@ class Evidence(models.Model):
     agrees = models.BooleanField(default=False)
     needs_help = models.BooleanField(default=False)
 
+    def __str__(self):
+        return 'Evidence#{} : {} {} la Suggestion#{}'.format(
+            self.pk,
+            self.user,
+            "approuve" if self.agrees else "rejette",
+            self.suggestion.pk
+        )
+
 
 class WorkCluster(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
