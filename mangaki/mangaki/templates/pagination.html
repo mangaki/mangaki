@@ -1,25 +1,25 @@
-{% if is_paginated %}
-<nav style="text-align: center">
-  <ul class="pagination">
-    {% if page_obj.has_previous %}
-    <li>
-        <a href="?{% if sort_mode %}sort={{ sort_mode }}{% endif %}{% if letter %}&amp;letter={{ letter }}{% endif %}&amp;page={{ page_obj.previous_page_number }}{% if search %}&amp;search={{search}}{% endif %}" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
+{% if paginator.page_range|length > 1 %}
+<nav aria-label="Pagination" class="text-center">
+<ul class="pagination">
+    <li {% if not page_obj.has_previous %} class="disabled" {% endif %}>
+        <a {% if page_obj.has_previous %}href="?page={{ page_obj.previous_page_number }}{% if sort_mode %}&amp;sort={{ sort_mode }}{% endif %}{% if letter %}&amp;letter={{ letter }}{% endif %}{% if search %}&amp;search={{search}}{% endif %}{% if algo %}&amp;algo={{algo}}{% endif %}"{% endif %} aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+        </a>
     </li>
-    {% endif %}
     {% for page in paginator.page_range %}
-    {% if page >= page_obj.number|add:-3 and page <= page_obj.number|add:3 %}
-    <li><a href="?{% if sort_mode %}sort={{ sort_mode }}{% endif %}{% if letter %}&amp;letter={{ letter }}{% endif %}&amp;page={{ page }}{% if search %}&amp;search={{search}}{% endif %}">{% if page_obj.number == page %}<strong>{{ page }}</strong>{% else %}{{ page }}{% endif %}</a></li>
-    {% endif %}
+        {% if page >= page_obj.number|add:-3 and page <= page_obj.number|add:3 %}
+        <li {% if page == page_obj.number %} class="active" {% endif %}>
+            <a {% if page != page_obj.number %}href="?page={{ page }}{% if sort_mode %}&amp;sort={{ sort_mode }}{% endif %}{% if letter %}&amp;letter={{ letter }}{% endif %}{% if search %}&amp;search={{search}}{% endif %}{% if algo %}&amp;algo={{algo}}{% endif %}"{% endif %} {% if page == page_obj.number %}aria-label="Current"{% endif %}>{{ page }}</a>
+        </li>
+        {% endif %}
     {% endfor %}
-    {% if page_obj.has_next %}
-    <li>
-        <a href="?{% if sort_mode %}sort={{ sort_mode }}{% endif %}{% if letter %}&amp;letter={{ letter }}{% endif %}&amp;page={{ page_obj.next_page_number }}{% if search %}&amp;search={{search}}{% endif %}" aria-label="Next">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
+    <li {% if not page_obj.has_next %} class="disabled" {% endif %}>
+        <a {% if page_obj.has_next %}href="?page={{ page_obj.next_page_number }}{% if sort_mode %}&amp;sort={{ sort_mode }}{% endif %}{% if letter %}&amp;letter={{ letter }}{% endif %}{% if search %}&amp;search={{search}}{% endif %}{% if algo %}&amp;algo={{algo}}{% endif %}"{% endif %} aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+        </a>
     </li>
-    {% endif %}
-  </ul>
+</ul>
 </nav>
+{% else %}
+<br/>
 {% endif %}
