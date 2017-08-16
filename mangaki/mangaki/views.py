@@ -9,6 +9,7 @@ import allauth.account.views
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -890,15 +891,15 @@ def fix_suggestion(request, suggestion_id):
     return render(request, 'fix/fix_suggestion.html', context)
 
 
+@login_required
 def update_evidence(request):
-    result = (request.POST if request.method == 'POST'
-              else request.GET if request.method == 'GET'
-              else redirect('fix-index'))
+    if request.method != 'POST':
+        redirect('fix-index')
 
-    agrees = result.get('agrees') == 'True'
-    needs_help = result.get('needs_help') == 'True'
-    delete = result.get('delete')
-    suggestion_id = result.get('suggestion')
+    agrees = request.POST.get('agrees') == 'True'
+    needs_help = request.POST.get('needs_help') == 'True'
+    delete = request.POST.get('delete')
+    suggestion_id = request.POST.get('suggestion')
 
     if request.user.is_authenticated and suggestion_id:
         if delete:

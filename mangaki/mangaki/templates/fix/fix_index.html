@@ -13,8 +13,8 @@
     <h3 class="panel-heading panel-title">
         <a href="{% url "fix-suggestion" suggestion.id %}" class="text-primary">Suggestion #{{ suggestion.id }}</a>
         <span class="small font-weight-bold">
-            &nbsp;&nbsp;<span class="glyphicon glyphicon-{% if suggestion.is_checked %}lock{% else %}flag{% endif %}" aria-hidden="true"></span>
-            Ce problème est {% if suggestion.is_checked %}résolu{% else %}en cours{% endif %}
+            &nbsp;&nbsp;<span class="glyphicon glyphicon-{{ suggestion.is_checked|yesno:'lock,flag' }}" aria-hidden="true"></span>
+            Ce problème est {{ suggestion.is_checked|yesno:'résolu,en cours' }}
         </span>
         &nbsp;
         &nbsp;
