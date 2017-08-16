@@ -32,7 +32,7 @@ from markdown import markdown
 from natsort import natsorted
 
 from mangaki.choices import TOP_CATEGORY_CHOICES
-from mangaki.forms import SuggestionForm, EvidenceForm
+from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
@@ -884,28 +884,39 @@ def fix_suggestion(request, suggestion_id):
         'clusters': zip(clusters, colors) if clusters and colors else None,
         'evidence': evidence,
         'next_id': next_suggestions_ids[0] if next_suggestions_ids else None,
-        'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None,
-        'evidence_form': EvidenceForm(instance=evidence)
+        'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None
     }
 
     return render(request, 'fix/fix_suggestion.html', context)
 
 
 def update_evidence(request):
-    suggestion_id = None
-    if request.method == 'POST':
-        agrees = 'agrees' in request.POST
-        needs_help = 'needs_help' in request.POST
-        suggestion_id = request.POST.get('suggestion')
+    result = (request.POST if request.method == 'POST'
+              else request.GET if request.method == 'GET'
+              else redirect('fix-index'))
+
+    agrees = result.get('agrees') == 'True'
+    needs_help = result.get('needs_help') == 'True'
+    delete = result.get('delete')
+    suggestion_id = result.get('suggestion')
 
     if request.user.is_authenticated and suggestion_id:
-        evidence, created = Evidence.objects.get_or_create(
-            user=request.user,
-            suggestion=Suggestion.objects.get(pk=suggestion_id)
-        )
-        evidence.agrees = agrees
-        evidence.needs_help = needs_help
-        evidence.save()
+        if delete:
+            try:
+                Evidence.objects.get(
+                    user=request.user,
+                    suggestion=Suggestion.objects.get(pk=suggestion_id)
+                ).delete()
+            except ObjectDoesNotExist:
+                pass
+        else:
+            evidence, created = Evidence.objects.get_or_create(
+                user=request.user,
+                suggestion=Suggestion.objects.get(pk=suggestion_id)
+            )
+            evidence.agrees = agrees
+            evidence.needs_help = needs_help
+            evidence.save()
 
     if suggestion_id:
         return redirect('fix-suggestion', suggestion_id)

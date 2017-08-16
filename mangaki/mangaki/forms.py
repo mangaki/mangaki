@@ -21,17 +21,3 @@ class SignupForm(forms.Form):
                 Rating(user=user, work_id=work_id, choice=choice)
                 for work_id, choice in ratings.items()
             ])
-
-
-class EvidenceForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('label_suffix', '')
-        super(forms.ModelForm, self).__init__(*args, **kwargs)
-
-    class Meta:
-        model = Evidence
-        fields = ['agrees', 'needs_help']
-        labels = {
-            'agrees': 'Approuvez-vous cette suggestion ?  ',
-            'needs_help': 'Demander de l\'aide à un administrateur ?  '
-        }

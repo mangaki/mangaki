@@ -268,7 +268,7 @@ class SuggestionViewsTest(SuggestionFactoryMixin, TestCase):
                 self.client.force_login(user)
 
                 response = self.client.post('/evidence/', {
-                    'agrees': 'on',
+                    'agrees': 'True',
                     'suggestion': self.suggestion.pk
                 })
                 self.assertEqual(response.status_code, 302)
@@ -277,3 +277,16 @@ class SuggestionViewsTest(SuggestionFactoryMixin, TestCase):
                 evidence_updated = Evidence.objects.get(user=user, suggestion=self.suggestion)
                 self.assertTrue(evidence_updated.agrees)
                 self.assertFalse(evidence_updated.needs_help)
+
+    def test_delete_evidence(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post('/evidence/', {
+            'delete': 'True',
+            'suggestion': self.suggestion.pk
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/fix/suggestion/{:d}'.format(self.suggestion.pk))
+
+        with self.assertRaises(Evidence.DoesNotExist):
+            Evidence.objects.get(user=self.user, suggestion=self.suggestion)
