@@ -1,5 +1,5 @@
 from django import forms
-from mangaki.models import Suggestion, Evidence, Rating
+from mangaki.models import Suggestion, Rating
 from mangaki.utils.ratings import get_anonymous_ratings, clear_anonymous_ratings
 
 
