@@ -41,7 +41,8 @@ class SuggestionFactoryMixin:
         self.suggestion = Suggestion.objects.create(
             user=self.user,
             work=self.anime,
-            message='Message'
+            message='Message',
+            problem='nsfw'
         )
 
         self.evidence = Evidence.objects.create(
