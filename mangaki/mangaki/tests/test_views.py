@@ -226,6 +226,7 @@ class SuggestionViewsTest(SuggestionFactoryMixin, TestCase):
     def test_misc_views(self):
         self._test_static_view('fix')
         self._test_static_view('fix/suggestion')
+        self._test_static_view('grid/nsfw')
 
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
@@ -269,6 +270,7 @@ class SuggestionViewsTest(SuggestionFactoryMixin, TestCase):
 
                 response = self.client.post('/evidence/', {
                     'agrees': 'True',
+                    'redirect': '/fix/suggestion/{:d}'.format(self.suggestion.pk),
                     'suggestion': self.suggestion.pk
                 })
                 self.assertEqual(response.status_code, 302)
@@ -283,6 +285,7 @@ class SuggestionViewsTest(SuggestionFactoryMixin, TestCase):
 
         response = self.client.post('/evidence/', {
             'delete': 'True',
+            'redirect': '/fix/suggestion/{:d}'.format(self.suggestion.pk),
             'suggestion': self.suggestion.pk
         })
         self.assertEqual(response.status_code, 302)

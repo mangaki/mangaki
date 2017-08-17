@@ -57,7 +57,7 @@ TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 FIXES_PER_PAGE = 5
-NSFW_GRID_PER_PAGE = 10
+NSFW_GRID_PER_PAGE = 5
 
 REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
@@ -892,6 +892,48 @@ def fix_suggestion(request, suggestion_id):
     return render(request, 'fix/fix_suggestion.html', context)
 
 
+def nsfw_grid(request):
+    #FIXME: remove duplicate suggestions OR group by work ID
+    #TODO: prevent non authentificated and non NSFW users seeing NSFW posters, but let them choose to see them
+    nsfw_suggestion_list = Suggestion.objects.select_related('work', 'user').filter(
+        problem__in=['nsfw', 'n_nsfw'], is_checked=False).prefetch_related('work__category',
+        'evidence_set__user').order_by('-work__nb_ratings')
+
+    paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
+    page = request.GET.get('page')
+
+    try:
+        suggestions = paginator.page(page)
+    except PageNotAnInteger:
+        suggestions = paginator.page(1)
+    except EmptyPage:
+        suggestions = paginator.page(paginator.num_pages)
+
+    nsfw_states = []
+    supposed_nsfw = []
+    for index, suggestion in enumerate(suggestions):
+        nsfw_states.append(None)
+        supposed_nsfw.append(suggestion.problem == 'nsfw')
+
+        for evidence in suggestion.evidence_set.all():
+            if evidence.user_id != request.user.id:
+                continue
+
+            agrees_with_problem = evidence.agrees
+            agrees = ((agrees_with_problem and supposed_nsfw[index])
+                   or (not agrees_with_problem and not supposed_nsfw[index]))
+            nsfw_states[index] = agrees
+
+    suggestions_with_states = zip(suggestions, nsfw_states, supposed_nsfw)
+
+    context = {
+        'suggestions_with_states': suggestions_with_states,
+        'suggestions': suggestions
+    }
+
+    return render(request, 'fix/nsfw_grid.html', context)
+
+
 @login_required
 def update_evidence(request):
     if request.method != 'POST':
@@ -901,6 +943,7 @@ def update_evidence(request):
     needs_help = request.POST.get('needs_help') == 'True'
     delete = request.POST.get('delete')
     suggestion_id = request.POST.get('suggestion')
+    redirect_link = request.POST.get('redirect')
 
     if request.user.is_authenticated and suggestion_id:
         if delete:
@@ -920,49 +963,9 @@ def update_evidence(request):
             evidence.needs_help = needs_help
             evidence.save()
 
-    if suggestion_id:
-        return redirect('fix-suggestion', suggestion_id)
+    if redirect_link:
+        return redirect(redirect_link)
     return redirect('fix-index')
-
-
-def nsfw_grid(request):
-    #FIXME: remove duplicate suggestions OR group by work ID
-    #TODO: prevent non authentificated and non NSFW users seeing NSFW posters, but let them choose to see them
-    nsfw_suggestion_list = Suggestion.objects.select_related('work', 'user').filter(
-        problem__in=['nsfw', 'n_nsfw']).prefetch_related('work__category',
-        'evidence_set__user').order_by('-work__nb_ratings')
-
-    paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
-    page = request.GET.get('page')
-
-    try:
-        suggestions = paginator.page(page)
-    except PageNotAnInteger:
-        suggestions = paginator.page(1)
-    except EmptyPage:
-        suggestions = paginator.page(paginator.num_pages)
-
-    evidences_nsfw = []
-    for index, suggestion in enumerate(suggestions):
-        evidences_nsfw.append(None)
-        supposed_nsfw = suggestion.problem == 'nsfw'
-        for evidence in suggestion.evidence_set.all():
-            if evidence.user_id != request.user.id:
-                continue
-
-            agrees_with_problem = evidence.agrees
-            agrees = ((agrees_with_problem and supposed_nsfw)
-                   or (not agrees_with_problem and not supposed_nsfw))
-            evidences_nsfw[index] = agrees
-
-    suggestions_with_nsfw_states = zip(suggestions, evidences_nsfw)
-
-    context = {
-        'suggestions_with_nsfw_states': suggestions_with_nsfw_states,
-        'suggestions': suggestions
-    }
-
-    return render(request, 'fix/nsfw_grid.html', context)
 
 
 def generic_error_view(error, error_code):

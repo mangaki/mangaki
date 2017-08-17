@@ -71,6 +71,7 @@
             <hr/>
             <form id="evidence_form" action="{% url "update-evidence" %}" method="POST">
                 {% csrf_token %}
+                <input type="hidden" name="redirect" value="{{ request.get_full_path }}">
                 <input type="hidden" name="suggestion" id="id_suggestion" value="{{ suggestion.pk }}">
                 {% if evidence %}
                     <input type="hidden" name="agrees" value="{{ evidence.agrees }}">
