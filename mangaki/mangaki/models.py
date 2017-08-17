@@ -164,13 +164,16 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
+    def get_poster(self):
+        if self.int_poster:
+            return self.int_poster.url
+        return self.ext_poster
+
     def safe_poster(self, user):
         if self.id is None:
             return '{}{}'.format(settings.STATIC_URL, 'img/chiro.gif')
         if not self.nsfw or (user.is_authenticated and user.profile.nsfw_ok):
-            if self.int_poster:
-                return self.int_poster.url
-            return self.ext_poster
+            return self.get_poster()
         return '{}{}'.format(settings.STATIC_URL, 'img/nsfw.jpg')
 
     def retrieve_poster(self, url=None, session=None):
