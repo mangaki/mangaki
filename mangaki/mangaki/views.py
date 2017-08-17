@@ -894,10 +894,10 @@ def fix_suggestion(request, suggestion_id):
 
 def nsfw_grid(request):
     #FIXME: remove duplicate suggestions OR group by work ID
-    #TODO: prevent non authentificated and non NSFW users seeing NSFW posters, but let them choose to see them
-    nsfw_suggestion_list = Suggestion.objects.select_related('work', 'user').filter(
-        problem__in=['nsfw', 'n_nsfw'], is_checked=False).prefetch_related('work__category',
-        'evidence_set__user').order_by('-work__nb_ratings')
+    nsfw_suggestion_list = Suggestion.objects.select_related(
+            'work', 'user', 'work__category').prefetch_related(
+            'work__category', 'evidence_set__user').filter(
+            problem__in=['nsfw', 'n_nsfw'], is_checked=False).order_by('-work__nb_ratings')
 
     paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
     page = request.GET.get('page')
@@ -911,18 +911,19 @@ def nsfw_grid(request):
 
     nsfw_states = []
     supposed_nsfw = []
-    for index, suggestion in enumerate(suggestions):
-        nsfw_states.append(None)
+    for suggestion in suggestions:
         supposed_nsfw.append(suggestion.problem == 'nsfw')
 
         for evidence in suggestion.evidence_set.all():
-            if evidence.user_id != request.user.id:
-                continue
+            if evidence.user == request.user:
+                agrees_with_problem = evidence.agrees
+                agrees = ((agrees_with_problem and suggestion.problem == 'nsfw')
+                       or (not agrees_with_problem and not suggestion.problem == 'nsfw'))
+                nsfw_states.append(agrees)
+                break
+        else:
+            nsfw_states.append(None)
 
-            agrees_with_problem = evidence.agrees
-            agrees = ((agrees_with_problem and supposed_nsfw[index])
-                   or (not agrees_with_problem and not supposed_nsfw[index]))
-            nsfw_states[index] = agrees
 
     suggestions_with_states = zip(suggestions, nsfw_states, supposed_nsfw)
 

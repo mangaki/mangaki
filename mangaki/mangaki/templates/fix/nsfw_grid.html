@@ -6,20 +6,44 @@
 
 {% block body %}
 
-<h1>Grille NSFW</h1>
+<div class="page-header">
+    <a href="{% url "fix-index" %}" class="btn btn-sm btn-info pull-right" style="margin-top: 8px;">
+        <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span> Retour aux suggestions
+    </a>
+    <h1>Grille NSFW</h1>
+</div>
 
 <div class="row">
+{% if not request.user.profile.nsfw_ok and request.GET.nsfw_ok is None %}
+<div class="alert alert-warning">
+    <strong>Attention !</strong> Vous avez indiqué sur votre profil ne pas vouloir voir les œuvres marquées NSFW. Souhaitez-vous tout de même les voir ?
+    <a href="{{ request.build_absolute_uri }}{{ request.GET.page|yesno:'&,?' }}nsfw_ok">Oui</a> / <a href="{% url "fix-index" %}">Non</a>.
+</div>
+{% endif %}
+
+{% if not request.user.profile.nsfw_ok and request.GET.nsfw_ok is not None %}
+<div class="alert alert-warning">
+    <strong>Rappel :</strong> Vous avez accepté de voir les œuvres marquées NSFW sur cette grille temporairement.
+    Cliquez <a href="{% url "fix-index" %}">ici</a> pour revenir en arrière.
+</div>
+{% endif %}
+
+{% if request.user.profile.nsfw_ok or not request.user.nsfw_ok and request.GET.nsfw_ok is not None %}
+
 <div class="cards-grid no-rating">
 {% for suggestion, says_is_nsfw, supposed_nsfw in suggestions_with_states %}
 <div style="margin: 10px 0;">
-    {% include "mangaki/work_rating.html" with category=suggestion.work.category.slug work=suggestion.work %}
+    {% include "mangaki/work_rating.html" with category=suggestion.work.category.slug work=suggestion.work bypass_nsfw_settings=True %}
 
     <div class="panel panel-default panel-body" style="margin: 10px 0;">
-        <strong>Cette oeuvre est-elle NSFW ?</strong>
-        <small>Supposée {{ supposed_nsfw|yesno:'NSFW,non NSFW' }} par
-        <a href="{% url "profile" suggestion.user %}">{{ suggestion.user.username }}</a>.</small>
+        <strong>Cette œuvre est-elle NSFW ?</strong>
+        <small>
+            Signalée <span class="{{ supposed_nsfw|yesno:'text-danger,text-success' }}">{{ supposed_nsfw|yesno:'NSFW,non NSFW' }}</span> par
+            <a href="{% url "profile" suggestion.user %}">{{ suggestion.user.username }}</a>.
+        </small>
     </div>
 
+    {% if request.user.is_authenticated %}
     <form action="{% url "update-evidence" %}" method="POST" align="center">
         {% csrf_token %}
         <input type="hidden" name="redirect" value="{{ request.get_full_path }}">
@@ -38,14 +62,18 @@
             </button>
         </div>
     </form>
+    {% endif %}
 </div>
 {% endfor %}
 </div>
+
 </div>
 
 <div class="row">
-    {% include "pagination.html" with page_obj=suggestions paginator=suggestions.paginator %}
+    {% include "pagination.html" with page_obj=suggestions paginator=suggestions.paginator nsfw_ok=True %}
 </div>
+
+{% endif %}
 
 {% endblock %}
 
