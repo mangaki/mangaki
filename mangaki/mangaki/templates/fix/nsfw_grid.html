@@ -20,34 +20,18 @@
         <a href="{% url "profile" suggestion.user %}">{{ suggestion.user.username }}</a>.</small>
     </div>
 
-    <!--<button type="button" name="nsfw-button" data-suggestion="{{ suggestion.id }}"
-            data-problem="{{ suggestion.problem }}"
-            data-nsfw="{{ says_is_nsfw|yesno:'yes,no' }}"
-            class="btn {{ says_is_nsfw|yesno:'btn-success,btn-danger' }}">
-            {% if says_is_nsfw %}Oui{% else %}Non{% endif %}
-    </button>
-
-    <button type="button" data-suggestion="{{ suggestion.id }}" data-state="not-toggled"
-            data-problem="{{ suggestion.problem }}" data-nsfw="yes"
-            name="nsfw-button" class="btn btn-success">Oui</button>
-    <button type="button" data-suggestion="{{ suggestion.id }}" data-state="not-toggled"
-            data-problem="{{ suggestion.problem }}" data-nsfw="no"
-            name="nsfw-button" class="btn btn-danger">Non</button> -->
-
-    <form id="evidence_form" action="{% url "update-evidence" %}" method="POST" align="center">
+    <form action="{% url "update-evidence" %}" method="POST" align="center">
         {% csrf_token %}
         <input type="hidden" name="redirect" value="{{ request.get_full_path }}">
-        <input type="hidden" name="suggestion" id="id_suggestion" value="{{ suggestion.pk }}">
+        <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
         <div class="btn-group btn-group-sm">
-            <button class="btn {{ says_is_nsfw|yesno:'btn-success,btn-default,btn-default' }}"
+            <button class="btn btn-sm {{ says_is_nsfw|yesno:'btn-success,btn-default,btn-default' }}" data-nsfw="True"
                     type="submit" name="agrees" value="{{ supposed_nsfw|yesno:'True,False,True' }}"
                     {{ says_is_nsfw|yesno:'disabled,,' }}>
                     <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Oui
             </button>
-            {% if says_is_nsfw is not None %}
-            <button type="submit" class="btn btn-warning" name="delete" value="True">Annuler</button>
-            {% endif %}
-            <button class="btn {{ says_is_nsfw|yesno:'btn-default,btn-danger,btn-default' }}"
+            <input type="submit" class="btn btn-sm btn-warning" name="delete" value="Annuler" {% if says_is_nsfw is None %}disabled{% endif %}>
+            <button class="btn btn-sm {{ says_is_nsfw|yesno:'btn-default,btn-danger,btn-default' }}" data-nsfw="False"
                     type="submit" name="agrees" value="{{ supposed_nsfw|yesno:'False,True,False' }}"
                     {{ says_is_nsfw|yesno:',disabled,' }}>
                 Non <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
@@ -67,28 +51,45 @@
 
 {% block extrajs %}
 <script>
-    // $.fn.extend({
-    //     toggleText: function(a, b) {
-    //         return this.text(this.text().trim() == b ? a : b);
-    //     }
-    // });
-    //
-    // $("[name='nsfw-button']").on("click", function() {
-    //     if($(this).attr('data-state')) {
-    //         $(this).parent().siblings('div').remove();
-    //         $(this).removeAttr('data-state');
-    //     }
-    //     else {
-    //         $(this).toggleClass('btn-danger btn-success');
-    //         $(this).toggleText('Oui', 'Non');
-    //         $(this).data('nsfw', $(this).data('nsfw') == 'yes' ? 'no' : 'yes');
-    //     }
-    //
-    //     var says_is_nsfw = $(this).data('nsfw') == 'yes';
-    //     var supposed_nsfw = $(this).data('problem') == 'nsfw';
-    //     var agrees = (says_is_nsfw && supposed_nsfw) || (!says_is_nsfw && !supposed_nsfw);
-    //
-    //     $.post(Urls['update-evidence'](), {agrees: agrees, suggestion: $(this).data("suggestion")});
-    // });
+    $("form").submit(function(e){
+        e.preventDefault();
+    });
+
+    $("[name='agrees']").on("click", function() {
+        var curr_button = $(this);
+        var clos_button = $(this).closest('form').find("[name='agrees']");
+        var delt_button = $(this).closest('form').find("[name='delete']");
+        var is_nsfw = curr_button.data('nsfw') === 'True';
+
+        $.post(Urls['update-evidence'](), {
+            agrees: $(this).val(),
+            suggestion: $(this).closest('form').find("[name='suggestion']").val(),
+            success: function(data) {
+                delt_button.prop('disabled', false);
+
+                clos_button.prop('disabled', false);
+                curr_button.prop('disabled', true);
+
+                clos_button.removeClass('btn-success btn-danger').addClass('btn-default');
+                curr_button.removeClass('btn-default').addClass(is_nsfw ? 'btn-success' : 'btn-danger');
+            }
+        });
+    });
+
+    $("[name='delete']").on("click", function() {
+        var delete_button = $(this);
+        var agrees_button = $(this).closest('form').find("[name='agrees']");
+
+        $.post(Urls['update-evidence'](), {
+            delete: $(this).val(),
+            suggestion: $(this).closest('form').find("[name='suggestion']").val(),
+            success: function(data) {
+                delete_button.prop('disabled', true);
+
+                agrees_button.removeClass('btn-success btn-danger').addClass('btn-default');
+                agrees_button.prop('disabled', false);
+            }
+        });
+    });
 </script>
 {% endblock %}
