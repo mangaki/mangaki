@@ -6,7 +6,9 @@
 
 {% block body %}
 
-<h1>Suggestion #{{ suggestion.pk }}</h1><br/>
+<div class="page-header">
+    <h1>Suggestion #{{ suggestion.pk }}</h1>
+</div>
 
 {% if suggestion.is_checked %}
 <div class="alert alert-info">
