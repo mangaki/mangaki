@@ -8,5 +8,5 @@ def poster_url(context, work, bypass_nsfw_settings=None):
     if work is None:
         return static('img/chiro.gif')
     if bypass_nsfw_settings:
-        return work.get_poster()
+        return work.poster_url
     return work.safe_poster(context.request.user)

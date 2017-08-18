@@ -122,8 +122,8 @@
 
 
     <div class="container">
+        {% block anonymous_rating_banner %}
         {% if request|has_anonymous_ratings %}
-            {% block anonymous_rating_banner %}
             <div class="col-xs-12">
                 <div class="alert alert-warning">
                     Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les
@@ -131,8 +131,8 @@
                     sauvegarder!
                 </div>
             </div>
-            {% endblock %}
         {% endif %}
+        {% endblock %}
         {% block body %}{% endblock %}
     </div>
     <div id="push"></div>

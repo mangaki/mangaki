@@ -14,10 +14,11 @@
 </div>
 
 <div class="row">
+
 {% if not request.user.profile.nsfw_ok and request.GET.nsfw_ok is None %}
 <div class="alert alert-warning">
-    <strong>Attention !</strong> Vous avez indiqué sur votre profil ne pas vouloir voir les œuvres marquées NSFW. Souhaitez-vous tout de même les voir ?
-    <a href="{{ request.build_absolute_uri }}{{ request.GET.page|yesno:'&,?' }}nsfw_ok">Oui</a> / <a href="{% url "fix-index" %}">Non</a>.
+    <strong>Attention !</strong> Vous {{ request.user.is_anonymous|yesno:"n'êtes pas connecté et ne voyez donc par défaut pas,avez indiqué sur votre profil ne pas vouloir voir" }} les œuvres marquées NSFW.
+    Souhaitez-vous tout de même les voir ? <a href="{{ request.build_absolute_uri }}{{ request.GET.page|yesno:'&,?' }}nsfw_ok=yes">Oui</a> / <a href="{% url "fix-index" %}">Non</a>.
 </div>
 {% endif %}
 
@@ -44,9 +45,8 @@
     </div>
 
     {% if request.user.is_authenticated %}
-    <form action="{% url "update-evidence" %}" method="POST" align="center">
+    <form action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST" class="text-center">
         {% csrf_token %}
-        <input type="hidden" name="redirect" value="{{ request.get_full_path }}">
         <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
         <div class="btn-group btn-group-sm">
             <button class="btn btn-sm {{ says_is_nsfw|yesno:'btn-success,btn-default,btn-default' }}" data-nsfw="True"

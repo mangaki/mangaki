@@ -944,7 +944,6 @@ def update_evidence(request):
     needs_help = request.POST.get('needs_help') == 'True'
     delete = request.POST.get('delete')
     suggestion_id = request.POST.get('suggestion')
-    redirect_link = request.POST.get('redirect')
 
     if request.user.is_authenticated and suggestion_id:
         if delete:
@@ -964,8 +963,8 @@ def update_evidence(request):
             evidence.needs_help = needs_help
             evidence.save()
 
-    if redirect_link:
-        return redirect(redirect_link)
+    if 'next' in request.GET:
+        return redirect(request.GET['next'])
     return redirect('fix-index')
 
 
