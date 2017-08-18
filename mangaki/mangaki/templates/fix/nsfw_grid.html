@@ -18,7 +18,7 @@
 {% if not request.user.profile.nsfw_ok and request.GET.nsfw_ok is None %}
 <div class="alert alert-warning">
     <strong>Attention !</strong> Vous {{ request.user.is_anonymous|yesno:"n'êtes pas connecté et ne voyez donc par défaut pas,avez indiqué sur votre profil ne pas vouloir voir" }} les œuvres marquées NSFW.
-    Souhaitez-vous tout de même les voir ? <a href="{{ request.build_absolute_uri }}{{ request.GET.page|yesno:'&,?' }}nsfw_ok=yes">Oui</a> / <a href="{% url "fix-index" %}">Non</a>.
+    Souhaitez-vous tout de même les voir ? <a href="{{ request.build_absolute_uri }}{{ request.GET.page|yesno:'&,?' }}nsfw_ok">Oui</a> / <a href="{% url "fix-index" %}">Non</a>.
 </div>
 {% endif %}
 

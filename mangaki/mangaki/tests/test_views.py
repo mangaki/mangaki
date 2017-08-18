@@ -269,11 +269,13 @@ class SuggestionViewsTest(SuggestionFactoryMixin, TestCase):
             with self.subTest(label, user=user):
                 self.client.force_login(user)
 
-                response = self.client.post('/evidence/', {
-                    'agrees': 'True',
-                    'redirect': '/fix/suggestion/{:d}'.format(self.suggestion.pk),
-                    'suggestion': self.suggestion.pk
-                })
+                response = self.client.post(
+                    '/evidence/?next=/fix/suggestion/{:d}'.format(self.suggestion.pk), {
+                        'agrees': 'True',
+                        'suggestion': self.suggestion.pk
+                    }
+                )
+
                 self.assertEqual(response.status_code, 302)
                 self.assertEqual(response.url, '/fix/suggestion/{:d}'.format(self.suggestion.pk))
 
@@ -284,11 +286,13 @@ class SuggestionViewsTest(SuggestionFactoryMixin, TestCase):
     def test_delete_evidence(self):
         self.client.force_login(self.user)
 
-        response = self.client.post('/evidence/', {
-            'delete': 'True',
-            'redirect': '/fix/suggestion/{:d}'.format(self.suggestion.pk),
-            'suggestion': self.suggestion.pk
-        })
+        response = self.client.post(
+            '/evidence/?next=/fix/suggestion/{:d}'.format(self.suggestion.pk), {
+                'delete': 'True',
+                'suggestion': self.suggestion.pk
+            }
+        )
+
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/fix/suggestion/{:d}'.format(self.suggestion.pk))
 
