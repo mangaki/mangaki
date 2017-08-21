@@ -897,7 +897,9 @@ def nsfw_grid(request):
     nsfw_suggestion_list = Suggestion.objects.select_related(
             'work', 'user', 'work__category').prefetch_related(
             'work__category', 'evidence_set__user').filter(
-            problem__in=['nsfw', 'n_nsfw'], is_checked=False).order_by('-work__nb_ratings')
+            problem__in=['nsfw', 'n_nsfw'], is_checked=False).exclude(
+            evidence__isnull=False
+            ).order_by('-work__nb_ratings')
 
     paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
     page = request.GET.get('page')
@@ -925,7 +927,7 @@ def nsfw_grid(request):
             nsfw_states.append(None)
 
 
-    suggestions_with_states = zip(suggestions, nsfw_states, supposed_nsfw)
+    suggestions_with_states = list(zip(suggestions, nsfw_states, supposed_nsfw))
 
     context = {
         'suggestions_with_states': suggestions_with_states,
