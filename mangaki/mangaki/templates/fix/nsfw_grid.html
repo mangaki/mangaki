@@ -30,9 +30,11 @@
     {% endif %}
 
     {% if request.user.profile.nsfw_ok or not request.user.nsfw_ok and request.GET.nsfw_ok is not None %}
+        {% if request.user.is_authenticated %}
         <div class="panel panel-default panel-body" style="margin: 10px 0;">
             Cliquez sur <strong>&laquo; C'est NSFW ! &raquo;</strong> si vous pensez qu'une œuvre est NSFW.
         </div>
+        {% endif %}
 
         <div class="row">
         <div class="cards-grid no-rating">
