@@ -6,7 +6,6 @@ django-nose
 tensorflow
 matplotlib
 flake8
-dedupe
 # Linting
 git-lint
 pylint

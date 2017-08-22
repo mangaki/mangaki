@@ -6,21 +6,21 @@ from dedupe import Dedupe, consoleLabel, canonicalize
 from mangaki.models import Work
 
 
-def dedupe_training(category):
+def dedupe_training(category, recall_weight=1):
     assert (category in ['mangas', 'animes']),"Only mangas or animes needs training"
     data = {}
-    for work in Work.objects.filter(category__slug=category[:len(category)-1]):
-        data[work.id] = {'title': work.title, 'vo_title': work.vo_title}
+    for work in Work.objects.filter(category__slug=category[:-1]).values_list('title', 'vo_title', 'id'):
+        data[work[2]] = {'title': work[0], 'vo_title': work[1]}
         for field in ['title', 'vo_title']:
-            if not data[work.id][field]:
-                data[work.id][field] = None
+            if not data[work[2]][field]:
+                data[work[2]][field] = None
     fields = [
         {'field': 'title', 'type': 'String'},
         {'field': 'vo_title', 'type': 'String'},
     ]
-    output_file = 'dedupe/'+category+'_output.csv'
-    settings_file = 'dedupe/'+category+'_learned_settings'
-    training_file = 'dedupe/'+category+'_training.json'
+    output_file = os.path.join('./dedupe/', category+'_output.csv')
+    settings_file = os.path.join('./dedupe/', category+'_learned_settings')
+    training_file = os.path.join('./dedupe/', category+'_training.json')
 
     deduper = Dedupe(fields)
     deduper.sample(data)
@@ -39,21 +39,21 @@ def dedupe_training(category):
     with open(settings_file, 'wb') as sf:
         deduper.writeSettings(sf)
 
-    threshold = deduper.threshold(data, recall_weight=2)
+    #recall_weight defines the value you give to recall opposed to the value of precision
+    threshold = deduper.threshold(data, recall_weight)
 
     print('clustering...')
     clustered_dupes = deduper.match(data, threshold)
 
     print('# duplicate sets', len(clustered_dupes))
 
-    input_file = 'dedupe/'+category+'.csv'
+    input_file = os.path.join('./dedupe/', category+'.csv')
     with open(input_file, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f, delimiter=",")
+        writer = csv.writer(f, delimiter='\t')
         writer.writerow(['id', 'title', 'vo_title'])
         for work_id in data:
             title = data[work_id]['title']
             vo_title = data[work_id]['vo_title']
-            print(vo_title)
             writer.writerow([work_id, title, vo_title])
     cluster_membership = {}
     cluster_id = 0
@@ -70,8 +70,8 @@ def dedupe_training(category):
     singleton_id = cluster_id + 1
 
     with open(output_file, 'w', newline='', encoding='utf-8') as f_output, open(input_file, newline='', encoding='utf-8') as f_input:
-        writer = csv.writer(f_output, delimiter=",")
-        reader = csv.reader(f_input)
+        writer = csv.writer(f_output, delimiter='\t')
+        reader = csv.reader(f_input, delimiter='\t')
 
         heading_row = next(reader)
         heading_row.insert(0, 'confidence_score')
