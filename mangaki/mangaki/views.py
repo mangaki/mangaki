@@ -14,7 +14,7 @@ from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When, Count
+from django.db.models import Case, IntegerField, Sum, Value, When, Count, Q
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -897,8 +897,9 @@ def nsfw_grid(request):
     nsfw_suggestion_list = Suggestion.objects.select_related(
             'work', 'user', 'work__category').prefetch_related(
             'work__category', 'evidence_set__user').filter(
-            problem__in=['nsfw', 'n_nsfw'], is_checked=False).exclude(
-            evidence__isnull=False
+                Q(problem__in=('nsfw', 'n_nsfw')),
+                Q(is_checked=False),
+                ~Q(evidence__user=request.user) | Q(evidence=None)
             ).order_by('-work__nb_ratings')
 
     paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
@@ -925,7 +926,6 @@ def nsfw_grid(request):
                 break
         else:
             nsfw_states.append(None)
-
 
     suggestions_with_states = list(zip(suggestions, nsfw_states, supposed_nsfw))
 
