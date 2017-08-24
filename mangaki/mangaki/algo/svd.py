@@ -20,7 +20,6 @@ class MangakiSVD(RecommendationAlgorithm):
 
     def load(self, filename):
         backup = super().load(filename)
-        self.M = backup.M
         self.U = backup.U
         self.sigma = backup.sigma
         self.VT = backup.VT
@@ -55,12 +54,15 @@ class MangakiSVD(RecommendationAlgorithm):
         self.U, self.sigma, self.VT = randomized_svd(matrix, self.nb_components, n_iter=self.nb_iterations, random_state=42)
         if self.verbose_level:
             print('Shapes', self.U.shape, self.sigma.shape, self.VT.shape)
-        self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
+        # self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
 
         self.chrono.save('factor matrix')
 
     def predict(self, X):
-        return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
+        self.chrono.save('begin of fit')
+        M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
+        self.chrono.save('end of fit')
+        return M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
 
     def get_shortname(self):
         return 'svd-%d' % self.nb_components
