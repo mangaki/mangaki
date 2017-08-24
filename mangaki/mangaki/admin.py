@@ -14,12 +14,12 @@ from django.utils import timezone
 
 from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
-    Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
+    Suggestion, Evidence, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
     FAQEntry, ColdStartRating, Trope, Language,
     ExtLanguage, WorkCluster
 )
-from mangaki.utils.anidb import client
+from mangaki.utils.anidb import AniDBTag, client, diff_between_anidb_and_local_tags
 from mangaki.utils.db import get_potential_posters
 
 from collections import defaultdict
@@ -36,11 +36,27 @@ class MergeType(Enum):
         self.row_color = row_color
 
 
+class MergeErrors(Enum):
+    NO_ID = 'no ID'
+    FIELDS_MISSING = 'fields missings'
+    NOT_ENOUGH_WORKS = 'not enough works'
+
+
 def overwrite_fields(final_work, request):
-    for field in request.POST.get('fields_to_choose').split(','):
-        if request.POST.get(field) != 'None':
-            setattr(final_work, field, request.POST.get(field))
-    final_work.save()
+    fields_to_choose = set(filter(None, request.POST.get('fields_to_choose').split(',')))
+    fields_required = set(filter(None, request.POST.get('fields_required').split(',')))
+    missing_required_fields = []
+
+    for field in fields_to_choose:
+        curr_field = request.POST.get(field)
+        if curr_field != 'None' and curr_field is not None:
+            setattr(final_work, field, curr_field)
+        if (curr_field == 'None' or curr_field is None) and field in fields_required:
+            missing_required_fields.append(field)
+
+    if not missing_required_fields:
+        final_work.save()
+    return missing_required_fields  # Return the list of missing required fields
 
 
 def redirect_ratings(works_to_merge, final_work):
@@ -93,7 +109,9 @@ def create_merge_form(works_to_merge_qs):
     for work_dict in work_dicts_to_merge:
         for field in work_dict:
             rows[field].append(work_dict[field])
+
     fields_to_choose = []
+    fields_required = []
     template_rows = []
     for field in rows:
         choices = rows[field]
@@ -117,10 +135,13 @@ def create_merge_form(works_to_merge_qs):
         })
         if field != 'id' and merge_type != MergeType.INFO_ONLY:
             fields_to_choose.append(field)
+        if merge_type == MergeType.CHOICE_REQUIRED:
+            fields_required.append(field)
+
     template_rows.sort(key=lambda row: row['merge_type'].priority, reverse=True)
     rating_samples = [(Rating.objects.filter(work_id=work_dict['id']).count(),
                        Rating.objects.filter(work_id=work_dict['id'])[:10]) for work_dict in work_dicts_to_merge]
-    return fields_to_choose, template_rows, rating_samples
+    return fields_to_choose, fields_required, template_rows, rating_samples
 
 
 @transaction.atomic  # In case trouble happens
@@ -134,14 +155,26 @@ def merge_works(request, selected_queryset):
         from_cluster = False
         works_to_merge_qs = selected_queryset.prefetch_related('rating_set', 'genre')
         works_to_merge = list(works_to_merge_qs)
+
     if request.POST.get('confirm'):  # Merge has been confirmed
         if not from_cluster:
             cluster = WorkCluster(user=request.user, checker=request.user)
             cluster.save()  # Otherwise we cannot add works
             cluster.works.add(*works_to_merge)
+
+        # Happens when no ID was provided
+        if not request.POST.get('id'):
+            return None, None, MergeErrors.NO_ID
+
         final_id = int(request.POST.get('id'))
         final_work = Work.objects.get(id=final_id)
-        overwrite_fields(final_work, request)
+
+        missing_required_fields = overwrite_fields(final_work, request)
+
+        # Happens when a required field was left empty
+        if missing_required_fields:
+            return None, missing_required_fields, MergeErrors.FIELDS_MISSING
+
         redirect_ratings(works_to_merge, final_work)
         redirect_staff(works_to_merge, final_work)
         redirect_related_objects(works_to_merge, final_work)
@@ -149,9 +182,14 @@ def merge_works(request, selected_queryset):
             checker=request.user, resulting_work=final_work, merged_on=timezone.now(), status='accepted')
         return len(works_to_merge), final_work, None
 
-    fields_to_choose, template_rows, rating_samples = create_merge_form(works_to_merge_qs)
+    # Just show a warning if only one work was checked
+    if len(works_to_merge) < 2:
+        return None, None, MergeErrors.NOT_ENOUGH_WORKS
+
+    fields_to_choose, fields_required, template_rows, rating_samples = create_merge_form(works_to_merge_qs)
     context = {
         'fields_to_choose': ','.join(fields_to_choose),
+        'fields_required': ','.join(fields_required),
         'template_rows': template_rows,
         'rating_samples': rating_samples,
         'queryset': selected_queryset,
@@ -209,7 +247,8 @@ class WorkAdmin(admin.ModelAdmin):
     list_display = ('id', 'category', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter)
     raw_id_fields = ('redirect',)
-    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge', 'refresh_work', 'update_tags_via_anidb', 'change_title']
+    actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge',
+               'refresh_work', 'update_tags_via_anidb', 'change_title']
     inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
@@ -229,60 +268,98 @@ class WorkAdmin(admin.ModelAdmin):
 
     make_nsfw.short_description = "Rendre NSFW les œuvres sélectionnées"
 
-    # FIXME : https://github.com/mangaki/mangaki/issues/205
     def update_tags_via_anidb(self, request, queryset):
-        if request.POST.get("post"):
-            kept_ids = request.POST.getlist('checks')
-            for anime_id in kept_ids:
-                anime = Work.objects.get(id=anime_id)
+        works = queryset.all()
 
-                retrieved_tags = anime.retrieve_tags(client)
-                deleted_tags = retrieved_tags["deleted_tags"]
-                added_tags = retrieved_tags["added_tags"]
-                updated_tags = retrieved_tags["updated_tags"]
+        if request.POST.get('confirm'): # Updating tags has been confirmed
+            to_update_work_ids = set(map(int, request.POST.getlist('to_update_work_ids')))
+            nb_updates = len(to_update_work_ids)
 
-                tags = deleted_tags
-                tags.update(added_tags)
-                tags.update(updated_tags)
+            work_ids = list(map(int, request.POST.getlist('work_ids')))
 
-                anime.update_tags(tags)
+            tag_titles = request.POST.getlist('tag_titles')
+            tag_weights = list(map(int, request.POST.getlist('weights')))
+            tag_anidb_tag_ids = list(map(int, request.POST.getlist('anidb_tag_ids')))
+            tags = list(map(AniDBTag, tag_titles, tag_weights, tag_anidb_tag_ids))
 
-            self.message_user(request, "Modifications sur les tags faites")
+            # Checkboxes to know which tags have to be kept regardless of their pending status
+            tag_checkboxes = request.POST.getlist('tag_checkboxes')
+            tags_to_process = set(tuple(map(int, tag_checkbox.split(':'))) for tag_checkbox in tag_checkboxes)
+
+            # Make a dict with work_id -> tags to keep
+            tags_final = {}
+            for index, work_id in enumerate(work_ids):
+                if work_id not in to_update_work_ids:
+                    continue
+                if work_id not in tags_final:
+                    tags_final[work_id] = []
+                if (work_id, tags[index].anidb_tag_id) in tags_to_process:
+                    tags_final[work_id].append(tags[index])
+
+            # Process selected tags for works that have been selected
+            for work in works:
+                if work.id in to_update_work_ids:
+                    client.update_tags(work, tags_final[work.id])
+
+            if nb_updates == 0:
+                self.message_user(request,
+                                  "Aucune oeuvre n'a été marquée comme devant être mise à jour.",
+                                  level=messages.WARNING)
+            elif nb_updates == 1:
+                self.message_user(request,
+                                  "Mise à jour des tags effectuée pour une œuvre.")
+            else:
+                self.message_user(request,
+                                  "Mise à jour des tags effectuée pour {} œuvres.".format(nb_updates))
             return None
 
-        for anime in queryset.select_related("category"):
-            if anime.category.slug != 'anime':
-                self.message_user(request,
-                                  "%s n'est pas un anime. La recherche des tags via AniDB n'est possible que pour les "
-                                  "animes " % anime.title)
-                self.message_user(request, "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
-                return None
-            elif not anime.anidb_aid:
-                self.message_user(
-                    request,
-                    "%s n'a pas de lien actuel avec la base d'aniDB (pas d'anidb_aid)" % anime.title)
-                self.message_user(
-                    request,
-                    "Vous avez un filtre à votre droite pour avoir les animes avec un anidb_aid")
-                return None
+        # Check for works with missing AniDB AID
+        if not all(work.anidb_aid for work in works):
+            self.message_user(request,
+            """Certains de vos choix ne possèdent pas d'identifiant AniDB.
+            Le rafraichissement de leurs tags a été omis. (Détails: {})"""
+            .format(", ".join(map(lambda w: w.title,
+                                  filter(lambda w: not w.anidb_aid, works)))),
+            level=messages.WARNING)
 
+        # Retrieve and send tags information to the appropriate form
         all_information = {}
-        for anime in queryset:
-            retrieved_tags = anime.retrieve_tags(client)
-            deleted_tags = retrieved_tags["deleted_tags"]
-            added_tags = retrieved_tags["added_tags"]
-            updated_tags = retrieved_tags["updated_tags"]
-            kept_tags = retrieved_tags["kept_tags"]
+        for index, work in enumerate(works, start=1):
+            if work.anidb_aid:
+                if index % 25 == 0:
+                    logger.info('(AniDB refresh): Sleeping...')
+                    time.sleep(1)  # Don't spam AniDB.
 
-            all_information[anime.id] = {'title': anime.title, 'deleted_tags': deleted_tags.items(),
-                                         'added_tags': added_tags.items(), 'updated_tags': updated_tags.items(),
-                                         "kept_tags": kept_tags.items()}
+                anidb_tags = client.get_tags(anidb_aid=work.anidb_aid)
+                tags_diff = diff_between_anidb_and_local_tags(work, anidb_tags)
+                tags_count = 0
 
-        context = {
-            'all_information': all_information.items(),
-            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-        }
-        return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
+                for tags_info in tags_diff.values():
+                    tags_count += len(tags_info)
+
+                if tags_count > 0:
+                    all_information[work.id] = {
+                        'title': work.title,
+                        'deleted_tags': tags_diff["deleted_tags"],
+                        'added_tags': tags_diff["added_tags"],
+                        'updated_tags': tags_diff["updated_tags"],
+                        'kept_tags': tags_diff["kept_tags"]
+                    }
+
+        if all_information:
+            context = {
+                'all_information': all_information.items(),
+                'queryset': queryset,
+                'opts': TaggedWork._meta,
+                'action': 'update_tags_via_anidb',
+                'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+            }
+            return TemplateResponse(request, "admin/update_tags_via_anidb.html", context)
+        else:
+            self.message_user(request,
+                              "Aucune des œuvres sélectionnées n'a subit de mise à jour des tags chez AniDB.",
+                              level=messages.WARNING)
+            return None
 
     update_tags_via_anidb.short_description = "Mettre à jour les tags des œuvres depuis AniDB"
 
@@ -358,6 +435,19 @@ class WorkAdmin(admin.ModelAdmin):
 
     def merge(self, request, queryset):
         nb_merged, final_work, response = merge_works(request, queryset)
+        if response == MergeErrors.NO_ID:
+            self.message_user(request,
+                              "Aucun ID n'a été fourni pour la fusion.",
+                              level=messages.ERROR)
+        if response == MergeErrors.FIELDS_MISSING:
+            self.message_user(request,
+                              """Un ou plusieurs des champs requis n'ont pas été remplis.
+                              (Détails: {})""".format(", ".join(final_work)),
+                              level=messages.ERROR)
+        if response == MergeErrors.NOT_ENOUGH_WORKS:
+            self.message_user(request,
+                              "Veuillez sélectionner au moins 2 œuvres à fusionner.",
+                              level=messages.WARNING)
         if response is None:  # Confirmed
             self.message_user(request, format_html('La fusion de {:d} œuvres vers <a href="{:s}">{:s}</a> a bien été effectuée.'
                 .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
@@ -652,6 +742,11 @@ class TopAdmin(admin.ModelAdmin):
 class RoleAdmin(admin.ModelAdmin):
     model = Role
     prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(Evidence)
+class EvidenceAdmin(admin.ModelAdmin):
+    list_display = ['user', 'suggestion', 'agrees', 'needs_help']
 
 
 admin.site.register(Genre)

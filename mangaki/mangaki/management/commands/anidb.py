@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Count
-from mangaki.utils.anidb import client
+from mangaki.utils.anidb import client, diff_between_anidb_and_local_tags
 from mangaki.models import Artist, Role, Staff, Work, WorkTitle, ArtistSpelling, Language
 from urllib.parse import parse_qs, urlparse
 
@@ -68,44 +68,41 @@ class Command(BaseCommand):
                 language = Language.objects.get(iso639=worktitle[2])
                 WorkTitle.objects.get_or_create(work=anime, title=worktitle[0], language=language, type=worktitle[1])
 
-            retrieved_tags = anime.retrieve_tags(a)
-            deleted_tags = retrieved_tags["deleted_tags"]
-            added_tags = retrieved_tags["added_tags"]
-            updated_tags = retrieved_tags["updated_tags"]
-            kept_tags = retrieved_tags["kept_tags"]
+            anidb_tags = client.get_tags(anidb_aid=anime.anidb_aid)
+            tags_diff = diff_between_anidb_and_local_tags(anime, anidb_tags)
+
+            deleted_tags = tags_diff["deleted_tags"]
+            added_tags = tags_diff["added_tags"]
+            updated_tags = tags_diff["updated_tags"]
+            kept_tags = tags_diff["kept_tags"]
 
             print(anime.title+":")
             if deleted_tags:
                 print("\n\tLes tags enlevés sont :")
-                for tag, tag_infos in deleted_tags.items():
-                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag_infos["anidb_tag_id"], tag, tag_infos["weight"]))
+                for tag in deleted_tags:
+                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag.anidb_tag_id, tag.title, tag.weight))
 
             if added_tags:
                 print("\n\tLes tags totalement nouveaux sont :")
-                for tag, tag_infos in added_tags.items():
-                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag_infos["anidb_tag_id"], tag, tag_infos["weight"]))
+                for tag in added_tags:
+                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag.anidb_tag_id, tag.title, tag.weight))
 
             if updated_tags:
                 print("\n\tLes tags modifiés sont :")
-                for tag, tag_infos in updated_tags.items():
-                    print('\t\t[AniDB Tag ID #{} -> #{}] {}: {} -> {}'.format(
-                        tag_infos[0]["anidb_tag_id"], tag_infos[1]["anidb_tag_id"], tag, tag_infos[0]["weight"], tag_infos[1]["weight"]))
-
+                for tag in updated_tags:
+                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag.anidb_tag_id, tag.title, tag.weight))
 
             if kept_tags:
-                print("\n\tLes tags non modifiés/restés identiques sont :")
-                for tag, tag_infos in kept_tags.items():
-                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag_infos["anidb_tag_id"], tag, tag_infos["weight"]))
+                print("\n\tLes tags identiques sont :")
+                for tag in kept_tags:
+                    print('\t\t[AniDB Tag ID #{}] {}: {} '.format(tag.anidb_tag_id, tag.title, tag.weight))
 
             choice = input("Voulez-vous réaliser ces changements [y/n] : ")
             if choice == 'n':
                 print("\nOk, aucun changement ne va être fait")
             elif choice == 'y':
-                tags = deleted_tags
-                tags.update(added_tags)
-                tags.update(updated_tags)
-                tags.update(kept_tags)
-                anime.update_tags(tags)
+                all_tags = deleted_tags + added_tags + updated_tags + kept_tags
+                client.update_tags(anime, all_tags)
 
             staff_map = dict(Role.objects.filter(slug__in=['author', 'director', 'composer']).values_list('slug', 'pk'))
 

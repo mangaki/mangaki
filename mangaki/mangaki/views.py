@@ -9,12 +9,13 @@ import allauth.account.views
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
+from django.db.models import Case, IntegerField, Sum, Value, When, Count
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone, translation
@@ -35,7 +36,7 @@ from mangaki.choices import TOP_CATEGORY_CHOICES
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
-                            Recommendation, Staff, Suggestion, Top, Trope, Work)
+                            Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
 from mangaki.utils.mal import import_mal, client
 from mangaki.utils.profile import (
     get_profile_ratings,
@@ -55,6 +56,8 @@ RATINGS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
+FIXES_PER_PAGE = 5
+
 REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
     ('http://animeka.com', 'Animeka'),
@@ -431,7 +434,7 @@ def get_profile(request,
     else:
         reco_count = len(received_recommendation_list)
 
-    member_time = (datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
+    member_time = (datetime.date.today() - user.date_joined.date()
                    if (can_see and not is_anonymous) else None)
     user_events = get_profile_events(user) if (can_see and not is_anonymous) else []
 
@@ -805,6 +808,120 @@ def faq_index(request):
 
 def legal_mentions(request):
     return render(request, 'mangaki/legal.html')
+
+
+def fix_index(request):
+    suggestion_list = Suggestion.objects.select_related('work', 'user').prefetch_related(
+        'work__category', 'evidence_set__user').annotate(
+            count_agrees=Count(Case(When(evidence__agrees=True, then=1))),
+            count_disagrees=Count(Case(When(evidence__agrees=False, then=1)))
+        ).all().order_by('is_checked', '-date')
+
+    paginator = Paginator(suggestion_list, FIXES_PER_PAGE)
+    page = request.GET.get('page')
+
+    try:
+        suggestions = paginator.page(page)
+    except PageNotAnInteger:
+        suggestions = paginator.page(1)
+    except EmptyPage:
+        suggestions = paginator.page(paginator.num_pages)
+
+    context = {
+        'suggestions': suggestions
+    }
+
+    return render(request, 'fix/fix_index.html', context)
+
+
+def fix_suggestion(request, suggestion_id):
+    cluster_colors = {
+        'unprocessed': 'text-info',
+        'accepted': 'text-success',
+        'rejected': 'text-danger'
+    }
+
+    # Retrieve the Suggestion object if it exists else raise a 404 error
+    suggestion = get_object_or_404(
+        Suggestion.objects.select_related('work', 'user', 'work__category').annotate(
+            count_agrees=Count(Case(When(evidence__agrees=True, then=1))),
+            count_disagrees=Count(Case(When(evidence__agrees=False, then=1)))
+        ),
+        id=suggestion_id
+    )
+
+    # Retrieve the Evidence object if it exists
+    evidence = None
+    if request.user.is_authenticated:
+        try:
+            evidence = Evidence.objects.get(user=request.user, suggestion=suggestion)
+        except ObjectDoesNotExist:
+            evidence = None
+
+    # Retrieve related clusters
+    clusters = WorkCluster.objects.select_related(
+        'resulting_work', 'resulting_work__category').prefetch_related(
+        'works', 'works__category', 'checker').filter(origin=suggestion_id).all()
+    colors = [cluster_colors[cluster.status] for cluster in clusters]
+
+    # Get the previous suggestion, ie. more recent and of the same checked status
+    previous_suggestions_ids = Suggestion.objects.filter(date__gt=suggestion.date,
+        is_checked=suggestion.is_checked).order_by('date').values_list('id', flat=True)
+
+    # If there is no more recent suggestion, and was checked, just pick from not checked suggestions
+    if not previous_suggestions_ids and suggestion.is_checked:
+        previous_suggestions_ids = Suggestion.objects.filter(is_checked=False).order_by('date').values_list('id', flat=True)
+
+    # Get the next suggestion, ie. less recent and of the same checked status
+    next_suggestions_ids = Suggestion.objects.filter(date__lt=suggestion.date,
+        is_checked=suggestion.is_checked).order_by('-date').values_list('id', flat=True)
+
+    # If there is no less recent suggestion, and wasn't checked, just pick from checked suggestions
+    if not next_suggestions_ids and not suggestion.is_checked:
+        next_suggestions_ids = Suggestion.objects.filter(is_checked=True).order_by('-date').values_list('id', flat=True)
+
+    context = {
+        'suggestion': suggestion,
+        'clusters': zip(clusters, colors) if clusters and colors else None,
+        'evidence': evidence,
+        'next_id': next_suggestions_ids[0] if next_suggestions_ids else None,
+        'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None
+    }
+
+    return render(request, 'fix/fix_suggestion.html', context)
+
+
+@login_required
+def update_evidence(request):
+    if request.method != 'POST':
+        redirect('fix-index')
+
+    agrees = request.POST.get('agrees') == 'True'
+    needs_help = request.POST.get('needs_help') == 'True'
+    delete = request.POST.get('delete')
+    suggestion_id = request.POST.get('suggestion')
+
+    if request.user.is_authenticated and suggestion_id:
+        if delete:
+            try:
+                Evidence.objects.get(
+                    user=request.user,
+                    suggestion=Suggestion.objects.get(pk=suggestion_id)
+                ).delete()
+            except ObjectDoesNotExist:
+                pass
+        else:
+            evidence, created = Evidence.objects.get_or_create(
+                user=request.user,
+                suggestion=Suggestion.objects.get(pk=suggestion_id)
+            )
+            evidence.agrees = agrees
+            evidence.needs_help = needs_help
+            evidence.save()
+
+    if suggestion_id:
+        return redirect('fix-suggestion', suggestion_id)
+    return redirect('fix-index')
 
 
 def generic_error_view(error, error_code):

@@ -2,7 +2,7 @@
 
 This role configures a server for running Mangaki backend services:
 
-- crons for top / director refresh.
+- crons for top refresh.
 - Celery workers.
 
 ## Dependencies

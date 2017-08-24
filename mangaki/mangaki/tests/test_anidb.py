@@ -6,7 +6,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from mangaki.models import Category, Editor, Studio, Work, RelatedWork, Role, Staff, Artist, TaggedWork, Tag
-from mangaki.utils.anidb import to_python_datetime, AniDB
+from mangaki.utils.anidb import to_python_datetime, AniDB, diff_between_anidb_and_local_tags
 
 
 class AniDBTest(TestCase):
@@ -24,7 +24,6 @@ class AniDBTest(TestCase):
         self.anidb = AniDB('test_client', 1)
         self.no_anidb = AniDB()
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
-        self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
 
     def test_to_python_datetime(self):
         self.assertEqual(to_python_datetime('2017-12-25'), datetime(2017, 12, 25, 0, 0))
@@ -51,6 +50,28 @@ class AniDBTest(TestCase):
         self.assertEqual(len(responses.calls), 1)
 
     @responses.activate
+    def test_anidb_get_methods(self):
+        responses.add(
+            responses.GET,
+            AniDB.BASE_URL,
+            body=self.read_fixture('anidb/sangatsu_no_lion.xml'),
+            status=200,
+            content_type='application/xml'
+        )
+
+        titles, main_title = self.anidb.get_titles(anidb_aid=11606)
+        creators, studio = self.anidb.get_creators(anidb_aid=11606)
+        tags = self.anidb.get_tags(anidb_aid=11606)
+        related_animes = self.anidb.get_related_animes(anidb_aid=11606)
+
+        self.assertEqual(len(titles), 9)
+        self.assertEqual(main_title, 'Sangatsu no Lion')
+        self.assertEqual(len(creators), 4)
+        self.assertEqual(studio.title, 'Shaft')
+        self.assertEqual(len(tags), 30)
+        self.assertEqual(len(related_animes), 2)
+
+    @responses.activate
     def test_anidb_get_animes(self):
         # Fake an artist entry with no AniDB creator ID that will be filled by retrieving Sangatsu
         artist = Artist(name="Shinbou Akiyuki").save()
@@ -67,7 +88,8 @@ class AniDBTest(TestCase):
                 )
 
             sangatsu = self.anidb.get_or_update_work(11606)
-            retrieved_tags_sangatsu = sangatsu.retrieve_tags(self.anidb)
+            tags_sangatsu_from_anidb = self.anidb.get_tags(11606)
+            tags_diff_sangatsu = diff_between_anidb_and_local_tags(sangatsu, tags_sangatsu_from_anidb)
             hibike = self.anidb.get_or_update_work(10889)
 
         # Retrieve tags
@@ -92,10 +114,10 @@ class AniDBTest(TestCase):
         self.assertCountEqual(staff_sangatsu, ['Umino Chika', 'Hashimoto Yukari', 'Shinbou Akiyuki', 'Okada Kenjirou'])
 
         # Check retrieved tags from AniDB
-        self.assertEqual(len(retrieved_tags_sangatsu["deleted_tags"]), 0)
-        self.assertEqual(len(retrieved_tags_sangatsu["added_tags"]), 0)
-        self.assertEqual(len(retrieved_tags_sangatsu["updated_tags"]), 0)
-        self.assertEqual(len(retrieved_tags_sangatsu["kept_tags"]), len(tags_sangatsu))
+        self.assertEqual(len(tags_diff_sangatsu["deleted_tags"]), 0)
+        self.assertEqual(len(tags_diff_sangatsu["added_tags"]), 0)
+        self.assertEqual(len(tags_diff_sangatsu["updated_tags"]), 0)
+        self.assertEqual(len(tags_diff_sangatsu["kept_tags"]), len(tags_sangatsu))
 
         # Check for no artist duplication
         artist = Artist.objects.filter(name="Shinbou Akiyuki")
