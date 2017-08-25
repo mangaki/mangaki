@@ -9,7 +9,7 @@ from django.utils.functional import cached_property
 
 from mangaki import settings
 from mangaki.models import (Work, RelatedWork, WorkTitle, Reference, Category,
-                            ExtLanguage, Studio)
+                            ExtLanguage, Studio, Genre)
 
 
 def to_python_datetime(date):
@@ -573,10 +573,11 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
             manga_type=manga_type,
             studio=studio
         )
-        new_works.append(work)
 
-        # Add a Reference for this work
-        Reference.objects.create(work=work, url=entry.anilist_url)
+        # Build genres for this Work
+        for genre_title in entry.genres:
+            genre, created = Genre.objects.get_or_create(title=genre_title)
+            work.genre.add(genre)
 
         # Create WorkTitle entries in the database for this Work
         current_work_titles = [
@@ -610,6 +611,10 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
             RelatedWork.objects.bulk_create(new_relations)
 
         # Here, should build staff too ! [AniListRichEntry only]
-        # Here, should build genres too !
+
+        # Save the Work object and add a Reference
+        work.save()
+        Reference.objects.create(work=work, url=entry.anilist_url)
+        new_works.append(work)
 
     return new_works
