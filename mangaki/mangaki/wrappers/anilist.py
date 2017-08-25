@@ -48,6 +48,48 @@ def to_anime_season(date):
     else:
         return 'fall'
 
+def is_no_results(anilist_error):
+    """
+    Return True is the error is a 'no results' error, False else
+    """
+    if isinstance(anilist_error, dict) and anilist_error.get('messages'):
+        for message in anilist_error['messages']:
+            message = message.lower()
+            if 'no query results' in message or 'no results' in message:
+                return True
+
+    return False
+
+def is_route_not_found(anilist_error):
+    """
+    Return True is the error is a 'no such API route found' error, False else
+    """
+    if isinstance(anilist_error, dict) and anilist_error.get('messages'):
+        for message in anilist_error['messages']:
+            message = message.lower()
+            if 'api route not found' in message:
+                return True
+
+    return False
+
+def is_token_error(anilist_error):
+    """
+    Return True is the error is a 'no token or token expired' error, False else
+    """
+    return anilist_error in ('unauthorized', 'access_denied')
+
+
+class AniListException(Exception):
+    def __init__(self, error):
+        super().__init__()
+        if isinstance(error, dict):
+            self.args = ['{} - {}'.format(k, v) for k, v in error.items()]
+        else:
+            self.args = [error]
+
+    def __str__(self):
+        return ', '.join(self.args)
+
 
 class AniListWorks(Enum):
     animes = 'anime'
@@ -65,91 +107,102 @@ class AniListStatus(Enum):
 
 
 class AniListEntry:
-    def __init__(self, anime_info, work_type: AniListWorks):
-        self.anime_info = anime_info
+    def __init__(self, work_info, work_type: AniListWorks):
+        self.work_info = work_info
         self.work_type = work_type
 
-        if self.anime_info['series_type'] != work_type.value:
+        if self.work_info['series_type'] != work_type.value:
             raise ValueError('AniList data not from {}'.format(work_type.value))
 
     @property
     def anilist_id(self) -> int:
-        return self.anime_info['id']
+        return self.work_info['id']
 
     @property
     def title(self) -> str:
-        return self.anime_info['title_romaji']
+        return self.work_info['title_romaji']
 
     @property
     def english_title(self) -> str:
-        return self.anime_info['title_english']
+        return self.work_info['title_english']
 
     @property
     def japanese_title(self) -> str:
-        return self.anime_info['title_japanese']
+        return self.work_info['title_japanese']
 
     @property
     def media_type(self) -> str:
-        return self.anime_info['type']
+        return self.work_info['type']
 
     @property
     def start_date(self) -> Optional[datetime]:
-        if self.anime_info['start_date_fuzzy']:
-            return to_python_datetime(self.anime_info['start_date_fuzzy'])
+        if self.work_info['start_date_fuzzy']:
+            return to_python_datetime(self.work_info['start_date_fuzzy'])
         return None
 
     @property
     def end_date(self) -> Optional[datetime]:
-        if self.anime_info['end_date_fuzzy']:
-            return to_python_datetime(self.anime_info['end_date_fuzzy'])
+        if self.work_info['end_date_fuzzy']:
+            return to_python_datetime(self.work_info['end_date_fuzzy'])
         return None
 
     @property
+    def description(self) -> Optional[str]:
+        return self.work_info.get('description')
+
+    @property
     def synonyms(self) -> List[str]:
-        return list(filter(None, self.anime_info['synonyms']))
+        return list(filter(None, self.work_info['synonyms']))
 
     @property
     def genres(self) -> List[str]:
-        return list(filter(None, self.anime_info['genres']))
+        return list(filter(None, self.work_info['genres']))
 
     @property
     def is_nsfw(self) -> bool:
-        return self.anime_info['adult']
+        return self.work_info['adult']
 
     @property
     def poster_url(self) -> str:
-        return self.anime_info['image_url_lge']
+        return self.work_info['image_url_lge']
 
     @property
     def nb_episodes(self) -> Optional[int]:
         if self.work_type == AniListWorks.animes:
-            return self.anime_info['total_episodes']
+            return self.work_info['total_episodes']
+        return None
+
+    @property
+    def episode_length(self) -> Optional[int]:
+        if self.work_type == AniListWorks.animes:
+            return self.work_info.get('duration')
         return None
 
     @property
     def nb_chapters(self) -> Optional[int]:
         if self.work_type == AniListWorks.mangas:
-            return self.anime_info['total_chapters']
+            return self.work_info['total_chapters']
         return None
 
     @property
     def status(self) -> Optional[AniListStatus]:
         if self.work_type == AniListWorks.animes:
-            return AniListStatus(self.anime_info['airing_status'])
+            return AniListStatus(self.work_info['airing_status'])
         elif self.work_type == AniListWorks.mangas:
-            return AniListStatus(self.anime_info['publishing_status'])
-        else:
-            return None
+            return AniListStatus(self.work_info['publishing_status'])
+        return None
 
     @property
-    def tags(self) -> List[Dict[str, Any]]:
-        return [
-            {
-                'name': tag['name'],
-                'anilist_tag_id': tag['id'],
-                'spoiler': tag['spoiler'] or tag['series_spoiler']
-            } for tag in self.anime_info['tags']
-        ]
+    def tags(self) -> Optional[List[Dict[str, Any]]]:
+        if not self.work_info.get('tags'):
+            return []
+
+        return [{
+            'name': tag['name'],
+            'anilist_tag_id': tag['id'],
+            'spoiler': tag['spoiler'] or tag['series_spoiler'],
+            'votes': tag['votes']
+        } for tag in self.work_info['tags']]
 
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
@@ -160,26 +213,56 @@ class AniListEntry:
         )
 
 
+class AniListRichEntry(AniListEntry):
+    def __init__(self, work_info, work_type: AniListWorks):
+        super().__init__(work_info, work_type)
+        self._build_external_links()
+
+    @property
+    def studio(self) -> Optional[str]:
+        if self.work_info.get('studio'):
+            for studio in self.work_info.get('studio'):
+                if studio['main_studio'] == 1:
+                    return studio['studio_name']
+        return None
+
+    @property
+    def youtube_url(self) -> Optional[str]:
+        if self.work_info.get('youtube_id'):
+            return 'https://www.youtube.com/watch?v={}'.format(self.work_info['youtube_id'])
+        return None
+
+    def _build_external_links(self):
+        if self.work_info.get('external_links'):
+            for link in self.work_info.get('external_links'):
+                if link['site'] == 'Crunchyroll':
+                    self.crunchyroll_url = link['url']
+                elif link['site'] == 'Twitter':
+                    self.twitter_url = link['url']
+                elif link['site'] == 'Official Site':
+                    self.official_url = link['url']
+
+    @property
+    def relations(self):
+        pass
+
+
 class AniListWorks(Enum):
     animes = 'anime'
     mangas = 'manga'
 
 
 class AniListUserWork:
-    __slots__ = ['title', 'poster', 'anilist_id', 'score']
+    __slots__ = ['work', 'score']
 
     def __init__(self,
-                 title: str,
-                 poster: str,
-                 anilist_id: int,
+                 work: AniListEntry,
                  score: int):
-        self.title = title
-        self.poster = poster
-        self.anilist_id = anilist_id
+        self.work = work
         self.score = score
 
     def __hash__(self):
-        return hash(self.anilist_id)
+        return hash(self.work.anilist_id)
 
 
 class AniList:
@@ -247,8 +330,20 @@ class AniList:
             query_params = {}
 
         r = self._session.get(urljoin(self.BASE_URL, datapage.format(**params)), params=query_params)
+        data = r.json()
+
+        if not isinstance(data, list) and data.get('error'):
+            if is_no_results(data['error']):
+                return None
+            elif is_route_not_found(data['error']):
+                raise AniListException('"{}" API route does not exist'.format(datapage))
+            elif is_token_error(data['error']):
+                raise AniListException('token no longer valid or not found')
+            else:
+                raise AniListException(data['error'])
+
         r.raise_for_status()
-        return r.json()
+        return data
 
     def list_seasonal_animes(self,
                              *,
@@ -269,6 +364,42 @@ class AniList:
         for anime_info in data:
             yield AniListEntry(anime_info, AniListWorks.animes)
 
+    def get_work_by_id(self,
+                       worktype: AniListWorks,
+                       id: int) -> AniListRichEntry:
+        """
+        Search a work by ID on AniList and returns a rich entry if the ID exists,
+        or None if there are no results.
+        A rich entry has informations about characters, staff, studio and even
+        related works.
+        """
+        data = self._request(
+            '{worktype}/{id}/page',
+            {'worktype': worktype.value, 'id': id}
+        )
+
+        if data:
+            return AniListRichEntry(data, worktype)
+        return None
+
+    def get_work_by_title(self,
+                          worktype: AniListWorks,
+                          title: str) -> AniListEntry:
+        """
+        Search a work by title on AniList and returns the first result if there
+        are results, or None if there are no results.
+        AniList searches a work by romaji, English or Japanese title and even
+        by synonym titles.
+        """
+        data = self._request(
+            '{worktype}/search/{title}',
+            {'worktype': worktype.value, 'title': title}
+        )
+
+        if data:
+            return AniListEntry(data[0], worktype)
+        return None
+
     def get_user_list(self,
                       worktype: AniListWorks,
                       username: str) -> Generator[AniListUserWork, None, None]:
@@ -277,13 +408,14 @@ class AniList:
             {'username': username, 'worktype': worktype.value}
         )
 
+        if not data:
+            raise StopIteration
+
         for list_type in data['lists']:
             for list_entry in data['lists'][list_type]:
                 try:
                     yield AniListUserWork(
-                        anilist_id=int(list_entry['series_id']),
-                        title=list_entry[worktype.value]['title_romaji'],
-                        poster=list_entry[worktype.value]['image_url_lge'],
+                        work=AniListEntry(list_entry[worktype.value], worktype),
                         score=int(list_entry['score'])
                     )
                 except KeyError:

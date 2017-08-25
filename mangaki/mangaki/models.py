@@ -164,119 +164,6 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
-    def retrieve_tags(self, anidb):
-        anidb_tags = anidb.handle_tags(anidb_aid=self.anidb_aid)
-
-        tag_work_list = TaggedWork.objects.filter(work=self).all()
-        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-        current_tags = {
-            value[0]: {
-                "weight": value[2],
-                "anidb_tag_id": value[1]
-            } for value in values
-        }
-
-        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
-        deleted_tags = {key: current_tags[key] for key in deleted_tags_keys}
-
-        added_tags_keys = anidb_tags.keys() - current_tags.keys()
-        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
-
-        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
-        remaining_tags = {key: current_tags[key] for key in remaining_tags_keys}
-
-        updated_tags = {title: (current_tags[title], anidb_tags[title]) for title in remaining_tags if current_tags[title] != anidb_tags[title]}
-        kept_tags = {title: current_tags[title] for title in remaining_tags if current_tags[title] == anidb_tags[title]}
-
-        return {"deleted_tags": deleted_tags, "added_tags": added_tags, "updated_tags": updated_tags, "kept_tags": kept_tags}
-
-    def update_tags(self, anidb_tags):
-        tag_work_list = TaggedWork.objects.filter(work=self).all()
-        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-        current_tags = {
-            value[0]: {
-                "weight": value[2],
-                "anidb_tag_id": value[1]
-            } for value in values
-        }
-
-        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
-
-        added_tags_keys = anidb_tags.keys() - current_tags.keys()
-        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
-
-        tags_id = [added_tags[title]["anidb_tag_id"] for title in added_tags]
-        existing_tags = Tag.objects.filter(anidb_tag_id__in=tags_id).all()
-        existing_tags_id = existing_tags.values_list('anidb_tag_id', flat=True)
-
-        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
-        updated_tags = {key: anidb_tags[key] for key in remaining_tags_keys if current_tags[key] != anidb_tags[key]}
-
-        # New tags have to be added to the database (if they aren't already present)
-        # And new tags have to be assigned to that work
-        tags_weight = {}
-        tags_to_add = []
-        tags_list = []
-        tagged_works_to_add = []
-
-        for title, tag_infos in added_tags.items():
-            anidb_tag_id = tag_infos["anidb_tag_id"]
-            tags_weight[anidb_tag_id] = tag_infos["weight"]
-            if anidb_tag_id not in existing_tags_id:
-                tag = Tag(title=title, anidb_tag_id=anidb_tag_id)
-                tags_to_add.append(tag)
-            else:
-                tag = existing_tags.filter(anidb_tag_id=anidb_tag_id).first()
-            tags_list.append(tag)
-        Tag.objects.bulk_create(tags_to_add)
-
-        for tag in tags_list:
-            tag_weight = tags_weight[tag.anidb_tag_id]
-            tagged_work = TaggedWork(tag=tag, work=self, weight=tag_weight)
-            tagged_works_to_add.append(tagged_work)
-        TaggedWork.objects.bulk_create(tagged_works_to_add)
-
-        # Update the weight of tags that already exist (only if the weight changed)
-        for title, tag_infos in updated_tags.items():
-            tagged_work = self.taggedwork_set.get(tag__title=title)
-            tagged_work.weight = tag_infos["weight"]
-            tagged_work.save()
-
-        # Finally, remove a tag from a work if it no longer exists on AniDB's side
-        TaggedWork.objects.filter(work=self, tag__title__in=deleted_tags_keys).delete()
-
-    # Should add an update_creators method similar to update_tags
-
-    def is_nsfw_based_on_tags(self, anidb_tags):
-        # FIXME: potentially NSFW tags should be stored somewhere else
-        potentially_nsfw_tags = ['nudity', 'ecchi', 'pantsu', 'breasts', 'sex',
-                                 'large breasts', 'small breasts', 'gigantic breasts',
-                                 'incest', 'pornography', 'shota', 'masturbation',
-                                 'sexual fantasies', 'anal', 'loli']
-
-         # FIXME: these should be configurable constants
-        HIGH_NSFW_THRESHOLD = 15
-        LOW_NSFW_THRESHOLD = 30
-
-        sum_weight_all_low = sum(infos["weight"] for infos in anidb_tags.values()
-                                 if infos["weight"] <= 400)
-        sum_weight_nsfw_low = sum(infos["weight"] for t, infos in anidb_tags.items()
-                                  if t in potentially_nsfw_tags and infos["weight"] <= 400)
-
-        sum_weight_all_high = sum(infos["weight"] for infos in anidb_tags.values()
-                                  if infos["weight"] > 400)
-        sum_weight_nsfw_high = sum(infos["weight"] for t, infos in anidb_tags.items()
-                                   if t in potentially_nsfw_tags and infos["weight"] > 400)
-
-        if sum_weight_all_low > 0 and sum_weight_all_high > 0:
-            percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
-            percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
-        else:
-            return False
-
-        return (percent_high_nsfw > HIGH_NSFW_THRESHOLD or
-                percent_low_nsfw > LOW_NSFW_THRESHOLD)
-
     def safe_poster(self, user):
         if self.id is None:
             return '{}{}'.format(settings.STATIC_URL, 'img/chiro.gif')
@@ -551,6 +438,26 @@ class Suggestion(models.Model):
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
 
+    def __str__(self):
+        return 'Suggestion#{} de {} : {} - {}'.format(
+            self.pk, self.user, self.work.title, self.get_problem_display()
+        )
+
+
+class Evidence(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    suggestion = models.ForeignKey(Suggestion, on_delete=models.CASCADE)
+    agrees = models.BooleanField(default=False)
+    needs_help = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'Evidence#{} : {} {} la Suggestion#{}'.format(
+            self.pk,
+            self.user,
+            "approuve" if self.agrees else "rejette",
+            self.suggestion.pk
+        )
+
 
 class WorkCluster(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -560,6 +467,7 @@ class WorkCluster(models.Model):
     checker = models.ForeignKey(User, related_name='reported_clusters', on_delete=models.CASCADE, blank=True, null=True)
     resulting_work = models.ForeignKey(Work, related_name='clusters', blank=True, null=True)
     merged_on = models.DateTimeField(blank=True, null=True)
+    origin = models.ForeignKey(Suggestion, related_name='origin_suggestion', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])

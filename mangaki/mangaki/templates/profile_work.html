@@ -7,53 +7,5 @@
         </p>
     {% endif %}
     {% include "works_no_poster.html" with disabled=meta.ratings_disabled works=ratings category=meta.category config=meta.config %}
-    <nav aria-label="Navigation de la page" class="text-center">
-        <ul class="pagination">
-            <li {% if not ratings.has_previous %} class="disabled" {% endif %}>
-                <a
-                        {% if rating.has_previous %}
-                            {% if algo_name %}
-                                href="?page={{ rating.previous_page_number }}&algo={{ algo_name }}"
-                            {% else %}
-                                href="?page={{ rating.previous_page_number }}"
-                            {% endif %}
-                        {% endif %}
-                    aria-label="Précédent">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            {% for page in ratings.paginator.page_range %}
-                {% if page <= ratings.number|add:3 and page >= ratings.number|add:-3 %}
-                    <li
-                            {% if page == ratings.number %}class="active" {% endif %}>
-                        <a
-                                {% if page == ratings.number %}
-                                    href="#"
-                                {% else %}
-                                    {% if algo_name %}
-                                        href="?page={{ page }}&algo={{ algo_name }}"
-                                    {% else %}
-                                        href="?page={{ page }}"
-                                    {% endif %}
-                                {% endif %}>
-                            {{ page }} <span class="sr-only">(courante)</span>
-                        </a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-            <li {% if not ratings.has_next %} class="disabled" {% endif %}>
-                <a
-                        {% if ratings.has_next %}
-                            {% if algo_name %}
-                                href="?page={{ ratings.next_page_number }}&algo={{ algo_name }}"
-                            {% else %}
-                                href="?page={{ ratings.next_page_number }}"
-                            {% endif %}
-                        {% endif %}
-                        aria-label="Suivant">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+    {% include "pagination.html" with page_obj=ratings paginator=ratings.paginator algo=meta.algo_name %}
 </div>

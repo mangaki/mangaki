@@ -52,7 +52,7 @@
                         <li class="dropdown">
                             {% get_current_language as LANGUAGE_CODE %}
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-globe"></span>&nbsp;{{ LANGUAGE_CODE }} <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu" aria-label="language-submenu" aria-hidden="true">
                                 <li><a href="{% url 'about' 'fr' %}">Français</a></li>
                                 <li><a href="{% url 'about' 'en' %}">English</a></li>
                                 <li><a href="{% url 'about' 'ja' %}">日本語</a></li>
@@ -86,8 +86,18 @@
                             </a>
                         </li>
                         <li class="dropdown">
-                            <a href="{% url 'top' 'directors' %}">
-                                {% trans "Top 20" %}
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                {% trans "Top 20" %} <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" aria-label="top20-submenu" aria-hidden="true">
+                                <li><a href="{% url 'top' 'directors' %}">{% trans "Directeurs" %}</a></li>
+                                <li><a href="{% url 'top' 'composers' %}">{% trans "Compositeurs" %}</a></li>
+                                <li><a href="{% url 'top' 'authors' %}">{% trans "Auteurs" %}</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="{% url 'fix-index' %}">
+                                {% trans "Suggestions" %}
                             </a>
                         </li>
                     </ul>
