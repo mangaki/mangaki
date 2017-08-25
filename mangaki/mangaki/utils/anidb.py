@@ -1,4 +1,5 @@
 from datetime import datetime
+from collections import namedtuple
 from typing import Dict, List, Tuple, Optional, Any
 from urllib.parse import urljoin
 
@@ -33,6 +34,8 @@ def to_python_datetime(date):
         except ValueError:
             pass
     raise ValueError('no valid date format found for {}'.format(date))
+
+AniDBTag = namedtuple('AniDBTag', ['title', 'weight', 'anidb_tag_id'])
 
 
 class AniDB:
@@ -280,66 +283,67 @@ class AniDB:
 
     def get_tags(self,
                  anidb_aid: Optional[int] = None,
-                 tags_soup: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+                 tags_soup: Optional[str] = None) -> List[AniDBTag]:
         """ Get the list of tags for an anime given the the AniDB ID or the XML
         string containing tags.
 
-        Return : Dict[tag_title: {'weight': int, 'anidb_tag_id': int}]
+        Return : List[AniDBTag]
         """
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
             tags_soup = anime.tags
 
-        tags = {}
-        if tags_soup is not None:
-            for tag_node in tags_soup.find_all('tag'):
-                tag_title = str(tag_node.find('name').string).strip()
-                tag_id = int(tag_node.get('id'))
-                tag_weight = int(tag_node.get('weight'))
-                tag_verified = tag_node.get('verified').lower() == 'true'
+        if tags_soup is None:
+            return []
 
-                if tag_verified:
-                    tags[tag_title] = {'weight': tag_weight, 'anidb_tag_id': tag_id}
+        tags = []
+        for tag_node in tags_soup.find_all('tag'):
+            tag_title = str(tag_node.find('name').string).strip()
+            tag_id = int(tag_node.get('id'))
+            tag_weight = int(tag_node.get('weight'))
+            tag_verified = tag_node.get('verified').lower() == 'true'
+
+            if tag_verified:
+                tags.append(
+                    AniDBTag(
+                        title=tag_title,
+                        weight=tag_weight,
+                        anidb_tag_id=tag_id
+                    )
+                )
 
         return tags
 
     def update_tags(self,
                     work: Work,
-                    anidb_tags: Dict[str, Dict[str, Any]]):
-        tag_work_list = TaggedWork.objects.filter(work=work).all()
-        values = tag_work_list.values_list('tag__title', 'tag__anidb_tag_id', 'weight')
-        current_tags = {
-            value[0]: {
-                "weight": value[2],
-                "anidb_tag_id": value[1]
-            } for value in values
-        }
+                    anidb_tags: List[AniDBTag]):
+        tags_diff = diff_between_anidb_and_local_tags(work, anidb_tags)
 
-        deleted_tags_keys = current_tags.keys() - anidb_tags.keys()
+        deleted_tags = tags_diff['deleted_tags']
+        added_tags = tags_diff['added_tags']
+        updated_tags = tags_diff['updated_tags']
+        kept_tags = tags_diff['kept_tags']
+        all_tags = deleted_tags + added_tags + updated_tags + kept_tags
 
-        added_tags_keys = anidb_tags.keys() - current_tags.keys()
-        added_tags = {key: anidb_tags[key] for key in added_tags_keys}
+        tags_ids = [tag.anidb_tag_id for tag in all_tags]
+        deleted_tags_ids = [tag.anidb_tag_id for tag in deleted_tags]
 
-        tags_id = [added_tags[title]["anidb_tag_id"] for title in added_tags]
-        existing_tags = Tag.objects.filter(anidb_tag_id__in=tags_id).all()
-        existing_tags_id = existing_tags.values_list('anidb_tag_id', flat=True)
-
-        remaining_tags_keys = list(set(current_tags.keys()).intersection(anidb_tags.keys()))
-        updated_tags = {key: anidb_tags[key] for key in remaining_tags_keys if current_tags[key] != anidb_tags[key]}
+        existing_tags = Tag.objects.filter(anidb_tag_id__in=tags_ids).all()
+        existing_tags_id = set(existing_tags.values_list('anidb_tag_id', flat=True))
 
         # New tags have to be added to the database (if they aren't already present)
         tags_weight = {}
         tags_to_add = []
         tags_list = []
-        for title, tag_infos in added_tags.items():
-            anidb_tag_id = tag_infos["anidb_tag_id"]
-            tags_weight[anidb_tag_id] = tag_infos["weight"]
-            if anidb_tag_id not in existing_tags_id:
-                tag = Tag(title=title, anidb_tag_id=anidb_tag_id)
-                tags_to_add.append(tag)
+        for tag in added_tags:
+            tags_weight[tag.anidb_tag_id] = tag.weight
+            if tag.anidb_tag_id not in existing_tags_id:
+                tag_to_add = Tag(title=tag.title, anidb_tag_id=tag.anidb_tag_id)
+                tags_to_add.append(tag_to_add)
+                tags_list.append(tag_to_add)
             else:
-                tag = existing_tags.filter(anidb_tag_id=anidb_tag_id).first()
-            tags_list.append(tag)
+                existing_tag = existing_tags.filter(anidb_tag_id=tag.anidb_tag_id).first()
+                tags_list.append(existing_tag)
         Tag.objects.bulk_create(tags_to_add)
 
         # Assign tags to the work via TaggedWork
@@ -351,13 +355,13 @@ class AniDB:
         TaggedWork.objects.bulk_create(tagged_works_to_add)
 
         # Update the weight of tags that already exist (only if the weight changed)
-        for title, tag_infos in updated_tags.items():
-            tagged_work = work.taggedwork_set.get(tag__title=title)
-            tagged_work.weight = tag_infos["weight"]
+        for tag in updated_tags:
+            tagged_work = work.taggedwork_set.get(tag__title=tag.title)
+            tagged_work.weight = tag.weight
             tagged_work.save()
 
         # Finally, remove a tag from a work if it no longer exists on AniDB's side
-        TaggedWork.objects.filter(work=work, tag__title__in=deleted_tags_keys).delete()
+        TaggedWork.objects.filter(work=work, tag__anidb_tag_id__in=deleted_tags_ids).delete()
 
     def get_related_animes(self,
                            anidb_aid: Optional[int] = None,
@@ -489,7 +493,7 @@ class AniDB:
         self._build_staff(work, creators, reload_role_cache)
         self.update_tags(work, tags)
 
-        if created and work.is_nsfw_based_on_tags(tags):
+        if created and is_nsfw_based_on_anidb_tags(tags):
             work.nsfw = True
             work.save()
 
@@ -502,3 +506,59 @@ client = AniDB(
     getattr(settings, 'ANIDB_CLIENT', None),
     getattr(settings, 'ANIDB_VERSION', None)
 )
+
+def diff_between_anidb_and_local_tags(work: Work,
+                                      anidb_tags: List[AniDBTag]) -> Dict[str, List[AniDBTag]]:
+    """
+    Return a Dict containing the difference (ie. added, updated, deleted or kept
+    tags) between AniDB's tags and local tags.
+    """
+
+    tag_work_list = TaggedWork.objects.filter(work=work).all()
+    values = tag_work_list.values_list('tag__title', 'weight', 'tag__anidb_tag_id')
+    current_tags = [AniDBTag(title=v[0], weight=v[1], anidb_tag_id=v[2]) for v in values]
+
+    deleted_tags = list(set(current_tags) - set(anidb_tags))
+    added_tags = list(set(anidb_tags) - set(current_tags))
+    kept_tags = list(set.intersection(set(anidb_tags), set(current_tags)))
+
+    updated_tags = []
+    for current_tag in current_tags:
+        for anidb_tag in anidb_tags:
+            if (current_tag.title == anidb_tag.title
+                and current_tag.weight != anidb_tag.weight):
+                updated_tags.append(anidb_tag)
+
+    return {
+        'deleted_tags': deleted_tags,
+        'added_tags': added_tags,
+        'updated_tags': updated_tags,
+        'kept_tags': kept_tags
+    }
+
+def is_nsfw_based_on_anidb_tags(anidb_tags: List[AniDBTag]) -> bool:
+    # FIXME: potentially NSFW tags should be stored somewhere else
+    potentially_nsfw_tags = ['nudity', 'ecchi', 'pantsu', 'breasts', 'sex',
+                             'large breasts', 'small breasts', 'gigantic breasts',
+                             'incest', 'pornography', 'shota', 'masturbation',
+                             'sexual fantasies', 'anal', 'loli']
+
+     # FIXME: these should be configurable constants
+    HIGH_NSFW_THRESHOLD = 15
+    LOW_NSFW_THRESHOLD = 30
+
+    sum_weight_all_low = sum(tag.weight for tag in anidb_tags if tag.weight <= 400)
+    sum_weight_nsfw_low = sum(tag.weight for tag in anidb_tags
+                              if tag.title in potentially_nsfw_tags and tag.weight <= 400)
+
+    sum_weight_all_high = sum(tag.weight for tag in anidb_tags if tag.weight > 400)
+    sum_weight_nsfw_high = sum(tag.weight for tag in anidb_tags
+                               if tag.title in potentially_nsfw_tags and tag.weight > 400)
+
+    if sum_weight_all_low > 0 and sum_weight_all_high > 0:
+        percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
+        percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+    else:
+        return False
+
+    return (percent_high_nsfw > HIGH_NSFW_THRESHOLD or percent_low_nsfw > LOW_NSFW_THRESHOLD)

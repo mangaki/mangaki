@@ -19,9 +19,9 @@
 <table>
 {% for row in template_rows %}
     <tr>
-        <th><span style="color: {{ row.color }}">{{ row.field }}</span></th>
+        <th style="vertical-align: middle;"><span style="color: {{ row.color }}">{{ row.field }}</span></th>
         {% for choice in row.choices %}
-            <td>
+            <td style="max-width: 450px;">
                 <label>
                     {% if row.merge_type != 'INFO_ONLY' %}
                         {% comment %}
@@ -30,7 +30,7 @@
                         <input type="radio" name="{{ row.field }}" value="{{ choice|safe }}" {% if choice == row.suggested %} checked{% endif %} />
                     {% endif %}
                     {% if row.field == 'ext_poster' %}
-                        <img src="{{ choice }}" alt="{{ choice }}" />
+                        <img src="{{ choice }}" alt="{{ choice }}" style="max-height: 300px;" />
                     {% elif row.field == 'source' %}
                         <a href="{{ choice }}">{{ choice }}</a>
                     {% else %}
@@ -59,6 +59,7 @@
     <input type="hidden" name="action" value="{{ action }}" />
     <input type="hidden" name="confirm" value="yes" />
     <input type="hidden" name="fields_to_choose" value="{{ fields_to_choose }}" />
+    <input type="hidden" name="fields_required" value="{{ fields_required }}" />
     <input type="submit" value="{% trans "Yes, I'm sure" %}" />
     <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
 </div>
