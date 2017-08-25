@@ -438,6 +438,26 @@ class Suggestion(models.Model):
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
 
+    def __str__(self):
+        return 'Suggestion#{} de {} : {} - {}'.format(
+            self.pk, self.user, self.work.title, self.get_problem_display()
+        )
+
+
+class Evidence(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    suggestion = models.ForeignKey(Suggestion, on_delete=models.CASCADE)
+    agrees = models.BooleanField(default=False)
+    needs_help = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'Evidence#{} : {} {} la Suggestion#{}'.format(
+            self.pk,
+            self.user,
+            "approuve" if self.agrees else "rejette",
+            self.suggestion.pk
+        )
+
 
 class WorkCluster(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -447,6 +467,7 @@ class WorkCluster(models.Model):
     checker = models.ForeignKey(User, related_name='reported_clusters', on_delete=models.CASCADE, blank=True, null=True)
     resulting_work = models.ForeignKey(Work, related_name='clusters', blank=True, null=True)
     merged_on = models.DateTimeField(blank=True, null=True)
+    origin = models.ForeignKey(Suggestion, related_name='origin_suggestion', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])

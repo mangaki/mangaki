@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
-    Suggestion, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
+    Suggestion, Evidence, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
     FAQEntry, ColdStartRating, Trope, Language,
     ExtLanguage, WorkCluster
@@ -742,6 +742,11 @@ class TopAdmin(admin.ModelAdmin):
 class RoleAdmin(admin.ModelAdmin):
     model = Role
     prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(Evidence)
+class EvidenceAdmin(admin.ModelAdmin):
+    list_display = ['user', 'suggestion', 'agrees', 'needs_help']
 
 
 admin.site.register(Genre)
