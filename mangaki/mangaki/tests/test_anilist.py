@@ -6,7 +6,7 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.models import Work, RelatedWork, Language, ExtLanguage
+from mangaki.models import Work, RelatedWork, Language, ExtLanguage, Artist
 from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks, AniListException, insert_works_into_database_from_anilist
 
 
@@ -214,6 +214,7 @@ class AniListTest(TestCase):
     @responses.activate
     def test_insert_into_database(self):
         self.add_fake_auth()
+        artist = Artist(name='Ishihara Tatsuya').save()
 
         # Test insert AniListEntry into database
         responses.add(
@@ -236,5 +237,15 @@ class AniListTest(TestCase):
 
         hibike = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
         added_hibike = insert_works_into_database_from_anilist([hibike])[0]
+
         related_hibike = RelatedWork.objects.filter(parent_work=added_hibike)
+        staff_hibike = Work.objects.get(pk=added_hibike.pk).staff_set.all().values_list('artist__name', flat=True)
+
         self.assertEqual(len(related_hibike), 4)
+        self.assertEqual(added_hibike.genre.count(), 3)
+        self.assertCountEqual(staff_hibike, ['Ishihara Tatsuya', 'Matsuda Akito', 'Takeda Ayano'])
+
+        # Check for no artist duplication
+        artist = Artist.objects.filter(name='Ishihara Tatsuya')
+        self.assertEqual(artist.count(), 1)
+        self.assertEqual(artist.first().anilist_creator_id, 100055)

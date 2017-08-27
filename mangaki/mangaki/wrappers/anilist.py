@@ -1,15 +1,17 @@
 from datetime import datetime
 from enum import Enum
+from collections import namedtuple
 from typing import Dict, List, Tuple, Optional, Any, Generator
 from urllib.parse import urljoin
 import time
 
 import requests
 from django.utils.functional import cached_property
+from django.db.models import Q
 
 from mangaki import settings
 from mangaki.models import (Work, RelatedWork, WorkTitle, Reference, Category,
-                            ExtLanguage, Studio, Genre)
+                            ExtLanguage, Studio, Genre, Artist, Staff, Role)
 
 
 def to_python_datetime(date):
@@ -122,6 +124,12 @@ class WorkCategories:
     @cached_property
     def manga(self) -> Category:
         return Category.objects.get(slug=AniListWorks.mangas.value)
+
+
+class StaffRoles:
+    @cached_property
+    def role_map(self) -> Dict[str, Role]:
+        return {role.slug: role for role in Role.objects.all()}
 
 
 class AniListWorks(Enum):
@@ -317,6 +325,19 @@ class AniListRichEntry(AniListEntry):
                     self.official_url = link['url']
 
     @property
+    def staff(self) -> List[Tuple[AniListEntry, str]]:
+        staff_members = []
+        if self.work_info.get('staff'):
+            for staff in self.work_info['staff']:
+                staff_members.append(AniListStaff(
+                    id=staff['id'],
+                    name_first=staff['name_first'],
+                    name_last=staff['name_last'],
+                    role=staff['role']
+                ))
+        return staff_members
+
+    @property
     def relations(self) -> List[Tuple[AniListEntry, str]]:
         related_works = []
         if self.work_info.get('relations'):
@@ -328,22 +349,8 @@ class AniListRichEntry(AniListEntry):
         return related_works
 
 
-class AniListUserEntry:
-    """
-    This class makes it possible to store a user's score alongside the AniList
-    entry, regardless of the entry being an AniListEntry or an AniListRichEntry.
-    """
-
-    __slots__ = ['work', 'score']
-
-    def __init__(self,
-                 work: AniListEntry,
-                 score: int):
-        self.work = work
-        self.score = score
-
-    def __hash__(self):
-        return hash(self.work.anilist_id)
+AniListUserEntry = namedtuple('AniListUserEntry', ('work', 'score'))
+AniListStaff = namedtuple('AniListStaff', ('id', 'name_first', 'name_last', 'role'))
 
 
 class AniList:
@@ -522,6 +529,9 @@ category_map = {
     AniListWorks.mangas: work_categories.manga
 }
 
+staff_roles = StaffRoles()
+role_map = staff_roles.role_map
+
 def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Optional[List[Work]]:
     """
     Insert works into Mangaki database from AniList data, and return Works added.
@@ -610,7 +620,52 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
 
             RelatedWork.objects.bulk_create(new_relations)
 
-        # Here, should build staff too ! [AniListRichEntry only]
+        # Build Artist and Staff [AniListRichEntry only]
+        if isinstance(entry, AniListRichEntry) and entry.staff:
+            anilist_roles_map = {
+                'Director': 'director',
+                'Music': 'composer',
+                'Original Creator': 'author'
+            }
+
+            artists_to_add = []
+            artists = []
+            for creator in entry.staff:
+                name = '{} {}'.format(creator.name_last, creator.name_first)
+                artist = Artist.objects.filter(Q(name=name) | Q(anilist_creator_id=creator.id)).first()
+
+                if not artist: # This artist does not yet exist : will be bulk created
+                   artist = Artist(name=name, anilist_creator_id=creator.id)
+                   artists_to_add.append(artist)
+                else: # This artist exists : prevent duplicates by updating with the AniDB id
+                   artist.name = name
+                   artist.anilist_creator_id = creator.id
+                   artist.save()
+                   artists.append(artist)
+
+            artists.extend(Artist.objects.bulk_create(artists_to_add))
+
+            staffs = []
+            for index, creator in enumerate(entry.staff):
+                role_slug = anilist_roles_map.get(creator.role)
+                if role_slug:
+                    staffs.append(Staff(
+                       work=work,
+                       role=role_map.get(role_slug),
+                       artist=artists[index]
+                    ))
+
+            existing_staff = set(Staff.objects
+                                .filter(work=work,
+                                        artist__in=[artist for artist in artists])
+                                .values_list('work', 'role', 'artist'))
+
+            missing_staff = [
+                staff for staff in staffs
+                if (staff.work, staff.role, staff.artist) not in existing_staff
+            ]
+
+            Staff.objects.bulk_create(missing_staff)
 
         # Save the Work object and add a Reference
         work.save()
