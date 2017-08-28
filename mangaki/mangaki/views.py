@@ -156,7 +156,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
 
         if self.request.user.is_authenticated:
-            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
+            context['suggestion_form'] = SuggestionForm(work=self.object, instance=Suggestion(user=self.request.user, work=self.object))
         context['rating'] = current_user_rating(self.request, self.object)
 
         context['references'] = []

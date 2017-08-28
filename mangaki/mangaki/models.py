@@ -15,7 +15,8 @@ from django.db import models
 from django.db.models import CharField, F, Func, Lookup, Value, Q
 from django.utils.functional import cached_property
 
-from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES, RELATION_TYPE_CHOICES
+from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
+                             CLUSTER_CHOICES, RELATION_TYPE_CHOICES, SUGGESTION_PROBLEM_CHOICES)
 from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
 from mangaki.utils.dpp import MangakiDPP
 from mangaki.utils.ratingsmatrix import RatingsMatrix
@@ -428,17 +429,7 @@ class Suggestion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
-    problem = models.CharField(verbose_name='Partie concernée', max_length=8, choices=(
-        ('title', 'Le titre n\'est pas le bon'),
-        ('poster', 'Le poster ne convient pas'),
-        ('synopsis', 'Le synopsis comporte des erreurs'),
-        ('author', 'L\'auteur n\'est pas le bon'),
-        ('composer', 'Le compositeur n\'est pas le bon'),
-        ('double', 'Ceci est un doublon'),
-        ('nsfw', 'L\'oeuvre est NSFW'),
-        ('n_nsfw', 'L\'oeuvre n\'est pas NSFW'),
-        ('ref', 'Proposer une URL (myAnimeList, AniDB, Icotaku, VGMdb, etc.)')
-    ), default='ref')
+    problem = models.CharField(verbose_name='Partie concernée', max_length=8, choices=SUGGESTION_PROBLEM_CHOICES, default='ref')
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
 
