@@ -93,7 +93,7 @@
 
 {% else %}
 
-    <div class="alert alert-warning text-center">
+    <div class="alert alert-warning text-center" style="vertical-align: center;">
         <strong>Aucun résultat à afficher :</strong> soit aucune œuvre n'a été marquée NSFW ou non NSFW, soit vous avez déjà donné votre avis.
     </div>
 
@@ -123,12 +123,10 @@
                 $(".skip-form input[name='suggestion'][value="+suggestion_id+"]").next("input[name='agrees']").remove();
                 $(".skip-form input[name='suggestion'][value="+suggestion_id+"]").remove();
 
-                if ($(".skip-form input[name='suggestion']").length <= 0) {
+                if ($(".skip-form input[name='suggestion']").length === 0) {
                     $(".skip-form button").fadeOut(200, function() {
                         $(this).text('Rafraîchir la page et passer à la suite').fadeIn(200);
                     });
-                    $('form').submit(function(e) { e.preventDefault(); });
-                    $(".skip-form button").click(function() { window.location.reload(); });
                 }
             }
         });

@@ -20,6 +20,7 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpRespon
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone, translation
+from django.utils.http import is_safe_url
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -906,6 +907,7 @@ def nsfw_grid(request):
     count_nsfw_left = nsfw_suggestion_list.count()
 
     paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
+    count_nsfw_left = paginator.count
     page = request.GET.get('page')
 
     try:
@@ -946,6 +948,9 @@ def update_evidence(request):
     if request.method != 'POST' or not request.user.is_authenticated:
         return redirect('fix-index')
 
+    # Retrieve agrees, needs_help, delete and suggestion_ids values from one or several fields in a form
+    # Every values are then zipped together, with zip_longest since the length of suggestion_ids is the one that matters
+    # See templates/fix/nsfw_grid.html for an example
     agrees_values = map(lambda x: x == 'True', request.POST.getlist('agrees'))
     needs_help_values = map(lambda x: x == 'True', request.POST.getlist('needs_help'))
     delete_values = request.POST.getlist('delete')
@@ -974,8 +979,9 @@ def update_evidence(request):
             evidence.needs_help = needs_help
             evidence.save()
 
-    if 'next' in request.GET:
-        return redirect(request.GET['next'])
+    next_url = request.GET.get('next')
+    if next_url and is_safe_url(url=next_url, host=request.get_host()):
+        return redirect(next_url)
     return redirect('fix-index')
 
 

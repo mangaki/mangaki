@@ -14,6 +14,7 @@ class SuggestionForm(forms.ModelForm):
         work = kwargs.pop('work', None)
         super(SuggestionForm, self).__init__(*args, **kwargs)
 
+        # Remove redundant choices for NSFW works (e.g. don't display "Is NSFW" choice if work is NSFW)
         if work is not None:
             nsfw_state = 'nsfw' if work.nsfw else 'n_nsfw'
             new_choices = filter(lambda x: x[0] != nsfw_state, SUGGESTION_PROBLEM_CHOICES)
