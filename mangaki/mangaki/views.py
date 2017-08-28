@@ -942,7 +942,7 @@ def nsfw_grid(request):
 @login_required
 def update_evidence(request):
     if request.method != 'POST' or not request.user.is_authenticated:
-        redirect('fix-index')
+        return redirect('fix-index')
 
     agrees_values = map(lambda x: x == 'True', request.POST.getlist('agrees'))
     needs_help_values = map(lambda x: x == 'True', request.POST.getlist('needs_help'))

@@ -8,31 +8,34 @@
 
 <div class="page-header">
     <a href="{% url "fix-index" %}" class="btn btn-sm btn-info pull-right" style="margin-top: 8px;">
-        <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span> Retour aux suggestions
+        <span class="glyphicon glyphicon-list" aria-hidden="true"></span> Retour aux suggestions
     </a>
-    {% if suggestions_with_states %}
+
+    <h1>Grille NSFW</h1>
+</div>
+
+{% if suggestions_with_states %}
+
+    {% if request.user.is_authenticated %}
     {% if request.user.profile.nsfw_ok or not request.user.nsfw_ok and request.GET.nsfw_ok is not None %}
+    <div class="alert clearfix" style="padding: 0 15px;">
+    <p class="pull-left" style="margin: 5px 0 0;">
+        Cliquez sur <strong>&laquo; C'est NSFW ! &raquo;</strong> si vous pensez qu'une œuvre est NSFW.
+    </p>
+
     <form action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST" class="form-group skip-form">
         {% csrf_token %}
         {% for suggestion, says_is_nsfw, supposed_nsfw in suggestions_with_states %}
         <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
         <input type="hidden" name="agrees" value="{{ supposed_nsfw|yesno:'False,True' }}">
         {% endfor %}
-        <button class="btn btn-sm btn-danger pull-right" style="margin-top: 8px; margin-right: 5px;">
-            {% if suggestions.paginator.page_range|length > 1 %}
-            <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> Passer à la suite
-            {% else %}
-            <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> Tout marquer comme non NSFW
-            {% endif %}
+        <button class="btn btn-sm btn-link pull-right">
+            Marquer les œuvres restantes comme non NSFW{% if suggestions.paginator.page_range|length > 1 %} et passer à la suite{% endif %}
         </button>
     </form>
+    </div>
     {% endif %}
     {% endif %}
-
-    <h1>Grille NSFW</h1>
-</div>
-
-{% if suggestions_with_states %}
 
     {% if not request.user.profile.nsfw_ok and request.GET.nsfw_ok is None %}
     <div class="alert alert-warning">
@@ -49,12 +52,6 @@
     {% endif %}
 
     {% if request.user.profile.nsfw_ok or not request.user.nsfw_ok and request.GET.nsfw_ok is not None %}
-        {% if request.user.is_authenticated %}
-        <div class="panel panel-default panel-body" style="margin: 10px 0;">
-            Cliquez sur <strong>&laquo; C'est NSFW ! &raquo;</strong> si vous pensez qu'une œuvre est NSFW.
-        </div>
-        {% endif %}
-
         <div class="row">
         <div class="cards-grid no-rating">
         {% for suggestion, says_is_nsfw, supposed_nsfw in suggestions_with_states %}
@@ -105,7 +102,7 @@
 
 {% block extrajs %}
 <script>
-    $('.nsfw-form form').submit(function(e){
+    $('.nsfw-form form').submit(function(e) {
         e.preventDefault();
     });
 
@@ -124,6 +121,14 @@
 
                 $(".skip-form input[name='suggestion'][value="+suggestion_id+"]").next("input[name='agrees']").remove();
                 $(".skip-form input[name='suggestion'][value="+suggestion_id+"]").remove();
+
+                if ($(".skip-form input[name='suggestion']").length <= 0) {
+                    $(".skip-form button").fadeOut(200, function() {
+                        $(this).text('Rafraîchir la page et passer à la suite').fadeIn(200);
+                    });
+                    $('form').submit(function(e) { e.preventDefault(); });
+                    $(".skip-form button").click(function() { window.location.reload(); });
+                }
             }
         });
     });
