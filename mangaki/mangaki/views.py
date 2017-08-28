@@ -895,16 +895,17 @@ def fix_suggestion(request, suggestion_id):
 
 
 def nsfw_grid(request):
-    #FIXME: remove duplicate suggestions OR group by work ID
     user = request.user if request.user.is_authenticated else None
+
+    user_evidences = Evidence.objects.filter(user=user)
     nsfw_suggestion_list = Suggestion.objects.select_related(
-            'work', 'user', 'work__category').prefetch_related(
-            'work__category', 'evidence_set__user').filter(
+                'work', 'user', 'work__category'
+            ).prefetch_related('evidence_set__user').filter(
                 Q(problem__in=('nsfw', 'n_nsfw')),
-                Q(is_checked=False),
-                ~Q(evidence__user=user) | Q(evidence=None)
-            ).order_by('-work__nb_ratings')
-    count_nsfw_left = nsfw_suggestion_list.count()
+                Q(is_checked=False)
+            ).exclude(
+                work__in=user_evidences.values('suggestion__work')
+            ).order_by('work', '-date', '-work__sum_ratings').distinct('work')
 
     paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
     count_nsfw_left = paginator.count
