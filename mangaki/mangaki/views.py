@@ -1,6 +1,7 @@
 import datetime
 import json
 from collections import Counter, OrderedDict
+from itertools import zip_longest
 from typing import List, Dict, Any, Tuple
 from urllib.parse import urlencode
 
@@ -940,15 +941,20 @@ def nsfw_grid(request):
 
 @login_required
 def update_evidence(request):
-    if request.method != 'POST':
+    if request.method != 'POST' or not request.user.is_authenticated:
         redirect('fix-index')
 
-    agrees = request.POST.get('agrees') == 'True'
-    needs_help = request.POST.get('needs_help') == 'True'
-    delete = request.POST.get('delete')
-    suggestion_id = request.POST.get('suggestion')
+    agrees_values = map(lambda x: x == 'True', request.POST.getlist('agrees'))
+    needs_help_values = map(lambda x: x == 'True', request.POST.getlist('needs_help'))
+    delete_values = request.POST.getlist('delete')
+    suggestion_ids = map(int, request.POST.getlist('suggestion'))
 
-    if request.user.is_authenticated and suggestion_id:
+    informations = zip_longest(suggestion_ids, agrees_values, needs_help_values, delete_values, fillvalue=False)
+
+    for suggestion_id, agrees, needs_help, delete in informations:
+        if not suggestion_id:
+            continue
+
         if delete:
             try:
                 Evidence.objects.get(

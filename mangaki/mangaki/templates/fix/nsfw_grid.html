@@ -10,6 +10,23 @@
     <a href="{% url "fix-index" %}" class="btn btn-sm btn-info pull-right" style="margin-top: 8px;">
         <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span> Retour aux suggestions
     </a>
+    {% if suggestions_with_states and request.user.profile.nsfw_ok or not request.user.nsfw_ok and request.GET.nsfw_ok is not None %}
+    <form action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST" class="form-group skip-form">
+        {% csrf_token %}
+        {% for suggestion, says_is_nsfw, supposed_nsfw in suggestions_with_states %}
+        <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
+        <input type="hidden" name="agrees" value="{{ supposed_nsfw|yesno:'False,True' }}">
+        {% endfor %}
+        <button class="btn btn-sm btn-danger pull-right" style="margin-top: 8px; margin-right: 5px;">
+            {% if suggestions.paginator.page_range|length > 1 %}
+            <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> Passer à la suite
+            {% else %}
+            <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> Tout marquer comme non NSFW
+            {% endif %}
+        </button>
+    </form>
+    {% endif %}
+
     <h1>Grille NSFW</h1>
 </div>
 
@@ -86,21 +103,25 @@
 
 {% block extrajs %}
 <script>
-    $("form").submit(function(e){
+    $('.nsfw-form form').submit(function(e){
         e.preventDefault();
     });
 
     $("[name='agrees']").on("click", function() {
         var agrees_button = $(this);
+        var suggestion_id = $(this).closest('form').find("[name='suggestion']").val();
 
         $.post(Urls['update-evidence'](), {
             agrees: $(this).val(),
-            suggestion: $(this).closest('form').find("[name='suggestion']").val(),
+            suggestion: suggestion_id,
             success: function(data) {
                 agrees_button.closest('.nsfw-form').fadeOut(100, function() {
                     $(this).next('.nsfw-form-post').fadeIn(100);
                 });
                 agrees_button.prop('disabled', true);
+
+                $(".skip-form input[name='suggestion'][value="+suggestion_id+"]").next("input[name='agrees']").remove();
+                $(".skip-form input[name='suggestion'][value="+suggestion_id+"]").remove();
             }
         });
     });
