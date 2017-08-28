@@ -535,7 +535,6 @@ role_map = staff_roles.role_map
 def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Optional[List[Work]]:
     """
     Insert works into Mangaki database from AniList data, and return Works added.
-    Alternative WorkTitle are also added to the database, as well as a Reference.
     :param entries: a list of entries from AniList to insert if not present in the database
     :type entries: List[AniListEntry]
     :return: a list of works effectively added in the Mangaki database
@@ -672,4 +671,8 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
         Reference.objects.create(work=work, url=entry.anilist_url)
         new_works.append(work)
 
-    return new_works
+    return new_works if new_works else None
+
+def insert_work_into_database_from_anilist(entry: AniListEntry) -> Optional[Work]:
+    work_result = insert_works_into_database_from_anilist([entry])
+    return work_result[0] if work_result else None

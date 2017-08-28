@@ -6,8 +6,10 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.models import Work, RelatedWork, Language, ExtLanguage, Artist
-from mangaki.wrappers.anilist import to_python_datetime, to_anime_season, AniList, AniListStatus, AniListWorks, AniListException, insert_works_into_database_from_anilist
+from mangaki.models import Work, WorkTitle, RelatedWork, Language, ExtLanguage, Artist
+from mangaki.wrappers.anilist import (to_python_datetime, to_anime_season, AniList, AniListStatus,
+                                      AniListWorks, AniListException, insert_works_into_database_from_anilist,
+                                      insert_work_into_database_from_anilist)
 
 
 class AniListTest(TestCase):
@@ -235,17 +237,24 @@ class AniListTest(TestCase):
             status=200, content_type='application/json'
         )
 
-        hibike = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
-        added_hibike = insert_works_into_database_from_anilist([hibike])[0]
+        hibike_entry = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
+        hibike = insert_work_into_database_from_anilist(hibike_entry)
 
-        related_hibike = RelatedWork.objects.filter(parent_work=added_hibike)
-        staff_hibike = Work.objects.get(pk=added_hibike.pk).staff_set.all().values_list('artist__name', flat=True)
+        studio_hibike = hibike.studio.title
+        titles_hibike = WorkTitle.objects.filter(work=hibike)
+        related_hibike = RelatedWork.objects.filter(parent_work=hibike)
+        staff_hibike = Work.objects.get(pk=hibike.pk).staff_set.all().values_list('artist__name', flat=True)
 
+        self.assertEqual(studio_hibike, 'Kyoto Animation')
+        self.assertEqual(len(titles_hibike), 3)
         self.assertEqual(len(related_hibike), 4)
-        self.assertEqual(added_hibike.genre.count(), 3)
+        self.assertEqual(hibike.genre.count(), 3)
         self.assertCountEqual(staff_hibike, ['Ishihara Tatsuya', 'Matsuda Akito', 'Takeda Ayano'])
 
         # Check for no artist duplication
         artist = Artist.objects.filter(name='Ishihara Tatsuya')
         self.assertEqual(artist.count(), 1)
         self.assertEqual(artist.first().anilist_creator_id, 100055)
+
+        # Try adding this work to the DB again
+        self.assertIsNone(insert_work_into_database_from_anilist(hibike_entry))
