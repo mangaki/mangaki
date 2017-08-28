@@ -903,6 +903,7 @@ def nsfw_grid(request):
                 Q(is_checked=False),
                 ~Q(evidence__user=user) | Q(evidence=None)
             ).order_by('-work__nb_ratings')
+    count_nsfw_left = nsfw_suggestion_list.count()
 
     paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
     page = request.GET.get('page')
@@ -933,7 +934,8 @@ def nsfw_grid(request):
 
     context = {
         'suggestions_with_states': suggestions_with_states,
-        'suggestions': suggestions
+        'suggestions': suggestions,
+        'count_nsfw_left': count_nsfw_left
     }
 
     return render(request, 'fix/nsfw_grid.html', context)
