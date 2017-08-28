@@ -63,5 +63,5 @@ class Command(BaseCommand):
     	if len(options['myargs'])==2:
     		print(morphing(a, b))
     	else:
-    		subdiv = int(options['myargs'][2])
+    		subdiv = int(options['myargs'][2]+1)
     		print(morphing(a, b, subdiv))
