@@ -1,12 +1,13 @@
-from mangaki.utils.common import RecommendationAlgorithm
+from mangaki.utils.common import RecommendationAlgorithm, register_algorithm
 from collections import Counter, defaultdict
 import numpy as np
 from scipy.sparse import coo_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
 
+@register_algorithm('knn')
 class MangakiKNN(RecommendationAlgorithm):
-    NB_NEIGHBORS = None
+    nb_neighbors = None
     closest_neighbors = None
     rated_works = None
     mean_score = None
@@ -14,10 +15,10 @@ class MangakiKNN(RecommendationAlgorithm):
     sum_ratings = None
     nb_ratings = None
     M = None
-    def __init__(self, NB_NEIGHBORS=20, RATED_BY_NEIGHBORS_AT_LEAST=3, missing_is_mean=True, weighted_neighbors=False):
+    def __init__(self, nb_neighbors=20, rated_by_neighbors_at_least=3, missing_is_mean=True, weighted_neighbors=False):
         super().__init__()
-        self.NB_NEIGHBORS = NB_NEIGHBORS
-        self.RATED_BY_NEIGHBORS_AT_LEAST = RATED_BY_NEIGHBORS_AT_LEAST
+        self.nb_neighbors = nb_neighbors
+        self.rated_by_neighbors_at_least = rated_by_neighbors_at_least
         self.missing_is_mean = missing_is_mean
         self.weighted_neighbors = weighted_neighbors
         self.closest_neighbors = {}
@@ -29,7 +30,7 @@ class MangakiKNN(RecommendationAlgorithm):
 
     def load(self, filename):
         backup = super().load(filename)
-        self.NB_NEIGHBORS = backup.NB_NEIGHBORS
+        self.nb_neighbors = backup.NB_NEIGHBORS
         self.closest_neighbors = backup.closest_neighbors
         self.rated_works = backup.rated_works
         self.mean_score = backup.mean_score
@@ -40,6 +41,10 @@ class MangakiKNN(RecommendationAlgorithm):
         self.nb_works = backup.nb_works
         self.nb_users = backup.nb_users
 
+    @property
+    def is_serializable(self):
+        return True
+
     def get_neighbors(self, user_ids=None):
         neighbors = []
         if user_ids is None:
@@ -48,13 +53,13 @@ class MangakiKNN(RecommendationAlgorithm):
         else:
             score = cosine_similarity(self.M[user_ids], self.M)
         for i, user_id in enumerate(user_ids):
-            if self.NB_NEIGHBORS < self.nb_users - 1:
+            if self.nb_neighbors < self.nb_users - 1:
                 score[i][user_id] = float('-inf')  # Do not select the user itself while looking at its potential neighbors
                 # Put top NB_NEIGHBORS user indices at the end of array, no matter their order; then, slice them!
                 neighbor_ids = (
                     score[i]
-                    .argpartition(-self.NB_NEIGHBORS - 1)
-                    [-self.NB_NEIGHBORS - 1:-1]
+                    .argpartition(-self.nb_neighbors - 1)
+                    [-self.nb_neighbors - 1:-1]
                 )
             else:
                 neighbor_ids = list(range(len(score[i])))
@@ -104,7 +109,7 @@ class MangakiKNN(RecommendationAlgorithm):
                 else:
                     predicted_rating += their_rating
                     weight += 1
-            if nb_neighbors_that_rated_it < self.RATED_BY_NEIGHBORS_AT_LEAST:
+            if nb_neighbors_that_rated_it < self.rated_by_neighbors_at_least:
                 predicted_rating = 0
             if weight > 0:
                 predicted_rating /= weight
@@ -112,7 +117,7 @@ class MangakiKNN(RecommendationAlgorithm):
         return np.array(y)
 
     def __str__(self):
-        return '[KNN] NB_NEIGHBORS = %d' % self.NB_NEIGHBORS
+        return '[KNN] NB_NEIGHBORS = %d' % self.nb_neighbors
 
     def get_shortname(self):
-        return 'knn-%d' % self.NB_NEIGHBORS
+        return 'knn-%d' % self.nb_neighbors
