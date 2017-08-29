@@ -6,7 +6,9 @@
 
 {% block body %}
 
-<h1>Suggestion #{{ suggestion.pk }}</h1><br/>
+<div class="page-header">
+    <h1>Suggestion #{{ suggestion.pk }}</h1>
+</div>
 
 {% if suggestion.is_checked %}
 <div class="alert alert-info">
@@ -69,13 +71,9 @@
 
         {% if request.user.is_authenticated and not suggestion.is_checked %}
             <hr/>
-            <form id="evidence_form" action="{% url "update-evidence" %}" method="POST">
+            <form id="evidence_form" action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="suggestion" id="id_suggestion" value="{{ suggestion.pk }}">
-                {% if evidence %}
-                    <input type="hidden" name="agrees" value="{{ evidence.agrees }}">
-                    <input type="hidden" name="needs_help" value="{{ evidence.needs_help }}">
-                {% endif %}
                 <p align="center">
                     <span class="small text-success" align="right" style="width: 70px; display: inline-block;">
                         {% if evidence and evidence.agrees %}Approuvé{% else %}Approuver ?{% endif %}
@@ -103,6 +101,8 @@
                     <button type="submit" class="btn btn-xs btn-default" disabled>Vous avez demandé l'aide d'un administrateur</button>
                     {% endif %}
                 </p>
+                <input type="hidden" name="agrees" value="{{ evidence.agrees }}">
+                <input type="hidden" name="needs_help" value="{{ evidence.needs_help }}">
                 {% endif %}
             </form>
         {% elif suggestion.is_checked and evidence %}

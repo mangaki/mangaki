@@ -56,3 +56,15 @@ RELATION_TYPE_CHOICES = (
     ('same_setting', 'Univers commun'),
     ('other', 'Spécial')
 )
+
+SUGGESTION_PROBLEM_CHOICES = (
+    ("title", "Le titre n'est pas le bon"),
+    ("poster", "Le poster ne convient pas"),
+    ("synopsis", "Le synopsis comporte des erreurs"),
+    ("author", "L'auteur n'est pas le bon"),
+    ("composer", "Le compositeur n'est pas le bon"),
+    ("double", "Ceci est un doublon"),
+    ("nsfw", "L'oeuvre est NSFW"),
+    ("n_nsfw", "L'oeuvre n'est pas NSFW"),
+    ("ref", "Proposer une URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)")
+)
