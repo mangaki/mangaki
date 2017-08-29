@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When, Count, Q
+from django.db.models import Case, IntegerField, Sum, Value, When, Count
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -901,8 +901,8 @@ def nsfw_grid(request):
     nsfw_suggestion_list = Suggestion.objects.select_related(
                 'work', 'user', 'work__category'
             ).prefetch_related('evidence_set__user').filter(
-                Q(problem__in=('nsfw', 'n_nsfw')),
-                Q(is_checked=False)
+                problem__in=('nsfw', 'n_nsfw'),
+                is_checked=False
             ).exclude(
                 work__in=user_evidences.values('suggestion__work')
             ).order_by('work', '-date', '-work__sum_ratings').distinct('work')
