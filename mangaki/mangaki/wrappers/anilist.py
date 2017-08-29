@@ -181,6 +181,7 @@ class AniListEntry:
     def __init__(self, work_info, work_type: AniListWorks):
         self.work_info = work_info
         self.work_type = work_type
+        self.is_rich = False
 
         if self.work_info['series_type'] != work_type.value:
             raise ValueError('AniList data not from {}'.format(work_type.value))
@@ -298,6 +299,7 @@ class AniListRichEntry(AniListEntry):
 
     def __init__(self, work_info, work_type: AniListWorks):
         super().__init__(work_info, work_type)
+        self.is_rich = True
         self._build_external_links()
 
     @property
@@ -326,27 +328,27 @@ class AniListRichEntry(AniListEntry):
 
     @property
     def staff(self) -> List[Tuple[AniListEntry, str]]:
-        staff_members = []
-        if self.work_info.get('staff'):
-            for staff in self.work_info['staff']:
-                staff_members.append(AniListStaff(
-                    id=staff['id'],
-                    name_first=staff['name_first'],
-                    name_last=staff['name_last'],
-                    role=staff['role']
-                ))
-        return staff_members
+        if not self.work_info.get('staff'):
+            return []
+        return [
+            AniListStaff(
+                id=staff['id'],
+                name_first=staff['name_first'],
+                name_last=staff['name_last'],
+                role=staff['role']
+            ) for staff in self.work_info['staff']
+        ]
 
     @property
     def relations(self) -> List[Tuple[AniListEntry, str]]:
-        related_works = []
-        if self.work_info.get('relations'):
-            for relation in self.work_info['relations']:
-                related_works.append((
-                    AniListEntry(relation, self.work_type),
-                    AniListRelationType(relation['relation_type'])
-                ))
-        return related_works
+        if not self.work_info.get('relations'):
+            return []
+        return [
+            (
+                AniListEntry(relation, self.work_type),
+                AniListRelationType(relation['relation_type'])
+            ) for relation in self.work_info['relations']
+        ]
 
 
 AniListUserEntry = namedtuple('AniListUserEntry', ('work', 'score'))
@@ -565,7 +567,7 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
             continue
 
         # Link Studio and Work [AniListRichEntry only]
-        if isinstance(entry, AniListRichEntry) and entry.studio:
+        if entry.is_rich and entry.studio:
             studio, created = Studio.objects.get_or_create(title=entry.studio)
 
         # Create the Work entry in the database
@@ -576,7 +578,7 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
             nsfw=entry.is_nsfw,
             date=entry.start_date,
             end_date=entry.end_date,
-            ext_synopsis=(entry.description if entry.description else ''),
+            ext_synopsis=(entry.description or ''),
             nb_episodes=(entry.nb_episodes or entry.nb_chapters),
             anime_type=anime_type,
             manga_type=manga_type,
@@ -601,18 +603,18 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
         WorkTitle.objects.bulk_create(current_work_titles)
 
         # Build RelatedWorks (and add those Works too) [AniListRichEntry only]
-        if isinstance(entry, AniListRichEntry) and entry.relations:
+        if entry.is_rich and entry.relations:
             new_relations = []
 
             for work_related, relation_type in entry.relations:
-                added_work = insert_works_into_database_from_anilist([work_related])
+                added_work = insert_work_into_database_from_anilist(work_related)
                 if not added_work:
                     continue
 
                 new_relations.append(
                     RelatedWork(
                         parent_work=work,
-                        child_work=added_work[0],
+                        child_work=added_work,
                         type=relation_type.name
                     )
                 )
@@ -620,7 +622,7 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
             RelatedWork.objects.bulk_create(new_relations)
 
         # Build Artist and Staff [AniListRichEntry only]
-        if isinstance(entry, AniListRichEntry) and entry.staff:
+        if entry.is_rich and entry.staff:
             anilist_roles_map = {
                 'Director': 'director',
                 'Music': 'composer',
