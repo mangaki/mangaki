@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}Liste des suggestions {% if suggestions.paginator.page_range|length > 1 %}- Page {{ suggestions.number }} {% endif %}- Mangaki{% endblock %}
+
+{% block body %}
+
+<div class="page-header">
+    <a href="{% url "nsfw-grid" %}" class="btn btn-sm btn-info pull-right" style="margin-top: 8px;">
+        <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span> Accéder à la grille NSFW
+    </a>
+    <h1>Suggestions</h1>
+</div>
+
+{% for suggestion in suggestions %}
+<div class="panel panel-default">
+    <h3 class="panel-heading panel-title">
+        <a href="{% url "fix-suggestion" suggestion.id %}" class="text-primary">Suggestion #{{ suggestion.id }}</a>
+        <span class="small font-weight-bold">
+            &nbsp;&nbsp;<span class="glyphicon glyphicon-{{ suggestion.is_checked|yesno:'lock,flag' }}" aria-hidden="true"></span>
+            Ce problème est {{ suggestion.is_checked|yesno:'résolu,en cours' }}
+        </span>
+        &nbsp;
+        &nbsp;
+        <span class="text-success" title="Nombre de personnes approuvant">
+            <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> {{suggestion.count_agrees}}
+        </span>
+        &nbsp;
+        <span class="text-danger" title="Nombre de personnes n'approuvant pas">
+            <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> {{ suggestion.count_disagrees }}
+        </span>
+    </h3>
+    <ul class="list-group">
+        <li class="list-group-item"><strong>Problème :</strong> {{ suggestion.get_problem_display }}
+
+        <li class="list-group-item"><strong>Envoyé par :</strong>
+            <a href="{% url "profile" suggestion.user %}">
+                {{ suggestion.user.username }}</a> <small>({{ suggestion.date }})</small>
+        </li>
+
+        <li class="list-group-item"><strong>Œuvre :</strong>
+            <a href="{% url "work-detail" suggestion.work.category.slug suggestion.work.pk %}">
+                {{ suggestion.work.title }}</a> <small>({{ suggestion.work.category }})</small>
+        </li>
+
+        {% if request.user.is_authenticated %}
+        {% for evidence in suggestion.evidence_set.all %}
+        {% if request.user == evidence.user %}
+        <div class="panel-footer small">
+            {% if evidence.agrees %}
+            <div>Vous avez <strong><span class="text-success">approuvé <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span></span></strong> cette suggestion.</div>
+            {% else %}
+            <div>Vous avez <strong><span class="text-danger">rejeté <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span></span></strong> cette suggestion.</div>
+            {% endif %}
+            {% if evidence.needs_help %}
+            <div>Vous avez demandé <strong>l'aide d'un administrateur</strong>.</div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </ul>
+</div>
+{% endfor %}
+
+<div class="row">
+    {% include "pagination.html" with page_obj=suggestions paginator=suggestions.paginator %}
+</div>
+
+{% endblock %}
