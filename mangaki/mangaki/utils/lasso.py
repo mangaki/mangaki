@@ -75,21 +75,18 @@ class MangakiLASSO(RecommendationAlgorithm):
             self.logger.info('Sparsity: {}'.format(avgstd(self.user_sparsities)))
 
     def predict(self, X):
-        y_pred = []
-        for user_id, work_id in X:
-            if user_id not in self.reg:
-                y_pred.append(0)
-            else:
-                y_pred.append(
-                    relu(
-                        # Get the *unique* and first element of the prediction array.
-                        self.reg[user_id].predict(
-                            # We need to get a N × 1 array for the regressor.
-                            self.T[work_id].reshape(1, -1)
-                        )
-                        [0]
+        y_pred = np.zeros(X.shape[0])
+        for index, (user_id, work_id) in enumerate(X):
+            if user_id in self.reg:
+                y_pred[index] = (relu(
+                    # Get the *unique* and first element of the prediction array.
+                    self.reg[user_id].predict(
+                        # We need to get a N × 1 array for the regressor.
+                        self.T[work_id].reshape(1, -1)
                     )
-                )
+                    [0]
+                ))
+
         return y_pred
 
     def compute_user_sparsities(self):
