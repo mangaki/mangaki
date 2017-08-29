@@ -7,15 +7,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pickle
 import os.path
 
-# FIXME: You should really disregard this.
-# Rationale: until we can move all algorithms into a `algos/` subfolder, we cannot recognize an algorithm except
-# if we import every files here. Which we don't want to do. So let's hardcode.
-_REMOVE_ME_SOON_OR_FIRE_RAITO = [
-    'mangaki.utils.als',
-    'mangaki.utils.svd',
-    'mangaki.utils.knn',
-    'mangaki.utils.zero'
-]
+
 class RecommendationAlgorithmFactory:
     def __init__(self):
         self.algorithm_registry = {}
@@ -24,9 +16,10 @@ class RecommendationAlgorithmFactory:
         self.initialized = False
 
     def initialize(self):
-        for name in _REMOVE_ME_SOON_OR_FIRE_RAITO:
-            importlib.import_module(name)
-
+        # FIXME: make it less complicated and go for a commonly used design pattern.
+        # Behind the hood, it's called in `utils.__init__.py` which triggers the `algos.__init__.py`
+        # which in turn triggers registration on this instance.
+        # Then, once it reach `recommendation_algorithm` file, it's good to go.
         self.logger.info('Recommendation algorithm factory initialized. {} algorithms available in the factory.'
                          .format(len(self.algorithm_registry)))
         self.initialized = True
@@ -35,6 +28,7 @@ class RecommendationAlgorithmFactory:
         self.algorithm_registry[name] = klass
         self.algorithm_factory[name] = default_kwargs
         self.logger.info('Registered {} as a recommendation algorithm'.format(name))
+
 
 class RecommendationAlgorithm:
     factory = RecommendationAlgorithmFactory()
