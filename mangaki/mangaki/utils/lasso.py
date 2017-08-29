@@ -1,32 +1,57 @@
+import logging
+
 from mangaki.utils.common import RecommendationAlgorithm
-from mangaki.settings import DATA_DIR
-from scipy.sparse import coo_matrix, load_npz
+from django.conf import settings
+from scipy.sparse import coo_matrix, load_npz, issparse
 from sklearn.linear_model import Lasso
 from sklearn.preprocessing import scale
 from collections import Counter, defaultdict
 from mangaki.utils.stats import avgstd
 import os.path
+import numpy as np
 
 
 def relu(x):
     return max(-2, min(2, x))
 
 
+def load_and_scale_tags(T=None, perform_scaling=True, with_mean=False):
+    # Load in CSC format if no matrix provided.
+    if T is None:
+        T = load_npz(os.path.join(settings.DATA_DIR, 'tag-matrix.npz')).tocsc()
+
+    nb_tags = T.shape[1]
+
+    if perform_scaling:
+        # Densify T to prevent sparsity destruction (which will anyway result in an exception).
+        if with_mean and issparse(T):
+            T = T.toarray()
+
+        T = scale(T, with_mean=with_mean, copy=False)
+
+        # If it's still sparse, let's get a dense version.
+        if issparse(T):
+            T = T.toarray()
+    else:
+        T = T.toarray() if issparse(T) else T
+
+    return nb_tags, T
+
+
 class MangakiLASSO(RecommendationAlgorithm):
     def __init__(self, with_bias=True, alpha=0.01):
         super().__init__()
+        self.logger = logging.getLogger(self.get_shortname())
         self.alpha = alpha
         self.with_bias = with_bias
 
-    def load_tags(self, T=None):
-        if T is None:
-            T = load_npz(os.path.join(DATA_DIR, 'balse/tag-matrix.npz')).tocsc()
-            T_scaled = scale(T, with_mean=False).toarray()
-        _, self.nb_tags = T.shape
-        self.T = T_scaled
+    def load_tags(self, T=None, perform_scaling=True, with_mean=False):
+        self.nb_tags, self.T = load_and_scale_tags(T, perform_scaling, with_mean)
 
-    def fit(self, X, y):
-        self.load_tags()
+    def fit(self, X, y, autoload_tags=True):
+        if autoload_tags:
+            self.load_tags()
+
         row = X[:, 0]
         col = X[:, 1]
         self.nb_rated = Counter(col)
@@ -38,26 +63,37 @@ class MangakiLASSO(RecommendationAlgorithm):
             indices = M[user_id].indices
             values = M[user_id].data
             self.reg[user_id].fit(self.T[indices], values)
-            if user_id % 500 == 0:
-                print(user_id)
-        self.compute_sparsity()
+            # TODO: cuter progress information with tqdm.
+            if self.verbose:
+                if user_id % 500 == 0:
+                    self.logger.info('Fitting user ID {:d}/{:d}…'.format(user_id, len(user_ids)))
+
+        # Black magic of high level, freeze the defaultdict (i.e. remove the default factory).
+        self.reg.default_factory = None
+        self.user_sparsities = self.compute_user_sparsities()
+        if self.verbose:
+            self.logger.info('Sparsity: {}'.format(avgstd(self.user_sparsities)))
 
     def predict(self, X):
         y_pred = []
         for user_id, work_id in X:
             if user_id not in self.reg:
-                print(user_id, 'not')
                 y_pred.append(0)
             else:
-                y_pred.append(relu(self.reg[user_id].predict(self.T[work_id].reshape(1, -1))[0]))
+                y_pred.append(
+                    relu(
+                        # Get the *unique* and first element of the prediction array.
+                        self.reg[user_id].predict(
+                            # We need to get a N × 1 array for the regressor.
+                            self.T[work_id].reshape(1, -1)
+                        )
+                        [0]
+                    )
+                )
         return y_pred
 
-    def compute_sparsity(self):
-        sparsity = []
-        for user_id in self.reg:
-            nb_features = sum(weight != 0 for weight in self.reg[user_id].coef_)
-            sparsity.append(nb_features)
-        print('Sparsity', avgstd(sparsity))
+    def compute_user_sparsities(self):
+        return [np.count_nonzero(reg.coef_ for reg in self.reg.values())]
 
     def get_shortname(self):
-        return 'lasso-%d' % self.NB_COMPONENTS
+        return 'lasso{}{:f}'.format('-with_bias-' if self.with_bias else '-', self.alpha)
