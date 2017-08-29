@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load posters %}
+
+{% block title %}Grille NSFW {% if suggestions.paginator.page_range|length > 1 %}- Page {{ suggestions.number }} {% endif %}- Mangaki{% endblock %}
+
+{% block body %}
+
+<div class="page-header">
+    <a href="{% url "fix-index" %}" class="btn btn-sm btn-info pull-right" style="margin-top: 8px;">
+        <span class="glyphicon glyphicon-list" aria-hidden="true"></span> Retour aux suggestions
+    </a>
+
+    <h1>Grille NSFW</h1>
+</div>
+
+{% if suggestions_with_states %}
+
+    {% if request.user.is_authenticated %}
+    {% if request.user.profile.nsfw_ok or not request.user.nsfw_ok and request.GET.nsfw_ok is not None %}
+    <div class="alert clearfix" style="padding: 0 15px;">
+    <p class="pull-left" style="margin: 5px 0 0;">
+        Cliquez sur <strong>&laquo; C'est NSFW ! &raquo;</strong> si vous pensez qu'une œuvre est NSFW
+        <span class="text-muted small">({{ count_nsfw_left }} œuvres dans la grille)</span>
+    </p>
+
+    <form action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST" class="form-group skip-form">
+        {% csrf_token %}
+        {% for suggestion, says_is_nsfw, supposed_nsfw in suggestions_with_states %}
+        <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
+        <input type="hidden" name="agrees" value="{{ supposed_nsfw|yesno:'False,True' }}">
+        {% endfor %}
+        <button class="btn btn-sm btn-link pull-right">
+            Marquer les œuvres restantes comme non NSFW{% if suggestions.paginator.page_range|length > 1 %} et passer à la suite{% endif %}
+        </button>
+    </form>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% if not request.user.profile.nsfw_ok and request.GET.nsfw_ok is None %}
+    <div class="alert alert-warning">
+        <strong>Attention !</strong> Vous {{ request.user.is_anonymous|yesno:"n'êtes pas connecté et ne voyez donc par défaut pas,avez indiqué sur votre profil ne pas vouloir voir" }} les œuvres marquées NSFW.
+        Souhaitez-vous tout de même les voir ? <a href="{{ request.build_absolute_uri }}{{ request.GET.page|yesno:'&,?' }}nsfw_ok">Oui</a> / <a href="{% url "fix-index" %}">Non</a>.
+    </div>
+    {% endif %}
+
+    {% if not request.user.profile.nsfw_ok and request.GET.nsfw_ok is not None %}
+    <div class="alert alert-warning">
+        <strong>Rappel :</strong> Vous avez accepté de voir les œuvres marquées NSFW sur cette grille temporairement.
+        Cliquez <a href="{% url "fix-index" %}">ici</a> pour revenir en arrière.
+    </div>
+    {% endif %}
+
+    {% if request.user.profile.nsfw_ok or not request.user.nsfw_ok and request.GET.nsfw_ok is not None %}
+        <div class="row">
+        <div class="cards-grid no-rating">
+        {% for suggestion, says_is_nsfw, supposed_nsfw in suggestions_with_states %}
+        <div style="margin: 10px 0;">
+            {% include "mangaki/work_rating.html" with category=suggestion.work.category.slug work=suggestion.work bypass_nsfw_settings=True %}
+
+            {% if request.user.is_authenticated %}
+            <div class="nsfw-form">
+                <form action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST" class="form-group" style="margin-top: 10px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
+                    <button style="width: 100%;" class="btn {{ says_is_nsfw|yesno:'btn-success,btn-success,btn-default' }}"
+                            type="submit" name="agrees" value="{{ supposed_nsfw|yesno:'True,False' }}"
+                            {% if says_is_nsfw is not None %}disabled{% endif %}>
+                            C'est NSFW !
+                    </button>
+                </form>
+
+                <div class="small text-muted text-right">
+                    Signalée <em>{{ supposed_nsfw|yesno:'NSFW,non NSFW' }}</em> par
+                    <a href="{% url "profile" suggestion.user %}">{{ suggestion.user.username }}</a>.
+                </div>
+            </div>
+
+            <div class="nsfw-form-post text-muted small text-center" style="margin: 20px 0 0; display: none;">
+                Merci de votre vote.<br/>
+                Un administrateur interviendra aussi rapidement que possible !
+            </div>
+            {% endif %}
+        </div>
+
+        {% endfor %}
+        </div>
+        </div>
+
+        {% include "pagination.html" with page_obj=suggestions paginator=suggestions.paginator nsfw_ok=True %}
+    {% endif %}
+
+{% else %}
+
+    <div class="alert alert-warning text-center" style="vertical-align: center;">
+        <strong>Aucun résultat à afficher :</strong> soit aucune œuvre n'a été marquée NSFW ou non NSFW, soit vous avez déjà donné votre avis.
+    </div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $('.nsfw-form form').submit(function(e) {
+        e.preventDefault();
+    });
+
+    $("[name='agrees']").on("click", function() {
+        var agrees_button = $(this);
+        var suggestion_id = $(this).closest('form').find("[name='suggestion']").val();
+
+        $.post(Urls['update-evidence'](), {
+            agrees: $(this).val(),
+            suggestion: suggestion_id,
+            success: function(data) {
+                agrees_button.closest('.nsfw-form').fadeOut(100, function() {
+                    $(this).next('.nsfw-form-post').fadeIn(100);
+                });
+                agrees_button.prop('disabled', true);
+
+                $(".skip-form input[name='suggestion'][value="+suggestion_id+"]").next("input[name='agrees']").remove();
+                $(".skip-form input[name='suggestion'][value="+suggestion_id+"]").remove();
+
+                if ($(".skip-form input[name='suggestion']").length === 0) {
+                    $(".skip-form button").fadeOut(200, function() {
+                        $(this).text('Rafraîchir la page et passer à la suite').fadeIn(200);
+                    });
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

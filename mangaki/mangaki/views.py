@@ -1,6 +1,7 @@
 import datetime
 import json
 from collections import Counter, OrderedDict
+from itertools import zip_longest
 from typing import List, Dict, Any, Tuple
 from urllib.parse import urlencode
 
@@ -19,6 +20,7 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpRespon
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone, translation
+from django.utils.http import is_safe_url
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -57,6 +59,7 @@ TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 FIXES_PER_PAGE = 5
+NSFW_GRID_PER_PAGE = 5
 
 REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
@@ -154,7 +157,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
 
         if self.request.user.is_authenticated:
-            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
+            context['suggestion_form'] = SuggestionForm(work=self.object, instance=Suggestion(user=self.request.user, work=self.object))
         context['rating'] = current_user_rating(self.request, self.object)
 
         context['references'] = []
@@ -891,17 +894,75 @@ def fix_suggestion(request, suggestion_id):
     return render(request, 'fix/fix_suggestion.html', context)
 
 
+def nsfw_grid(request):
+    user = request.user if request.user.is_authenticated else None
+
+    user_evidences = Evidence.objects.filter(user=user)
+    nsfw_suggestion_list = Suggestion.objects.select_related(
+                'work', 'user', 'work__category'
+            ).prefetch_related('evidence_set__user').filter(
+                problem__in=('nsfw', 'n_nsfw'),
+                is_checked=False
+            ).exclude(
+                work__in=user_evidences.values('suggestion__work')
+            ).order_by('work', '-date', '-work__sum_ratings').distinct('work')
+
+    paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
+    count_nsfw_left = paginator.count
+    page = request.GET.get('page')
+
+    try:
+        suggestions = paginator.page(page)
+    except PageNotAnInteger:
+        suggestions = paginator.page(1)
+    except EmptyPage:
+        suggestions = paginator.page(paginator.num_pages)
+
+    nsfw_states = []
+    supposed_nsfw = []
+    for suggestion in suggestions:
+        supposed_nsfw.append(suggestion.problem == 'nsfw')
+
+        for evidence in suggestion.evidence_set.all():
+            if evidence.user == request.user:
+                agrees_with_problem = evidence.agrees
+                agrees = ((agrees_with_problem and suggestion.problem == 'nsfw')
+                       or (not agrees_with_problem and not suggestion.problem == 'nsfw'))
+                nsfw_states.append(agrees)
+                break
+        else:
+            nsfw_states.append(None)
+
+    suggestions_with_states = list(zip(suggestions, nsfw_states, supposed_nsfw))
+
+    context = {
+        'suggestions_with_states': suggestions_with_states,
+        'suggestions': suggestions,
+        'count_nsfw_left': count_nsfw_left
+    }
+
+    return render(request, 'fix/nsfw_grid.html', context)
+
+
 @login_required
 def update_evidence(request):
-    if request.method != 'POST':
-        redirect('fix-index')
+    if request.method != 'POST' or not request.user.is_authenticated:
+        return redirect('fix-index')
 
-    agrees = request.POST.get('agrees') == 'True'
-    needs_help = request.POST.get('needs_help') == 'True'
-    delete = request.POST.get('delete')
-    suggestion_id = request.POST.get('suggestion')
+    # Retrieve agrees, needs_help, delete and suggestion_ids values from one or several fields in a form
+    # Every values are then zipped together, with zip_longest since the length of suggestion_ids is the one that matters
+    # See templates/fix/nsfw_grid.html for an example
+    agrees_values = map(lambda x: x == 'True', request.POST.getlist('agrees'))
+    needs_help_values = map(lambda x: x == 'True', request.POST.getlist('needs_help'))
+    delete_values = request.POST.getlist('delete')
+    suggestion_ids = map(int, request.POST.getlist('suggestion'))
 
-    if request.user.is_authenticated and suggestion_id:
+    informations = zip_longest(suggestion_ids, agrees_values, needs_help_values, delete_values, fillvalue=False)
+
+    for suggestion_id, agrees, needs_help, delete in informations:
+        if not suggestion_id:
+            continue
+
         if delete:
             try:
                 Evidence.objects.get(
@@ -919,8 +980,9 @@ def update_evidence(request):
             evidence.needs_help = needs_help
             evidence.save()
 
-    if suggestion_id:
-        return redirect('fix-suggestion', suggestion_id)
+    next_url = request.GET.get('next')
+    if next_url and is_safe_url(url=next_url, host=request.get_host()):
+        return redirect(next_url)
     return redirect('fix-index')
 
 
