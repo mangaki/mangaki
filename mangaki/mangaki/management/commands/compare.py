@@ -1,8 +1,6 @@
-import importlib
 import json
 from typing import Type, List, Any, Dict, Optional
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from collections import defaultdict
@@ -14,7 +12,6 @@ from mangaki.utils.data import Dataset
 from mangaki.utils.values import rating_values
 import logging
 
-NB_SPLIT = 5  # Divide the dataset into 5 buckets
 FILENAMES = {
     'movies': 'ratings-ml.csv',
     'mangas': 'ratings.csv'
@@ -56,8 +53,7 @@ class Experiment(object):
         """
         Prepare the experiment.
 
-        Read the available algorithms from `algos` section.
-        Register them under a short name provided or their static name (i.e. `class_name[len('Mangaki'):].lower()`).
+        The algorithms are registered under their short name, which can be found in their definition file (e.g. als.py).
 
         Read the configuration for the experiment as a (short_name, …params) tuple.
         Wrap configuration in an AlgorithmWrapper which will create instance during comparisons.
@@ -73,24 +69,10 @@ class Experiment(object):
         with open(self.experiment_filename, 'r') as f:
             experiment_data = json.loads(f.read())
 
-        algos = experiment_data['algos']
-        classes = {}
-        for algo in algos:
-            *mod_paths, class_name = algo['class'].split('.')
-            mod_path = '.'.join(mod_paths)
-            mod = importlib.import_module(mod_path)
-            klass = getattr(mod, class_name)
-            if not klass:
-                raise ValueError('No class named `{}` in module `{}`'.format(class_name, mod_path))
-
-            algo_name = algo.get('short_name', klass.static_name())
-            classes[algo_name] = klass
-            logger.debug('Registered {} as an available algorithm.'.format(algo_name))
-
         configurations = experiment_data['configurations']
         for config in configurations:
             short_name, *params = config
-            klass = classes[short_name]
+            klass = RecommendationAlgorithm.factory.algorithm_registry[short_name]
             self.algos.append(AlgorithmWrapper(short_name, klass, params))
 
     def load_dataset(self, dataset_name):
@@ -113,15 +95,15 @@ class Experiment(object):
 
         return results
 
-    def compare_models(self):
-        k_fold = ShuffleSplit(n_splits=NB_SPLIT)
+    def compare_models(self, nb_split: int = 5):
+        k_fold = ShuffleSplit(n_splits=nb_split)
         metrics = defaultdict(lambda: defaultdict(list))
 
         pass_index = 0
         for i_train, i_test in k_fold.split(self.anonymized.X):
             for algo in self.algos:
                 model = algo.make_instance()
-                logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), NB_SPLIT, pass_index + 1))
+                logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), nb_split, pass_index + 1))
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
                 y_pred = model.predict(self.anonymized.X[i_test])
@@ -152,7 +134,7 @@ class Experiment(object):
 
 class Command(BaseCommand):
     args = ''
-    help = 'Compare recommendation algorithms'
+    help = 'Reproducible comparison of recommendation algorithms'
 
     def add_arguments(self, parser):
         parser.add_argument('dataset_name', type=str)
@@ -166,11 +148,17 @@ class Command(BaseCommand):
                             dest='experiment_filename',
                             type=str,
                             help='Specify an experiment filename (JSON format)')
+        parser.add_argument('-sp', '--nb-split',
+                            dest='nb_split',
+                            type=int,
+                            default=5,
+                            help='How many splits should be done on the dataset using a sklearn ShuffleSplit '
+                                 '(default: 5-fold)')
 
     def handle(self, *args, **options):
         dataset_name = options.get('dataset_name')
-        eval_metrics = options.get('eval_metrics', ['rmse'])
+        eval_metrics = options.get('eval_metrics') or ['rmse']
         experiment_filename = options.get('experiment_filename', None)
 
         experiment = Experiment(dataset_name, eval_metrics, experiment_filename)
-        experiment.compare_models()
+        experiment.compare_models(options.get('nb_split'))

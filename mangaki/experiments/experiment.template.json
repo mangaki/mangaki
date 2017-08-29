@@ -1,25 +1,4 @@
 {
-  "algos": [
-    {
-      "class": "mangaki.utils.als.MangakiALS",
-      "short_name": "als"
-    },
-    {
-      "class": "mangaki.utils.svd.MangakiSVD"
-    },
-    {
-      "class": "mangaki.utils.knn.MangakiKNN"
-    },
-    {
-      "class": "mangaki.utils.pca.MangakiPCA"
-    },
-    {
-      "class": "mangaki.utils.wals.MangakiWALS"
-    },
-    {
-      "class": "mangaki.utils.zero.MangakiZero"
-    }
-  ],
   "configurations": [
     ["zero"]
   ]

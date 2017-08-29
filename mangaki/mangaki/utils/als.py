@@ -1,17 +1,22 @@
-from mangaki.utils.common import RecommendationAlgorithm
+from mangaki.utils.common import RecommendationAlgorithm, register_algorithm
 from collections import defaultdict
 import numpy as np
 
 
+@register_algorithm('als', {'nb_components': 20})
 class MangakiALS(RecommendationAlgorithm):
     M = None
     U = None
     VT = None
-    def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10, LAMBDA=0.1):
+    def __init__(self, nb_components=10, nb_iterations=10, lambda_=0.1):
         super().__init__()
-        self.NB_COMPONENTS = NB_COMPONENTS
-        self.NB_ITERATIONS = NB_ITERATIONS
-        self.LAMBDA = LAMBDA
+        self.nb_components = nb_components
+        self.nb_iterations = nb_iterations
+        self.lambda_ = lambda_
+
+    @property
+    def is_serializable(self):
+        return True
 
     def load(self, filename):
         backup = super().load(filename)
@@ -35,13 +40,13 @@ class MangakiALS(RecommendationAlgorithm):
     def fit_user(self, user, matrix):
         Ru = np.array(list(matrix[user].values()), ndmin=2).T
         Vu = self.VT[:,list(matrix[user].keys())]
-        Gu = self.LAMBDA * len(matrix[user]) * np.eye(self.NB_COMPONENTS)
+        Gu = self.lambda_ * len(matrix[user]) * np.eye(self.nb_components)
         self.U[[user],:] = np.linalg.solve(Vu.dot(Vu.T) + Gu, Vu.dot(Ru)).T
 
     def fit_work(self, work, matrixT):
         Ri = np.array(list(matrixT[work].values()), ndmin=2).T
         Ui = self.U[list(matrixT[work].keys()),:].T
-        Gi = self.LAMBDA  * len(matrixT[work]) * np.eye(self.NB_COMPONENTS)
+        Gi = self.lambda_ * len(matrixT[work]) * np.eye(self.nb_components)
         self.VT[:,[work]] = np.linalg.solve(Ui.dot(Ui.T) + Gi, Ui.dot(Ri))
 
     def factorize(self, matrix, random_state):
@@ -51,10 +56,10 @@ class MangakiALS(RecommendationAlgorithm):
             for work in matrix[user]:
                 matrixT[work][user] = matrix[user][work]
         # Init
-        self.U = np.random.rand(self.nb_users, self.NB_COMPONENTS)
-        self.VT = np.random.rand(self.NB_COMPONENTS, self.nb_works)
+        self.U = np.random.rand(self.nb_users, self.nb_components)
+        self.VT = np.random.rand(self.nb_components, self.nb_works)
         # ALS
-        for i in range(self.NB_ITERATIONS):
+        for i in range(self.nb_iterations):
             #print('Step {}'.format(i))
             for user in matrix:
                 self.fit_user(user, matrix)
@@ -81,4 +86,4 @@ class MangakiALS(RecommendationAlgorithm):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
 
     def get_shortname(self):
-        return 'als-%d' % self.NB_COMPONENTS
+        return 'als-%d' % self.nb_components

@@ -1,4 +1,4 @@
-from mangaki.utils.common import RecommendationAlgorithm
+from mangaki.utils.common import RecommendationAlgorithm, register_algorithm
 from collections import defaultdict, Counter
 import numpy as np
 
@@ -19,18 +19,19 @@ def simple_train(model, inp, num_iterations):
         col_update_op.run()
 
 
+@register_algorithm('wals', {'nb_components': 20})
 class MangakiWALS(RecommendationAlgorithm):
     M = None
     U = None
     VT = None
 
-    def __init__(self, NB_COMPONENTS=20):
+    def __init__(self, nb_components=20):
         """An implementation of the Weighted Alternate Least Squares.
         NB_COMPONENTS: the number of components in the factorization"""
         import tensorflow as tf
 
         super().__init__()
-        self.NB_COMPONENTS = NB_COMPONENTS
+        self.nb_components = nb_components
         self.sess = tf.InteractiveSession()
 
     def load(self, filename):
@@ -39,6 +40,10 @@ class MangakiWALS(RecommendationAlgorithm):
         self.U = backup.U
         self.VT = backup.VT
         self.means = backup.means
+
+    @property
+    def is_serializable(self):
+        return False  # FIXME: serialize me!
 
     def make_matrix(self, X, y):
         matrix = defaultdict(dict)
@@ -66,7 +71,7 @@ class MangakiWALS(RecommendationAlgorithm):
 
         rows = self.nb_users
         cols = self.nb_works
-        dims = self.NB_COMPONENTS
+        dims = self.nb_components
         row_wts = 0.1 + np.random.rand(rows)
         col_wts = 0.1 + np.random.rand(cols)
         inp = sparse_tensor.SparseTensor(indices, values, [rows, cols])
