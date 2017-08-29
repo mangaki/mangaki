@@ -92,6 +92,7 @@ class MALTest(TestCase):
             content_type='application/xml'
         )
 
-        with self.assertLogs(level='ERROR'):
+        from mangaki.utils.mal import logger as mal_logger
+        with self.assertLogs(logger=mal_logger, level='ERROR'):
             results = list(self.mal.list_works_from_a_user(MALWorks.animes, 'raitobezarius'))
             self.assertEqual(len(results), 0)
