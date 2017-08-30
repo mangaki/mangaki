@@ -1,8 +1,9 @@
-from mangaki.utils.common import RecommendationAlgorithm
+from mangaki.utils.common import RecommendationAlgorithm, register_algorithm
 from sklearn.utils.extmath import randomized_svd
 import numpy as np
 
 
+@register_algorithm('svd', {'nb_components': 20})
 class MangakiSVD(RecommendationAlgorithm):
     M = None
     U = None
@@ -11,10 +12,10 @@ class MangakiSVD(RecommendationAlgorithm):
     inv_work = None
     inv_user = None
     work_titles = None
-    def __init__(self, NB_COMPONENTS=10, NB_ITERATIONS=10):
+    def __init__(self, nb_components=10, nb_iterations=10):
         super().__init__()
-        self.NB_COMPONENTS = NB_COMPONENTS
-        self.NB_ITERATIONS = NB_ITERATIONS
+        self.nb_components = nb_components
+        self.nb_iterations = nb_iterations
 
     def load(self, filename):
         backup = super().load(filename)
@@ -26,6 +27,10 @@ class MangakiSVD(RecommendationAlgorithm):
         self.inv_user = backup.inv_user
         self.work_titles = backup.work_titles
         self.means = backup.means
+
+    @property
+    def is_serializable(self):
+        return True
 
     def make_matrix(self, X, y):
         matrix = np.zeros((self.nb_users, self.nb_works), dtype=np.float64)
@@ -46,7 +51,7 @@ class MangakiSVD(RecommendationAlgorithm):
 
         self.chrono.save('fill and center matrix')
 
-        self.U, self.sigma, self.VT = randomized_svd(matrix, self.NB_COMPONENTS, n_iter=self.NB_ITERATIONS, random_state=42)
+        self.U, self.sigma, self.VT = randomized_svd(matrix, self.nb_components, n_iter=self.nb_iterations, random_state=42)
         if self.verbose:
             print('Shapes', self.U.shape, self.sigma.shape, self.VT.shape)
         self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
@@ -57,4 +62,4 @@ class MangakiSVD(RecommendationAlgorithm):
         return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
 
     def get_shortname(self):
-        return 'svd-%d' % self.NB_COMPONENTS
+        return 'svd-%d' % self.nb_components
