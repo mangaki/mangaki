@@ -328,26 +328,21 @@ class AniListRichEntry(AniListEntry):
 
     @property
     def staff(self) -> List[Tuple[AniListEntry, str]]:
-        if not self.work_info.get('staff'):
-            return []
         return [
             AniListStaff(
                 id=staff['id'],
                 name_first=staff['name_first'],
                 name_last=staff['name_last'],
                 role=staff['role']
-            ) for staff in self.work_info['staff']
+            ) for staff in self.work_info.get('staff', [])
         ]
 
     @property
     def relations(self) -> List[Tuple[AniListEntry, str]]:
-        if not self.work_info.get('relations'):
-            return []
         return [
-            (
-                AniListEntry(relation, self.work_type),
-                AniListRelationType(relation['relation_type'])
-            ) for relation in self.work_info['relations']
+            (AniListEntry(relation, self.work_type),
+            AniListRelationType(relation['relation_type']))
+            for relation in self.work_info.get('relations', [])
         ]
 
 
