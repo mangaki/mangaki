@@ -54,7 +54,8 @@ RELATION_TYPE_CHOICES = (
     ('parent_story', 'Histoire mère'),
     ('alternative_setting', 'Univers alternatif'),
     ('same_setting', 'Univers commun'),
-    ('other', 'Spécial')
+    ('other', 'Spécial'),
+    ('adaptation', 'Adaptation')
 )
 
 SUGGESTION_PROBLEM_CHOICES = (
