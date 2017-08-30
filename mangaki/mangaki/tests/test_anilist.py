@@ -6,11 +6,12 @@ import responses
 from django.conf import settings
 from django.test import TestCase
 
-from mangaki.models import Work, WorkTitle, RelatedWork, Language, ExtLanguage, Artist
+from mangaki.models import (Work, WorkTitle, RelatedWork, Category, Genre,
+                            Language, ExtLanguage, Artist, Staff, Studio)
 from mangaki.wrappers.anilist import (to_python_datetime, to_anime_season, AniList, AniListStatus,
-                                      AniListWorks, AniListException, insert_works_into_database_from_anilist,
-                                      insert_work_into_database_from_anilist)
-
+                                      AniListWorks, AniListException,
+                                      insert_works_into_database_from_anilist, insert_work_into_database_from_anilist)
+import logging
 
 class AniListTest(TestCase):
     @staticmethod
@@ -240,15 +241,15 @@ class AniListTest(TestCase):
         hibike_entry = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
         hibike = insert_work_into_database_from_anilist(hibike_entry)
 
-        studio_hibike = hibike.studio.title
         titles_hibike = WorkTitle.objects.filter(work=hibike)
+        genres_hibike = hibike.genre.values_list('title', flat=True)
         related_hibike = RelatedWork.objects.filter(parent_work=hibike)
         staff_hibike = Work.objects.get(pk=hibike.pk).staff_set.all().values_list('artist__name', flat=True)
 
-        self.assertEqual(studio_hibike, 'Kyoto Animation')
+        self.assertEqual(hibike.studio.title, 'Kyoto Animation')
         self.assertEqual(len(titles_hibike), 3)
         self.assertEqual(len(related_hibike), 4)
-        self.assertEqual(hibike.genre.count(), 3)
+        self.assertCountEqual(genres_hibike, ['Slice of Life', 'Music', 'Drama'])
         self.assertCountEqual(staff_hibike, ['Ishihara Tatsuya', 'Matsuda Akito', 'Takeda Ayano'])
 
         # Check for no artist duplication
@@ -257,4 +258,40 @@ class AniListTest(TestCase):
         self.assertEqual(artist.first().anilist_creator_id, 100055)
 
         # Try adding this work to the DB again
-        self.assertIsNone(insert_work_into_database_from_anilist(hibike_entry))
+        hibike_again = insert_work_into_database_from_anilist(hibike_entry)
+        self.assertEqual(hibike, hibike_again)
+
+    @responses.activate
+    def test_update_work(self):
+        self.add_fake_auth()
+
+        fake_studio = Studio.objects.create(title='Fake Studio')
+        hibike_outdated = Work.objects.create(
+            category=Category.objects.get(slug='anime'),
+            title='Sound! Euphonium',
+            studio=fake_studio
+        )
+        hibike_outdated.genre.add(Genre.objects.create(title='Fake genre'))
+
+        responses.add(
+            responses.GET,
+            urljoin(AniList.BASE_URL, 'anime/20912/page'),
+            body=self.read_fixture('anilist/hibike_euphonium.json'),
+            status=200, content_type='application/json'
+        )
+
+        hibike_entry = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
+        insert_work_into_database_from_anilist(hibike_entry) # Update this work from AniList
+
+        hibike_updated = Work.objects.get(title='Hibike! Euphonium')
+
+        titles_hibike = WorkTitle.objects.filter(work=hibike_updated)
+        genres_hibike = hibike_updated.genre.values_list('title', flat=True)
+        related_hibike = RelatedWork.objects.filter(parent_work=hibike_updated)
+        staff_hibike = Work.objects.get(pk=hibike_updated.pk).staff_set.all().values_list('artist__name', flat=True)
+
+        self.assertEqual(hibike_updated.studio.title, 'Kyoto Animation')
+        self.assertEqual(len(titles_hibike), 3)
+        self.assertEqual(len(related_hibike), 4)
+        self.assertCountEqual(genres_hibike, ['Slice of Life', 'Music', 'Drama'])
+        self.assertCountEqual(staff_hibike, ['Ishihara Tatsuya', 'Matsuda Akito', 'Takeda Ayano'])

@@ -534,6 +534,92 @@ category_map = {
 staff_roles = StaffRoles()
 role_map = staff_roles.role_map
 
+
+def build_work_titles(work: Work,
+                      titles: Dict[str, Tuple[str, str]]) -> List[WorkTitle]:
+    worktitles = []
+    for title, (language, title_type) in titles.items():
+        ext_language = language_map.get(language, language_map['unknown'])
+        worktitles.append(WorkTitle(
+            work=work,
+            title=title,
+            ext_language=ext_language,
+            language=ext_language.lang if ext_language else None,
+            type=title_type
+        ))
+
+    existing_titles = set(WorkTitle.objects.filter(title__in=titles).values_list('title', flat=True))
+    missing_titles = [worktitle for worktitle in worktitles if worktitle.title not in existing_titles]
+    WorkTitle.objects.bulk_create(missing_titles)
+
+    return missing_titles
+
+def build_related_works(work: Work,
+                        relations: List[Tuple[AniListEntry, AniListRelationType]]) -> List[RelatedWork]:
+    related_works = [
+        insert_work_into_database_from_anilist(work_related)
+        for work_related, relation_type in relations
+    ]
+
+    existing_relations = RelatedWork.objects.filter(parent_work=work, child_work__in=related_works)
+    existing_child_works = set(existing_relations.values_list('child_work__pk', flat=True))
+    existing_parent_works = set(existing_relations.values_list('parent_work__pk', flat=True))
+
+    new_relations = [
+        RelatedWork(
+            parent_work=work,
+            child_work=related_works[index],
+            type=relation_type.value
+        ) for index, (entry, relation_type) in enumerate(relations)
+        if related_works[index] is not None
+        and related_works[index].pk not in existing_child_works
+        and work.pk not in existing_parent_works
+    ]
+
+    RelatedWork.objects.bulk_create(new_relations)
+
+    return new_relations
+
+def build_staff(work: Work,
+                staff: List[Tuple[AniListEntry, str]]) -> List[Staff]:
+    anilist_roles_map = {
+        'Director': 'director',
+        'Music': 'composer',
+        'Original Creator': 'author'
+    }
+
+    artists_to_add = []
+    artists = []
+    for creator in staff:
+        name = '{} {}'.format(creator.name_last or '', creator.name_first or '').strip()
+
+        try: # This artist exists : prevent duplicates by updating with the AniList id
+            artist = Artist.objects.get(Q(name=name) | Q(anilist_creator_id=creator.id))
+            artist.name = name
+            artist.anilist_creator_id = creator.id
+            artist.save()
+            artists.append(artist)
+        except Artist.DoesNotExist: # This artist does not yet exist : will be bulk created
+            artist = Artist(name=name, anilist_creator_id=creator.id)
+            artists_to_add.append(artist)
+
+    artists.extend(Artist.objects.bulk_create(artists_to_add))
+
+    existing_staff_artists = set(s.artist for s in Staff.objects.filter(work=work, artist__in=artists))
+
+    missing_staff = [
+        Staff(
+           work=work,
+           role=role_map.get(anilist_roles_map[creator.role]),
+           artist=artists[index]
+        ) for index, creator in enumerate(staff) if anilist_roles_map.get(creator.role)
+        and artists[index] not in existing_staff_artists
+    ]
+
+    Staff.objects.bulk_create(missing_staff)
+
+    return missing_staff
+
 def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Optional[List[Work]]:
     """
     Insert works into Mangaki database from AniList data, and return Works added.
@@ -553,124 +639,50 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
         anime_type = entry.media_type if entry.work_type == AniListWorks.animes else ''
         manga_type = entry.media_type if entry.work_type == AniListWorks.mangas else ''
 
-        studio = None
-
-        category = category_map.get(entry.work_type, None)
-
-        work_present_in_db = Work.objects.filter(
-            category__slug=entry.work_type.value,
-            title__in=titles
-        )
-
-        # If one of this entry's title match in the database, skip it
-        if work_present_in_db:
-            continue
+        category = category_map.get(entry.work_type)
 
         # Link Studio and Work [AniListRichEntry only]
+        studio = None
         if entry.is_rich and entry.studio:
-            studio, created = Studio.objects.get_or_create(title=entry.studio)
+            studio, _ = Studio.objects.get_or_create(title=entry.studio)
 
-        # Create the Work entry in the database
-        work = Work.objects.create(
-            category=category,
-            title=entry.title,
-            ext_poster=entry.poster_url,
-            nsfw=entry.is_nsfw,
-            date=entry.start_date,
-            end_date=entry.end_date,
-            ext_synopsis=(entry.description or ''),
-            nb_episodes=(entry.nb_episodes or entry.nb_chapters),
-            anime_type=anime_type,
-            manga_type=manga_type,
-            studio=studio
+        # Create or update the Work entry in the database
+        work, created_work = Work.objects.update_or_create(
+            title__in=titles,
+            category__slug=entry.work_type.value,
+            defaults={
+                'category': category,
+                'title': entry.title,
+                'ext_poster': entry.poster_url,
+                'nsfw': entry.is_nsfw,
+                'date': entry.start_date,
+                'end_date': entry.end_date,
+                'ext_synopsis': entry.description or '',
+                'nb_episodes': entry.nb_episodes or entry.nb_chapters,
+                'anime_type': anime_type,
+                'manga_type': manga_type,
+                'studio': studio
+            }
         )
 
         # Build genres for this Work
-        for genre_title in entry.genres:
-            genre, created = Genre.objects.get_or_create(title=genre_title)
-            work.genre.add(genre)
+        genres = [Genre.objects.get_or_create(title=genre)[0] for genre in entry.genres]
+        work.genre.set(genres, bulk=True, clear=(not created_work))
 
         # Create WorkTitle entries in the database for this Work
-        current_work_titles = [
-            WorkTitle(
-                work=work,
-                title=title,
-                ext_language=language_map[language],
-                language=language_map[language].lang,
-                type=title_type
-            ) for title, (language, title_type) in titles.items()
-        ]
-        WorkTitle.objects.bulk_create(current_work_titles)
+        build_work_titles(work, titles)
 
         # Build RelatedWorks (and add those Works too) [AniListRichEntry only]
         if entry.is_rich and entry.relations:
-            new_relations = []
-
-            for work_related, relation_type in entry.relations:
-                added_work = insert_work_into_database_from_anilist(work_related)
-                if not added_work:
-                    continue
-
-                new_relations.append(
-                    RelatedWork(
-                        parent_work=work,
-                        child_work=added_work,
-                        type=relation_type.name
-                    )
-                )
-
-            RelatedWork.objects.bulk_create(new_relations)
+            build_related_works(work, entry.relations)
 
         # Build Artist and Staff [AniListRichEntry only]
         if entry.is_rich and entry.staff:
-            anilist_roles_map = {
-                'Director': 'director',
-                'Music': 'composer',
-                'Original Creator': 'author'
-            }
-
-            artists_to_add = []
-            artists = []
-            for creator in entry.staff:
-                name = '{} {}'.format(creator.name_last, creator.name_first)
-                artist = Artist.objects.filter(Q(name=name) | Q(anilist_creator_id=creator.id)).first()
-
-                if not artist: # This artist does not yet exist : will be bulk created
-                   artist = Artist(name=name, anilist_creator_id=creator.id)
-                   artists_to_add.append(artist)
-                else: # This artist exists : prevent duplicates by updating with the AniDB id
-                   artist.name = name
-                   artist.anilist_creator_id = creator.id
-                   artist.save()
-                   artists.append(artist)
-
-            artists.extend(Artist.objects.bulk_create(artists_to_add))
-
-            staffs = []
-            for index, creator in enumerate(entry.staff):
-                role_slug = anilist_roles_map.get(creator.role)
-                if role_slug:
-                    staffs.append(Staff(
-                       work=work,
-                       role=role_map.get(role_slug),
-                       artist=artists[index]
-                    ))
-
-            existing_staff = set(Staff.objects
-                                .filter(work=work,
-                                        artist__in=[artist for artist in artists])
-                                .values_list('work', 'role', 'artist'))
-
-            missing_staff = [
-                staff for staff in staffs
-                if (staff.work, staff.role, staff.artist) not in existing_staff
-            ]
-
-            Staff.objects.bulk_create(missing_staff)
+            build_staff(work, entry.staff)
 
         # Save the Work object and add a Reference
         work.save()
-        Reference.objects.create(work=work, url=entry.anilist_url)
+        Reference.objects.get_or_create(work=work, url=entry.anilist_url)
         new_works.append(work)
 
     return new_works if new_works else None
