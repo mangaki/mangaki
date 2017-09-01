@@ -34,19 +34,19 @@ logger = logging.getLogger(__name__)
 class Experiment(object):
     def __init__(self, dataset_name):
         self.algos = [
-            lambda: MangakiALS(10),
+            # lambda: MangakiALS(10),
             lambda: MangakiALS(20),
-            lambda: MangakiALS(30),
-            lambda: MangakiALS(40),
+            # lambda: MangakiALS(30),
+            # lambda: MangakiALS(40),
             lambda: MangakiWALS(20),
-            lambda: MangakiSVD(10),
+            # lambda: MangakiSVD(10),
             lambda: MangakiSVD(20),
-            lambda: MangakiSVD(30),
-            lambda: MangakiSVD(40),
-            lambda: MangakiSVD(50),
-            lambda: MangakiPCA(20),
+            # lambda: MangakiSVD(30),
+            # lambda: MangakiSVD(40),
+            # lambda: MangakiSVD(50),
+            # lambda: MangakiPCA(20),
             lambda: MangakiKNN(20),
-            lambda: MangakiKNN(40),
+            # lambda: MangakiKNN(40),
             lambda: MangakiZero()
         ]
         self.anonymized = None
@@ -66,7 +66,7 @@ class Experiment(object):
         for i_train, i_test in k_fold.split(self.anonymized.X):
             for algo in self.algos:
                 model = algo()
-                logger.info(model.get_shortname())
+                print('-> Computing', model.get_shortname())
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
                 y_pred = model.predict(self.anonymized.X[i_test])
@@ -74,11 +74,13 @@ class Experiment(object):
                 if model.verbose:
                     logger.debug('Predicted: %s' % y_pred[:5])
                     logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
-                logger.debug('RMSE %f' % rmse)
+                print('RMSE %.3f' % rmse)
                 rmse_values[model.get_shortname()].append(rmse)
-        logger.info('Final results')
+                print()
+            break  # TODO remove
+        print('# Final results')
         for algo_name in rmse_values:
-            logger.info('%s: RMSE = %f' % (algo_name, np.mean(rmse_values[algo_name])))
+            print('%s: RMSE = %.3f' % (algo_name, np.mean(rmse_values[algo_name])))
 
 
 class Command(BaseCommand):
