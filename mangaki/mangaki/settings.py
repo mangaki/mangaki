@@ -139,48 +139,53 @@ TEMPLATES = [
     }
 ]
 
+
+def get_sentry_handler(config_instance) -> str:
+    if config_instance.has_section('sentry'):
+        return 'raven.contrib.django.raven_compat.handlers.SentryHandler'
+    return 'logging.NullHandler'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    # In order for Sentry to catch exceptions and report them.
     'root': {
         'level': 'INFO',
-        'handlers': ['console'],
+        'handlers': ['console', 'sentry'],
     },
     'handlers': {
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
         },
+        'sentry': {
+            'level': 'ERROR',
+            'class': get_sentry_handler(config)
+        }
     },
     'loggers': {
         'mangaki': {
-            'handlers': ['console'],
-            'level': 'DEBUG'
+            'handlers': ['console', 'sentry'],
+            'level': 'DEBUG',
+            'propagate': False,
         },
         'django.db.backends': {
             'level': 'ERROR',
-            'handlers': ['console'],
+            'handlers': ['console', 'sentry'],
             'propagate': False,
         },
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False
+        },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False
+        }
     },
 }
-
-if config.has_section('sentry'):
-    LOGGING['handlers']['sentry'] = {
-            'level': 'ERROR',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-    }
-    LOGGING['root']['handlers'].append('sentry')
-    LOGGING['loggers']['raven'] = {
-        'level': 'DEBUG',
-        'handlers': ['console'],
-        'propagate': False,
-    }
-    LOGGING['loggers']['sentry.errors'] = {
-        'level': 'DEBUG',
-        'handlers': ['console'],
-        'propagate': False,
-    }
 
 
 ROOT_URLCONF = 'mangaki.urls'
