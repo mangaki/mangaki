@@ -41,9 +41,9 @@ def load_and_scale_tags(T=None, perform_scaling=True, with_mean=False):
 class MangakiLASSO(RecommendationAlgorithm):
     def __init__(self, with_bias=True, alpha=0.01):
         super().__init__()
-        self.logger = logging.getLogger(self.get_shortname())
         self.alpha = alpha
         self.with_bias = with_bias
+        self.logger = logging.getLogger(self.get_shortname())
 
     def load_tags(self, T=None, perform_scaling=True, with_mean=False):
         self.nb_tags, self.T = load_and_scale_tags(T, perform_scaling, with_mean)
@@ -90,7 +90,7 @@ class MangakiLASSO(RecommendationAlgorithm):
         return y_pred
 
     def compute_user_sparsities(self):
-        return [np.count_nonzero(reg.coef_ for reg in self.reg.values())]
+        return [np.count_nonzero(reg.coef_) for reg in self.reg.values()]
 
     def get_shortname(self):
         return 'lasso{}{:f}'.format('-with_bias-' if self.with_bias else '-', self.alpha)
