@@ -11,6 +11,7 @@ import numpy as np
 from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
 from mangaki.utils.algos.dataset import Dataset
 from mangaki.utils.values import rating_values
+import mangaki.utils.logging as mangaki_logging
 from mangaki.settings import DATA_DIR
 import logging
 import os.path
@@ -92,14 +93,13 @@ class Experiment(object):
         for metric in self.evaluation_metrics:
             compute_method = getattr(model, 'compute_{}'.format(metric))
             results[metric] = compute_method(y_pred, self.anonymized.y[i_test])
-            if model.verbose_level:
-                logger.debug('{} ({}) {:f}'.format(metric,
-                                                   i_test,
-                                                   results[metric]))
+            logger.debug('{} ({}) {:f}'.format(metric,
+                                               i_test,
+                                               results[metric]))
 
         return results
 
-    def compare_models(self, nb_split: int = 5, full_cv: bool = False):
+    def compare_models(self, nb_split: int, full_cv: bool):
         if not self.algos:
             logger.warning('No algorithms has been specified in this experiment. Stopping early!'
                            'Did you forget an experiment file with -exp?')
@@ -115,9 +115,8 @@ class Experiment(object):
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
                 y_test = model.predict(self.anonymized.X[i_test])
-                if model.verbose_level >= 2:
-                    logger.info('Predicted: %s' % y_test[:5])
-                    logger.info('Was: %s' % self.anonymized.y[i_test][:5])
+                logger.debug('Predicted: %s' % y_test[:5])
+                logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
 
                 metrics_values = self.compute_metrics(model, y_test, i_test)
                 for metric, value in metrics_values.items():
@@ -146,17 +145,20 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('dataset_name', type=str)
-        parser.add_argument('--full', action='store_true', help='Make a full cross validation instead of a single run')
+        parser.add_argument('--full', action='store_true', help='Make a full cross validation instead of a single run',
+                            default=False)
         parser.add_argument('-em', '--eval-metric',
                             dest='eval_metrics',
                             type=str,
+                            default=['rmse'],
                             action='append',
                             help='Add an evaluation metric for comparing models (available: {})'
                             .format(', '.join(RecommendationAlgorithm.available_evaluation_metrics())))
         parser.add_argument('-exp', '--experiment-filename',
                             dest='experiment_filename',
                             type=str,
-                            help='Specify an experiment filename (JSON format)')
+                            help='Specify an experiment filename (JSON format)',
+                            default=DEFAULT_CONFIG_FILENAME)
         parser.add_argument('-sp', '--nb-split',
                             dest='nb_split',
                             type=int,
@@ -165,10 +167,27 @@ class Command(BaseCommand):
                                  '(default: 5-fold)')
 
     def handle(self, *args, **options):
+        verbosity_level = options.get('verbosity')
         dataset_name = options.get('dataset_name')
         full_cv = options.get('full')
-        eval_metrics = options.get('eval_metrics') or ['rmse']
-        experiment_filename = options.get('experiment_filename') or DEFAULT_CONFIG_FILENAME
+        eval_metrics = options.get('eval_metrics')
+        experiment_filename = options.get('experiment_filename')
+        nb_split = options.get('nb_split')
 
+        # We allow DEBUG to be the minimal level.
+        # Refer to Logging Levels for more information, but basically, levels are in multiple of 10.
+        # DEBUG = 10. INFO = 20.
+        # Verbosity level starts at 1 by default.
+        # FIXME: this should be abstracted somewhere for reuse with other management commands.
+        mangaki_logger = logging.getLogger('mangaki')
+        mangaki_logger.setLevel(logging.INFO - min(verbosity_level - 1, 1) * 10)
+        if verbosity_level >= 3:
+            for handler in mangaki_logger.handlers:
+                mangaki_logging.set_advanced_formatting(handler)
+
+        if not full_cv:
+            logger.debug('Compare will perform only one run.')
+        else:
+            logger.debug('Compare will perform a full cross validation of {}-fold.'.format(nb_split))
         experiment = Experiment(dataset_name, eval_metrics, experiment_filename)
-        experiment.compare_models(options.get('nb_split'), full_cv=full_cv)
+        experiment.compare_models(nb_split, full_cv=full_cv)

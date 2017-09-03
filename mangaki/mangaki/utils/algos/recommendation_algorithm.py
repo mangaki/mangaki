@@ -1,5 +1,3 @@
-import importlib
-
 import logging
 from django.conf import settings
 from mangaki.utils.chrono import Chrono
@@ -20,14 +18,14 @@ class RecommendationAlgorithmFactory:
         # Behind the hood, it's called in `utils.__init__.py` which triggers the `algos.__init__.py`
         # which in turn triggers registration on this instance.
         # Then, once it reach `recommendation_algorithm` file, it's good to go.
-        self.logger.info('Recommendation algorithm factory initialized. {} algorithms available in the factory.'
+        self.logger.debug('Recommendation algorithm factory initialized. {} algorithms available in the factory.'
                          .format(len(self.algorithm_registry)))
         self.initialized = True
 
     def register(self, name, klass, default_kwargs):
         self.algorithm_registry[name] = klass
         self.algorithm_factory[name] = default_kwargs
-        self.logger.info('Registered {} as a recommendation algorithm'.format(name))
+        self.logger.debug('Registered {} as a recommendation algorithm'.format(name))
 
 
 class RecommendationAlgorithm:
