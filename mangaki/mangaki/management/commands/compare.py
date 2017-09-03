@@ -66,7 +66,7 @@ class Experiment(object):
         for i_train, i_test in k_fold.split(self.anonymized.X):
             for algo in self.algos:
                 model = algo()
-                print('-> Computing', model.get_shortname())
+                logger.info('-> Computing', model.get_shortname())
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
                 y_pred = model.predict(self.anonymized.X[i_test])
@@ -74,13 +74,12 @@ class Experiment(object):
                 if model.verbose:
                     logger.debug('Predicted: %s' % y_pred[:5])
                     logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
-                print('RMSE %.3f' % rmse)
+                logger.debug('RMSE %.3f' % rmse)
                 rmse_values[model.get_shortname()].append(rmse)
-                print()
-            break  # TODO remove
-        print('# Final results')
+                logger.debug('')
+        logger.info('# Final results')
         for algo_name in rmse_values:
-            print('%s: RMSE = %.3f' % (algo_name, np.mean(rmse_values[algo_name])))
+            logger.info('%s: RMSE = %.3f' % (algo_name, np.mean(rmse_values[algo_name])))
 
 
 class Command(BaseCommand):
