@@ -75,7 +75,7 @@ class MangakiKNN(RecommendationAlgorithm):
         self.sum_ratings = Counter()
         self.nb_ratings = Counter()
         users, works = zip(*list(X))
-        self.M = coo_matrix((y,(users,works)), shape=(self.nb_users, self.nb_works)).astype(np.float32) # Might take some time, but coo is efficient for creating matrices
+        self.M = coo_matrix((y,(users,works)), shape=(self.nb_users, self.nb_works)).astype(np.float64) # Might take some time, but coo is efficient for creating matrices
         self.M = self.M.tocsr() # knn.M should be CSR for faster arithmetic operations
         for (user_id, work_id), rating in zip(X, y):
             self.ratings[user_id][work_id] = rating
