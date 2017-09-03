@@ -117,7 +117,6 @@ class Experiment(object):
                 y_test = model.predict(self.anonymized.X[i_test])
                 if model.verbose_level >= 2:
                     logger.info('Predicted: %s' % y_test[:5])
-                if model.verbose:
                     logger.info('Was: %s' % self.anonymized.y[i_test][:5])
 
                 metrics_values = self.compute_metrics(model, y_test, i_test)
