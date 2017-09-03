@@ -8,14 +8,6 @@ from mangaki.models import Rating, Work
 from mangaki.algo import fit_algo
 
 
-ALGOS = {
-    'knn': lambda: MangakiKNN(),
-    'svd': lambda: MangakiSVD(20),
-    'als': lambda: MangakiALS(20),
-    'wals': lambda: MangakiWALS(20),
-}
-
-
 class Command(BaseCommand):
     args = ''
     help = 'Train a recommendation algorithm'
