@@ -100,6 +100,11 @@ class Experiment(object):
         return results
 
     def compare_models(self, nb_split: int = 5, full_cv: bool = False):
+        if not self.algos:
+            logger.warning('No algorithms has been specified in this experiment. Stopping early!'
+                           'Did you forget an experiment file with -exp?')
+            return
+
         k_fold = ShuffleSplit(n_splits=nb_split)
         metrics = defaultdict(lambda: defaultdict(list))
 
@@ -109,12 +114,13 @@ class Experiment(object):
                 logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), nb_split, pass_index))
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
-                y_pred = model.predict(self.anonymized.X[i_test])
+                y_test = model.predict(self.anonymized.X[i_test])
                 if model.verbose_level >= 2:
-                    logger.info('Predicted: %s' % y_pred[:5])
+                    logger.info('Predicted: %s' % y_test[:5])
+                if model.verbose:
                     logger.info('Was: %s' % self.anonymized.y[i_test][:5])
 
-                metrics_values = self.compute_metrics(model, y_pred, i_test)
+                metrics_values = self.compute_metrics(model, y_test, i_test)
                 for metric, value in metrics_values.items():
                     metrics[metric][model.get_shortname()].append(value)
             if not full_cv:
