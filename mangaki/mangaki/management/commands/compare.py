@@ -11,7 +11,9 @@ import numpy as np
 from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
 from mangaki.utils.algos.dataset import Dataset
 from mangaki.utils.values import rating_values
+from mangaki.settings import DATA_DIR
 import logging
+import os.path
 
 FILENAMES = {
     'movies': 'ratings-ml.csv',
@@ -21,6 +23,7 @@ CONVERT_FUNCTIONS = {
     'movies': float,
     'mangas': lambda choice: rating_values[choice]
 }
+DEFAULT_CONFIG_FILENAME = os.path.join(DATA_DIR, 'experiment_config.json')
 
 logger = logging.getLogger(__name__)
 
@@ -89,34 +92,33 @@ class Experiment(object):
         for metric in self.evaluation_metrics:
             compute_method = getattr(model, 'compute_{}'.format(metric))
             results[metric] = compute_method(y_pred, self.anonymized.y[i_test])
-            if model.verbose:
+            if model.verbose_level:
                 logger.debug('{} ({}) {:f}'.format(metric,
                                                    i_test,
                                                    results[metric]))
 
         return results
 
-    def compare_models(self, nb_split: int = 5):
+    def compare_models(self, nb_split: int = 5, full_cv: bool = False):
         k_fold = ShuffleSplit(n_splits=nb_split)
         metrics = defaultdict(lambda: defaultdict(list))
 
-        pass_index = 0
-        for i_train, i_test in k_fold.split(self.anonymized.X):
+        for pass_index, (i_train, i_test) in enumerate(k_fold.split(self.anonymized.X), start=1):
             for algo in self.algos:
                 model = algo.make_instance()
-                logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), nb_split, pass_index + 1))
+                logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), nb_split, pass_index))
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
                 y_pred = model.predict(self.anonymized.X[i_test])
-                if model.verbose:
+                if model.verbose_level >= 2:
                     logger.info('Predicted: %s' % y_pred[:5])
                     logger.info('Was: %s' % self.anonymized.y[i_test][:5])
 
                 metrics_values = self.compute_metrics(model, y_pred, i_test)
                 for metric, value in metrics_values.items():
                     metrics[metric][model.get_shortname()].append(value)
-
-            pass_index += 1
+            if not full_cv:
+                break
 
         logger.info('Final results')
         for metric_name, algos in metrics.items():
@@ -139,6 +141,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('dataset_name', type=str)
+        parser.add_argument('--full', action='store_true', help='Make a full cross validation instead of a single run')
         parser.add_argument('-em', '--eval-metric',
                             dest='eval_metrics',
                             type=str,
@@ -158,8 +161,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dataset_name = options.get('dataset_name')
+        full_cv = options.get('full')
         eval_metrics = options.get('eval_metrics') or ['rmse']
-        experiment_filename = options.get('experiment_filename', None)
+        experiment_filename = options.get('experiment_filename') or DEFAULT_CONFIG_FILENAME
 
         experiment = Experiment(dataset_name, eval_metrics, experiment_filename)
-        experiment.compare_models(options.get('nb_split'))
+        experiment.compare_models(options.get('nb_split'), full_cv=full_cv)

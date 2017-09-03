@@ -34,8 +34,8 @@ class RecommendationAlgorithm:
     factory = RecommendationAlgorithmFactory()
 
     def __init__(self):
-        self.verbose = settings.RECO_ALGORITHMS_DEFAULT_VERBOSE
-        self.chrono = Chrono(self.verbose)
+        self.verbose_level = settings.RECO_ALGORITHMS_VERBOSE_LEVEL
+        self.chrono = Chrono(self.verbose_level)
         self.nb_users = None
         self.nb_works = None
 

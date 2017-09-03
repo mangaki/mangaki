@@ -8,7 +8,7 @@ class MangakiALS(RecommendationAlgorithm):
     M = None
     U = None
     VT = None
-    def __init__(self, nb_components=10, nb_iterations=10, lambda_=0.1):
+    def __init__(self, nb_components=20, nb_iterations=10, lambda_=0.1):
         super().__init__()
         self.nb_components = nb_components
         self.nb_iterations = nb_iterations
@@ -67,14 +67,14 @@ class MangakiALS(RecommendationAlgorithm):
                 self.fit_work(work, matrixT)
 
     def fit(self, X, y):
-        if self.verbose:
+        if self.verbose_level:
             print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         matrix, self.means = self.make_matrix(X, y)
 
         self.chrono.save('fill and center matrix')
 
         self.factorize(matrix, random_state=42)
-        if self.verbose:
+        if self.verbose_level:
             print('Shapes', self.U.shape, self.VT.shape)
         self.M = self.U.dot(self.VT)
 
