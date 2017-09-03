@@ -1,5 +1,3 @@
-import importlib
-
 import logging
 from django.conf import settings
 from mangaki.utils.chrono import Chrono
@@ -7,15 +5,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pickle
 import os.path
 
-# FIXME: You should really disregard this.
-# Rationale: until we can move all algorithms into a `algos/` subfolder, we cannot recognize an algorithm except
-# if we import every files here. Which we don't want to do. So let's hardcode.
-_REMOVE_ME_SOON_OR_FIRE_RAITO = [
-    'mangaki.utils.als',
-    'mangaki.utils.svd',
-    'mangaki.utils.knn',
-    'mangaki.utils.zero'
-]
+
 class RecommendationAlgorithmFactory:
     def __init__(self):
         self.algorithm_registry = {}
@@ -24,24 +14,26 @@ class RecommendationAlgorithmFactory:
         self.initialized = False
 
     def initialize(self):
-        for name in _REMOVE_ME_SOON_OR_FIRE_RAITO:
-            importlib.import_module(name)
-
-        self.logger.info('Recommendation algorithm factory initialized. {} algorithms available in the factory.'
+        # FIXME: make it less complicated and go for a commonly used design pattern.
+        # Behind the hood, it's called in `utils.__init__.py` which triggers the `algos.__init__.py`
+        # which in turn triggers registration on this instance.
+        # Then, once it reach `recommendation_algorithm` file, it's good to go.
+        self.logger.debug('Recommendation algorithm factory initialized. {} algorithms available in the factory.'
                          .format(len(self.algorithm_registry)))
         self.initialized = True
 
     def register(self, name, klass, default_kwargs):
         self.algorithm_registry[name] = klass
         self.algorithm_factory[name] = default_kwargs
-        self.logger.info('Registered {} as a recommendation algorithm'.format(name))
+        self.logger.debug('Registered {} as a recommendation algorithm'.format(name))
+
 
 class RecommendationAlgorithm:
     factory = RecommendationAlgorithmFactory()
 
     def __init__(self):
-        self.verbose = settings.RECO_ALGORITHMS_DEFAULT_VERBOSE
-        self.chrono = Chrono(self.verbose)
+        self.verbose_level = settings.RECO_ALGORITHMS_VERBOSE_LEVEL
+        self.chrono = Chrono(self.verbose_level)
         self.nb_users = None
         self.nb_works = None
 
@@ -104,8 +96,8 @@ class RecommendationAlgorithm:
     @classmethod
     def instantiate_algorithm(cls, name):
         klass = cls.factory.algorithm_registry.get(name)
-        default_kwargs = cls.factory.algorithm_factory.get(name)
-        if not klass or not default_kwargs:
+        default_kwargs = cls.factory.algorithm_factory.get(name) or {}
+        if not klass:
             raise KeyError('No algorithm named "{}" in the registry! Did you forget a @register_algorithm? A typo?'
                            .format(name))
 

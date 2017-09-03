@@ -1,6 +1,7 @@
-from mangaki.utils.common import RecommendationAlgorithm, register_algorithm
-from sklearn.utils.extmath import randomized_svd
 import numpy as np
+from sklearn.utils.extmath import randomized_svd
+
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 
 @register_algorithm('svd', {'nb_components': 20})
@@ -12,7 +13,7 @@ class MangakiSVD(RecommendationAlgorithm):
     inv_work = None
     inv_user = None
     work_titles = None
-    def __init__(self, nb_components=10, nb_iterations=10):
+    def __init__(self, nb_components=20, nb_iterations=10):
         super().__init__()
         self.nb_components = nb_components
         self.nb_iterations = nb_iterations
@@ -45,14 +46,14 @@ class MangakiSVD(RecommendationAlgorithm):
         return matrix, means
 
     def fit(self, X, y):
-        if self.verbose:
+        if self.verbose_level:
             print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         matrix, self.means = self.make_matrix(X, y)
 
         self.chrono.save('fill and center matrix')
 
         self.U, self.sigma, self.VT = randomized_svd(matrix, self.nb_components, n_iter=self.nb_iterations, random_state=42)
-        if self.verbose:
+        if self.verbose_level:
             print('Shapes', self.U.shape, self.sigma.shape, self.VT.shape)
         self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
 

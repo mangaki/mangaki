@@ -155,7 +155,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
         'sentry': {
@@ -166,7 +166,7 @@ LOGGING = {
     'loggers': {
         'mangaki': {
             'handlers': ['console', 'sentry'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
         'django.db.backends': {
@@ -175,12 +175,12 @@ LOGGING = {
             'propagate': False,
         },
         'raven': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['console'],
             'propagate': False
         },
         'sentry.errors': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['console'],
             'propagate': False
         }
@@ -269,6 +269,6 @@ GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 
 JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'
 
-RECO_ALGORITHMS_DEFAULT_VERBOSE = True
+RECO_ALGORITHMS_VERBOSE_LEVEL = 1
 
 ANONYMOUS_RATINGS_SESSION_KEY = 'mangaki_ratings'

@@ -1,11 +1,12 @@
-from mangaki.models import Rating, Work
-from mangaki.utils.chrono import Chrono
-from mangaki.utils.algo import fit_algo, get_algo_backup, get_dataset_backup
-from mangaki.utils.ratings import current_user_ratings
-from scipy.sparse import coo_matrix
-from mangaki.utils.values import rating_values
 import numpy as np
 import pandas as pd
+from scipy.sparse import coo_matrix
+
+from mangaki.models import Rating, Work
+from mangaki.algo import fit_algo, get_algo_backup, get_dataset_backup
+from mangaki.utils.chrono import Chrono
+from mangaki.utils.ratings import current_user_ratings
+from mangaki.utils.values import rating_values
 
 NB_RECO = 10
 CHRONO_ENABLED = True
