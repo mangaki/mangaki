@@ -373,6 +373,7 @@ class Track(models.Model):
 class Artist(models.Model):
     name = models.CharField(max_length=255)
     anidb_creator_id = models.IntegerField(null=True, unique=True)
+    anilist_creator_id = models.IntegerField(null=True, unique=True)
 
     def __str__(self):
         return self.name
