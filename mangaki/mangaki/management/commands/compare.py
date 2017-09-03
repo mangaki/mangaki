@@ -35,17 +35,17 @@ class Experiment(object):
     def __init__(self, dataset_name):
         self.algos = [
             # lambda: MangakiALS(10),
-            lambda: MangakiALS(20),
+            # lambda: MangakiALS(20),
             # lambda: MangakiALS(30),
             # lambda: MangakiALS(40),
-            lambda: MangakiWALS(20),
+            # lambda: MangakiWALS(20),
             # lambda: MangakiSVD(10),
             lambda: MangakiSVD(20),
             # lambda: MangakiSVD(30),
             # lambda: MangakiSVD(40),
             # lambda: MangakiSVD(50),
             # lambda: MangakiPCA(20),
-            lambda: MangakiKNN(20),
+            # lambda: MangakiKNN(20),
             # lambda: MangakiKNN(40),
             lambda: MangakiZero()
         ]
@@ -70,6 +70,8 @@ class Experiment(object):
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
                 y_pred = model.predict(self.anonymized.X[i_test])
+                logger.info('Predicted: %s' % y_pred[:5])
+                logger.info('Was: %s' % self.anonymized.y[i_test][:5])
                 rmse = model.compute_rmse(y_pred, self.anonymized.y[i_test])
                 if model.verbose:
                     logger.debug('Predicted: %s' % y_pred[:5])
