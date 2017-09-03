@@ -1,8 +1,0 @@
-{
-    "configurations": [
-        ["zero"],
-        ["svd"],
-        ["knn"],
-        ["als"]
-    ]
-}
