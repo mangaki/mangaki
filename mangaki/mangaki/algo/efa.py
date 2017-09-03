@@ -2,9 +2,10 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn.decomposition import FactorAnalysis
 
-from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 
+@register_algorithm('efa')
 class MangakiEFA(RecommendationAlgorithm):
     '''Factor Analysis:
     See http://scikit-learn.org/stable/modules/decomposition.html#factor-analysis

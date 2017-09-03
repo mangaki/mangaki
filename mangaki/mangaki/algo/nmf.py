@@ -6,7 +6,7 @@ from django.conf import settings
 from scipy.sparse import lil_matrix
 from sklearn.decomposition import NMF
 
-from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 PIG_ID = 1124#1407 # QCTX=1434  JJ=1407  SebNL=1124
 
@@ -43,6 +43,7 @@ explanation = {
 }
 
 
+@register_algorithm('nmf')
 class MangakiNMF(RecommendationAlgorithm):
     M = None
     W = None
