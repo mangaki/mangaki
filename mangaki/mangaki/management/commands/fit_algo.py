@@ -1,7 +1,3 @@
-from mangaki.utils.wals import MangakiWALS
-from mangaki.utils.als import MangakiALS
-from mangaki.utils.knn import MangakiKNN
-from mangaki.utils.svd import MangakiSVD
 from django.core.management.base import BaseCommand
 
 from mangaki.models import Rating, Work
