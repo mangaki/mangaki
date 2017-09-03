@@ -1,7 +1,8 @@
-from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
-from sklearn.decomposition import FactorAnalysis
-from scipy.sparse import csr_matrix
 import numpy as np
+from scipy.sparse import csr_matrix
+from sklearn.decomposition import FactorAnalysis
+
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm
 
 
 class MangakiEFA(RecommendationAlgorithm):

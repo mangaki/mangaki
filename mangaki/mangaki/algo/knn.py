@@ -1,8 +1,10 @@
-from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 from collections import Counter, defaultdict
+
 import numpy as np
 from scipy.sparse import coo_matrix
 from sklearn.metrics.pairwise import cosine_similarity
+
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 
 @register_algorithm('knn')

@@ -166,7 +166,7 @@ LOGGING = {
     'loggers': {
         'mangaki': {
             'handlers': ['console', 'sentry'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
         'django.db.backends': {
@@ -175,12 +175,12 @@ LOGGING = {
             'propagate': False,
         },
         'raven': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['console'],
             'propagate': False
         },
         'sentry.errors': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['console'],
             'propagate': False
         }

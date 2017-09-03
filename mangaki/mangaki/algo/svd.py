@@ -1,7 +1,7 @@
-from sklearn.utils.extmath import randomized_svd
 import numpy as np
+from sklearn.utils.extmath import randomized_svd
 
-from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 
 @register_algorithm('svd', {'nb_components': 20})

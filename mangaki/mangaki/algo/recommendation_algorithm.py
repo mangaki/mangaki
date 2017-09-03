@@ -96,8 +96,8 @@ class RecommendationAlgorithm:
     @classmethod
     def instantiate_algorithm(cls, name):
         klass = cls.factory.algorithm_registry.get(name)
-        default_kwargs = cls.factory.algorithm_factory.get(name)
-        if not klass or not default_kwargs:
+        default_kwargs = cls.factory.algorithm_factory.get(name) or {}
+        if not klass:
             raise KeyError('No algorithm named "{}" in the registry! Did you forget a @register_algorithm? A typo?'
                            .format(name))
 

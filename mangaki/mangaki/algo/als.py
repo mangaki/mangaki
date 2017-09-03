@@ -1,6 +1,8 @@
-from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 from collections import defaultdict
+
 import numpy as np
+
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 
 @register_algorithm('als', {'nb_components': 20})

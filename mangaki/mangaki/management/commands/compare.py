@@ -1,20 +1,18 @@
 import json
-import importlib
-from typing import Type, List, Any, Dict, Optional
-
-from django.core.management.base import BaseCommand
-
-from collections import defaultdict
-from sklearn.model_selection import ShuffleSplit
-import numpy as np
-
-from mangaki.utils.algos.recommendation_algorithm import RecommendationAlgorithm
-from mangaki.utils.algos.dataset import Dataset
-from mangaki.utils.values import rating_values
-import mangaki.utils.logging as mangaki_logging
-from mangaki.settings import DATA_DIR
 import logging
 import os.path
+from collections import defaultdict
+from typing import Type, List, Any, Dict, Optional
+
+import numpy as np
+from django.core.management.base import BaseCommand
+from sklearn.model_selection import ShuffleSplit
+
+import mangaki.utils.logging as mangaki_logging
+from mangaki.settings import DATA_DIR
+from mangaki.algo import Dataset
+from mangaki.algo import RecommendationAlgorithm
+from mangaki.utils.values import rating_values
 
 FILENAMES = {
     'movies': 'ratings-ml.csv',

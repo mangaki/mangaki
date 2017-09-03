@@ -71,7 +71,7 @@ class Dataset:
             triplets = [[int(user_id), int(work_id), rating] for user_id, work_id, rating in csv.reader(f)]
         triplets = np.array(triplets, dtype=np.object)
         # noinspection PyTypeChecker
-        vectorized_convert = np.vectorize(convert)
+        vectorized_convert = np.vectorize(convert, otypes=[np.float64])
         self.anonymized = AnonymizedData(
             X=triplets[:, 0:2],
             y=vectorized_convert(triplets[:, 2]),
