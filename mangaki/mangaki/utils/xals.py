@@ -1,7 +1,9 @@
-from mangaki.utils.common import RecommendationAlgorithm
 from collections import defaultdict
+
 import numpy as np
-from .lasso import load_and_scale_tags
+from mangaki.utils.common import RecommendationAlgorithm
+
+from mangaki.algo.lasso import load_and_scale_tags
 
 
 class MangakiXALS(RecommendationAlgorithm):

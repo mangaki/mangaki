@@ -1,8 +1,9 @@
-from mangaki.utils.common import RecommendationAlgorithm
-from mangaki.utils.als import MangakiALS
-from mangaki.utils.lasso import MangakiLASSO
+from .recommendation_algorithm import RecommendationAlgorithm, register_algorithm
+from .als import MangakiALS
+from .lasso import MangakiLASSO
 
 
+@register_algorithm('balse')
 class MangakiBALSE(RecommendationAlgorithm):
     M = None
     U = None

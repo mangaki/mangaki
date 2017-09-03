@@ -1,6 +1,6 @@
 import logging
 
-from mangaki.utils.common import RecommendationAlgorithm
+from mangaki.algo import RecommendationAlgorithm, register_algorithm
 from django.conf import settings
 from scipy.sparse import coo_matrix, load_npz, issparse
 from sklearn.linear_model import Lasso
@@ -18,7 +18,7 @@ def relu(x):
 def load_and_scale_tags(T=None, perform_scaling=True, with_mean=False):
     # Load in CSC format if no matrix provided.
     if T is None:
-        T = load_npz(os.path.join(settings.DATA_DIR, 'tag-matrix.npz')).tocsc()
+        T = load_npz(os.path.join(settings.DATA_DIR, 'lasso', 'tag-matrix.npz')).tocsc()
 
     nb_tags = T.shape[1]
 
@@ -38,12 +38,13 @@ def load_and_scale_tags(T=None, perform_scaling=True, with_mean=False):
     return nb_tags, T
 
 
+@register_algorithm('lasso')
 class MangakiLASSO(RecommendationAlgorithm):
     def __init__(self, with_bias=True, alpha=0.01):
         super().__init__()
         self.alpha = alpha
         self.with_bias = with_bias
-        self.logger = logging.getLogger(self.get_shortname())
+        self.logger = logging.getLogger(__name__ + '.' + self.get_shortname())
 
     def load_tags(self, T=None, perform_scaling=True, with_mean=False):
         self.nb_tags, self.T = load_and_scale_tags(T, perform_scaling, with_mean)
@@ -64,15 +65,13 @@ class MangakiLASSO(RecommendationAlgorithm):
             values = M[user_id].data
             self.reg[user_id].fit(self.T[indices], values)
             # TODO: cuter progress information with tqdm.
-            if self.verbose:
-                if user_id % 500 == 0:
-                    self.logger.info('Fitting user ID {:d}/{:d}…'.format(user_id, len(user_ids)))
+            if user_id % 500 == 0:
+                self.logger.debug('Fitting user ID {:d}/{:d}…'.format(user_id, len(user_ids)))
 
         # Black magic of high level, freeze the defaultdict (i.e. remove the default factory).
         self.reg.default_factory = None
         self.user_sparsities = self.compute_user_sparsities()
-        if self.verbose:
-            self.logger.info('Sparsity: {}'.format(avgstd(self.user_sparsities)))
+        self.logger.info('Sparsity: {}'.format(avgstd(self.user_sparsities)))
 
     def predict(self, X):
         y_pred = np.zeros(X.shape[0])

@@ -10,17 +10,11 @@ from mangaki.utils.values import rating_values
 
 NB_RECO = 10
 CHRONO_ENABLED = True
-ALGOS = {
-    'knn': lambda: MangakiKNN(),
-    'svd': lambda: MangakiSVD(20),
-    'als': lambda: MangakiALS(20),
-    'wals': lambda: MangakiWALS(20),
-}
 
 
 def user_exists_in_backup(user, algo_name):
     try:
-        dataset = get_dataset_backup(ALGOS[algo_name]())
+        dataset = get_dataset_backup(algo_name)
         return user.id in dataset.encode_user
     except FileNotFoundError:
         return False
@@ -53,9 +47,8 @@ def get_reco_algo(request, algo_name='knn', category='all'):
     chrono.save('get rated works')
 
     try:
-        algo = ALGOS[algo_name]()
-        algo = get_algo_backup(algo)
-        dataset = get_dataset_backup(algo)
+        algo = get_algo_backup(algo_name)
+        dataset = get_dataset_backup(algo_name)
     except FileNotFoundError:
         triplets = list(
             Rating.objects.values_list('user_id', 'work_id', 'choice'))
