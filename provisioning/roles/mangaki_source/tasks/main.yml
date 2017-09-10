@@ -77,8 +77,10 @@
   register: project_install
 
 - name: Request service reloading.
-  set_fact:
-    mangaki_needs_restart: true
+  debug:
+    msg: Project contents has changed, notifying a restart.
+  notify: restart_mangaki_services
+  changed_when: true # Force trigger the handler.
   when: project_install.changed
 
 - name: Ensure settings.ini is present.
@@ -92,8 +94,10 @@
   become: true
 
 - name: Request service reloading.
-  set_fact:
-    mangaki_needs_restart: true
+  debug:
+    msg: settings.ini has changed, notifying a restart.
+  notify: restart_mangaki_services
+  changed_when: true # Force trigger the handler.
   when: settings_ini.changed
 
 - name: Insert/update virtualenv configuration to bashrc.
