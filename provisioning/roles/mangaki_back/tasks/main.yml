@@ -37,19 +37,14 @@
     cron_command: '{{ mangaki_back_manage }} ranking'
     cron_env: '{{ mangaki_back_env }}'
 
-- name: Setup top directors cron.
+- name: Setup top directors, authors and composers cron.
   include_role:
     name: utils/cron
   vars:
-    cron_name: '{{ mangaki_back_name }}-top-directors'
-    cron_description: 'Compute top directors'
+    cron_name: '{{ mangaki_back_name }}-top'
+    cron_description: 'Compute top directors, authors and composers'
     cron_user: '{{ mangaki_back_user }}'
     cron_group: '{{ mangaki_back_group }}'
     cron_schedule: 'daily'
-    cron_command: '{{ mangaki_back_manage }} top director'
+    cron_command: '{{ mangaki_back_manage }} top --all'
     cron_env: '{{ mangaki_back_env }}'
-
-- name: Restart services if needed.
-  meta: noop
-  notify: Restart Mangaki services.
-  when: mangaki_needs_restart

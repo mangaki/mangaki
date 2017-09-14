@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load posters %}
+
+{% block title %}Suggestion #{{ suggestion.pk }} - Mangaki{% endblock %}
+
+{% block body %}
+
+<div class="page-header">
+    <h1>Suggestion #{{ suggestion.pk }}</h1>
+</div>
+
+{% if suggestion.is_checked %}
+<div class="alert alert-info">
+    <span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Ce problème a été marqué comme résolu !
+</div>
+{% endif %}
+
+<div class="row">
+
+<div class="col-md-3" align="center">
+    {% include "mangaki/work_rating.html" with category=suggestion.work.category.slug work=suggestion.work simple=True %}
+</div>
+
+<div class="col-md-9">
+    <br/>
+    <div class="row">
+    <div class="col-md-push-1 col-sm-push-1 col-lg-10 col-sm-10">
+        <div class="input-group">
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="button" id="copy-share-link" data-toggle="tooltip"
+                        data-placement="top" data-copy="{{ request.build_absolute_uri }}" title="Copier">
+                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Lien de partage
+                </button>
+            </span>
+            <input type="text" class="form-control" id="input-share-link" value="{{ request.build_absolute_uri }}">
+        </div>
+    </div>
+    </div>
+    <br/>
+
+    <div class="well">
+        <p>
+            <div class="pull-right"><strong>
+                <span class="text-success" title="Nombre de personnes approuvant">
+                    <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+                    <span id="agrees_count" {% if not evidence %}data-has-evidence="false"{% endif %}>{{suggestion.count_agrees}}</span>
+                </span>
+                &nbsp;
+                <span class="text-danger" title="Nombre de personnes n'approuvant pas">
+                    <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+                    <span id="disagrees_count">{{ suggestion.count_disagrees }}</span>
+                </span>
+            </strong></div>
+            <h4><strong>Problème&nbsp;:</strong>
+                {{ suggestion.get_problem_display }}
+            </h4>
+        </p>
+
+        <p>
+            <h5><strong>Envoyé par&nbsp;:</strong>
+                <a href="{% url "profile" suggestion.user %}">{{ suggestion.user }}</a>
+                <small>({{ suggestion.date }})</small>
+            </h5>
+        </p>
+
+        {% if suggestion.message %}
+        <hr/>
+        <p class="text-muted">{{ suggestion.message|urlize }}</p>
+        {% endif %}
+
+        {% if request.user.is_authenticated and not suggestion.is_checked %}
+            <hr/>
+            <form id="evidence_form" action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="suggestion" id="id_suggestion" value="{{ suggestion.pk }}">
+                <p align="center">
+                    <span class="small text-success" align="right" style="width: 70px; display: inline-block;">
+                        {% if evidence and evidence.agrees %}Approuvé{% else %}Approuver ?{% endif %}
+                    </span>
+                    &nbsp;<button class="btn {% if evidence and evidence.agrees %}btn-success{% else %}btn-default{% endif %}"
+                            type="submit" id="agree-button" name="agrees" value="True" {% if evidence and evidence.agrees %}disabled{% endif %}>
+                        <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+                    </button>
+                    {% if evidence %}
+                    &nbsp;<button type="submit" class="btn btn-warning" name="delete" value="True">Annuler</button>&nbsp;
+                    {% endif %}
+                    <button class="btn {% if evidence and not evidence.agrees %}btn-danger{% else %}btn-default{% endif %}"
+                            type="submit" id="disagree-button" name="agrees" value="False" {% if evidence and not evidence.agrees %}disabled{% endif %}>
+                        <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+                    </button>&nbsp;
+                    <span class="small text-danger" align="left" style="width: 70px; display: inline-block;">
+                        {% if evidence and not evidence.agrees %}Rejeté{% else %}Rejeter ?{% endif %}
+                    </span>
+                </p>
+                {% if evidence %}
+                <p align="center">
+                    {% if not evidence.needs_help %}
+                    <button type="submit" class="btn btn-xs btn-primary" value="True" name="needs_help">Demander l'aide d'un administrateur</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-xs btn-default" disabled>Vous avez demandé l'aide d'un administrateur</button>
+                    {% endif %}
+                </p>
+                <input type="hidden" name="agrees" value="{{ evidence.agrees }}">
+                <input type="hidden" name="needs_help" value="{{ evidence.needs_help }}">
+                {% endif %}
+            </form>
+        {% elif suggestion.is_checked and evidence %}
+            <hr/>
+            <p align="center">
+                {% if evidence.agrees %}
+                Vous avez <strong><span class="text-success">approuvé <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span></span></strong> cette suggestion.
+                {% else %}
+                Vous avez <strong><span class="text-danger">rejeté <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span></span></strong> cette suggestion.
+                {% endif %}
+            </p>
+            {% if evidence.needs_help %}
+            <p align="center">
+                Vous avez demandé <strong>l'aide d'un administrateur</strong>.
+            </p>
+            {% endif %}
+        {% endif %}
+
+        {% for cluster, color in clusters %}
+            <hr/>
+            <p><strong>Cette œuvre est présente dans ce cluster&nbsp;:</strong></p>
+            <div class="cards-grid no-rating">
+                {% for work in cluster.works.all %}
+                    {% if work != suggestion.work %}
+                    {% include "mangaki/work_rating.html" with category=work.category.slug work=work %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <hr/>
+            <p>
+                Ce cluster est <strong><span class="{{ color }}">{{ cluster.get_status_display.lower }}</span></strong>
+                {% if cluster.checker %} par <a href="{% url "profile" cluster.checker %}">{{ cluster.checker }}</a>{% endif %}.
+            </p>
+            {% if cluster.resulting_work %}
+            <p>
+                Ce cluster a été fusionné :
+                <a href="{% url "work-detail" cluster.resulting_work.category.slug cluster.resulting_work.pk %}">{{ cluster.resulting_work }}</a>.
+                <small>({{ cluster.merged_on }})</small>
+            </p>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+</div>
+
+<hr/>
+
+<div class="row">
+<nav aria-label="Navigation dans les suggestions de fix">
+    <ul class="pager">
+        <li class="previous {% if not previous_id %} disabled {% endif %}">
+            <a {% if previous_id %}href="{% url "fix-suggestion" previous_id %}"{% endif %}>
+                <span aria-hidden="true">&larr;</span> Précédent
+            </a>
+        </li>
+        <li>
+            <a href="/fix/">Retour</a>
+        </li>
+        <li class="next {% if not next_id %} disabled {% endif %}">
+            <a {% if next_id %}href="{% url "fix-suggestion" next_id %}"{% endif %}>
+                Suivant <span aria-hidden="true">&rarr;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    // https://codepen.io/nathanlong/pen/ZpAmjv
+    function copyToClipboard(text, el) {
+        var elOriginalText = el.attr('data-original-title');
+
+        if (document.queryCommandSupported('copy')) {
+            var copyTextArea = document.createElement("textarea");
+            copyTextArea.value = text;
+            document.body.appendChild(copyTextArea);
+            copyTextArea.select();
+            try {
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'Lien copié !' : 'Lien non copié …';
+                el.attr('data-original-title', msg).tooltip('show');
+            } catch (err) {
+                console.log('Le lien n\'a pas pu être copié …');
+            }
+            document.body.removeChild(copyTextArea);
+            el.attr('data-original-title', elOriginalText);
+        }
+        else {
+            window.prompt("Pour copier, Ctrl+C ou Command+C, Entrée", text);
+        }
+    }
+
+    $('button#copy-share-link').click(function() {
+        copyToClipboard($(this).attr('data-copy'), $(this));
+    });
+</script>
+{% endblock %}

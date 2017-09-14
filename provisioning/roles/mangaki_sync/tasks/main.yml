@@ -27,6 +27,15 @@
   when: 'mangaki_sync_migrate|bool'
   tags: action
 
+- name: Compile locale messages.
+  shell: '{{ mangaki_sync_manage }} compilemessages'
+  environment: '{{ mangaki_sync_env }}'
+  become: true
+  become_user: '{{ mangaki_sync_user }}'
+  run_once: true
+  when: 'mangaki_sync_compilemessages|bool'
+  tags: action
+
 - block:
   - name: Copy fixture to remote host.
     copy:

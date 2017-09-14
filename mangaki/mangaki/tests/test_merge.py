@@ -75,7 +75,8 @@ class MergeTest(TestCase):
             admin.ACTION_CHECKBOX_NAME: self.work_ids,
             'confirm': 1,
             'id': self.work_ids[0],  # Chosen ID for the canonical work
-            'fields_to_choose': ''
+            'fields_to_choose': '',
+            'fields_required': ''
         }
         with self.assertNumQueries(36):
             self.client.post(merge_url, context)

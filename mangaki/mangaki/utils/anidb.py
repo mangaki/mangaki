@@ -1,9 +1,11 @@
 from datetime import datetime
-from typing import Dict, List, Optional
+from collections import namedtuple
+from typing import Dict, List, Tuple, Optional, Any
 from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
+from django.core.exceptions import MultipleObjectsReturned
 from django.utils.functional import cached_property
 from django.db.models import Q
 
@@ -32,6 +34,8 @@ def to_python_datetime(date):
         except ValueError:
             pass
     raise ValueError('no valid date format found for {}'.format(date))
+
+AniDBTag = namedtuple('AniDBTag', ['title', 'weight', 'anidb_tag_id'])
 
 
 class AniDB:
@@ -96,25 +100,62 @@ class AniDB:
 
     @cached_property
     def lang_map(self) -> Dict[str, ExtLanguage]:
-        ext_langs = (
-            ExtLanguage.objects.filter(source='anidb')
-            .select_related('lang')
-        )
+        ext_langs = ExtLanguage.objects.filter(source='anidb').select_related('lang')
+        return {ext.lang.code: ext for ext in ext_langs}
 
-        return {
-            ext.lang.code: ext for ext in ext_langs
-        }
+    @cached_property
+    def role_map(self) -> Dict[str, Role]:
+        return {role.slug: role for role in Role.objects.all()}
 
     @cached_property
     def unknown_language(self) -> ExtLanguage:
         return ExtLanguage.objects.get(source='anidb', ext_lang='x-unk')
+
+    def get_xml(self, anidb_aid: int):
+        """Return the XML file for an anime from AniDB given its AniDB ID"""
+
+        r = self._request("anime", {'aid': anidb_aid})
+        soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')
+        if soup.error is not None:
+            raise Exception(soup.error.string)
+
+        return soup.anime
+
+    def get_titles(self,
+                   anidb_aid: Optional[int] = None,
+                   titles_soup: Optional[str] = None) -> Tuple[List[Dict[str, str]], str]:
+        """ Get the list of titles and the main title for an anime given the the
+        AniDB ID or the XML string containing titles.
+
+        Return : List[{'title': str, 'lang': str, 'type': str}], str
+        """
+        if anidb_aid is not None:
+            anime = self.get_xml(anidb_aid)
+            titles_soup = anime.titles
+
+        main_title = None
+        titles = []
+        for title_node in titles_soup.find_all('title'):
+            title = str(title_node.string).strip()
+            lang = title_node.get('xml:lang')
+            title_type = title_node.get('type')
+
+            titles.append({
+                'title': title,
+                'lang': lang,
+                'type': title_type
+            })
+
+            if title_type == 'main':
+                main_title = title
+
+        return titles, main_title
 
     def _build_work_titles(self,
                            work: Work,
                            titles: Dict[str, Dict[str, str]],
                            reload_lang_cache: bool = False) -> List[WorkTitle]:
         if reload_lang_cache:
-            # noinspection PyPropertyAccess
             del self.lang_map
 
         work_titles = []
@@ -150,35 +191,189 @@ class AniDB:
 
         return missing_titles
 
-    def get_xml(self, anidb_aid: int):
-        anidb_aid = int(anidb_aid)
+    def get_creators(self,
+                     anidb_aid: Optional[int] = None,
+                     creators_soup: Optional[str] = None) -> Tuple[List[Dict[str, Any]], Studio]:
+        """ Get the list of staff and the studio for an anime given the the
+        AniDB ID or the XML string containing creators.
 
-        r = self._request("anime", {'aid': anidb_aid})
-        soup = BeautifulSoup(r.text.encode('utf-8'), 'xml')
-        if soup.error is not None:
-            raise Exception(soup.error.string)
+        Return : List[{'role': Role, 'name': str, 'anidb_creator_id': int}], Studio
+        """
+        if anidb_aid is not None:
+            anime = self.get_xml(anidb_aid)
+            creators_soup = anime.creators
 
-        return soup.anime
+        creators = []
+        studio = None
+        if creators_soup is not None:
+            for creator_node in creators_soup.find_all('name'):
+                creator_name = str(creator_node.string).strip()
+                creator_id = creator_node.get('id')
+                creator_type = creator_node.get('type')
+                role_slug = None
 
-    def handle_tags(self, anidb_aid=None, tags_soup=None):
+                if creator_type == 'Direction':
+                    role_slug = 'director'
+                elif creator_type == 'Music':
+                    role_slug = 'composer'
+                elif creator_type == 'Original Work' or creator_type == 'Story Composition':
+                    role_slug = 'author'
+                elif creator_type == 'Animation Work' or creator_type == 'Work':
+                    # AniDB marks Studio as such a creator's type
+                    studio = Studio.objects.filter(title=creator_name).first()
+                    if studio is None:
+                        studio = Studio(title=creator_name)
+                        studio.save()
+
+                if role_slug is not None:
+                    creators.append({
+                        'role': self.role_map.get(role_slug),
+                        'name': creator_name,
+                        'anidb_creator_id': creator_id
+                    })
+
+        return creators, studio
+
+    def _build_staff(self,
+                     work: Work,
+                     creators: List[Dict[str, Any]],
+                     reload_role_cache: bool = False) -> List[Staff]:
+        if reload_role_cache:
+            del self.role_map
+
+        artists_to_add = []
+        artists = []
+        for nc in creators:
+            artist = Artist.objects.filter(Q(name=nc["name"]) | Q(anidb_creator_id=nc["anidb_creator_id"])).first()
+
+            if not artist: # This artist does not yet exist : will be bulk created
+                artist = Artist(name=nc["name"], anidb_creator_id=nc["anidb_creator_id"])
+                artists_to_add.append(artist)
+            else: # This artist exists : prevent duplicates by updating with the AniDB id
+                artist.name = nc["name"]
+                artist.anidb_creator_id = nc["anidb_creator_id"]
+                artist.save()
+                artists.append(artist)
+
+        artists.extend(Artist.objects.bulk_create(artists_to_add))
+
+        staffs = []
+        for index, nc in enumerate(creators):
+            staffs.append(
+                Staff(
+                    work=work,
+                    role=nc["role"],
+                    artist=artists[index]
+                )
+            )
+
+        existing_staff = set(Staff.objects
+                            .filter(work=work,
+                                    role__in=[nc["role"] for nc in creators],
+                                    artist__in=[artist for artist in artists])
+                            .values_list('work', 'role', 'artist'))
+
+        missing_staff = [
+            staff for staff in staffs
+            if (staff.work, staff.role, staff.artist) not in existing_staff
+        ]
+
+        Staff.objects.bulk_create(missing_staff)
+        return missing_staff
+
+    def get_tags(self,
+                 anidb_aid: Optional[int] = None,
+                 tags_soup: Optional[str] = None) -> List[AniDBTag]:
+        """ Get the list of tags for an anime given the the AniDB ID or the XML
+        string containing tags.
+
+        Return : List[AniDBTag]
+        """
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
             tags_soup = anime.tags
 
-        tags = {}
-        if tags_soup is not None:
-            for tag_node in tags_soup.find_all('tag'):
-                tag_title = str(tag_node.find('name').string).strip()
-                tag_id = int(tag_node.get('id'))
-                tag_weight = int(tag_node.get('weight'))
-                tag_verified = tag_node.get('verified').lower() == 'true'
+        if tags_soup is None:
+            return []
 
-                if tag_verified:
-                    tags[tag_title] = {"weight": tag_weight, "anidb_tag_id": tag_id}
+        tags = []
+        for tag_node in tags_soup.find_all('tag'):
+            tag_title = str(tag_node.find('name').string).strip()
+            tag_id = int(tag_node.get('id'))
+            tag_weight = int(tag_node.get('weight'))
+            tag_verified = tag_node.get('verified').lower() == 'true'
+
+            if tag_verified:
+                tags.append(
+                    AniDBTag(
+                        title=tag_title,
+                        weight=tag_weight,
+                        anidb_tag_id=tag_id
+                    )
+                )
 
         return tags
 
-    def get_related_animes(self, anidb_aid=None, related_animes_soup=None):
+    def update_tags(self,
+                    work: Work,
+                    anidb_tags: List[AniDBTag]):
+        tags_diff = diff_between_anidb_and_local_tags(work, anidb_tags)
+
+        deleted_tags = tags_diff['deleted_tags']
+        added_tags = tags_diff['added_tags']
+        updated_tags = tags_diff['updated_tags']
+        kept_tags = tags_diff['kept_tags']
+        all_tags = deleted_tags + added_tags + updated_tags + kept_tags
+
+        tags_ids = [tag.anidb_tag_id for tag in all_tags]
+        deleted_tags_ids = [tag.anidb_tag_id for tag in deleted_tags]
+
+        existing_tags = Tag.objects.filter(anidb_tag_id__in=tags_ids).all()
+        existing_tags_id = set(existing_tags.values_list('anidb_tag_id', flat=True))
+
+        # New tags have to be added to the database (if they aren't already present)
+        tags_weight = {}
+        tags_to_add = []
+        tags_list = []
+        for tag in added_tags:
+            tags_weight[tag.anidb_tag_id] = tag.weight
+            if tag.anidb_tag_id not in existing_tags_id:
+                tag_to_add = Tag(title=tag.title, anidb_tag_id=tag.anidb_tag_id)
+                tags_to_add.append(tag_to_add)
+                tags_list.append(tag_to_add)
+            else:
+                existing_tag = existing_tags.filter(anidb_tag_id=tag.anidb_tag_id).first()
+                tags_list.append(existing_tag)
+        Tag.objects.bulk_create(tags_to_add)
+
+        # Assign tags to the work via TaggedWork
+        tagged_works_to_add = []
+        for tag in tags_list:
+            tag_weight = tags_weight[tag.anidb_tag_id]
+            tagged_work = TaggedWork(tag=tag, work=work, weight=tag_weight)
+            tagged_works_to_add.append(tagged_work)
+        TaggedWork.objects.bulk_create(tagged_works_to_add)
+
+        # Update the weight of tags that already exist (only if the weight changed)
+        for tag in updated_tags:
+            tagged_work = work.taggedwork_set.get(tag__title=tag.title)
+            tagged_work.weight = tag.weight
+            tagged_work.save()
+
+        # Finally, remove a tag from a work if it no longer exists on AniDB's side
+        TaggedWork.objects.filter(work=work, tag__anidb_tag_id__in=deleted_tags_ids).delete()
+
+    def get_related_animes(self,
+                           anidb_aid: Optional[int] = None,
+                           related_animes_soup: Optional[str] = None) -> Dict[int, Dict[str, str]]:
+        """ Get the list of related animes given the the AniDB ID or the XML
+        string containing related animes.
+
+        Return : Dict[related_anime_id: {'title': str, 'type': str}]
+
+        relation type is one of 'prequel', 'sequel', 'summary', 'side_story',
+        'parent_story', 'alternative_setting', 'same_setting' or 'other'
+        """
         if anidb_aid is not None:
             anime = self.get_xml(anidb_aid)
             related_animes_soup = anime.relatedanime
@@ -244,11 +439,12 @@ class AniDB:
 
     def get_or_update_work(self,
                            anidb_aid: int,
-                           reload_lang_cache: bool = False) -> Work:
+                           reload_lang_cache: bool = False,
+                           reload_role_cache: bool = False) -> Work:
         """
         Use `get_dict` internally to create (in the database) the bunch of objects you need to create a work.
 
-        Cache internally intermediate models objects (e.g. Language, ExtLanguage, Category)
+        Cache internally intermediate models objects (e.g. Language, ExtLanguage, Category, Role)
 
         This won't return already existing WorkTitle attached to the Work object.
 
@@ -256,69 +452,27 @@ class AniDB:
         :type anidb_aid: integer
         :param reload_lang_cache: forcefully reload the ExtLanguage cache,
             if it has changed since the instantiation of the AniDB client (default: false).
+        :param reload_role_cache: forcefully reload the Role cache,
+            if it has changed since the instantiation of the AniDB client (default: false).
         :type reload_lang_cache: boolean
-        :return: the Work object related to the AniDB ID passed in parameter.
+        :type reload_role_cache: boolean
+        :return: the Work object related to the AniDB ID passed in parameter,
+            None if two or more Work objects match the AniDB ID provided.
         :rtype: a `mangaki.models.Work` object.
         """
 
         anime = self.get_xml(anidb_aid)
 
-        anime_restricted = anime.get('restricted') == 'true'
-        all_titles = anime.titles
-        all_creators = anime.creators
-        all_tags = anime.tags
-        all_related_animes = anime.relatedanime
-
-        # Handling of titles
-        main_title = None
-        titles = []
-        for title_node in all_titles.find_all('title'):
-            title = str(title_node.string).strip()
-            lang = title_node.get('xml:lang')
-            title_type = title_node.get('type')
-
-            titles.append({
-                'title': title,
-                'lang': lang,
-                'type': title_type
-            })
-
-            if title_type == 'main':
-                main_title = title
-
-        # Handling of staff
-        creators = []
-        studio = None
-        # FIXME: cache this query
-        staff_map = dict(Role.objects.values_list('slug', 'pk'))
-        for creator_node in all_creators.find_all('name'):
-            creator = str(creator_node.string).strip()
-            creator_id = creator_node.get('id')
-            creator_type = creator_node.get('type')
-            staff_id = None
-
-            if creator_type == 'Direction':
-                staff_id = 'director'
-            elif creator_type == 'Music':
-                staff_id = 'composer'
-            elif creator_type == 'Original Work' or creator_type == 'Story Composition':
-                staff_id = 'author'
-            elif creator_type == 'Animation Work' or creator_type == 'Work':
-                # AniDB marks Studio as such a creator's type
-                studio, s_created = Studio.objects.get_or_create(title=creator)
-
-            if staff_id is not None:
-                creators.append({
-                    "role_id": staff_map[staff_id],
-                    "name": creator,
-                    "anidb_creator_id": creator_id
-                })
+        titles, main_title = self.get_titles(titles_soup=anime.titles)
+        creators, studio = self.get_creators(creators_soup=anime.creators)
+        tags = self.get_tags(tags_soup=anime.tags)
+        related_animes = self.get_related_animes(related_animes_soup=anime.relatedanime)
 
         anime = {
             'title': main_title,
             'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
-            'nsfw': anime_restricted,
+            'nsfw': anime.get('restricted') == 'true',
             'date': to_python_datetime(anime.startdate.string),
             'end_date': to_python_datetime(anime.enddate.string),
             'ext_synopsis': str(anime.description.string) if anime.description else '',
@@ -328,42 +482,83 @@ class AniDB:
             'studio': studio
         }
 
-        # Add or update work
-        work, created = Work.objects.update_or_create(category=self.anime_category,
-                                                      anidb_aid=anidb_aid,
-                                                      defaults=anime)
+        try:
+            work, created = Work.objects.update_or_create(category=self.anime_category,
+                                                          anidb_aid=anidb_aid,
+                                                          defaults=anime)
+        except MultipleObjectsReturned:
+            return None
 
-        # Add new creators
-        for nc in creators:
-            artist = Artist.objects.filter(Q(name=nc["name"]) | Q(anidb_creator_id=nc["anidb_creator_id"])).first()
+        self._build_work_titles(work, titles, reload_lang_cache)
+        self._build_staff(work, creators, reload_role_cache)
+        self.update_tags(work, tags)
 
-            if not artist: # This artist does not yet exist
-                artist, a_created = Artist.objects.get_or_create(name=nc["name"], anidb_creator_id=nc["anidb_creator_id"])
-            else: # This artist exists : prevent duplicates by updating with the AniDB id
-                artist.name = nc["name"]
-                artist.anidb_creator_id = nc["anidb_creator_id"]
-                artist.save()
-
-            Staff.objects.update_or_create(work=work, role_id=nc["role_id"], artist=artist)
-
-        tags = self.handle_tags(tags_soup=all_tags)
-        work.update_tags(tags)
-
-        # Check for NSFW based on tags if this work is new
-        if created and work.is_nsfw_based_on_tags(tags):
+        if created and is_nsfw_based_on_anidb_tags(tags):
             work.nsfw = True
             work.save()
 
-        # Add alternative titles for this work to the database
-        self._build_work_titles(work, titles, reload_lang_cache)
-
-        # Add the correct relations to this work in the database
         if created:
-            related_animes = self.get_related_animes(related_animes_soup=all_related_animes)
             self._build_related_animes(work, related_animes)
 
         return work
 
 client = AniDB(
     getattr(settings, 'ANIDB_CLIENT', None),
-    getattr(settings, 'ANIDB_VERSION', None))
+    getattr(settings, 'ANIDB_VERSION', None)
+)
+
+def diff_between_anidb_and_local_tags(work: Work,
+                                      anidb_tags: List[AniDBTag]) -> Dict[str, List[AniDBTag]]:
+    """
+    Return a Dict containing the difference (ie. added, updated, deleted or kept
+    tags) between AniDB's tags and local tags.
+    """
+
+    tag_work_list = TaggedWork.objects.filter(work=work).all()
+    values = tag_work_list.values_list('tag__title', 'weight', 'tag__anidb_tag_id')
+    current_tags = [AniDBTag(title=v[0], weight=v[1], anidb_tag_id=v[2]) for v in values]
+
+    deleted_tags = list(set(current_tags) - set(anidb_tags))
+    added_tags = list(set(anidb_tags) - set(current_tags))
+    kept_tags = list(set.intersection(set(anidb_tags), set(current_tags)))
+
+    updated_tags = []
+    for current_tag in current_tags:
+        for anidb_tag in anidb_tags:
+            if (current_tag.title == anidb_tag.title
+                and current_tag.weight != anidb_tag.weight):
+                updated_tags.append(anidb_tag)
+
+    return {
+        'deleted_tags': deleted_tags,
+        'added_tags': added_tags,
+        'updated_tags': updated_tags,
+        'kept_tags': kept_tags
+    }
+
+def is_nsfw_based_on_anidb_tags(anidb_tags: List[AniDBTag]) -> bool:
+    # FIXME: potentially NSFW tags should be stored somewhere else
+    potentially_nsfw_tags = ['nudity', 'ecchi', 'pantsu', 'breasts', 'sex',
+                             'large breasts', 'small breasts', 'gigantic breasts',
+                             'incest', 'pornography', 'shota', 'masturbation',
+                             'sexual fantasies', 'anal', 'loli']
+
+     # FIXME: these should be configurable constants
+    HIGH_NSFW_THRESHOLD = 15
+    LOW_NSFW_THRESHOLD = 30
+
+    sum_weight_all_low = sum(tag.weight for tag in anidb_tags if tag.weight <= 400)
+    sum_weight_nsfw_low = sum(tag.weight for tag in anidb_tags
+                              if tag.title in potentially_nsfw_tags and tag.weight <= 400)
+
+    sum_weight_all_high = sum(tag.weight for tag in anidb_tags if tag.weight > 400)
+    sum_weight_nsfw_high = sum(tag.weight for tag in anidb_tags
+                               if tag.title in potentially_nsfw_tags and tag.weight > 400)
+
+    if sum_weight_all_low > 0 and sum_weight_all_high > 0:
+        percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
+        percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+    else:
+        return False
+
+    return (percent_high_nsfw > HIGH_NSFW_THRESHOLD or percent_low_nsfw > LOW_NSFW_THRESHOLD)

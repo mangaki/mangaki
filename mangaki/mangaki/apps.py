@@ -1,5 +1,7 @@
 from django.apps import AppConfig
 
+from mangaki.algo import RecommendationAlgorithm
+
 
 class MangakiConfig(AppConfig):
     name = 'mangaki'
@@ -9,3 +11,4 @@ class MangakiConfig(AppConfig):
         # Ensure signal receivers decorated with `@receiver` are connected by
         # importing the `receivers` module.
         from . import receivers
+        RecommendationAlgorithm.factory.initialize()

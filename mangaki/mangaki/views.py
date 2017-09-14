@@ -1,6 +1,7 @@
 import datetime
 import json
 from collections import Counter, OrderedDict
+from itertools import zip_longest
 from typing import List, Dict, Any, Tuple
 from urllib.parse import urlencode
 
@@ -9,15 +10,17 @@ import allauth.account.views
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponsePermanentRedirect
+from django.db.models import Case, IntegerField, Sum, Value, When, Count
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone, translation
+from django.utils.http import is_safe_url
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -35,7 +38,7 @@ from mangaki.choices import TOP_CATEGORY_CHOICES
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
-                            Recommendation, Staff, Suggestion, Top, Trope, Work)
+                            Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
 from mangaki.utils.mal import import_mal, client
 from mangaki.utils.profile import (
     get_profile_ratings,
@@ -55,6 +58,9 @@ RATINGS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
+FIXES_PER_PAGE = 5
+NSFW_GRID_PER_PAGE = 5
+
 REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
     ('http://animeka.com', 'Animeka'),
@@ -151,7 +157,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
 
         if self.request.user.is_authenticated:
-            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
+            context['suggestion_form'] = SuggestionForm(work=self.object, instance=Suggestion(user=self.request.user, work=self.object))
         context['rating'] = current_user_rating(self.request, self.object)
 
         context['references'] = []
@@ -526,7 +532,7 @@ def top(request, category_slug):
     except Top.DoesNotExist:
         raise Http404
     data = []
-    rankings = Ranking.objects.filter(top=top).prefetch_related('content_object')
+    rankings = Ranking.objects.filter(top=top).prefetch_related('content_object').order_by('-score')
     for rank, ranking in enumerate(rankings):
         data.append({
             'rank': rank + 1,
@@ -805,6 +811,179 @@ def faq_index(request):
 
 def legal_mentions(request):
     return render(request, 'mangaki/legal.html')
+
+
+def fix_index(request):
+    suggestion_list = Suggestion.objects.select_related('work', 'user').prefetch_related(
+        'work__category', 'evidence_set__user').annotate(
+            count_agrees=Count(Case(When(evidence__agrees=True, then=1))),
+            count_disagrees=Count(Case(When(evidence__agrees=False, then=1)))
+        ).all().order_by('is_checked', '-date')
+
+    paginator = Paginator(suggestion_list, FIXES_PER_PAGE)
+    page = request.GET.get('page')
+
+    try:
+        suggestions = paginator.page(page)
+    except PageNotAnInteger:
+        suggestions = paginator.page(1)
+    except EmptyPage:
+        suggestions = paginator.page(paginator.num_pages)
+
+    context = {
+        'suggestions': suggestions
+    }
+
+    return render(request, 'fix/fix_index.html', context)
+
+
+def fix_suggestion(request, suggestion_id):
+    cluster_colors = {
+        'unprocessed': 'text-info',
+        'accepted': 'text-success',
+        'rejected': 'text-danger'
+    }
+
+    # Retrieve the Suggestion object if it exists else raise a 404 error
+    suggestion = get_object_or_404(
+        Suggestion.objects.select_related('work', 'user', 'work__category').annotate(
+            count_agrees=Count(Case(When(evidence__agrees=True, then=1))),
+            count_disagrees=Count(Case(When(evidence__agrees=False, then=1)))
+        ),
+        id=suggestion_id
+    )
+
+    # Retrieve the Evidence object if it exists
+    evidence = None
+    if request.user.is_authenticated:
+        try:
+            evidence = Evidence.objects.get(user=request.user, suggestion=suggestion)
+        except ObjectDoesNotExist:
+            evidence = None
+
+    # Retrieve related clusters
+    clusters = WorkCluster.objects.select_related(
+        'resulting_work', 'resulting_work__category').prefetch_related(
+        'works', 'works__category', 'checker').filter(origin=suggestion_id).all()
+    colors = [cluster_colors[cluster.status] for cluster in clusters]
+
+    # Get the previous suggestion, ie. more recent and of the same checked status
+    previous_suggestions_ids = Suggestion.objects.filter(date__gt=suggestion.date,
+        is_checked=suggestion.is_checked).order_by('date').values_list('id', flat=True)
+
+    # If there is no more recent suggestion, and was checked, just pick from not checked suggestions
+    if not previous_suggestions_ids and suggestion.is_checked:
+        previous_suggestions_ids = Suggestion.objects.filter(is_checked=False).order_by('date').values_list('id', flat=True)
+
+    # Get the next suggestion, ie. less recent and of the same checked status
+    next_suggestions_ids = Suggestion.objects.filter(date__lt=suggestion.date,
+        is_checked=suggestion.is_checked).order_by('-date').values_list('id', flat=True)
+
+    # If there is no less recent suggestion, and wasn't checked, just pick from checked suggestions
+    if not next_suggestions_ids and not suggestion.is_checked:
+        next_suggestions_ids = Suggestion.objects.filter(is_checked=True).order_by('-date').values_list('id', flat=True)
+
+    context = {
+        'suggestion': suggestion,
+        'clusters': zip(clusters, colors) if clusters and colors else None,
+        'evidence': evidence,
+        'next_id': next_suggestions_ids[0] if next_suggestions_ids else None,
+        'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None
+    }
+
+    return render(request, 'fix/fix_suggestion.html', context)
+
+
+def nsfw_grid(request):
+    user = request.user if request.user.is_authenticated else None
+
+    user_evidences = Evidence.objects.filter(user=user)
+    nsfw_suggestion_list = Suggestion.objects.select_related(
+                'work', 'user', 'work__category'
+            ).prefetch_related('evidence_set__user').filter(
+                problem__in=('nsfw', 'n_nsfw'),
+                is_checked=False
+            ).exclude(
+                work__in=user_evidences.values('suggestion__work')
+            ).order_by('work', '-date', '-work__sum_ratings').distinct('work')
+
+    paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
+    count_nsfw_left = paginator.count
+    page = request.GET.get('page')
+
+    try:
+        suggestions = paginator.page(page)
+    except PageNotAnInteger:
+        suggestions = paginator.page(1)
+    except EmptyPage:
+        suggestions = paginator.page(paginator.num_pages)
+
+    nsfw_states = []
+    supposed_nsfw = []
+    for suggestion in suggestions:
+        supposed_nsfw.append(suggestion.problem == 'nsfw')
+
+        for evidence in suggestion.evidence_set.all():
+            if evidence.user == request.user:
+                agrees_with_problem = evidence.agrees
+                agrees = ((agrees_with_problem and suggestion.problem == 'nsfw')
+                       or (not agrees_with_problem and not suggestion.problem == 'nsfw'))
+                nsfw_states.append(agrees)
+                break
+        else:
+            nsfw_states.append(None)
+
+    suggestions_with_states = list(zip(suggestions, nsfw_states, supposed_nsfw))
+
+    context = {
+        'suggestions_with_states': suggestions_with_states,
+        'suggestions': suggestions,
+        'count_nsfw_left': count_nsfw_left
+    }
+
+    return render(request, 'fix/nsfw_grid.html', context)
+
+
+@login_required
+def update_evidence(request):
+    if request.method != 'POST' or not request.user.is_authenticated:
+        return redirect('fix-index')
+
+    # Retrieve agrees, needs_help, delete and suggestion_ids values from one or several fields in a form
+    # Every values are then zipped together, with zip_longest since the length of suggestion_ids is the one that matters
+    # See templates/fix/nsfw_grid.html for an example
+    agrees_values = map(lambda x: x == 'True', request.POST.getlist('agrees'))
+    needs_help_values = map(lambda x: x == 'True', request.POST.getlist('needs_help'))
+    delete_values = request.POST.getlist('delete')
+    suggestion_ids = map(int, request.POST.getlist('suggestion'))
+
+    informations = zip_longest(suggestion_ids, agrees_values, needs_help_values, delete_values, fillvalue=False)
+
+    for suggestion_id, agrees, needs_help, delete in informations:
+        if not suggestion_id:
+            continue
+
+        if delete:
+            try:
+                Evidence.objects.get(
+                    user=request.user,
+                    suggestion=Suggestion.objects.get(pk=suggestion_id)
+                ).delete()
+            except ObjectDoesNotExist:
+                pass
+        else:
+            evidence, created = Evidence.objects.get_or_create(
+                user=request.user,
+                suggestion=Suggestion.objects.get(pk=suggestion_id)
+            )
+            evidence.agrees = agrees
+            evidence.needs_help = needs_help
+            evidence.save()
+
+    next_url = request.GET.get('next')
+    if next_url and is_safe_url(url=next_url, host=request.get_host()):
+        return redirect(next_url)
+    return redirect('fix-index')
 
 
 def generic_error_view(error, error_code):

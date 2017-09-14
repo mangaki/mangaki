@@ -3,7 +3,7 @@
   service:
     name: '{{ mangaki_back_name }}-{{ item }}.service'
     state: 'started'
-  with_items: ['ranking', 'top-directors']
+  with_items: ['ranking', 'top']
   become: true
   listen: Restart Mangaki services.
 
@@ -12,5 +12,5 @@
     name: '{{ mangaki_back_celery_name }}'
     state: restarted
   when: start_celery
-  listen: Restart Mangaki services.
+  listen: restart_mangaki_services
   become: true
