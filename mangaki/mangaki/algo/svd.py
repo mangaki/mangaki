@@ -10,9 +10,6 @@ class MangakiSVD(RecommendationAlgorithm):
     U = None
     sigma = None
     VT = None
-    inv_work = None
-    inv_user = None
-    work_titles = None
     def __init__(self, nb_components=20, nb_iterations=10):
         super().__init__()
         self.nb_components = nb_components
@@ -24,9 +21,6 @@ class MangakiSVD(RecommendationAlgorithm):
         self.U = backup.U
         self.sigma = backup.sigma
         self.VT = backup.VT
-        self.inv_work = backup.inv_work
-        self.inv_user = backup.inv_user
-        self.work_titles = backup.work_titles
         self.means = backup.means
 
     @property
@@ -55,12 +49,20 @@ class MangakiSVD(RecommendationAlgorithm):
         self.U, self.sigma, self.VT = randomized_svd(matrix, self.nb_components, n_iter=self.nb_iterations, random_state=42)
         if self.verbose_level:
             print('Shapes', self.U.shape, self.sigma.shape, self.VT.shape)
-        self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
 
         self.chrono.save('factor matrix')
 
+    def unzip(self):
+        self.chrono.save('begin of fit')
+        self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
+        self.chrono.save('end of fit')
+
     def predict(self, X):
-        return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
+        if self.M is not None:  # Model is unzipped
+            M = self.M
+        else:
+            M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
+        return M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
 
     def get_shortname(self):
         return 'svd-%d' % self.nb_components

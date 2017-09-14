@@ -32,7 +32,7 @@ class MangakiKNN(RecommendationAlgorithm):
 
     def load(self, filename):
         backup = super().load(filename)
-        self.nb_neighbors = backup.NB_NEIGHBORS
+        self.nb_neighbors = backup.nb_neighbors
         self.closest_neighbors = backup.closest_neighbors
         self.rated_works = backup.rated_works
         self.mean_score = backup.mean_score

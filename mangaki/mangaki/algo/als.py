@@ -78,14 +78,20 @@ class MangakiALS(RecommendationAlgorithm):
         self.factorize(matrix, random_state=42)
         if self.verbose_level:
             print('Shapes', self.U.shape, self.VT.shape)
-        self.M = self.U.dot(self.VT)
-
-        #self.save('backup.pickle')
 
         self.chrono.save('factor matrix')
 
+    def unzip(self):
+        self.chrono.save('begin of fit')
+        self.M = self.U.dot(self.VT)
+        self.chrono.save('end of fit')
+
     def predict(self, X):
-        return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
+        if self.M is not None:  # Model is unzipped
+            M = self.M
+        else:
+            M = self.U.dot(self.VT)
+        return M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
 
     def get_shortname(self):
         return 'als-%d' % self.nb_components
