@@ -9,7 +9,7 @@
     <h3 style="margin-bottom: 1em">Notez vos séries favorites, on vous en fera découvrir d'autres&nbsp;!</h3>
 {% if not user.is_authenticated %}
     <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="{% url 'about' 'fr' %}">En savoir plus</a>
+        <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">C'est parti !</a>
     </div>
     <div class="col-md-4 col-sm-12 margin">
         {% include "socialaccount/snippets/provider_list.html" with process="login" verb="try" %}
@@ -39,8 +39,14 @@
         <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; text-align: center;">
             Dernières nouveautés
         </h2>
-        <a href="http://research.mangaki.fr/changelog/2017/06/29/nouvelle-version-mangaki/">Blog&nbsp;: Pourquoi vous devriez essayer la nouvelle version de Mangaki&nbsp;!</a>
-        <blockquote class="twitter-tweet" data-lang="en"><p lang="fr" dir="ltr">Le Mangaki Data Challenge × <a href="https://twitter.com/hashtag/KyotoUniversity?src=hash">#KyotoUniversity</a>, ça démarre le 1er juillet ! Inscription ouverte à tous.<br>Plus d&#39;infos : <a href="https://t.co/nX4bmRTwex">https://t.co/nX4bmRTwex</a></p>&mdash; Mangaki @AX2017 (@MangakiFR) <a href="https://twitter.com/MangakiFR/status/879357016925511682">June 26, 2017</a></blockquote>
+        <p align="center">
+            Le <a href="http://research.mangaki.fr/2017/07/18/mangaki-data-challenge-fr/">Mangaki Data Challenge</a> court jusqu'au <strong>1er octobre</strong> !<br />
+            Gagnez des goodies !
+        </p>
+        <a class="twitter-timeline" data-height="400"
+          href="https://twitter.com/MangakiFR">
+        Tweets by @MangakiFR
+        </a>
         <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
       </div>
     </div>
