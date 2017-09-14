@@ -78,7 +78,7 @@
 
 - name: Request service reloading.
   debug:
-    msg: Project contents has changed, notifying a restart.
+    msg: Project contents have changed, notifying a restart.
   notify: restart_mangaki_services
   changed_when: true # Force trigger the handler.
   when: project_install.changed
