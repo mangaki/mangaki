@@ -431,7 +431,7 @@ def get_profile(request,
     else:
         reco_count = len(received_recommendation_list)
 
-    member_time = (datetime.datetime.now().replace(tzinfo=utc) - user.date_joined
+    member_time = (datetime.date.today() - user.date_joined.date()
                    if (can_see and not is_anonymous) else None)
     user_events = get_profile_events(user) if (can_see and not is_anonymous) else []
 
