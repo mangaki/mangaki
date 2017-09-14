@@ -53,7 +53,6 @@ class RecommendationAlgorithm:
         return False
 
     def save(self, filename):
-        self.logger.debug('Will be saved', self.__dict__.keys())
         with open(self.get_backup_path(filename), 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
         self.size = os.path.getsize(self.get_backup_path(filename)) / 1e6
