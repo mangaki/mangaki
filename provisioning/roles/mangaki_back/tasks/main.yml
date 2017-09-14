@@ -48,8 +48,3 @@
     cron_schedule: 'daily'
     cron_command: '{{ mangaki_back_manage }} top --all'
     cron_env: '{{ mangaki_back_env }}'
-
-- name: Restart services if needed.
-  meta: noop
-  notify: Restart Mangaki services.
-  when: mangaki_needs_restart

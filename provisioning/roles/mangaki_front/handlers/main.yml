@@ -3,5 +3,5 @@
   supervisorctl:
     name: '{{ mangaki_front_name }}'
     state: restarted
-  listen: Restart Mangaki services.
+  listen: restart_mangaki_services
   become: true
