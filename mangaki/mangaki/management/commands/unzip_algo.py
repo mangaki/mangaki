@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from mangaki.models import Rating, Work
-from mangaki.algo import fit_algo, get_algo_backup
+from mangaki.algo import get_algo_backup
 
 
 class Command(BaseCommand):
@@ -14,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         algo_name = options.get('algo_name')
         algo = get_algo_backup(algo_name)
-        if True or algo.M is None:
+        if algo.M is None:
             algo.unzip()
             if algo.is_serializable:
                 algo.save(algo.get_backup_filename())
