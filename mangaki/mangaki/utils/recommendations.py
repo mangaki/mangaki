@@ -51,52 +51,30 @@ def get_reco_algo(request, algo_name='knn', category='all'):
         algo_name = 'knn'
 
     chrono.save('get rated works')
-    still_not_okay = True
 
     if algo_name == 'knn':
         try:
             algo = get_algo_backup(algo_name)
             dataset = get_dataset_backup(algo_name)
-
-            framed_rated_works = pd.DataFrame(list(current_user_ratings(request).items()), columns=['work_id', 'choice'])
-            work_ids = framed_rated_works['work_id']
-            framed_rated_works['work_id'] = dataset.encode_works(framed_rated_works['work_id'])
-            framed_rated_works['rating'] = framed_rated_works['choice'].map(rating_values)
-            nb_rated_works = len(framed_rated_works['work_id'])
-            ratings_from_user = coo_matrix((framed_rated_works['rating'],([0.] * nb_rated_works, framed_rated_works['work_id'])), shape=(1, algo.nb_works))
-            ratings_from_user = ratings_from_user.tocsr()
-
-            #Expands knn.M with current user ratings (vstack is too slow)
-            algo.M.data = np.hstack((algo.M.data, ratings_from_user.data))
-            algo.M.indices = np.hstack((algo.M.indices, ratings_from_user.indices))
-            algo.M.indptr = np.hstack((algo.M.indptr, (ratings_from_user.indptr + algo.M.nnz)[1:]))
-            algo.M._shape = (algo.M.shape[0] + ratings_from_user.shape[0], ratings_from_user.shape[1])
-
-            chrono.save('loading knn and expanding with current user ratings')
-            still_not_okay = False
-
-        except (FileNotFoundError, ValueError):
+        except FileNotFoundError:
             triplets = list(
                 Rating.objects.values_list('user_id', 'work_id', 'choice'))
             chrono.save('get all %d interesting ratings' % len(triplets))
             dataset, algo = fit_algo(algo_name, triplets)
+        framed_rated_works = pd.DataFrame(list(current_user_ratings(request).items()), columns=['work_id', 'choice'])
+        framed_rated_works['work_id'] = dataset.encode_works(framed_rated_works['work_id'])
+        framed_rated_works['rating'] = framed_rated_works['choice'].map(rating_values)
+        nb_rated_works = len(framed_rated_works['work_id'])
+        ratings_from_user = coo_matrix((framed_rated_works['rating'],([0.] * nb_rated_works, framed_rated_works['work_id'])), shape=(1, algo.nb_works))
+        ratings_from_user = ratings_from_user.tocsr()
 
-        if still_not_okay:
-            framed_rated_works = pd.DataFrame(list(current_user_ratings(request).items()), columns=['work_id', 'choice'])
-            work_ids = framed_rated_works['work_id']
-            framed_rated_works['work_id'] = dataset.encode_works(framed_rated_works['work_id'])
-            framed_rated_works['rating'] = framed_rated_works['choice'].map(rating_values)
-            nb_rated_works = len(framed_rated_works['work_id'])
-            ratings_from_user = coo_matrix((framed_rated_works['rating'],([0.] * nb_rated_works, framed_rated_works['work_id'])), shape=(1, algo.nb_works))
-            ratings_from_user = ratings_from_user.tocsr()
+        #Expands knn.M with current user ratings (vstack is too slow)
+        algo.M.data = np.hstack((algo.M.data, ratings_from_user.data))
+        algo.M.indices = np.hstack((algo.M.indices, ratings_from_user.indices))
+        algo.M.indptr = np.hstack((algo.M.indptr, (ratings_from_user.indptr + algo.M.nnz)[1:]))
+        algo.M._shape = (algo.M.shape[0] + ratings_from_user.shape[0], ratings_from_user.shape[1])
 
-            #Expands knn.M with current user ratings (vstack is too slow)
-            algo.M.data = np.hstack((algo.M.data, ratings_from_user.data))
-            algo.M.indices = np.hstack((algo.M.indices, ratings_from_user.indices))
-            algo.M.indptr = np.hstack((algo.M.indptr, (ratings_from_user.indptr + algo.M.nnz)[1:]))
-            algo.M._shape = (algo.M.shape[0] + ratings_from_user.shape[0], ratings_from_user.shape[1])
-
-            chrono.save('loading knn and expanding with current user ratings')
+        chrono.save('loading knn and expanding with current user ratings')
 
     else:  # SVD or ALS, etc.
         try:
