@@ -57,6 +57,7 @@ NB_POINTS_DPP = 10
 RATINGS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
+ARTISTS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 FIXES_PER_PAGE = 5
 NSFW_GRID_PER_PAGE = 5
@@ -362,6 +363,26 @@ class WorkList(WorkListMixin, ListView):
             ]
 
         return context
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class ArtistList(ListView):
+    paginate_by = ARTISTS_PER_PAGE
+
+    def get_queryset(self):
+        queryset = Artist.objects.all()
+        if self.search():
+            return queryset.filter(name__icontains=self.search())
+        return queryset.annotate(nb_works=Count('work')).order_by('-nb_works')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['nb_artists'] = Artist.objects.count()
+        context['search'] = self.search()
+        return context
+
+    def search(self):
+        return self.request.GET.get('search', None)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
