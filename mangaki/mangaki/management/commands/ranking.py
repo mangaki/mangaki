@@ -9,7 +9,7 @@ class Command(BaseCommand):
         cursor = connection.cursor()
 
         # Since we are using PostgreSQL, using the WITH ... UPDATE constructs
-        # gives us much faster updates than the Django ORM. Not that is matters
+        # gives us much faster updates than the Django ORM. Not that it matters
         # that much for a maintenance operation...
         # The controversy computation must stay identical to the one in
         # utils/ranking.py, don't change one without the other!

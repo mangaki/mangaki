@@ -12,7 +12,8 @@ from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models import CharField, F, Func, Lookup, Value, Q
+from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
+from django.db.models.functions import Cast
 from django.utils.functional import cached_property
 
 from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
@@ -61,6 +62,15 @@ class WorkQuerySet(models.QuerySet):
         return self.filter(
             nb_ratings__gte=TOP_MIN_RATINGS).order_by(
                 (F('sum_ratings') / F('nb_ratings')).desc())
+
+    def pearls(self):
+        return (self.exclude(nb_likes=0)
+                    .annotate(
+                        dislike_rate=ExpressionWrapper(
+                            Cast(F('nb_dislikes'), FloatField()) / F('nb_likes'), output_field=FloatField())
+                    )
+                    .filter(nb_ratings__gte=30, nb_ratings__lte=126, dislike_rate__lte=5/42)
+                    .order_by('dislike_rate'))
 
     def popular(self):
         return self.order_by('-nb_ratings')

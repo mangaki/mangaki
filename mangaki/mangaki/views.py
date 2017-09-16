@@ -286,6 +286,9 @@ class WorkList(WorkListMixin, ListView):
     def search(self):
         return self.request.GET.get('search', None)
 
+    def flat(self):
+        return self.request.GET.get('flat', 0)
+
     def sort_mode(self):
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
@@ -317,6 +320,8 @@ class WorkList(WorkListMixin, ListView):
             else:
                 queryset = queryset.filter(title__istartswith=letter)
             queryset = queryset.order_by('title')
+        elif sort_mode == 'pearls':
+            queryset = queryset.pearls()
         elif sort_mode == 'random':
             queryset = queryset.random().order_by('?')[:self.paginate_by]
         elif sort_mode == 'mosaic':
@@ -336,8 +341,10 @@ class WorkList(WorkListMixin, ListView):
         slot_sort_types = ['popularity', 'controversy', 'top', 'random']
         search_text = self.search()
         sort_mode = self.sort_mode()
+        flat = self.flat()
 
         context['search'] = search_text
+        context['flat'] = flat
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
