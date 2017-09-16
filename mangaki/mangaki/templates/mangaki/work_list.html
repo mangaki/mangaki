@@ -34,6 +34,8 @@
       <a href="{% url 'work-list' category %}?sort=controversy">Les plus controversés</a></li>
     <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=top">Les plus aimés</a></li>
+    <li role="presentation"{% if sort_mode == 'pearls' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=pearls">Perles rares</a></li>
     <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
     <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
@@ -70,7 +72,11 @@
   </form>
 {% endif %}
 </div>
-{% include "works.html" with works=object_list is_dpp=is_dpp %}
+{% if flat %}
+  {% include "works_no_poster.html" with works=object_list %}
+{% else %}
+  {% include "works.html" with works=object_list is_dpp=is_dpp %}
+{% endif %}
 {% if user.is_authenticated %}
 
 <div class="row margin">

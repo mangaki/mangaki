@@ -13,4 +13,3 @@ def controversy(nb):
     if nb_likes == 0 or nb_dislikes == 0:
         return 0
     return (nb_likes + nb_dislikes) ** min(float(nb_likes) / nb_dislikes, float(nb_dislikes) / nb_likes)
-
