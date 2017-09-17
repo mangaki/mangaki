@@ -12,6 +12,7 @@ class RecommendationAlgorithmFactory:
         self.algorithm_factory = {}
         self.logger = logging.getLogger(__name__ + '.' + self.__class__.__name__)
         self.initialized = False
+        self.size = 0
 
     def initialize(self):
         # FIXME: make it less complicated and go for a commonly used design pattern.
@@ -54,6 +55,7 @@ class RecommendationAlgorithm:
     def save(self, filename):
         with open(self.get_backup_path(filename), 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+        self.size = os.path.getsize(self.get_backup_path(filename)) / 1e6
 
     def load(self, filename):
         """
