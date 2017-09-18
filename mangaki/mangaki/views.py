@@ -259,11 +259,10 @@ class EventDetail(LoginRequiredMixin, DetailView):
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        ratings = current_user_ratings(self.request, context['object_list'])
 
-        ratings = current_user_ratings(
-            self.request, list(context['object_list']))
         for work in context['object_list']:
-            work.rating = ratings.get(work.id, None)
+            work.rating = ratings.get(work.id)
 
         context['object_list'] = [
             {
@@ -300,36 +299,37 @@ class WorkList(WorkListMixin, ListView):
 
     def get_queryset(self):
         search_text = self.search()
-        queryset = self.category.work_set.all()
+        self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
+
         if self.is_dpp:
-            queryset = self.category.work_set.exclude(coldstartrating__user=self.request.user).dpp(10)
+            self.queryset = self.queryset.exclude(coldstartrating__user=self.request.user).dpp(10)
         elif sort_mode == 'top':
-            queryset = queryset.top()
+            self.queryset = self.queryset.top()
         elif sort_mode == 'popularity':
-            queryset = queryset.popular()
+            self.queryset = self.queryset.popular()
         elif sort_mode == 'controversy':
-            queryset = queryset.controversial()
+            self.queryset = self.queryset.controversial()
         elif sort_mode == 'alpha':
             letter = self.request.GET.get('letter', '0')
             if letter == '0':  # '#'
-                queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
+                self.queryset = self.queryset.exclude(title__regex=r'^[a-zA-Z]')
             else:
-                queryset = queryset.filter(title__istartswith=letter)
-            queryset = queryset.order_by('title')
+                self.queryset = self.queryset.filter(title__istartswith=letter)
+            self.queryset = self.queryset.order_by('title')
         elif sort_mode == 'random':
-            queryset = queryset.random().order_by('?')[:self.paginate_by]
+            self.queryset = self.queryset.random().order_by('?')[:self.paginate_by]
         elif sort_mode == 'mosaic':
-            queryset = queryset.none()
+            self.queryset = self.queryset.none()
         else:
             raise Http404
 
-        if search_text is not None:
-            queryset = queryset.search(search_text)
+        if search_text:
+            self.queryset = self.queryset.search(search_text)
 
-        queryset = queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
+        self.queryset = self.queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
-        return queryset
+        return self.queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -355,6 +355,13 @@ class WorkList(WorkListMixin, ListView):
             ]
 
         return context
+
+    def render_to_response(self, context):
+        if context.get('paginator') and context['paginator'].count == 1:  # Redirect to work detail if only result
+            unique_work = self.queryset.first()
+            return redirect('work-detail', category=self.category.slug, pk=unique_work.pk)
+        else:
+            return super(WorkList, self).render_to_response(context)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
