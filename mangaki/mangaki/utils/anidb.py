@@ -257,26 +257,18 @@ class AniDB:
 
         artists.extend(Artist.objects.bulk_create(artists_to_add))
 
-        staffs = []
+        missing_staff = []
+        existing_staff = set(Staff.objects.filter(
+                                    work=work,
+                                    role__in=[nc["role"] for nc in creators],
+                                    artist__in=[artist for artist in artists]).values_list('work', 'role', 'artist'))
         for index, nc in enumerate(creators):
-            staffs.append(
-                Staff(
+            if (work.pk, nc["role"].pk, artists[index].pk) not in existing_staff:
+                missing_staff.append(Staff(
                     work=work,
                     role=nc["role"],
                     artist=artists[index]
-                )
-            )
-
-        existing_staff = set(Staff.objects
-                            .filter(work=work,
-                                    role__in=[nc["role"] for nc in creators],
-                                    artist__in=[artist for artist in artists])
-                            .values_list('work', 'role', 'artist'))
-
-        missing_staff = [
-            staff for staff in staffs
-            if (staff.work, staff.role, staff.artist) not in existing_staff
-        ]
+                ))
 
         Staff.objects.bulk_create(missing_staff)
         return missing_staff
