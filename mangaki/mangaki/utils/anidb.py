@@ -241,34 +241,39 @@ class AniDB:
         if reload_role_cache:
             del self.role_map
 
+        processed_anidb_aids = []
         artists_to_add = []
-        artists = []
+        artists_list = []
         for nc in creators:
             artist = Artist.objects.filter(Q(name=nc["name"]) | Q(anidb_creator_id=nc["anidb_creator_id"])).first()
 
-            if not artist: # This artist does not yet exist : will be bulk created
+            if nc["anidb_creator_id"] in processed_anidb_aids:  # Skip if this artist has more than one role
+                continue
+
+            if not artist:  # This artist does not yet exist : will be bulk created
                 artist = Artist(name=nc["name"], anidb_creator_id=nc["anidb_creator_id"])
                 artists_to_add.append(artist)
-            else: # This artist exists : prevent duplicates by updating with the AniDB id
+            else:  # This artist exists : prevent duplicates by updating with the AniDB id
                 artist.name = nc["name"]
                 artist.anidb_creator_id = nc["anidb_creator_id"]
                 artist.save()
-                artists.append(artist)
+                artists_list.append(artist)
+            processed_anidb_aids.append(nc["anidb_creator_id"])
 
-        artists.extend(Artist.objects.bulk_create(artists_to_add))
+        artists_list.extend(Artist.objects.bulk_create(artists_to_add))
+        artists = {artist.name: artist for artist in artists_list}
 
-        missing_staff = []
-        existing_staff = set(Staff.objects.filter(
-                                    work=work,
-                                    role__in=[nc["role"] for nc in creators],
-                                    artist__in=[artist for artist in artists]).values_list('work', 'role', 'artist'))
-        for index, nc in enumerate(creators):
-            if (work.pk, nc["role"].pk, artists[index].pk) not in existing_staff:
-                missing_staff.append(Staff(
-                    work=work,
-                    role=nc["role"],
-                    artist=artists[index]
-                ))
+        existing_staff = set(Staff.objects.filter(work=work,
+                                role__in=(nc["role"] for nc in creators),
+                                artist__name__in=(nc["name"] for nc in creators))
+                                .values_list('work', 'role', 'artist'))
+        missing_staff = [
+            Staff(
+                work=work,
+                role=nc["role"],
+                artist=artists[nc["name"]]
+            ) for nc in creators if (work.pk, nc["role"].pk, artists[nc["name"]].pk) not in existing_staff
+        ]
 
         Staff.objects.bulk_create(missing_staff)
         return missing_staff
