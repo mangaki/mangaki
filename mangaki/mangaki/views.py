@@ -262,7 +262,7 @@ class WorkListMixin:
         ratings = current_user_ratings(self.request, context['object_list'])
 
         for work in context['object_list']:
-            work.rating = ratings.get(work.id)
+            work.rating = ratings.get(work.id, None)
 
         context['object_list'] = [
             {
