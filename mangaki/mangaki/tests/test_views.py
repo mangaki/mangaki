@@ -14,10 +14,7 @@ class WorkFactoryMixin:
         self.client = Client()
 
         anime = Category.objects.get(slug='anime')
-
-        self.anime = Work.objects.create(
-            title='Title',
-            category=anime)
+        self.anime = Work.objects.create(title='Title', category=anime)
 
 
 class AuthenticatedMixin:
@@ -63,6 +60,11 @@ class WorkDetailAnonymousTest(WorkFactoryMixin, TestCase):
 
         self.assertEqual(response.context['object'], self.anime)
         self.assertNotIn('suggestion_form', response.context)
+
+    def test_work_unique_search_result_redirect_to_detail(self):
+        response = self.client.get('/anime/?search=Title')
+        self.assertEqual(response.status_code, 302)  # 302 redirect
+        self.assertEqual(response.url, '/anime/{:d}'.format(self.anime.pk))
 
     def test_work_detail_redirect(self):
         response = self.client.get('/work/{:d}'.format(self.anime.pk))
