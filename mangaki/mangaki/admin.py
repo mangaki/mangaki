@@ -96,9 +96,12 @@ def redirect_staff(works_to_merge, final_work):
 def redirect_related_objects(works_to_merge, final_work):
     genres = sum((list(work.genre.all()) for work in works_to_merge), [])
     work_ids = [work.id for work in works_to_merge]
+    existing_tag_ids = TaggedWork.objects.filter(work=final_work).values_list('tag__pk', flat=True)
+
     final_work.genre.add(*genres)
     Trope.objects.filter(origin_id__in=work_ids).update(origin_id=final_work.id)
-    for model in [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]:
+    TaggedWork.objects.filter(work_id__in=work_ids).exclude(tag_id__in=existing_tag_ids).update(work_id=final_work.id)
+    for model in [WorkTitle, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]:
         model.objects.filter(work_id__in=work_ids).update(work_id=final_work.id)
     Work.objects.filter(id__in=work_ids).exclude(id=final_work.id).update(redirect=final_work)
 
