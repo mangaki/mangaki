@@ -559,7 +559,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(TaggedWork)
 class TaggedWorkAdmin(admin.ModelAdmin):
-    search_fields = ('work', 'tag')
+    search_fields = ('work__title', 'tag__title')
 
 
 @admin.register(WorkCluster)
