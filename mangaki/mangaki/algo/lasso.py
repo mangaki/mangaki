@@ -50,7 +50,7 @@ class MangakiLASSO(RecommendationAlgorithm):
         self.nb_tags, self.T = load_and_scale_tags(T, perform_scaling, with_mean)
 
     def fit(self, X, y, autoload_tags=True):
-        if autoload_tags:
+        if self.T is None and autoload_tags:
             self.load_tags()
 
         row = X[:, 0]
