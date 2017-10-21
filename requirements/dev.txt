@@ -5,6 +5,7 @@ django-extensions
 django-nose
 matplotlib
 flake8
+tensorflow
 typing
 # Linting
 git-lint

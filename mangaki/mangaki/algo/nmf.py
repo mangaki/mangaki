@@ -43,7 +43,6 @@ explanation = {
 }
 
 
-@register_algorithm('nmf')
 class MangakiNMF(RecommendationAlgorithm):
     M = None
     W = None
