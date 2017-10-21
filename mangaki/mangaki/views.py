@@ -380,7 +380,7 @@ class ArtistList(ListView):
         queryset = Artist.objects.all()
         if self.search():
             return queryset.filter(name__icontains=self.search())
-        return queryset.annotate(nb_works=Count('work')).order_by('-nb_works')
+        return queryset.order_by('name')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
