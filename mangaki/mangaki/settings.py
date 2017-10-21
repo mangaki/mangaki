@@ -28,6 +28,8 @@ SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 
 if config.has_section('hosts'):
     ALLOWED_HOSTS = [host.strip() for host in config.get('hosts', 'ALLOWED_HOSTS').split(',')]
+    print(ALLOWED_HOSTS, 'hosts')
+print('has it', config.has_section('hosts'))
 
 SITE_ID = config.getint('deployment', 'SITE_ID', fallback=1)
 
