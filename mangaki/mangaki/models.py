@@ -18,7 +18,8 @@ from django.utils.functional import cached_property
 
 from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
                              CLUSTER_CHOICES, RELATION_TYPE_CHOICES, SUGGESTION_PROBLEM_CHOICES)
-from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+from mangaki.utils.ranking import (TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO,
+                                   PEARLS_MIN_RATINGS, PEARLS_MAX_RATINGS, PEARLS_MAX_DISLIKE_RATE)
 from mangaki.utils.dpp import MangakiDPP
 from mangaki.utils.ratingsmatrix import RatingsMatrix
 
@@ -69,7 +70,7 @@ class WorkQuerySet(models.QuerySet):
                         dislike_rate=ExpressionWrapper(
                             Cast(F('nb_dislikes'), FloatField()) / F('nb_likes'), output_field=FloatField())
                     )
-                    .filter(nb_ratings__gte=30, nb_ratings__lte=126, dislike_rate__lte=5/42)
+                    .filter(nb_ratings__gte=PEARLS_MIN_RATINGS, nb_ratings__lte=PEARLS_MAX_RATINGS, dislike_rate__lte=PEARLS_MAX_DISLIKE_RATE)
                     .order_by('dislike_rate'))
 
     def popular(self):

@@ -7,8 +7,8 @@ from .balse import MangakiBALSE
 from .lasso import MangakiLASSO
 from .efa import MangakiEFA
 from .knn import MangakiKNN
-from .nmf import MangakiNMF
 from .pca import MangakiPCA
 from .svd import MangakiSVD
 from .wals import MangakiWALS
+from .xals import MangakiXALS
 from .zero import MangakiZero

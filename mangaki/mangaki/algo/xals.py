@@ -77,14 +77,14 @@ class MangakiXALS(RecommendationAlgorithm):
     def fit(self, X, y):
         self.X_train = X
         self.y_train = y
-        if self.verbose:
+        if self.verbose_level:
             print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         matrix, self.means = self.make_matrix(X, y)
 
         self.chrono.save('fill and center matrix')
 
         self.factorize(matrix, random_state=42)
-        if self.verbose:
+        if self.verbose_level:
             print('Shapes', self.U.shape, self.VT.shape)
         self.M = self.U.dot(self.VT)
 
