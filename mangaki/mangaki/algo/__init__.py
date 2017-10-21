@@ -10,4 +10,5 @@ from .knn import MangakiKNN
 from .pca import MangakiPCA
 from .svd import MangakiSVD
 from .wals import MangakiWALS
+from .xals import MangakiXALS
 from .zero import MangakiZero
