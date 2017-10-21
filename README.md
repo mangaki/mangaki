@@ -4,7 +4,8 @@
 [![CircleCI](https://circleci.com/gh/mangaki/mangaki.svg?style=svg)](https://circleci.com/gh/mangaki/mangaki)
 [![Codecov](https://img.shields.io/codecov/c/github/mangaki/mangaki.svg)]()
 
-Here is Mangaki's installation manual. Welcome! Also available [in French](README-fr.md).
+Here is Mangaki's installation manual. Welcome!  
+Also available [in French](README-fr.md).
 
 ## Install
 
@@ -16,7 +17,7 @@ Requires [Vagrant](https://www.vagrantup.com/downloads.html).
     vagrant provision  # May be required
     vagrant ssh  # Will open a tmux that you can detach using C-b d
 
-And voilà! You can access Mangaki at http://192.168.33.10:8000 (or http://app.mangaki.fr if you have `vagrant-hostupdater`).
+And voilà! You can access Mangaki at http://192.168.33.10:8000 (or http://app.mangaki.dev if you have `vagrant-hostupdater`).
 
 ### Full install
 
@@ -35,11 +36,11 @@ And voilà! You can access Mangaki at http://localhost:8000.
 ## Some perks
 
     ./manage.py loaddata ../fixtures/{partners,seed_data}.json
-    ./manage.py ranking  # Compute the anime/manga ranking pages. This should be done regularly.
-    ./manage.py top --all  # Compute the Top 20 directors, etc. This should be done regularly.
-    ./manage.py test  # Run all tests
+    ./manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
+    ./manage.py top --all  # Compute the Top 20 directors, etc. Should be done regularly.
+    ./manage.py test       # Run all tests
 
-See also the [notebooks](https://github.com/mangaki/notebooks), in another folder.
+See also our interesting [Jupyter notebooks](https://github.com/mangaki/notebooks), in another repository.
 
 ## Contribute
 
@@ -49,4 +50,6 @@ See also the [notebooks](https://github.com/mangaki/notebooks), in another folde
 
 ## Contact
 
-Feel free to contact us at jj@mangaki.fr or [create an issue](https://github.com/mangaki/mangaki/issues/new).
+- Feel free to contact us at jj@mangaki.fr
+- Found a bug? [Create an issue](https://github.com/mangaki/mangaki/issues/new).
+- Stay in touch with our blog: http://research.mangaki.fr
