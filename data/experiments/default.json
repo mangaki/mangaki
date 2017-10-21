@@ -1,6 +1,8 @@
 {
     "configurations": [
         ["zero"],
-        ["als", 10]
+        ["svd", 5],
+        ["als", 5],
+        ["tfr", 5]
     ]
 }

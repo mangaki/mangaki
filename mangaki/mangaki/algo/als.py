@@ -86,7 +86,7 @@ class MangakiALS(RecommendationAlgorithm):
         self.M = self.U.dot(self.VT)
         self.chrono.save('end of fit')
 
-    def predict(self, X):
+    def predict(self, X, y=[]):
         if self.M is not None:  # Model is unzipped
             M = self.M
         else:

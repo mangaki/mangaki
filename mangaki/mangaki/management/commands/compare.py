@@ -139,7 +139,7 @@ class Experiment(object):
                 logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), nb_split, pass_index))
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
-                y_test = model.predict(self.anonymized.X[i_test])
+                y_test = model.predict(self.anonymized.X[i_test], self.anonymized.y[i_test])
                 logger.debug('Predicted: %s' % y_test[:5])
                 logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
 

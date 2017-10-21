@@ -10,5 +10,6 @@ from .knn import MangakiKNN
 from .nmf import MangakiNMF
 from .pca import MangakiPCA
 from .svd import MangakiSVD
+from .tfr import MangakiTFR
 from .wals import MangakiWALS
 from .zero import MangakiZero

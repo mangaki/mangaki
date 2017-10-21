@@ -57,7 +57,7 @@ class MangakiSVD(RecommendationAlgorithm):
         self.M = self.U.dot(np.diag(self.sigma)).dot(self.VT)
         self.chrono.save('end of fit')
 
-    def predict(self, X):
+    def predict(self, X, y=[]):
         if self.M is not None:  # Model is unzipped
             M = self.M
         else:

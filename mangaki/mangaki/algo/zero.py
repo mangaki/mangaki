@@ -9,7 +9,7 @@ class MangakiZero(RecommendationAlgorithm):
     def fit(self, X, y):
         pass
 
-    def predict(self, X):
+    def predict(self, X, y=[]):
         return [0] * len(X)
 
     def get_shortname(self):
