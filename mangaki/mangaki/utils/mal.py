@@ -500,7 +500,8 @@ def get_or_create_from_mal(work_list: QuerySet,
 
 
 @transaction.atomic
-def import_mal(mal_username: str, mangaki_username: str):
+def import_mal(mal_username: str, mangaki_username: str,
+               update_callback=None):
     """
     Import myAnimeList by username
     """
@@ -520,6 +521,7 @@ def import_mal(mal_username: str, mangaki_username: str):
             client.list_works_from_a_user(work_type, mal_username)
         )
         logger.info('Fetching {} works from {}\'s MAL.'.format(len(user_works), mal_username))
+        count = 0
         for user_work in user_works:
             try:
                 work = get_or_create_from_mal(
@@ -537,6 +539,10 @@ def import_mal(mal_username: str, mangaki_username: str):
                         wontsee.add(work.id)
                     elif user_work.status == MALStatus.plan_to_watch:
                         willsee.add(work.id)
+
+                if update_callback:
+                    update_callback(count,
+                                    len(user_works))
             except Exception:
                 logger.exception('Failure to fetch the work from MAL and import it into the Mangaki database.')
                 SearchIssue(

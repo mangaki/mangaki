@@ -39,7 +39,8 @@ from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
-from mangaki.utils.mal import import_mal, client
+from mangaki.utils.mal import client
+from mangaki.tasks import import_mal, get_current_mal_import
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
@@ -792,12 +793,17 @@ def update_reco_willsee(request):
 
 def import_from_mal(request, mal_username):
     if request.method == 'POST' and client.is_available:
-        nb_added, fails = import_mal(mal_username, request.user.username)
-        payload = {
-            'added': nb_added,
-            'failures': fails
-        }
-        return HttpResponse(json.dumps(payload), content_type='application/json')
+        pending_import = get_current_mal_import(request.user)
+        if not pending_import:
+            result = import_mal.s(mal_username, request.user.username).apply_async()
+            task_id = result.task_id
+        else:
+            task_id = pending_import.task_id
+
+        return HttpResponse(json.dumps({
+            'task_id': task_id
+        }), content_type='application/json')
+
     elif not client.is_available:
         raise Http404()
     else:
