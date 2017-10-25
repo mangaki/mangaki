@@ -53,10 +53,6 @@
         </div>
         <div class="col-xs-6 col-lg-4">
             {% if meta.is_me and not meta.is_anonymous %}
-                <br/>
-                Je participe au data challenge de Kyoto&nbsp;:
-                <input type="checkbox" name="research_ok" {% if user.profile.research_ok %} checked{% endif %}/>
-                <hr />
                 Profil public&nbsp;:
                 <input type="checkbox" name="is_shared" {% if user.profile.is_shared %} checked{% endif %}/>
                 <hr />

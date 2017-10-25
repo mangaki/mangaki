@@ -61,7 +61,7 @@
 {% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' and not is_dpp %}
   <form method="GET">
     <div class="input-group">
-      <input class="search-input form-control {{category}}" placeholder="Entrez un titre d'{{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
+      <input class="search-input form-control {{category}}" placeholder="Entrez le titre d'un {{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
       <span class="input-group-btn">
 	<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
       </span>
