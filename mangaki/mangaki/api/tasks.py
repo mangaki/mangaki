@@ -17,7 +17,7 @@ from mangaki.models import UserBackgroundTask
 class UserBGTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserBackgroundTask
-        fields = ('id', 'task_id')
+        fields = ('id', 'task_id', 'tag')
 
 
 @api_view(['GET'])
