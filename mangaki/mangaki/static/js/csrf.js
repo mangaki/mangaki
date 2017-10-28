@@ -27,3 +27,11 @@ $.ajaxSetup({
         }
     }
 });
+
+function betterFetch(url, params) {
+  return fetch(url, Object.assign({}, {
+    headers: Object.assign({}, {
+      'X-CSRFToken': csrftoken
+    }, params.headers || {})
+  }, params));
+}
