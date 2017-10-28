@@ -45,6 +45,7 @@ def import_mal(self, mal_username: str, mangaki_username: str):
     bg_task = UserBackgroundTask(owner=user, task_id=self.request.id, tag=MAL_IMPORT_TAG)
     bg_task.save()
     logger.debug('[{}] MAL import task created: {}.'.format(user, bg_task.task_id))
-    mal.import_mal(mal_username, mangaki_username)
+    mal.import_mal(mal_username, mangaki_username, update_callback=update_details)
     bg_task.delete()
+    r.delete('tasks:{task_id}:details')
     logger.debug('[{}] MAL import task recycled and deleted.'.format(user))
