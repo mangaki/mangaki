@@ -466,17 +466,18 @@ def get_profile(request,
     except EmptyPage:
         ratings = paginator.page(paginator.num_pages)
 
+    is_me = request.user == user
     data = {
         'meta': {
             'mal': {
                 'is_available': client.is_available,
-                'pending_import': get_current_mal_import(request.user) if not is_anonymous else None
+                'pending_import': None if (not is_me) or is_anonymous else get_current_mal_import(request.user),
             },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,
             'username': request.user.username,
             'is_shared': is_shared,
-            'is_me': request.user == user,
+            'is_me': is_me,
             'category': category,
             'seen': seen_works,
             'is_anonymous': is_anonymous,
