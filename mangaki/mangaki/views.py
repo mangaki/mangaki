@@ -468,7 +468,10 @@ def get_profile(request,
 
     data = {
         'meta': {
-            'is_mal_import_available': client.is_available,
+            'mal': {
+                'is_available': client.is_available,
+                'pending_import': get_current_mal_import(request.user)
+            },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,
             'username': request.user.username,
