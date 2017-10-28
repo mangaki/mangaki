@@ -521,8 +521,7 @@ def import_mal(mal_username: str, mangaki_username: str,
             client.list_works_from_a_user(work_type, mal_username)
         )
         logger.info('Fetching {} works from {}\'s MAL.'.format(len(user_works), mal_username))
-        count = 0
-        for user_work in user_works:
+        for current_index, user_work in enumerate(user_works):
             try:
                 work = get_or_create_from_mal(
                     mangaki_lists[work_type],
@@ -541,8 +540,9 @@ def import_mal(mal_username: str, mangaki_username: str,
                         willsee.add(work.id)
 
                 if update_callback:
-                    update_callback(count,
-                                    len(user_works))
+                    update_callback(len(user_works),
+                                    current_index + 1,
+                                    user_work.title)
             except Exception:
                 logger.exception('Failure to fetch the work from MAL and import it into the Mangaki database.')
                 SearchIssue(
