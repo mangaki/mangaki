@@ -63,18 +63,36 @@
                 <input type="checkbox" name="newsletter_ok" {% if user.profile.newsletter_ok %} checked{% endif %}/>
                 {% if meta.mal.is_available %}
                     <hr />
-                    {% if not meta.mal.pending_import %}
-                        <p>Importer depuis myAnimeList&nbsp;:</p>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="mal_username" placeholder="Ton login"/>
-                            <span class="input-group-btn">
-                            <button id="import_mal" class="btn btn-default">OK</button>
-                        </span>
-                        </div>
-                    {% else %}
-                        <p>Votre myAnimeList est en cours d'importation. Veuillez patienter.</p>
-                        <p>Cette page sera mise à jour, une fois que votre myAnimeList sera importée.</p>
-                    {% endif %}
+                    <div id="mal_container">
+                        {% verbatim %}
+                        <transition-group appear name="fade">
+                            <template v-if="showForm">
+                                <p key="form_title">Importer depuis myAnimeList&nbsp;:</p>
+                                <div key="form_input" class="input-group">
+                                    <input v-model.lazy="mal_username" @keyup.enter="importMAL" type="text" class="form-control" placeholder="Ton login"/>
+                                    <span class="input-group-btn">
+                                        <button v-on:click="importMAL" class="btn btn-default">C'est parti!</button>
+                                    </span>
+                                </div>
+                            </template>
+                            <template v-if="followProgress">
+                                <p key="progress_title">Votre myAnimeList est en cours d'importation. Veuillez patienter.</p>
+                                <loading-spinner key="spinner"></loading-spinner>
+                                <p key="work_title" v-if="currentWorkTitle != null">✓✓ {{ currentWorkTitle }} importé.
+                                    <span v-if="workCount && currentWorkIndex">({{ currentWorkIndex }} / {{ workCount }})</span>
+                                </p>
+                            </template>
+                            <template v-if="errorMessage">
+                                <p key="message">Une erreur est survenue, rechargez la page.</p>
+                                <p key="details">Détails: {{ errorMessage }}</p>
+                            </template>
+                            <template v-if="importFinished">
+                                <p key="finished-title">Votre import myAnimeList est désormais terminé.</p>
+                                <button class="btn btn-primary" key="reload-page" v-on:click="reloadPage">Cliquez ici pour recharger la page</button>
+                            </template>
+                        </transition-group>
+                        {% endverbatim %}
+                    </div>
                 {% endif %}
             {% endif %}
             {% if meta.is_anonymous %}
@@ -152,6 +170,10 @@
 {% endblock %}
 
 {% block extrajs %}
+    {% if meta.mal.is_available %}
+    <script src="https://vuejs.org/js/vue.js"></script>
+    <script src="/static/js/mal_import.js"></script>
+    {% endif %}
     <script>
         $("[name='research_ok']").bootstrapSwitch();
         $("[name='research_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
@@ -169,18 +191,17 @@
         $("[name='newsletter_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
             $.post(Urls['newsletter'](), {newsletter_ok: state});
         });
-        $("#import_mal").on('click', function () {
-            $.post(Urls['import-mal']($('#mal_username').val()), function (data) {
-                console.log(data);
-                location.reload();
+
+        {% if meta.mal.is_available %}
+            $(document).ready(function () {
+                if ({{meta.mal.pending_import|yesno:"true,false"}}) {
+                    MALImporterApp.fetchServerSideTaskId()
+                        .then(() => {
+                            MALImporterApp.showForm = false;
+                        })
+                }
             });
-        });
-        $('#mal_username').on('keydown', function (evt) {
-            if (evt.keyCode === 13) {
-                $("#import_mal").click();
-                this.value = "";
-            }
-        });
+        {% endif %}
 
         function removeReco(elt) {
             var $elt = $(elt);
