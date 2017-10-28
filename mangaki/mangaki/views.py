@@ -470,7 +470,7 @@ def get_profile(request,
         'meta': {
             'mal': {
                 'is_available': client.is_available,
-                'pending_import': get_current_mal_import(request.user)
+                'pending_import': get_current_mal_import(request.user) if not is_anonymous else None
             },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,
