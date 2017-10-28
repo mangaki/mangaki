@@ -599,3 +599,6 @@ class UserBackgroundTask(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='background_tasks')
     task_id = models.CharField(max_length=80)
     tag = models.CharField(max_length=80)  # For custom usage of tasks.
+
+    def __str__(self):
+        return '<{} owned by {}>'.format(self.tag, self.owner)
