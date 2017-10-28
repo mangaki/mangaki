@@ -206,7 +206,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'mosaic_slot_card': '4/sec'
+        'mosaic_slot_card': '4/sec',
+        'mal_import': '3/hour'
     }
 }
 
