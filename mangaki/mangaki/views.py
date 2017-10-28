@@ -795,25 +795,6 @@ def update_reco_willsee(request):
     return HttpResponse()
 
 
-def import_from_mal(request, mal_username):
-    if request.method == 'POST' and client.is_available:
-        pending_import = get_current_mal_import(request.user)
-        if not pending_import:
-            result = import_mal.s(mal_username, request.user.username).apply_async()
-            task_id = result.task_id
-        else:
-            task_id = pending_import.task_id
-
-        return HttpResponse(json.dumps({
-            'task_id': task_id
-        }), content_type='application/json')
-
-    elif not client.is_available:
-        raise Http404()
-    else:
-        return HttpResponse()
-
-
 def add_pairing(request, artist_id, work_id):
     if request.user.is_authenticated:
         artist = get_object_or_404(Artist, id=artist_id)
