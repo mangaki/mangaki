@@ -15,7 +15,10 @@ import mangaki.utils.mal as mal
 MAL_IMPORT_TAG = 'MAL_IMPORT'
 
 logger = get_task_logger(__name__)
-redis_pool = redis.ConnectionPool.from_url(settings.REDIS_URL)
+if settings.REDIS_URL:
+    redis_pool = redis.ConnectionPool.from_url(settings.REDIS_URL)
+else:
+    redis_pool = None
 
 
 def get_current_mal_import(user: User):
