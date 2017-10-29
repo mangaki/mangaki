@@ -30,7 +30,7 @@ def get_current_mal_import(user: User):
     return user.background_tasks.filter(tag=MAL_IMPORT_TAG).first()
 
 
-@app.task(name='import_mal', bind=True)
+@app.task(name='import_mal', bind=True, ignore_result=True)
 def import_mal(self, mal_username: str, mangaki_username: str):
     r = redis.StrictRedis(connection_pool=redis_pool)
 
