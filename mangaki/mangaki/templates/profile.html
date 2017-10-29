@@ -171,7 +171,11 @@
 
 {% block extrajs %}
     {% if meta.mal.is_available %}
-    <script src="https://vuejs.org/js/vue.js"></script>
+        {% if meta.debug_vue %}
+            <script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
+        {% else %}
+            <script src="https://unpkg.com/vue@2.5.2/dist/vue.min.js"></script>
+        {% endif %}
     <script src="/static/js/mal_import.js"></script>
     {% endif %}
     <script>

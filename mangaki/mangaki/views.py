@@ -469,6 +469,7 @@ def get_profile(request,
     is_me = request.user == user
     data = {
         'meta': {
+            'debug_vue': settings.DEBUG_VUE_JS,
             'mal': {
                 'is_available': client.is_available,
                 'pending_import': None if (not is_me) or is_anonymous else get_current_mal_import(request.user),

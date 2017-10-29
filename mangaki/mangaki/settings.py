@@ -23,6 +23,8 @@ config.read(
     os.environ.get('MANGAKI_SETTINGS_PATH', os.path.join(BASE_DIR, 'settings.ini')))
 
 DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
+# Use non-minified version of Vue.js
+DEBUG_VUE_JS = config.getboolean('debug', 'DEBUG_VUE_JS', fallback=False)
 
 SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 
