@@ -3,6 +3,7 @@ import json
 
 import redis
 from celery.utils.log import get_task_logger
+from django.db import IntegrityError
 
 from .celery import app
 from django.contrib.auth.models import User
@@ -44,8 +45,12 @@ def import_mal(self, mal_username: str, mangaki_username: str):
 
     bg_task = UserBackgroundTask(owner=user, task_id=self.request.id, tag=MAL_IMPORT_TAG)
     bg_task.save()
-    logger.debug('[{}] MAL import task created: {}.'.format(user, bg_task.task_id))
-    mal.import_mal(mal_username, mangaki_username, update_callback=update_details)
-    bg_task.delete()
-    r.delete('tasks:{task_id}:details')
-    logger.debug('[{}] MAL import task recycled and deleted.'.format(user))
+    logger.info('[{}] MAL import task created: {}.'.format(user, bg_task.task_id))
+    try:
+        mal.import_mal(mal_username, mangaki_username, update_callback=update_details)
+    except IntegrityError:
+        logger.exception('MAL import failed due to integrity error')
+    finally:
+        bg_task.delete()
+        r.delete('tasks:{task_id}:details')
+        logger.info('[{}] MAL import task recycled and deleted.'.format(user))
