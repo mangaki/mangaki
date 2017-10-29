@@ -15,13 +15,13 @@ Requires [Vagrant](https://www.vagrantup.com/downloads.html).
 
     vagrant up
     vagrant provision  # May be required
-    vagrant ssh  # Will open a tmux that you can detach using C-b d
+    vagrant ssh  # Will open a tmux that you can detach by pressing Ctrl + b then d
 
 And voilà! You can access Mangaki at http://192.168.33.10:8000 (or http://app.mangaki.dev if you have `vagrant-hostupdater`).
 
 ### Full install
 
-Requires Python 3.4 → 3.6, PostgreSQL 9.3 → 10, and preferably `pwgen`.
+Requires Python 3.4 → 3.6, PostgreSQL 9.3 → 10, Redis 4.0, and preferably `pwgen`.
 
     ./config.sh
     python3 -m venv venv
@@ -29,6 +29,23 @@ Requires Python 3.4 → 3.6, PostgreSQL 9.3 → 10, and preferably `pwgen`.
     pip install -r requirements/dev.txt
     cd mangaki
     ./manage.py migrate
+
+#### Running the background worker (Celery)
+
+This step is mandatory only if you need background tasks which is required for features such as MAL imports.
+
+     celery -A -B mangaki:celery_app worker -l INFO
+
+If you can read something along these lines:
+
+```console
+[2017-10-29 14:34:47,810: INFO/MainProcess] celery@your_hostname ready.
+```
+
+The worker is ready to receive background tasks (e.g. MAL imports).
+
+#### Running the web server
+
     ./manage.py runserver
 
 And voilà! You can access Mangaki at http://localhost:8000.
