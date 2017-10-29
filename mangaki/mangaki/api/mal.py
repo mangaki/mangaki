@@ -1,6 +1,7 @@
 from django.http import Http404
 
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -12,6 +13,12 @@ from mangaki.utils.mal import client
 
 class MALImportRateThrottle(UserRateThrottle):
     scope = 'mal_import'
+
+
+class MALImportUnavailable(APIException):
+    status_code = 503
+    default_detail = 'MAL import temporarily unavailable, try again later.'
+    default_code = 'mal_import_unavailable'
 
 
 @api_view(['POST'])
@@ -31,4 +38,4 @@ def import_from_mal(request: Request, mal_username: str) -> Response:
             'message': 'Already importing' if pending_import else 'Import is starting'
         })
     else:
-        raise Http404()
+        raise MALImportUnavailable()

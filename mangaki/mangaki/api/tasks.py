@@ -3,6 +3,8 @@ import json
 import redis
 from celery.result import AsyncResult
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import APIException
+
 from mangaki.tasks import redis_pool
 
 from rest_framework.decorators import api_view, permission_classes
@@ -20,9 +22,18 @@ class UserBGTaskSerializer(serializers.ModelSerializer):
         fields = ('id', 'task_id', 'tag')
 
 
+class BackgroundTaskUnavailable(APIException):
+    status_code = 503
+    default_detail = 'Service temporarily unavailable, try again later.'
+    default_code = 'service_unavailable'
+
+
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def task_status(request: Request, task_id: str) -> Response:
+    if not redis_pool:
+        raise BackgroundTaskUnavailable()
+
     bg_task = get_object_or_404(request.user.background_tasks, task_id=task_id)
     result = AsyncResult(bg_task.task_id)
     r = redis.StrictRedis(connection_pool=redis_pool)

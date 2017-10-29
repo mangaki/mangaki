@@ -17,6 +17,11 @@ MAL_IMPORT_TAG = 'MAL_IMPORT'
 logger = get_task_logger(__name__)
 if settings.REDIS_URL:
     redis_pool = redis.ConnectionPool.from_url(settings.REDIS_URL)
+    try:
+        redis.StrictRedis(connection_pool=redis_pool).ping()
+    except redis.exceptions.ConnectionError:
+        redis_pool.disconnect()
+        redis_pool = None
 else:
     redis_pool = None
 

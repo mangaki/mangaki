@@ -40,7 +40,7 @@ from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
 from mangaki.utils.mal import client
-from mangaki.tasks import import_mal, get_current_mal_import
+from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
@@ -471,7 +471,7 @@ def get_profile(request,
         'meta': {
             'debug_vue': settings.DEBUG_VUE_JS,
             'mal': {
-                'is_available': client.is_available,
+                'is_available': client.is_available and (redis_pool is not None),
                 'pending_import': None if (not is_me) or is_anonymous else get_current_mal_import(request.user),
             },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
