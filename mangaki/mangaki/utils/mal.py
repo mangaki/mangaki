@@ -368,6 +368,8 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
         titles = [entry.title]
         if entry.english_title:
             titles.append(entry.english_title)
+        if entry.synonyms:
+            titles.extend(entry.synonyms)
 
         is_present = (
             len(lookup_works(
@@ -499,6 +501,10 @@ def get_or_create_from_mal(work_list: QuerySet,
         return insert_into_mangaki_database_from_mal(works, title)
 
 
+def get_existing_ratings_ids(user, work_ids):
+    return (Rating.objects.filter(user=user, work__in=work_ids)
+            .values_list('work', flat=True))
+
 @transaction.atomic
 def import_mal(mal_username: str, mangaki_username: str,
                update_callback=None):
@@ -553,14 +559,14 @@ def import_mal(mal_username: str, mangaki_username: str,
                     score=user_work.score).save()
                 fails.append(user_work.title)
 
-    existing_ratings = (
-        Rating.objects.filter(user=user, work__in=scores.keys())
-            .values_list('work', flat=True)
-            .all()
-    )
-
-    for related_work_id in existing_ratings:
+    for related_work_id in get_existing_ratings_ids(user, scores.keys()).iterator():
         del scores[related_work_id]
+
+    for related_work_id in get_existing_ratings_ids(user, willsee).iterator():
+        willsee.discard(related_work_id)
+
+    for related_work_id in get_existing_ratings_ids(user, wontsee).iterator():
+        wontsee.discard(related_work_id)
 
     ratings = []
     for work_id, score in scores.items():
