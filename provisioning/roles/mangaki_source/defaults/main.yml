@@ -21,7 +21,7 @@ mangaki_source_db_user: '{{ mangaki_db_user }}'
 mangaki_source_redis_host: '127.0.0.1'
 mangaki_source_redis_port: 6379
 mangaki_source_redis_database: 0
-mangaki_source_redis_password: '{{ mangaki_redis_password | default("") }}'
+mangaki_source_redis_password: '{{ mangaki_redis_password }}'
 
 # Email
 mangaki_source_has_email: true
