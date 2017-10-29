@@ -55,5 +55,5 @@ def import_mal(self, mal_username: str, mangaki_username: str):
         logger.exception('MAL import failed due to integrity error')
     finally:
         bg_task.delete()
-        r.delete('tasks:{task_id}:details')
+        r.delete('tasks:{}:details'.format(self.request.id))
         logger.info('[{}] MAL import task recycled and deleted.'.format(user))
