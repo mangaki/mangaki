@@ -6,7 +6,7 @@ machine:
 dependencies:
   pre:
     - pip install -r requirements/dev.txt
-    - pip install ansible==2.5.0
+    - pip install ansible==2.4.1.0
 database:
   override:
     - psql -d circle_test -c "create extension if not exists pg_trgm;
