@@ -6,6 +6,7 @@ machine:
 dependencies:
   pre:
     - pip install -r requirements/dev.txt
+    - pip install ansible==2.5.0
 database:
   override:
     - psql -d circle_test -c "create extension if not exists pg_trgm;
@@ -23,3 +24,9 @@ test:
   post:
     - cd mangaki && coverage html -d $CIRCLE_ARTIFACTS
     - cd mangaki && bash <(curl -s https://codecov.io/bash)
+deployment:
+  beta:
+    branch: [master, raito/beta-autodeploy]
+    owner: mangaki
+    commands:
+      - ./provisioning/scripts/deploy_beta.sh
