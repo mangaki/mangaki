@@ -10,13 +10,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import configparser
 import json
 import os
-import pkg_resources
+from setuptools_scm import get_version
 from django.utils.translation import ugettext_lazy as _
-
-try:
-    VERSION = pkg_resources.require('mangaki')[0].version
-except:
-    VERSION = 'unknown'
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PICKLE_DIR = os.path.join(BASE_DIR, '../pickles')
@@ -33,6 +28,13 @@ DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
 DEBUG_VUE_JS = config.getboolean('debug', 'DEBUG_VUE_JS', fallback=False)
 
 SECRET_KEY = config.get('secrets', 'SECRET_KEY')
+
+try:
+    REPO_DIR = os.path.dirname(BASE_DIR)
+    VERSION = get_version(REPO_DIR)
+except:
+    VERSION = 'unknown'
+
 
 if config.has_section('hosts'):
     ALLOWED_HOSTS = [host.strip() for host in config.get('hosts', 'ALLOWED_HOSTS').split(',')]
