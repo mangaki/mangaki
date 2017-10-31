@@ -10,7 +10,13 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import configparser
 import json
 import os
+import pkg_resources
 from django.utils.translation import ugettext_lazy as _
+
+try:
+    VERSION = pkg_resources.require('mangaki')[0].version
+except:
+    VERSION = 'unknown'
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PICKLE_DIR = os.path.join(BASE_DIR, '../pickles')

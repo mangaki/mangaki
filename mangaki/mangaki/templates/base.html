@@ -3,6 +3,7 @@
 {% load anonymous_ratings %}
 {% load bootstrap3 %}
 {% load i18n %}
+{% load utils %}
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -154,6 +155,12 @@
                         class="glyphicon glyphicon-fire"></span>&nbsp;Signaler un bug</a></li>
                 <li><a href="https://paypal.me/mangaki" target="_blank"><span
                         class="glyphicon glyphicon-heart"></span>&nbsp;Faire un don</a></li>
+                <li>
+                    <a href="https://github.com/mangaki/mangaki/commits/{% mangaki_revision %}">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                        Version: {% mangaki_version %}
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
