@@ -108,7 +108,7 @@ Card.prototype.hydrate = function (work) {
   $el.find('.work-card__media').css('background-image', 'url("' + work.poster + '")');
   $el.find('.work-card__title').text(work.title);
   $el.find('.work-cover__wrapper').attr('data-category', work.category);
-  $el.find('.work-card__synopsis').text(work.synopsis);
+  $el.find('.work-card__synopsis').html(work.synopsis);
   $el.find('.work-card__link').attr('href', '/' + this.category + '/' + work.id);
   $el.find('.ratings .rating__checkbox').attr('name', 'rating[' + work.id + ']').each(function () {
     this.checked = false;
