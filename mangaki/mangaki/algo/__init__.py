@@ -7,6 +7,7 @@ from .balse import MangakiBALSE
 from .lasso import MangakiLASSO
 from .efa import MangakiEFA
 from .knn import MangakiKNN
+from .knn2 import MangakiKNN2
 from .pca import MangakiPCA
 from .svd import MangakiSVD
 from .wals import MangakiWALS
