@@ -2,14 +2,9 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
-from mangaki.algo.recommendation_algorithm import (RecommendationAlgorithm,
-                                                   register_algorithm)
 
-
-@register_algorithm('knn2')
-class MangakiKNN2(RecommendationAlgorithm):
-    def __init__(self, nb_neighbors=2):
-        super().__init__()
+class MangakiKNN:
+    def __init__(self, nb_users, nb_works, nb_neighbors=20):
         self.nb_neighbors = nb_neighbors
         self.nb_users = nb_users
         self.nb_works = nb_works
@@ -35,12 +30,3 @@ class MangakiKNN2(RecommendationAlgorithm):
             y.append(rating)
         return np.array(y)
 
-    @property
-    def is_serializable(self):
-        return True
-
-    def __str__(self):
-        return '[KNN2] NB_NEIGHBORS = %d' % self.nb_neighbors
-
-    def get_shortname(self):
-        return 'knn2-%d' % self.nb_neighbors
