@@ -11,7 +11,7 @@ def get_volume(vectors):
 
 
 class MangakiUniform:
-    def __init__(self, vectors=None, REPEAT=5):
+    def __init__(self, vectors=None, REPEAT=10):
         self.vectors = vectors
         self.items = list(range(len(vectors)))
 
@@ -30,8 +30,8 @@ class MangakiDPP:
         self.ids = ids
         self.indices = None if vectors is None else np.array(list(range(len(vectors))))
 
-    def compute_similarity(self):
-        self.L = self.vectors.dot(self.vectors.T)
+    def compute_similarity(self, kernel):
+        self.L = kernel(self.vectors)
 
     def load_from_algo(self, algo_name):
         algo = get_algo_backup(algo_name)
