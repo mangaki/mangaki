@@ -57,6 +57,7 @@ NB_POINTS_DPP = 10
 RATINGS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
+ARTISTS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 FIXES_PER_PAGE = 5
 NSFW_GRID_PER_PAGE = 5
@@ -282,7 +283,8 @@ class WorkList(WorkListMixin, ListView):
     def category(self):
         return get_object_or_404(Category, slug=self.kwargs.get('category'))
 
-    def search(self):
+    @property
+    def search_query(self):
         return self.request.GET.get('search', None)
 
     def flat(self):
@@ -291,7 +293,7 @@ class WorkList(WorkListMixin, ListView):
     def sort_mode(self):
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
-        if self.search() is not None and sort == default:
+        if self.search_query is not None and sort == default:
             return 'popularity'  # Mosaic cannot be searched through because it is random. We enforce the popularity as the second default when searching.
         else:
             return sort
@@ -301,7 +303,7 @@ class WorkList(WorkListMixin, ListView):
         return self.kwargs.get('dpp', False)
 
     def get_queryset(self):
-        search_text = self.search()
+        search_text = self.search_query
         self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
 
@@ -339,7 +341,7 @@ class WorkList(WorkListMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slot_sort_types = ['popularity', 'controversy', 'top', 'random']
-        search_text = self.search()
+        search_text = self.search_query
         sort_mode = self.sort_mode()
         flat = self.flat()
 
@@ -369,6 +371,27 @@ class WorkList(WorkListMixin, ListView):
             return redirect('work-detail', category=self.category.slug, pk=unique_work.pk)
         else:
             return super(WorkList, self).render_to_response(context)
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class ArtistList(ListView):
+    paginate_by = ARTISTS_PER_PAGE
+
+    def get_queryset(self):
+        queryset = Artist.objects.all()
+        if self.search_query:
+            return queryset.filter(name__icontains=self.search_query)
+        return queryset.order_by('name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['nb_artists'] = Artist.objects.count()
+        context['search'] = self.search_query
+        return context
+
+    @property
+    def search_query(self):
+        return self.request.GET.get('search', None)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
