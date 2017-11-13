@@ -6,7 +6,7 @@ register = template.Library()
 
 @register.simple_tag(takes_context=False)
 def mangaki_version():
-    return settings.VERSION
+    return settings.VERSION.split('+')[0]
 
 @register.simple_tag(takes_context=False)
 def mangaki_revision():
