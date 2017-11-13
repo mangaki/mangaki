@@ -22,3 +22,5 @@ media
 .hypothesis
 # Merci JJ <3
 /mangaki/debug.log
+# Configuration de Visual Studio Code
+.vscode/
