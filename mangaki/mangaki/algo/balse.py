@@ -15,7 +15,8 @@ class MangakiBALSE(RecommendationAlgorithm):
                  lambda_=0.1,
                  alpha=0.01,
                  with_bias=True,
-                 gamma=5):
+                 gamma=5,
+                 T=None):
         super().__init__()
         self.nb_components = nb_components
         self.nb_iterations = nb_iterations
@@ -23,6 +24,8 @@ class MangakiBALSE(RecommendationAlgorithm):
         self.alpha = alpha
         self.with_bias = with_bias
         self.gamma = gamma
+        self.T = T
+        self.nb_tags = None
 
         self.als = MangakiALS(self.nb_components, self.nb_iterations, self.lambda_)
         self.lasso = MangakiLASSO(self.with_bias, self.alpha)
@@ -30,6 +33,8 @@ class MangakiBALSE(RecommendationAlgorithm):
     def fit(self, X, y):
         self.als.set_parameters(self.nb_users, self.nb_works)
         self.lasso.set_parameters(self.nb_users, self.nb_works)
+        self.lasso.nb_tags = self.nb_tags
+        self.lasso.T = self.T
 
         self.als.fit(X, y)
         self.lasso.fit(X, y)

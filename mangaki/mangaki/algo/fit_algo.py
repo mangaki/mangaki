@@ -2,7 +2,6 @@ from .dataset import Dataset
 
 from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm
 
-
 def fit_algo(algo_name, triplets, titles=None, categories=None, output_csv=False):
     algo = RecommendationAlgorithm.instantiate_algorithm(algo_name)
     dataset = Dataset()

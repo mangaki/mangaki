@@ -12,6 +12,7 @@ class RecommendationAlgorithmFactory:
         self.algorithm_factory = {}
         self.logger = logging.getLogger(__name__ + '.' + self.__class__.__name__)
         self.initialized = False
+        self.size = 0
 
     def initialize(self):
         # FIXME: make it less complicated and go for a commonly used design pattern.
@@ -54,6 +55,7 @@ class RecommendationAlgorithm:
     def save(self, filename):
         with open(self.get_backup_path(filename), 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+        self.size = os.path.getsize(self.get_backup_path(filename)) / 1e6
 
     def load(self, filename):
         """
@@ -80,6 +82,12 @@ class RecommendationAlgorithm:
     @staticmethod
     def compute_mae(y_pred, y_true):
         return mean_absolute_error(y_true, y_pred)
+
+    def compute_all_errors(X_train, y_train, X_test, y_test):
+        y_train_pred = self.predict(X_train)
+        logging.debug('Train RMSE=%f', self.compute_rmse(y_train, y_train_pred))
+        y_test_pred = self.predict(X_test)
+        logging.debug('Test RMSE=%f', self.compute_rmse(y_test, y_test_pred))
 
     @staticmethod
     def available_evaluation_metrics():
