@@ -1,6 +1,7 @@
-from mangaki.utils.common import RecommendationAlgorithm
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 
+@register_algorithm('zero')
 class MangakiZero(RecommendationAlgorithm):
     def __init__(self):
         super().__init__()

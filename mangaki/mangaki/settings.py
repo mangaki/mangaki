@@ -139,48 +139,53 @@ TEMPLATES = [
     }
 ]
 
+
+def get_sentry_handler(config_instance) -> str:
+    if config_instance.has_section('sentry'):
+        return 'raven.contrib.django.raven_compat.handlers.SentryHandler'
+    return 'logging.NullHandler'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    # In order for Sentry to catch exceptions and report them.
     'root': {
         'level': 'INFO',
-        'handlers': ['console'],
+        'handlers': ['console', 'sentry'],
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
+        'sentry': {
+            'level': 'ERROR',
+            'class': get_sentry_handler(config)
+        }
     },
     'loggers': {
         'mangaki': {
-            'handlers': ['console'],
-            'level': 'DEBUG'
+            'handlers': ['console', 'sentry'],
+            'level': 'INFO',
+            'propagate': False,
         },
         'django.db.backends': {
             'level': 'ERROR',
-            'handlers': ['console'],
+            'handlers': ['console', 'sentry'],
             'propagate': False,
         },
+        'raven': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': False
+        },
+        'sentry.errors': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': False
+        }
     },
 }
-
-if config.has_section('sentry'):
-    LOGGING['handlers']['sentry'] = {
-            'level': 'ERROR',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-    }
-    LOGGING['root']['handlers'].append('sentry')
-    LOGGING['loggers']['raven'] = {
-        'level': 'DEBUG',
-        'handlers': ['console'],
-        'propagate': False,
-    }
-    LOGGING['loggers']['sentry.errors'] = {
-        'level': 'DEBUG',
-        'handlers': ['console'],
-        'propagate': False,
-    }
 
 
 ROOT_URLCONF = 'mangaki.urls'
@@ -236,7 +241,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
@@ -264,6 +268,6 @@ GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 
 JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'
 
-RECO_ALGORITHMS_DEFAULT_VERBOSE = True
+RECO_ALGORITHMS_VERBOSE_LEVEL = 1
 
 ANONYMOUS_RATINGS_SESSION_KEY = 'mangaki_ratings'

@@ -22,9 +22,9 @@
     {% if is_dpp %}
 
     <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}"><em>Anime</em> seulement</a></li>
-    
+
     <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'manga' %}"><em>Manga</em> seulement</a></li>
-    
+
     {% else %}
     <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}">Mosaïque</a></li>
@@ -34,6 +34,8 @@
       <a href="{% url 'work-list' category %}?sort=controversy">Les plus controversés</a></li>
     <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=top">Les plus aimés</a></li>
+    <li role="presentation"{% if sort_mode == 'pearls' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=pearls">Perles rares</a></li>
     <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
     <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
@@ -41,8 +43,6 @@
       {% endif %}
   </ul>
 </div>
-
-
 
 <div class="col-xs-12" style="margin: 10px 0; text-align: center">
 {% if sort_mode == 'alpha' %}
@@ -61,7 +61,7 @@
 {% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' and not is_dpp %}
   <form method="GET">
     <div class="input-group">
-      <input class="search-input form-control {{category}}" placeholder="Entrez un titre d'{{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
+      <input class="search-input form-control {{category}}" placeholder="Entrez le titre d'un {{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
       <span class="input-group-btn">
 	<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
       </span>
@@ -70,40 +70,41 @@
   </form>
 {% endif %}
 </div>
-{% include "works.html" with works=object_list is_dpp=is_dpp %}
-{% if user.is_authenticated %}
+<div class="row">
+{% if flat %}
+  {% include "works_no_poster.html" with works=object_list %}
+{% else %}
+  {% include "works.html" with works=object_list is_dpp=is_dpp %}
+{% endif %}
+</div>
 
-<div class="row margin">
-  <div class="col-md-12 col-sm-12">
+{% if user.is_authenticated %}
+<div class="row">
+<div class="col-md-12 col-sm-12">
     {% if is_dpp %}
-    <a class="btn btn-primary btn-lg" href="{% url 'reco_dpp' %}?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">montrez-moi de nouvelles oeuvres&nbsp;!</a>
+    <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco_dpp' %}?category={{ category }}">Je n'arrive plus à noter, montrez-moi de nouvelles oeuvres&nbsp;!</a>
     {% else %}
-    <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}" style="display: block; margin: auto">Je n'arrive plus à noter, <br class="visible-xs">conseillez-moi&nbsp;!</a>
+    <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco' %}?category={{ category }}">Je n'arrive plus à noter, conseillez-moi&nbsp;!</a>
     {% endif %}
-  </div>
+</div>
 </div>
 {% endif %}
 
-{% include "pagination.html" %}
+<br/>
 
-<br />
-<br />
-<br />
+{% include "pagination.html" %}
 
 {% endblock %}
 
 {% block extrajs %}
 {% if not is_dpp %}
-
 <script>
-var category = '{{ category }}';
+    var category = '{{ category }}';
 
-loadMenu();
-{% if sort_mode == 'mosaic' %}
-new Mosaic('.cards-grid', '{{ category }}');
-{% endif %}
-
-
+    loadMenu();
+    {% if sort_mode == 'mosaic' %}
+    new Mosaic('.cards-grid', '{{ category }}');
+    {% endif %}
 </script>
 {% endif %}
 {% endblock %}

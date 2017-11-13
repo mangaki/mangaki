@@ -3,7 +3,7 @@ import sys
 from django.core.management.base import BaseCommand
 
 from mangaki.models import Rating
-from mangaki.utils.svd import MangakiSVD
+from mangaki.algo import MangakiSVD
 from mangaki.utils.values import rating_values
 
 

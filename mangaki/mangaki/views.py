@@ -1,6 +1,7 @@
 import datetime
 import json
 from collections import Counter, OrderedDict
+from itertools import zip_longest
 from typing import List, Dict, Any, Tuple
 from urllib.parse import urlencode
 
@@ -19,6 +20,7 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpRespon
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone, translation
+from django.utils.http import is_safe_url
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -57,6 +59,7 @@ TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 FIXES_PER_PAGE = 5
+NSFW_GRID_PER_PAGE = 5
 
 REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
@@ -154,7 +157,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
 
         if self.request.user.is_authenticated:
-            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
+            context['suggestion_form'] = SuggestionForm(work=self.object, instance=Suggestion(user=self.request.user, work=self.object))
         context['rating'] = current_user_rating(self.request, self.object)
 
         context['references'] = []
@@ -256,9 +259,8 @@ class EventDetail(LoginRequiredMixin, DetailView):
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        ratings = current_user_ratings(self.request, context['object_list'])
 
-        ratings = current_user_ratings(
-            self.request, list(context['object_list']))
         for work in context['object_list']:
             work.rating = ratings.get(work.id, None)
 
@@ -283,6 +285,9 @@ class WorkList(WorkListMixin, ListView):
     def search(self):
         return self.request.GET.get('search', None)
 
+    def flat(self):
+        return self.request.GET.get('flat', 0)
+
     def sort_mode(self):
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
@@ -297,44 +302,49 @@ class WorkList(WorkListMixin, ListView):
 
     def get_queryset(self):
         search_text = self.search()
-        queryset = self.category.work_set.all()
+        self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
+
         if self.is_dpp:
-            queryset = self.category.work_set.exclude(coldstartrating__user=self.request.user).dpp(10)
+            self.queryset = self.queryset.exclude(coldstartrating__user=self.request.user).dpp(10)
         elif sort_mode == 'top':
-            queryset = queryset.top()
+            self.queryset = self.queryset.top()
         elif sort_mode == 'popularity':
-            queryset = queryset.popular()
+            self.queryset = self.queryset.popular()
         elif sort_mode == 'controversy':
-            queryset = queryset.controversial()
+            self.queryset = self.queryset.controversial()
         elif sort_mode == 'alpha':
             letter = self.request.GET.get('letter', '0')
             if letter == '0':  # '#'
-                queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
+                self.queryset = self.queryset.exclude(title__regex=r'^[a-zA-Z]')
             else:
-                queryset = queryset.filter(title__istartswith=letter)
-            queryset = queryset.order_by('title')
+                self.queryset = self.queryset.filter(title__istartswith=letter)
+            self.queryset = self.queryset.order_by('title')
+        elif sort_mode == 'pearls':
+            self.queryset = self.queryset.pearls()
         elif sort_mode == 'random':
-            queryset = queryset.random().order_by('?')[:self.paginate_by]
+            self.queryset = self.queryset.random().order_by('?')[:self.paginate_by]
         elif sort_mode == 'mosaic':
-            queryset = queryset.none()
+            self.queryset = self.queryset.none()
         else:
             raise Http404
 
-        if search_text is not None:
-            queryset = queryset.search(search_text)
+        if search_text:
+            self.queryset = self.queryset.search(search_text)
 
-        queryset = queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
+        self.queryset = self.queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
-        return queryset
+        return self.queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slot_sort_types = ['popularity', 'controversy', 'top', 'random']
         search_text = self.search()
         sort_mode = self.sort_mode()
+        flat = self.flat()
 
         context['search'] = search_text
+        context['flat'] = flat
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
@@ -352,6 +362,13 @@ class WorkList(WorkListMixin, ListView):
             ]
 
         return context
+
+    def render_to_response(self, context):
+        if context.get('paginator') and context['paginator'].count == 1:  # Redirect to work detail if only result
+            unique_work = self.queryset.first()
+            return redirect('work-detail', category=self.category.slug, pk=unique_work.pk)
+        else:
+            return super(WorkList, self).render_to_response(context)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -891,17 +908,75 @@ def fix_suggestion(request, suggestion_id):
     return render(request, 'fix/fix_suggestion.html', context)
 
 
+def nsfw_grid(request):
+    user = request.user if request.user.is_authenticated else None
+
+    user_evidences = Evidence.objects.filter(user=user)
+    nsfw_suggestion_list = Suggestion.objects.select_related(
+                'work', 'user', 'work__category'
+            ).prefetch_related('evidence_set__user').filter(
+                problem__in=('nsfw', 'n_nsfw'),
+                is_checked=False
+            ).exclude(
+                work__in=user_evidences.values('suggestion__work')
+            ).order_by('work', '-date', '-work__sum_ratings').distinct('work')
+
+    paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
+    count_nsfw_left = paginator.count
+    page = request.GET.get('page')
+
+    try:
+        suggestions = paginator.page(page)
+    except PageNotAnInteger:
+        suggestions = paginator.page(1)
+    except EmptyPage:
+        suggestions = paginator.page(paginator.num_pages)
+
+    nsfw_states = []
+    supposed_nsfw = []
+    for suggestion in suggestions:
+        supposed_nsfw.append(suggestion.problem == 'nsfw')
+
+        for evidence in suggestion.evidence_set.all():
+            if evidence.user == request.user:
+                agrees_with_problem = evidence.agrees
+                agrees = ((agrees_with_problem and suggestion.problem == 'nsfw')
+                       or (not agrees_with_problem and not suggestion.problem == 'nsfw'))
+                nsfw_states.append(agrees)
+                break
+        else:
+            nsfw_states.append(None)
+
+    suggestions_with_states = list(zip(suggestions, nsfw_states, supposed_nsfw))
+
+    context = {
+        'suggestions_with_states': suggestions_with_states,
+        'suggestions': suggestions,
+        'count_nsfw_left': count_nsfw_left
+    }
+
+    return render(request, 'fix/nsfw_grid.html', context)
+
+
 @login_required
 def update_evidence(request):
-    if request.method != 'POST':
-        redirect('fix-index')
+    if request.method != 'POST' or not request.user.is_authenticated:
+        return redirect('fix-index')
 
-    agrees = request.POST.get('agrees') == 'True'
-    needs_help = request.POST.get('needs_help') == 'True'
-    delete = request.POST.get('delete')
-    suggestion_id = request.POST.get('suggestion')
+    # Retrieve agrees, needs_help, delete and suggestion_ids values from one or several fields in a form
+    # Every values are then zipped together, with zip_longest since the length of suggestion_ids is the one that matters
+    # See templates/fix/nsfw_grid.html for an example
+    agrees_values = map(lambda x: x == 'True', request.POST.getlist('agrees'))
+    needs_help_values = map(lambda x: x == 'True', request.POST.getlist('needs_help'))
+    delete_values = request.POST.getlist('delete')
+    suggestion_ids = map(int, request.POST.getlist('suggestion'))
 
-    if request.user.is_authenticated and suggestion_id:
+    informations = zip_longest(suggestion_ids, agrees_values, needs_help_values, delete_values, fillvalue=False)
+
+    for suggestion_id, agrees, needs_help, delete in informations:
+        if not suggestion_id:
+            continue
+
         if delete:
             try:
                 Evidence.objects.get(
@@ -919,8 +994,9 @@ def update_evidence(request):
             evidence.needs_help = needs_help
             evidence.save()
 
-    if suggestion_id:
-        return redirect('fix-suggestion', suggestion_id)
+    next_url = request.GET.get('next')
+    if next_url and is_safe_url(url=next_url, host=request.get_host()):
+        return redirect(next_url)
     return redirect('fix-index')
 
 

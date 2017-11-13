@@ -1,0 +1,9 @@
+{
+    "configurations": [
+        ["zero"],
+        ["knn", 20],
+        ["svd", 20],
+        ["als", 20],
+        ["wals", 20]
+    ]
+}
