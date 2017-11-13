@@ -110,7 +110,7 @@ class MALTest(TestCase):
     def test_mal_task_cleanup(self, strict_redis, import_mal_operation):
         tasks.import_mal.push_request(id=1)
 
-        with self.subTest('When the import succeed, there is no background task anymore, nor Redis task details.'):
+        with self.subTest('When the import succeeds, there is no background task anymore, nor Redis task details.'):
             tasks.import_mal.run('RaitoBezarius',
                                  self.user.username)
             r = strict_redis.return_value

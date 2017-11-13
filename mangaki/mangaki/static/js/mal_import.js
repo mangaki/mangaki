@@ -104,7 +104,7 @@ $(document).ready(function () {
       checkServerSideTaskId: function () {
         if (!this.serverSideTaskId) {
           this.followProgress = false;
-          this.errorMessage = "Subitement, votre ticket d'import a disparu!";
+          this.errorMessage = "Subitement, votre ticket d'import a disparu !";
         }
       },
       startPollingProgress: function () {
