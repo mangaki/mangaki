@@ -34,7 +34,8 @@ Requires Python 3.4 → 3.6, PostgreSQL 9.3 → 10, Redis 4.0, and preferably `p
 
 This step is mandatory only if you need background tasks which is required for features such as MAL imports.
 
-     celery -A -B mangaki:celery_app worker -l INFO
+     # Ensure that your working directory is where manage.py is. (i.e. ls in this folder should show you manage.py)
+     celery -B -A mangaki:celery_app worker -l INFO
 
 If you can read something along these lines:
 
