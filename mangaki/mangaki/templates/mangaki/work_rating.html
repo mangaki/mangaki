@@ -16,7 +16,7 @@
             <div class="work-cover__content">
             <div class="work-card__content">
                 <div class="work-card__synopsis">
-                    {{ work.synopsis|linebreaksbr }}
+                    {{ work.synopsis | safe | linebreaksbr}}
                 </div>
                 <a href="{% if work.id == None %}#{% else %}{% url "work-detail" work.category.slug work.id %}{% endif %}"
                         class="work-card__link">
