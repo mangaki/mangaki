@@ -13,8 +13,6 @@ def fit_algo(algo_name, triplets, titles=None, categories=None, output_csv=False
 
     anonymized = dataset.make_anonymous_data(triplets)
     algo.set_parameters(anonymized.nb_users, anonymized.nb_works)
-    if algo_name == 'gbr':
-        algo.load_dataset(dataset)
     algo.fit(anonymized.X, anonymized.y)
 
     if algo.is_serializable:
