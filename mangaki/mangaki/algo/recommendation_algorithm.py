@@ -83,6 +83,12 @@ class RecommendationAlgorithm:
     def compute_mae(y_pred, y_true):
         return mean_absolute_error(y_true, y_pred)
 
+    def compute_all_errors(X_train, y_train, X_test, y_test):
+        y_train_pred = self.predict(X_train)
+        logging.debug('Train RMSE=%f', self.compute_rmse(y_train, y_train_pred))
+        y_test_pred = self.predict(X_test)
+        logging.debug('Test RMSE=%f', self.compute_rmse(y_test, y_test_pred))
+
     @staticmethod
     def available_evaluation_metrics():
         return ['rmse', 'mae']
