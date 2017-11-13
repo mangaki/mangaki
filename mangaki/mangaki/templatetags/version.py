@@ -12,7 +12,7 @@ def mangaki_version():
 def mangaki_revision():
     try:
         parts = settings.VERSION.split('+')
-        rev, _ = parts[-1].split('.')
+        rev = parts[-1].split('.')[0]
         return rev[1:]
     except:
         return '' # just go to latest commit on master.
