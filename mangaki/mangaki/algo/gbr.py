@@ -1,12 +1,18 @@
-from mangaki.utils.common import RecommendationAlgorithm
+from mangaki.algo import RecommendationAlgorithm, register_algorithm
 from sklearn.ensemble import GradientBoostingRegressor as GBR
-from mangaki.utils.als import MangakiALS
-from mangaki.utils.data import Dataset
-from mangaki.utils.values import tags_definition
+from mangaki.algo.als import MangakiALS
+from mangaki.algo.dataset import Dataset
+from django.conf import settings
 import json
 import numpy as np
+import os.path
 
-class  MangakiGBR(RecommendationAlgorithm):
+
+I2V_DIR = os.path.join(settings.DATA_DIR, 'illustration2vec')
+
+
+@register_algorithm('gbr')
+class MangakiGBR(RecommendationAlgorithm):
 	U = None
 	M = None
 	dataset = Dataset()
@@ -26,9 +32,25 @@ class  MangakiGBR(RecommendationAlgorithm):
 		als_algo = MangakiALS(20)
 		als_algo.set_parameters(self.nb_users,self.nb_works)
 		als_algo.fit(X, y)
-		tags = json.load(open('../fixtures/mangaki_i2v.json'))
+		tags = json.load(open(os.path.join(I2V_DIR, 'mangaki_i2v.json')))
 		self.chrono.save("fitting als algo")
 		V = np.transpose(als_algo.VT)
+
+		try:
+			tags_definition = json.load(open(os.path.join(I2V_DIR, 'all_tags.json')))
+		except FileNotFoundError:
+			tags = json.load(open(os.path.join(I2V_DIR, 'mangaki_i2v.json')))
+			all_tags = set()
+			for poster in tags:
+				all_tags.update([tag for tag, _ in tags[poster]['general']])
+			tags_definition = {}
+			i = 0
+			for tag in all_tags:
+				tags_definition[tag] = i
+				i += 1
+
+			json.dump(tags_definition, open(os.path.join(I2V_DIR, 'all_tags.json'), 'w'))
+
 		nb_tags = len(tags_definition)
 		poster_tags = np.zeros((self.nb_works, nb_tags))
 		for i in range(self.nb_works):

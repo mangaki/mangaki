@@ -6,6 +6,7 @@ from .als import MangakiALS
 from .balse import MangakiBALSE
 from .lasso import MangakiLASSO
 from .efa import MangakiEFA
+from .gbr import MangakiGBR
 from .knn import MangakiKNN
 from .pca import MangakiPCA
 from .svd import MangakiSVD
