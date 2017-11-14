@@ -3,6 +3,7 @@ from scipy.sparse import coo_matrix
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics.pairwise import cosine_similarity
 import random
+import logging
 
 from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
@@ -10,28 +11,26 @@ from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, regis
 @register_algorithm('sgd')
 class MangakiSGD(RecommendationAlgorithm):
     def __init__(self, nb_components=20, nb_iterations=10,
-                 nb_users=2079, nb_works=9979, gamma=0.01, lambda_=0.1):
+                 gamma=0.01, lambda_=0.1):
         super().__init__()
         self.nb_components = nb_components
         self.nb_iterations = nb_iterations
         self.gamma = gamma
         self.lambda_ = lambda_
-        self.nb_users = nb_users
-        self.nb_works = nb_works
+
+    def fit(self, X, y):
         self.bias = np.random.random()
         self.bias_u = np.random.random(self.nb_users)
         self.bias_v = np.random.random(self.nb_works)
         self.U = np.random.random((self.nb_users, self.nb_components))
         self.V = np.random.random((self.nb_works, self.nb_components))
-
-    def fit(self, X, y):
         for epoch in range(self.nb_iterations):
             step = 0
             for (i, j), rating in zip(X, y):
                 if step % 100000 == 0:  # Pour afficher l'erreur de train
                     y_pred = self.predict(X)
-                    print('Train RMSE (epoch={}, step={}): {}'.format(
-                        epoch, step, mean_squared_error(y, y_pred) ** 0.5))
+                    logging.info('Train RMSE (epoch=%d, step=%d): %f',
+                        epoch, step, mean_squared_error(y, y_pred) ** 0.5)
                 predicted_rating = self.predict_one(i, j)
                 error = predicted_rating - rating
                 self.bias -= self.gamma * error
@@ -57,7 +56,7 @@ class MangakiSGD(RecommendationAlgorithm):
 
     @property
     def is_serializable(self):
-        return True
+        return False  # Not yet, but easy to do
 
     def __str__(self):
         return '[SGD] NB_COMPONENTS = %d' % self.nb_components
