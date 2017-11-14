@@ -8,13 +8,26 @@ from mangaki.algo.recommendation_algorithm import (RecommendationAlgorithm,
 
 @register_algorithm('knn2')
 class MangakiKNN2(RecommendationAlgorithm):
-    def __init__(self, nb_neighbors=2):
+    '''
+    Toy implementation (not usable in production) of KNN for the mere sake of science.
+    N users, M ~ 10k works, P ~ 300k user-work pairs, K neighbors.
+
+    Algorithm:
+    For each user-work pair (over all P pairs):
+    - Find closest raters of user *who rated this work* (takes O(M log M))
+    - Compute their average rating (takes O(K))
+    Complexity: O(P·(M log M + K)) => Oops!
+    '''
+    def __init__(self, nb_neighbors=20):
         super().__init__()
         self.nb_neighbors = nb_neighbors
-        self.nb_users = nb_users
-        self.nb_works = nb_works
+        self.ratings = None
 
-    def fit(self, X, y):
+    @property
+    def is_serializable(self):
+        return True
+
+    def fit(self, X, y, whole_dataset=False):
         user_ids = X[:, 0]
         work_ids = X[:, 1]
         self.ratings = coo_matrix((y, (user_ids, work_ids)),
@@ -34,10 +47,6 @@ class MangakiKNN2(RecommendationAlgorithm):
             rating = self.ratings_by_work[neighbor_ids, work_id].mean()
             y.append(rating)
         return np.array(y)
-
-    @property
-    def is_serializable(self):
-        return True
 
     def __str__(self):
         return '[KNN2] NB_NEIGHBORS = %d' % self.nb_neighbors
