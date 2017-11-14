@@ -26,7 +26,8 @@ class MangakiCFM(RecommendationAlgorithm):
         user_ids = X[:, 0]
         work_ids = X[:, 1]
         rows = list(range(nb_samples))
-        rows += rows
+        # For the k-th user_id-work_id pair, we need (k, user_id) and (k, N + work_id), so two copies of range(nb_samples)
+        rows.extend(rows)
         cols = np.concatenate((user_ids, self.nb_users + work_ids))
         X_fm = coo_matrix(([1] * (2 * nb_samples), (rows, cols)),
                           shape=(nb_samples, self.nb_users + self.nb_works)
