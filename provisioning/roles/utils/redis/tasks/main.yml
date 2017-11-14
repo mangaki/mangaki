@@ -17,8 +17,8 @@
   template:
     src: 'etc/redis/redis.conf'
     dest: '/etc/redis/redis.conf'
-    owner: 'root'
-    group: 'root'
+    owner: 'redis'
+    group: 'redis'
     mode: '0640'
   become: true
   notify: Restart redis.
@@ -27,8 +27,8 @@
   template:
     src: 'etc/redis/core.conf'
     dest: '/etc/redis/core.conf'
-    owner: 'root'
-    group: 'root'
+    owner: 'redis'
+    group: 'redis'
     mode: '0644'
   become: true
   notify: Restart redis.
