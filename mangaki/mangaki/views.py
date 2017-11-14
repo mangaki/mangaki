@@ -39,7 +39,8 @@ from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
-from mangaki.utils.mal import import_mal, client
+from mangaki.utils.mal import client
+from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
@@ -488,14 +489,19 @@ def get_profile(request,
     except EmptyPage:
         ratings = paginator.page(paginator.num_pages)
 
+    is_me = request.user == user
     data = {
         'meta': {
-            'is_mal_import_available': client.is_available,
+            'debug_vue': settings.DEBUG_VUE_JS,
+            'mal': {
+                'is_available': client.is_available and (redis_pool is not None),
+                'pending_import': None if (not is_me) or is_anonymous else get_current_mal_import(request.user),
+            },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,
             'username': request.user.username,
             'is_shared': is_shared,
-            'is_me': request.user == user,
+            'is_me': is_me,
             'category': category,
             'seen': seen_works,
             'is_anonymous': is_anonymous,
@@ -811,20 +817,6 @@ def update_reco_willsee(request):
     if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
     return HttpResponse()
-
-
-def import_from_mal(request, mal_username):
-    if request.method == 'POST' and client.is_available:
-        nb_added, fails = import_mal(mal_username, request.user.username)
-        payload = {
-            'added': nb_added,
-            'failures': fails
-        }
-        return HttpResponse(json.dumps(payload), content_type='application/json')
-    elif not client.is_available:
-        raise Http404()
-    else:
-        return HttpResponse()
 
 
 def add_pairing(request, artist_id, work_id):

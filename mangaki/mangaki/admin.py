@@ -17,7 +17,8 @@ from mangaki.models import (
     Suggestion, Evidence, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
     FAQEntry, ColdStartRating, Trope, Language,
-    ExtLanguage, WorkCluster
+    ExtLanguage, WorkCluster,
+    UserBackgroundTask
 )
 from mangaki.utils.anidb import AniDBTag, client, diff_between_anidb_and_local_tags
 from mangaki.utils.db import get_potential_posters
@@ -764,3 +765,4 @@ admin.site.register(ColdStartRating)
 admin.site.register(Trope)
 admin.site.register(Language)
 admin.site.register(ExtLanguage)
+admin.site.register(UserBackgroundTask)
