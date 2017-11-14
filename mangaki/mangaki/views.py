@@ -39,7 +39,8 @@ from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
-from mangaki.utils.mal import import_mal, client
+from mangaki.utils.mal import client
+from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
@@ -57,6 +58,7 @@ NB_POINTS_DPP = 10
 RATINGS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
+ARTISTS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 FIXES_PER_PAGE = 5
 NSFW_GRID_PER_PAGE = 5
@@ -282,7 +284,8 @@ class WorkList(WorkListMixin, ListView):
     def category(self):
         return get_object_or_404(Category, slug=self.kwargs.get('category'))
 
-    def search(self):
+    @property
+    def search_query(self):
         return self.request.GET.get('search', None)
 
     def flat(self):
@@ -291,7 +294,7 @@ class WorkList(WorkListMixin, ListView):
     def sort_mode(self):
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
-        if self.search() is not None and sort == default:
+        if self.search_query is not None and sort == default:
             return 'popularity'  # Mosaic cannot be searched through because it is random. We enforce the popularity as the second default when searching.
         else:
             return sort
@@ -301,7 +304,7 @@ class WorkList(WorkListMixin, ListView):
         return self.kwargs.get('dpp', False)
 
     def get_queryset(self):
-        search_text = self.search()
+        search_text = self.search_query
         self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
 
@@ -339,7 +342,7 @@ class WorkList(WorkListMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slot_sort_types = ['popularity', 'controversy', 'top', 'random']
-        search_text = self.search()
+        search_text = self.search_query
         sort_mode = self.sort_mode()
         flat = self.flat()
 
@@ -369,6 +372,27 @@ class WorkList(WorkListMixin, ListView):
             return redirect('work-detail', category=self.category.slug, pk=unique_work.pk)
         else:
             return super(WorkList, self).render_to_response(context)
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class ArtistList(ListView):
+    paginate_by = ARTISTS_PER_PAGE
+
+    def get_queryset(self):
+        queryset = Artist.objects.all()
+        if self.search_query:
+            return queryset.filter(name__icontains=self.search_query)
+        return queryset.order_by('name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['nb_artists'] = Artist.objects.count()
+        context['search'] = self.search_query
+        return context
+
+    @property
+    def search_query(self):
+        return self.request.GET.get('search', None)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -465,14 +489,19 @@ def get_profile(request,
     except EmptyPage:
         ratings = paginator.page(paginator.num_pages)
 
+    is_me = request.user == user
     data = {
         'meta': {
-            'is_mal_import_available': client.is_available,
+            'debug_vue': settings.DEBUG_VUE_JS,
+            'mal': {
+                'is_available': client.is_available and (redis_pool is not None),
+                'pending_import': None if (not is_me) or is_anonymous else get_current_mal_import(request.user),
+            },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,
             'username': request.user.username,
             'is_shared': is_shared,
-            'is_me': request.user == user,
+            'is_me': is_me,
             'category': category,
             'seen': seen_works,
             'is_anonymous': is_anonymous,
@@ -788,20 +817,6 @@ def update_reco_willsee(request):
     if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
     return HttpResponse()
-
-
-def import_from_mal(request, mal_username):
-    if request.method == 'POST' and client.is_available:
-        nb_added, fails = import_mal(mal_username, request.user.username)
-        payload = {
-            'added': nb_added,
-            'failures': fails
-        }
-        return HttpResponse(json.dumps(payload), content_type='application/json')
-    elif not client.is_available:
-        raise Http404()
-    else:
-        return HttpResponse()
 
 
 def add_pairing(request, artist_id, work_id):
