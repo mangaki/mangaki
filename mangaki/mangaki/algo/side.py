@@ -16,7 +16,7 @@ class SideInformation:
     def load(self):
         # Load in CSC format if no matrix provided.
         if self.T is None:
-            self.T = load_npz(os.path.join(settings.DATA_DIR, 'lasso',
+            self.T = load_npz(os.path.join(settings.DATA_DIR, 'tags',
                                            'tag-matrix.npz')).tocsc()
         _, self.nb_tags = self.T.shape
 

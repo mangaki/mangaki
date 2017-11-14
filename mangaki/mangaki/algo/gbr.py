@@ -51,8 +51,8 @@ class MangakiGBR(RecommendationAlgorithm):
 
         self.gbr = GBR(n_estimators=self.nb_estimators)
         self.gbr.fit(X_full, y)
-        logging.info(self.gbr.feature_importances_)
-        logging.info(self.gbr.train_score_)
+        logging.debug('feature_importances=%s', str(self.gbr.feature_importances_))
+        logging.debug('train_score=%s', str(self.gbr.train_score_))
 
         self.chrono.save('fit GBR model')
 
