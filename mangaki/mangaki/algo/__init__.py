@@ -8,7 +8,9 @@ from .lasso import MangakiLASSO
 from .cfm import MangakiCFM
 from .efa import MangakiEFA
 from .knn import MangakiKNN
+from .knn2 import MangakiKNN2
 from .pca import MangakiPCA
+from .sgd import MangakiSGD
 from .svd import MangakiSVD
 from .wals import MangakiWALS
 from .xals import MangakiXALS
