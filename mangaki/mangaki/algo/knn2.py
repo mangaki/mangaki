@@ -9,6 +9,16 @@ from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, regis
 
 @register_algorithm('knn2')
 class MangakiKNN2(RecommendationAlgorithm):
+    '''
+    Toy implementation (not usable in production) of KNN for the mere sake of science.
+    N users, M ~ 10k works, P ~ 300k user-work pairs, K neighbors.
+
+    Algorithm:
+    For each user-work pair (over all P pairs):
+    - Find closest raters of user *who rated this work* (takes O(M log M))
+    - Compute their average rating (takes O(K))
+    Complexity: O(P·(M log M + K)) => Oops!
+    '''
     nb_neighbors = None
     closest_neighbors = None
     rated_works = None
