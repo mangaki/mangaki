@@ -80,7 +80,18 @@ RATING_COLORS = {
     'wontsee': {'normal': '#5bc0de', 'highlight': '#31b0d5'}
 }
 
-UTA_ID = 14293
+FEATURED = {
+    'utamonogatari': 14293,
+    'coo': 378,
+    'colorful': 9944,
+    'crayon': 3125,
+    'nausicaa': 1289,
+    'godfathers': 330,
+    'souvenirs': 2696,
+    'silent': 2238,
+    'night': 18416,
+    'fireworks': 18331
+}
 
 DPP_UI_CONFIG_FOR_RATINGS = {
     'ui': [
@@ -549,21 +560,20 @@ def about(request, lang):
 
 
 def events(request):
-    uta_rating = None
+    user_ratings = {}
     if request.user.is_authenticated:
-        for rating in Rating.objects.filter(work_id=UTA_ID, user=request.user):
-            if rating.work_id == UTA_ID:
-                uta_rating = rating.choice
-    utamonogatari = Work.objects.in_bulk([UTA_ID])
+        for rating in Rating.objects.filter(work_id__in=FEATURED.values(), user=request.user):
+            user_ratings[rating.work_id] = rating.choice
+    featured_works = Work.objects.in_bulk(FEATURED.values())
+    context = {
+        'wakanim': Partner.objects.get(pk=12),
+        'config': VANILLA_UI_CONFIG_FOR_RATINGS
+    }
+    for work_tag, work_id in FEATURED.items():
+        context[work_tag] = featured_works[work_id]
+        context['{}_rating'.format(work_tag)] = user_ratings.get(work_id)
     return render(
-        request, 'events.html',
-        {
-            'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
-            'utamonogatari': utamonogatari.get(UTA_ID, None),
-            'wakanim': Partner.objects.get(pk=12),
-            'utamonogatari_rating': uta_rating,
-            'config': VANILLA_UI_CONFIG_FOR_RATINGS
-        })
+        request, 'events.html', context)
 
 
 def top(request, category_slug):
