@@ -9,6 +9,7 @@ from django.core import management
 from django.conf import settings
 from mangaki.models import Work, Category, Artist
 from mangaki.utils.anidb import AniDB
+from mangaki.utils.tokens import compute_token
 
 
 class CommandTest(TestCase):
@@ -103,7 +104,7 @@ class CommandTest(TestCase):
         management.call_command('tokens', 'DR', '--salt', 'PEPPER',  # HA HA
                                 stdout=self.stdout)
         self.assertEquals(self.stdout.getvalue(),
-                          'DR a2c8126e2a2c7b0bb8cac57577e16f9ddc9971f9\n')
+                          'DR {:s}\n'.format(compute_token('PEPPER', 'DR')))
 
     @responses.activate
     def test_vgmdb(self):

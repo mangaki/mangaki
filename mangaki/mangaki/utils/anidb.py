@@ -500,8 +500,8 @@ class AniDB:
         return work
 
 client = AniDB(
-    getattr(settings, 'ANIDB_CLIENT', None),
-    getattr(settings, 'ANIDB_VERSION', None)
+    getattr(settings, 'ANIDB_CLIENT', 'test_client'),
+    getattr(settings, 'ANIDB_VERSION', 1)
 )
 
 def diff_between_anidb_and_local_tags(work: Work,
