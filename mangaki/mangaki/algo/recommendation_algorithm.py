@@ -37,6 +37,7 @@ class RecommendationAlgorithm:
         self.chrono = Chrono(self.verbose_level)
         self.nb_users = None
         self.nb_works = None
+        self.size = 0  # For backup files
 
     def get_backup_path(self, filename):
         if filename is None:

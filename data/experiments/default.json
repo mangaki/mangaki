@@ -1,7 +1,5 @@
 {
     "configurations": [
-        ["zero"],
-        ["knn", 20],
-        ["knn2", 20]
+        ["zero"]
     ]
 }

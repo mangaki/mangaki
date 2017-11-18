@@ -471,7 +471,7 @@ class AniDB:
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
             'nsfw': anime.get('restricted') == 'true',
             'date': to_python_datetime(anime.startdate.string),
-            'end_date': to_python_datetime(anime.enddate.string),
+            'end_date': to_python_datetime(anime.enddate.string) if anime.enddate else None,
             'ext_synopsis': str(anime.description.string) if anime.description else '',
             'nb_episodes': int(anime.episodecount.string) if anime.episodecount else None,
             'anime_type': str(anime.type.string) if anime.type else None,

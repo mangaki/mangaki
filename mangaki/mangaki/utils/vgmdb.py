@@ -1,4 +1,6 @@
 import json
+from django.conf import settings
+import os.path
 
 from urllib.request import urlopen
 
