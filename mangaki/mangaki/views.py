@@ -321,6 +321,8 @@ class WorkList(WorkListMixin, ListView):
 
         if self.is_dpp:
             self.queryset = self.queryset.exclude(coldstartrating__user=self.request.user).dpp(10)
+        elif sort_mode == 'new':
+            self.queryset = self.queryset.filter(date__isnull=False).order_by('-date')
         elif sort_mode == 'top':
             self.queryset = self.queryset.top()
         elif sort_mode == 'popularity':

@@ -28,16 +28,18 @@
     {% else %}
     <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}">Mosaïque</a></li>
-    <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=popularity">Les plus populaires</a></li>
-    <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=controversy">Les plus controversés</a></li>
+    <li role="presentation"{% if sort_mode == 'new' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=new">Récents</a></li>
     <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=top">Les plus aimés</a></li>
+      <a href="{% url 'work-list' category %}?sort=top">Top</a></li>
+    <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=popularity">Populaires</a></li>
     <li role="presentation"{% if sort_mode == 'pearls' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=pearls">Perles rares</a></li>
+    <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
+      <a href="{% url 'work-list' category %}?sort=controversy">Controversés !</a></li>
     <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=random">Perles au hasard</a></li>
+      <a href="{% url 'work-list' category %}?sort=random">Random</a></li>
     <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
       <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
       {% endif %}
