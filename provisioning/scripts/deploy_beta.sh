@@ -19,7 +19,7 @@ fi
 # Prepare a nice package.
 cd mangaki && python setup.py sdist && cd ..
 # Get the path to the package.
-LOCAL_PACKAGE_NAME=$(find "mangaki/dist" -maxdepth 1 -name "*.tar.gz" | sort -n | tail -n1)
+LOCAL_PACKAGE_NAME=$(find "mangaki/dist" -maxdepth 1 -name "*.tar.gz" | xargs ls -t | head -n1)
 LOCAL_PACKAGE_PATH="$(pwd)/$LOCAL_PACKAGE_NAME"
 echo "I will install $LOCAL_PACKAGE_PATH on beta.mangaki.fr."
 # Prepare the password file.
