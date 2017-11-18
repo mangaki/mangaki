@@ -61,7 +61,7 @@ class CommandTest(TestCase):
         self.assertIn('---', self.stdout.getvalue())
 
     def test_compare(self):
-        management.call_command('compare', 'mangas', stdout=self.stdout)
+        management.call_command('compare', 'dummy', stdout=self.stdout)
         self.assertTrue(True)
 
     def test_fit_algo(self):

@@ -17,6 +17,7 @@ from mangaki.utils.values import rating_values
 FILENAMES = {
     'movies': 'ratings-ml.csv',
     'mangas': 'ratings.csv',
+    'dummy': '../mangaki/tests/data/ratings.csv',
     'balse': 'balse/ratings.csv'
 }
 CONVERT_FUNCTIONS = {
