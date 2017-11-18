@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.core import management
 from django.conf import settings
 from mangaki.models import Work, Category, Artist
+from mangaki.utils.anidb import AniDB
 
 
 class CommandTest(TestCase):
@@ -18,24 +19,42 @@ class CommandTest(TestCase):
 
     def setUp(self):
         self.anime = Work.objects.create(
-                        anidb_aid=3651,
+                        anidb_aid=11606,
                         ext_poster='https://mangaki.fr/static/img/favicon.png',
                         category=Category.objects.get(slug='anime'),
-                        title='La Mélancolie de Haruhi Suzumiya')
+                        title='Sangatsu no Lion')
+        self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
         self.album = Work.objects.create(
                         vgmdb_aid=22495,
                         category=Category.objects.get(slug='album'),
                         title='BLUE')
-        self.artist = Artist.objects.create(name='Yoko Kanno')
         self.album_fixture = self.read_fixture('blue_vgmdb.json')
+        self.artist = Artist.objects.create(name='Yoko Kanno')
         self.stdout = StringIO()
 
+    @responses.activate
     def test_add_anidb(self):
-        management.call_command('add_anidb', 12994, stdout=self.stdout)
+        responses.add(
+            responses.GET,
+            AniDB.BASE_URL,
+            body=self.anime_fixture,
+            status=200,
+            content_type='application/xml'
+        )
+        management.call_command('add_anidb', self.anime.anidb_aid,
+                                stdout=self.stdout)
         self.assertEquals(self.stdout.getvalue(),
-                          "Successfully added Sangatsu no Lion (2017)\n")
+                          "Successfully added Sangatsu no Lion\n")
 
+    @responses.activate
     def test_anidb_tags_to_json(self):
+        responses.add(
+            responses.GET,
+            AniDB.BASE_URL,
+            body=self.anime_fixture,
+            status=200,
+            content_type='application/xml'
+        )
         management.call_command('anidb_tags_to_json', self.anime.id,
                                 stdout=self.stdout)
         self.assertIn('---', self.stdout.getvalue())
@@ -59,14 +78,22 @@ class CommandTest(TestCase):
         self.assertTrue(True)
 
     def test_lookup(self):
-        management.call_command('lookup', 'haruhi', stdout=self.stdout)
+        management.call_command('lookup', 'lion', stdout=self.stdout)
         self.assertIn(str(self.anime.id), self.stdout.getvalue())
 
     def test_ranking(self):
         management.call_command('ranking')
         self.assertTrue(True)
 
+    @responses.activate
     def test_retrieveposters(self):
+        responses.add(
+            responses.GET,
+            re.compile(r'https://mangaki\.fr/.*'),
+            body=self.anime_fixture,
+            status=200,
+            content_type='application/xml'
+        )
         management.call_command('retrieveposters', self.anime.id,
                                 stdout=self.stdout)
         self.assertEquals(self.stdout.getvalue(),
@@ -82,7 +109,7 @@ class CommandTest(TestCase):
     def test_vgmdb(self):
         responses.add(
             responses.GET,
-            re.compile(r'http://vgmdb.info/album/.*?format=json'),
+            re.compile(r'http://vgmdb\.info/.*'),
             body=self.album_fixture,
             status=200,
             content_type='application/json'

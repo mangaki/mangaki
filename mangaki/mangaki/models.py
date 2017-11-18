@@ -198,7 +198,7 @@ class Work(models.Model):
             return False
 
         poster_filename = "{:d}-{:s}".format(self.id, os.path.basename(urlparse(url).path))
-        # Hé mais ça va pas écraser des posters / créer des collisions, ça ?
+        # TODO: Où est le hash
 
         try:
             r = session.get(url, timeout=5, stream=True)

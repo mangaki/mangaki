@@ -1,8 +1,7 @@
 import json
 from django.conf import settings
 import os.path
-
-from urllib.request import urlopen
+import requests
 
 BASE_URL = "http://vgmdb.info/"
 SITE_URL = "http://vgmdb.net/"
@@ -25,8 +24,8 @@ class VGMdb:
     """
     id = int(id) # why?
 
-    r = urlopen(BASE_URL + 'album/' + str(id) + '?format=json')
-    soup = json.loads(r.read().decode('utf-8'))
+    r = requests.get(BASE_URL + 'album/' + str(id), {'format': 'json'})
+    soup = json.loads(r.text)
     
     a = Album({
       'date': soup['release_date'],
