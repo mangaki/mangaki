@@ -39,7 +39,8 @@ from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
-from mangaki.utils.mal import import_mal, client
+from mangaki.utils.mal import client
+from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
@@ -79,7 +80,18 @@ RATING_COLORS = {
     'wontsee': {'normal': '#5bc0de', 'highlight': '#31b0d5'}
 }
 
-UTA_ID = 14293
+FEATURED = {
+    'utamonogatari': 14293,
+    'coo': 378,
+    'colorful': 9944,
+    'crayon': 3125,
+    'nausicaa': 1289,
+    'godfathers': 330,
+    'souvenirs': 2696,
+    'silent': 2238,
+    'night': 18416,
+    'fireworks': 18331
+}
 
 DPP_UI_CONFIG_FOR_RATINGS = {
     'ui': [
@@ -309,6 +321,8 @@ class WorkList(WorkListMixin, ListView):
 
         if self.is_dpp:
             self.queryset = self.queryset.exclude(coldstartrating__user=self.request.user).dpp(10)
+        elif sort_mode == 'new':
+            self.queryset = self.queryset.filter(date__isnull=False).order_by('-date')
         elif sort_mode == 'top':
             self.queryset = self.queryset.top()
         elif sort_mode == 'popularity':
@@ -488,14 +502,19 @@ def get_profile(request,
     except EmptyPage:
         ratings = paginator.page(paginator.num_pages)
 
+    is_me = request.user == user
     data = {
         'meta': {
-            'is_mal_import_available': client.is_available,
+            'debug_vue': settings.DEBUG_VUE_JS,
+            'mal': {
+                'is_available': client.is_available and (redis_pool is not None),
+                'pending_import': None if (not is_me) or is_anonymous else get_current_mal_import(request.user),
+            },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,
             'username': request.user.username,
             'is_shared': is_shared,
-            'is_me': request.user == user,
+            'is_me': is_me,
             'category': category,
             'seen': seen_works,
             'is_anonymous': is_anonymous,
@@ -543,21 +562,20 @@ def about(request, lang):
 
 
 def events(request):
-    uta_rating = None
+    user_ratings = {}
     if request.user.is_authenticated:
-        for rating in Rating.objects.filter(work_id=UTA_ID, user=request.user):
-            if rating.work_id == UTA_ID:
-                uta_rating = rating.choice
-    utamonogatari = Work.objects.in_bulk([UTA_ID])
+        for rating in Rating.objects.filter(work_id__in=FEATURED.values(), user=request.user):
+            user_ratings[rating.work_id] = rating.choice
+    featured_works = Work.objects.in_bulk(FEATURED.values())
+    context = {
+        'wakanim': Partner.objects.get(pk=12),
+        'config': VANILLA_UI_CONFIG_FOR_RATINGS
+    }
+    for work_tag, work_id in FEATURED.items():
+        context[work_tag] = featured_works[work_id]
+        context['{}_rating'.format(work_tag)] = user_ratings.get(work_id)
     return render(
-        request, 'events.html',
-        {
-            'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
-            'utamonogatari': utamonogatari.get(UTA_ID, None),
-            'wakanim': Partner.objects.get(pk=12),
-            'utamonogatari_rating': uta_rating,
-            'config': VANILLA_UI_CONFIG_FOR_RATINGS
-        })
+        request, 'events.html', context)
 
 
 def top(request, category_slug):
@@ -811,20 +829,6 @@ def update_reco_willsee(request):
     if request.user.is_authenticated and request.method == 'POST':
         Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
     return HttpResponse()
-
-
-def import_from_mal(request, mal_username):
-    if request.method == 'POST' and client.is_available:
-        nb_added, fails = import_mal(mal_username, request.user.username)
-        payload = {
-            'added': nb_added,
-            'failures': fails
-        }
-        return HttpResponse(json.dumps(payload), content_type='application/json')
-    elif not client.is_available:
-        raise Http404()
-    else:
-        return HttpResponse()
 
 
 def add_pairing(request, artist_id, work_id):

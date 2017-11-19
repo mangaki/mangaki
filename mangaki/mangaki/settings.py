@@ -23,6 +23,8 @@ config.read(
     os.environ.get('MANGAKI_SETTINGS_PATH', os.path.join(BASE_DIR, 'settings.ini')))
 
 DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
+# Use non-minified version of Vue.js
+DEBUG_VUE_JS = config.getboolean('debug', 'DEBUG_VUE_JS', fallback=False)
 
 SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 
@@ -206,7 +208,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'mosaic_slot_card': '4/sec'
+        'mosaic_slot_card': '4/sec',
+        'mal_import': '3/hour'
     }
 }
 
@@ -214,6 +217,7 @@ REST_FRAMEWORK = {
 # Celery configuration #
 ########################
 
+REDIS_URL = config.get('redis', 'broker_url', fallback='redis://')
 CELERY_BROKER_URL = config.get('celery', 'broker_url', fallback='redis://')
 CELERY_RESULT_BACKEND = config.get('celery', 'result_backend', fallback='redis://')
 

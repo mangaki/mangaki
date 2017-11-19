@@ -14,10 +14,15 @@ psql -d mangaki -c \
 cat > mangaki/settings.ini <<EOF
 [debug]
 DEBUG = True
+DEBUG_VUE_JS = True
 
 [secrets]
 SECRET_KEY = $(pwgen -s -c 60 1)
 DB_PASSWORD = ${DB_PASSWORD}
+
+[celery]
+BROKER_URL = redis://
+RESULT_BACKEND = redis://
 
 [email]
 EMAIL_BACKEND = django.core.mail.backends.console.EmailBackend

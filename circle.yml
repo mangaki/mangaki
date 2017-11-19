@@ -5,6 +5,7 @@ machine:
     version: 3.5.2
 dependencies:
   pre:
+    - sudo apt-get update; sudo apt-get install -y software-properties-common; sudo apt-add-repository ppa:ansible/ansible -y; sudo apt-get update; sudo apt-get install -y ansible
     - pip install -r requirements/dev.txt
 database:
   override:
@@ -23,3 +24,9 @@ test:
   post:
     - cd mangaki && coverage html -d $CIRCLE_ARTIFACTS
     - cd mangaki && bash <(curl -s https://codecov.io/bash)
+deployment:
+  beta:
+    branch: [master, raito/beta-autodeploy]
+    owner: mangaki
+    commands:
+      - ./provisioning/scripts/deploy_beta.sh
