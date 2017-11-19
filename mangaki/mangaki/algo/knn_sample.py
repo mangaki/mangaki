@@ -2,32 +2,14 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
-from mangaki.algo.recommendation_algorithm import (RecommendationAlgorithm,
-                                                   register_algorithm)
 
-
-@register_algorithm('knn2')
-class MangakiKNN2(RecommendationAlgorithm):
-    '''
-    Toy implementation (not usable in production) of KNN for the mere sake of science.
-    N users, M ~ 10k works, P ~ 300k user-work pairs, K neighbors.
-
-    Algorithm:
-    For each user-work pair (over all P pairs):
-    - Find closest raters of user *who rated this work* (takes O(M log M))
-    - Compute their average rating (takes O(K))
-    Complexity: O(P·(M log M + K)) => Oops!
-    '''
-    def __init__(self, nb_neighbors=20):
-        super().__init__()
+class MangakiKNN:
+    def __init__(self, nb_users, nb_works, nb_neighbors=20):
         self.nb_neighbors = nb_neighbors
-        self.ratings = None
+        self.nb_users = nb_users
+        self.nb_works = nb_works
 
-    @property
-    def is_serializable(self):
-        return True
-
-    def fit(self, X, y, whole_dataset=False):
+    def fit(self, X, y):
         user_ids = X[:, 0]
         work_ids = X[:, 1]
         self.ratings = coo_matrix((y, (user_ids, work_ids)),
@@ -48,8 +30,3 @@ class MangakiKNN2(RecommendationAlgorithm):
             y.append(rating)
         return np.array(y)
 
-    def __str__(self):
-        return '[KNN2] NB_NEIGHBORS = %d' % self.nb_neighbors
-
-    def get_shortname(self):
-        return 'knn2-%d' % self.nb_neighbors

@@ -12,7 +12,7 @@ UMask=0027
 
 PermissionsStartOnly=yes
 ExecStart={{ cron_command }}
-{% for key, value in cron_env.iteritems() %}
+{% for key, value in cron_env.items() %}
 Environment={{ key }}={{ value }}
 {% endfor %}
 

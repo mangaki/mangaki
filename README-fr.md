@@ -21,6 +21,7 @@ Prérequis
 
 - 3.4 ≤ Python ≥ 3.6
 - 9.3 ≤ PostgreSQL ≤ 10
+- 4.0.0 ≤ Redis ≤ 4.0.2
 
 Si vous n'avez jamais fait de Django, je vous renvoie vers [leur super tutoriel](https://docs.djangoproject.com/en/1.9/intro/tutorial01/).
 
@@ -65,10 +66,15 @@ l'application. Pour une installation de développement, il suffit de faire :
     cat > mangaki/settings.ini <<EOF
     [debug]
     DEBUG = True
+    DEBUG_VUE_JS = True
 
     [secrets]
     SECRET_KEY = $(pwgen -s -c 60 1)
     DB_PASSWORD = ${DB_PASSWORD}
+
+    [celery]
+    BROKER_URL = redis://
+    RESULT_BACKEND = redis://
 
     [email]
     EMAIL_BACKEND = django.core.mail.backends.console.EmailBackend

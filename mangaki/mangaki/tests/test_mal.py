@@ -1,10 +1,15 @@
 import os
 import re
+from unittest.mock import patch
 
+import redis
 import responses
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 
+from mangaki import tasks
+from mangaki.models import UserBackgroundTask
 from mangaki.utils.mal import MALClient, MALWorks
 
 from hypothesis import given
@@ -21,6 +26,9 @@ class MALTest(TestCase):
         self.mal = MALClient('test_client', 'test_client')
         self.search_fixture = self.read_fixture('code_geass_mal_search.xml')
         self.list_fixture = self.read_fixture('raitobezarius_mal.xml')
+        self.user = User.objects.create(
+            username='Raito_Bezarius'
+        )
 
     @given(choice=st.choices(),
            query=st.text())
@@ -96,3 +104,41 @@ class MALTest(TestCase):
         with self.assertLogs(logger=mal_logger, level='ERROR'):
             results = list(self.mal.list_works_from_a_user(MALWorks.animes, 'raitobezarius'))
             self.assertEqual(len(results), 0)
+
+    @patch('mangaki.utils.mal.import_mal')
+    @patch('redis.StrictRedis', autospec=True, create=True)
+    def test_mal_task_cleanup(self, strict_redis, import_mal_operation):
+        tasks.import_mal.push_request(id=1)
+
+        with self.subTest('When the import succeeds, there is no background task anymore, nor Redis task details.'):
+            tasks.import_mal.run('RaitoBezarius',
+                                 self.user.username)
+            r = strict_redis.return_value
+            self.assertTrue(r.delete.called)
+            self.assertFalse(self.user.background_tasks.exists())
+
+        with self.subTest('When the import fails, there is no background task anymore, nor Redis task details.'):
+            import_mal_operation.side_effect = Exception('Boom !')
+            with self.assertRaises(Exception):
+                tasks.import_mal.run('RaitoBezarius',
+                                     self.user.username)
+
+            r = strict_redis.return_value
+            self.assertTrue(r.delete.called)
+            self.assertFalse(self.user.background_tasks.exists())
+
+    @patch('redis.StrictRedis', autospec=True, create=True)
+    @patch('mangaki.utils.mal.import_mal')
+    def test_mal_task_multiple_start(self, import_mal_operation, strict_redis):
+        bg_task, created = UserBackgroundTask.objects.get_or_create(owner=self.user,
+                                                                    tag=tasks.MAL_IMPORT_TAG)
+
+        self.assertTrue(created)
+
+        tasks.import_mal('RaitoBezarius',
+                         self.user.username)
+        r = strict_redis.return_value
+        bg_task.delete()
+
+        self.assertFalse(r.set.called)
+        import_mal_operation.assert_not_called()
