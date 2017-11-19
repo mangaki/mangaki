@@ -12,7 +12,7 @@ def parse_mangaki_version(version: str) -> str:
     >>> parse_mangaki_version('v0.2.dev32+g42148.0034934')
     'v0.2.dev32'
     """
-    return settings.VERSION.split('+')[0]
+    return version.split('+')[0]
 
 def parse_mangaki_revision(version: str) -> str:
     """
