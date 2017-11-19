@@ -1,10 +1,8 @@
 import logging
 
 from mangaki.algo import RecommendationAlgorithm, register_algorithm
-from django.conf import settings
-from scipy.sparse import coo_matrix, load_npz, issparse
+from scipy.sparse import coo_matrix
 from sklearn.linear_model import Lasso
-from sklearn.preprocessing import scale
 from collections import Counter, defaultdict
 from mangaki.utils.stats import avgstd
 import os.path
@@ -15,29 +13,6 @@ def relu(x):
     return max(-2, min(2, x))
 
 
-def load_and_scale_tags(T=None, perform_scaling=True, with_mean=False):
-    # Load in CSC format if no matrix provided.
-    if T is None:
-        T = load_npz(os.path.join(settings.DATA_DIR, 'lasso', 'tag-matrix.npz')).tocsc()
-
-    nb_tags = T.shape[1]
-
-    if perform_scaling:
-        # Densify T to prevent sparsity destruction (which will anyway result in an exception).
-        if with_mean and issparse(T):
-            T = T.toarray()
-
-        T = scale(T, with_mean=with_mean, copy=False)
-
-        # If it's still sparse, let's get a dense version.
-        if issparse(T):
-            T = T.toarray()
-    else:
-        T = T.toarray() if issparse(T) else T
-
-    return nb_tags, T
-
-
 @register_algorithm('lasso')
 class MangakiLASSO(RecommendationAlgorithm):
     def __init__(self, with_bias=True, alpha=0.01, T=None):
@@ -46,9 +21,6 @@ class MangakiLASSO(RecommendationAlgorithm):
         self.with_bias = with_bias
         self.logger = logging.getLogger(__name__ + '.' + self.get_shortname())
         self.T = T
-
-    def load_tags(self, T=None, perform_scaling=True, with_mean=False):
-        self.nb_tags, self.T = load_and_scale_tags(T, perform_scaling, with_mean)
 
     def fit(self, X, y, autoload_tags=True):
         if self.T is None and autoload_tags:
