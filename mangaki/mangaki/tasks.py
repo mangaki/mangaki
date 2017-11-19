@@ -19,7 +19,8 @@ if settings.REDIS_URL:
     redis_pool = redis.ConnectionPool.from_url(settings.REDIS_URL)
     try:
         redis.StrictRedis(connection_pool=redis_pool).ping()
-    except redis.exceptions.ConnectionError:
+    except (redis.exceptions.ConnectionError,
+            redis.exceptions.ResponseError):
         redis_pool.disconnect()
         redis_pool = None
 else:
