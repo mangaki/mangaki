@@ -3,7 +3,7 @@ django-allauth==0.28
 markdown
 django-bootstrap3==8.2.*
 psycopg2
-numpy
+numpy>=1.13
 beautifulsoup4
 natsort
 django-analytical
