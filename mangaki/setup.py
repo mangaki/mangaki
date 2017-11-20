@@ -32,7 +32,8 @@ setup(
         'coreapi>=2.3,<2.4',
         'celery>=4.0,<4.1',
         'redis>=2.10,<2.11',
-        'Pillow>=4.1'
+        'Pillow>=4.1',
+        'setuptools_scm>=1.15'
     ],
     packages=find_packages(),
     include_package_data=True,
