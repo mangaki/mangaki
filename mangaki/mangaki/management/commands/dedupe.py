@@ -4,6 +4,10 @@ import os
 import csv
 from dedupe import Dedupe, consoleLabel, canonicalize
 from mangaki.models import Work
+from mangaki.settings import DATA_DIR
+
+
+DEDUPE_DIR = os.path.join(DATA_DIR, 'dedupe')
 
 
 def dedupe_training(category, recall_weight=1):
@@ -18,9 +22,9 @@ def dedupe_training(category, recall_weight=1):
         {'field': 'title', 'type': 'String'},
         {'field': 'vo_title', 'type': 'String'},
     ]
-    output_file = os.path.join('./dedupe/', category+'_output.csv')
-    settings_file = os.path.join('./dedupe/', category+'_learned_settings')
-    training_file = os.path.join('./dedupe/', category+'_training.json')
+    output_file = os.path.join(DEDUPE_DIR, category + '_output.csv')
+    settings_file = os.path.join(DEDUPE_DIR, category + '_learned_settings')
+    training_file = os.path.join(DEDUPE_DIR, category+'_training.json')
 
     deduper = Dedupe(fields)
     deduper.sample(data)
@@ -47,7 +51,7 @@ def dedupe_training(category, recall_weight=1):
 
     print('# duplicate sets', len(clustered_dupes))
 
-    input_file = os.path.join('./dedupe/', category+'.csv')
+    input_file = os.path.join(DEDUPE_DIR, category + '.csv')
     with open(input_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f, delimiter='\t')
         writer.writerow(['id', 'title', 'vo_title'])
