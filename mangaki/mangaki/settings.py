@@ -10,6 +10,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import configparser
 import json
 import os
+from setuptools_scm import get_version
+import pkg_resources
 from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -23,8 +25,28 @@ config.read(
     os.environ.get('MANGAKI_SETTINGS_PATH', os.path.join(BASE_DIR, 'settings.ini')))
 
 DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
+# Use non-minified version of Vue.js
+DEBUG_VUE_JS = config.getboolean('debug', 'DEBUG_VUE_JS', fallback=False)
 
 SECRET_KEY = config.get('secrets', 'SECRET_KEY')
+
+# Step 1: if we are in a Git repository.
+try:
+    REPO_DIR = os.path.dirname(BASE_DIR)
+    VERSION = get_version(REPO_DIR)
+except:
+    VERSION = None
+
+# Step 2: if we are a nice package.
+try:
+    if not VERSION:
+        VERSION = pkg_resources.require('mangaki')[0].version
+except:
+    VERSION = None
+
+# Otherwise, let the version be unknown.
+VERSION = VERSION or 'unknown'
+
 
 if config.has_section('hosts'):
     ALLOWED_HOSTS = [host.strip() for host in config.get('hosts', 'ALLOWED_HOSTS').split(',')]
@@ -206,7 +228,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'mosaic_slot_card': '4/sec'
+        'mosaic_slot_card': '4/sec',
+        'mal_import': '3/hour'
     }
 }
 
@@ -214,6 +237,7 @@ REST_FRAMEWORK = {
 # Celery configuration #
 ########################
 
+REDIS_URL = config.get('celery', 'broker_url', fallback='redis://')
 CELERY_BROKER_URL = config.get('celery', 'broker_url', fallback='redis://')
 CELERY_RESULT_BACKEND = config.get('celery', 'result_backend', fallback='redis://')
 

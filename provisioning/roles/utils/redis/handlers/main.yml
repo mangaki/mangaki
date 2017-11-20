@@ -1,6 +1,6 @@
 ---
 - name: Restart redis.
   service:
-    name: 'redis'
+    name: 'redis-server'
     state: 'restarted'
   become: true
