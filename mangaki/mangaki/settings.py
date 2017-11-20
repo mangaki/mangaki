@@ -253,8 +253,8 @@ STATIC_ROOT = config.get('deployment', 'STATIC_ROOT', fallback=os.path.join(BASE
 MEDIA_ROOT = config.get('deployment', 'MEDIA_ROOT', fallback=os.path.join(BASE_DIR, 'media'))
 DATA_ROOT = config.get('deployment', 'DATA_ROOT', fallback=os.path.join(BASE_DIR, 'data'))
 
-DATA_DIR = DATA_ROOT
-PICKLE_DIR = os.path.join(DATA_ROOT, 'snapshots')
+DATA_DIR = DATA_ROOT  # FIXME: replace every occurrence of DATA_DIR with DATA_ROOT
+PICKLE_DIR = os.path.join(DATA_ROOT, 'snapshots')  # FIXME: rename PICKLE_DIR to SNAPSHOT_DIR
 
 # External services
 if config.has_section('mal'):
