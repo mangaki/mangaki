@@ -86,7 +86,7 @@ mangaki_source_auth_providers: ['twitter', 'facebook']
 mangaki_source_static_root: '/var/www/mangaki/static'
 
 # The path to the web root to store data and snapshots in (required).
-mangaki_source_data_root: '/var/mangaki/data'
+mangaki_source_data_root: '/opt/mangaki/data'
 
 # The list of domains this instance is allowed to serve (required).
 mangaki_source_domains: ['mangaki.fr', 'www.mangaki.fr']
