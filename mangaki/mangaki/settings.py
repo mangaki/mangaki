@@ -11,7 +11,7 @@ import configparser
 import json
 import os
 from setuptools_scm import get_version
-import pkg_resources
+from pkg_resources import get_distribution, DistributionNotFound
 from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -38,8 +38,8 @@ except:
 # Step 2: if we are a nice package.
 try:
     if not VERSION:
-        VERSION = pkg_resources.require('mangaki')[0].version
-except:
+        VERSION = get_distribution('mangaki').version
+except DistributionNotFound:
     VERSION = None
 
 # Otherwise, let the version be unknown.
