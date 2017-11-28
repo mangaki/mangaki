@@ -471,7 +471,7 @@ class AniDB:
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
             'nsfw': anime.get('restricted') == 'true',
             'date': to_python_datetime(anime.startdate.string),
-            'end_date': to_python_datetime(anime.enddate.string),
+            'end_date': to_python_datetime(anime.enddate.string) if anime.enddate else None,
             'ext_synopsis': str(anime.description.string) if anime.description else '',
             'nb_episodes': int(anime.episodecount.string) if anime.episodecount else None,
             'anime_type': str(anime.type.string) if anime.type else None,
@@ -500,9 +500,9 @@ class AniDB:
         return work
 
 client = AniDB(
-    getattr(settings, 'ANIDB_CLIENT', None),
-    getattr(settings, 'ANIDB_VERSION', None)
-)
+    getattr(settings, 'ANIDB_CLIENT', 'test_client'),
+    getattr(settings, 'ANIDB_VERSION', 1)
+)  # FIXME: Such a thing should not exist. It should be created in the test.
 
 def diff_between_anidb_and_local_tags(work: Work,
                                       anidb_tags: List[AniDBTag]) -> Dict[str, List[AniDBTag]]:

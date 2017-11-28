@@ -10,11 +10,11 @@ class Command(BaseCommand):
     help = 'Pair with AniDB'
 
     def handle(self, *args, **options):
-        q = Work.objects\
-                .only('pk', 'title', 'ext_poster', 'nsfw')\
-                .annotate(rating_count=Count('rating'))\
-                .filter(anidb_aid=0, category__slug='anime', rating_count__gte=6)\
-                .order_by('-rating_count')
+        q = (Work.objects.only('pk', 'title', 'ext_poster', 'nsfw')
+                         .annotate(rating_count=Count('rating'))
+                         .filter(anidb_aid=0, category__slug='anime',
+                                 rating_count__gte=6)
+                         .order_by('-rating_count'))
         for anime in q:
             print(anime.title, anime.id)
             for proposal in client.search(r'\%s' % anime.title):

@@ -68,8 +68,9 @@ class Command(BaseCommand):
                     if anilist_search:
                         anilist_result = client.get_work_by_id(worktype, anilist_search.anilist_id)
                     break
-                except:
-                    delay = BACKOFF_DELAY**tries
+                except Exception as err:
+                    print(err)
+                    delay = BACKOFF_DELAY ** tries
                     self.stdout.write(self.style.WARNING('Sleep : Retrying {} in {} seconds ...'.format(title_display, delay)))
                     sleep(delay)
                     continue
