@@ -198,7 +198,7 @@ class Work(models.Model):
             return False
 
         poster_filename = "{:d}-{:s}".format(self.id, os.path.basename(urlparse(url).path))
-        # TODO: Où est le hash
+        # FIXME: Add a get_poster_filename with hash, and use it everywhere
 
         try:
             r = session.get(url, timeout=5, stream=True)

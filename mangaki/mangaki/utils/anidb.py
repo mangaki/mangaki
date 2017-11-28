@@ -502,7 +502,7 @@ class AniDB:
 client = AniDB(
     getattr(settings, 'ANIDB_CLIENT', 'test_client'),
     getattr(settings, 'ANIDB_VERSION', 1)
-)
+)  # FIXME: Such a thing should not exist. It should be created in the test.
 
 def diff_between_anidb_and_local_tags(work: Work,
                                       anidb_tags: List[AniDBTag]) -> Dict[str, List[AniDBTag]]:
