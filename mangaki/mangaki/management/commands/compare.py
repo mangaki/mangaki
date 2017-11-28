@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from sklearn.model_selection import ShuffleSplit
 
 import mangaki.utils.logging as mangaki_logging
-from mangaki.settings import DATA_DIR
+from mangaki.settings import DATA_DIR, TEST_DATA_DIR
 from mangaki.algo import Dataset
 from mangaki.algo import RecommendationAlgorithm
 from mangaki.utils.values import rating_values
@@ -17,7 +17,7 @@ from mangaki.utils.values import rating_values
 FILENAMES = {
     'movies': 'ratings-ml.csv',
     'mangas': 'ratings.csv',
-    'dummy': '../mangaki/tests/data/ratings.csv',  # FIXME: path
+    'dummy': os.path.join(TEST_DATA_DIR, 'ratings.csv'),
     'balse': 'balse/ratings.csv'
 }
 CONVERT_FUNCTIONS = {
