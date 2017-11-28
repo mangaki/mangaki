@@ -18,9 +18,10 @@ mangaki_redis_password: '{{ vault_mangaki_redis_password }}'
 mangaki_source_secret_key: '{{ vault_mangaki_source_secret_key }}'
 
 # MAL configuration
-mangaki_source_has_mal: false
+mangaki_source_has_mal: true
 mangaki_source_mal_user: '{{ vault_mangaki_source_mal_user }}'
 mangaki_source_mal_password: '{{ vault_mangaki_source_mal_password }}'
+mangaki_source_mal_user_agent: 'mangaki/beta'
 
 # Sentry configuration
 mangaki_source_has_sentry: true

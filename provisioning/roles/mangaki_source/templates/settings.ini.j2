@@ -17,6 +17,7 @@ MAL_PASS = {{ mangaki_source_mal_password }}
 [deployment]
 SITE_ID = 1
 STATIC_ROOT = {{ mangaki_source_static_root }}
+DATA_ROOT = {{ mangaki_source_data_root }}
 
 [hosts]
 ALLOWED_HOSTS = {{ mangaki_source_domains|join(', ') }}
