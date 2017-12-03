@@ -20,6 +20,7 @@ class SlotCardTypes(enum.Enum):
     top = 'top'
     random = 'random'
     dpp = 'dpp'
+    pearls = 'pearls'
 
 
 slots_choices = [
@@ -31,6 +32,7 @@ slot_dispatchers = {
     SlotCardTypes.popularity: lambda qs: qs.popular(),
     SlotCardTypes.controversy: lambda qs: qs.controversial(),
     SlotCardTypes.top: lambda qs: qs.top(),
+    SlotCardTypes.pearls: lambda qs: qs.pearls(),
     SlotCardTypes.random: lambda qs: qs.random().order_by('?'),
     SlotCardTypes.dpp: lambda qs: qs.dpp(NB_POINTS_DPP)
 }

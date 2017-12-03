@@ -42,7 +42,7 @@ class Command(BaseCommand):
         self.stdout.write('Number of works : '+str(count)+'\n\n')
 
         for work in works:
-            title_display = work.title.encode('utf8').decode(self.stdout.encoding)
+            title_display = work.title
             tries = 0
             delay = 0
 
@@ -70,7 +70,7 @@ class Command(BaseCommand):
                     tries += 1
                     continue
 
-            self.stdout.write('> Working on : '+str(title_display))
+            self.stdout.write('> Working on : ' + str(title_display))
 
             dict_key = '{}.jpg'.format(work.pk)
             tags_list = []
@@ -78,11 +78,11 @@ class Command(BaseCommand):
             if not work_tags:
                 continue
 
-            for tag_title, tag_infos in work_tags.items():
-                weight = tag_infos['weight']/600
+            for tag in work_tags:
+                weight = tag.weight / 600
                 if weight != 0:
-                    tags_list.append([tag_title, weight])
-                    all_tags.add(tag_title)
+                    tags_list.append([tag.title, weight])
+                    all_tags.add(tag.title)
 
             final_tags[dict_key] = tags_list
 

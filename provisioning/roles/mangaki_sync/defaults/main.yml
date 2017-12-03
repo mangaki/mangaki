@@ -4,3 +4,4 @@ mangaki_sync_migrate: false
 mangaki_sync_collectstatic: false
 mangaki_sync_load_seed: false
 mangaki_sync_load_seed_path: 'seed_data.json'
+mangaki_sync_compilemessages: false

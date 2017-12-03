@@ -1,5 +1,6 @@
 import logging
 from django.conf import settings
+from mangaki.algo.side import SideInformation
 from mangaki.utils.chrono import Chrono
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pickle
@@ -37,6 +38,7 @@ class RecommendationAlgorithm:
         self.chrono = Chrono(self.verbose_level)
         self.nb_users = None
         self.nb_works = None
+        self.size = 0  # For backup files
 
     def get_backup_path(self, filename):
         if filename is None:
@@ -65,6 +67,11 @@ class RecommendationAlgorithm:
             backup = pickle.load(f)
         return backup
 
+    def load_tags(self, T=None, perform_scaling=True, with_mean=False):
+        side = SideInformation(T, perform_scaling, with_mean)
+        self.nb_tags = side.nb_tags
+        self.T = side.T
+
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users
         self.nb_works = nb_works
@@ -82,6 +89,12 @@ class RecommendationAlgorithm:
     @staticmethod
     def compute_mae(y_pred, y_true):
         return mean_absolute_error(y_true, y_pred)
+
+    def compute_all_errors(self, X_train, y_train, X_test, y_test):
+        y_train_pred = self.predict(X_train)
+        logging.info('Train RMSE=%f', self.compute_rmse(y_train, y_train_pred))
+        y_test_pred = self.predict(X_test)
+        logging.info('Test RMSE=%f', self.compute_rmse(y_test, y_test_pred))
 
     @staticmethod
     def available_evaluation_metrics():

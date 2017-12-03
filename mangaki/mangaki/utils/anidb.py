@@ -241,41 +241,38 @@ class AniDB:
         if reload_role_cache:
             del self.role_map
 
+        processed_anidb_aids = []
         artists_to_add = []
-        artists = []
+        artists_list = []
         for nc in creators:
             artist = Artist.objects.filter(Q(name=nc["name"]) | Q(anidb_creator_id=nc["anidb_creator_id"])).first()
 
-            if not artist: # This artist does not yet exist : will be bulk created
+            if nc["anidb_creator_id"] in processed_anidb_aids:  # Skip if this artist has more than one role
+                continue
+
+            if not artist:  # This artist does not yet exist : will be bulk created
                 artist = Artist(name=nc["name"], anidb_creator_id=nc["anidb_creator_id"])
                 artists_to_add.append(artist)
-            else: # This artist exists : prevent duplicates by updating with the AniDB id
+            else:  # This artist exists : prevent duplicates by updating with the AniDB id
                 artist.name = nc["name"]
                 artist.anidb_creator_id = nc["anidb_creator_id"]
                 artist.save()
-                artists.append(artist)
+                artists_list.append(artist)
+            processed_anidb_aids.append(nc["anidb_creator_id"])
 
-        artists.extend(Artist.objects.bulk_create(artists_to_add))
+        artists_list.extend(Artist.objects.bulk_create(artists_to_add))
+        artists = {artist.name: artist for artist in artists_list}
 
-        staffs = []
-        for index, nc in enumerate(creators):
-            staffs.append(
-                Staff(
-                    work=work,
-                    role=nc["role"],
-                    artist=artists[index]
-                )
-            )
-
-        existing_staff = set(Staff.objects
-                            .filter(work=work,
-                                    role__in=[nc["role"] for nc in creators],
-                                    artist__in=[artist for artist in artists])
-                            .values_list('work', 'role', 'artist'))
-
+        existing_staff = set(Staff.objects.filter(work=work,
+                                role__in=(nc["role"] for nc in creators),
+                                artist__name__in=(nc["name"] for nc in creators))
+                                .values_list('work', 'role', 'artist'))
         missing_staff = [
-            staff for staff in staffs
-            if (staff.work, staff.role, staff.artist) not in existing_staff
+            Staff(
+                work=work,
+                role=nc["role"],
+                artist=artists[nc["name"]]
+            ) for nc in creators if (work.pk, nc["role"].pk, artists[nc["name"]].pk) not in existing_staff
         ]
 
         Staff.objects.bulk_create(missing_staff)
@@ -474,7 +471,7 @@ class AniDB:
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
             'nsfw': anime.get('restricted') == 'true',
             'date': to_python_datetime(anime.startdate.string),
-            'end_date': to_python_datetime(anime.enddate.string),
+            'end_date': to_python_datetime(anime.enddate.string) if anime.enddate else None,
             'ext_synopsis': str(anime.description.string) if anime.description else '',
             'nb_episodes': int(anime.episodecount.string) if anime.episodecount else None,
             'anime_type': str(anime.type.string) if anime.type else None,
@@ -503,9 +500,9 @@ class AniDB:
         return work
 
 client = AniDB(
-    getattr(settings, 'ANIDB_CLIENT', None),
-    getattr(settings, 'ANIDB_VERSION', None)
-)
+    getattr(settings, 'ANIDB_CLIENT', 'test_client'),
+    getattr(settings, 'ANIDB_VERSION', 1)
+)  # FIXME: Such a thing should not exist. It should be created in the test.
 
 def diff_between_anidb_and_local_tags(work: Work,
                                       anidb_tags: List[AniDBTag]) -> Dict[str, List[AniDBTag]]:

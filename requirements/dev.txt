@@ -3,9 +3,10 @@
 django-debug-toolbar==1.8
 django-extensions
 django-nose
-tensorflow
 matplotlib
 flake8
+tensorflow
+typing
 # Linting
 git-lint
 pylint

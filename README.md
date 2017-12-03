@@ -1,140 +1,73 @@
-Mangaki
-=======
+# Mangaki
 
 [![Dependency Status](https://dependencyci.com/github/mangaki/mangaki/badge)](https://dependencyci.com/github/mangaki/mangaki)
 [![CircleCI](https://circleci.com/gh/mangaki/mangaki.svg?style=svg)](https://circleci.com/gh/mangaki/mangaki)
+[![Codecov](https://img.shields.io/codecov/c/github/mangaki/mangaki.svg)]()
 
-Voici le manuel d'installation de Mangaki. Vous ne pouvez pas savoir comme ça fait plaisir que vous me lisiez !
+Here is Mangaki's installation manual. Welcome!  
+Also available [in French](README-fr.md).
 
-Mangaki est [sous licence AGPLv3](https://en.wikipedia.org/wiki/Affero_General_Public_License).
+## Install
 
-Comment contribuer ?
---------------------
+### VM install (super simple but requires 4.4 GB)
 
-Que vous soyez simple otaku, data expert, codeur Python, passionné d'algo, data scientist ou designer, vous pouvez contribuer à Mangaki ! Quelques pistes sont sur le [wiki](https://github.com/mangaki/mangaki/wiki), mais aussi dans le fichier [CONTRIBUTING.md](./CONTRIBUTING.md) !
-
-Prérequis
----------
-
-- Python ≥ 3.4
-- PostgreSQL ≥ 9.3 (9.4.2 étant mieux)
-* `python3-sqlparse` pour la Debug Toolbar (**inutile** en production).
-
-Si vous n'avez jamais fait de Django, je vous renvoie vers [leur super tutoriel](https://docs.djangoproject.com/en/1.9/intro/tutorial01/).
-
-Configurer PostgreSQL
----------------------
-
-Vous aurez besoin de l'utilitaire `pwgen` pour générer un mot de passe
-aléatoire lors de la configuration.
-
-    sudo -u postgres -H createdb mangaki
-    sudo -u postgres -H createuser django
-    export DB_PASSWORD=$(pwgen -s -c 30 1)
-    sudo -u postgres -H DB_PASSWORD=$DB_PASSWORD psql -d mangaki -c \
-      "alter user django with password '$DB_PASSWORD'; \
-      grant all privileges on database mangaki to django; \
-      create extension if not exists pg_trgm; \
-      create extension if not exists unaccent"
-
-Configurer un environnement virtuel
------------------------------------
-
-Il est fortement recommandé d'installer les dépendances de Mangaki dans un
-environnement virtuel, ce qui est fait par les commandes ci-dessous.
-    
-    python3 -m venv venv --system-site-packages
-    . venv/bin/activate
-    pip install -r requirements/dev.txt # S'il s'agit d'une instance de développement, sinon utilisez requirements/production.txt
-
-Pour activer l'environnement virtuel dans le futur, il faudra faire
-
-    . venv/bin/activate
-
-Configurer Mangaki
-------------------
-
-Pour configurer Mangaki, il faut créer un fichier `settings.ini` à la racine de
-l'application. Pour une installation de développement, il suffit de faire :
-
-    cat > mangaki/settings.ini <<EOF
-    [debug]
-    DEBUG = True
-
-    [secrets]
-    SECRET_KEY = $(pwgen -s -c 60 1)
-    DB_PASSWORD = ${DB_PASSWORD}
-
-    [email]
-    EMAIL_BACKEND = django.core.mail.backends.console.EmailBackend
-    EOF
-
-Si vous souhaitez mettre en production une instance de Mangaki, le fichier de
-configuration est un peu plus complexe - regardez dans `settings.template.ini`
-et `mangaki/settings.py` pour un aperçu des options utiles.
-
-Remplir la base de données
---------------------------
-    
-    cd mangaki
-    ./manage.py migrate
-    ./manage.py loaddata ../fixtures/{partners,seed_data}.json
-    ./manage.py ranking # Compute cached ranking information. This should be done regularly.
-    ./manage.py top --all # Store data for the Top20 page. This should be done regularly.
-
-Voilà ! Vous avez une installation de Mangaki fonctionnelle.
-
-Afficher les notebooks
-----------------------
-
-    . venv/bin/activate
-    pip install jupyter[notebook]
-
-Ensuite, vous pourrez faire `./mangaki/manage.py shell_plus --notebook` pour lancer Jupyter Notebook. Les notebooks se trouvent… dans le dossier `notebook`.
-
-
-Lancer les tests
-----------------
-
-    . venv/bin/activate
-    ./mangaki/manage.py test
-
-Ceci va lancer les [doctests](https://docs.python.org/3.5/library/doctest.html) et les tests unitaires contenus dans chaque application avec un dossier `tests`.
-
-Pour calculer la couverture de test, il faut plutôt faire:
-
-    coverage run ./mangaki/manage.py test --with-coverage --cover-package=mangaki,irl --cover-html
-
-Ainsi, vous aurez un dossier `cover` qui contiendra les informations de couverture en HTML.
-
-Installation facile (Vagrant)
------------------------------
-
-Vous devez installer [Vagrant](https://www.vagrantup.com/downloads.html).
+Requires [Vagrant](https://www.vagrantup.com/downloads.html).
 
     vagrant up
-    vagrant ssh
-    ./manage.py runserver 0.0.0.0:8000
+    vagrant provision  # May be required
+    vagrant ssh  # Will open a tmux that you can detach by pressing Ctrl + b then d
 
-Votre machine virtuelle est maintenant prête.
-Vous pouvez utiliser Mangaki à l'adresse `app.mangaki.dev:8000` (si vous avez le plugin `vagrant-hostsupdater`) ou `192.168.33.10:8000`.
+And voilà! You can access Mangaki at http://192.168.33.10:8000 (or http://app.mangaki.dev if you have `vagrant-hostupdater`).
 
-Pour plus de détails, lisez le script `provisioning/bootstrap.sh` qui s'occupe de mettre en place la machine.
+### Full install
 
-:warning: **Attention** :warning: : L'installation vous prendra environ _3 Gio_, une fois terminée. C'est en raison principalement de l'image Debian qui est téléchargée puis installée dans la machine virtuelle.
+Requires Python 3.4 → 3.6, PostgreSQL 9.3 → 10, Redis 4.0, and preferably `pwgen`.
 
-Remarques utiles
-----------------
+    ./config.sh
+    python3 -m venv venv
+    . venv/bin/activate
+    pip install -r requirements/dev.txt
+    cd mangaki
+    ./manage.py migrate
 
-Si vous vous rendez sur la page des mangas, la troisième colonne chargera en boucle. C'est parce que le Top Manga est vide, pour des raisons intrinsèques à [`ranking.py`](https://github.com/mangaki/mangaki/blob/master/mangaki/mangaki/management/commands/ranking.py#L9).
+#### Running the background worker (Celery)
 
-Si vous obtenez des erreurs 400 lorsque vous mettez Mangaki en production (c'est-à-dire que `DEBUG = False`), faites bien attention à modifier les `ALLOWED_HOSTS` qui se trouvent dans votre configuration (`mangaki/settings/`) afin d'autoriser votre [FQDN](https://fr.wikipedia.org/wiki/Fully_qualified_domain_name) dedans.
+This step is mandatory only if you need background tasks which is required for features such as MAL imports.
 
-Pour une mise en production, veillez à faire `./manage.py collectstatic` afin d'obtenir les assets: il est possible de changer le repertoire dans `mangaki/settings.py` (la variable `STATIC_ROOT`).
+     # Ensure that your working directory is where manage.py is. (i.e. ls in this folder should show you manage.py)
+     celery -B -A mangaki:celery_app worker -l INFO
 
-Mangaki a été testé et fonctionne parfaitement avec NGINX et Gunicorn.
+If you can read something along these lines:
 
-Nous contacter
---------------
+```console
+[2017-10-29 14:34:47,810: INFO/MainProcess] celery@your_hostname ready.
+```
 
-En cas de pépin, [créez un ticket](https://github.com/mangaki/mangaki/issues) ou contactez-moi à vie@jill-jenn.net.
+The worker is ready to receive background tasks (e.g. MAL imports).
+
+#### Running the web server
+
+    ./manage.py runserver
+
+And voilà! You can access Mangaki at http://localhost:8000.
+
+## Some perks
+
+    ./manage.py loaddata ../fixtures/{partners,seed_data}.json
+    ./manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
+    ./manage.py top --all  # Compute the Top 20 directors, etc. Should be done regularly.
+    ./manage.py test       # Run all tests
+
+See also our interesting [Jupyter notebooks](https://github.com/mangaki/notebooks), in another repository.
+
+## Contribute
+
+- Read [CONTRIBUTING.md](CONTRIBUTING.md)
+- Browse the [issues](https://github.com/mangaki/mangaki/issues) and the [wiki](https://github.com/mangaki/mangaki/wiki)
+- First time? Track the [`good first issue`](https://github.com/mangaki/mangaki/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) label!
+
+## Contact
+
+- Feel free to contact us at jj@mangaki.fr
+- Found a bug? [Create an issue](https://github.com/mangaki/mangaki/issues/new).
+- Stay in touch with our blog: http://research.mangaki.fr

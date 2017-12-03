@@ -1,2 +1,2 @@
 [mangaki_standalone]
-beta.mangaki.fr
+beta.mangaki.fr ansible_ssh_user=root

@@ -3,8 +3,6 @@ from collections import defaultdict
 import numpy as np
 from .recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
-from .lasso import load_and_scale_tags
-
 
 @register_algorithm('xals')
 class MangakiXALS(RecommendationAlgorithm):
@@ -23,9 +21,6 @@ class MangakiXALS(RecommendationAlgorithm):
         self.U = backup.U
         self.VT = backup.VT
         self.means = backup.means
-
-    def load_tags(self, T=None, perform_scaling=True, with_mean=False):
-        self.nb_tags, self.T = load_and_scale_tags(T, perform_scaling, with_mean)
 
     def make_matrix(self, X, y):
         matrix = defaultdict(dict)
@@ -77,14 +72,14 @@ class MangakiXALS(RecommendationAlgorithm):
     def fit(self, X, y):
         self.X_train = X
         self.y_train = y
-        if self.verbose:
+        if self.verbose_level:
             print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         matrix, self.means = self.make_matrix(X, y)
 
         self.chrono.save('fill and center matrix')
 
         self.factorize(matrix, random_state=42)
-        if self.verbose:
+        if self.verbose_level:
             print('Shapes', self.U.shape, self.VT.shape)
         self.M = self.U.dot(self.VT)
 
