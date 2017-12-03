@@ -10,7 +10,7 @@ django-analytical
 django-cookie-law
 django-js-reverse
 scikit-learn==0.18.*
-scipy>=0.19.1
+scipy
 pandas
 responses==0.5.1
 jinja2
@@ -20,4 +20,3 @@ djangorestframework==3.6.*
 coreapi==2.3.*
 celery==4.0.*
 redis==2.10.*
-Pillow>=4.1

@@ -4,33 +4,35 @@
 
 {% static 'img/ratings.svg' as rating_svg_link %}
 
-<div class="work-card{% if not config and not rating %} no-rating{% endif %}{% if sort_mode == "mosaic" %} work-card_loading{% endif %} work-card_horizontal"
+<div class="work-card{% if sort_mode == "mosaic" %} work-card_loading{% endif %} work-card_horizontal"
         {% if sort_mode == 'mosaic' %} data-slot-sort="{{ slot_type|lower }}" {% endif %}>
-    <div class="work-card__media work-cover{% if not simple %} work-cover_backdrop{% endif %}"
-            style="background-image: url('{% poster_url work bypass_nsfw_settings %}');">
-        <div class="work-cover__wrapper" data-category="{{ work.category|lower }}">
-            <div class="work-cover__title">
-                <h2 class="work-card__title">{{ work.title|truncatechars:50 }}</h2>
-            </div>
-            {% if not simple %}
-            <div class="work-cover__content">
-            <div class="work-card__content">
-                <div class="work-card__synopsis">
-                    {{ work.synopsis|linebreaksbr }}
-                </div>
-                <a href="{% if work.id == None %}#{% else %}{% url "work-detail" work.category.slug work.id %}{% endif %}"
-                        class="work-card__link">
-                Plus d'infos…
-                </a>
-            </div>
-            </div>
-            {% endif %}
-        </div>
+  <div
+    class="work-card__media work-cover{% if not simple %} work-cover_backdrop{% endif %}"
+    style="background-image: url('{% poster_url work %}');">
+    <div class="work-cover__wrapper" data-category="{{ work.category|lower }}">
+      <div class="work-cover__title">
+	<h2 class="work-card__title">
+	  {{ work.title|truncatechars:50 }}
+	</h2>
+      </div>
+      {% if not simple %}
+      <div class="work-cover__content">
+	<div class="work-card__content">
+	  <div class="work-card__synopsis">
+	    {{ work.synopsis|linebreaksbr }}
+	  </div>
+	  <a
+	    href="{% if work.id == None %}#{% else %}{% url "work-detail" work.category.slug work.id %}{% endif %}"
+	    class="work-card__link">
+	    Plus d'infos…
+	  </a>
+	</div>
+      </div>
+      {% endif %}
     </div>
+  </div>
 
-    {% if config or rating %}
-        <div class="ratings ratings_medium" data-endpoint="{{ config.vote_endpoint }}">
-        {% include "mangaki/ratings.html" with config=config.ui rating_svg_link=rating_svg_link %}
-        </div>
-    {% endif %}
+  <div class="ratings ratings_medium" data-endpoint="{{ config.vote_endpoint }}">
+    {% include "mangaki/ratings.html" with config=config.ui rating_svg_link=rating_svg_link %}
+  </div>
 </div>

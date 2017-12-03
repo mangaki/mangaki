@@ -1,12 +1,10 @@
+from django.conf import settings
+from mangaki.utils.chrono import Chrono
+from sklearn.decomposition import NMF
+from scipy.sparse import lil_matrix
+import numpy as np
 import csv
 import os
-
-import numpy as np
-from django.conf import settings
-from scipy.sparse import lil_matrix
-from sklearn.decomposition import NMF
-
-from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 PIG_ID = 1124#1407 # QCTX=1434  JJ=1407  SebNL=1124
 
@@ -43,14 +41,13 @@ explanation = {
 }
 
 
-@register_algorithm('nmf')
-class MangakiNMF(RecommendationAlgorithm):
+class MangakiNMF(object):
     M = None
     W = None
     H = None
     def __init__(self, NB_COMPONENTS=10):
-        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
+        self.chrono = Chrono(True)
         with open(os.path.join(settings.BASE_DIR, '../data/works.csv')) as f:
             self.works = [x for _, x in csv.reader(f)]
 

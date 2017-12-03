@@ -404,10 +404,6 @@ ul.checklist .list-icon {
   max-width: 90vw;
 }
 
-.work-card.no-rating {
-  width: 225px;
-}
-
 .work-card__title {
   font-family: 'Economica', 'Open Sans', sans-serif;
 }
@@ -545,7 +541,6 @@ ul.checklist .list-icon {
   padding: 8px 12px;
 
   overflow-y: auto;
-  overflow-x: hidden;
 }
 
 .work-card__extra {
@@ -581,10 +576,6 @@ ul.checklist .list-icon {
   grid-gap: 0 10px;
 
   justify-content: space-around;
-}
-
-.cards-grid.no-rating {
-  grid-template-columns: repeat(auto-fill, 225px);
 }
 
 .cards-grid > .work-card {
@@ -638,16 +629,8 @@ ul.checklist .list-icon {
     width: 300px;
   }
 
-  .work-card.no-rating {
-      width: 265px;
-  }
-
   .cards-grid {
     grid-template-columns: repeat(auto-fill, 300px);
-  }
-
-  .cards-grid.no-rating {
-    grid-template-columns: repeat(auto-fill, 265px);
   }
 }
 

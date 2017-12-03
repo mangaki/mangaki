@@ -1,10 +1,8 @@
-import numpy as np
+from mangaki.utils.common import RecommendationAlgorithm
 from sklearn.decomposition import PCA
+import numpy as np
 
-from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
-
-@register_algorithm('pca')
 class MangakiPCA(RecommendationAlgorithm):
     M = None
     def __init__(self, NB_COMPONENTS=10):

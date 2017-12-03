@@ -1,9 +1,7 @@
-from random import sample
-
-import numpy as np
-
 from mangaki.utils import dpplib
-from mangaki.algo import get_algo_backup, get_dataset_backup
+from mangaki.utils.algo import get_algo_backup, get_dataset_backup
+from random import sample
+import numpy as np
 
 
 def get_volume(vectors):

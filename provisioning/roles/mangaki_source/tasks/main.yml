@@ -44,12 +44,6 @@
   when: 'mangaki_source_install_type == "package"'
   become: true
 
-- name: Ensure locale dependencies are installed.
-  apt:
-    name: 'gettext'
-    state: 'latest'
-  become: true
-
 - name: Ensure system-wide development dependencies are installed.
   apt:
     name: '{{ item }}'
@@ -77,10 +71,8 @@
   register: project_install
 
 - name: Request service reloading.
-  debug:
-    msg: Project contents have changed, notifying a restart.
-  notify: restart_mangaki_services
-  changed_when: true # Force trigger the handler.
+  set_fact:
+    mangaki_needs_restart: true
   when: project_install.changed
 
 - name: Ensure settings.ini is present.
@@ -94,10 +86,8 @@
   become: true
 
 - name: Request service reloading.
-  debug:
-    msg: settings.ini has changed, notifying a restart.
-  notify: restart_mangaki_services
-  changed_when: true # Force trigger the handler.
+  set_fact:
+    mangaki_needs_restart: true
   when: settings_ini.changed
 
 - name: Insert/update virtualenv configuration to bashrc.

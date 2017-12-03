@@ -8,7 +8,7 @@
 - name: Ensure supervisor configuration is up-to-date.
   template:
     src: 'etc/supervisor/conf.d/celery.conf.j2'
-    dest: '/etc/supervisor/conf.d/{{ celery_app_module }}_celery.conf'
+    dest: '/etc/supervisor/conf.d/{{ celery_app_module}}_celery.conf'
     owner: 'root'
     group: 'root'
     mode: '0640'
@@ -16,7 +16,7 @@
 
 - name: Run Celery.
   supervisorctl:
-    name: '{{ celery_name }}'
+    name: '{{ celery_app_module }}_celery'
     state: present
   become: true
   when: start

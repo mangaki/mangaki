@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Max
 from django.test import Client, TestCase
 
-from mangaki.models import Category, Editor, Studio, Work, Suggestion, Evidence
+from mangaki.models import Category, Editor, Studio, Work
 
 
 class WorkFactoryMixin:
@@ -25,30 +25,6 @@ class AuthenticatedMixin:
         super().setUp()
         self.user = self.User.objects.create_user('username')
         self.client.force_login(self.user)
-
-
-class SuggestionFactoryMixin:
-    def setUp(self):
-        self.user = get_user_model().objects.create_user(username='test', password='test')
-        self.user_with_no_evidence = get_user_model().objects.create_user(username='noevidence', password='pwd')
-        self.client = Client()
-
-        self.anime = Work.objects.create(
-            title='Title',
-            category=Category.objects.get(slug='anime')
-        )
-
-        self.suggestion = Suggestion.objects.create(
-            user=self.user,
-            work=self.anime,
-            message='Message',
-            problem='nsfw'
-        )
-
-        self.evidence = Evidence.objects.create(
-            user=self.user,
-            suggestion=self.suggestion
-        )
 
 
 class WorkDetailAnonymousTest(WorkFactoryMixin, TestCase):
@@ -78,7 +54,7 @@ class WorkDetailAnonymousTest(WorkFactoryMixin, TestCase):
 
         response = self.client.get('/anime/{:d}'.format(invalid_pk))
         self.assertEqual(response.status_code, 404)  # 404 Not Found
-
+        
         response = self.client.get('/work/{:d}'.format(invalid_pk))
         self.assertEqual(response.status_code, 404)  # 404 Not Found
 
@@ -122,7 +98,7 @@ class WorkDetailAuthenticatedTest(AuthenticatedMixin, WorkFactoryMixin, TestCase
         })
         self.assertEqual(response.status_code, 302)  # 302 Found
         self.assertEqual(response.url, '/anime/{:d}'.format(self.anime.pk))
-
+        
         suggestions = list(self.user.suggestion_set.all())
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(suggestions[0].problem, 'title')
@@ -136,13 +112,13 @@ class WorkDetailAuthenticatedTest(AuthenticatedMixin, WorkFactoryMixin, TestCase
             'message': "Mauvais titre",
         })
         self.assertEqual(response.status_code, 200)
-
+        
         response = self.client.post('/anime/{:d}'.format(self.anime.pk), {
             'work': self.anime.pk,
             'message': "Mauvais titre",
         })
         self.assertEqual(response.status_code, 200)
-
+        
         response = self.client.post('/anime/{:d}'.format(self.anime.pk), {
             'problem': 'title',
             'message': "Mauvais titre",
@@ -200,7 +176,7 @@ class AnonymousViewsTest(WorkFactoryMixin, TestCase):
     def test_misc_views(self):
         self._test_static_view('about')
         self._test_static_view('faq')
-
+        
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
@@ -216,85 +192,3 @@ class AnonymousViewsTest(WorkFactoryMixin, TestCase):
 
         response = self.client.get('/u/dummy/anime/seen')
         self.assertEqual(response.status_code, 200)
-
-
-class SuggestionViewsTest(SuggestionFactoryMixin, TestCase):
-    def get_invalid_pk(self, model):
-        pk = model.objects.aggregate(Max('pk'))['pk__max'] + 10
-        self.assertFalse(model.objects.filter(pk=pk).exists())
-        return pk
-
-    def test_misc_views(self):
-        self._test_static_view('fix')
-        self._test_static_view('fix/suggestion')
-        self._test_static_view('grid/nsfw')
-
-        response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
-
-    def _test_static_view(self, url):
-        response = self.client.get('/{:s}'.format(url))
-        self.assertEqual(response.status_code, 301)
-        self.assertEqual(response.url, '/{:s}/'.format(url))
-
-        response = self.client.get('/{:s}/'.format(url))
-        self.assertEqual(response.status_code, 200)
-
-    def test_suggestion_view(self):
-        with self.subTest('Existing suggestion, with evidence'):
-            self.client.force_login(self.user)
-            response = self.client.get('/fix/suggestion/{:d}'.format(self.suggestion.pk))
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.context['suggestion'], self.suggestion)
-            self.assertEqual(response.context['evidence'], self.evidence)
-
-        with self.subTest('Existing suggestion, with no evidence'):
-            self.client.force_login(self.user_with_no_evidence)
-            response = self.client.get('/fix/suggestion/{:d}'.format(self.suggestion.pk))
-            self.assertEqual(response.status_code, 200)
-            self.assertIsNone(response.context.get('evidence'))
-
-        with self.subTest('Non existing suggestion'):
-            invalid_pk = self.get_invalid_pk(Suggestion)
-            response = self.client.get('/fix/suggestion/{:d}'.format(invalid_pk))
-            self.assertEqual(response.status_code, 404)
-
-    def test_update_or_create_evidence(self):
-        users = {
-            'User with Evidence': self.user,
-            'User with no Evidence': self.user_with_no_evidence
-        }
-
-        for label, user in users.items():
-            with self.subTest(label, user=user):
-                self.client.force_login(user)
-
-                response = self.client.post(
-                    '/evidence/?next=/fix/suggestion/{:d}'.format(self.suggestion.pk), {
-                        'agrees': 'True',
-                        'suggestion': self.suggestion.pk
-                    }
-                )
-
-                self.assertEqual(response.status_code, 302)
-                self.assertEqual(response.url, '/fix/suggestion/{:d}'.format(self.suggestion.pk))
-
-                evidence_updated = Evidence.objects.get(user=user, suggestion=self.suggestion)
-                self.assertTrue(evidence_updated.agrees)
-                self.assertFalse(evidence_updated.needs_help)
-
-    def test_delete_evidence(self):
-        self.client.force_login(self.user)
-
-        response = self.client.post(
-            '/evidence/?next=/fix/suggestion/{:d}'.format(self.suggestion.pk), {
-                'delete': 'True',
-                'suggestion': self.suggestion.pk
-            }
-        )
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/fix/suggestion/{:d}'.format(self.suggestion.pk))
-
-        with self.assertRaises(Evidence.DoesNotExist):
-            Evidence.objects.get(user=self.user, suggestion=self.suggestion)
