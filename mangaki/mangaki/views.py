@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When, Count
+from django.db.models import Case, IntegerField, Sum, Value, When, Count, Q
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -346,7 +346,7 @@ class WorkList(WorkListMixin, ListView):
             raise Http404
 
         if search_text:
-            self.queryset = self.queryset.search(search_text)
+            self.queryset = self.queryset.filter(Q(title__icontains=search_text) | Q(worktitle__title__icontains=search_text))
 
         self.queryset = self.queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
