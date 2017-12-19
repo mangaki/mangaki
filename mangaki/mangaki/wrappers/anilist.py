@@ -513,25 +513,20 @@ client = AniList(
 )
 
 anilist_langs = AniListLanguages()
-language_map = {
-    'english': anilist_langs.english_ext_lang,
-    'romaji': anilist_langs.romaji_ext_lang,
-    'japanese': anilist_langs.japanese_ext_lang,
-    'unknown': anilist_langs.unknown_ext_lang,
-}
 
 work_categories = WorkCategories()
-category_map = {
-    AniListWorks.animes: work_categories.anime,
-    AniListWorks.mangas: work_categories.manga
-}
 
 staff_roles = StaffRoles()
-role_map = staff_roles.role_map
 
 
 def build_work_titles(work: Work,
                       titles: Dict[str, Tuple[str, str]]) -> List[WorkTitle]:
+    language_map = {
+        'english': anilist_langs.english_ext_lang,
+        'romaji': anilist_langs.romaji_ext_lang,
+        'japanese': anilist_langs.japanese_ext_lang,
+        'unknown': anilist_langs.unknown_ext_lang,
+    }
     worktitles = []
     for title, (language, title_type) in titles.items():
         ext_language = language_map.get(language, language_map['unknown'])
@@ -602,6 +597,8 @@ def build_staff(work: Work,
 
     existing_staff_artists = set(s.artist for s in Staff.objects.filter(work=work, artist__in=artists))
 
+    role_map = staff_roles.role_map
+
     missing_staff = [
         Staff(
            work=work,
@@ -623,6 +620,10 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
     :return: a list of works effectively added in the Mangaki database
     :rtype: Optional[List[Work]]
     """
+    category_map = {
+        AniListWorks.animes: work_categories.anime,
+        AniListWorks.mangas: work_categories.manga
+    }
     new_works = []
 
     for entry in entries:

@@ -197,8 +197,8 @@ class Work(models.Model):
         if not url:
             return False
 
-        filename = os.path.basename(urlparse(url).path)
-        # Hé mais ça va pas écraser des posters / créer des collisions, ça ?
+        poster_filename = "{:d}-{:s}".format(self.id, os.path.basename(urlparse(url).path))
+        # FIXME: Add a get_poster_filename with hash, and use it everywhere
 
         try:
             r = session.get(url, timeout=5, stream=True)
@@ -210,7 +210,7 @@ class Work(models.Model):
                 for chunk in r.iter_content(chunk_size=1024):
                     f.write(chunk)
                 self.ext_poster = url
-                self.int_poster.save(filename, File(f))
+                self.int_poster.save(poster_filename, File(f))
         finally:
             r.close()
         return True

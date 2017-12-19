@@ -11,12 +11,10 @@ import configparser
 import json
 import os
 from setuptools_scm import get_version
-import pkg_resources
+from pkg_resources import get_distribution, DistributionNotFound
 from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-PICKLE_DIR = os.path.join(BASE_DIR, '../pickles')
-DATA_DIR = os.path.join(BASE_DIR, '../data')
 FIXTURE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
 TEST_DATA_DIR = os.path.join(BASE_DIR, 'tests', 'data')
 
@@ -40,8 +38,8 @@ except:
 # Step 2: if we are a nice package.
 try:
     if not VERSION:
-        VERSION = pkg_resources.require('mangaki')[0].version
-except:
+        VERSION = get_distribution('mangaki').version
+except DistributionNotFound:
     VERSION = None
 
 # Otherwise, let the version be unknown.
@@ -273,6 +271,10 @@ MEDIA_URL = '/media/'
 
 STATIC_ROOT = config.get('deployment', 'STATIC_ROOT', fallback=os.path.join(BASE_DIR, 'static'))
 MEDIA_ROOT = config.get('deployment', 'MEDIA_ROOT', fallback=os.path.join(BASE_DIR, 'media'))
+DATA_ROOT = config.get('deployment', 'DATA_ROOT', fallback=os.path.join(BASE_DIR, 'data'))
+
+DATA_DIR = DATA_ROOT  # FIXME: replace every occurrence of DATA_DIR with DATA_ROOT
+PICKLE_DIR = os.path.join(DATA_ROOT, 'snapshots')  # FIXME: rename PICKLE_DIR to SNAPSHOT_DIR
 
 # External services
 if config.has_section('mal'):

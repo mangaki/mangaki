@@ -1,0 +1,496 @@
+{
+    "arrangers": [
+        {
+            "link": "artist/319",
+            "names": {
+                "en": "Yoko Kanno",
+                "ja": "菅野よう子"
+            }
+        }
+    ],
+    "catalog": "VICL-60203",
+    "categories": [
+        "Animation"
+    ],
+    "category": "Animation",
+    "classification": "Original Soundtrack",
+    "composers": [
+        {
+            "link": "artist/319",
+            "names": {
+                "en": "Yoko Kanno",
+                "ja": "菅野よう子"
+            }
+        }
+    ],
+    "covers": [
+        {
+            "full": "https://medium-media.vgm.io/albums/59/22495/22495-1381769605.jpg",
+            "medium": "https://medium-media.vgm.io/albums/59/22495/22495-1381769605.jpg",
+            "name": "Front",
+            "thumb": "https://medium-media.vgm.io/albums/59/22495/22495-1381769605.jpg"
+        },
+        {
+            "full": "https://medium-media.vgm.io/albums/59/22495/22495-1381769576.jpg",
+            "medium": "https://medium-media.vgm.io/albums/59/22495/22495-1381769576.jpg",
+            "name": "Back",
+            "thumb": "https://medium-media.vgm.io/albums/59/22495/22495-1381769576.jpg"
+        },
+        {
+            "full": "https://medium-media.vgm.io/albums/59/22495/22495-1381769579.jpg",
+            "medium": "https://medium-media.vgm.io/albums/59/22495/22495-1381769579.jpg",
+            "name": "Booklet Front & Back",
+            "thumb": "https://medium-media.vgm.io/albums/59/22495/22495-1381769579.jpg"
+        },
+        {
+            "full": "https://medium-media.vgm.io/albums/59/22495/22495-1381769602.jpg",
+            "medium": "https://medium-media.vgm.io/albums/59/22495/22495-1381769602.jpg",
+            "name": "Disc",
+            "thumb": "https://medium-media.vgm.io/albums/59/22495/22495-1381769602.jpg"
+        }
+    ],
+    "discs": [
+        {
+            "disc_length": "71:17",
+            "name": "Disc 1",
+            "tracks": [
+                {
+                    "names": {
+                        "English": "BLUE"
+                    },
+                    "track_length": "5:04"
+                },
+                {
+                    "names": {
+                        "English": "WORDS THAT WE COULDN'T SAY"
+                    },
+                    "track_length": "3:29"
+                },
+                {
+                    "names": {
+                        "English": "AUTUMN IN GANYMEDE"
+                    },
+                    "track_length": "3:54"
+                },
+                {
+                    "names": {
+                        "English": "MUSHROOM HUNTING"
+                    },
+                    "track_length": "3:18"
+                },
+                {
+                    "names": {
+                        "English": "GO GO CACTUS MAN"
+                    },
+                    "track_length": "2:37"
+                },
+                {
+                    "names": {
+                        "English": "CHICKEN BONE"
+                    },
+                    "track_length": "4:56"
+                },
+                {
+                    "names": {
+                        "English": "THE REAL MAN"
+                    },
+                    "track_length": "4:00"
+                },
+                {
+                    "names": {
+                        "English": "N.Y.RUSH"
+                    },
+                    "track_length": "5:05"
+                },
+                {
+                    "names": {
+                        "English": "ADIEU"
+                    },
+                    "track_length": "5:39"
+                },
+                {
+                    "names": {
+                        "English": "CALL ME CALL ME"
+                    },
+                    "track_length": "4:42"
+                },
+                {
+                    "names": {
+                        "English": "AVE MARIA"
+                    },
+                    "track_length": "5:49"
+                },
+                {
+                    "names": {
+                        "English": "STELLA BY MOOR"
+                    },
+                    "track_length": "1:08"
+                },
+                {
+                    "names": {
+                        "English": "FLYING TEAPOT"
+                    },
+                    "track_length": "3:32"
+                },
+                {
+                    "names": {
+                        "English": "WO QUI NON COIN"
+                    },
+                    "track_length": "3:43"
+                },
+                {
+                    "names": {
+                        "English": "ROAD TO THE WEST"
+                    },
+                    "track_length": "2:55"
+                },
+                {
+                    "names": {
+                        "English": "FAREWELL BLUES"
+                    },
+                    "track_length": "5:31"
+                },
+                {
+                    "names": {
+                        "English": "See You Space Cowboy..."
+                    },
+                    "track_length": "5:55"
+                }
+            ]
+        }
+    ],
+    "link": "album/22495",
+    "lyricists": [
+        {
+            "link": "artist/8424",
+            "names": {
+                "en": "Tim Jensen",
+                "ja": "ティム・ジェンセン"
+            }
+        },
+        {
+            "link": "artist/5281",
+            "names": {
+                "en": "Gabriela Robin"
+            }
+        },
+        {
+            "names": {
+                "en": "Brian Richy"
+            }
+        },
+        {
+            "names": {
+                "en": "Jerzy Knetig"
+            }
+        },
+        {
+            "link": "artist/1515",
+            "names": {
+                "en": "Tomoko Tane",
+                "ja": "種ともこ"
+            }
+        }
+    ],
+    "media_format": "CD",
+    "meta": {
+        "added_date": "2010-12-17T14:24",
+        "edited_date": "2017-02-21T14:38",
+        "fetched_date": "2017-11-18T06:34",
+        "freedb": 13,
+        "ttl": 86400,
+        "visitors": 5305
+    },
+    "name": "COWBOY BEBOP Original Soundtrack 3 BLUE",
+    "names": {
+        "en": "COWBOY BEBOP Original Soundtrack 3 BLUE",
+        "ja": "カウボーイビバップ オリジナル サウンドトラック3 BLUE",
+        "ja-latn": "COWBOY BEBOP Original Soundtrack 3 BLUE"
+    },
+    "notes": "All music and arrangement by Yoko Kanno.\nM-01\nWords by Tim Jensen\nVocal: Mai Yamane\nSoprano Voice: Soichiro Otsuka with Gabriela Robin\nAnd Seatbelts\nM-02\nWords by Tim Jensen\nVocal: Steve Conte\nAnd Seatbelts\nM-03\nSeatbelts\nM-04\nDrums: Jum Mussen\nE.Piano: Mark Soskin\nE.Bass: Booker King\nTrumpet: Steven Berstein\nTrombone: Josh Roseman\nT.sax: Paul Shapiro\nConga: Danny Sandownick\nVoice: Tulivu-Donna Cumberbatch\nM-05\nSeatbelts\nM-06\nWords by Gabriela Robin\nVocal: Sydney with sister R\nAnd Seatbelts\nM-07\nBass: Bakabon Suzuki\nAnd Seatbelts\nM-08\nDrums: Bobby Previte\nE.Piano: Mark Soskin\nBass: Booker King\nGuitar: Stuw Cutler\nT.sax: Paul Shapiro\nTrumpet: Steven Berstein\nM-09\nWords by Brian Richy\nVocal: Emily Bindiger\nDrums: Tony Reedus\nPiano: Mark Soskin\nBass: Booker King\nGuitar: Stuw Cutler\nM-10\nWords by Tim Jensen\nVocal: Steve Conte\nAnd Seatbelts\nM-11\nVocal: Jerzy Knetig\nOrchestra: Warsaw Philharmonic Orchestra\nConducted: Anthony Inglis\nM-12\nSeatbelts\nM-13\nWords by Tomoko Tane\nVocal: Emily Bindiger\nPiano: Mark Soskin\nTrumpet: Steven Berstein\nM-14\nWords by Gabriela Robin\nVocal: Aoi Tada\nHanamogeraed by: Aoi \"ED\" Tada\nAnd Seatbelts\nM-15\nSeatbelts\nM-16\nDrums: Bobby Previte\nPiano: Mark Soskin\nBass: Booker King\nTrumpet: Steven Berstein\nM-17\nby Seatbelts\nSeatbelts are\nDrums: Yasuo Sano\nBass: Hitoshi Watanabe\nGuitar: Tsuneo Imahori\nPiano & keyboards: Yoko Kanno\nSynthesizer manipulation: Keishi Urata\nStrings: Masatsugu Shinozaki Strings\nTrumpet: Toshio Araki\nTrombone: Yoichi Murata\nSax & whistle: Takuo Yamamoto\nPercussion: Yoichi Okabe\nProduced by Yoko Kanno\nCo-produced by Toshiaki Ota (BORDER LINE Inc.), Shiro Sasaki (Victor)\nDirected by Yukako Inoue (Victor)\nRecorded & Mixed by Masashi Yabuhara [TOKYO & N.Y.] (Except M-04, 8, 9, 11, 13, 16)\nAssisted by Miyuki Ishimoto, Yasuhiro Tsurusaki, Mana Nagahiro, Jin-Won-Lee, Seiji Sekine, Harutomo Kawazura, Sayuri Taguchi, Masaho Takeda\nRecorded at Victor Studio, Z'd Studio, Sound Valley Studio, Cherry Island Studio, Towerside Studio, Soundtrack Studio\nRecorded & Mixed by Rudy Van Gelder at Van Gelder Studio [N.Y.] (M-04, 8, 9, 13, 16)\nAssisted by Maureen Sickler\nRecorded by DUPOUY CHRISTOPHE at Plus XXXstudio [Paris] (M-06)\nAssisted by J.B MILLET, YANN ARNAUD\nRecorded by Andrzej Sasin, Andrzej Lupa at Filharmoina Hall [Warsaw]\nEdited by Julita Emanuilow at CD Accord Studio\nMastered by Scott Hull at Master Disk [N.Y.]\nRecording Co-ordinated by Chiyo Sagae (Paris), Cherry Kaoru Hulsey BLUE SUN FILM Company (N.Y.), Wojchiech Nowak (Warsaw)\nPromoted by Shosei Ito, Shiho Miyai (Victor)\nSales Promoted by Tetsuya Yamada, Ko Yamashita (Victor)\nTHANX!\nNoboru Mano, Yumi Kawakami, Shinichi Akagawa, Kengo Watanabe, Dai Satoh (Frognation), Kaoru Asai, Takako Nishikiori, Grand Funk Inc., TIM & MAYU \"Traveler\" Jensen & RUDY!",
+    "organizations": [
+        {
+            "link": "org/77",
+            "names": {
+                "en": "Victor Entertainment",
+                "ja": "ビクターエンタテインメント株式会社",
+                "ja-latn": "Victor Entertainment"
+            },
+            "role": "publisher"
+        }
+    ],
+    "performers": [
+        {
+            "link": "artist/5257",
+            "names": {
+                "en": "Seatbelts"
+            }
+        },
+        {
+            "link": "artist/8474",
+            "names": {
+                "en": "Mai Yamane",
+                "ja": "山根麻以"
+            }
+        },
+        {
+            "link": "artist/26290",
+            "names": {
+                "en": "Soichiro Otsuka",
+                "ja": "大塚宗一郎"
+            }
+        },
+        {
+            "link": "artist/5281",
+            "names": {
+                "en": "Gabriela Robin"
+            }
+        },
+        {
+            "link": "artist/7701",
+            "names": {
+                "en": "Steve Conte"
+            }
+        },
+        {
+            "names": {
+                "en": "Tulivu-Donna Cumberbatch"
+            }
+        },
+        {
+            "link": "artist/880",
+            "names": {
+                "en": "Mark Soskin"
+            }
+        },
+        {
+            "names": {
+                "en": "Jim Mussen"
+            }
+        },
+        {
+            "names": {
+                "en": "Booker King"
+            }
+        },
+        {
+            "names": {
+                "en": "Steven Berstein"
+            }
+        },
+        {
+            "names": {
+                "en": "Josh Roseman"
+            }
+        },
+        {
+            "names": {
+                "en": "Paul Shapiro"
+            }
+        },
+        {
+            "names": {
+                "en": "Danny Sandownick"
+            }
+        },
+        {
+            "names": {
+                "en": "SYDNEY"
+            }
+        },
+        {
+            "names": {
+                "en": "sister R"
+            }
+        },
+        {
+            "link": "artist/2429",
+            "names": {
+                "en": "Bakabon Suzuki"
+            }
+        },
+        {
+            "names": {
+                "en": "Bobby Previte"
+            }
+        },
+        {
+            "names": {
+                "en": "Stuw Cutler"
+            }
+        },
+        {
+            "link": "artist/3657",
+            "names": {
+                "en": "Emily Bindiger"
+            }
+        },
+        {
+            "names": {
+                "en": "Tony Reedus"
+            }
+        },
+        {
+            "link": "artist/262",
+            "names": {
+                "en": "Warsaw Philharmonic Orchestra",
+                "ja": "Orkiestra Symfoniczna Filharmonii Narodowej"
+            }
+        },
+        {
+            "link": "artist/5509",
+            "names": {
+                "en": "Aoi \"ED\" Tada"
+            }
+        }
+    ],
+    "picture_full": "https://medium-media.vgm.io/albums/59/22495/22495-1381769605.jpg",
+    "picture_small": "https://medium-media.vgm.io/albums/59/22495/22495-1381769605.jpg",
+    "picture_thumb": "https://medium-media.vgm.io/albums/59/22495/22495-1381769605.jpg",
+    "products": [
+        {
+            "link": "product/1776",
+            "names": {
+                "en": "Cowboy Bebop",
+                "ja": "カウボーイビバップ",
+                "ja-latn": "Cowboy Bebop"
+            }
+        }
+    ],
+    "publish_format": "Commercial",
+    "publisher": {
+        "link": "org/77",
+        "names": {
+            "en": "Victor Entertainment",
+            "ja": "ビクターエンタテインメント株式会社",
+            "ja-latn": "Victor Entertainment"
+        }
+    },
+    "rating": 3.75,
+    "related": [
+        {
+            "catalog": "VICL-60201",
+            "link": "album/19089",
+            "names": {
+                "en": "COWBOY BEBOP",
+                "ja": "TVアニメーション カウボーイ ビバップ",
+                "ja-latn": "COWBOY BEBOP"
+            },
+            "type": "anime"
+        },
+        {
+            "catalog": "VICL-60248",
+            "link": "album/23492",
+            "names": {
+                "en": "COWBOY BEBOP: Vitaminless",
+                "ja": "カウボーイビバップ: ビタミンレス",
+                "ja-latn": "COWBOY BEBOP: Vitaminless"
+            },
+            "type": "anime"
+        },
+        {
+            "catalog": "VICL-60202",
+            "link": "album/19203",
+            "names": {
+                "en": "COWBOY BEBOP Original Soundtrack 2 No Disc",
+                "ja": "カウボーイビバップ...",
+                "ja-latn": "COWBOY BEBOP Original Soundtrack 2 No Disc"
+            },
+            "type": "anime"
+        },
+        {
+            "catalog": "GGG-325",
+            "link": "album/50910",
+            "names": {
+                "en": "Cowboy Bebop Remixes: Music For Freelance + Vitaminless",
+                "ja": "Cowboy Bebop Remixes: Music For Freelance + Vitaminless",
+                "ja-latn": "Cowboy Bebop Remixes: Music For Freelance + Vitaminless"
+            },
+            "type": "bootleg"
+        },
+        {
+            "catalog": "VICL-60371",
+            "link": "album/23157",
+            "names": {
+                "en": "Cowboy Bebop remixes - music for Freelance",
+                "ja": "Cowboy Bebop remixes - music for Freelance",
+                "ja-latn": "Cowboy Bebop remixes - music for Freelance"
+            },
+            "type": "anime"
+        },
+        {
+            "catalog": "ALCA-8032~5",
+            "link": "album/51478",
+            "names": {
+                "en": "COWBOY BEBOP CD-BOX",
+                "ja": "COWBOY BEBOP CD-BOX Original Sound Track Limited Edition",
+                "ja-latn": "COWBOY BEBOP CD-BOX"
+            },
+            "type": "bootleg"
+        },
+        {
+            "catalog": "N/A",
+            "link": "album/41867",
+            "names": {
+                "en": "COWBOY BIIBOP Soundtrack EP",
+                "ja": "COWBOY BIIBOP Soundtrack EP",
+                "ja-latn": "COWBOY BIIBOP Soundtrack EP"
+            },
+            "type": "doujin"
+        }
+    ],
+    "release_date": "1999-05-01",
+    "release_events": [],
+    "release_price": {
+        "currency": "JPY",
+        "price": 3045.0
+    },
+    "reprints": [
+        {
+            "catalog": "GGG-290",
+            "link": "album/51483",
+            "note": "Taiwanese, Bootleg printing, 1999"
+        },
+        {
+            "catalog": "A8-991",
+            "link": "album/51484",
+            "note": "Taiwanese, Bootleg printing, 1999"
+        },
+        {
+            "catalog": "MICA-0032",
+            "link": "album/23836",
+            "note": "Taiwanese, Bootleg printing, 2003"
+        },
+        {
+            "catalog": "T0089",
+            "link": "album/67973",
+            "note": "Malaysian, Bootleg printing, 2005"
+        },
+        {
+            "catalog": "KO-88150",
+            "link": "album/51488",
+            "note": "Taiwanese, Bootleg printing, 2007"
+        },
+        {
+            "catalog": "VTCL-60328",
+            "link": "album/36043",
+            "note": "Dec 21, 2012"
+        }
+    ],
+    "stores": [
+        {
+            "link": "https://itunes.apple.com/us/album/cowboy-bebop-original-soundtrack/id489778227",
+            "name": "iTunes (digital download)"
+        },
+        {
+            "link": "http://vgmdb.solarisjapan.com/VICL-60203",
+            "name": "Solaris Japan"
+        },
+        {
+            "link": "http://www.cdjapan.co.jp/detailview.html?KEY=VICL-60203",
+            "name": "CD Japan"
+        }
+    ],
+    "vgmdb_link": "http://vgmdb.net/album/22495?perpage=99999",
+    "votes": 10
+}
