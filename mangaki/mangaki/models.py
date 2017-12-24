@@ -464,7 +464,7 @@ class Suggestion(models.Model):
         It'll raise ValueError when it is impossible to automatically fix the issue.
         """
         if self.problem in ('nsfw', 'n_nsfw'):
-            self.work.nsfw = not self.work.nsfw
+            self.work.nsfw = True if self.problem == 'nsfw' else False
             self.work.save()
         else:
             raise ValueError('Unable to auto-fix `{}`-type suggestions.'.format(self.problem))
