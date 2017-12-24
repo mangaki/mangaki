@@ -25,14 +25,6 @@ $(document).ready(function () {
       acceptsResearchUsage: window.INITIAL_DATA.acceptsResearchUsage,
       receivesNewsletter: window.INITIAL_DATA.receivesNewsletter
     },
-    mounted: function () {
-      // return this.$nextTick(function () {
-      //   $("[name='research_ok']").bootstrapSwitch();
-      //   $("[name='is_shared']").bootstrapSwitch();
-      //   $("[name='newsletter_ok']").bootstrapSwitch();
-      //   $("[name='nsfw_ok']").bootstrapSwitch();
-      // });
-    },
     beforeUpdate: function () {
       this.updateProfile();
     },
