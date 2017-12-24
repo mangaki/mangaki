@@ -207,42 +207,10 @@ Card.prototype.focus = function () {
   this.$el.focus();
 };
 
-/* Update checkboxes state */
-var TRIGGER_LOAD_NEXT_AFTER = 50;
-Card.prototype.updateCheckboxesState = function (ratingChecked, triggerChange) {
-  // Don't trigger mangaki.loadNext event by default.
-  triggerChange = triggerChange || false;
-
-  var $ratings = this.$el.find('.ratings');
-
-  var checkboxes = $ratings.find('.rating__checkbox');
-  var someCheckbox = null;
-  checkboxes.each(function () {
-    var lastValue = this.checked;
-    this.checked = this.value === ratingChecked;
-    if (lastValue !== this.checked) {
-      someCheckbox = this;
-    }
-  });
-
-  if (triggerChange) {
-      setTimeout(function () {
-        // Bypass UI changes.
-        $(someCheckbox).trigger('mangaki.loadNext');
-      }, TRIGGER_LOAD_NEXT_AFTER);
-    }
-};
-
 /* Vote for this card */
 Card.prototype.vote = function (choice) {
-  var card = this;
-  return function () {
-    var endpoint = card.$el.find('.ratings').data('endpoint') || '/vote';
-
-    $.post(endpoint + '/' + card.work.id, {choice: choice}, function (rating) {
-        card.updateCheckboxesState(rating, true);
-    });
-  }
+  this.$el.find('.rating_' + choice).trigger('click');
+  this.focus();
 };
 
 var CARD_SHORTCUTS = {
@@ -276,7 +244,7 @@ Card.prototype.bindShortcuts = function () {
 
   var card = this;
   $.each(CARD_SHORTCUTS, function (keystroke, vote_value) {
-    Mousetrap.bind(keystroke, debounce(card.vote(vote_value), DEBOUNCE_VOTE_TIME), 'keypress');
+    Mousetrap.bind(keystroke, debounce(() => card.vote(vote_value), DEBOUNCE_VOTE_TIME), 'keypress');
   });
 };
 
@@ -350,7 +318,7 @@ function Mosaic(el, category, enable_shortcut) {
   this.cards = els.map(function (el, index) {
     var card = new Card(el, category);
 
-    card.$el.find('.rating__checkbox').on('mangaki.loadNext change', function () {
+    card.$el.find('.rating__checkbox').on('change', function () {
       // When someone rates a work on the mosaic, we'll give them the next one.
       mosaic.loadCard(index);
     });
