@@ -26,6 +26,8 @@ from mangaki.utils.db import get_potential_posters
 from collections import defaultdict
 from enum import Enum
 
+from mangaki.utils.work_merge import WorkClusterMergeHandler
+
 
 class MergeType(Enum):
     INFO_ONLY = (0, 'black')
@@ -41,70 +43,6 @@ class MergeErrors(Enum):
     NO_ID = 'no ID'
     FIELDS_MISSING = 'fields missings'
     NOT_ENOUGH_WORKS = 'not enough works'
-
-
-def overwrite_fields(final_work, request):
-    fields_to_choose = set(filter(None, request.POST.get('fields_to_choose').split(',')))
-    fields_required = set(filter(None, request.POST.get('fields_required').split(',')))
-    missing_required_fields = []
-
-    for field in fields_to_choose:
-        curr_field = request.POST.get(field)
-        if curr_field != 'None' and curr_field is not None:
-            setattr(final_work, field, curr_field)
-        if (curr_field == 'None' or curr_field is None) and field in fields_required:
-            missing_required_fields.append(field)
-
-    if not missing_required_fields:
-        final_work.save()
-    return missing_required_fields  # Return the list of missing required fields
-
-
-def redirect_ratings(works_to_merge, final_work):
-    # Get all IDs of considered ratings
-    get_id_of_rating = {}
-    for rating_id, user_id, date in Rating.objects.filter(work__in=works_to_merge).values_list('id', 'user_id', 'date'):
-        get_id_of_rating[(user_id, date)] = rating_id
-    # What is the latest rating of every user? (N. B. – latest may be null)
-    kept_rating_ids = []
-    for rating in Rating.objects.filter(work__in=works_to_merge).values('user_id').annotate(latest=Max('date')):
-        user_id = rating['user_id']
-        date = rating['latest']
-        kept_rating_ids.append(get_id_of_rating[(user_id, date)])
-    Rating.objects.filter(work__in=works_to_merge).exclude(id__in=kept_rating_ids).delete()
-    Rating.objects.filter(id__in=kept_rating_ids).update(work_id=final_work.id)
-
-
-def redirect_staff(works_to_merge, final_work):
-    final_work_staff = set()
-    kept_staff_ids = []
-    # Only one query: put final_work's Staff objects first in the list
-    queryset = (Staff.objects.filter(work__in=works_to_merge)
-                             .annotate(belongs_to_final_work=Case(
-                                        When(work_id=final_work.id, then=Value(1)),
-                                        default=Value(0), output_field=IntegerField()))
-                             .order_by('-belongs_to_final_work')
-                             .values_list('id', 'work_id', 'artist_id', 'role_id'))
-    for staff_id, work_id, artist_id, role_id in queryset:
-        if work_id == final_work.id:  # This condition will be met for the first iterations
-            final_work_staff.add((artist_id, role_id))
-        elif (artist_id, role_id) not in final_work_staff:  # Now we are sure we know every staff of the final work
-            kept_staff_ids.append(staff_id)
-    Staff.objects.filter(work__in=works_to_merge).exclude(work_id=final_work.id).exclude(id__in=kept_staff_ids).delete()
-    Staff.objects.filter(id__in=kept_staff_ids).update(work_id=final_work.id)
-
-
-def redirect_related_objects(works_to_merge, final_work):
-    genres = sum((list(work.genre.all()) for work in works_to_merge), [])
-    work_ids = [work.id for work in works_to_merge]
-    existing_tag_ids = TaggedWork.objects.filter(work=final_work).values_list('tag__pk', flat=True)
-
-    final_work.genre.add(*genres)
-    Trope.objects.filter(origin_id__in=work_ids).update(origin_id=final_work.id)
-    TaggedWork.objects.filter(work_id__in=work_ids).exclude(tag_id__in=existing_tag_ids).update(work_id=final_work.id)
-    for model in [WorkTitle, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]:
-        model.objects.filter(work_id__in=work_ids).update(work_id=final_work.id)
-    Work.objects.filter(id__in=work_ids).exclude(id=final_work.id).update(redirect=final_work)
 
 
 def create_merge_form(works_to_merge_qs):
@@ -173,18 +111,25 @@ def merge_works(request, selected_queryset):
         final_id = int(request.POST.get('id'))
         final_work = Work.objects.get(id=final_id)
 
-        missing_required_fields = overwrite_fields(final_work, request)
+        # Notice how `cluster` always exist in this scope.
+
+        # noinspection PyUnboundLocalVariable
+        merge_handler = WorkClusterMergeHandler(cluster,
+                                                works_to_merge,
+                                                final_work)
+
+        missing_required_fields = merge_handler.overwrite_fields(
+            set(filter(None, request.POST.get('fields_to_choose').split(','))),
+            set(filter(None, request.POST.get('fields_required').split(','))),
+            request.POST)
 
         # Happens when a required field was left empty
         if missing_required_fields:
             return None, missing_required_fields, MergeErrors.FIELDS_MISSING
 
-        redirect_ratings(works_to_merge, final_work)
-        redirect_staff(works_to_merge, final_work)
-        redirect_related_objects(works_to_merge, final_work)
-        WorkCluster.objects.filter(id=cluster.id).update(
-            checker=request.user, resulting_work=final_work, merged_on=timezone.now(), status='accepted')
-        return len(works_to_merge), final_work, None
+        merge_handler.perform_redirections()
+        merge_handler.accept_cluster(request.user)
+        return len(works_to_merge), merge_handler.target_work, None
 
     # Just show a warning if only one work was checked
     if len(works_to_merge) < 2:
