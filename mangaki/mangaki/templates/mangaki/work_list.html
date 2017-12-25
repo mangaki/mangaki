@@ -3,99 +3,123 @@
 {% load anonymous_ratings %}
 
 {% block body %}
+    <div class="fb-container">
+        {% if enable_kb_shortcuts %}
+        <div class="row well shortcuts-explanations-container">
+            <span>
+                <h3><strong>
+                    Cheatsheet pour les raccourcis clavier
+                </strong></h3>
+            </span>
+            <h4>Déplacements</h4>
+            <ul>
+                <li>Aller à gauche: <kbd>←</kbd></li>
+                <li>Aller à droite: <kbd>→</kbd></li>
+            </ul>
+            <h4>Voter</h4>
+            <ul>
+                <li>Mettre en favori: <kbd>E</kbd></li>
+                <li>Aimer: <kbd>R</kbd></li>
+                <li>Neutre: <kbd>T</kbd></li>
+                <li>Ne pas aimer: <kbd>Y</kbd></li>
+                <li>Je veux voir: <kbd>G</kbd></li>
+                <li>Je ne veux pas voir: <kbd>H</kbd></li>
+            </ul>
+        </div>
+        {% endif %}
 
-{% if not is_dpp and not request|has_anonymous_ratings %}
-<div class="col-xs-12">
-  <p class="alert alert-info">
-{% if user.is_authenticated %}
-    Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
-{% else %}
-    Nouveau sur Mangaki ? <a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
-    <a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
-{% endif %}
-  </p>
-</div>
-{% endif %}
+        <div class="row mosaic">
+            {% if not is_dpp and not request|has_anonymous_ratings %}
+                <div class="col-xs-12">
+                    <p class="alert alert-info">
+                        {% if user.is_authenticated %}
+                            Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
+                        {% else %}
+                            Nouveau sur Mangaki ? <a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
+                            <a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
 
-<div class="col-xs-12">
-  <ul class="nav nav-tabs">
-    {% if is_dpp %}
+            <div class="col-xs-12">
+                <ul class="nav nav-tabs">
+                    {% if is_dpp %}
 
-    <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}"><em>Anime</em> seulement</a></li>
+                        <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}"><em>Anime</em> seulement</a></li>
 
-    <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'manga' %}"><em>Manga</em> seulement</a></li>
+                        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'manga' %}"><em>Manga</em> seulement</a></li>
 
-    {% else %}
-    <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}">Mosaïque</a></li>
-    <li role="presentation"{% if sort_mode == 'new' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=new">Récents</a></li>
-    <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=top">Top</a></li>
-    <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=popularity">Populaires</a></li>
-    <li role="presentation"{% if sort_mode == 'pearls' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=pearls">Perles rares</a></li>
-    <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=controversy">Controversés !</a></li>
-    <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=random">Random</a></li>
-    <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
-      <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
-      {% endif %}
-  </ul>
-</div>
+                    {% else %}
+                        <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
+                            <a href="{% url 'work-list' category %}">Mosaïque</a></li>
+                        <li role="presentation"{% if sort_mode == 'new' %} class="active"{% endif %}>
+                            <a href="{% url 'work-list' category %}?sort=new">Récents</a></li>
+                        <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
+                            <a href="{% url 'work-list' category %}?sort=top">Top</a></li>
+                        <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
+                            <a href="{% url 'work-list' category %}?sort=popularity">Populaires</a></li>
+                        <li role="presentation"{% if sort_mode == 'pearls' %} class="active"{% endif %}>
+                            <a href="{% url 'work-list' category %}?sort=pearls">Perles rares</a></li>
+                        <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
+                            <a href="{% url 'work-list' category %}?sort=controversy">Controversés !</a></li>
+                        <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
+                            <a href="{% url 'work-list' category %}?sort=random">Random</a></li>
+                        <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
+                            <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
+                    {% endif %}
+                </ul>
+            </div>
 
-<div class="col-xs-12" style="margin: 10px 0; text-align: center">
-{% if sort_mode == 'alpha' %}
-<ul class="pagination pagination-sm" style="margin: 0">
-  {% for letter_ in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
-    <li role="presentation"
-      {% if letter_ == letter %}class="active"{% endif %}
-      {% if letter_ == '#' and letter == '0'%}class="active"{% endif %}>
-      <a
-	 href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter_ == '#' %}0{% else %}{{ letter_ }}{% endif %}">
-	{{letter_}}
-      </a>
-    </li>
-  {% endfor %}
-</ul>
-{% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' and not is_dpp %}
-  <form method="GET">
-    <div class="input-group">
-      <input class="search-input form-control {{category}}" placeholder="Entrez le titre d'un {{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
-      <span class="input-group-btn">
-	<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
-      </span>
+            <div class="col-xs-12" style="margin: 10px 0; text-align: center">
+                {% if sort_mode == 'alpha' %}
+                    <ul class="pagination pagination-sm" style="margin: 0">
+                        {% for letter_ in "#ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+                            <li role="presentation"
+                                {% if letter_ == letter %}class="active"{% endif %}
+                                {% if letter_ == '#' and letter == '0'%}class="active"{% endif %}>
+                                <a
+                                    href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter_ == '#' %}0{% else %}{{ letter_ }}{% endif %}">
+                                    {{letter_}}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' and not is_dpp %}
+                    <form method="GET">
+                        <div class="input-group">
+                            <input class="search-input form-control {{category}}" placeholder="Entrez le titre d'un {{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
+                            <span class="input-group-btn">
+        <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+          </span>
+                        </div>
+                        <span class="help-block" style="float: right">Astuce&nbsp;: Vous pouvez appuyer sur la touche "Entrée" de votre clavier pour lancer la recherche</span>
+                    </form>
+                {% endif %}
+            </div>
+            <div class="row">
+                {% if flat %}
+                    {% include "works_no_poster.html" with works=object_list %}
+                {% else %}
+                    {% include "works.html" with works=object_list is_dpp=is_dpp %}
+                {% endif %}
+            </div>
+
+            {% if user.is_authenticated %}
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        {% if is_dpp %}
+                            <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco_dpp' %}?category={{ category }}">Je n'arrive plus à noter, montrez-moi de nouvelles oeuvres&nbsp;!</a>
+                        {% else %}
+                            <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco' %}?category={{ category }}">Je n'arrive plus à noter, conseillez-moi&nbsp;!</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            <br/>
+            {% include "pagination.html" %}
+        </div>
     </div>
-    <span class="help-block" style="float: right">Astuce&nbsp;: Vous pouvez appuyer sur la touche "Entrée" de votre clavier pour lancer la recherche</span>
-  </form>
-{% endif %}
-</div>
-<div class="row">
-{% if flat %}
-  {% include "works_no_poster.html" with works=object_list %}
-{% else %}
-  {% include "works.html" with works=object_list is_dpp=is_dpp %}
-{% endif %}
-</div>
-
-{% if user.is_authenticated %}
-<div class="row">
-<div class="col-md-12 col-sm-12">
-    {% if is_dpp %}
-    <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco_dpp' %}?category={{ category }}">Je n'arrive plus à noter, montrez-moi de nouvelles oeuvres&nbsp;!</a>
-    {% else %}
-    <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco' %}?category={{ category }}">Je n'arrive plus à noter, conseillez-moi&nbsp;!</a>
-    {% endif %}
-</div>
-</div>
-{% endif %}
-
-<br/>
-
-{% include "pagination.html" %}
-
 {% endblock %}
 
 {% block extrajs %}
@@ -104,7 +128,7 @@
     var category = '{{ category }}';
     loadMenu();
     {% if sort_mode == 'mosaic' %}
-    new Mosaic('.cards-grid', '{{ category }}');
+    new Mosaic('.cards-grid', '{{ category }}', {{ enable_kb_shortcuts|yesno:"true,false" }});
     {% endif %}
 </script>
 {% endif %}
