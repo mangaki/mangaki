@@ -66,8 +66,6 @@ def look_for_workclusters(steal_workcluster: bool = False):
         logger.info('Compression done.')
 
 
-
-
 @app.task(name='import_mal', bind=True, ignore_result=True)
 def import_mal(self, mal_username: str, mangaki_username: str):
     r = redis.StrictRedis(connection_pool=redis_pool)

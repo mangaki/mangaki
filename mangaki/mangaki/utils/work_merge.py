@@ -14,7 +14,7 @@ def union_work_cluster(cluster, works):
 
 
 def create_work_cluster(works):
-    # Union-Find approach.
+    # FIXME: Do an actual Union-Find.
     target_cluster = None
     for work in works:
         clusters = list(work.workcluster_set.all())
