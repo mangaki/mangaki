@@ -6,11 +6,9 @@ from django.contrib import messages
 from django.contrib.admin import helpers
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.db.models import Count, Case, When, Value, IntegerField
-from django.db.models.aggregates import Max
+from django.db.models import Count
 from django.template.response import TemplateResponse
 from django.utils.html import format_html, format_html_join
-from django.utils import timezone
 
 from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
