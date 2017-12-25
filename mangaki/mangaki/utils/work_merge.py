@@ -1,4 +1,8 @@
-from django.db.models import Max, Case, When, Value, IntegerField, timezone
+from collections import defaultdict
+from enum import IntEnum
+
+from django.db.models import Max, Case, When, Value, IntegerField
+from django.utils import timezone
 
 from mangaki.models import (
     WorkCluster,
@@ -17,7 +21,58 @@ from mangaki.models import (
 
 
 def is_param_null(param):
-    return param == 'None' or param is None
+    return param == 'None' or (not param) or param is None
+
+
+UNK_VALUES = {'Inconnu'}
+
+
+def is_empty_field(field):
+    return field is None or field in UNK_VALUES
+
+
+PRECOMPUTED_FIELDS = {'sum_ratings',
+                      'nb_ratings',
+                      'nb_likes',
+                      'nb_dislikes',
+                      'controversy',
+                      'title_search',
+                      'redirect_id'}
+
+
+class ActionType(IntEnum):
+    DO_NOTHING = 0
+    JUST_CONFIRM = 1
+    CHOICE_REQUIRED = 2
+
+
+def field_changeset(works):
+    rows = defaultdict(list)
+
+    for work in works:
+        for field in work:
+            rows[field].append(work[field])
+
+    for field, choices in rows.items():
+        suggested = None
+
+        if field == 'id':
+            action = ActionType.JUST_CONFIRM
+            suggested = min(choices)
+        elif field in PRECOMPUTED_FIELDS:
+            action = ActionType.DO_NOTHING
+        # Equality on all values.
+        elif all(choice == choices[0] for choice in choices):
+            action = ActionType.JUST_CONFIRM
+            suggested = choices[0]
+        # All but one field empty.
+        elif sum(is_empty_field(choice) for choice in choices) == len(choices) - 1:
+            action = ActionType.JUST_CONFIRM
+            suggested = [choice for choice in choices if not is_empty_field(choice)][0]
+        else:
+            action = ActionType.CHOICE_REQUIRED
+
+        yield (field, choices, action, suggested)
 
 
 class WorkClusterMergeHandler:
@@ -58,6 +113,7 @@ class WorkClusterMergeHandler:
         self.redirect_ratings()
         self.redirect_staff()
         self.redirect_related_objects()
+        self.merge_references()
 
     def redirect_ratings(self):
         # Get all IDs of considered ratings
@@ -78,7 +134,7 @@ class WorkClusterMergeHandler:
         Rating.objects.filter(id__in=kept_rating_ids).update(work_id=self.target_work.id)
 
     def redirect_staff(self):
-        self.target_work_staff = set()
+        target_work_staff = set()
         kept_staff_ids = []
         # Only one query: put self.target_work's Staff objects first in the list
         queryset = (Staff.objects.filter(work__in=self.works_to_merge)
@@ -89,13 +145,30 @@ class WorkClusterMergeHandler:
             .values_list('id', 'work_id', 'artist_id', 'role_id'))
         for staff_id, work_id, artist_id, role_id in queryset:
             if work_id == self.target_work.id:  # This condition will be met for the first iterations
-                self.target_work_staff.add((artist_id, role_id))
+                target_work_staff.add((artist_id, role_id))
             # Now we are sure we know every staff of the final work
-            elif (artist_id, role_id) not in self.target_work_staff:
+            elif (artist_id, role_id) not in target_work_staff:
                 kept_staff_ids.append(staff_id)
         Staff.objects.filter(work__in=self.works_to_merge).exclude(work_id=self.target_work.id).exclude(
             id__in=kept_staff_ids).delete()
         Staff.objects.filter(id__in=kept_staff_ids).update(work_id=self.target_work.id)
+
+    def merge_references(self):
+        def compute_hash(source, identifier):
+            return hash(source + str(identifier))
+
+        references = Reference.objects.filter(work__in=self.works_to_merge).all()
+        kept_references = dict()
+        target_work_references = {compute_hash(ref.source, ref.identifier) for ref in references
+                                  if ref.work_id == self.target_work.id}
+
+        for reference in references:
+            h = compute_hash(reference.source, reference.identifier)
+            if h not in target_work_references:
+                kept_references[h] = reference.id
+
+        for ref_id in kept_references:
+            Reference.objects.filter(id=ref_id).update(work_id=self.target_work.id)
 
     def redirect_related_objects(self):
         genres = sum((list(work.genre.all()) for work in self.works_to_merge), [])
@@ -106,8 +179,9 @@ class WorkClusterMergeHandler:
         Trope.objects.filter(origin_id__in=work_ids).update(origin_id=self.target_work.id)
         TaggedWork.objects.filter(work_id__in=work_ids).exclude(tag_id__in=existing_tag_ids).update(
             work_id=self.target_work.id)
-        for model in [WorkTitle, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]:
+        for model in [WorkTitle, Suggestion, Recommendation, Pairing, ColdStartRating]:
             model.objects.filter(work_id__in=work_ids).update(work_id=self.target_work.id)
+
         Work.objects.filter(id__in=work_ids).exclude(id=self.target_work.id).update(redirect=self.target_work)
 
 

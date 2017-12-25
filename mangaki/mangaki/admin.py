@@ -24,23 +24,40 @@ from mangaki.utils.db import get_potential_posters
 from collections import defaultdict
 from enum import Enum
 
-from mangaki.utils.work_merge import WorkClusterMergeHandler
+from mangaki.utils.work_merge import WorkClusterMergeHandler, field_changeset, ActionType
 
-
-class MergeType(Enum):
-    INFO_ONLY = (0, 'black')
-    JUST_CONFIRM = (1, 'green')
-    CHOICE_REQUIRED = (2, 'red')
-
-    def __init__(self, priority, row_color):
-        self.priority = priority
-        self.row_color = row_color
+ActionTypeColors = {
+    ActionType.DO_NOTHING: 'black',  # INFO_ONLY
+    ActionType.JUST_CONFIRM: 'green',
+    ActionType.CHOICE_REQUIRED: 'red'
+}
 
 
 class MergeErrors(Enum):
     NO_ID = 'no ID'
     FIELDS_MISSING = 'fields missings'
     NOT_ENOUGH_WORKS = 'not enough works'
+
+
+def handle_merge_errors(response, request, final_work, nb_merged,
+                        message_user):
+    if response == MergeErrors.NO_ID:
+        message_user(request,
+                     "Aucun ID n'a été fourni pour la fusion.",
+                     level=messages.ERROR)
+    if response == MergeErrors.FIELDS_MISSING:
+        message_user(request,
+                     """Un ou plusieurs des champs requis n'ont pas été remplis.
+                          (Détails: {})""".format(", ".join(final_work)),
+                     level=messages.ERROR)
+    if response == MergeErrors.NOT_ENOUGH_WORKS:
+        message_user(request,
+                     "Veuillez sélectionner au moins 2 œuvres à fusionner.",
+                     level=messages.WARNING)
+    if response is None:  # Confirmed
+        message_user(request,
+                     format_html('La fusion de {:d} œuvres vers <a href="{:s}">{:s}</a> a bien été effectuée.'
+                                 .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
 
 
 def create_merge_form(works_to_merge_qs):
@@ -53,32 +70,23 @@ def create_merge_form(works_to_merge_qs):
     fields_to_choose = []
     fields_required = []
     template_rows = []
-    for field in rows:
-        choices = rows[field]
-        suggested = None
-        if field in {'sum_ratings', 'nb_ratings', 'nb_likes', 'nb_dislikes', 'controversy'}:
-            merge_type = MergeType.INFO_ONLY
-        elif all(choice == choices[0] for choice in choices):  # All equal
-            merge_type = MergeType.JUST_CONFIRM
-            suggested = choices[0]
-        elif sum(not choice or choice == 'Inconnu' for choice in choices) == len(choices) - 1:  # All empty but one
-            merge_type = MergeType.JUST_CONFIRM
-            suggested = [choice for choice in choices if choice and choice != 'Inconnu'][0]  # Remaining one
-        else:
-            merge_type = MergeType.CHOICE_REQUIRED
+
+    for field, choices, action, suggested in field_changeset(work_dicts_to_merge):
         template_rows.append({
             'field': field,
             'choices': choices,
-            'merge_type': merge_type,
+            'action_type': action,
             'suggested': suggested,
-            'color': merge_type.row_color,
+            'color': ActionTypeColors[action],
         })
-        if field != 'id' and merge_type != MergeType.INFO_ONLY:
+
+        if field != 'id' and action != ActionType.DO_NOTHING:
             fields_to_choose.append(field)
-        if merge_type == MergeType.CHOICE_REQUIRED:
+
+        if action == ActionType.CHOICE_REQUIRED:
             fields_required.append(field)
 
-    template_rows.sort(key=lambda row: row['merge_type'].priority, reverse=True)
+    template_rows.sort(key=lambda row: int(row['action_type']), reverse=True)
     rating_samples = [(Rating.objects.filter(work_id=work_dict['id']).count(),
                        Rating.objects.filter(work_id=work_dict['id'])[:10]) for work_dict in work_dicts_to_merge]
     return fields_to_choose, fields_required, template_rows, rating_samples
@@ -382,22 +390,8 @@ class WorkAdmin(admin.ModelAdmin):
 
     def merge(self, request, queryset):
         nb_merged, final_work, response = merge_works(request, queryset)
-        if response == MergeErrors.NO_ID:
-            self.message_user(request,
-                              "Aucun ID n'a été fourni pour la fusion.",
-                              level=messages.ERROR)
-        if response == MergeErrors.FIELDS_MISSING:
-            self.message_user(request,
-                              """Un ou plusieurs des champs requis n'ont pas été remplis.
-                              (Détails: {})""".format(", ".join(final_work)),
-                              level=messages.ERROR)
-        if response == MergeErrors.NOT_ENOUGH_WORKS:
-            self.message_user(request,
-                              "Veuillez sélectionner au moins 2 œuvres à fusionner.",
-                              level=messages.WARNING)
-        if response is None:  # Confirmed
-            self.message_user(request, format_html('La fusion de {:d} œuvres vers <a href="{:s}">{:s}</a> a bien été effectuée.'
-                .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
+        handle_merge_errors(response, request, final_work, nb_merged,
+                            self.message_user)
         return response
 
     merge.short_description = "Fusionner les œuvres sélectionnées"
@@ -521,11 +515,9 @@ class WorkClusterAdmin(admin.ModelAdmin):
         return qs.prefetch_related('works')
 
     def trigger_merge(self, request, queryset):
-        cluster = queryset.first()
         nb_merged, final_work, response = merge_works(request, queryset)
-        if response is None:
-            self.message_user(request, format_html('La fusion de {:d} œuvres vers <a href="{:s}">{:s}</a> a bien été effectuée.'
-                .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
+        handle_merge_errors(response, request, final_work, nb_merged,
+                            self.message_user)
         return response
 
     trigger_merge.short_description = "Fusionner les œuvres de ce cluster"

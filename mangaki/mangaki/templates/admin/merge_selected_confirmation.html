@@ -23,7 +23,7 @@
         {% for choice in row.choices %}
             <td style="max-width: 450px;">
                 <label>
-                    {% if row.merge_type != 'INFO_ONLY' %}
+                    {% if row.action_type != 'DO_NOTHING' %}
                         <input type="radio" name="{{ row.field }}"
                                value="{% if row.field == 'date' or row.field == 'end_date' %}{{ choice|date:'Y-m-d' }}{% else %}{{ choice }}{% endif %}"
                                {% if choice == row.suggested %} checked{% endif %} />
