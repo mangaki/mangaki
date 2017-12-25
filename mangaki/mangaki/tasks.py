@@ -4,13 +4,16 @@ import json
 import redis
 from celery.utils.log import get_task_logger
 from django.db import IntegrityError
+from django.db.models import Count, Q
 
+from mangaki.utils.work_merge import create_work_cluster, merge_work_clusters
 from .celery import app
 from django.contrib.auth.models import User
 from django.conf import settings
 
-from mangaki.models import UserBackgroundTask
+from mangaki.models import UserBackgroundTask, Work, WorkCluster
 import mangaki.utils.mal as mal
+import redis_lock
 
 MAL_IMPORT_TAG = 'MAL_IMPORT'
 
@@ -29,6 +32,40 @@ else:
 
 def get_current_mal_import(user: User):
     return user.background_tasks.filter(tag=MAL_IMPORT_TAG).first()
+
+# 10 minutes.
+
+DEFAULT_LOCK_EXPIRATION_TIME = 10*60
+
+
+@app.task(name='look_for_workclusters', ignore_result=True)
+def look_for_workclusters(steal_workcluster: bool = False):
+    logger.info('Looking for easy WorkCluster to create...')
+    with redis_lock.Lock(redis.StrictRedis(connection_pool=redis_pool),
+                         'lock-wc-lookout',
+                         expire=DEFAULT_LOCK_EXPIRATION_TIME):
+        logger.info('Acquired Redis lock.')
+        # MAL-created duplicates
+        duplicates = Work.objects.values('title').annotate(Count('id')).filter(id__count__gte=2)
+        for dupe in duplicates.iterator():
+            works = Work.objects.filter(title=dupe['title']).prefetch_related('workcluster_set')
+            cluster = create_work_cluster(works)
+            logger.info('Clustered {} works. ({})'.format(len(works), cluster.id))
+
+        logger.info('Clustering done.')
+        logger.info('Compresssing redundant work clusters.')
+        for work in Work.objects.prefetch_related('workcluster_set').iterator():
+            # Only merge automatic unprocessed work clusters.
+            cluster_filter = Q(status='unprocessed')
+            if not steal_workcluster:
+                cluster_filter |= Q(user=None)
+            clusters = work.workcluster_set.filter(cluster_filter).order_by('id').all()
+            if len(clusters) > 1:
+                merge_work_clusters(*clusters)
+                logger.info('{} clusters merged.'.format(len(clusters)))
+        logger.info('Compression done.')
+
+
 
 
 @app.task(name='import_mal', bind=True, ignore_result=True)

@@ -68,7 +68,8 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'bootstrap3',
     'django_js_reverse',
-    'rest_framework'
+    'rest_framework',
+    'django_celery_beat'
 )
 
 if config.has_section('sentry'):
