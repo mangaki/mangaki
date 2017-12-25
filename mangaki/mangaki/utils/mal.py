@@ -501,10 +501,6 @@ def get_or_create_from_mal(work_list: QuerySet,
         return insert_into_mangaki_database_from_mal(works, title)
 
 
-def get_existing_ratings_ids(user, work_ids):
-    return (Rating.objects.filter(user=user, work__in=work_ids)
-            .values_list('work', flat=True))
-
 @transaction.atomic
 def import_mal(mal_username: str, mangaki_username: str,
                update_callback=None):
@@ -559,15 +555,9 @@ def import_mal(mal_username: str, mangaki_username: str,
                     score=user_work.score).save()
                 fails.append(user_work.title)
 
-    for related_work_id in get_existing_ratings_ids(user, scores.keys()).iterator():
-        del scores[related_work_id]
-
-    for related_work_id in get_existing_ratings_ids(user, willsee).iterator():
-        willsee.discard(related_work_id)
-
-    for related_work_id in get_existing_ratings_ids(user, wontsee).iterator():
-        wontsee.discard(related_work_id)
-
+    # MAL is the source of truth for further imports, rather than our own database of ratings.
+    Rating.objects.filter(user=user,
+                          work__in=list(scores.keys()) + list(willsee | wontsee)).delete()
     ratings = []
     for work_id, score in scores.items():
         choice = compute_rating_choice_from_mal_score(score)
