@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.contrib import admin
 from django.db import connection
-from mangaki.models import Work, Editor, Category, Studio, WorkCluster, Rating, Staff, Role, Artist, Genre
+from mangaki.models import Work, Editor, Category, Studio, WorkCluster, Rating, Staff, Role, Artist, Genre, Reference
 from datetime import datetime, timedelta
 
 
@@ -26,6 +26,15 @@ class MergeTest(TestCase):
         Rating.objects.bulk_create([Rating(work_id=work_id, user=self.user, choice='like') for work_id in self.work_ids])
 
         the_artist = Artist.objects.create(name='Yoko Kanno')
+
+        references = []
+        for work_id in self.work_ids:
+            references.extend(Reference.objects.bulk_create([
+                Reference(work_id=work_id, source='MAL', identifier=31646,
+                          url='https://myanimelist.net/anime/31646'),
+                Reference(work_id=work_id, source='AniDB', identifier=11606,
+                          url='https://anidb.net/perl-bin/animedb.pl?show=anime&aid=11606')
+            ]))
 
         roles = Role.objects.bulk_create([
             Role(name='Director', slug='xxx'),
