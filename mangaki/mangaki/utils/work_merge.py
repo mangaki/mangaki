@@ -209,16 +209,30 @@ class WorkClusterMergeHandler:
 
         references = Reference.objects.filter(work__in=self.works_to_merge).all()
         kept_references = dict()
-        target_work_references = {compute_hash(ref.source, ref.identifier) for ref in references
+        all_references_ids = {ref.id for ref in references}
+        target_work_references = {compute_hash(ref.source, ref.identifier): ref.id for ref in references
                                   if ref.work_id == self.target_work.id}
 
+        # Compute hashes of all references.
         for reference in references:
             h = compute_hash(reference.source, reference.identifier)
             if h not in target_work_references:
                 kept_references[h] = reference.id
+                target_work_references[h] = reference.id
 
-        for ref_id in kept_references:
+        # Redirect the old (interesting) references.
+        for ref_id in kept_references.values():
             Reference.objects.filter(id=ref_id).update(work_id=self.target_work.id)
+
+        # Clean up the rest.
+        remaining_references_ids = (
+            all_references_ids -
+            (set(list(kept_references.values())) | set(list(target_work_references.values())))
+        )
+
+        Reference.objects.filter(id__in=remaining_references_ids).delete()
+
+
 
     def redirect_related_objects(self):
         genres = sum((list(work.genre.all()) for work in self.works_to_merge), [])
