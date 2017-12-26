@@ -166,12 +166,21 @@ class AniListRelationType(Enum):
     on AniList
     """
 
-    sequel = 'sequel'
-    prequel = 'prequel'
-    side_story = 'side story'
-    parent_story = 'parent'
-    summary = 'summary'
-    adaptation = 'adaptation'
+    ADAPTATION = 'An adaption of the media into a different format'
+    PREQUEL = 'Released before the relation'
+    SEQUEL = 'Released after the relation'
+    PARENT = 'The media a side story is from'
+    SIDE_STORY = 'A side story of the parent media'
+    CHARACTER = 'Shares at least 1 character'
+    SUMMARY = 'Shares at least 1 character'
+    ALTERNATIVE = 'An alternative version of the same media'
+    SPIN_OFF = 'An alternative version of the media with a different primary focus'
+    OTHER = 'Other'
+
+
+AniListUserEntry = namedtuple('AniListUserEntry', ('work', 'score'))
+AniListStaff = namedtuple('AniListStaff', ('id', 'name_first', 'name_last', 'role'))
+AniListRelation = namedtuple('AniListRelation', ('related_id', 'relation_type'))
 
 
 class AniListEntry:
@@ -255,7 +264,7 @@ class AniListEntry:
 
     @property
     def status(self) -> Optional[AniListStatus]:
-        return AniListStatus(self.work_info['status'])
+        return AniListStatus[self.work_info['status']]
 
     @property
     def external_links(self) -> Dict[str, str]:
@@ -270,32 +279,33 @@ class AniListEntry:
             'votes': tag['rank']
         } for tag in self.work_info['tags']]
 
-    # @property
-    # def studio(self) -> Optional[str]:
-    #     if self.work_info.get('studio'):
-    #         for studio in self.work_info.get('studio'):
-    #             if studio['main_studio'] == 1:
-    #                 return studio['studio_name']
-    #     return None
-    #
-    # @property
-    # def staff(self) -> List[Tuple[AniListEntry, str]]:
-    #     return [
-    #         AniListStaff(
-    #             id=staff['id'],
-    #             name_first=staff['name_first'],
-    #             name_last=staff['name_last'],
-    #             role=staff['role']
-    #         ) for staff in self.work_info.get('staff', [])
-    #     ]
-    #
-    # @property
-    # def relations(self) -> List[Tuple[AniListEntry, str]]:
-    #     return [
-    #         (AniListEntry(relation, self.work_type),
-    #         AniListRelationType(relation['relation_type']))
-    #         for relation in self.work_info.get('relations', [])
-    #     ]
+    @property
+    def studio(self) -> Optional[str]:
+        for studio in self.work_info['studios']['edges']:
+            if studio['isMain']:
+                return studio['node']['name']
+        return None
+
+    @property
+    def staff(self) -> List[AniListStaff]:
+        return [
+            AniListStaff(
+                id=staff['node']['id'],
+                name_first=staff['node']['name']['first'],
+                name_last=staff['node']['name']['last'],
+                role=staff['role']
+            ) for staff in self.work_info['staff']['edges']
+        ]
+
+    @property
+    def relations(self) -> List[Tuple[int, str]]:
+        return [
+            AniListRelation(
+                related_id=relation['node']['id'],
+                relation_type=AniListRelationType[relation['relationType']]
+            )
+            for relation in self.work_info['relations']['edges']
+        ]
 
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
@@ -304,10 +314,6 @@ class AniListEntry:
             self.title,
             self.status.value
         )
-
-
-AniListUserEntry = namedtuple('AniListUserEntry', ('work', 'score'))
-AniListStaff = namedtuple('AniListStaff', ('id', 'name_first', 'name_last', 'role'))
 
 
 class AniList:
