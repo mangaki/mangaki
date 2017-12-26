@@ -30,6 +30,7 @@ query ($id: Int, $search: String, $type: MediaType) {
       month
       day
     }
+    season
     title {
       romaji
       english

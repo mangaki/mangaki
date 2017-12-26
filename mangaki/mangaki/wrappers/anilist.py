@@ -328,13 +328,7 @@ class AniListEntry:
     def __eq__(self, other):
         if isinstance(self, other.__class__):
             return self.__dict__ == other.__dict__
-        return NotImplemented
-
-    def __ne__(self, other):
-        x = self.__eq__(other)
-        if x is not NotImplemented:
-            return not x
-        return NotImplemented
+        return False
 
     def __hash__(self):
         return hash(tuple(sorted(self.__dict__.items())))
@@ -351,20 +345,8 @@ class AniListEntry:
 class AniList:
     BASE_URL = 'https://graphql.anilist.co'
 
-    def __init__(self,
-                 client_id: Optional[str] = None,
-                 client_secret: Optional[str] = None):
-        if not client_id or not client_secret:
-            self.is_available = False
-        else:
-            self.is_available = True
-
-            self.client_id = client_id
-            self.client_secret = client_secret
-
-            self._cache = {}
-            self._session = requests.Session()
-            self._auth = None
+    def __init__(self):
+        self._cache = {}
 
     def _request(self,
                  query: str,
@@ -399,25 +381,6 @@ class AniList:
         r.raise_for_status()
         return data['data']
 
-    def list_seasonal_animes(self,
-                             *,
-                             only_airing: Optional[bool] = True,
-                             year: Optional[int] = None,
-                             season: Optional[str] = None) -> Generator[AniListEntry, None, None]:
-        if not year or not season:
-            now = datetime.now()
-            year = now.year
-            season = to_anime_season(now)
-
-        query_params = {'year': year, 'season': season, 'full_page': 'true'}
-
-        if only_airing:
-            query_params.update({'status': AniListStatus.airing.value})
-
-        data = self._request('browse/anime', query_params=query_params)
-        for anime_info in data:
-            yield AniListEntry(anime_info, AniListWorkType.ANIME)
-
     def get_work(self,
                  worktype: AniListWorkType,
                  search_id: Optional[int] = None,
@@ -425,12 +388,10 @@ class AniList:
         if search_id is None and search_title is None:
             raise ValueError("Please provide an ID or a title")
 
-        variables = {'type': worktype.name}
-
-        if search_id is not None:
-            variables['id'] = search_id
-        if search_title is not None:
-            variables['search'] = search_title
+        variables = {}
+        variables.update({'type': worktype.name})
+        variables.update({'id': search_id} if search_id else {})
+        variables.update({'search': search_title} if search_title else {})
 
         data = self._request(
             query=read_graphql_query('work-info'),
@@ -441,15 +402,49 @@ class AniList:
             return AniListEntry(data['Media'], worktype)
         return None
 
-    def get_user_list(self,
-                      worktype: AniListWorkType,
-                      username: str) -> Generator[AniListUserEntry, None, None]:
+    def list_seasonal_animes(self,
+                             *,
+                             year: Optional[int] = None,
+                             season: Optional[AniListSeason] = None,
+                             only_airing: Optional[bool] = True,
+                             current_page: Optional[int] = 1) -> Generator[AniListEntry, None, None]:
+        variables = {}
+        variables.update({'season': (season or to_anime_season(datetime.now())).name})
+        variables.update({'seasonYear': year or datetime.now().year})
+        variables.update({'status': AniListStatus.RELEASING.name} if only_airing else {})
+        variables.update({'perPage': 50})
+        variables.update({'page': current_page})
+
         data = self._request(
             query=read_graphql_query('user-list'),
-            variables={
-                'username': username,
-                'mediaType': worktype.value.upper()
-            }
+            variables=variables
+        )
+
+        if not data:
+            raise StopIteration
+
+        for anime_info in data['Page']['media']:
+            try:
+                yield AniListEntry(anime_info, AniListWorkType.ANIME)
+            except KeyError:
+                raise RuntimeError('Malformed JSON, or AniList changed their API.')
+
+        if data['Page']['pageInfo']['hasNextPage'] and current_page < data['Page']['pageInfo']['lastPage']:
+            yield from self.list_seasonal_animes(year=year, season=season, only_airing=only_airing, current_page=current_page+1)
+
+    def get_user_list(self,
+                      worktype: AniListWorkType,
+                      username: str,
+                      current_page: Optional[int] = 1) -> Generator[AniListUserEntry, None, None]:
+        variables = {}
+        variables.update({'username': username})
+        variables.update({'mediaType': worktype.name})
+        variables.update({'perPage': 50})
+        variables.update({'page': current_page})
+
+        data = self._request(
+            query=read_graphql_query('user-list'),
+            variables=variables
         )
 
         if not data:
@@ -464,16 +459,12 @@ class AniList:
             except KeyError:
                 raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
+        if data['Page']['pageInfo']['hasNextPage'] and current_page < data['Page']['pageInfo']['lastPage']:
+            yield from self.get_user_list(worktype, username, current_page+1)
 
-client = AniList(
-    getattr(settings, 'ANILIST_CLIENT', None),
-    getattr(settings, 'ANILIST_SECRET', None)
-)
-
+client = AniList()
 anilist_langs = AniListLanguages()
-
 work_categories = WorkCategories()
-
 staff_roles = StaffRoles()
 
 

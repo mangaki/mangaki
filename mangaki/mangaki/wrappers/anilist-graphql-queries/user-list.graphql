@@ -1,5 +1,5 @@
-query ($username: String, $mediaType: MediaType) {
-  Page(perPage: 1) {
+query ($username: String, $mediaType: MediaType, $perPage: Int) {
+  Page(perPage: $perPage) {
     pageInfo {
       total
       perPage
@@ -41,6 +41,7 @@ query ($username: String, $mediaType: MediaType) {
           month
           day
         }
+        season
         title {
           romaji
           english
@@ -53,6 +54,36 @@ query ($username: String, $mediaType: MediaType) {
           rank
           isMediaSpoiler
           isGeneralSpoiler
+        }
+        studios {
+          edges {
+            isMain
+            node {
+              id
+              name
+            }
+          }
+        }
+        staff {
+          edges {
+            role
+            node {
+              id
+              name {
+                first
+                last
+                native
+              }
+            }
+          }
+        }
+        relations {
+          edges {
+            relationType
+            node {
+              id
+            }
+          }
         }
       }
     }
