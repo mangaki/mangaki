@@ -37,6 +37,7 @@ PRECOMPUTED_FIELDS = {'sum_ratings',
                       'nb_dislikes',
                       'controversy',
                       'title_search',
+                      'int_poster',
                       'redirect_id'}
 
 

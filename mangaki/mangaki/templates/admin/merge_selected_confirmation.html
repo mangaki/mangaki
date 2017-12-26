@@ -30,6 +30,12 @@
                     {% endif %}
                     {% if row.field == 'ext_poster' %}
                         <img src="{{ choice }}" alt="{{ choice }}" style="max-height: 300px;" />
+                    {% elif row.field == 'int_poster' %}
+                        {% if choice.size %}
+                            <img src="{{ choice.url }}" alt="{{ choice.name }} - {{ choice.size }}" style="max-height: 300px;" />
+                        {% else %}
+                            Rien n'est stocké sur le disque.
+                        {% endif %}
                     {% elif row.field == 'source' %}
                         <a href="{{ choice }}">{{ choice }}</a>
                     {% else %}
