@@ -213,7 +213,7 @@ class AniListEntry:
 
     @property
     def japanese_title(self) -> str:
-        return self.work_info['title']['japanese']
+        return self.work_info['title']['native']
 
     @property
     def media_type(self) -> str:
@@ -307,6 +307,20 @@ class AniListEntry:
             for relation in self.work_info['relations']['edges']
         ]
 
+    def __eq__(self, other):
+        if isinstance(self, other.__class__):
+            return self.__dict__ == other.__dict__
+        return NotImplemented
+
+    def __ne__(self, other):
+        x = self.__eq__(other)
+        if x is not NotImplemented:
+            return not x
+        return NotImplemented
+
+    def __hash__(self):
+        return hash(tuple(sorted(self.__dict__.items())))
+
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
             self.work_type.value,
@@ -386,40 +400,27 @@ class AniList:
         for anime_info in data:
             yield AniListEntry(anime_info, AniListWorks.animes)
 
-    def get_work_by_id(self,
-                       worktype: AniListWorks,
-                       id: int) -> AniListEntry:
-        """
-        Search a work by ID on AniList and returns a rich entry if the ID exists,
-        or None if there are no results.
-        A rich entry has informations about characters, staff, studio and even
-        related works.
-        """
+    def get_work(self,
+                 worktype: AniListWorks,
+                 search_id: Optional[int] = None,
+                 search_title: Optional[str] = None) -> AniListEntry:
+        if search_id is None and search_title is None:
+            raise ValueError("Please provide an ID or a title")
+
+        variables = {'type': worktype.value.upper()}
+
+        if search_id is not None:
+            variables['id'] = search_id
+        if search_title is not None:
+            variables['search'] = search_title
+
         data = self._request(
-            '{worktype}/{id}/page',
-            {'worktype': worktype.value, 'id': id}
+            query=read_graphql_query('work-info'),
+            variables=variables
         )
 
         if data:
-            return AniListEntry(data, worktype)
-        return None
-
-    def get_work_by_title(self,
-                          worktype: AniListWorks,
-                          title: str) -> AniListEntry:
-        """
-        Search a work by title on AniList and returns the first result if there
-        are results, or None if there are no results.
-        AniList searches a work by romaji, English or Japanese title and even
-        by synonym titles.
-        """
-        data = self._request(
-            '{worktype}/search/{title}',
-            {'worktype': worktype.value, 'title': title}
-        )
-
-        if data:
-            return AniListEntry(data[0], worktype)
+            return AniListEntry(data['Media'], worktype)
         return None
 
     def get_user_list(self,
