@@ -24,7 +24,7 @@ def is_param_null(param):
     return param == 'None' or (not param) or param is None
 
 
-UNK_VALUES = {'Inconnu'}
+UNK_VALUES = {'Inconnu', ''}
 
 
 def is_empty_field(field):
