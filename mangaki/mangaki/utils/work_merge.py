@@ -21,6 +21,24 @@ from mangaki.models import (
 
 
 def is_param_null(param):
+    """
+    Test if a parameter in a request is null (i.e. 'None' or None or falsy).
+
+    Args:
+        param (Any): a value parameter
+
+    Returns: True if null, False otherwise.
+
+    >>> is_param_null('None')
+    True
+    >>> is_param_null(None)
+    True
+    >>> is_param_null('')
+    True
+    >>> is_param_null('Inconnu')
+    False
+
+    """
     return param == 'None' or (not param) or param is None
 
 
@@ -28,6 +46,24 @@ UNK_VALUES = {'Inconnu', ''}
 
 
 def is_empty_field(field):
+    """
+    Test if a work field is empty, i.e. None or value in default unknown values.
+
+    Args:
+        field (Any): value of the field
+
+    Returns: True if empty, False otherwise.
+
+    >>> is_empty_field('Inconnu')
+    True
+    >>> is_empty_field('')
+    True
+    >>> is_empty_field(None)
+    True
+    >>> is_empty_field('anime')
+    False
+
+    """
     return field is None or field in UNK_VALUES
 
 
@@ -156,6 +192,19 @@ class WorkClusterMergeHandler:
 
     def merge_references(self):
         def compute_hash(source, identifier):
+            """
+            Compute an hash for a given reference (source, identifier) couple.
+
+            Args:
+                source (str): Source of the reference (e.g. MAL, AniDB)
+                identifier (Any): Unique identifier for the given source (e.g. ID)
+                    which can be converted into a string through str.
+
+            Returns: A string digest
+
+            >>> hash('MAL', 1)
+            4255228164310404961
+            """
             return hash(source + str(identifier))
 
         references = Reference.objects.filter(work__in=self.works_to_merge).all()
