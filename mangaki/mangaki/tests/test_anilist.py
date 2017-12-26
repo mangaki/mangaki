@@ -19,25 +19,19 @@ class AniListTest(TestCase):
         with open(os.path.join(settings.TEST_DATA_DIR, filename), 'r', encoding='utf-8') as f:
             return f.read()
 
-    @staticmethod
-    def add_fake_auth():
-        responses.add(
-            responses.POST,
-            urljoin(AniList.BASE_URL, AniList.AUTH_PATH),
-            body='{"access_token":"fake_token","token_type":"Bearer","expires_in":3600,"expires":946684800}',
-            status=200,
-            content_type='application/json'
-        )
-
     def setUp(self):
         self.anilist = AniList('test_client', 'client_secret')
         self.no_anilist = AniList()
 
     def test_to_python_datetime(self):
-        self.assertEqual(to_python_datetime('20171225'), datetime(2017, 12, 25, 0, 0))
-        self.assertEqual(to_python_datetime('20171200'), datetime(2017, 12, 1, 0, 0))
-        self.assertEqual(to_python_datetime('20170000'), datetime(2017, 1, 1, 0, 0))
-        self.assertRaises(ValueError, to_python_datetime, '2017')
+        self.assertEqual(to_python_datetime({'year': 2017, 'month': 12, 'day': 25}), datetime(2017, 12, 25, 0, 0))
+        self.assertEqual(to_python_datetime({'year': 2017, 'month': 12, 'day': None}), datetime(2017, 12, 1, 0, 0))
+        self.assertEqual(to_python_datetime({'year': 2017, 'month': None, 'day': None}), datetime(2017, 1, 1, 0, 0))
+
+        self.assertIsNone(to_python_datetime({'year': None, 'month': None, 'day': 25}))
+        self.assertIsNone(to_python_datetime({'year': None, 'month': 12, 'day': 25}))
+        self.assertIsNone(to_python_datetime({'year': None, 'month': 12, 'day': None}))
+        self.assertIsNone(to_python_datetime({'year': None, 'month': None, 'day': None}))
 
     def test_to_anime_season(self):
         self.assertEqual(to_anime_season(datetime(2017, 1, 1, 0, 0)), 'winter')

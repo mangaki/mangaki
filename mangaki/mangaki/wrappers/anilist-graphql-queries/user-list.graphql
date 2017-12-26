@@ -1,0 +1,60 @@
+query ($username: String, $mediaType: MediaType) {
+  Page(perPage: 1) {
+    pageInfo {
+      total
+      perPage
+      currentPage
+      lastPage
+      hasNextPage
+    }
+    mediaList(userName: $username, type: $mediaType) {
+      id
+      score
+      media {
+        id
+        type
+        siteUrl
+        description
+        synonyms
+        genres
+        isAdult
+        episodes
+        duration
+        chapters
+        status
+        externalLinks {
+          id
+          url
+          site
+        }
+        coverImage {
+          large
+          medium
+        }
+        startDate {
+          year
+          month
+          day
+        }
+        endDate {
+          year
+          month
+          day
+        }
+        title {
+          romaji
+          english
+          native
+          userPreferred
+        }
+        tags {
+          id
+          name
+          rank
+          isMediaSpoiler
+          isGeneralSpoiler
+        }
+      }
+    }
+  }
+}
