@@ -11,6 +11,7 @@ query ($season: MediaSeason, $seasonYear: Int, $status: MediaStatus, $perPage: I
       id
       type
       siteUrl
+      format
       description
       synonyms
       genres

@@ -60,36 +60,6 @@ def to_anime_season(date):
         return AniListSeason.FALL
     return AniListSeason.UNKNOWN
 
-def is_no_results(anilist_error):
-    """
-    Return True is the error is a 'no results' error, False else
-    """
-    if isinstance(anilist_error, dict) and anilist_error.get('messages'):
-        for message in anilist_error['messages']:
-            message = message.lower()
-            if 'no query results' in message or 'no results' in message:
-                return True
-
-    return False
-
-def is_route_not_found(anilist_error):
-    """
-    Return True is the error is a 'no such API route found' error, False else
-    """
-    if isinstance(anilist_error, dict) and anilist_error.get('messages'):
-        for message in anilist_error['messages']:
-            message = message.lower()
-            if 'api route not found' in message:
-                return True
-
-    return False
-
-def is_token_error(anilist_error):
-    """
-    Return True is the error is a 'no token or token expired' error, False else
-    """
-    return anilist_error in ('unauthorized', 'access_denied')
-
 
 class AniListException(Exception):
     """
@@ -98,13 +68,11 @@ class AniListException(Exception):
 
     def __init__(self, error):
         super().__init__()
-        if isinstance(error, dict):
-            self.args = ['{} - {}'.format(k, v) for k, v in error.items()]
-        else:
-            self.args = [error]
+        self.status = error['status']
+        self.message = error['message']
 
     def __str__(self):
-        return ', '.join(self.args)
+        return 'Error {} : {}'.format(self.status, self.message)
 
 
 class AniListLanguages:
@@ -192,6 +160,23 @@ class AniListRelationType(Enum):
     OTHER = 'Other'
 
 
+class AniListMediaFormat(Enum):
+    """
+    This class enumerates the different media formats found on AniList
+    """
+
+    TV = 'Anime broadcast on television'
+    TV_SHORT = 'Anime which are under 15 minutes in length and broadcast on television'
+    MOVIE = 'Anime movies with a theatrical release'
+    SPECIAL = 'Special episodes that have been included in DVD/Blu-ray releases, picture dramas, pilots, etc'
+    OVA = '(Original Video Animation) Anime that have been released directly on DVD/Blu-ray without originally going through a theatrical release or television broadcast'
+    ONA = '(Original Net Animation) Anime that have been originally released online or are only available through streaming services.'
+    MUSIC = 'Short anime released as a music video'
+    MANGA = 'Professionally published manga with more than one chapter'
+    NOVEL = 'Written books released as a novel or series of light novels'
+    ONE_SHOT = 'Manga with just one chapter'
+
+
 AniListUserEntry = namedtuple('AniListUserEntry', ('work', 'score'))
 AniListStaff = namedtuple('AniListStaff', ('id', 'name_first', 'name_last', 'role'))
 AniListRelation = namedtuple('AniListRelation', ('related_id', 'relation_type'))
@@ -218,6 +203,10 @@ class AniListEntry:
         return self.work_info['siteUrl']
 
     @property
+    def media_format(self) -> AniListMediaFormat:
+        return AniListMediaFormat[self.work_info['format']]
+
+    @property
     def title(self) -> str:
         return self.work_info['title']['romaji']
 
@@ -230,16 +219,16 @@ class AniListEntry:
         return self.work_info['title']['native']
 
     @property
-    def media_type(self) -> str:
-        return self.work_info['type']
+    def synonyms(self) -> List[str]:
+        return list(filter(None, self.work_info['synonyms']))
 
     @property
     def start_date(self) -> Optional[datetime]:
-        return to_python_datetime(self.work_info['startDate'])
+        return fuzzydate_to_python_datetime(self.work_info['startDate'])
 
     @property
     def end_date(self) -> Optional[datetime]:
-        return to_python_datetime(self.work_info['endDate'])
+        return fuzzydate_to_python_datetime(self.work_info['endDate'])
 
     @property
     def season(self) -> AniListSeason:
@@ -248,10 +237,6 @@ class AniListEntry:
     @property
     def description(self) -> str:
         return self.work_info['description']
-
-    @property
-    def synonyms(self) -> List[str]:
-        return list(filter(None, self.work_info['synonyms']))
 
     @property
     def genres(self) -> List[str]:
@@ -281,8 +266,15 @@ class AniListEntry:
         return self.work_info['chapters']
 
     @property
-    def status(self) -> Optional[AniListStatus]:
+    def status(self) -> AniListStatus:
         return AniListStatus[self.work_info['status']]
+
+    @property
+    def studio(self) -> Optional[str]:
+        for studio in self.work_info['studios']['edges']:
+            if studio['isMain']:
+                return studio['node']['name']
+        return None
 
     @property
     def external_links(self) -> Dict[str, str]:
@@ -296,13 +288,6 @@ class AniListEntry:
             'spoiler': tag['isMediaSpoiler'] or tag['isGeneralSpoiler'],
             'votes': tag['rank']
         } for tag in self.work_info['tags']]
-
-    @property
-    def studio(self) -> Optional[str]:
-        for studio in self.work_info['studios']['edges']:
-            if studio['isMain']:
-                return studio['node']['name']
-        return None
 
     @property
     def staff(self) -> List[AniListStaff]:
@@ -335,7 +320,7 @@ class AniListEntry:
 
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
-            self.work_type.value,
+            self.work_type.name,
             self.anilist_id,
             self.title,
             self.status.value
@@ -368,28 +353,20 @@ class AniList:
         )
         data = r.json()
 
-        if not isinstance(data, list) and data.get('error'):
-            if is_no_results(data['error']):
-                return None
-            elif is_route_not_found(data['error']):
-                raise AniListException('"{}" API route does not exist'.format(datapage))
-            elif is_token_error(data['error']):
-                raise AniListException('token no longer valid or not found')
-            else:
-                raise AniListException(data['error'])
+        if data.get('errors'):
+            for error in data['errors']:
+                raise AniListException(error)
 
         r.raise_for_status()
         return data['data']
 
     def get_work(self,
-                 worktype: AniListWorkType,
                  search_id: Optional[int] = None,
                  search_title: Optional[str] = None) -> AniListEntry:
         if search_id is None and search_title is None:
             raise ValueError("Please provide an ID or a title")
 
         variables = {}
-        variables.update({'type': worktype.name})
         variables.update({'id': search_id} if search_id else {})
         variables.update({'search': search_title} if search_title else {})
 
@@ -399,8 +376,8 @@ class AniList:
         )
 
         if data:
-            return AniListEntry(data['Media'], worktype)
-        return None
+            return AniListEntry(data['Media'], AniListWorkType[data['Media']['type']])
+        raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
     def list_seasonal_animes(self,
                              *,
@@ -462,6 +439,7 @@ class AniList:
         if data['Page']['pageInfo']['hasNextPage'] and current_page < data['Page']['pageInfo']['lastPage']:
             yield from self.get_user_list(worktype, username, current_page+1)
 
+
 client = AniList()
 anilist_langs = AniListLanguages()
 work_categories = WorkCategories()
@@ -493,11 +471,12 @@ def build_work_titles(work: Work,
 
     return missing_titles
 
+# FIXME : to fix !
 def build_related_works(work: Work,
                         relations: List[Tuple[AniListEntry, AniListRelationType]]) -> List[RelatedWork]:
     related_works = [
-        insert_work_into_database_from_anilist(work_related)
-        for work_related, relation_type in relations
+        insert_work_into_database_from_anilist(client.get_work(search_id=related_id))
+        for related_id, relation_type in relations
     ]
 
     existing_relations = RelatedWork.objects.filter(parent_work=work, child_work__in=related_works)
@@ -581,10 +560,8 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
         titles.update({entry.english_title: ('english', 'main')})
         titles.update({entry.japanese_title: ('japanese', 'official')})
 
-        anime_type = entry.media_type if entry.work_type == AniListWorkType.ANIME else ''
-        manga_type = entry.media_type if entry.work_type == AniListWorkType.MANGA else ''
-
-        category = category_map.get(entry.work_type)
+        anime_type = entry.media_format.name if entry.work_type == AniListWorkType.ANIME else ''
+        manga_type = entry.media_format.name if entry.work_type == AniListWorkType.MANGA else ''
 
         # Link Studio and Work
         studio = None
@@ -596,7 +573,7 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
             title__in=titles,
             category__slug=entry.work_type.value,
             defaults={
-                'category': category,
+                'category': category_map.get(entry.work_type),
                 'title': entry.title,
                 'ext_poster': entry.poster_url,
                 'nsfw': entry.is_nsfw,
@@ -618,8 +595,9 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
         build_work_titles(work, titles)
 
         # Build RelatedWorks (and add those Works too)
-        if entry.relations:
-            build_related_works(work, entry.relations)
+        # FIXME: should fix building related works (before, full entry was provided, now only the ID)
+        # if entry.relations:
+        #     build_related_works(work, entry.relations)
 
         # Build Artist and Staff
         if entry.staff:

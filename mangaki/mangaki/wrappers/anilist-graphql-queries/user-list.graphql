@@ -14,6 +14,7 @@ query ($username: String, $mediaType: MediaType, $perPage: Int) {
         id
         type
         siteUrl
+        format
         description
         synonyms
         genres

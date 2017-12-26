@@ -1,8 +1,9 @@
-query ($id: Int, $search: String, $type: MediaType) {
-  Media(id: $id, search: $search, type: $type) {
+query ($id: Int, $search: String) {
+  Media(id: $id, search: $search) {
     id
     type
     siteUrl
+    format
     description
     synonyms
     genres
