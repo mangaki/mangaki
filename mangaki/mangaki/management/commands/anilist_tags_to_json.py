@@ -3,7 +3,7 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from mangaki.wrappers.anilist import client, AniListWorks
+from mangaki.wrappers.anilist import client, AniListWorkType
 from mangaki.models import Work
 
 
@@ -54,9 +54,9 @@ class Command(BaseCommand):
 
             # Associate the right worktype or exit if not correct
             if work.category.slug == 'anime':
-                worktype = AniListWorks.animes
+                worktype = AniListWorkType.ANIME
             elif work.category.slug == 'manga':
-                worktype = AniListWorks.mangas
+                worktype = AniListWorkType.MANGA
             else:
                 continue
 

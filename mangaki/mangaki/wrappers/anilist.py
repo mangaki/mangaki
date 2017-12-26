@@ -20,20 +20,20 @@ def read_graphql_query(filename):
     with open(path, 'r', encoding='utf-8') as f:
         return f.read()
 
-def to_python_datetime(date):
+def fuzzydate_to_python_datetime(date):
     """
     Converts AniList's fuzzydate to Python datetime format.
-    >>> to_python_datetime({'year': 2015, 'month': 7, 'day': 14})
+    >>> fuzzydate_to_python_datetime({'year': 2015, 'month': 7, 'day': 14})
     datetime.datetime(2015, 7, 14, 0, 0)
-    >>> to_python_datetime({'year': 2015, 'month': 7, 'day': None})
+    >>> fuzzydate_to_python_datetime({'year': 2015, 'month': 7, 'day': None})
     datetime.datetime(2015, 7, 1, 0, 0)
-    >>> to_python_datetime({'year': 2015, 'month': None, 'day': None})
+    >>> fuzzydate_to_python_datetime({'year': 2015, 'month': None, 'day': None})
     datetime.datetime(2015, 1, 1, 0, 0)
-    >>> to_python_datetime({'year': None, 'month': None, 'day': 14})
+    >>> fuzzydate_to_python_datetime({'year': None, 'month': None, 'day': 14})
     None
-    >>> to_python_datetime({'year': None, 'month': 7, 'day': None})
+    >>> fuzzydate_to_python_datetime({'year': None, 'month': 7, 'day': None})
     None
-    >>> to_python_datetime({'year': None, 'month': None, 'day': None})
+    >>> fuzzydate_to_python_datetime({'year': None, 'month': None, 'day': None})
     None
     """
 
@@ -47,16 +47,18 @@ def to_anime_season(date):
     """
     Return the season corresponding to a date
     >>> to_anime_season(datetime.datetime(2017, 3, 3, 0, 0))
-    'winter'
+    'AniListSeason.SPRING'
     """
-    if 1 <= date.month <= 3:
-        return 'winter'
-    elif 4 <= date.month <= 6:
-        return 'spring'
-    elif 7 <= date.month <= 9:
-        return 'summer'
-    else:
-        return 'fall'
+
+    if date.month in (12, 1, 2):
+        return AniListSeason.WINTER
+    elif date.month in (3, 4, 5):
+        return AniListSeason.SPRING
+    elif date.month in (6, 7, 8):
+        return AniListSeason.SUMMER
+    elif date.month in (9, 10, 11):
+        return AniListSeason.FALL
+    return AniListSeason.UNKNOWN
 
 def is_no_results(anilist_error):
     """
@@ -126,11 +128,11 @@ class AniListLanguages:
 class WorkCategories:
     @cached_property
     def anime(self) -> Category:
-        return Category.objects.get(slug=AniListWorks.animes.value)
+        return Category.objects.get(slug=AniListWorkType.ANIME.value)
 
     @cached_property
     def manga(self) -> Category:
-        return Category.objects.get(slug=AniListWorks.mangas.value)
+        return Category.objects.get(slug=AniListWorkType.MANGA.value)
 
 
 class StaffRoles:
@@ -139,13 +141,25 @@ class StaffRoles:
         return {role.slug: role for role in Role.objects.all()}
 
 
-class AniListWorks(Enum):
+class AniListWorkType(Enum):
     """
     This class enumerates the different kinds of works found on AniList
     """
 
-    animes = 'anime'
-    mangas = 'manga'
+    ANIME = 'anime'
+    MANGA = 'manga'
+
+
+class AniListSeason(Enum):
+    """
+    This class enumerates the different seasons on AniList
+    """
+
+    WINTER = 'Months December to February'
+    SPRING = 'Months March to May'
+    SUMMER = 'Months June to August'
+    FALL = 'Months September to November'
+    UNKNOWN = 'Unknown season'
 
 
 class AniListStatus(Enum):
@@ -188,11 +202,11 @@ class AniListEntry:
     This class stores informations for AniList entries given a JSON.
     """
 
-    def __init__(self, work_info, work_type: AniListWorks):
+    def __init__(self, work_info, work_type: AniListWorkType):
         self.work_info = work_info
         self.work_type = work_type
 
-        if self.work_info['type'] != work_type.value.upper():
+        if self.work_info['type'] != work_type.name:
             raise ValueError('AniList data not from {}'.format(work_type.value))
 
     @property
@@ -226,6 +240,10 @@ class AniListEntry:
     @property
     def end_date(self) -> Optional[datetime]:
         return to_python_datetime(self.work_info['endDate'])
+
+    @property
+    def season(self) -> AniListSeason:
+        return AniListSeason[self.work_info['season']]
 
     @property
     def description(self) -> str:
@@ -398,16 +416,16 @@ class AniList:
 
         data = self._request('browse/anime', query_params=query_params)
         for anime_info in data:
-            yield AniListEntry(anime_info, AniListWorks.animes)
+            yield AniListEntry(anime_info, AniListWorkType.ANIME)
 
     def get_work(self,
-                 worktype: AniListWorks,
+                 worktype: AniListWorkType,
                  search_id: Optional[int] = None,
                  search_title: Optional[str] = None) -> AniListEntry:
         if search_id is None and search_title is None:
             raise ValueError("Please provide an ID or a title")
 
-        variables = {'type': worktype.value.upper()}
+        variables = {'type': worktype.name}
 
         if search_id is not None:
             variables['id'] = search_id
@@ -424,7 +442,7 @@ class AniList:
         return None
 
     def get_user_list(self,
-                      worktype: AniListWorks,
+                      worktype: AniListWorkType,
                       username: str) -> Generator[AniListUserEntry, None, None]:
         data = self._request(
             query=read_graphql_query('user-list'),
@@ -561,8 +579,8 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
     :rtype: Optional[List[Work]]
     """
     category_map = {
-        AniListWorks.animes: work_categories.anime,
-        AniListWorks.mangas: work_categories.manga
+        AniListWorkType.ANIME: work_categories.anime,
+        AniListWorkType.MANGA: work_categories.manga
     }
     new_works = []
 
@@ -572,8 +590,8 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
         titles.update({entry.english_title: ('english', 'main')})
         titles.update({entry.japanese_title: ('japanese', 'official')})
 
-        anime_type = entry.media_type if entry.work_type == AniListWorks.animes else ''
-        manga_type = entry.media_type if entry.work_type == AniListWorks.mangas else ''
+        anime_type = entry.media_type if entry.work_type == AniListWorkType.ANIME else ''
+        manga_type = entry.media_type if entry.work_type == AniListWorkType.MANGA else ''
 
         category = category_map.get(entry.work_type)
 
