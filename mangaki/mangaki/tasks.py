@@ -46,7 +46,7 @@ def look_for_workclusters(steal_workcluster: bool = False):
                          expire=DEFAULT_LOCK_EXPIRATION_TIME):
         logger.info('Acquired Redis lock.')
         # MAL-created duplicates
-        duplicates = Work.objects.values('title').annotate(Count('id')).filter(id__count__gte=2)
+        duplicates = Work.objects.values('title', 'category_id').annotate(Count('id')).filter(id__count__gte=2)
         for dupe in duplicates.iterator():
             works = Work.objects.filter(title=dupe['title']).prefetch_related('workcluster_set')
             cluster = create_work_cluster(works)
