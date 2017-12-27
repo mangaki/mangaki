@@ -250,18 +250,15 @@ class AniListEntry:
     def poster_url(self) -> str:
         return self.work_info['coverImage']['large']
 
-    # Only for animes
-    @property
+    @property # Only for animes
     def nb_episodes(self) -> Optional[int]:
         return self.work_info['episodes']
 
-    # Only for animes
-    @property
+    @property # Only for animes
     def episode_length(self) -> Optional[int]:
         return self.work_info['duration']
 
-    # Only for mangas
-    @property
+    @property # Only for mangas
     def nb_chapters(self) -> Optional[int]:
         return self.work_info['chapters']
 
@@ -269,7 +266,7 @@ class AniListEntry:
     def status(self) -> AniListStatus:
         return AniListStatus[self.work_info['status']]
 
-    @property
+    @property # Only for animes
     def studio(self) -> Optional[str]:
         for studio in self.work_info['studios']['edges']:
             if studio['isMain']:
@@ -335,9 +332,18 @@ class AniList:
 
     def _request(self,
                  query: str,
-                 variables: Dict[str, Any]):
+                 variables: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Make a query to the AniList's GraphQL API
+        Make a request to AniList's v2 API.
+        :param self: an AniList client
+        :param query: the GraphQL query string
+        :param variables: the GraphQL variables provided for the query
+        :type self: AniList
+        :type query: str
+        :type variables: Dict[str, Any]
+        :return: the data returned for this query
+        :rtype: Dict[str, Any]
+        :raises: an AniListException in case of error
         """
 
         r = requests.post(
@@ -363,6 +369,18 @@ class AniList:
     def get_work(self,
                  search_id: Optional[int] = None,
                  search_title: Optional[str] = None) -> AniListEntry:
+        """
+        Retrieve a work's information entry from AniList, given an ID or/and a title.
+        :param self: an AniList client
+        :param search_id: the ID of the work to look for
+        :param search_title: the title of the work to look for
+        :type self: AniList
+        :type search_id: Optional[int]
+        :type search_title: Optional[str]
+        :return: the entry that was looked for
+        :rtype: AniListEntry
+        """
+
         if search_id is None and search_title is None:
             raise ValueError("Please provide an ID or a title")
 
@@ -385,6 +403,22 @@ class AniList:
                              season: Optional[AniListSeason] = None,
                              only_airing: Optional[bool] = True,
                              current_page: Optional[int] = 1) -> Generator[AniListEntry, None, None]:
+        """
+        Retrieve a list of entries for a given anime season.
+        :param self: an AniList client
+        :param year: the year to look for
+        :param season: the anime season to look for
+        :param only_airing: specify whether or not to look for only airing animes, defaults to True
+        :param current_page: the current page, useful when the list is split on multiple pages
+        :type self: AniList
+        :type year: Optional[int]
+        :type season: Optional[AniListSeason]
+        :type only_airing: Optional[bool]
+        :type current_page: Optional[int]
+        :return: a generator for the different work entries for the selected season
+        :rtype: Generator[AniListEntry, None, None]
+        """
+
         variables = {}
         variables.update({'season': (season or to_anime_season(datetime.now())).name})
         variables.update({'seasonYear': year or datetime.now().year})
@@ -413,6 +447,20 @@ class AniList:
                       worktype: AniListWorkType,
                       username: str,
                       current_page: Optional[int] = 1) -> Generator[AniListUserEntry, None, None]:
+        """
+        Retrieve an AniList's user manga or anime list.
+        :param self: an AniList client
+        :param worktype: the worktype to retrieve, either manga or anime
+        :param username: the username of the AniList user to find
+        :param current_page: the current page, useful when the list is split on multiple pages
+        :type self: AniList
+        :type worktype: AniListWorkType
+        :type username: str
+        :type current_page: Optional[int]
+        :return: a generator for the different entries in this user's list (score + work's informations)
+        :rtype: Generator[AniListUserEntry, None, None]
+        """
+
         variables = {}
         variables.update({'username': username})
         variables.update({'mediaType': worktype.name})
@@ -447,6 +495,16 @@ staff_roles = StaffRoles()
 
 def build_work_titles(work: Work,
                       titles: Dict[str, Tuple[str, str]]) -> List[WorkTitle]:
+    """
+    Insert WorkTitle objects for a given Work when required into Mangaki's database.
+    :param work: a work
+    :param titles: a list of alternative titles
+    :type work: Work
+    :type titles: Dict[str, Tuple[str, str]]
+    :return: a list of WorkTitle objects that were inserted in Mangaki's database
+    :rtype: List[WorkTitle]
+    """
+
     if not titles:
         return []
 
@@ -475,6 +533,17 @@ def build_work_titles(work: Work,
 
 def build_related_works(work: Work,
                         relations: List[Tuple[int, AniListRelationType]]) -> List[RelatedWork]:
+    """
+    Insert RelatedWork objects for a given Work when required into Mangaki's database.
+    This also inserts the related works into the database when they don't exist.
+    :param work: a work
+    :param relations: a list of related works, with their AniList ID and the relation type
+    :type work: Work
+    :type relations: List[Tuple[int, AniListRelationType]]
+    :return: a list of RelatedWork objects that were inserted in Mangaki's database
+    :rtype: List[RelatedWork]
+    """
+
     if not relations:
         return []
 
@@ -504,6 +573,16 @@ def build_related_works(work: Work,
 
 def build_staff(work: Work,
                 staff: List[AniListStaff]) -> List[Staff]:
+    """
+    Insert Artist and Staff objects for a given Work when required into Mangaki's database.
+    :param work: a work
+    :param staff: a list of staff (and artists) informations
+    :type work: Work
+    :type staff: List[AniListStaff]
+    :return: a list of Staff objects that were inserted in Mangaki's database
+    :rtype: List[Staff]
+    """
+
     if not staff:
         return []
 
@@ -550,14 +629,15 @@ def build_staff(work: Work,
 def insert_works_into_database_from_anilist(entries: List[AniListEntry],
                                             build_related: Optional[bool] = True) -> Optional[List[Work]]:
     """
-    Insert works into Mangaki's database from AniList data, and return Works added.
-    :param entries: a list of entries from AniList to insert into the database, if not already existing
+    Insert works into Mangaki's database from AniList data, and return Works inserted.
+    :param entries: a list of entries from AniList
     :param build_related: specify whether or not RelatedWorks should be created, defaults to True
     :type entries: List[AniListEntry]
-    :type build_related: bool
-    :return: a list of works effectively added in the Mangaki database, or None
+    :type build_related: Optional[bool]
+    :return: a list of works effectively added in Mangaki's database (if not already in), or None
     :rtype: Optional[List[Work]]
     """
+
     category_map = {
         AniListWorkType.ANIME: work_categories.anime,
         AniListWorkType.MANGA: work_categories.manga
@@ -620,14 +700,15 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
 
 def insert_work_into_database_from_anilist(entry: AniListEntry,
                                            build_related: Optional[bool] = True) -> Optional[Work]:
-   """
-   Insert a single work into Mangaki's database from AniList data, and return Work added.
-   :param entry: an entry from AniList to insert into the database, if not already existing
-   :param build_related: specify whether or not RelatedWorks should be created, defaults to True
-   :type entries: AniListEntry
-   :type build_related: bool
-   :return: a work effectively added in the Mangaki database, or None
-   :rtype: Optional[Work]
-   """
+    """
+    Insert a single work into Mangaki's database from AniList data, and return Work inserted.
+    :param entry: an entry from AniList
+    :param build_related: specify whether or not RelatedWorks should be created, defaults to True
+    :type entries: AniListEntry
+    :type build_related: Optional[bool]
+    :return: a work effectively added in Mangaki's database (if not already in), or None
+    :rtype: Optional[Work]
+    """
+
     work_result = insert_works_into_database_from_anilist([entry], build_related)
     return work_result[0] if work_result else None
