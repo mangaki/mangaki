@@ -3,7 +3,7 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from mangaki.wrappers.anilist import client
+from mangaki.wrappers.anilist import AniList
 from mangaki.models import Work
 
 
@@ -28,6 +28,8 @@ class Command(BaseCommand):
         parser.add_argument('work_id', nargs='*', type=int)
 
     def handle(self, *args, **options):
+        client = AniList()
+
         if options['work_id']:
             works = Work.objects.filter(pk__in=options['work_id']).order_by('pk')
         else:

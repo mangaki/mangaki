@@ -188,16 +188,16 @@ class AniListTest(TestCase):
         )
 
         hibike_entry = self.anilist.get_work(search_id=20912)
-        hibike = insert_work_into_database_from_anilist(hibike_entry)
+        # FIXME: properly mock the insertion of related works
+        hibike = insert_work_into_database_from_anilist(hibike_entry, build_related=False)
 
-        titles_hibike = WorkTitle.objects.filter(work=hibike)
+        titles_hibike = WorkTitle.objects.filter(work=hibike).values_list('title', flat=True)
         genres_hibike = hibike.genre.values_list('title', flat=True)
         related_hibike = RelatedWork.objects.filter(parent_work=hibike)
         staff_hibike = Work.objects.get(pk=hibike.pk).staff_set.all().values_list('artist__name', flat=True)
 
         self.assertEqual(hibike.studio.title, 'Kyoto Animation')
-        self.assertEqual(len(titles_hibike), 3)
-        # self.assertEqual(len(related_hibike), 4)
+        self.assertCountEqual(titles_hibike, ['Hibike! Euphonium', 'Sound! Euphonium', '響け！ユーフォニアム'])
         self.assertCountEqual(genres_hibike, ['Slice of Life', 'Music', 'Drama'])
         self.assertCountEqual(staff_hibike, ['Ishihara Tatsuya', 'Matsuda Akito', 'Takeda Ayano'])
 
@@ -207,7 +207,8 @@ class AniListTest(TestCase):
         self.assertEqual(artist.first().anilist_creator_id, 100055)
 
         # Try adding this work to the DB again
-        hibike_again = insert_work_into_database_from_anilist(hibike_entry)
+        # FIXME: properly mock the insertion of related works
+        hibike_again = insert_work_into_database_from_anilist(hibike_entry, build_related=False)
         self.assertEqual(hibike, hibike_again)
 
     @responses.activate
@@ -229,17 +230,17 @@ class AniListTest(TestCase):
         )
 
         hibike_entry = self.anilist.get_work(search_id=20912)
-        insert_work_into_database_from_anilist(hibike_entry) # Update this work from AniList
+        # FIXME: properly mock the insertion of related works
+        insert_work_into_database_from_anilist(hibike_entry, build_related=False)
 
         hibike_updated = Work.objects.get(title='Hibike! Euphonium')
 
-        titles_hibike = WorkTitle.objects.filter(work=hibike_updated)
+        titles_hibike = WorkTitle.objects.filter(work=hibike_updated).values_list('title', flat=True)
         genres_hibike = hibike_updated.genre.values_list('title', flat=True)
         related_hibike = RelatedWork.objects.filter(parent_work=hibike_updated)
         staff_hibike = Work.objects.get(pk=hibike_updated.pk).staff_set.all().values_list('artist__name', flat=True)
 
         self.assertEqual(hibike_updated.studio.title, 'Kyoto Animation')
-        self.assertEqual(len(titles_hibike), 3)
-        # self.assertEqual(len(related_hibike), 4)
+        self.assertCountEqual(titles_hibike, ['Hibike! Euphonium', 'Sound! Euphonium', '響け！ユーフォニアム'])
         self.assertCountEqual(genres_hibike, ['Slice of Life', 'Music', 'Drama'])
         self.assertCountEqual(staff_hibike, ['Ishihara Tatsuya', 'Matsuda Akito', 'Takeda Ayano'])

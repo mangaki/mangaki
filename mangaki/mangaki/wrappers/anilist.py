@@ -440,7 +440,6 @@ class AniList:
             yield from self.get_user_list(worktype, username, current_page+1)
 
 
-client = AniList()
 anilist_langs = AniListLanguages()
 work_categories = WorkCategories()
 staff_roles = StaffRoles()
@@ -448,6 +447,9 @@ staff_roles = StaffRoles()
 
 def build_work_titles(work: Work,
                       titles: Dict[str, Tuple[str, str]]) -> List[WorkTitle]:
+    if not titles:
+        return []
+
     language_map = {
         'english': anilist_langs.english_ext_lang,
         'romaji': anilist_langs.romaji_ext_lang,
@@ -471,9 +473,11 @@ def build_work_titles(work: Work,
 
     return missing_titles
 
-# FIXME : to fix !
 def build_related_works(work: Work,
-                        relations: List[Tuple[AniListEntry, AniListRelationType]]) -> List[RelatedWork]:
+                        relations: List[Tuple[int, AniListRelationType]]) -> List[RelatedWork]:
+    if not relations:
+        return []
+
     related_works = [
         insert_work_into_database_from_anilist(client.get_work(search_id=related_id))
         for related_id, relation_type in relations
@@ -499,7 +503,10 @@ def build_related_works(work: Work,
     return new_relations
 
 def build_staff(work: Work,
-                staff: List[Tuple[AniListEntry, str]]) -> List[Staff]:
+                staff: List[AniListStaff]) -> List[Staff]:
+    if not staff:
+        return []
+
     anilist_roles_map = {
         'Director': 'director',
         'Music': 'composer',
@@ -540,12 +547,15 @@ def build_staff(work: Work,
 
     return missing_staff
 
-def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Optional[List[Work]]:
+def insert_works_into_database_from_anilist(entries: List[AniListEntry],
+                                            build_related: Optional[bool] = True) -> Optional[List[Work]]:
     """
-    Insert works into Mangaki database from AniList data, and return Works added.
-    :param entries: a list of entries from AniList to insert if not present in the database
+    Insert works into Mangaki's database from AniList data, and return Works added.
+    :param entries: a list of entries from AniList to insert into the database, if not already existing
+    :param build_related: specify whether or not RelatedWorks should be created, defaults to True
     :type entries: List[AniListEntry]
-    :return: a list of works effectively added in the Mangaki database
+    :type build_related: bool
+    :return: a list of works effectively added in the Mangaki database, or None
     :rtype: Optional[List[Work]]
     """
     category_map = {
@@ -594,14 +604,12 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
         # Create WorkTitle entries in the database for this Work
         build_work_titles(work, titles)
 
-        # Build RelatedWorks (and add those Works too)
-        # FIXME: should fix building related works (before, full entry was provided, now only the ID)
-        # if entry.relations:
-        #     build_related_works(work, entry.relations)
+        # Build RelatedWorks (and add those Works too) if wanted
+        if build_related:
+            build_related_works(work, entry.relations)
 
         # Build Artist and Staff
-        if entry.staff:
-            build_staff(work, entry.staff)
+        build_staff(work, entry.staff)
 
         # Save the Work object and add a Reference
         work.save()
@@ -610,6 +618,16 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry]) -> Opti
 
     return new_works if new_works else None
 
-def insert_work_into_database_from_anilist(entry: AniListEntry) -> Optional[Work]:
-    work_result = insert_works_into_database_from_anilist([entry])
+def insert_work_into_database_from_anilist(entry: AniListEntry,
+                                           build_related: Optional[bool] = True) -> Optional[Work]:
+   """
+   Insert a single work into Mangaki's database from AniList data, and return Work added.
+   :param entry: an entry from AniList to insert into the database, if not already existing
+   :param build_related: specify whether or not RelatedWorks should be created, defaults to True
+   :type entries: AniListEntry
+   :type build_related: bool
+   :return: a work effectively added in the Mangaki database, or None
+   :rtype: Optional[Work]
+   """
+    work_result = insert_works_into_database_from_anilist([entry], build_related)
     return work_result[0] if work_result else None
