@@ -4,6 +4,7 @@ import os.path
 from collections import defaultdict
 from typing import Type, List, Any, Dict, Optional
 
+import pandas as pd
 import numpy as np
 from django.core.management.base import BaseCommand
 from sklearn.model_selection import ShuffleSplit
@@ -135,16 +136,23 @@ class Experiment(object):
         metrics = defaultdict(lambda: defaultdict(list))
 
         for pass_index, (i_train, i_test) in enumerate(k_fold.split(self.anonymized.X), start=1):
+            X_train = self.anonymized.X[i_train]
+            y_train = self.anonymized.y[i_train]
+            X_test = self.anonymized.X[i_test]
+            y_test = self.anonymized.y[i_test]
+            # pd.DataFrame(np.column_stack((X_train, y_train))).to_csv('/tmp/train.dat', header=False, index=False)
+            # pd.DataFrame(np.column_stack((X_test, y_test))).to_csv('/tmp/test.dat', header=False, index=False)
+
             for algo in self.algos:
                 model = algo.make_instance()
                 logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), nb_split, pass_index))
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
-                model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
-                y_test = model.predict(self.anonymized.X[i_test])
-                logger.debug('Predicted: %s' % y_test[:5])
+                model.fit(X_train, y_train)
+                y_pred = model.predict(self.anonymized.X[i_test])
+                logger.debug('Predicted: %s' % y_pred[:5])
                 logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
 
-                metrics_values = self.compute_metrics(model, y_test, i_test)
+                metrics_values = self.compute_metrics(model, y_pred, i_test)
                 for metric, value in metrics_values.items():
                     metrics[metric][model.get_shortname()].append(value)
             if not full_cv:
