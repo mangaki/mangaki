@@ -928,6 +928,9 @@ def fix_suggestion(request, suggestion_id):
         'suggestion': suggestion,
         'clusters': zip(clusters, colors) if clusters and colors else None,
         'evidence': evidence,
+        'can_auto_fix': suggestion.can_auto_fix and request.user.is_staff,
+        'can_close': request.user.is_staff,
+        'can_reopen': request.user.is_staff,
         'next_id': next_suggestions_ids[0] if next_suggestions_ids else None,
         'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None
     }
@@ -997,10 +1000,21 @@ def update_evidence(request):
     needs_help_values = map(lambda x: x == 'True', request.POST.getlist('needs_help'))
     delete_values = request.POST.getlist('delete')
     suggestion_ids = map(int, request.POST.getlist('suggestion'))
+    close_values = map(lambda x: x == 'True', request.POST.getlist('close_suggestion'))
+    reopen_values = map(lambda x: x == 'True', request.POST.getlist('re_open'))
+    auto_fix_values = map(lambda x: x == 'True', request.POST.getlist('auto_fix'))
 
-    informations = zip_longest(suggestion_ids, agrees_values, needs_help_values, delete_values, fillvalue=False)
+    informations = zip_longest(
+        suggestion_ids,
+        agrees_values,
+        needs_help_values,
+        delete_values,
+        close_values,
+        reopen_values,
+        auto_fix_values,
+        fillvalue=False)
 
-    for suggestion_id, agrees, needs_help, delete in informations:
+    for suggestion_id, agrees, needs_help, delete, close, reopen, auto_fix in informations:
         if not suggestion_id:
             continue
 
@@ -1011,6 +1025,24 @@ def update_evidence(request):
                     suggestion=Suggestion.objects.get(pk=suggestion_id)
                 ).delete()
             except ObjectDoesNotExist:
+                pass
+        elif close:
+            try:
+               Suggestion.objects.filter(pk=suggestion_id).update(is_checked=True)
+            except ObjectDoesNotExist:
+                pass
+        elif reopen:
+            try:
+                Suggestion.objects.filter(pk=suggestion_id).update(is_checked=False)
+            except ObjectDoesNotExist:
+                pass
+        elif auto_fix:
+            try:
+                suggestion = Suggestion.objects.get(pk=suggestion_id)
+                suggestion.auto_fix()
+            except ObjectDoesNotExist:
+                pass
+            except ValueError:
                 pass
         else:
             evidence, created = Evidence.objects.get_or_create(
