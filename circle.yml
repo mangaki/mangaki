@@ -9,7 +9,6 @@ dependencies:
     - sudo apt-get install python-dev libopenblas-dev
     - pip install --upgrade pip
     - pip install -r requirements/dev.txt
-    - pip install fastFM
 database:
   override:
     - psql -d circle_test -c "create extension if not exists pg_trgm;

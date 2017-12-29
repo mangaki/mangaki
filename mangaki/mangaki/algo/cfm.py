@@ -12,6 +12,7 @@ class MangakiCFM(RecommendationAlgorithm):
         super().__init__()
         self.rank = rank
         self.nb_iterations = nb_iterations
+        self.fm = None
 
     def load(self, filename):
         backup = super().load(filename)
@@ -25,9 +26,8 @@ class MangakiCFM(RecommendationAlgorithm):
         nb_samples = len(X)
         user_ids = X[:, 0]
         work_ids = X[:, 1]
-        rows = list(range(nb_samples))
         # For the k-th user_id-work_id pair, we need (k, user_id) and (k, N + work_id), so two copies of range(nb_samples)
-        rows.extend(rows)
+        rows = list(range(nb_samples)) * 2
         cols = np.concatenate((user_ids, self.nb_users + work_ids))
         X_fm = coo_matrix(([1] * (2 * nb_samples), (rows, cols)),
                           shape=(nb_samples, self.nb_users + self.nb_works)
@@ -39,7 +39,7 @@ class MangakiCFM(RecommendationAlgorithm):
 
         self.chrono.save('prepare data in sparse FM format')
 
-        self.fm = als.FMRegression(n_iter=10, rank=self.rank)
+        self.fm = als.FMRegression(n_iter=self.nb_iterations, rank=self.rank)
         self.fm.fit(X_fm, y)
 
         self.chrono.save('factor matrix')
