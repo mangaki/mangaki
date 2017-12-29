@@ -11,7 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.core.urlresolvers import reverse
-from django.db import models
+from django.db import models, transaction
 from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
 from django.db.models.functions import Cast
 from django.utils.functional import cached_property
@@ -449,6 +449,28 @@ class Suggestion(models.Model):
         return 'Suggestion#{} de {} : {} - {}'.format(
             self.pk, self.user, self.work.title, self.get_problem_display()
         )
+
+    @property
+    def can_auto_fix(self):
+        # FIXME: use Enum + dynamic based on evidences / message (links).
+        return self.problem in ('nsfw', 'n_nsfw')
+
+    @transaction.atomic
+    def auto_fix(self):
+        """
+        Apply automatically a fix on the issue.
+        e.g. for a NSFW (resp. non-NSFW) problem, it'll set the work as NSFW (resp. non-NSFW).
+
+        It'll raise ValueError when it is impossible to automatically fix the issue.
+        """
+        if self.problem in ('nsfw', 'n_nsfw'):
+            self.work.nsfw = True if self.problem == 'nsfw' else False
+            self.work.save()
+        else:
+            raise ValueError('Unable to auto-fix `{}`-type suggestions.'.format(self.problem))
+
+        self.is_checked = True
+        self.save()
 
 
 class Evidence(models.Model):

@@ -5,6 +5,7 @@ from .fit_algo import get_algo_backup, get_dataset_backup, fit_algo
 from .als import MangakiALS
 from .balse import MangakiBALSE
 from .lasso import MangakiLASSO
+from .cfm import MangakiCFM
 from .efa import MangakiEFA
 from .gbr import MangakiGBR
 from .knn import MangakiKNN
