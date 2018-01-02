@@ -140,6 +140,17 @@ class Experiment(object):
             y_train = self.anonymized.y[i_train]
             X_test = self.anonymized.X[i_test]
             y_test = self.anonymized.y[i_test]
+            print(y_train[:5], y_test[:5])
+            df_train = pd.DataFrame(np.column_stack((X_train, y_train)), columns=['user_id', 'work_id', 'rating'], dtype=float)
+            print(df_train.head())
+            df_test = pd.DataFrame(np.column_stack((X_test, y_test)), columns=['user_id', 'work_id', 'rating'], dtype=float)
+            mean_rating_by_user_id = df_train.groupby('user_id')['rating'].mean()
+            print(mean_rating_by_user_id.head())
+            df_train['user_mean_rating'] = df_train['user_id'].map(mean_rating_by_user_id)
+            df_train['corrected_rating'] = df_train['rating'] - df_train['user_mean_rating']
+            df_test['corrected_rating']  = df_test['rating']  - df_train['user_mean_rating']
+            df_train[['user_id', 'work_id', 'rating']].to_csv('/tmp/train.dat', header=False, index=False)
+            df_test[['user_id', 'work_id', 'rating']].to_csv('/tmp/test.dat', header=False, index=False)
             # pd.DataFrame(np.column_stack((X_train, y_train))).to_csv('/tmp/train.dat', header=False, index=False)
             # pd.DataFrame(np.column_stack((X_test, y_test))).to_csv('/tmp/test.dat', header=False, index=False)
 
