@@ -1,11 +1,11 @@
-from mangaki.utils.common import RecommendationAlgorithm
-from django.conf import settings
-from mangaki.utils.chrono import Chrono
-from sklearn.decomposition import FactorAnalysis
-from scipy.sparse import csr_matrix
 import numpy as np
+from scipy.sparse import csr_matrix
+from sklearn.decomposition import FactorAnalysis
+
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 
+@register_algorithm('efa')
 class MangakiEFA(RecommendationAlgorithm):
     '''Factor Analysis:
     See http://scikit-learn.org/stable/modules/decomposition.html#factor-analysis
@@ -14,8 +14,8 @@ class MangakiEFA(RecommendationAlgorithm):
     W = None
     H = None
     def __init__(self, NB_COMPONENTS=20):
+        super().__init__()
         self.NB_COMPONENTS = NB_COMPONENTS
-        self.chrono = Chrono(True)
 
     def set_parameters(self, nb_users, nb_works):
         self.nb_users = nb_users

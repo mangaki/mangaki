@@ -40,6 +40,7 @@ urlpatterns = [
 
     url(r'^reco/$', views.get_reco, name='reco'),
     url(r'^reco_dpp/$', views.get_reco_dpp, name='reco_dpp'),
+    url(r'^artists/$', views.ArtistList.as_view(), name='artist-list'),
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing, name='add-pairing'),
     url(r'^vote_dpp/(?P<work_id>\d+)$', views.dpp_work, name='vote-dpp'),
@@ -49,7 +50,6 @@ urlpatterns = [
     url(r'^newsletter/$', views.update_newsletter, name='newsletter'),
     url(r'^research/$', views.update_research, name='research'),
     url(r'^reco_willsee/$', views.update_reco_willsee, name='reco-willsee'),
-    url(r'^mal/(?P<mal_username>.+)$', views.import_from_mal, name='import-mal'),
     url(r'^admin/', admin.site.urls),
     url(r'^about/(?P<lang>\w*)$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),
@@ -61,6 +61,7 @@ urlpatterns = [
     url(r'^fix/suggestion/$', views.fix_index, name='fix-index'),
     url(r'^fix/suggestion/(?P<suggestion_id>\d+)$', views.fix_suggestion, name='fix-suggestion'),
     url(r'^evidence/$', views.update_evidence, name='update-evidence'),
+    url(r'^grid/nsfw/$', views.nsfw_grid, name='nsfw-grid'),
 
     # url(r'^lookup/$', views.lookup_work'),
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top, name='top'),

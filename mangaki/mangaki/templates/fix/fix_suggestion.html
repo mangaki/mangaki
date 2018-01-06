@@ -6,7 +6,9 @@
 
 {% block body %}
 
-<h1>Suggestion #{{ suggestion.pk }}</h1><br/>
+<div class="page-header">
+    <h1>Suggestion #{{ suggestion.pk }}</h1>
+</div>
 
 {% if suggestion.is_checked %}
 <div class="alert alert-info">
@@ -69,13 +71,9 @@
 
         {% if request.user.is_authenticated and not suggestion.is_checked %}
             <hr/>
-            <form id="evidence_form" action="{% url "update-evidence" %}" method="POST">
+            <form id="evidence_form" action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="suggestion" id="id_suggestion" value="{{ suggestion.pk }}">
-                {% if evidence %}
-                    <input type="hidden" name="agrees" value="{{ evidence.agrees }}">
-                    <input type="hidden" name="needs_help" value="{{ evidence.needs_help }}">
-                {% endif %}
                 <p align="center">
                     <span class="small text-success" align="right" style="width: 70px; display: inline-block;">
                         {% if evidence and evidence.agrees %}Approuvé{% else %}Approuver ?{% endif %}
@@ -96,6 +94,19 @@
                     </span>
                 </p>
                 {% if evidence %}
+                    {% if evidence.agrees and can_auto_fix %}
+                        <p align="center">
+                            <button type="submit" class="btn btn-xs btn-primary" value="True" name="auto_fix">
+                                Résoudre automatiquement le problème
+                            </button>
+                        </p>
+                    {% elif not evidence.agrees and can_close %}
+                        <p align="center">
+                            <button type="submit" class="btn btn-xs btn-default" value="True" name="close_suggestion">
+                                Fermer cette suggestion
+                            </button>
+                        </p>
+                    {% endif %}
                 <p align="center">
                     {% if not evidence.needs_help %}
                     <button type="submit" class="btn btn-xs btn-primary" value="True" name="needs_help">Demander l'aide d'un administrateur</button>
@@ -103,6 +114,8 @@
                     <button type="submit" class="btn btn-xs btn-default" disabled>Vous avez demandé l'aide d'un administrateur</button>
                     {% endif %}
                 </p>
+                <input type="hidden" name="agrees" value="{{ evidence.agrees }}">
+                <input type="hidden" name="needs_help" value="{{ evidence.needs_help }}">
                 {% endif %}
             </form>
         {% elif suggestion.is_checked and evidence %}
@@ -114,6 +127,17 @@
                 Vous avez <strong><span class="text-danger">rejeté <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span></span></strong> cette suggestion.
                 {% endif %}
             </p>
+            <form id="evidence_form" action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="suggestion" value="{{ suggestion.pk }}" />
+                <p align="center">
+                    {% if can_reopen %}
+                        <button type="submit" class="btn btn-primary" name="re_open" value="True">
+                            Réouvrir cette suggestion
+                        </button>
+                    {% endif %}
+                </p>
+            </form>
             {% if evidence.needs_help %}
             <p align="center">
                 Vous avez demandé <strong>l'aide d'un administrateur</strong>.

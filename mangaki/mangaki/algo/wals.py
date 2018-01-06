@@ -1,6 +1,8 @@
-from mangaki.utils.common import RecommendationAlgorithm
 from collections import defaultdict, Counter
+
 import numpy as np
+
+from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
 
 
 def simple_train(model, inp, num_iterations):
@@ -19,26 +21,28 @@ def simple_train(model, inp, num_iterations):
         col_update_op.run()
 
 
+@register_algorithm('wals', {'nb_components': 20})
 class MangakiWALS(RecommendationAlgorithm):
     M = None
     U = None
-    VT = None
+    V = None
 
-    def __init__(self, NB_COMPONENTS=20):
+    def __init__(self, nb_components=20):
         """An implementation of the Weighted Alternate Least Squares.
         NB_COMPONENTS: the number of components in the factorization"""
-        import tensorflow as tf
-
         super().__init__()
-        self.NB_COMPONENTS = NB_COMPONENTS
-        self.sess = tf.InteractiveSession()
+        self.nb_components = nb_components
 
     def load(self, filename):
         backup = super().load(filename)
         self.M = backup.M
         self.U = backup.U
-        self.VT = backup.VT
+        self.V = backup.V
         self.means = backup.means
+
+    @property
+    def is_serializable(self):
+        return True
 
     def make_matrix(self, X, y):
         matrix = defaultdict(dict)
@@ -61,12 +65,13 @@ class MangakiWALS(RecommendationAlgorithm):
         return indices, values, means
 
     def factorize(self, indices, values):
+        import tensorflow as tf
         from tensorflow.contrib.factorization.python.ops import factorization_ops
         from tensorflow.python.framework import sparse_tensor
 
         rows = self.nb_users
         cols = self.nb_works
-        dims = self.NB_COMPONENTS
+        dims = self.nb_components
         row_wts = 0.1 + np.random.rand(rows)
         col_wts = 0.1 + np.random.rand(cols)
         inp = sparse_tensor.SparseTensor(indices, values, [rows, cols])
@@ -80,13 +85,12 @@ class MangakiWALS(RecommendationAlgorithm):
             row_weights=None,  # row_wts,
             col_weights=None,  # col_wts,
             use_factors_weights_cache=use_factors_weights_cache)
+        tf.InteractiveSession()
         simple_train(model, inp, 25)
         row_factor = model.row_factors[0].eval()
-        print('Shape', row_factor.shape)
+        self.U = row_factor
         col_factor = model.col_factors[0].eval()
-        print('Shape', col_factor.shape)
-        out = np.dot(row_factor, np.transpose(col_factor))
-        return out
+        self.V = col_factor
 
     def fit(self, X, y):
         print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
@@ -94,12 +98,21 @@ class MangakiWALS(RecommendationAlgorithm):
 
         self.chrono.save('fill and center matrix')
 
-        self.M = self.factorize(indices, values)
+        self.factorize(indices, values)
 
         self.chrono.save('factor matrix')
 
+    def unzip(self):
+        self.chrono.save('begin of fit')
+        self.M = self.U.dot(self.V.T)
+        self.chrono.save('end of fit')
+
     def predict(self, X):
-        return self.M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
+        if self.M is not None:  # Model is unzipped
+            M = self.M
+        else:
+            M = self.U.dot(self.V.T)
+        return M[X[:, 0].astype(np.int64), X[:, 1].astype(np.int64)] + self.means[X[:, 0].astype(np.int64)]
 
     def get_shortname(self):
         return 'wals'

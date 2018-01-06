@@ -11,12 +11,15 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.core.urlresolvers import reverse
-from django.db import models
-from django.db.models import CharField, F, Func, Lookup, Value, Q
+from django.db import models, transaction
+from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
+from django.db.models.functions import Cast
 from django.utils.functional import cached_property
 
-from mangaki.choices import ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES, CLUSTER_CHOICES, RELATION_TYPE_CHOICES
-from mangaki.utils.ranking import TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO
+from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
+                             CLUSTER_CHOICES, RELATION_TYPE_CHOICES, SUGGESTION_PROBLEM_CHOICES)
+from mangaki.utils.ranking import (TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO,
+                                   PEARLS_MIN_RATINGS, PEARLS_MAX_RATINGS, PEARLS_MAX_DISLIKE_RATE)
 from mangaki.utils.dpp import MangakiDPP
 from mangaki.utils.ratingsmatrix import RatingsMatrix
 
@@ -60,6 +63,15 @@ class WorkQuerySet(models.QuerySet):
         return self.filter(
             nb_ratings__gte=TOP_MIN_RATINGS).order_by(
                 (F('sum_ratings') / F('nb_ratings')).desc())
+
+    def pearls(self):
+        return (self.exclude(nb_likes=0)
+                    .annotate(
+                        dislike_rate=ExpressionWrapper(
+                            Cast(F('nb_dislikes'), FloatField()) / F('nb_likes'), output_field=FloatField())
+                    )
+                    .filter(nb_ratings__gte=PEARLS_MIN_RATINGS, nb_ratings__lte=PEARLS_MAX_RATINGS, dislike_rate__lte=PEARLS_MAX_DISLIKE_RATE)
+                    .order_by('dislike_rate'))
 
     def popular(self):
         return self.order_by('-nb_ratings')
@@ -164,13 +176,17 @@ class Work(models.Model):
     def get_absolute_url(self):
         return reverse('work-detail', args=[self.category.slug, str(self.id)])
 
+    @property
+    def poster_url(self):
+        if self.int_poster:
+            return self.int_poster.url
+        return self.ext_poster
+
     def safe_poster(self, user):
         if self.id is None:
             return '{}{}'.format(settings.STATIC_URL, 'img/chiro.gif')
         if not self.nsfw or (user.is_authenticated and user.profile.nsfw_ok):
-            if self.int_poster:
-                return self.int_poster.url
-            return self.ext_poster
+            return self.poster_url
         return '{}{}'.format(settings.STATIC_URL, 'img/nsfw.jpg')
 
     def retrieve_poster(self, url=None, session=None):
@@ -181,8 +197,8 @@ class Work(models.Model):
         if not url:
             return False
 
-        filename = os.path.basename(urlparse(url).path)
-        # Hé mais ça va pas écraser des posters / créer des collisions, ça ?
+        poster_filename = "{:d}-{:s}".format(self.id, os.path.basename(urlparse(url).path))
+        # FIXME: Add a get_poster_filename with hash, and use it everywhere
 
         try:
             r = session.get(url, timeout=5, stream=True)
@@ -194,7 +210,7 @@ class Work(models.Model):
                 for chunk in r.iter_content(chunk_size=1024):
                     f.write(chunk)
                 self.ext_poster = url
-                self.int_poster.save(filename, File(f))
+                self.int_poster.save(poster_filename, File(f))
         finally:
             r.close()
         return True
@@ -368,6 +384,7 @@ class Track(models.Model):
 class Artist(models.Model):
     name = models.CharField(max_length=255)
     anidb_creator_id = models.IntegerField(null=True, unique=True)
+    anilist_creator_id = models.IntegerField(null=True, unique=True)
 
     def __str__(self):
         return self.name
@@ -424,17 +441,7 @@ class Suggestion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
-    problem = models.CharField(verbose_name='Partie concernée', max_length=8, choices=(
-        ('title', 'Le titre n\'est pas le bon'),
-        ('poster', 'Le poster ne convient pas'),
-        ('synopsis', 'Le synopsis comporte des erreurs'),
-        ('author', 'L\'auteur n\'est pas le bon'),
-        ('composer', 'Le compositeur n\'est pas le bon'),
-        ('double', 'Ceci est un doublon'),
-        ('nsfw', 'L\'oeuvre est NSFW'),
-        ('n_nsfw', 'L\'oeuvre n\'est pas NSFW'),
-        ('ref', 'Proposer une URL (myAnimeList, AniDB, Icotaku, VGMdb, etc.)')
-    ), default='ref')
+    problem = models.CharField(verbose_name='Partie concernée', max_length=8, choices=SUGGESTION_PROBLEM_CHOICES, default='ref')
     message = models.TextField(verbose_name='Proposition', blank=True)
     is_checked = models.BooleanField(default=False)
 
@@ -442,6 +449,28 @@ class Suggestion(models.Model):
         return 'Suggestion#{} de {} : {} - {}'.format(
             self.pk, self.user, self.work.title, self.get_problem_display()
         )
+
+    @property
+    def can_auto_fix(self):
+        # FIXME: use Enum + dynamic based on evidences / message (links).
+        return self.problem in ('nsfw', 'n_nsfw')
+
+    @transaction.atomic
+    def auto_fix(self):
+        """
+        Apply automatically a fix on the issue.
+        e.g. for a NSFW (resp. non-NSFW) problem, it'll set the work as NSFW (resp. non-NSFW).
+
+        It'll raise ValueError when it is impossible to automatically fix the issue.
+        """
+        if self.problem in ('nsfw', 'n_nsfw'):
+            self.work.nsfw = True if self.problem == 'nsfw' else False
+            self.work.save()
+        else:
+            raise ValueError('Unable to auto-fix `{}`-type suggestions.'.format(self.problem))
+
+        self.is_checked = True
+        self.save()
 
 
 class Evidence(models.Model):
@@ -585,3 +614,13 @@ class Trope(models.Model):
 
     def __str__(self):
         return self.trope
+
+
+class UserBackgroundTask(models.Model):
+    created_on = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='background_tasks')
+    task_id = models.CharField(max_length=80)
+    tag = models.CharField(max_length=80)  # For custom usage of tasks.
+
+    def __str__(self):
+        return '<{} owned by {}>'.format(self.tag, self.owner)

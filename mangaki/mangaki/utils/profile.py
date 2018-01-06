@@ -1,11 +1,11 @@
-from typing import Tuple, List, Any, Dict, Optional
 from collections import Counter, defaultdict
+from typing import Tuple, List, Any, Dict, Optional
 
-from django.utils import timezone
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from mangaki.models import Rating, Work, Category, Recommendation
-from mangaki.utils.algo import get_algo_backup, get_dataset_backup
+from mangaki.algo import get_algo_backup, get_dataset_backup
 from mangaki.utils.ratings import get_anonymous_ratings
 from mangaki.utils.recommendations import get_pos_of_best_works_for_user_via_algo
 

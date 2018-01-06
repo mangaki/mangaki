@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db import connection
+import logging
 
 
 class Chrono(object):
@@ -15,5 +16,5 @@ class Chrono(object):
         if self.is_enabled:
             now = datetime.now()
             delta = now - self.checkpoint
-            print('Chrono:', title, '[%dq, %dms]' % (len(connection.queries), round(delta.total_seconds() * 1000)))
+            logging.info('Chrono: %s [%dq, %dms]', title, len(connection.queries), round(delta.total_seconds() * 1000))
             self.checkpoint = now

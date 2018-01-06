@@ -1,6 +1,7 @@
 import datetime
 import json
 from collections import Counter, OrderedDict
+from itertools import zip_longest
 from typing import List, Dict, Any, Tuple
 from urllib.parse import urlencode
 
@@ -14,11 +15,12 @@ from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When, Count
+from django.db.models import Case, IntegerField, Sum, Value, When, Count, Q
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone, translation
+from django.utils.http import is_safe_url
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -37,7 +39,8 @@ from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
-from mangaki.utils.mal import import_mal, client
+from mangaki.utils.mal import client
+from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
@@ -55,8 +58,10 @@ NB_POINTS_DPP = 10
 RATINGS_PER_PAGE = 24
 TITLES_PER_PAGE = 24
 POSTERS_PER_PAGE = 24
+ARTISTS_PER_PAGE = 24
 USERNAMES_PER_PAGE = 24
 FIXES_PER_PAGE = 5
+NSFW_GRID_PER_PAGE = 5
 
 REFERENCE_DOMAINS = (
     ('http://myanimelist.net', 'myAnimeList'),
@@ -75,7 +80,18 @@ RATING_COLORS = {
     'wontsee': {'normal': '#5bc0de', 'highlight': '#31b0d5'}
 }
 
-UTA_ID = 14293
+FEATURED = {
+    'utamonogatari': 14293,
+    'coo': 378,
+    'colorful': 9944,
+    'crayon': 3125,
+    'nausicaa': 1289,
+    'godfathers': 330,
+    'souvenirs': 2696,
+    'silent': 2238,
+    'night': 18416,
+    'fireworks': 18331
+}
 
 DPP_UI_CONFIG_FOR_RATINGS = {
     'ui': [
@@ -154,7 +170,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         context['genres'] = ', '.join(genre.title for genre in self.object.genre.all())
 
         if self.request.user.is_authenticated:
-            context['suggestion_form'] = SuggestionForm(instance=Suggestion(user=self.request.user, work=self.object))
+            context['suggestion_form'] = SuggestionForm(work=self.object, instance=Suggestion(user=self.request.user, work=self.object))
         context['rating'] = current_user_rating(self.request, self.object)
 
         context['references'] = []
@@ -256,9 +272,8 @@ class EventDetail(LoginRequiredMixin, DetailView):
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        ratings = current_user_ratings(self.request, context['object_list'])
 
-        ratings = current_user_ratings(
-            self.request, list(context['object_list']))
         for work in context['object_list']:
             work.rating = ratings.get(work.id, None)
 
@@ -280,13 +295,17 @@ class WorkList(WorkListMixin, ListView):
     def category(self):
         return get_object_or_404(Category, slug=self.kwargs.get('category'))
 
-    def search(self):
+    @property
+    def search_query(self):
         return self.request.GET.get('search', None)
+
+    def flat(self):
+        return self.request.GET.get('flat', 0)
 
     def sort_mode(self):
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
-        if self.search() is not None and sort == default:
+        if self.search_query is not None and sort == default:
             return 'popularity'  # Mosaic cannot be searched through because it is random. We enforce the popularity as the second default when searching.
         else:
             return sort
@@ -296,45 +315,52 @@ class WorkList(WorkListMixin, ListView):
         return self.kwargs.get('dpp', False)
 
     def get_queryset(self):
-        search_text = self.search()
-        queryset = self.category.work_set.all()
+        search_text = self.search_query
+        self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
+
         if self.is_dpp:
-            queryset = self.category.work_set.exclude(coldstartrating__user=self.request.user).dpp(10)
+            self.queryset = self.queryset.exclude(coldstartrating__user=self.request.user).dpp(10)
+        elif sort_mode == 'new':
+            self.queryset = self.queryset.filter(date__isnull=False).order_by('-date')
         elif sort_mode == 'top':
-            queryset = queryset.top()
+            self.queryset = self.queryset.top()
         elif sort_mode == 'popularity':
-            queryset = queryset.popular()
+            self.queryset = self.queryset.popular()
         elif sort_mode == 'controversy':
-            queryset = queryset.controversial()
+            self.queryset = self.queryset.controversial()
         elif sort_mode == 'alpha':
             letter = self.request.GET.get('letter', '0')
             if letter == '0':  # '#'
-                queryset = queryset.exclude(title__regex=r'^[a-zA-Z]')
+                self.queryset = self.queryset.exclude(title__regex=r'^[a-zA-Z]')
             else:
-                queryset = queryset.filter(title__istartswith=letter)
-            queryset = queryset.order_by('title')
+                self.queryset = self.queryset.filter(title__istartswith=letter)
+            self.queryset = self.queryset.order_by('title')
+        elif sort_mode == 'pearls':
+            self.queryset = self.queryset.pearls()
         elif sort_mode == 'random':
-            queryset = queryset.random().order_by('?')[:self.paginate_by]
+            self.queryset = self.queryset.random().order_by('?')[:self.paginate_by]
         elif sort_mode == 'mosaic':
-            queryset = queryset.none()
+            self.queryset = self.queryset.none()
         else:
             raise Http404
 
-        if search_text is not None:
-            queryset = queryset.search(search_text)
+        if search_text:
+            self.queryset = self.queryset.filter(Q(title__icontains=search_text) | Q(worktitle__title__icontains=search_text))
 
-        queryset = queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
+        self.queryset = self.queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
-        return queryset
+        return self.queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slot_sort_types = ['popularity', 'controversy', 'top', 'random']
-        search_text = self.search()
+        search_text = self.search_query
         sort_mode = self.sort_mode()
+        flat = self.flat()
 
         context['search'] = search_text
+        context['flat'] = flat
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
@@ -352,6 +378,34 @@ class WorkList(WorkListMixin, ListView):
             ]
 
         return context
+
+    def render_to_response(self, context):
+        if context.get('paginator') and context['paginator'].count == 1:  # Redirect to work detail if only result
+            unique_work = self.queryset.first()
+            return redirect('work-detail', category=self.category.slug, pk=unique_work.pk)
+        else:
+            return super(WorkList, self).render_to_response(context)
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class ArtistList(ListView):
+    paginate_by = ARTISTS_PER_PAGE
+
+    def get_queryset(self):
+        queryset = Artist.objects.all()
+        if self.search_query:
+            return queryset.filter(name__icontains=self.search_query)
+        return queryset.order_by('name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['nb_artists'] = Artist.objects.count()
+        context['search'] = self.search_query
+        return context
+
+    @property
+    def search_query(self):
+        return self.request.GET.get('search', None)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -448,14 +502,19 @@ def get_profile(request,
     except EmptyPage:
         ratings = paginator.page(paginator.num_pages)
 
+    is_me = request.user == user
     data = {
         'meta': {
-            'is_mal_import_available': client.is_available,
+            'debug_vue': settings.DEBUG_VUE_JS,
+            'mal': {
+                'is_available': client.is_available and (redis_pool is not None),
+                'pending_import': None if (not is_me) or is_anonymous else get_current_mal_import(request.user),
+            },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,
             'username': request.user.username,
             'is_shared': is_shared,
-            'is_me': request.user == user,
+            'is_me': is_me,
             'category': category,
             'seen': seen_works,
             'is_anonymous': is_anonymous,
@@ -503,21 +562,20 @@ def about(request, lang):
 
 
 def events(request):
-    uta_rating = None
+    user_ratings = {}
     if request.user.is_authenticated:
-        for rating in Rating.objects.filter(work_id=UTA_ID, user=request.user):
-            if rating.work_id == UTA_ID:
-                uta_rating = rating.choice
-    utamonogatari = Work.objects.in_bulk([UTA_ID])
+        for rating in Rating.objects.filter(work_id__in=FEATURED.values(), user=request.user):
+            user_ratings[rating.work_id] = rating.choice
+    featured_works = Work.objects.in_bulk(FEATURED.values())
+    context = {
+        'wakanim': Partner.objects.get(pk=12),
+        'config': VANILLA_UI_CONFIG_FOR_RATINGS
+    }
+    for work_tag, work_id in FEATURED.items():
+        context[work_tag] = featured_works[work_id]
+        context['{}_rating'.format(work_tag)] = user_ratings.get(work_id)
     return render(
-        request, 'events.html',
-        {
-            'screenings': Event.objects.filter(event_type='screening', date__gte=timezone.now()),
-            'utamonogatari': utamonogatari.get(UTA_ID, None),
-            'wakanim': Partner.objects.get(pk=12),
-            'utamonogatari_rating': uta_rating,
-            'config': VANILLA_UI_CONFIG_FOR_RATINGS
-        })
+        request, 'events.html', context)
 
 
 def top(request, category_slug):
@@ -773,20 +831,6 @@ def update_reco_willsee(request):
     return HttpResponse()
 
 
-def import_from_mal(request, mal_username):
-    if request.method == 'POST' and client.is_available:
-        nb_added, fails = import_mal(mal_username, request.user.username)
-        payload = {
-            'added': nb_added,
-            'failures': fails
-        }
-        return HttpResponse(json.dumps(payload), content_type='application/json')
-    elif not client.is_available:
-        raise Http404()
-    else:
-        return HttpResponse()
-
-
 def add_pairing(request, artist_id, work_id):
     if request.user.is_authenticated:
         artist = get_object_or_404(Artist, id=artist_id)
@@ -884,6 +928,9 @@ def fix_suggestion(request, suggestion_id):
         'suggestion': suggestion,
         'clusters': zip(clusters, colors) if clusters and colors else None,
         'evidence': evidence,
+        'can_auto_fix': suggestion.can_auto_fix and request.user.is_staff,
+        'can_close': request.user.is_staff,
+        'can_reopen': request.user.is_staff,
         'next_id': next_suggestions_ids[0] if next_suggestions_ids else None,
         'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None
     }
@@ -891,17 +938,86 @@ def fix_suggestion(request, suggestion_id):
     return render(request, 'fix/fix_suggestion.html', context)
 
 
+def nsfw_grid(request):
+    user = request.user if request.user.is_authenticated else None
+
+    user_evidences = Evidence.objects.filter(user=user)
+    nsfw_suggestion_list = Suggestion.objects.select_related(
+                'work', 'user', 'work__category'
+            ).prefetch_related('evidence_set__user').filter(
+                problem__in=('nsfw', 'n_nsfw'),
+                is_checked=False
+            ).exclude(
+                work__in=user_evidences.values('suggestion__work')
+            ).order_by('work', '-date', '-work__sum_ratings').distinct('work')
+
+    paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
+    count_nsfw_left = paginator.count
+    page = request.GET.get('page')
+
+    try:
+        suggestions = paginator.page(page)
+    except PageNotAnInteger:
+        suggestions = paginator.page(1)
+    except EmptyPage:
+        suggestions = paginator.page(paginator.num_pages)
+
+    nsfw_states = []
+    supposed_nsfw = []
+    for suggestion in suggestions:
+        supposed_nsfw.append(suggestion.problem == 'nsfw')
+
+        for evidence in suggestion.evidence_set.all():
+            if evidence.user == request.user:
+                agrees_with_problem = evidence.agrees
+                agrees = ((agrees_with_problem and suggestion.problem == 'nsfw')
+                       or (not agrees_with_problem and not suggestion.problem == 'nsfw'))
+                nsfw_states.append(agrees)
+                break
+        else:
+            nsfw_states.append(None)
+
+    suggestions_with_states = list(zip(suggestions, nsfw_states, supposed_nsfw))
+
+    context = {
+        'suggestions_with_states': suggestions_with_states,
+        'suggestions': suggestions,
+        'count_nsfw_left': count_nsfw_left
+    }
+
+    return render(request, 'fix/nsfw_grid.html', context)
+
+
 @login_required
 def update_evidence(request):
-    if request.method != 'POST':
-        redirect('fix-index')
+    if request.method != 'POST' or not request.user.is_authenticated:
+        return redirect('fix-index')
 
-    agrees = request.POST.get('agrees') == 'True'
-    needs_help = request.POST.get('needs_help') == 'True'
-    delete = request.POST.get('delete')
-    suggestion_id = request.POST.get('suggestion')
+    # Retrieve agrees, needs_help, delete and suggestion_ids values from one or several fields in a form
+    # Every values are then zipped together, with zip_longest since the length of suggestion_ids is the one that matters
+    # See templates/fix/nsfw_grid.html for an example
+    agrees_values = map(lambda x: x == 'True', request.POST.getlist('agrees'))
+    needs_help_values = map(lambda x: x == 'True', request.POST.getlist('needs_help'))
+    delete_values = request.POST.getlist('delete')
+    suggestion_ids = map(int, request.POST.getlist('suggestion'))
+    close_values = map(lambda x: x == 'True', request.POST.getlist('close_suggestion'))
+    reopen_values = map(lambda x: x == 'True', request.POST.getlist('re_open'))
+    auto_fix_values = map(lambda x: x == 'True', request.POST.getlist('auto_fix'))
 
-    if request.user.is_authenticated and suggestion_id:
+    informations = zip_longest(
+        suggestion_ids,
+        agrees_values,
+        needs_help_values,
+        delete_values,
+        close_values,
+        reopen_values,
+        auto_fix_values,
+        fillvalue=False)
+
+    for suggestion_id, agrees, needs_help, delete, close, reopen, auto_fix in informations:
+        if not suggestion_id:
+            continue
+
         if delete:
             try:
                 Evidence.objects.get(
@@ -909,6 +1025,24 @@ def update_evidence(request):
                     suggestion=Suggestion.objects.get(pk=suggestion_id)
                 ).delete()
             except ObjectDoesNotExist:
+                pass
+        elif close:
+            try:
+               Suggestion.objects.filter(pk=suggestion_id).update(is_checked=True)
+            except ObjectDoesNotExist:
+                pass
+        elif reopen:
+            try:
+                Suggestion.objects.filter(pk=suggestion_id).update(is_checked=False)
+            except ObjectDoesNotExist:
+                pass
+        elif auto_fix:
+            try:
+                suggestion = Suggestion.objects.get(pk=suggestion_id)
+                suggestion.auto_fix()
+            except ObjectDoesNotExist:
+                pass
+            except ValueError:
                 pass
         else:
             evidence, created = Evidence.objects.get_or_create(
@@ -919,8 +1053,9 @@ def update_evidence(request):
             evidence.needs_help = needs_help
             evidence.save()
 
-    if suggestion_id:
-        return redirect('fix-suggestion', suggestion_id)
+    next_url = request.GET.get('next')
+    if next_url and is_safe_url(url=next_url, host=request.get_host()):
+        return redirect(next_url)
     return redirect('fix-index')
 
 

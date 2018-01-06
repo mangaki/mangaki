@@ -1,13 +1,19 @@
-<div class="row">
-  <div class="col-xs-12 cards-grid">
-    {% for work_meta in works %}
-        {% with work_meta.slot_type as slot_type %}
-        {% with work_meta.work as work %}
-        {% with work.rating as rating %}
-          {% include "mangaki/work_rating.html" with config=config is_dpp=is_dpp sort_mode=sort_mode work=work rating=rating slot_type=slot_type only %}
-        {% endwith %}
-        {% endwith %}
-        {% endwith %}
-    {% endfor %}
-  </div>
-</div>
+{% if works %}
+    <div class="col-xs-12 cards-grid">
+        {% for work_meta in works %}
+            {% with work_meta.slot_type as slot_type %}
+            {% with work_meta.work as work %}
+            {% with work.rating as rating %}
+                {% include "mangaki/work_rating.html" with config=config is_dpp=is_dpp sort_mode=sort_mode work=work rating=rating slot_type=slot_type only %}
+            {% endwith %}
+            {% endwith %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-body">Aucun résultat correspondant.</div>
+        </div>
+    </div>
+{% endif %}

@@ -17,7 +17,8 @@ from mangaki.models import (
     Suggestion, Evidence, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
     FAQEntry, ColdStartRating, Trope, Language,
-    ExtLanguage, WorkCluster
+    ExtLanguage, WorkCluster,
+    UserBackgroundTask
 )
 from mangaki.utils.anidb import AniDBTag, client, diff_between_anidb_and_local_tags
 from mangaki.utils.db import get_potential_posters
@@ -96,9 +97,12 @@ def redirect_staff(works_to_merge, final_work):
 def redirect_related_objects(works_to_merge, final_work):
     genres = sum((list(work.genre.all()) for work in works_to_merge), [])
     work_ids = [work.id for work in works_to_merge]
+    existing_tag_ids = TaggedWork.objects.filter(work=final_work).values_list('tag__pk', flat=True)
+
     final_work.genre.add(*genres)
     Trope.objects.filter(origin_id__in=work_ids).update(origin_id=final_work.id)
-    for model in [WorkTitle, TaggedWork, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]:
+    TaggedWork.objects.filter(work_id__in=work_ids).exclude(tag_id__in=existing_tag_ids).update(work_id=final_work.id)
+    for model in [WorkTitle, Suggestion, Recommendation, Pairing, Reference, ColdStartRating]:
         model.objects.filter(work_id__in=work_ids).update(work_id=final_work.id)
     Work.objects.filter(id__in=work_ids).exclude(id=final_work.id).update(redirect=final_work)
 
@@ -559,7 +563,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(TaggedWork)
 class TaggedWorkAdmin(admin.ModelAdmin):
-    search_fields = ('work', 'tag')
+    search_fields = ('work__title', 'tag__title')
 
 
 @admin.register(WorkCluster)
@@ -761,3 +765,4 @@ admin.site.register(ColdStartRating)
 admin.site.register(Trope)
 admin.site.register(Language)
 admin.site.register(ExtLanguage)
+admin.site.register(UserBackgroundTask)

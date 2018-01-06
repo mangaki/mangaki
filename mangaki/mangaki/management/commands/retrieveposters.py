@@ -50,7 +50,7 @@ class Command(BaseCommand):
 
         if nb_success:
             self.stdout.write(self.style.SUCCESS(
-                '{:d} posters sucessfully downloaded.'.format(nb_success)))
+                '{:d} poster(s) successfully downloaded.'.format(nb_success)))
         if failed:
             self.stdout.write(self.style.ERROR('Some posters failed to download:'))
             for work in failed:

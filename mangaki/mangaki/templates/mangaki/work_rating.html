@@ -7,8 +7,8 @@
 <div class="work-card{% if not config and not rating %} no-rating{% endif %}{% if sort_mode == "mosaic" %} work-card_loading{% endif %} work-card_horizontal"
         {% if sort_mode == 'mosaic' %} data-slot-sort="{{ slot_type|lower }}" {% endif %}>
     <div class="work-card__media work-cover{% if not simple %} work-cover_backdrop{% endif %}"
-            style="background-image: url('{% poster_url work %}');">
-        <div class="work-cover__wrapper" data-category="{{ work.category|lower }}">
+            style="background-image: url('{% poster_url work bypass_nsfw_settings %}');">
+        <div class="work-cover__wrapper" data-category="{% if banner %}{{ banner }}{% else %}{{ work.category|lower }}{% endif %}">
             <div class="work-cover__title">
                 <h2 class="work-card__title">{{ work.title|truncatechars:50 }}</h2>
             </div>
@@ -16,7 +16,7 @@
             <div class="work-cover__content">
             <div class="work-card__content">
                 <div class="work-card__synopsis">
-                    {{ work.synopsis|linebreaksbr }}
+                    {{ work.synopsis | safe | linebreaksbr}}
                 </div>
                 <a href="{% if work.id == None %}#{% else %}{% url "work-detail" work.category.slug work.id %}{% endif %}"
                         class="work-card__link">

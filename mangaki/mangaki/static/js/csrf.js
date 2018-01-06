@@ -27,3 +27,15 @@ $.ajaxSetup({
         }
     }
 });
+
+function betterFetch(url, params) {
+  if (csrfSafeMethod(params.method || 'GET')) {
+    return fetch(url, params);
+  } else {
+    return fetch(url, Object.assign({}, {
+      headers: Object.assign({}, {
+        'X-CSRFToken': csrftoken
+      }, params.headers || {})
+    }, params));
+  }
+}
