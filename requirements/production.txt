@@ -3,7 +3,7 @@ django-allauth==0.28
 markdown
 django-bootstrap3==8.2.*
 psycopg2
-numpy
+numpy>=1.13
 beautifulsoup4
 natsort
 django-analytical
@@ -22,4 +22,5 @@ coreapi==2.3.*
 celery==4.0.*
 redis==2.10.*
 Pillow>=4.1
+dedupe==1.7.*
 setuptools-scm==1.15.*
