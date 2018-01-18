@@ -55,17 +55,19 @@ class RecommendationAlgorithm:
         return False
 
     def save(self, filename):
-        with open(self.get_backup_path(filename), 'wb') as f:
-            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
-        self.size = os.path.getsize(self.get_backup_path(filename)) / 1e6
+        if self.is_serializable:
+            with open(self.get_backup_path(filename), 'wb') as f:
+                pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+            self.size = os.path.getsize(self.get_backup_path(filename)) / 1e6
 
     def load(self, filename):
         """
         This function raises FileNotFoundException if no backup exists.
         """
-        with open(self.get_backup_path(filename), 'rb') as f:
-            backup = pickle.load(f)
-        return backup
+        if self.is_serializable:
+            with open(self.get_backup_path(filename), 'rb') as f:
+                backup = pickle.load(f)
+            return backup
 
     def load_tags(self, T=None, perform_scaling=True, with_mean=False):
         side = SideInformation(T, perform_scaling, with_mean)

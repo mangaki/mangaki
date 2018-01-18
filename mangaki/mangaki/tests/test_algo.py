@@ -1,8 +1,12 @@
 import logging
 import numpy as np
+import os
 
 from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm
 from django.test import TestCase
+
+
+SNAPSHOT_DIR_TEST = '/tmp/test_algo'
 
 
 class AlgoTest(TestCase):
@@ -22,6 +26,9 @@ class AlgoTest(TestCase):
         test_work_ids = [1, 0]
         self.X_test = np.column_stack((test_user_ids, test_work_ids))
         self.y_test = self.M[test_user_ids, test_work_ids]
+        if not os.path.exists(SNAPSHOT_DIR_TEST):
+            os.makedirs(SNAPSHOT_DIR_TEST)
+
 
     def test_fit_predict(self):
         for algo_name in RecommendationAlgorithm.list_available_algorithms():
@@ -31,6 +38,11 @@ class AlgoTest(TestCase):
                 algo.nb_tags = self.nb_tags
                 algo.T = self.T
             algo.fit(self.X_train, self.y_train)
+            with self.settings(PICKLE_DIR=SNAPSHOT_DIR_TEST):
+                algo.save(None)
+                algo.load(algo.get_backup_filename())
+                if algo.is_serializable:
+                    os.remove(os.path.join(SNAPSHOT_DIR_TEST, algo.get_backup_filename()))
             y_pred = algo.predict(self.X_test)
             logging.debug('rmse=%.3f algo=%s',
                           algo.compute_rmse(y_pred, self.y_test), algo_name)
