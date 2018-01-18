@@ -47,6 +47,6 @@ class RecoTest(TestCase):
         reco_url = reverse('get-reco-algo-list', args=['als', 'all'])
         with self.settings(PICKLE_DIR=SNAPSHOT_DIR_TEST):
             response = self.client.get(reco_url)
-        self.assertEqual(len(json.loads(response.content)), 3)
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
         os.remove(os.path.join(SNAPSHOT_DIR_TEST, 'als-20.pickle'))
         os.remove(os.path.join(SNAPSHOT_DIR_TEST, 'ratings-als-20.pickle'))
