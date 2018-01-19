@@ -5,7 +5,7 @@ mangaki_source_db_name: '{{ mangaki_db_name }}'
 mangaki_source_db_password: '{{ mangaki_db_password }}'
 mangaki_source_redis_password: '{{ mangaki_redis_password }}'
 mangaki_source_static_root: '{{ mangaki_source_home }}/www/static'
-mangaki_source_data_root: '{{ mangaki_source_home }}/www/data
+mangaki_source_data_root: '{{ mangaki_source_home }}/www/data'
 mangaki_source_domains: ['mangaki.dev', '192.168.33.10']  # VM IP
 
 # vi: ft=yaml
