@@ -2,20 +2,21 @@
 
 [![Dependency Status](https://dependencyci.com/github/mangaki/mangaki/badge)](https://dependencyci.com/github/mangaki/mangaki)
 [![CircleCI](https://circleci.com/gh/mangaki/mangaki.svg?style=svg)](https://circleci.com/gh/mangaki/mangaki)
-[![Codecov](https://img.shields.io/codecov/c/github/mangaki/mangaki.svg)]()
+[![Codecov](https://img.shields.io/codecov/c/github/mangaki/mangaki.svg)](https://codecov.io/gh/mangaki/mangaki/)
 
 Here is Mangaki's installation manual. Welcome!  
 Also available [in French](README-fr.md).
 
 ## Install
 
-### VM install (super simple but requires 4.4 GB)
+### VM install (super simple but requires 6 GB)
 
 Requires [Vagrant](https://www.vagrantup.com/downloads.html).
 
     vagrant up
     vagrant provision  # May be required
-    vagrant ssh  # Will open a tmux that you can detach by pressing Ctrl + b then d
+    vagrant ssh  # Will open a tmux that
+    # You can detach by pressing Ctrl + b then d
 
 And voilà! You can access Mangaki at http://192.168.33.10:8000 (or http://app.mangaki.dev if you have `vagrant-hostupdater`).
 
