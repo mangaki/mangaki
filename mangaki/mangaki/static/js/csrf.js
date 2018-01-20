@@ -32,10 +32,12 @@ function betterFetch(url, params) {
   if (csrfSafeMethod(params.method || 'GET')) {
     return fetch(url, params);
   } else {
+    const userHeaders = params.headers || {};
+    delete params.headers;
     return fetch(url, Object.assign({}, {
       headers: Object.assign({}, {
         'X-CSRFToken': csrftoken
-      }, params.headers || {})
+      }, userHeaders)
     }, params));
   }
 }

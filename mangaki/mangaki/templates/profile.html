@@ -53,14 +53,25 @@
         </div>
         <div class="col-xs-6 col-lg-4">
             {% if meta.is_me and not meta.is_anonymous %}
-                Profil public&nbsp;:
-                <input type="checkbox" name="is_shared" {% if user.profile.is_shared %} checked{% endif %}/>
-                <hr />
-                Afficher visuels pour public averti&nbsp;:
-                <input type="checkbox" name="nsfw_ok" {% if user.profile.nsfw_ok %} checked{% endif %}/>
-                <hr />
-                Recevoir la newsletter&nbsp;:
-                <input type="checkbox" name="newsletter_ok" {% if user.profile.newsletter_ok %} checked{% endif %}/>
+                {% verbatim %}
+                <div id="profile_settings_container">
+                    <bs-light-switch v-model="isShared">
+                        Profil public&nbsp;:
+                    </bs-light-switch>
+                    <hr />
+                    <bs-light-switch v-model="acceptsNSFW">
+                        Afficher visuels pour public averti&nbsp;:
+                    </bs-light-switch>
+                    <hr />
+                    <bs-light-switch v-model="acceptsResearchUsage">
+                        Participer à l'amélioration des algorithmes de Mangaki&nbsp;:
+                    </bs-light-switch>
+                    <hr />
+                    <bs-light-switch v-model="receivesNewsletter">
+                        Recevoir la newsletter&nbsp;:
+                    </bs-light-switch>
+                </div>
+                {% endverbatim %}
                 {% if meta.mal.is_available %}
                     <hr />
                     <div id="mal_container">
@@ -170,35 +181,27 @@
 {% endblock %}
 
 {% block extrajs %}
-    {% if meta.mal.is_available %}
-        {% if meta.debug_vue %}
-            <script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
-        {% else %}
-            <script src="https://unpkg.com/vue@2.5.2/dist/vue.min.js"></script>
-        {% endif %}
-    <script src="/static/js/mal_import.js"></script>
+    {% if meta.debug_vue %}
+        <script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
+    {% else %}
+        <script src="https://unpkg.com/vue@2.5.2/dist/vue.min.js"></script>
     {% endif %}
+    {% if meta.mal.is_available %}
+        <script src="/static/js/mal_import.js"></script>
+    {% endif %}
+    <script src="/static/js/profile_settings.js"></script>
     <script>
-        $("[name='research_ok']").bootstrapSwitch();
-        $("[name='research_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['research'](), {research_ok: state});
-        });
-        $("[name='is_shared']").bootstrapSwitch();
-        $("[name='is_shared']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['shared'](), {is_shared: state});
-        });
-        $("[name='nsfw_ok']").bootstrapSwitch();
-        $("[name='nsfw_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['nsfw'](), {nsfw_ok: state});
-        });
-        $("[name='newsletter_ok']").bootstrapSwitch();
-        $("[name='newsletter_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['newsletter'](), {newsletter_ok: state});
-        });
+        window.INITIAL_DATA = {
+            isShared: {{ user.profile.is_shared|yesno:"true,false" }},
+            acceptsNSFW: {{ user.profile.nsfw_ok|yesno:"true,false" }},
+            acceptsResearchUsage: {{ user.profile.research_ok|yesno:"true,false" }},
+            receivesNewsletter: {{ user.profile.newsletter_ok|yesno:"true,false" }},
+            hasPendingMALImport: {{ meta.mal.pending_import|yesno:"true,false" }}
+        };
 
         {% if meta.mal.is_available %}
             $(document).ready(function () {
-                if ({{meta.mal.pending_import|yesno:"true,false"}}) {
+                if (INITIAL_DATA.hasPendingMALImport) {
                     MALImporterApp.fetchServerSideTaskId()
                         .then(() => {
                             MALImporterApp.showForm = false;
