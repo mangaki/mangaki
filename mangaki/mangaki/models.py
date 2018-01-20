@@ -21,7 +21,7 @@ from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
 from mangaki.utils.ranking import (TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO,
                                    PEARLS_MIN_RATINGS, PEARLS_MAX_RATINGS, PEARLS_MAX_DISLIKE_RATE)
 from mangaki.utils.dpp import MangakiDPP
-from mangaki.utils.ratingsmatrix import RatingsMatrix
+
 
 TOP_POPULAR_WORKS_FOR_SAMPLING = 200
 
