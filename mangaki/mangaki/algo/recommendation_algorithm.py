@@ -55,14 +55,18 @@ class RecommendationAlgorithm:
         return False
 
     def save(self, filename):
+        if not self.is_serializable:
+            raise NotImplementedError
         with open(self.get_backup_path(filename), 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
-        self.size = os.path.getsize(self.get_backup_path(filename)) / 1e6
+        self.size = os.path.getsize(self.get_backup_path(filename))  # In bytes
 
     def load(self, filename):
         """
         This function raises FileNotFoundException if no backup exists.
         """
+        if not self.is_serializable:
+            raise NotImplementedError
         with open(self.get_backup_path(filename), 'rb') as f:
             backup = pickle.load(f)
         return backup
