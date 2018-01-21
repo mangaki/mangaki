@@ -1,0 +1,79 @@
+query ($id: Int, $search: String) {
+  Media(id: $id, search: $search) {
+    id
+    type
+    siteUrl
+    format
+    description
+    synonyms
+    genres
+    isAdult
+    episodes
+    duration
+    chapters
+    status
+    externalLinks {
+      id
+      url
+      site
+    }
+    coverImage {
+      large
+      medium
+    }
+    startDate {
+      year
+      month
+      day
+    }
+    endDate {
+      year
+      month
+      day
+    }
+    season
+    title {
+      romaji
+      english
+      native
+      userPreferred
+    }
+    tags {
+      id
+      name
+      rank
+      isMediaSpoiler
+      isGeneralSpoiler
+    }
+    studios {
+      edges {
+        isMain
+        node {
+          id
+          name
+        }
+      }
+    }
+    staff {
+      edges {
+        role
+        node {
+          id
+          name {
+            first
+            last
+            native
+          }
+        }
+      }
+    }
+    relations {
+      edges {
+        relationType
+        node {
+          id
+        }
+      }
+    }
+  }
+}

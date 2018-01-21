@@ -1,0 +1,4658 @@
+{
+  "data": {
+    "Page": {
+      "pageInfo": {
+        "total": 36,
+        "perPage": 50,
+        "currentPage": 1,
+        "lastPage": 1,
+        "hasNextPage": false
+      },
+      "media": [
+        {
+          "id": 97769,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/97769",
+          "format": "TV",
+          "description": "The second season of Yuuki Yuuna wa Yuusha de Aru.",
+          "synonyms": [],
+          "genres": [
+            "Mahou Shoujo",
+            "Action",
+            "Drama"
+          ],
+          "isAdult": false,
+          "episodes": 6,
+          "duration": 24,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 4524,
+              "url": "https://twitter.com/anime_yukiyuna",
+              "site": "Twitter"
+            },
+            {
+              "id": 4525,
+              "url": "http://yuyuyu.tv/",
+              "site": "Official Site"
+            },
+            {
+              "id": 6194,
+              "url": "https://www.amazon.com/gp/video/detail/B07663FM16",
+              "site": "Amazon"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/97769-XDcHzHyLW5xj.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/97769-XDcHzHyLW5xj.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 11,
+            "day": 25
+          },
+          "endDate": {
+            "year": 2018,
+            "month": 1,
+            "day": 6
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Yuuki Yuuna wa Yuusha De Aru: Yuusha no Shou",
+            "english": "Yuki Yuna Is a Hero: Yuusha no Shou",
+            "native": "結城友奈は勇者である -勇者の章-",
+            "userPreferred": "Yuuki Yuuna wa Yuusha De Aru: Yuusha no Shou"
+          },
+          "tags": [
+            {
+              "id": 29,
+              "name": "Magic",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 99,
+              "name": "Henshin",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 86,
+              "name": "Primarily Female Cast",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 84,
+              "name": "School Club",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 93,
+              "name": "Post Apocalyptic",
+              "rank": 20,
+              "isMediaSpoiler": true,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 418,
+                  "name": "Studio Gokumi"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Chief Director",
+                "node": {
+                  "id": 101909,
+                  "name": {
+                    "first": "Seiji",
+                    "last": "Kishi",
+                    "native": "岸 誠二"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 101929,
+                  "name": {
+                    "first": "Makoto",
+                    "last": "Uezu",
+                    "native": "上江洲誠"
+                  }
+                }
+              },
+              {
+                "role": "Original Character Design",
+                "node": {
+                  "id": 105742,
+                  "name": {
+                    "first": "",
+                    "last": "BUNBUN",
+                    "native": " ぶんぶん"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 123200,
+                  "name": {
+                    "first": "Daisei",
+                    "last": "Fukuoka",
+                    "native": "福岡大生"
+                  }
+                }
+              },
+              {
+                "role": "Music",
+                "node": {
+                  "id": 121585,
+                  "name": {
+                    "first": "Keiichi",
+                    "last": "Okabe",
+                    "native": "啓一 岡部"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 20800
+                }
+              },
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 86521
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 97940,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/97940",
+          "format": "TV",
+          "description": "Asta is a young boy who dreams of becoming the greatest mage in the kingdom. Only one problem – he can't use any magic! Luckily for Asta, he receives the incredibly rare five-leaf clover grimoire that gives him the power of anti-magic. Can someone who can't use magic really become the Wizard King? One thing's for sure – Asta will never give up!<br><br>\n\n(Source: VIZ Media)",
+          "synonyms": [],
+          "genres": [
+            "Action"
+          ],
+          "isAdult": false,
+          "episodes": 51,
+          "duration": 24,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5402,
+              "url": "http://bclover.jp/",
+              "site": "Official Site"
+            },
+            {
+              "id": 5403,
+              "url": "https://twitter.com/bclover_PR",
+              "site": "Twitter"
+            },
+            {
+              "id": 6168,
+              "url": "http://www.crunchyroll.com/black-clover",
+              "site": "Crunchyroll"
+            },
+            {
+              "id": 6378,
+              "url": "https://www.funimation.com/shows/black-clover/",
+              "site": "Funimation"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/97940-cmgkiM9APwu6.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/97940-cmgkiM9APwu6.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 3
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Black Clover",
+            "english": null,
+            "native": "ブラッククローバー",
+            "userPreferred": "Black Clover"
+          },
+          "tags": [
+            {
+              "id": 56,
+              "name": "Shounen",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 29,
+              "name": "Magic",
+              "rank": 66,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 1,
+                  "name": "Studio Pierrot"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 110063,
+                  "name": {
+                    "first": "Yuuki",
+                    "last": "Tabata",
+                    "native": "裕基 田畠"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 112047,
+                  "name": {
+                    "first": "Tatsuya",
+                    "last": "Yoshihara",
+                    "native": "吉原 達矢"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 110641,
+                  "name": {
+                    "first": "Kazuyuki",
+                    "last": "Fudeyasu",
+                    "native": "筆安一幸"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 102166,
+                  "name": {
+                    "first": "Itsuko",
+                    "last": "Takeda",
+                    "native": "逸子 竹田"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "OTHER",
+                "node": {
+                  "id": 87528
+                }
+              },
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 86123
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98310,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98310",
+          "format": "TV",
+          "description": "Based on the Idom@ster SideM app.<br>\n<br>\n<i>Includes episode 0.</i>",
+          "synonyms": [
+            "The Idolmaster Side M"
+          ],
+          "genres": [
+            "Music"
+          ],
+          "isAdult": false,
+          "episodes": 14,
+          "duration": 0,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 4927,
+              "url": "http://side-m.idolmaster-anime.jp/",
+              "site": "Official Site"
+            },
+            {
+              "id": 4928,
+              "url": "https://twitter.com/imas_anime",
+              "site": "Twitter"
+            },
+            {
+              "id": 6141,
+              "url": "http://www.crunchyroll.com/the-idolmster-side-m",
+              "site": "Crunchyroll"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98310-SNLr1yn60wS1.png",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98310-SNLr1yn60wS1.png"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 9,
+            "day": 30
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "The Idolm@ster Sidem",
+            "english": "The Idolm@ster Side M",
+            "native": "アイドルマスター Sidem",
+            "userPreferred": "The Idolm@ster Sidem"
+          },
+          "tags": [
+            {
+              "id": 115,
+              "name": "Idol",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 88,
+              "name": "Primarily Male Cast",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 561,
+                  "name": "A-1 Pictures"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ALTERNATIVE",
+                "node": {
+                  "id": 10278
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98349,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98349",
+          "format": "TV",
+          "description": "The second season of Love Live Sunshine!!",
+          "synonyms": [],
+          "genres": [
+            "Music",
+            "Slice of Life"
+          ],
+          "isAdult": false,
+          "episodes": 13,
+          "duration": 24,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 4961,
+              "url": "http://www.lovelive-anime.jp/uranohoshi/",
+              "site": "Official Site"
+            },
+            {
+              "id": 4962,
+              "url": "https://twitter.com/LoveLive_staff",
+              "site": "Twitter"
+            },
+            {
+              "id": 6175,
+              "url": "http://www.crunchyroll.com/love-live-sunshine",
+              "site": "Crunchyroll"
+            },
+            {
+              "id": 6384,
+              "url": "https://www.funimation.com/shows/love-live-sunshine/",
+              "site": "Funimation"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98349-kj4hp8iNSzLr.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98349-kj4hp8iNSzLr.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 7
+          },
+          "endDate": {
+            "year": 2017,
+            "month": 12,
+            "day": 30
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Love Live! Sunshine!! 2",
+            "english": null,
+            "native": "ラブライブ！サンシャイン!! 2",
+            "userPreferred": "Love Live! Sunshine!! 2"
+          },
+          "tags": [
+            {
+              "id": 86,
+              "name": "Primarily Female Cast",
+              "rank": 80,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 115,
+              "name": "Idol",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 14,
+                  "name": "Sunrise"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Story",
+                "node": {
+                  "id": 97197,
+                  "name": {
+                    "first": "Hajime",
+                    "last": "Yatate",
+                    "native": "肇 矢立"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 119895,
+                  "name": {
+                    "first": "Kazuo",
+                    "last": "Sakai",
+                    "native": "和男 酒井"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 107198,
+                  "name": {
+                    "first": "Jukki",
+                    "last": "Hanada",
+                    "native": "十輝 花田"
+                  }
+                }
+              },
+              {
+                "role": "Music",
+                "node": {
+                  "id": 108115,
+                  "name": {
+                    "first": "Tatsuya",
+                    "last": "Kato",
+                    "native": "加藤 達也"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 118986,
+                  "name": {
+                    "first": "Yuuhei",
+                    "last": "Murota",
+                    "native": "室田 雄平"
+                  }
+                }
+              },
+              {
+                "role": "Art Director",
+                "node": {
+                  "id": 119687,
+                  "name": {
+                    "first": "Junichi",
+                    "last": "Higashi",
+                    "native": "潤一東"
+                  }
+                }
+              },
+              {
+                "role": "Sound Director",
+                "node": {
+                  "id": 119896,
+                  "name": {
+                    "first": "Yukio",
+                    "last": "Nagasaki",
+                    "native": "長崎行男"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 21584
+                }
+              },
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 97385
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98436,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98436",
+          "format": "TV",
+          "description": "Chise Hatori has lived a life full of neglect and abuse, devoid of anything resembling love. Far from the warmth of family, she has had her share of troubles and pitfalls. Just when all hope seems lost, a fateful encounter awaits her. When a man with the head of a beast, wielding strange powers, obtains her through a slave auction, Chise's life will never be the same again.<br><br>\n\n(Source: Seven Seas)",
+          "synonyms": [
+            "Mahou Tsukai no Yome"
+          ],
+          "genres": [
+            "Fantasy"
+          ],
+          "isAdult": false,
+          "episodes": 24,
+          "duration": 25,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 4998,
+              "url": "http://mahoyome.jp/",
+              "site": "Official Site"
+            },
+            {
+              "id": 5489,
+              "url": "https://twitter.com/mahoyomeproject",
+              "site": "Twitter"
+            },
+            {
+              "id": 6174,
+              "url": "http://www.crunchyroll.com/the-ancient-magus-bride",
+              "site": "Crunchyroll"
+            },
+            {
+              "id": 6217,
+              "url": "https://www.youtube.com/channel/UCulneJtjMARpEHhWQTlGa6w",
+              "site": "Youtube"
+            },
+            {
+              "id": 6379,
+              "url": "https://www.funimation.com/shows/the-ancient-magus-bride/",
+              "site": "Funimation"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98436-UMxpGC5mcqHy.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98436-UMxpGC5mcqHy.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 8
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Mahoutsukai no Yome",
+            "english": "The Ancient Magus' Bride",
+            "native": "魔法使いの嫁",
+            "userPreferred": "Mahoutsukai no Yome"
+          },
+          "tags": [
+            {
+              "id": 29,
+              "name": "Magic",
+              "rank": 82,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 98,
+              "name": "Female Protagonist",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 321,
+              "name": "Urban Fantasy",
+              "rank": 70,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 109,
+              "name": "Primarily Adult Cast",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 138,
+              "name": "Age Gap",
+              "rank": 50,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": true
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 858,
+                  "name": "Wit Studio"
+                }
+              },
+              {
+                "isMain": false,
+                "node": {
+                  "id": 10,
+                  "name": "Production I.G"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 118727,
+                  "name": {
+                    "first": "Kore",
+                    "last": "Yamazaki",
+                    "native": "ヤマザキコレ"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 118406,
+                  "name": {
+                    "first": "Norihiro",
+                    "last": "Naganuma",
+                    "native": "長沼 範裕"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 118406,
+                  "name": {
+                    "first": "Norihiro",
+                    "last": "Naganuma",
+                    "native": "長沼 範裕"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 119175,
+                  "name": {
+                    "first": "Aya",
+                    "last": "Takaha",
+                    "native": "高羽 彩"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 118405,
+                  "name": {
+                    "first": "Hirotaka",
+                    "last": "Katou",
+                    "native": "加藤 寛崇"
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (OP 1)",
+                "node": {
+                  "id": 123119,
+                  "name": {
+                    "first": "",
+                    "last": "JUNNA",
+                    "native": "ジュンナ"
+                  }
+                }
+              },
+              {
+                "role": "Music",
+                "node": {
+                  "id": 123239,
+                  "name": {
+                    "first": "Junichi",
+                    "last": "Matsumoto",
+                    "native": "マツモトジュンイチ"
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (OP 2)",
+                "node": {
+                  "id": 101731,
+                  "name": {
+                    "first": "",
+                    "last": "May'n",
+                    "native": "芽依 中林"
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (ED 2)",
+                "node": {
+                  "id": 109335,
+                  "name": {
+                    "first": "",
+                    "last": "Akino",
+                    "native": "アキノ "
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 21688
+                }
+              },
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 85435
+                }
+              },
+              {
+                "relationType": "SIDE_STORY",
+                "node": {
+                  "id": 100256
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98438,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98438",
+          "format": "TV",
+          "description": "The second season of Hoozuki no Reitetsu.",
+          "synonyms": [
+            "Hozuki no Reitetsu",
+            "Cool-headed Hoozuki 2"
+          ],
+          "genres": [
+            "Comedy",
+            "Fantasy",
+            "Supernatural"
+          ],
+          "isAdult": false,
+          "episodes": 13,
+          "duration": 23,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5008,
+              "url": "http://www.hozukino-reitetsu.com/",
+              "site": "Official Site"
+            },
+            {
+              "id": 5009,
+              "url": "https://twitter.com/hozuki_anime",
+              "site": "Twitter"
+            },
+            {
+              "id": 6208,
+              "url": "https://www.hidive.com/tv/hozukis-coolheadedness-2",
+              "site": "Official Site"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98438-DdWr6KxfD5v4.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98438-DdWr6KxfD5v4.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 7
+          },
+          "endDate": {
+            "year": 2017,
+            "month": 12,
+            "day": 31
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Hoozuki no Reitetsu 2",
+            "english": "Hozuki’s Coolheadedness 2",
+            "native": "鬼灯の冷徹 2",
+            "userPreferred": "Hoozuki no Reitetsu 2"
+          },
+          "tags": [],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 37,
+                  "name": "Studio DEEN"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 111505,
+                  "name": {
+                    "first": "Natsumi",
+                    "last": "Eguchi",
+                    "native": "江口夏実"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 118785,
+                  "name": {
+                    "first": "Kazuhiro",
+                    "last": "Yoneda",
+                    "native": "米田和弘"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 118404,
+                  "name": {
+                    "first": "Midori",
+                    "last": "Gotou",
+                    "native": "後藤みどり"
+                  }
+                }
+              },
+              {
+                "role": "Music",
+                "node": {
+                  "id": 112505,
+                  "name": {
+                    "first": "Tomisiro",
+                    "last": "",
+                    "native": " "
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 66113
+                }
+              },
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 20431
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98478,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98478",
+          "format": "TV",
+          "description": "The second season of 3-gatsu no Lion.",
+          "synonyms": [
+            "Sangatsu no Lion 2"
+          ],
+          "genres": [
+            "Drama",
+            "Slice of Life"
+          ],
+          "isAdult": false,
+          "episodes": 22,
+          "duration": 25,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5031,
+              "url": "http://3lion-anime.com/",
+              "site": "Official Site"
+            },
+            {
+              "id": 5032,
+              "url": "https://twitter.com/3lion_anime",
+              "site": "Twitter"
+            },
+            {
+              "id": 6274,
+              "url": "http://www.crunchyroll.com/march-comes-in-like-a-lion",
+              "site": "Crunchyroll"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98478-jK91Uw1gq5Nr.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98478-jK91Uw1gq5Nr.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 14
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "3-gatsu no Lion 2",
+            "english": "March Comes In Like a Lion 2",
+            "native": "３月のライオン 2",
+            "userPreferred": "3-gatsu no Lion 2"
+          },
+          "tags": [
+            {
+              "id": 102,
+              "name": "Coming of Age",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 121,
+              "name": "Shogi",
+              "rank": 72,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 50,
+              "name": "Seinen",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 87,
+              "name": "Family Life",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 171,
+              "name": "Bullying",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 44,
+                  "name": "Shaft"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 97891,
+                  "name": {
+                    "first": "Chika",
+                    "last": "Umino",
+                    "native": "チカ 羽海野"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 100089,
+                  "name": {
+                    "first": "Akiyuki",
+                    "last": "Shinbou",
+                    "native": "昭之 新房"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 105083,
+                  "name": {
+                    "first": "Nobuhiro",
+                    "last": "Sugiyama",
+                    "native": "延寛 杉山"
+                  }
+                }
+              },
+              {
+                "role": "Music",
+                "node": {
+                  "id": 105082,
+                  "name": {
+                    "first": "Yukari",
+                    "last": "Hashimoto",
+                    "native": "橋本由香利"
+                  }
+                }
+              },
+              {
+                "role": "Art Director",
+                "node": {
+                  "id": 102499,
+                  "name": {
+                    "first": "Seiki",
+                    "last": "Tamura",
+                    "native": "せいき 田村"
+                  }
+                }
+              },
+              {
+                "role": "Sound Director",
+                "node": {
+                  "id": 103834,
+                  "name": {
+                    "first": "Toshiki",
+                    "last": "Kameyama",
+                    "native": "俊樹 亀山"
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (ED)",
+                "node": {
+                  "id": 120121,
+                  "name": {
+                    "first": "",
+                    "last": "Brian the Sun",
+                    "native": "ブライアン・ザ・サン "
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (OP 1)",
+                "node": {
+                  "id": 111315,
+                  "name": {
+                    "first": "",
+                    "last": "Yuki",
+                    "native": " "
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (OP 2)",
+                "node": {
+                  "id": 119406,
+                  "name": {
+                    "first": "Unison Square Garden",
+                    "last": null,
+                    "native": " "
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 31224
+                }
+              },
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 21366
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98521,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98521",
+          "format": "TV",
+          "description": "The second season of Time Bokan 24.",
+          "synonyms": [
+            "Time Bokan: Three Bad Guys' Counterattack",
+            "Time Bokan 24 2nd Season"
+          ],
+          "genres": [
+            "Action",
+            "Comedy",
+            "Sci-Fi",
+            "Mecha",
+            "Adventure"
+          ],
+          "isAdult": false,
+          "episodes": null,
+          "duration": null,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5078,
+              "url": "http://www.ytv.co.jp/timebokan24/",
+              "site": "Official Site"
+            },
+            {
+              "id": 5080,
+              "url": "https://twitter.com/timebokan_24",
+              "site": "Twitter"
+            },
+            {
+              "id": 6202,
+              "url": "http://www.crunchyroll.com/time-bokan-24",
+              "site": "Crunchyroll"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98521-ZiASx57aPD1I.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98521-ZiASx57aPD1I.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 7
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Time Bokan: Gyakushuu no San-akunin",
+            "english": "Time Bokan: The Villains' Strike Back",
+            "native": "タイムボカン 逆襲の三悪人",
+            "userPreferred": "Time Bokan: Gyakushuu no San-akunin"
+          },
+          "tags": [
+            {
+              "id": 28,
+              "name": "Kids",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 25,
+              "name": "Historical",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 140,
+              "name": "Educational",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 103,
+                  "name": "Tatsunoko Productions"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 21755
+                }
+              },
+              {
+                "relationType": "PARENT",
+                "node": {
+                  "id": 3915
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98546,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98546",
+          "format": "TV",
+          "description": "The second season of ClassicaLoid.",
+          "synonyms": [],
+          "genres": [
+            "Music"
+          ],
+          "isAdult": false,
+          "episodes": null,
+          "duration": 24,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5105,
+              "url": "http://www.classicaloid.net/",
+              "site": "Official Site"
+            },
+            {
+              "id": 5106,
+              "url": "https://twitter.com/Classica_BNP",
+              "site": "Twitter"
+            },
+            {
+              "id": 6210,
+              "url": "https://www.hidive.com/tv/classicaloid-2",
+              "site": "Official Site"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98546-fWGDzIOF5G67.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98546-fWGDzIOF5G67.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 7
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Classicaloid 2",
+            "english": null,
+            "native": "クラシカロイド 2",
+            "userPreferred": "Classicaloid 2"
+          },
+          "tags": [],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 14,
+                  "name": "Sunrise"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Director",
+                "node": {
+                  "id": 122552,
+                  "name": {
+                    "first": "Kei",
+                    "last": "Umahiki",
+                    "native": "馬引 圭"
+                  }
+                }
+              },
+              {
+                "role": "Supervisor",
+                "node": {
+                  "id": 107437,
+                  "name": {
+                    "first": "Yoichi",
+                    "last": "Fujita",
+                    "native": "藤田 陽一"
+                  }
+                }
+              },
+              {
+                "role": "Original Character Design",
+                "node": {
+                  "id": 122553,
+                  "name": {
+                    "first": "Makoto",
+                    "last": "Tsuchibayashi",
+                    "native": "土林 誠"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 122554,
+                  "name": {
+                    "first": "Seiichi",
+                    "last": "Hashimoto",
+                    "native": "橋本 誠一"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 106414,
+                  "name": {
+                    "first": "Miya",
+                    "last": "Asakawa",
+                    "native": "美也 浅川"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 122555,
+                  "name": {
+                    "first": "Tsutomu",
+                    "last": "Kamishiro",
+                    "native": "上代 務"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 122556,
+                  "name": {
+                    "first": "Tsuyoshi",
+                    "last": "Kida",
+                    "native": "きだ つよし"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 122557,
+                  "name": {
+                    "first": "Kyo",
+                    "last": "Kogure",
+                    "native": "こぐれ 京"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 119544,
+                  "name": {
+                    "first": "Yuka",
+                    "last": "Yamada",
+                    "native": "由香 山田"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 122558,
+                  "name": {
+                    "first": "Shuichi",
+                    "last": "Kamiyama",
+                    "native": "神山 修一"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 21250
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98565,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98565",
+          "format": "TV",
+          "description": "The second season of Osomatsu-san.",
+          "synonyms": [],
+          "genres": [
+            "Comedy",
+            "Slice of Life"
+          ],
+          "isAdult": false,
+          "episodes": 25,
+          "duration": 25,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5140,
+              "url": "http://www.osomatsusan.com/",
+              "site": "Official Site"
+            },
+            {
+              "id": 5141,
+              "url": "https://twitter.com/osomatsu_PR",
+              "site": "Twitter"
+            },
+            {
+              "id": 6169,
+              "url": "http://www.crunchyroll.com/mr-osomatsu",
+              "site": "Crunchyroll"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98565-w7tCiS4bnjt8.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98565-w7tCiS4bnjt8.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 3
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Osomatsu-san 2",
+            "english": "Mr. Osomatsu 2",
+            "native": "おそ松さん 2",
+            "userPreferred": "Osomatsu-san 2"
+          },
+          "tags": [
+            {
+              "id": 83,
+              "name": "Slapstick",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 39,
+              "name": "Parody",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 109,
+              "name": "Primarily Adult Cast",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 1,
+                  "name": "Studio Pierrot"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 97141,
+                  "name": {
+                    "first": "Fujio",
+                    "last": "Akatsuka",
+                    "native": "藤雄 赤塚"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 107437,
+                  "name": {
+                    "first": "Yoichi",
+                    "last": "Fujita",
+                    "native": "藤田 陽一"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 119479,
+                  "name": {
+                    "first": "Shuu",
+                    "last": "Matsubara",
+                    "native": " "
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 21261
+                }
+              },
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 87010
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98657,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98657",
+          "format": "TV_SHORT",
+          "description": "The \"slightly sweet tipsy couple comedy\" manga centers on the 28-year-old senior public relations company staff member Chisato Mizusawa. The story follows Chisato's daily life as she enjoys her husband Sora's cocktails. Chisato has secrets that only her husband knows.<br>\n<br>\n(Source: ANN)",
+          "synonyms": [
+            "Osake wa Fuufu ni Nattekara",
+            "Alcohol is for married couples",
+            "Osakefufu"
+          ],
+          "genres": [
+            "Comedy",
+            "Romance",
+            "Slice of Life"
+          ],
+          "isAdult": false,
+          "episodes": 13,
+          "duration": 3,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 6299,
+              "url": "http://www.osakefufu-anime.jp/",
+              "site": "Official Site"
+            },
+            {
+              "id": 6300,
+              "url": "https://twitter.com/osakefufu",
+              "site": "Twitter"
+            },
+            {
+              "id": 6301,
+              "url": "http://www.crunchyroll.com/love-is-like-a-cocktail",
+              "site": "Crunchyroll"
+            },
+            {
+              "id": 6302,
+              "url": "https://www.youtube.com/channel/UCazjJ6udlwl6cP_om1zqTQQ",
+              "site": "Youtube"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98657-P9OayeslJ79r.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98657-P9OayeslJ79r.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 4
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Osake wa Fuufu Ni Natte Kara",
+            "english": "Love Is Like a Cocktail",
+            "native": "お酒は夫婦になってから",
+            "userPreferred": "Osake wa Fuufu Ni Natte Kara"
+          },
+          "tags": [
+            {
+              "id": 50,
+              "name": "Seinen",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6072,
+                  "name": "Creators in Pack TOKYO"
+                }
+              },
+              {
+                "isMain": false,
+                "node": {
+                  "id": 6187,
+                  "name": "xenron"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 101029,
+                  "name": {
+                    "first": "Crystal na Yousuke",
+                    "last": "",
+                    "native": "クリスタルな洋介"
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (OP)",
+                "node": {
+                  "id": 123925,
+                  "name": {
+                    "first": "Cellchrome",
+                    "last": "",
+                    "native": null
+                  }
+                }
+              },
+              {
+                "role": "Chief Director",
+                "node": {
+                  "id": 120296,
+                  "name": {
+                    "first": "Hisayoshi",
+                    "last": "Hirasawa",
+                    "native": "ひらさわひさよし"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 123931,
+                  "name": {
+                    "first": "Saori",
+                    "last": "Tachibana",
+                    "native": "橘さおり"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 123932,
+                  "name": {
+                    "first": "WORDS",
+                    "last": "in STEREO",
+                    "native": null
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 123933,
+                  "name": {
+                    "first": "Yuzuko",
+                    "last": "Hanai",
+                    "native": "花井柚都子"
+                  }
+                }
+              },
+              {
+                "role": "Director of Photography",
+                "node": {
+                  "id": 123934,
+                  "name": {
+                    "first": "Kouji",
+                    "last": "Hayashi",
+                    "native": "林幸司"
+                  }
+                }
+              },
+              {
+                "role": "Animation Producer",
+                "node": {
+                  "id": 123935,
+                  "name": {
+                    "first": "Taichi",
+                    "last": "Hatanaka",
+                    "native": null
+                  }
+                }
+              },
+              {
+                "role": "Color Design",
+                "node": {
+                  "id": 123936,
+                  "name": {
+                    "first": "Miki",
+                    "last": "Sorakubo",
+                    "native": "空久保美貴"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 98831
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 98820,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98820",
+          "format": "TV",
+          "description": "The original anime Just Because! focuses on subtly portraying the feelings of a group of high school students nearing graduation. Near the end of second semester at third year, when students have very little time in high school left, and are just waiting for graduation, the appearance of a new transfer student begins to change what remains of their high school lives just as they were about to graduate.<br><br>\n\n(Source: ANN)",
+          "synonyms": [],
+          "genres": [
+            "Romance",
+            "Slice of Life",
+            "Drama"
+          ],
+          "isAdult": false,
+          "episodes": 12,
+          "duration": 24,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5377,
+              "url": "http://justbecause.jp/",
+              "site": "Official Site"
+            },
+            {
+              "id": 5378,
+              "url": "https://twitter.com/JustBecause_JP",
+              "site": "Twitter"
+            },
+            {
+              "id": 6181,
+              "url": "https://www.amazon.com/dp/B0765NVW1L/",
+              "site": "Amazon"
+            },
+            {
+              "id": 6393,
+              "url": "https://www.hidive.com/tv/just-because",
+              "site": "Official Site"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98820-uz3n6YW1OXYU.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98820-uz3n6YW1OXYU.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 5
+          },
+          "endDate": {
+            "year": 2017,
+            "month": 12,
+            "day": 28
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Just Because!",
+            "english": null,
+            "native": "Just Because！",
+            "userPreferred": "Just Because!"
+          },
+          "tags": [
+            {
+              "id": 46,
+              "name": "School",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6103,
+                  "name": "PINE JAM"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Director",
+                "node": {
+                  "id": 121739,
+                  "name": {
+                    "first": "Atsushi",
+                    "last": "Kobayashi",
+                    "native": "小林敦"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 109013,
+                  "name": {
+                    "first": "Hajime",
+                    "last": "Kamoshida",
+                    "native": "鴨志田一"
+                  }
+                }
+              },
+              {
+                "role": "Original Character Design",
+                "node": {
+                  "id": 117709,
+                  "name": {
+                    "first": "Kiseki",
+                    "last": "Himura",
+                    "native": "比村奇石"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 121740,
+                  "name": {
+                    "first": "Hiroyuki",
+                    "last": "Yoshii",
+                    "native": "吉井弘幸"
+                  }
+                }
+              },
+              {
+                "role": "Producer",
+                "node": {
+                  "id": 122959,
+                  "name": {
+                    "first": "Keisuke",
+                    "last": "Fukunaga",
+                    "native": "福永佳祐"
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (OP)",
+                "node": {
+                  "id": 109637,
+                  "name": {
+                    "first": "Nagi",
+                    "last": "Yanagi",
+                    "native": "やなぎなぎ"
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (ED)",
+                "node": {
+                  "id": 122965,
+                  "name": {
+                    "first": "Carin",
+                    "last": "Isobe",
+                    "native": "礒部花凜"
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (ED)",
+                "node": {
+                  "id": 118806,
+                  "name": {
+                    "first": "Lynn",
+                    "last": "",
+                    "native": "りん "
+                  }
+                }
+              },
+              {
+                "role": "Theme Song Performance (ED)",
+                "node": {
+                  "id": 108647,
+                  "name": {
+                    "first": "Rina",
+                    "last": "Dendou",
+                    "native": "里奈 田頭"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 98977,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/98977",
+          "format": "TV",
+          "description": "Adolescent romance takes another twist with the announcement of a TV anime adaptation based on the Kokuhaku Jikkou Iinkai (\"Confess Your Love Committee\") series of Vocaloid songs by HoneyWorks.\n<br><br>\n(Source: ANN)",
+          "synonyms": [],
+          "genres": [
+            "Comedy",
+            "Drama",
+            "Romance",
+            "Slice of Life"
+          ],
+          "isAdult": false,
+          "episodes": 6,
+          "duration": 24,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 6204,
+              "url": "http://www.honeyworks-movie.jp/",
+              "site": "Official Site"
+            },
+            {
+              "id": 6205,
+              "url": "https://twitter.com/HoneyWorksMovie",
+              "site": "Twitter"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/98977-W4BbBmRwdqGY.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/98977-W4BbBmRwdqGY.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 11,
+            "day": 25
+          },
+          "endDate": {
+            "year": 2017,
+            "month": 12,
+            "day": 30
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Itsudatte Bokura no Koi wa 10cm Datta",
+            "english": "Our Love Has Always Been 10 Centimeters Apart.",
+            "native": "いつだって僕らの恋は10センチだった",
+            "userPreferred": "Itsudatte Bokura no Koi wa 10cm Datta"
+          },
+          "tags": [],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6075,
+                  "name": "Lay-duce"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Chief Director",
+                "node": {
+                  "id": 106268,
+                  "name": {
+                    "first": "Hitoshi",
+                    "last": "Nanba",
+                    "native": "難波日登志"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 118545,
+                  "name": {
+                    "first": "Yoshimi",
+                    "last": "Narita",
+                    "native": "成田良美"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 101081,
+                  "name": {
+                    "first": "Maki",
+                    "last": "Fujii",
+                    "native": "まき 藤井"
+                  }
+                }
+              },
+              {
+                "role": "Sound Director",
+                "node": {
+                  "id": 119896,
+                  "name": {
+                    "first": "Yukio",
+                    "last": "Nagasaki",
+                    "native": "長崎行男"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 123202,
+                  "name": {
+                    "first": "Kentaro",
+                    "last": "Tokiwa",
+                    "native": "常盤健太郎"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ALTERNATIVE",
+                "node": {
+                  "id": 21296
+                }
+              },
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 87036
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 99441,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99441",
+          "format": "OVA",
+          "description": "Minato’s last blood-relative, his grandmother, passed away and now he is all alone in this world. He thinks about how he was blessed to have family, but dryly laughs about how he’ll need to take care of himself now.<br>\n<br>\nHowever, during the funeral of his grandmother, someone named Kazari approaches him and offers to admit him into a prestigious school, in addition to providing him a place to reside. Minato immediately and thankfully takes up on this offer, but soon realizes that the Suzu Academy is an all-girl’s school, and the \"ojou-sama\" that he’ll be residing with has flaws of their own which really shattered his expectation for a high-class lady.<br>\n<br>\n(Source VN Eroge Review)",
+          "synonyms": [],
+          "genres": [
+            "Hentai",
+            "Romance"
+          ],
+          "isAdult": true,
+          "episodes": null,
+          "duration": 27,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99441-lF52MmaqMWIC.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99441-lF52MmaqMWIC.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 9,
+            "day": 29
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Otome*domain The Animation",
+            "english": null,
+            "native": "オトメ＊ドメイン The Animation",
+            "userPreferred": "Otome*domain The Animation"
+          },
+          "tags": [
+            {
+              "id": 125,
+              "name": "Nakadashi",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 281,
+              "name": "Surreal Comedy",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 77,
+              "name": "Gender Bending",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 46,
+              "name": "School",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 129,
+              "name": "Virgin",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 137,
+              "name": "Large Breasts",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": []
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 99634,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99634",
+          "format": "OVA",
+          "description": "A three-part OVA adapting the \"Shingeki no Kyojin: Lost Girls\" spinoff novel that will be bundled with the 24th, 25th and 26th limited edition volumes of the manga.",
+          "synonyms": [
+            "Epispde 16.5A: Wall Sina",
+            " Goodbye"
+          ],
+          "genres": [
+            "Action",
+            "Drama",
+            "Fantasy",
+            "Mystery"
+          ],
+          "isAdult": false,
+          "episodes": 3,
+          "duration": 25,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5869,
+              "url": "http://shingeki.tv/season2/",
+              "site": "Official Site"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99634-W1WHgCw8wgmN.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99634-W1WHgCw8wgmN.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 12,
+            "day": 8
+          },
+          "endDate": {
+            "year": 2018,
+            "month": 8,
+            "day": 9
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Shingeki no Kyojin: Lost Girls",
+            "english": "Attack on Titan: Lost Girls",
+            "native": "進撃の巨人 Lost Girls",
+            "userPreferred": "Shingeki no Kyojin: Lost Girls"
+          },
+          "tags": [],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 858,
+                  "name": "Wit Studio"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 106705,
+                  "name": {
+                    "first": "Hajime",
+                    "last": "Isayama",
+                    "native": "諫山創"
+                  }
+                }
+              },
+              {
+                "role": "Original Story",
+                "node": {
+                  "id": 99012,
+                  "name": {
+                    "first": "Hiroshi",
+                    "last": "Seko",
+                    "native": "瀬古浩司"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 118905,
+                  "name": {
+                    "first": "Masashi",
+                    "last": "Koizuka",
+                    "native": "肥塚正史"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 99012,
+                  "name": {
+                    "first": "Hiroshi",
+                    "last": "Seko",
+                    "native": "瀬古浩司"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 113599,
+                  "name": {
+                    "first": "Kyouji",
+                    "last": "Asano",
+                    "native": "浅野恭司"
+                  }
+                }
+              },
+              {
+                "role": "Music",
+                "node": {
+                  "id": 103509,
+                  "name": {
+                    "first": "Hiroyuki",
+                    "last": "Sawano",
+                    "native": "澤野弘之"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 93313
+                }
+              },
+              {
+                "relationType": "PARENT",
+                "node": {
+                  "id": 16498
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 99685,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99685",
+          "format": "OVA",
+          "description": "Based on the adult game ALICESOFT.<br>\n<br>\nKinosaki Mao lost his mother since middle school, and living with just his father Hajime.\nBut his father too, suddenly left him at the same time he's enrolled in university.\nLeaving only a note that told Mao to not worry about him.<br>\n<br>\nThen 4 years passed, near the end of Mao's graduation, He's still not able to get over his mother's death, and developed Gynophobia disorder as a result.<br>\n<br>\nAnd then one day.\nHis father Hajime came back home bringing his new wife.\nHis new wife Arima Shiori, even more than her beauty, her character too is impeccable, she was an ideal mother indeed.\nBewildered Mao, began to live a sudden life together with a new mother.\nShiori is wrapping Mao with her cheerfulness and kindness.<br>\n<br>\nWhile coming in contact with her, Mao is gradually attracted to her as a woman rather than as a mother.\nThe action Shiori takes after becoming aware of that, is......<br>\n<br>\n(Source: Visual Novel Database)",
+          "synonyms": [],
+          "genres": [
+            "Hentai"
+          ],
+          "isAdult": true,
+          "episodes": null,
+          "duration": 30,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99685-5Gg1xudfM5wV.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99685-5Gg1xudfM5wV.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 27
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Heartful Maman The Animation",
+            "english": null,
+            "native": "は～とふるママン The Animation",
+            "userPreferred": "Heartful Maman The Animation"
+          },
+          "tags": [
+            {
+              "id": 137,
+              "name": "Large Breasts",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 316,
+              "name": "Netori",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 134,
+              "name": "Fellatio",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 126,
+              "name": "Paizuri",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 317,
+              "name": "Tekoki",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 130,
+              "name": "Facial",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 135,
+              "name": "Cunnilingus",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 125,
+              "name": "Nakadashi",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 45,
+                  "name": "Pink Pineapple"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Director",
+                "node": {
+                  "id": 115594,
+                  "name": {
+                    "first": "Naomi",
+                    "last": "Hayakawa",
+                    "native": "ナオミ 早川"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 99733,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99733",
+          "format": "TV",
+          "description": "Fifth season of Cardfight!! Vanguard G series.",
+          "synonyms": [],
+          "genres": [
+            "Action"
+          ],
+          "isAdult": false,
+          "episodes": null,
+          "duration": null,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99733-T3EJUGZlijXp.png",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99733-T3EJUGZlijXp.png"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 8
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Cardfight!! Vanguard G: Z",
+            "english": "Cardfight!! Vanguard G: Z",
+            "native": "カードファイト!! ヴァンガードg Z",
+            "userPreferred": "Cardfight!! Vanguard G: Z"
+          },
+          "tags": [
+            {
+              "id": 178,
+              "name": "Card Battle",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": []
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 99887,
+                  "name": {
+                    "first": "Akira",
+                    "last": "Itou",
+                    "native": "彰 伊藤"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 87476
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 99796,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99796",
+          "format": "TV",
+          "description": "The anime's story is set in a prosperous city named Russell City. Even as the city celebrates its success, a conspiracy that threatens to shake its world has been set in motion. A man named Sword is the first to hear the earliest stirrings of the plot, and throws himself into a shadow war in order to expose it. His only clue is the keyword \"El Dorado.\" He meets Sophie, a woman searching for her older brother who left her with only a message with the same word: \"El Dorado.\" With Sword having also lost his younger sister in the past, both are drawn together by the word, and work together to find out its meaning.<br><br>\n\n(Source: ANN)",
+          "synonyms": [],
+          "genres": [
+            "Action",
+            "Mystery"
+          ],
+          "isAdult": false,
+          "episodes": 24,
+          "duration": 24,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5971,
+              "url": "http://vanishing-line.jp/",
+              "site": "Official Site"
+            },
+            {
+              "id": 6063,
+              "url": "https://twitter.com/anime_garo",
+              "site": "Twitter"
+            },
+            {
+              "id": 6211,
+              "url": "http://www.crunchyroll.com/garo-vanishing-line-",
+              "site": "Crunchyroll"
+            },
+            {
+              "id": 6388,
+              "url": "https://www.funimation.com/shows/garo-vanishing-line-/",
+              "site": "Funimation"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99796-70HAaVBsiEEw.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99796-70HAaVBsiEEw.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 7
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Garo -vanishing Line-",
+            "english": "Garo -vanishing Line-",
+            "native": "牙狼＜garo＞-vanishing Line-",
+            "userPreferred": "Garo -vanishing Line-"
+          },
+          "tags": [
+            {
+              "id": 82,
+              "name": "Male Protagonist",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 173,
+              "name": "Motorcycles",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 569,
+                  "name": "MAPPA"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Director",
+                "node": {
+                  "id": 123074,
+                  "name": {
+                    "first": "Seong",
+                    "last": "Ho Park",
+                    "native": "朴性厚"
+                  }
+                }
+              },
+              {
+                "role": "Series Composition",
+                "node": {
+                  "id": 109387,
+                  "name": {
+                    "first": "Kiyoko",
+                    "last": "Yoshimura",
+                    "native": "清子 吉村"
+                  }
+                }
+              },
+              {
+                "role": "Original Character Design",
+                "node": {
+                  "id": 101144,
+                  "name": {
+                    "first": "Takashi",
+                    "last": "Okazaki",
+                    "native": "能士 岡崎"
+                  }
+                }
+              },
+              {
+                "role": "Character Design",
+                "node": {
+                  "id": 115568,
+                  "name": {
+                    "first": "Tomohiro",
+                    "last": "Kishi",
+                    "native": "友洋 岸"
+                  }
+                }
+              },
+              {
+                "role": "Music",
+                "node": {
+                  "id": 110481,
+                  "name": {
+                    "first": "",
+                    "last": "MONACA",
+                    "native": "有限会社モナカ "
+                  }
+                }
+              },
+              {
+                "role": "Original Story",
+                "node": {
+                  "id": 101953,
+                  "name": {
+                    "first": "Keita",
+                    "last": "Amemiya",
+                    "native": "雨宮慶太"
+                  }
+                }
+              },
+              {
+                "role": "Chief Animation Director",
+                "node": {
+                  "id": 115568,
+                  "name": {
+                    "first": "Tomohiro",
+                    "last": "Kishi",
+                    "native": "友洋 岸"
+                  }
+                }
+              },
+              {
+                "role": "Sound Director",
+                "node": {
+                  "id": 123567,
+                  "name": {
+                    "first": "Souichirou",
+                    "last": "Kubo",
+                    "native": "久保宗一郎"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "OTHER",
+                "node": {
+                  "id": 21277
+                }
+              },
+              {
+                "relationType": "OTHER",
+                "node": {
+                  "id": 20753
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 99818,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99818",
+          "format": "OVA",
+          "description": "Based on the adult manga by Goban.<br>\n<br>\nStarting from liking someone to a girl at the Volleyball Club, ask the help of a classmate who one club with her to be introduced. But, the business became deviated and framed by a Senior in the Volleyball Club. Now Takahashi has to be a manager at the Volleyball Club and as a satisfaction of the girls' desire there, especially the Senior In the Volleyball Club that trapped him.<br>\n<br>\n(Source: Nekopoi and Has Been Translated and Edited)",
+          "synonyms": [],
+          "genres": [
+            "Hentai",
+            "Romance"
+          ],
+          "isAdult": true,
+          "episodes": null,
+          "duration": 23,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99818-e7vbZ12dqJ7T.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99818-e7vbZ12dqJ7T.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 20
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Ikkyuu Nyuukon",
+            "english": "Only My Oppai Soul",
+            "native": "一求乳魂",
+            "userPreferred": "Ikkyuu Nyuukon"
+          },
+          "tags": [
+            {
+              "id": 125,
+              "name": "Nakadashi",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 137,
+              "name": "Large Breasts",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 116,
+              "name": "Volleyball",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 23,
+              "name": "Harem",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 309,
+              "name": "Blackmail",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 134,
+              "name": "Fellatio",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 317,
+              "name": "Tekoki",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 126,
+              "name": "Paizuri",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 130,
+              "name": "Facial",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 135,
+              "name": "Cunnilingus",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 46,
+              "name": "School",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": false,
+                "node": {
+                  "id": 6098,
+                  "name": "Mediabank"
+                }
+              },
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6093,
+                  "name": "Queen Bee"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 112385,
+                  "name": {
+                    "first": "",
+                    "last": "Goban",
+                    "native": " ごばん"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 99910
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 99819,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99819",
+          "format": "OVA",
+          "description": "Based on the adult game by Mink.<br>\n<br>\nAlternative Story: A former science teacher receives a mysterious recruitment document, inviting him to a prestigious school. However, this school is not what it seems...<br>\n<br>\nDetails Story: Teacher Ryuudouji Shimon is known as a teacher who trains people into sex slaves. On the orders of his old friend Sayaka, Mr. Ryuudouji was asked to conquer many women in school into his sex slaves. For the sake of pleasure and harem of torture, Ryuudouji is very happy to do so, especially Sayaka promises rewards to him.<br>\n<br>\n(Source: Nekopoi and Has Been Translated)",
+          "synonyms": [
+            "Ryuudouji Shimon's Obscene Plot"
+          ],
+          "genres": [
+            "Hentai"
+          ],
+          "isAdult": true,
+          "episodes": null,
+          "duration": 29,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99819-AuZyCsDrxmB9.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99819-AuZyCsDrxmB9.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 20
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Ryuudouji Shimon no Inbou",
+            "english": null,
+            "native": "龍堂寺士門の淫謀",
+            "userPreferred": "Ryuudouji Shimon no Inbou"
+          },
+          "tags": [
+            {
+              "id": 134,
+              "name": "Fellatio",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 246,
+              "name": "Bondage",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 133,
+              "name": "Sex Toys",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 130,
+              "name": "Facial",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 126,
+              "name": "Paizuri",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 125,
+              "name": "Nakadashi",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": false,
+                "node": {
+                  "id": 6098,
+                  "name": "Mediabank"
+                }
+              },
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6092,
+                  "name": "GOLD BEAR"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 99856,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99856",
+          "format": "TV_SHORT",
+          "description": "Short TV anime series celebrating the 50th anniversary of Youkai Ningen Bem.",
+          "synonyms": [],
+          "genres": [
+            "Horror"
+          ],
+          "isAdult": false,
+          "episodes": null,
+          "duration": null,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 5987,
+              "url": "http://youkainingen-bem.com/",
+              "site": "Official Site"
+            },
+            {
+              "id": 5988,
+              "url": "https://twitter.com/bem_50th",
+              "site": "Twitter"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99856-f4AJlEqKKGwg.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99856-f4AJlEqKKGwg.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 4
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Oretacha Youkai Ningen",
+            "english": null,
+            "native": "俺たちゃ妖怪人間",
+            "userPreferred": "Oretacha Youkai Ningen"
+          },
+          "tags": [],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 276,
+                  "name": "DLE"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ALTERNATIVE",
+                "node": {
+                  "id": 4044
+                }
+              },
+              {
+                "relationType": "ALTERNATIVE",
+                "node": {
+                  "id": 4823
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 99911,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99911",
+          "format": "OVA",
+          "description": "Based on the adult game by Shelf.<br>\n<br>\nAnother series from Kagirohi: Shaku Kei. The death of Kirishima Kaede's hanging self is still a mystery. The protagonist as Kaede's new girlfriend wanted to find out who the perpetrator was from this death. Because he believed it was not suicide, but murder. The first person he suspected was Minazuki Ajisai, because he was the one Kaede talked about before he died. Especially again, Ajisai is a mysterious girl at school, who rarely talks and greets anyone.<br>\n<br>\n(Source: Nekopoi and Has Been Translated)",
+          "synonyms": [
+            "Kagiroi"
+          ],
+          "genres": [
+            "Hentai",
+            "Romance"
+          ],
+          "isAdult": true,
+          "episodes": null,
+          "duration": 20,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99911-k4o5hseHXUwY.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99911-k4o5hseHXUwY.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 27
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Kagirohi: Shaku Kei - Another",
+            "english": null,
+            "native": "かぎろひ~勺景~ Another",
+            "userPreferred": "Kagirohi: Shaku Kei - Another"
+          },
+          "tags": [
+            {
+              "id": 129,
+              "name": "Virgin",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 134,
+              "name": "Fellatio",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 317,
+              "name": "Tekoki",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 46,
+              "name": "School",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": false,
+                "node": {
+                  "id": 274,
+                  "name": "Suzuki Mirano"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "OTHER",
+                "node": {
+                  "id": 7262
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 99964,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99964",
+          "format": "OVA",
+          "description": "Based on the adult game by Atelier Kaguya.<br>\n<br>\nProtagonist Munetaka is invited to have sex with his girlfriend, Miran, at the Hotel Lala.  Traumatised by his past, Munetaka fails his first time with Miran, straining his relationship with her.  However, to help overcome his trauma, his older sisters and cousin intend to help by providing him with sex lessons.  Between Ritsuka, Wakana, and Mashiro, who will Munetaka choose as his sex coach?<br>\n<br>\n(Source: Translated and Edited from Nekopoi)",
+          "synonyms": [
+            "\"Big\" Sisters 2: We're Gonna Squeeze out Lots of Our Little Brother's Semen"
+          ],
+          "genres": [
+            "Hentai",
+            "Romance"
+          ],
+          "isAdult": true,
+          "episodes": null,
+          "duration": 31,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99964-i6Lx84vsgMJn.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99964-i6Lx84vsgMJn.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 11,
+            "day": 24
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Baku Ane 2: Otouto Ippai Shibocchau Zo! The Animation",
+            "english": null,
+            "native": "ばくあね2 弟いっぱいしぼっちゃうぞ！ The Animation",
+            "userPreferred": "Baku Ane 2: Otouto Ippai Shibocchau Zo! The Animation"
+          },
+          "tags": [
+            {
+              "id": 137,
+              "name": "Large Breasts",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 128,
+              "name": "Incest",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 23,
+              "name": "Harem",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 126,
+              "name": "Paizuri",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 134,
+              "name": "Fellatio",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 279,
+              "name": "Ahegao",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 45,
+                  "name": "Pink Pineapple"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Director",
+                "node": {
+                  "id": 118393,
+                  "name": {
+                    "first": "Takashi",
+                    "last": "Nishikawa",
+                    "native": "貴史 西川"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "OTHER",
+                "node": {
+                  "id": 20933
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 99994,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/99994",
+          "format": "TV_SHORT",
+          "description": "Pingu and his family move from their small village to a big city, where there are many people with many different occupations. The ever-curious Pingu tries to join them at their jobs, but his mischievous side gets the better of him and he ends up messing things up.<br>\n<br>\n(Source: ANN)",
+          "synonyms": [],
+          "genres": [
+            "Comedy"
+          ],
+          "isAdult": false,
+          "episodes": 26,
+          "duration": 7,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 6054,
+              "url": "http://www.nhk.or.jp/anime/pingu/",
+              "site": "Official Site"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/99994-75PsHeell3nb.png",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/99994-75PsHeell3nb.png"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 7
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Pingu In The City",
+            "english": null,
+            "native": "ピングー In ザ・シティ",
+            "userPreferred": "Pingu In The City"
+          },
+          "tags": [
+            {
+              "id": 193,
+              "name": "Episodic",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 28,
+              "name": "Kids",
+              "rank": 50,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 145,
+              "name": "Work",
+              "rank": 50,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 148,
+              "name": "Football",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 89,
+              "name": "Full CGI",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6067,
+                  "name": "POLYGON PICTURES"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Director",
+                "node": {
+                  "id": 110251,
+                  "name": {
+                    "first": "Naomi",
+                    "last": "Iwata",
+                    "native": "イワタナオミ"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 118493,
+                  "name": {
+                    "first": "Kimiko",
+                    "last": "Ueno",
+                    "native": "うえのきみこ"
+                  }
+                }
+              },
+              {
+                "role": "Script",
+                "node": {
+                  "id": 120871,
+                  "name": {
+                    "first": "Shigenori",
+                    "last": "Tanabe",
+                    "native": null
+                  }
+                }
+              },
+              {
+                "role": "Music",
+                "node": {
+                  "id": 119131,
+                  "name": {
+                    "first": "Ken",
+                    "last": "Arai",
+                    "native": " "
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "SEQUEL",
+                "node": {
+                  "id": 99995
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 100003,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100003",
+          "format": "OVA",
+          "description": "It was a hot summer.\nOut of work, the protagonist visited his family's house in the countryside.\nHis ambitions were in tatters. He forewent a job hunt in favor of lazing around the house.\nThat's how he got close with his brother's wife.\nHer name was Arisa.\nShe was a stunningly beautiful Russian bride transplanted to Japan.\nHer interest in Japanese was strong, and she was refreshingly open and tender.\nIt wasn't long before the bitter protagonist fantasized about stealing her.\nAround the same time, his brother went on a trip.\nThe night before his brother left, he overheard that Arisa and his brother were in a basically sexless marriage.\nWhat could be more perfect?\nThe protagonist had his brother beat in two departments: virility and perversion.\nMore than just making Arisa his own... could he get her to fall in love with him?\n<br><br>\nSource: DLsite",
+          "synonyms": [
+            "A Story of How a Russian Girl Suddenly Became a Part of My Back-Country Household and of How Lots of Sex Ensued"
+          ],
+          "genres": [
+            "Hentai"
+          ],
+          "isAdult": true,
+          "episodes": null,
+          "duration": 20,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100003-zLLjPbFyYZzp.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100003-zLLjPbFyYZzp.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 11,
+            "day": 24
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Katainaka Ni Totsui De Kita Russia Musume to H Shimakuru Ohanashi",
+            "english": "Ecchi with a Rural Russian Housewife",
+            "native": "片田舎に嫁いできた○シア娘とhしまくるお話",
+            "userPreferred": "Katainaka Ni Totsui De Kita Russia Musume to H Shimakuru Ohanashi"
+          },
+          "tags": [
+            {
+              "id": 137,
+              "name": "Large Breasts",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 316,
+              "name": "Netori",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 279,
+              "name": "Ahegao",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 131,
+              "name": "Masturbation",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 134,
+              "name": "Fellatio",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 125,
+              "name": "Nakadashi",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 246,
+              "name": "Bondage",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 130,
+              "name": "Facial",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6155,
+                  "name": "Collaboration Works petit"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Director",
+                "node": {
+                  "id": 119845,
+                  "name": {
+                    "first": "Ryuuzou",
+                    "last": "Matano",
+                    "native": "龍三 股野"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 100004,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100004",
+          "format": "OVA",
+          "description": "Based on the adult manga by Kimura Neito.\n<br><br>\nDream interruption by Succubus Lidi's classmate to squeeze sperm makes her feel uncomfortable. Kaito requests his master's request to avenge him, with sperm exchange if his petition is granted. However, because of this, making Kaito and Lidi's relationship worse.\n<br><br>\n(Source: Nekopoi and Has Been Translated)",
+          "synonyms": [
+            "Sakyubamisuto Story"
+          ],
+          "genres": [
+            "Hentai",
+            "Romance"
+          ],
+          "isAdult": true,
+          "episodes": null,
+          "duration": 16,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100004-4XWPfkiRvHP4.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100004-4XWPfkiRvHP4.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 6
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Succuba Mist Story: Non-human Life The Animation",
+            "english": null,
+            "native": "さきゅばみすと・すとーりー ～のんひゅーまあんらいふ～ The Animation",
+            "userPreferred": "Succuba Mist Story: Non-human Life The Animation"
+          },
+          "tags": [
+            {
+              "id": 15,
+              "name": "Demons",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 137,
+              "name": "Large Breasts",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 46,
+              "name": "School",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 185,
+              "name": "Anal Sex",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 188,
+              "name": "Futanari",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 317,
+              "name": "Tekoki",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6085,
+                  "name": "BOOTLEG"
+                }
+              },
+              {
+                "isMain": false,
+                "node": {
+                  "id": 319,
+                  "name": "MS Pictures"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Original Creator",
+                "node": {
+                  "id": 123288,
+                  "name": {
+                    "first": "Neito",
+                    "last": "Kimura",
+                    "native": "寧都 木村"
+                  }
+                }
+              },
+              {
+                "role": "Director",
+                "node": {
+                  "id": 115594,
+                  "name": {
+                    "first": "Naomi",
+                    "last": "Hayakawa",
+                    "native": "ナオミ 早川"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 100005
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 100006,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100006",
+          "format": "OVA",
+          "description": "Desire for sex with next door neighbor's Aunt. making this young man who fell in love with a newly moved aunt. This wet dream and masturbation every day is done to vent his desire. Because of his curiosity towards the next aunt, he tried to peek and it turns out he knows a very surprising thing.<br>\n<br>\n(Source: Nekopoi and Has Been Translated and Edited)",
+          "synonyms": [
+            "MILF's Desire: Bondage"
+          ],
+          "genres": [
+            "Hentai"
+          ],
+          "isAdult": true,
+          "episodes": null,
+          "duration": 23,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100006-v4p95uFp5dTv.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100006-v4p95uFp5dTv.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 9,
+            "day": 29
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Jukujo Shigan: Kinbaku",
+            "english": null,
+            "native": "熟女志願～kinbaku～",
+            "userPreferred": "Jukujo Shigan: Kinbaku"
+          },
+          "tags": [
+            {
+              "id": 246,
+              "name": "Bondage",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 318,
+              "name": "Voyeur",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 187,
+              "name": "MILF",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 133,
+              "name": "Sex Toys",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 134,
+              "name": "Fellatio",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 131,
+              "name": "Masturbation",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 135,
+              "name": "Cunnilingus",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6095,
+                  "name": "ZIZ Entertainment"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 100108,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100108",
+          "format": "OVA",
+          "description": "As male customers arrive at the resort hotel of this tropical island paradise...<br>\nThey are greeted by the jiggly breasts of busty hotel women!<br>\n<br>\nIt turns out that on this island here, you can do whatever you please with the girls.<br>\nAnytime, anywhere, anything! They've been raised as fine young ladies,<br>\ntheir bodies and souls exist exclusively for your manly pleasures!<br>\n<br>\n...and with not a moment to spare, the hotel women begin to undress...<br>\n<br>\nSource: DLsite",
+          "synonyms": [
+            "Resort Island of Women Who Love It When You Cum Inside Them",
+            "The resort island where it's OK to cum inside the vagina whenever you like"
+          ],
+          "genres": [
+            "Hentai"
+          ],
+          "isAdult": true,
+          "episodes": 0,
+          "duration": 16,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100108-U7xHJXf4kJFZ.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100108-U7xHJXf4kJFZ.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 9,
+            "day": 20
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Kiniitta Chitsu Ni Ikinari Nakadashi Ok Na Resort Shima",
+            "english": "Resort of Cumpie Fantasies",
+            "native": "気に入った膣にいきなり中出しokなリゾート島",
+            "userPreferred": "Kiniitta Chitsu Ni Ikinari Nakadashi Ok Na Resort Shima"
+          },
+          "tags": [
+            {
+              "id": 125,
+              "name": "Nakadashi",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 137,
+              "name": "Large Breasts",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 134,
+              "name": "Fellatio",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 131,
+              "name": "Masturbation",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6144,
+                  "name": "SELFISH"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 100256,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100256",
+          "format": "ONA",
+          "description": "As the television anime Mahoutsukai no Yome debuts a new episode every week, one new 30-second episode of the series of shorts will debut every week on the official Twitter every Tuesday. The previous week's episode will no longer be available when the each new episode debuts.<br>\n<br>\n(Source: ANN)<br>\n<br>\n<i>Includes episode 0.</i>",
+          "synonyms": [
+            "The Ancient Magus' Bride",
+            "The Magician's Bride",
+            "Magic Bride",
+            "Maho Yome",
+            "#0あいさつ",
+            "#0 Aisatsu",
+            "#0 Greeting"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "isAdult": false,
+          "episodes": 25,
+          "duration": 1,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 6218,
+              "url": "http://mahoyome.jp/",
+              "site": "Official Site"
+            },
+            {
+              "id": 6219,
+              "url": "https://twitter.com/mahoyomeproject",
+              "site": "Twitter"
+            },
+            {
+              "id": 6220,
+              "url": "https://www.youtube.com/channel/UCulneJtjMARpEHhWQTlGa6w",
+              "site": "Youtube"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100256-y2vOgKFE97U0.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100256-y2vOgKFE97U0.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 3
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Mahoyome",
+            "english": null,
+            "native": "まほよめ",
+            "userPreferred": "Mahoyome"
+          },
+          "tags": [
+            {
+              "id": 39,
+              "name": "Parody",
+              "rank": 79,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 858,
+                  "name": "Wit Studio"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PARENT",
+                "node": {
+                  "id": 98436
+                }
+              },
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 85435
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 100262,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100262",
+          "format": "ONA",
+          "description": "Second part to Monster Strike 2.<br>\n<br>\n(Source: MAL)",
+          "synonyms": [
+            "Monster Strike 3",
+            "Monster Strike the Animation: : The Fading Cosmos",
+            "Monster Strike the Anime: The Fading Cosmos"
+          ],
+          "genres": [
+            "Action",
+            "Fantasy"
+          ],
+          "isAdult": false,
+          "episodes": 13,
+          "duration": 13,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 6231,
+              "url": "http://anime.monster-strike.com/",
+              "site": "Official Site"
+            },
+            {
+              "id": 6232,
+              "url": "https://twitter.com/monst_animation",
+              "site": "Twitter"
+            },
+            {
+              "id": 6233,
+              "url": "https://www.youtube.com/channel/UCWzenZSy9GJBcPzdSm-UX5w",
+              "site": "Youtube"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100262-1VMMC4Usz9Ft.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100262-1VMMC4Usz9Ft.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 7
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Monster Strike: Kieyuku Uchuu-hen",
+            "english": "Monster Strike The Animation: The Fading Cosmos",
+            "native": "モンスターストライク「消えゆく宇宙編」",
+            "userPreferred": "Monster Strike: Kieyuku Uchuu-hen"
+          },
+          "tags": [
+            {
+              "id": 308,
+              "name": "Video Games",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 144,
+              "name": "Meta",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 259,
+              "name": "Monster Girl",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 66,
+              "name": "Super Power",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": [
+              {
+                "isMain": true,
+                "node": {
+                  "id": 6159,
+                  "name": "Yokohama Animation Lab"
+                }
+              },
+              {
+                "isMain": false,
+                "node": {
+                  "id": 6184,
+                  "name": "anima"
+                }
+              },
+              {
+                "isMain": false,
+                "node": {
+                  "id": 6078,
+                  "name": "ILCA"
+                }
+              },
+              {
+                "isMain": false,
+                "node": {
+                  "id": 6185,
+                  "name": "XFLAG PICTURES"
+                }
+              }
+            ]
+          },
+          "staff": {
+            "edges": [
+              {
+                "role": "Director",
+                "node": {
+                  "id": 101952,
+                  "name": {
+                    "first": "Takayuki",
+                    "last": "Hamana",
+                    "native": "浜名孝行"
+                  }
+                }
+              }
+            ]
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PREQUEL",
+                "node": {
+                  "id": 98069
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 100287,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100287",
+          "format": "TV_SHORT",
+          "description": null,
+          "synonyms": [],
+          "genres": [
+            "Action",
+            "Sci-Fi"
+          ],
+          "isAdult": false,
+          "episodes": null,
+          "duration": 10,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 6264,
+              "url": "https://twitter.com/anime_GH",
+              "site": "Twitter"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100287-lJ1lA8Taxv2H.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100287-lJ1lA8Taxv2H.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 10,
+            "day": 7
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Glamorous Heroes",
+            "english": null,
+            "native": "グラマラスヒーローズ",
+            "userPreferred": "Glamorous Heroes"
+          },
+          "tags": [
+            {
+              "id": 240,
+              "name": "Amnesia",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": []
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 100295,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100295",
+          "format": "ONA",
+          "description": "The animation tells the story of Xiao Shuai who accidentally ends up in a fantasy world and gets embroiled in a dispute between parkour colleges.<br>\n<br>\nBased off the Tencent mobile game Parkour Everyday.<br>\n<br>\n(Source: MAL, edited)",
+          "synonyms": [
+            "Parkour Hero",
+            "The Running Heroes"
+          ],
+          "genres": [
+            "Action",
+            "Adventure",
+            "Fantasy"
+          ],
+          "isAdult": false,
+          "episodes": 26,
+          "duration": 15,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100295-yKkEEBlennS5.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100295-yKkEEBlennS5.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 9,
+            "day": 2
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Ku Pao Ying Xiong",
+            "english": null,
+            "native": "酷跑英雄",
+            "userPreferred": "Ku Pao Ying Xiong"
+          },
+          "tags": [
+            {
+              "id": 308,
+              "name": "Video Games",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 29,
+              "name": "Magic",
+              "rank": 40,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 244,
+              "name": "Isekai",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 82,
+              "name": "Male Protagonist",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            },
+            {
+              "id": 324,
+              "name": "Chibi",
+              "rank": 20,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": []
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 100296,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100296",
+          "format": "ONA",
+          "description": "In the modern cultivation world, everywhere is law of the jungle, everyone feels insecure. After saving a cultivatior girl, the security guard Ma Yingxiong accidentally starts the journey of practice cultivation.",
+          "synonyms": [
+            "Wo De Tian Jie Nv You"
+          ],
+          "genres": [
+            "Romance",
+            "Sci-Fi"
+          ],
+          "isAdult": false,
+          "episodes": null,
+          "duration": 13,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100296-4saN5nzgzpUE.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100296-4saN5nzgzpUE.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 9,
+            "day": 20
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "wo De Tian Jie Nu You",
+            "english": "My Cultivator Girlfriend",
+            "native": "我的天劫女友",
+            "userPreferred": "wo De Tian Jie Nu You"
+          },
+          "tags": [
+            {
+              "id": 326,
+              "name": "Cultivation",
+              "rank": 60,
+              "isMediaSpoiler": false,
+              "isGeneralSpoiler": false
+            }
+          ],
+          "studios": {
+            "edges": []
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": []
+          }
+        },
+        {
+          "id": 100297,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100297",
+          "format": "ONA",
+          "description": "Thirty thousand years ago, the Heaven Fighting Race who called themselves “Gods” invaded the Spirit Realm. Hundreds of races rose up in resistance, but ultimately suffered a crushing defeat. The Human Race was the first to concede, and the rest of the Hundred Races soon followed in succession.\n<br><br>\nDuring the subsequent ten thousand years, all of the races were enslaved by the Heaven Fighting Race. They were cruelly treated, and lived beneath the shadow of terror.\n<br><br>\nThe Heaven Fighting Race’s march of conquest did not stop there. With the Spirit Realm as the starting point, they invaded other secret dimensions, and spread war to all corners of existence. After greatly exhausting their combat strength, they were finally defeated by the Hundred Races who took advantage of this opportunity. With no other choice, they fled to the starry skies outside the realm.\n<br><br>\nThirty thousand years later, in an era where the Heaven Fighting Race has already faded to become ancient legend, an amnesiac youth possessing the Heaven Fighting Race’s bloodline is being fostered in an insignificant household. Whilst struggling to live on, he silently awaits the day of the bloodline’s awakening.<br><br>\n(Source: Novel Updates)",
+          "synonyms": [
+            "Spirit Realm",
+            "Spiritual Field"
+          ],
+          "genres": [
+            "Fantasy"
+          ],
+          "isAdult": false,
+          "episodes": null,
+          "duration": 12,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100297-CN99UPINmm2O.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100297-CN99UPINmm2O.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 9,
+            "day": 20
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Ling Yu",
+            "english": null,
+            "native": "灵域",
+            "userPreferred": "Ling Yu"
+          },
+          "tags": [],
+          "studios": {
+            "edges": []
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 98317
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 100517,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100517",
+          "format": "ONA",
+          "description": "Yuuji Aokura needs money. He needs money in order to support his family of orphans and earn a living at the same time. Looking online for potential employers, he finds a posting for a part time job in an \"evil organization.\" Seeing that the pay and benefits were fairly substantial, he took the chance and took the interview. He was somehow hired and now has to work as a henchman inside the evil organization \"Antares.\" Will he be able to survive the onslaught of missions against heroes while providing for his orphan brothers and sisters?\n<br><br>\n(Source: Mangahelpers)",
+          "synonyms": [],
+          "genres": [
+            "Action",
+            "Comedy",
+            "Romance"
+          ],
+          "isAdult": false,
+          "episodes": null,
+          "duration": null,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100517-gXQBbYtQn7vL.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100517-gXQBbYtQn7vL.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 11,
+            "day": 13
+          },
+          "endDate": {
+            "year": null,
+            "month": null,
+            "day": null
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Baito Saki wa \"aku no Soshiki\"?!",
+            "english": "Part-time Job Is \"evil Organization\"!?",
+            "native": "バイト先は「悪の組織」!?",
+            "userPreferred": "Baito Saki wa \"aku no Soshiki\"?!"
+          },
+          "tags": [],
+          "studios": {
+            "edges": []
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "ADAPTATION",
+                "node": {
+                  "id": 86433
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 100519,
+          "type": "ANIME",
+          "siteUrl": "https://anilist.co/anime/100519",
+          "format": "SPECIAL",
+          "description": "Picture dramas bundled with the Blu-ray and DVD volumes.",
+          "synonyms": [],
+          "genres": [
+            "Action",
+            "Adventure"
+          ],
+          "isAdult": false,
+          "episodes": 6,
+          "duration": 4,
+          "chapters": null,
+          "status": "RELEASING",
+          "externalLinks": [
+            {
+              "id": 6365,
+              "url": "http://www.pripri-anime.jp/",
+              "site": "Official Site"
+            },
+            {
+              "id": 6366,
+              "url": "https://twitter.com/pripri_anime/",
+              "site": "Twitter"
+            }
+          ],
+          "coverImage": {
+            "large": "https://cdn.anilist.co/img/dir/anime/reg/100519-gid50JBELlPi.jpg",
+            "medium": "https://cdn.anilist.co/img/dir/anime/med/100519-gid50JBELlPi.jpg"
+          },
+          "startDate": {
+            "year": 2017,
+            "month": 9,
+            "day": 27
+          },
+          "endDate": {
+            "year": 2018,
+            "month": 2,
+            "day": 23
+          },
+          "season": "FALL",
+          "title": {
+            "romaji": "Princess Principal Picture Drama",
+            "english": null,
+            "native": "プリンセス・プリンシパル ピクチャードラマ",
+            "userPreferred": "Princess Principal Picture Drama"
+          },
+          "tags": [],
+          "studios": {
+            "edges": []
+          },
+          "staff": {
+            "edges": []
+          },
+          "relations": {
+            "edges": [
+              {
+                "relationType": "PARENT",
+                "node": {
+                  "id": 98505
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

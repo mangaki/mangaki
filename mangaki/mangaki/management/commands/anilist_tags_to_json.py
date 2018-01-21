@@ -3,7 +3,7 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from mangaki.wrappers.anilist import client, AniListWorks
+from mangaki.wrappers.anilist import AniList
 from mangaki.models import Work
 
 
@@ -12,10 +12,9 @@ BACKOFF_DELAY = 2
 
 class Command(BaseCommand):
     """
-    Recherche par titre chaque Work sur AniList puis récupère l'ID du Work
-    chez AniList afin de finalement récupérer les tags (2 requêtes AniList à
-    chaque Work). Si un titre ne match pas sur AniList, le log l'affiche et
-    un fichier stocke l'ensemble des Work non récupérés (ID + Titre sur la BDD).
+    Recherche par titre chaque Work sur AniList afin de finalement récupérer les
+    tags. Si un titre ne match pas sur AniList, le log l'affiche et un fichier
+    stocke l'ensemble des Work non récupérés (ID + Titre sur la BDD).
     Enfin, sort un fichier JSON contenant, pour chaque Work la liste des tags
     et le poids associé (valeur de 0 à 1) récupéré grâce au système de votes
     d'AniList.
@@ -29,6 +28,8 @@ class Command(BaseCommand):
         parser.add_argument('work_id', nargs='*', type=int)
 
     def handle(self, *args, **options):
+        client = AniList()
+
         if options['work_id']:
             works = Work.objects.filter(pk__in=options['work_id']).order_by('pk')
         else:
@@ -47,26 +48,13 @@ class Command(BaseCommand):
 
         for work in works:
             title_display = work.title.encode('utf8').decode(self.stdout.encoding)
-
-            anilist_search = None
             anilist_result = None
-            worktype = None
-
-            # Associate the right worktype or exit if not correct
-            if work.category.slug == 'anime':
-                worktype = AniListWorks.animes
-            elif work.category.slug == 'manga':
-                worktype = AniListWorks.mangas
-            else:
-                continue
 
             # Try to fetch data from AniList with an exponential backoff
             for tries in range(MAX_ATTEMPTS):
                 try:
-                    # Search the work by title on AniList and then by ID if possible
-                    anilist_search = client.get_work_by_title(worktype, work.title)
-                    if anilist_search:
-                        anilist_result = client.get_work_by_id(worktype, anilist_search.anilist_id)
+                    # Search the work by title on AniList
+                    anilist_result = client.get_work(search_title=work.title)
                     break
                 except Exception as err:
                     print(err)
