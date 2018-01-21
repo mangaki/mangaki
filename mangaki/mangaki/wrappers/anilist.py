@@ -15,6 +15,14 @@ from mangaki.models import (Work, RelatedWork, WorkTitle, Reference, Category,
                             ExtLanguage, Studio, Genre, Artist, Staff, Role)
 
 
+# Filenames for AniList GraphQL queries
+ANILIST_QUERIES = {
+    'user-list': 'user-list',
+    'seasonal-animes': 'seasonal-animes',
+    'work-info': 'work-info'
+}
+
+
 def read_graphql_query(filename):
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'anilist-graphql-queries', filename+'.graphql')
     with open(path, 'r', encoding='utf-8') as f:
@@ -66,13 +74,12 @@ class AniListException(Exception):
     This class defines a custom Exception for errors with the AniList's API
     """
 
-    def __init__(self, error):
+    def __init__(self, errors):
         super().__init__()
-        self.status = error['status']
-        self.message = error['message']
+        self.errors = errors
 
     def __str__(self):
-        return 'Error {} : {}'.format(self.status, self.message)
+        return '\n'.join(map(lambda error: 'Error {} : {}'.format(error['status'], error['message']), self.errors))
 
 
 class AniListLanguages:
@@ -360,8 +367,7 @@ class AniList:
         data = r.json()
 
         if data.get('errors'):
-            for error in data['errors']:
-                raise AniListException(error)
+            raise AniListException(data['errors'])
 
         r.raise_for_status()
         return data['data']
@@ -389,7 +395,7 @@ class AniList:
         variables.update({'search': search_title} if search_title else {})
 
         data = self._request(
-            query=read_graphql_query('work-info'),
+            query=read_graphql_query(ANILIST_QUERIES['work-info']),
             variables=variables
         )
 
@@ -402,7 +408,8 @@ class AniList:
                              year: Optional[int] = None,
                              season: Optional[AniListSeason] = None,
                              only_airing: Optional[bool] = True,
-                             current_page: Optional[int] = 1) -> Generator[AniListEntry, None, None]:
+                             current_page: Optional[int] = 1,
+                             per_page: Optional[int] = 50) -> Generator[AniListEntry, None, None]:
         """
         Retrieve a list of entries for a given anime season.
         :param self: an AniList client
@@ -423,11 +430,11 @@ class AniList:
         variables.update({'season': (season or to_anime_season(datetime.now())).name})
         variables.update({'seasonYear': year or datetime.now().year})
         variables.update({'status': AniListStatus.RELEASING.name} if only_airing else {})
-        variables.update({'perPage': 50})
+        variables.update({'perPage': per_page})
         variables.update({'page': current_page})
 
         data = self._request(
-            query=read_graphql_query('user-list'),
+            query=read_graphql_query(ANILIST_QUERIES['seasonal-animes']),
             variables=variables
         )
 
@@ -446,7 +453,8 @@ class AniList:
     def get_user_list(self,
                       worktype: AniListWorkType,
                       username: str,
-                      current_page: Optional[int] = 1) -> Generator[AniListUserEntry, None, None]:
+                      current_page: Optional[int] = 1,
+                      per_page: Optional[int] = 50) -> Generator[AniListUserEntry, None, None]:
         """
         Retrieve an AniList's user manga or anime list.
         :param self: an AniList client
@@ -464,11 +472,11 @@ class AniList:
         variables = {}
         variables.update({'username': username})
         variables.update({'mediaType': worktype.name})
-        variables.update({'perPage': 50})
+        variables.update({'perPage': per_page})
         variables.update({'page': current_page})
 
         data = self._request(
-            query=read_graphql_query('user-list'),
+            query=read_graphql_query(ANILIST_QUERIES['user-list']),
             variables=variables
         )
 

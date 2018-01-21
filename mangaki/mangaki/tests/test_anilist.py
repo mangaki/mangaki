@@ -188,7 +188,6 @@ class AniListTest(TestCase):
         )
 
         hibike_entry = self.anilist.get_work(search_id=20912)
-        # FIXME: properly mock the insertion of related works
         hibike = insert_work_into_database_from_anilist(hibike_entry, build_related=False)
 
         titles_hibike = WorkTitle.objects.filter(work=hibike).values_list('title', flat=True)
@@ -207,7 +206,6 @@ class AniListTest(TestCase):
         self.assertEqual(artist.first().anilist_creator_id, 100055)
 
         # Try adding this work to the DB again
-        # FIXME: properly mock the insertion of related works
         hibike_again = insert_work_into_database_from_anilist(hibike_entry, build_related=False)
         self.assertEqual(hibike, hibike_again)
 
