@@ -652,6 +652,7 @@ def build_related_works(work: Work,
     return list(new_relations.values())
 
 
+
 def build_staff(work: Work,
                 staff: List[AniListStaff]) -> List[Staff]:
     """
@@ -711,6 +712,7 @@ def build_staff(work: Work,
     Staff.objects.bulk_create(list(missing_staff.values()))
 
     return list(missing_staff.values())
+
 
 
 def insert_works_into_database_from_anilist(entries: List[AniListEntry],
