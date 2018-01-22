@@ -1,21 +1,20 @@
 from datetime import datetime
 from enum import Enum
-from collections import namedtuple
 from typing import Dict, List, Tuple, Optional, Any, Generator
-from urllib.parse import urljoin
-import time
 import os
 
 import requests
+import typing
 from django.utils.functional import cached_property
 from django.db.models import Q
 
-from mangaki import settings
 from mangaki.models import (Work, RelatedWork, WorkTitle, Reference, Category,
                             ExtLanguage, Studio, Genre, Artist, Staff, Role)
 
+from mangaki.utils.singleton import Singleton
 
 # Filenames for AniList GraphQL queries
+
 ANILIST_QUERIES = {
     'user-list': 'user-list',
     'seasonal-animes': 'seasonal-animes',
@@ -184,9 +183,14 @@ class AniListMediaFormat(Enum):
     ONE_SHOT = 'Manga with just one chapter'
 
 
-AniListUserEntry = namedtuple('AniListUserEntry', ('work', 'score'))
-AniListStaff = namedtuple('AniListStaff', ('id', 'name_first', 'name_last', 'role'))
-AniListRelation = namedtuple('AniListRelation', ('related_id', 'relation_type'))
+AniListStaff = typing.NamedTuple('AniListStaff', [
+    ('id', int),
+    ('name_first', str),
+    ('name_last', str),
+    ('role', str)])
+AniListRelation = typing.NamedTuple('AniListRelation', [
+    ('related_id', int),
+    ('relation_type', AniListRelationType)])
 
 
 class AniListEntry:
@@ -305,7 +309,7 @@ class AniListEntry:
         ]
 
     @property
-    def relations(self) -> List[Tuple[int, str]]:
+    def relations(self) -> List[AniListRelation]:
         return [
             AniListRelation(
                 related_id=relation['node']['id'],
@@ -331,11 +335,40 @@ class AniListEntry:
         )
 
 
-class AniList:
+AniListUserEntry = typing.NamedTuple('AniListUserEntry', [
+    ('work', AniListEntry),
+    ('score', float)])
+
+
+class AniListRateLimitError(Exception):
+    def __init__(self,
+                 total_requests: int,
+                 retry_after: int,
+                 reset_timestamp: int):
+        super(AniListRateLimitError, self).__init__('AniList rate limit error')
+        self.total_requests = total_requests
+        self.retry_after = retry_after
+        self.reset_timestamp = reset_timestamp
+
+
+class AniList(metaclass=Singleton):
     BASE_URL = 'https://graphql.anilist.co'
 
     def __init__(self):
         self._cache = {}
+
+        self.requests_limit = None
+        self.remaining_requests = None
+        self.retry_after = None
+        self.rate_limit_reset_timestamp = None
+
+    @property
+    def rate_limited(self):
+        return (
+            self.rate_limit_reset_timestamp is not None
+            and
+            self.rate_limit_reset_timestamp >= int(datetime.now().timestamp())
+        )
 
     def _request(self,
                  query: str,
@@ -365,6 +398,16 @@ class AniList:
             }
         )
         data = r.json()
+
+        self.requests_limit = int(r.headers['X-RateLimit-Limit'])
+        self.remaining_requests = int(r.headers['X-RateLimit-Remaining'])
+        if r.status_code == 429:
+            self.retry_after = r.headers['Retry-After']
+            self.rate_limit_reset_timestamp = r.headers['X-RateLimit-Reset']
+
+            raise AniListRateLimitError(self.requests_limit,
+                                        self.retry_after,
+                                        self.rate_limit_reset_timestamp)
 
         if data.get('errors'):
             raise AniListException(data['errors'])
@@ -417,11 +460,13 @@ class AniList:
         :param season: the anime season to look for
         :param only_airing: specify whether or not to look for only airing animes, defaults to True
         :param current_page: the current page, useful when the list is split on multiple pages
+        :param per_page: amount of entries par page (default to 50)
         :type self: AniList
         :type year: Optional[int]
         :type season: Optional[AniListSeason]
         :type only_airing: Optional[bool]
         :type current_page: Optional[int]
+        :type per_page: Optional[int]
         :return: a generator for the different work entries for the selected season
         :rtype: Generator[AniListEntry, None, None]
         """
@@ -461,10 +506,12 @@ class AniList:
         :param worktype: the worktype to retrieve, either manga or anime
         :param username: the username of the AniList user to find
         :param current_page: the current page, useful when the list is split on multiple pages
+        :param per_page: amount of entries per page (default to 50)
         :type self: AniList
         :type worktype: AniListWorkType
         :type username: str
         :type current_page: Optional[int]
+        :type per_page: Optional[int]
         :return: a generator for the different entries in this user's list (score + work's informations)
         :rtype: Generator[AniListUserEntry, None, None]
         """
@@ -539,8 +586,9 @@ def build_work_titles(work: Work,
 
     return missing_titles
 
+
 def build_related_works(work: Work,
-                        relations: List[Tuple[int, AniListRelationType]]) -> List[RelatedWork]:
+                        relations: List[AniListRelation]) -> List[RelatedWork]:
     """
     Insert RelatedWork objects for a given Work when required into Mangaki's database.
     This also inserts the related works into the database when they don't exist.
@@ -555,9 +603,11 @@ def build_related_works(work: Work,
     if not relations:
         return []
 
+    # It's okay here to create an instance, it'll be shared due to the Singleton pattern used on AniList.
+    client = AniList()
     related_works = [
-        insert_work_into_database_from_anilist(client.get_work(search_id=related_id))
-        for related_id, relation_type in relations
+        insert_work_into_database_from_anilist(client.get_work(search_id=relation.related_id))
+        for relation in relations
     ]
 
     existing_relations = RelatedWork.objects.filter(parent_work=work, child_work__in=related_works)
@@ -568,8 +618,8 @@ def build_related_works(work: Work,
         RelatedWork(
             parent_work=work,
             child_work=related_works[index],
-            type=relation_type.value
-        ) for index, (entry, relation_type) in enumerate(relations)
+            type=relation.relation_type.name.lower()
+        ) for index, (entry, relation) in enumerate(relations)
         if related_works[index] is not None
         and related_works[index].pk not in existing_child_works
         and work.pk not in existing_parent_works
@@ -578,6 +628,7 @@ def build_related_works(work: Work,
     RelatedWork.objects.bulk_create(new_relations)
 
     return new_relations
+
 
 def build_staff(work: Work,
                 staff: List[AniListStaff]) -> List[Staff]:
@@ -633,6 +684,7 @@ def build_staff(work: Work,
     Staff.objects.bulk_create(missing_staff)
 
     return missing_staff
+
 
 def insert_works_into_database_from_anilist(entries: List[AniListEntry],
                                             build_related: Optional[bool] = True) -> Optional[List[Work]]:
@@ -709,13 +761,14 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
 
     return new_works if new_works else None
 
+
 def insert_work_into_database_from_anilist(entry: AniListEntry,
                                            build_related: Optional[bool] = True) -> Optional[Work]:
     """
     Insert a single work into Mangaki's database from AniList data, and return Work inserted.
     :param entry: an entry from AniList
     :param build_related: specify whether or not RelatedWorks should be created, defaults to True
-    :type entries: AniListEntry
+    :type entry: AniListEntry
     :type build_related: Optional[bool]
     :return: a work effectively added in Mangaki's database (if not already in), or None
     :rtype: Optional[Work]
