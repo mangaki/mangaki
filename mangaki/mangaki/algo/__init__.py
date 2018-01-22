@@ -3,6 +3,8 @@ from .dataset import Dataset
 from .fit_algo import get_algo_backup, get_dataset_backup, fit_algo
 
 from .als import MangakiALS
+from .als2 import MangakiALS2
+from .als3 import MangakiALS3
 from .balse import MangakiBALSE
 from .lasso import MangakiLASSO
 from .cfm import MangakiCFM
