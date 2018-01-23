@@ -397,11 +397,11 @@ class AniList(metaclass=Singleton):
         )
         data = r.json()
 
-        self.requests_limit = int(r.headers['X-RateLimit-Limit'])
-        self.remaining_requests = int(r.headers['X-RateLimit-Remaining'])
+        self.requests_limit = int(r.headers['X-RateLimit-Limit']) if 'X-RateLimit-Limit' in r.headers else None
+        self.remaining_requests = int(r.headers['X-RateLimit-Remaining']) if 'X-RateLimit-Remaining' in r.headers else None
         if r.status_code == 429:
-            self.retry_after = r.headers['Retry-After']
-            self.rate_limit_reset_timestamp = r.headers['X-RateLimit-Reset']
+            self.retry_after = r.headers.get('Retry-After')
+            self.rate_limit_reset_timestamp = r.headers.get('X-RateLimit-Reset')
 
             raise AniListRateLimitError(self.requests_limit,
                                         self.retry_after,
