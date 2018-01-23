@@ -319,12 +319,10 @@ class AniListEntry:
         ]
 
     def __eq__(self, other):
-        if isinstance(self, other.__class__):
-            return self.__dict__ == other.__dict__
-        return False
+        return self.anilist_id == other.anilist_id
 
     def __hash__(self):
-        return hash(tuple(sorted(self.__dict__.items())))
+        return hash(self.anilist_id)
 
     def __str__(self) -> str:
         return '<AniListEntry {}#{} : {} - {}>'.format(
