@@ -21,7 +21,7 @@ class MangakiALS3(RecommendationAlgorithm):
         self.y_test = y_test
         self.init_vars()
         self.bias = y.mean()
-        y -= self.bias
+        #y -= self.bias
         self.matrix, self.matrixT = self.to_dict(X, y)
         self.ratings_of_user, self.ratings_of_work = self.to_sparse(X, y)
         users, works = map(np.unique, self.ratings_of_user.nonzero())
@@ -76,7 +76,7 @@ class MangakiALS3(RecommendationAlgorithm):
         Ni = len(Ji)
         Vi = self.V[Ji]
         Wi = self.W_work[Ji]
-        bi = self.W_user[user_id] # self.bias + 
+        bi = self.W_user[user_id] + self.bias
         Li = self.lambda_ * Ni * np.eye(self.nb_components)
         # print(Ri.shape)
         # print(Wi.shape)
@@ -88,7 +88,7 @@ class MangakiALS3(RecommendationAlgorithm):
         self.U[user_id] = np.linalg.solve(Vi.T.dot(Vi) + Li, (Ri - Wi - bi).dot(Vi))
         #print(Vi.T.dot(Vi) + Li)
         #self.W_user[user_id] = (Ri - self.M[user_id, Ji]).mean() / (1 + self.lambda_)
-        self.W_user[user_id] = (Ri - self.U[user_id].dot(Vi.T) - Wi).mean() / (1 + self.lambda_) #- self.bias
+        self.W_user[user_id] = (Ri - self.U[user_id].dot(Vi.T) - Wi).mean() / (1 + self.lambda_) - self.bias
 
     def fit_work(self, work_id):
         # Ij = self.ratings_of_work[:, work_id].indices
@@ -100,11 +100,11 @@ class MangakiALS3(RecommendationAlgorithm):
         Nj = len(Ij)
         Uj = self.U[Ij]
         Wj = self.W_user[Ij]
-        bj = self.W_work[work_id]  # self.bias + 
+        bj = self.W_work[work_id] + self.bias
         Lj = self.lambda_ * Nj * np.eye(self.nb_components)
         self.V[work_id] = np.linalg.solve(Uj.T.dot(Uj) + Lj, (Rj - Wj - bj).dot(Uj))
         #self.W_work[work_id] = (Rj - self.M[Ij, work_id]).mean() / (1 + self.lambda_)
-        self.W_work[work_id] = (Rj - self.V[work_id].dot(Uj.T) - Wj).mean() / (1 + self.lambda_) #- self.bias
+        self.W_work[work_id] = (Rj - self.V[work_id].dot(Uj.T) - Wj).mean() / (1 + self.lambda_) - self.bias
 
     def predict(self, X):
         user_ids, work_ids = zip(*X)
