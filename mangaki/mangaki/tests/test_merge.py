@@ -26,7 +26,10 @@ class MergeTest(TestCase):
         tomorrow = datetime.now() + timedelta(1)
 
         anime = Category.objects.get(slug='anime')
+
         Work.objects.bulk_create([Work(title='Sangatsu no Lion', category=anime) for _ in range(10)])
+        Work.objects.create(title='Sangatsu no Lion', category=anime, nb_episodes=22)
+
         self.work_ids = Work.objects.values_list('id', flat=True)
         # Admin rated every movie
         Rating.objects.bulk_create([Rating(work_id=work_id, user=self.user, choice='like') for work_id in self.work_ids])
