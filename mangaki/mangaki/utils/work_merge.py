@@ -2,7 +2,7 @@ from collections import defaultdict
 from enum import IntEnum
 from typing import List
 
-from django.db.models import Max, Case, When, Value, IntegerField, QuerySet
+from django.db.models import Max, Case, When, Value, IntegerField
 from django.utils import timezone
 
 from mangaki.models import (
