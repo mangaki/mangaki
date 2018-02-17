@@ -42,7 +42,7 @@ Vagrant.configure(2) do |config|
     config.vm.network "private_network", ip: "192.168.33.10"
 
     # Useful with: https://github.com/cogitatio/vagrant-hostsupdater
-    config.vm.hostname = "mangaki.dev"
+    config.vm.hostname = "mangaki.localhost"
     config.vm.provider "virtualbox" do |vb|
         vb.name = "Mangaki"
     end
