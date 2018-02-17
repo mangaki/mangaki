@@ -10,7 +10,7 @@ from mangaki import tasks
 from mangaki.models import Work, Editor, Category, Studio, WorkCluster, Rating, Staff, Role, Artist, Genre, Reference
 from datetime import datetime, timedelta
 
-from mangaki.utils.work_merge import create_work_cluster
+from mangaki.utils.work_merge import create_work_cluster, merge_work_clusters
 
 
 class MergeTest(TestCase):
@@ -114,7 +114,29 @@ class MergeTest(TestCase):
         # Create duplicates WorkClusters on purpose.
         for _ in range(5):
             create_work_cluster(works, perform_union=False)
+
+        self.assertEqual(WorkCluster.objects.count(), 5)
         tasks.look_for_workclusters()
         # All duplicates have been reduced to one WorkCluster.
         self.assertEqual(WorkCluster.objects.count(), 1)
         self.assertEqual(lock.__enter__.call_count, 1)
+
+    def test_create_work_clusters_with_union(self):
+        works = Work.objects.filter(id__in=self.work_ids)
+
+        for _ in range(5):
+            create_work_cluster(works, perform_union=True)
+            self.assertEqual(WorkCluster.objects.count(), 1)
+
+    def test_merge_work_clusters(self):
+        works = Work.objects.filter(id__in=self.work_ids)
+        clusters = []
+
+        for _ in range(5):
+            clusters.append(create_work_cluster(works, perform_union=False))
+
+        self.assertEqual(WorkCluster.objects.count(), 5)
+
+        merge_work_clusters(*clusters)
+
+        self.assertEqual(WorkCluster.objects.count(), 1)
