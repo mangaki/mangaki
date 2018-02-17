@@ -26,8 +26,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-MATCH_ONLY_OVER_REFERENCED_WORKS = True
-
 
 # MAL provides three fields related to titles:
 #   — `english_title` which is, by definition, in english.
