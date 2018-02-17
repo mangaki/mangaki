@@ -1,60 +1,36 @@
 {% extends "base.html" %}
+{% load staticfiles %}
+{% load posters %}
 
 {% block body %}
 {% load account socialaccount %}
 
 {% get_providers as socialaccount_providers %}
 <div class="row featured text-center">
-    <h1>Mangaki, la recommandation d'anime et manga.</h1>
-    <h3 style="margin-bottom: 1em">Notez vos séries favorites, on vous en fera découvrir d'autres&nbsp;!</h3>
-{% if not user.is_authenticated %}
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">C'est parti !</a>
-    </div>
-    <div class="col-md-4 col-sm-12 margin">
-        {% include "socialaccount/snippets/provider_list.html" with process="login" verb="try" %}
-    </div>
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <img src="/static/img/pins.png" align="left" />
-        <iframe src="https://ghbtns.com/github-btn.html?user=mangaki&repo=mangaki&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
-        <iframe src="https://ghbtns.com/github-btn.html?user=mangaki&repo=mangaki&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
-    </div>
-{% else %}
-    {% if is_mal_import_available %}
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="{% url 'profile' user.username %}">Import myAnimeList</a>
-    </div>
-    {% endif %}
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">C'est parti !</a>
-    </div>
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki/wiki" target="_blank">Contribuer à Mangaki</a>
-    </div>
-{% endif %}
+    <h1>Mangaki, la recommandation d'anime et manga</h1>
 </div>
+
+<h2>Notez vos anime et mangas favoris…</h2>
+<div id="works" class="row">    
+    <div class="col-xs-12 cards-grid">
+        <card v-for="(work, index) in works" v-bind:work="work" :key="work.id">
+            <rating v-for="(rating, index) in ratings" v-bind:rating="rating" v-bind:work="work" :key="rating.id"></rating>
+        </card>
+    </div>
+</div>
+
+<h2>… et découvrez vos <a href="{% url 'reco' %}">recommandations</a> !</h2>
 <div class="row featured">
-    <div class="col-md-6 col-sm-12">
-      <div style="width: 80%; margin: auto;">
-        <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; text-align: center;">
-            Dernières nouveautés
-        </h2>
-	<p align="center">
-		Le Mangaki Data Challenge est terminé !<br><a href="http://research.mangaki.fr/2017/10/08/mangaki-data-challenge-winners-en/">Voir les résultats</a>
-	</p>
-        <a class="twitter-timeline" data-height="400"
-          href="https://twitter.com/MangakiFR">
-        Tweets by @MangakiFR
-        </a>
-        <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-      </div>
-    </div>
-    <div class="col-md-6 col-sm-12">
-        <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; margin-bottom: 1em; text-align: center;">
-          Comment ça marche ?
-        </h2>
-        <img src="/static/img/help.jpg" style="max-width: 100%" />
-    </div>
+  <div style="width: 80%; margin: auto;">
+    <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; text-align: center;">
+        Dernières nouveautés
+    </h2>
+    <a class="twitter-timeline" data-height="400"
+      href="https://twitter.com/MangakiFR">
+    Tweets by @MangakiFR
+    </a>
+    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
 </div>
 
 <div class="partners row">
@@ -68,4 +44,85 @@
 <br />
 <br />
 <br />
+{% endblock %}
+
+{% block extrajs %}
+{% static 'img/ratings.svg' as rating_svg_link %}
+<script>
+Vue.component('card', {
+  delimiters: ['#{', '}'],
+  props: ['work'],
+  template: `
+    <div class="work-card work-card_horizontal">
+        <div class="work-card__media work-cover work-cover_backdrop" :style="{'background-image': 'url(' + work.poster + ')'}">
+            <div class="work-cover__wrapper" :data-category="work.category">
+                <div class="work-cover__title">
+                    <h2 class="work-card__title">#{work.title}</h2>
+                </div>
+                <div class="work-cover__content">
+                <div class="work-card__content">
+                    <div class="work-card__synopsis">
+                        #{work.synopsis}
+                    </div>
+                    <a :href="'/' + work.category + '/' + work.id" class="work-card__link">
+                        Plus d'infos…
+                    </a>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="ratings ratings_medium" data-endpoint="">
+            <slot></slot>
+        </div>
+    </div>
+  `
+});
+
+Vue.component('rating', {
+  delimiters: ['#{', '}'],
+  props: ['rating', 'work'],
+  template: `
+    <label :class="['rating', 'rating_' + rating.name, (rating.name == 'willsee') ? 'rating_separator' : '']" :title="rating.title">
+      <span class="sr-only">#{rating.title}</span>
+      <input
+        type="checkbox"
+        :name="'rating[' + work.id + ']'"
+        :value="rating.name"
+        class="rating__checkbox">
+      <span class="rating__button">
+        <svg class="rating__icon">
+          <use :xlink:href="'{{ rating_svg_link }}#' + rating.name"></use>
+        </svg>
+      </span>
+    </label>
+  `
+})
+
+new Vue({
+  delimiters: ['${', '}'],
+  el: '#works',
+  data: {
+    works: [
+      // {id: 1, title: 'Death Note', category: 'anime', synopsis: 'Super', poster: '', nsfw: false},
+    ],
+    ratings: [
+      {name: 'favorite', title: "J'adore"},
+      {name: 'like', title: "J'aime"},
+      {name: 'neutral', title: "Neutre"},
+      {name: 'dislike', title: "Je déteste"},
+      {name: 'willsee', title: "J'ai envie de voir"},
+      {name: 'wontsee', title: "Je n'ai pas envie de voir"}
+    ]
+  },
+  methods: {
+    init() {
+      $.getJSON('/api/cards/anime/dpp', works => this.works = works);
+      $.getJSON('/api/cards/manga/dpp', works => works.forEach(work => this.works.push(work)));
+    }
+  },
+  mounted() {
+    this.init()
+  }
+})
+</script>
 {% endblock %}
