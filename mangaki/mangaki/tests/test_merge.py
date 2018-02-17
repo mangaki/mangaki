@@ -4,10 +4,9 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.contrib import admin
-from django.db import connection
 
 from mangaki import tasks
-from mangaki.models import Work, Editor, Category, Studio, WorkCluster, Rating, Staff, Role, Artist, Genre, Reference
+from mangaki.models import Work, Category, WorkCluster, Rating, Staff, Role, Artist, Genre, Reference
 from datetime import datetime, timedelta
 
 from mangaki.utils.work_merge import create_work_cluster, merge_work_clusters
@@ -79,13 +78,13 @@ class MergeTest(TestCase):
         Rating.objects.filter(work_id=self.work_ids[2], user=self.users[2]).update(date=yesterday),
         Rating.objects.filter(work_id=self.work_ids[0], user=self.users[3]).update(date=yesterday)
 
-    def test_merge(self, **kwargs):
+    def test_merge(self):
         self.client.login(username='test', password='test')
         merge_url = reverse('admin:mangaki_work_changelist')
         response = self.client.post(merge_url, {'action': 'merge', admin.ACTION_CHECKBOX_NAME: self.work_ids})
         self.assertEqual(response.status_code, 200)
 
-    def test_merge_confirmed(self, **kwargs):
+    def test_merge_confirmed(self):
         self.client.login(username='test', password='test')
         merge_url = reverse('admin:mangaki_work_changelist')
         context = {
