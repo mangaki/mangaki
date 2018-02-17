@@ -26,8 +26,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-MATCH_ONLY_OVER_REFERENCED_WORKS = True
-
 
 # MAL provides three fields related to titles:
 #   — `english_title` which is, by definition, in english.
@@ -335,31 +333,7 @@ def lookup_works(work_list: QuerySet,
     )
 
     # Referenced works are source of truth (for now).
-    # Early return.
-    if works_ids_matched:
-        return list(Work.objects.in_bulk(works_ids_matched).values())
-
-    if MATCH_ONLY_OVER_REFERENCED_WORKS:
-        return []
-
-    constraints_work = constraints_title = reduce(
-        lambda x, y: x | y,
-        (
-            SearchQuery(syn, config='simple')
-            for syn in titles
-        )
-    )
-    constraints_work = Q(title_search=constraints_work) | Q(ext_poster=ext_poster)
-
-    works_ids_matched = set(work_list.filter(constraints_work)
-                            .values_list('id', flat=True)[:2])
-    titles_ids_matched = set(
-        WorkTitle.objects
-            .filter(title_search=constraints_title)
-            .values_list('work_id', flat=True).all()
-    )
-
-    return list(Work.objects.in_bulk(titles_ids_matched | works_ids_matched).values())
+    return list(Work.objects.in_bulk(works_ids_matched).values()) if works_ids_matched else []
 
 
 def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
