@@ -1,7 +1,8 @@
 from collections import defaultdict
 from enum import IntEnum
+from typing import List
 
-from django.db.models import Max, Case, When, Value, IntegerField
+from django.db.models import Max, Case, When, Value, IntegerField, QuerySet
 from django.utils import timezone
 
 from mangaki.models import (
@@ -232,8 +233,6 @@ class WorkClusterMergeHandler:
 
         Reference.objects.filter(id__in=remaining_references_ids).delete()
 
-
-
     def redirect_related_objects(self):
         genres = sum((list(work.genre.all()) for work in self.works_to_merge), [])
         work_ids = [work.id for work in self.works_to_merge]
@@ -257,18 +256,20 @@ def merge_work_clusters(*clusters):
     return target_cluster
 
 
-def union_work_cluster(cluster, works):
+def union_work_cluster(cluster: WorkCluster, works: List[Work]):
     cluster.works.add(*works)
 
 
-def create_work_cluster(works):
-    # FIXME: Do an actual Union-Find.
+def create_work_cluster(works: List[Work], perform_union: bool = True):
     target_cluster = None
-    for work in works:
-        clusters = list(work.workcluster_set.all())
-        if clusters:
-            target_cluster = clusters[0]
-            break
+
+    if perform_union:
+        # FIXME: Do an actual Union-Find.
+        for work in works:
+            clusters = list(work.workcluster_set.all())
+            if clusters:
+                target_cluster = clusters[0]
+                break
 
     if not target_cluster:
         target_cluster = WorkCluster.objects.create()

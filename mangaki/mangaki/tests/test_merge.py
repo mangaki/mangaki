@@ -1,10 +1,16 @@
+from unittest.mock import patch, Mock
+
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.contrib import admin
 from django.db import connection
+
+from mangaki import tasks
 from mangaki.models import Work, Editor, Category, Studio, WorkCluster, Rating, Staff, Role, Artist, Genre, Reference
 from datetime import datetime, timedelta
+
+from mangaki.utils.work_merge import create_work_cluster
 
 
 class MergeTest(TestCase):
@@ -95,3 +101,20 @@ class MergeTest(TestCase):
         self.assertEqual(Staff.objects.count(), 2)
         self.assertEqual(Reference.objects.count(), 2)
         self.assertEqual(Work.objects.get(id=self.work_ids[0]).genre.count(), 2)
+
+    # noinspection PyPep8Naming
+    @patch('redis.StrictRedis', autospec=True, create=True)
+    @patch('redis_lock.Lock', autospec=True, create=True)
+    def test_look_for_workcluster_deduplication_task(self, Lock, _):
+        lock = Lock.return_value
+        lock.__enter__ = Mock(return_value=None)
+        lock.__exit__ = Mock(return_value=None)
+
+        works = Work.objects.filter(id__in=self.work_ids)
+        # Create duplicates WorkClusters on purpose.
+        for _ in range(5):
+            create_work_cluster(works, perform_union=False)
+        tasks.look_for_workclusters()
+        # All duplicates have been reduced to one WorkCluster.
+        self.assertEqual(WorkCluster.objects.count(), 1)
+        self.assertEqual(lock.__enter__.call_count, 1)

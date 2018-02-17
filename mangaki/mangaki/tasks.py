@@ -33,13 +33,26 @@ else:
 def get_current_mal_import(user: User):
     return user.background_tasks.filter(tag=MAL_IMPORT_TAG).first()
 
-# 10 minutes.
 
+# 10 minutes.
 DEFAULT_LOCK_EXPIRATION_TIME = 10*60
 
 
 @app.task(name='look_for_workclusters', ignore_result=True)
 def look_for_workclusters(steal_workcluster: bool = False):
+    """
+    A maintenance Celery Task which clusters works in the database,
+    creating WorkCluster objects.
+
+    Args:
+        steal_workcluster (bool): Allow for this task to merge non-automatic WorkClusters with automatic ones.
+            (i.e. if a WorkCluster is deemed to be the same but its user is human,
+            we would steal or not its WorkCluster to merge it with a new one).
+
+    Returns: None.
+
+    """
+
     logger.info('Looking for easy WorkCluster to create...')
     with redis_lock.Lock(redis.StrictRedis(connection_pool=redis_pool),
                          'lock-wc-lookout',
@@ -57,7 +70,7 @@ def look_for_workclusters(steal_workcluster: bool = False):
         for work in Work.objects.prefetch_related('workcluster_set').iterator():
             # Only merge automatic unprocessed work clusters.
             cluster_filter = Q(status='unprocessed')
-            if not steal_workcluster:
+            if not steal_workcluster:  # Don't be evil. Don't steal human WorkClusters.
                 cluster_filter |= Q(user=None)
             clusters = work.workcluster_set.filter(cluster_filter).order_by('id').all()
             if len(clusters) > 1:
