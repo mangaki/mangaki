@@ -24,7 +24,7 @@ class MangakiFMA(RecommendationAlgorithm):
 
     @property
     def is_serializable(self):
-        return False  # Not yet
+        return True
 
     def prepare_fm(self, X):
         nb_samples = len(X)
@@ -45,19 +45,19 @@ class MangakiFMA(RecommendationAlgorithm):
         os.environ['LIBFM_PATH'] = 'XXX'  # If applicable
         fm = pywFM.FM(task='regression', num_iter=self.nb_iterations, k2=self.rank, rlog=False)  # MCMC method
         model = fm.run(X_fm, y, X_fm, y)
-        self.chrono.save('train FM' + str(model))
+        self.chrono.save('train FM')
 
-        NB_AGENTS = self.nb_users + self.nb_works
+        nb_agents = self.nb_users + self.nb_works
         current = len(model.weights)
 
         if model.global_bias is None:  # Train failed (for example, libfm does not exist)
             self.mu = 0
-            self.W = np.random.random(NB_AGENTS)
-            self.V = np.random.random((NB_AGENTS, self.rank))
+            self.W = np.random.random(nb_agents)
+            self.V = np.random.random((nb_agents, self.rank))
         else:
             self.mu = model.global_bias
-            self.W = np.pad(np.array(model.weights), (0, NB_AGENTS - current), mode='constant')  # Just in case X_fm had too many zero columns on the right
-            self.V = np.pad(model.pairwise_interactions, [(0, NB_AGENTS - current), (0, 0)], mode='constant')
+            self.W = np.pad(np.array(model.weights), (0, nb_agents - current), mode='constant')  # Just in case X_fm had too many zero columns on the right
+            self.V = np.pad(model.pairwise_interactions, [(0, nb_agents - current), (0, 0)], mode='constant')
         self.V2 = np.power(self.V, 2)
 
     def predict(self, X):
