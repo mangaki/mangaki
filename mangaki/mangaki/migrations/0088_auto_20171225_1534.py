@@ -66,7 +66,7 @@ def copy_source_field_to_reference(apps, schema_editor):
         try:
             source = infer_source(work.source.lower())
             identifier = infer_identifier(work.source, source)
-            ref = Reference.get_or_create(work=work,
+            ref = Reference.objects.get_or_create(work=work,
                             source=source,
                             identifier=identifier,
                             url=work.source)
