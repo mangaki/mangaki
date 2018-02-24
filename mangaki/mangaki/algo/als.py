@@ -62,15 +62,15 @@ class MangakiALS(RecommendationAlgorithm):
         self.VT = np.random.rand(self.nb_components, self.nb_works)
         # ALS
         for i in range(self.nb_iterations):
-            print('Step {}'.format(i), self.compute_rmse(self.y_test, self.predict(self.X_test)))
+            # print('Step {}'.format(i), self.compute_rmse(self.y_test, self.predict(self.X_test)))
             for user in matrix:
                 self.fit_user(user, matrix)
             for work in matrixT:
                 self.fit_work(work, matrixT)
 
-    def fit(self, X, y, y_test, X_test):
-        self.X_test = X_test
-        self.y_test = y_test
+    def fit(self, X, y):
+        # self.X_test = X_test
+        # self.y_test = y_test
         if self.verbose_level:
             print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         matrix, self.means = self.make_matrix(X, y)

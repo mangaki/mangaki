@@ -35,8 +35,6 @@ class MangakiALS2(RecommendationAlgorithm):
             means[user] += rating
         for user in matrix:
             means[user] /= len(matrix[user])
-        # for (user, work) in X:
-        #     matrix[user][work] -= means[user]
         return matrix, means
 
     def fit_user(self, user, matrix):
@@ -46,11 +44,7 @@ class MangakiALS2(RecommendationAlgorithm):
         wu = self.w + self.W_user[user]
         Vu = self.VT[:, Ju]
         Gu = self.lambda_ * len(matrix[user]) * np.eye(self.nb_components)
-        # print(Ru.shape)
-        # print(Wu.shape)
-        # print((Ru - Wu).shape)
         self.U[[user],:] = np.linalg.solve(Vu.dot(Vu.T) + Gu, Vu.dot(Ru - Wu - wu)).T
-        # print(np.linalg.det(Vu.dot(Vu.T) + Gu))
         self.W_user[user] = (Ru - Vu.T.dot(self.U[user, :]) - Wu).mean() / (1 + self.lambda_) - self.w
 
     def fit_work(self, work, matrixT):
@@ -60,12 +54,6 @@ class MangakiALS2(RecommendationAlgorithm):
         wi = self.w + self.W_item[work]
         Ui = self.U[Ii, :].T
         Gi = self.lambda_ * len(matrixT[work]) * np.eye(self.nb_components)
-        # print(Ri.shape)
-        # print(Wi.shape)
-        # print((Ri - Wi).shape)
-        # print(Ui.dot(Ri).shape)
-        # print(Ui.dot(Ri - Wi - wi).reshape(1, -1).shape)
-        # print(Gi.shape)
         self.VT[:,[work]] = np.linalg.solve(Ui.dot(Ui.T) + Gi, Ui.dot(Ri - Wi - wi).reshape(-1, 1))
         self.W_item[work] = (Ri - Ui.T.dot(self.VT[:, work]) - Wi).mean() / (1 + self.lambda_) - self.w
 
@@ -83,15 +71,15 @@ class MangakiALS2(RecommendationAlgorithm):
         self.W_item = np.random.rand(self.nb_works)
         # ALS
         for i in range(self.nb_iterations):
-            print('Step {}'.format(i), self.compute_rmse(self.y_test, self.predict(self.X_test)))
+            # print('Step {}'.format(i), self.compute_rmse(self.y_test, self.predict(self.X_test)))
             for user in matrix:
                 self.fit_user(user, matrix)
             for work in matrixT:
                 self.fit_work(work, matrixT)
 
-    def fit(self, X, y, y_test, X_test):
-        self.X_test = X_test
-        self.y_test = y_test
+    def fit(self, X, y):
+        # self.X_test = X_test
+        # self.y_test = y_test
         if self.verbose_level:
             print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         self.w = y.mean()
