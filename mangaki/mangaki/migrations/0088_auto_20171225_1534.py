@@ -29,7 +29,7 @@ def infer_identifier(url, source):
     elif source == 'AniDB':
         _, _, _, query_encoded, _ = _urlsplit(url)
         query_params = dict(limited_parse_qsl(query_encoded))
-        return query_params['aid']
+        return query_params.get('aid', None)
     elif source == 'Manga-News':
         # structure is: protocol://www.manga-news.com/index.php/serie/(identifier)
         return url.split('/')[5]
