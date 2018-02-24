@@ -70,6 +70,9 @@
                     <bs-light-switch v-model="receivesNewsletter">
                         Recevoir la newsletter&nbsp;:
                     </bs-light-switch>
+                    <bs-light-switch v-model="enableKbShortcuts">
+                        Activer les raccourcis clavier sur la mosaique&nbsp;:
+                    </bs-light-switch>
                 </div>
                 {% endverbatim %}
                 {% if meta.mal.is_available %}
@@ -196,6 +199,7 @@
             acceptsNSFW: {{ user.profile.nsfw_ok|yesno:"true,false" }},
             acceptsResearchUsage: {{ user.profile.research_ok|yesno:"true,false" }},
             receivesNewsletter: {{ user.profile.newsletter_ok|yesno:"true,false" }},
+            enableKbShortcuts: {{ user.profile.keyboard_shortcuts_enabled|yesno:"true,false" }},
             hasPendingMALImport: {{ meta.mal.pending_import|yesno:"true,false" }}
         };
 

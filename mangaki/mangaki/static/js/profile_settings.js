@@ -23,7 +23,8 @@ $(document).ready(function () {
       isShared: window.INITIAL_DATA.isShared,
       acceptsNSFW: window.INITIAL_DATA.acceptsNSFW,
       acceptsResearchUsage: window.INITIAL_DATA.acceptsResearchUsage,
-      receivesNewsletter: window.INITIAL_DATA.receivesNewsletter
+      receivesNewsletter: window.INITIAL_DATA.receivesNewsletter,
+      enableKbShortcuts: window.INITIAL_DATA.enableKbShortcuts
     },
     beforeUpdate: function () {
       this.updateProfile();
@@ -34,7 +35,8 @@ $(document).ready(function () {
           is_shared: this.isShared,
           nsfw_ok: this.acceptsNSFW,
           research_ok: this.acceptsResearchUsage,
-          newsletter_ok: this.receivesNewsletter
+          newsletter_ok: this.receivesNewsletter,
+          keyboard_shortcuts_enabled: this.enableKbShortcuts
         };
         betterFetch(Urls['api-update-my-profile'](), {
           method: 'PUT',

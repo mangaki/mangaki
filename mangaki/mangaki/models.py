@@ -430,6 +430,7 @@ class Profile(models.Model):
     newsletter_ok = models.BooleanField(default=True)
     reco_willsee_ok = models.BooleanField(default=False)
     research_ok = models.BooleanField(default=True)
+    keyboard_shortcuts_enabled = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
 

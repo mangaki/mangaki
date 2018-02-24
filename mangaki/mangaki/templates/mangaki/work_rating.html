@@ -4,7 +4,7 @@
 
 {% static 'img/ratings.svg' as rating_svg_link %}
 
-<div class="work-card{% if not config and not rating %} no-rating{% endif %}{% if sort_mode == "mosaic" %} work-card_loading{% endif %} work-card_horizontal"
+<div tabindex="0" class="work-card{% if not config and not rating %} no-rating{% endif %}{% if sort_mode == "mosaic" %} work-card_loading{% endif %} work-card_horizontal"
         {% if sort_mode == 'mosaic' %} data-slot-sort="{{ slot_type|lower }}" {% endif %}>
     <div class="work-card__media work-cover{% if not simple %} work-cover_backdrop{% endif %}"
             style="background-image: url('{% poster_url work bypass_nsfw_settings %}');">

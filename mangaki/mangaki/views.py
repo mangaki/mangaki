@@ -366,6 +366,8 @@ class WorkList(WorkListMixin, ListView):
         context['category'] = self.category.slug
         context['is_dpp'] = self.is_dpp
         context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS if not self.is_dpp else DPP_UI_CONFIG_FOR_RATINGS
+        context['enable_kb_shortcuts'] = (False if self.request.user.is_anonymous
+        else self.request.user.profile.keyboard_shortcuts_enabled)
         context['objects_count'] = self.category.work_set.count()
 
         if sort_mode == 'mosaic' and not self.is_dpp:
