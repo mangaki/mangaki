@@ -1,5 +1,4 @@
 import numpy as np
-import pywFM
 import os
 from scipy.sparse import coo_matrix
 
@@ -39,11 +38,15 @@ class MangakiFMA(RecommendationAlgorithm):
         return X_fm
 
     def fit(self, X, y):
+        # Should not be done in production :) Otherwise you should also install libFM:
+        # https://github.com/srendle/libfm
+        import pywFM
         X_fm = self.prepare_fm(X)
         self.chrono.save('prepare data in sparse FM format')
 
         os.environ['LIBFM_PATH'] = 'XXX'  # If applicable
         fm = pywFM.FM(task='regression', num_iter=self.nb_iterations, k2=self.rank, rlog=False)  # MCMC method
+        # rlog contains the RMSE at each epoch, we do not need it here
         model = fm.run(X_fm, y, X_fm, y)
         self.chrono.save('train FM')
 
