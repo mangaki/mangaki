@@ -67,10 +67,15 @@ def copy_source_field_to_reference(apps, schema_editor):
             source = infer_source(work.source.lower())
             identifier = infer_identifier(work.source, source)
             if identifier is not None:
-                ref = Reference.objects.get_or_create(work=work,
-                                source=source,
-                                identifier=identifier,
-                                url=work.source)
+                lookup = {
+                    'work': work,
+                    'source': source,
+                    'identifier': identifier,
+                    'url': work.source
+                }
+                ref = Reference.objects.filter(**lookup)
+                if not ref:
+                    Reference.objects.create(**lookup)
         except (TypeError, ValueError) as e:
             print('Failed to data-migrate: {} - {} ({})'.format(ref.id, ref.url, e))
             continue
