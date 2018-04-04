@@ -80,6 +80,26 @@ def copy_source_field_to_reference(apps, schema_editor):
             print('Failed to data-migrate: {} - {} ({})'.format(ref.id, ref.url, e))
             continue
 
+def remove_duplicates(apps, schema_editor):
+    Reference = apps.get_model('mangaki', 'Reference')
+    db_alias = schema_editor.connection.alias
+
+    unique_fields = ['work', 'source', 'identifier']
+
+    duplicates = (Reference.objects.using(db_alias)
+                                   .values(*unique_fields)
+                                   .order_by()
+                                   .annotate(max_id=models.Max('id'),
+                                             count_id=models.Count('id'))
+                                   .filter(count_id__gt=1)
+                                   .iterator())
+
+    for duplicate in duplicates:
+        (Reference.objects.using(db_alias)
+                          .filter(**{x: duplicate[x] for x in unique_fields})
+                          .exclude(id=duplicate['max_id'])
+                          .delete())
+
 # migrations.RunPython.noop cause circular reference error…
 def noop(apps, schema_editor):
     return None
@@ -106,5 +126,7 @@ class Migration(migrations.Migration):
         migrations.RunPython(copy_url_to_id_and_source,
                              reverse_code=migrations.RunPython.noop),
         migrations.RunPython(copy_source_field_to_reference,
+                             reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(remove_duplicates,
                              reverse_code=migrations.RunPython.noop)
     ]
