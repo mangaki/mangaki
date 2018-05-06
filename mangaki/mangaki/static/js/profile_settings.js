@@ -30,6 +30,36 @@ $(document).ready(function () {
       this.updateProfile();
     },
     methods: {
+      exportData: function () {
+        betterFetch(Urls['api-export-my-data'](), {
+          method: 'POST',
+          credentials: 'same-origin'
+        }).then(resp => {
+          console.log('Download will start soon…', resp);
+          return resp.blob();
+        }).then(blob => {
+          let fakeLink = document.createElement('a');
+          document.body.appendChild(fakeLink);
+          let targetUrl = window.URL.createObjectURL(blob);
+          fakeLink.href = targetUrl;
+          fakeLink.download = 'user_archive.zip';
+          fakeLink.click();
+          window.URL.revokeObjectURL(targetUrl);
+          document.body.removeChild(fakeLink);
+        }).catch(err => {
+          console.log('error happened', err);
+        });
+      },
+      deleteAccount: function () {
+        betterFetch(Urls['api-delete-my-account'](), {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        }).then(resp => {
+          console.log('account deleted, redirecting to template', resp);
+        }).catch(err => {
+          console.log('error happened', err);
+        });
+      },
       updateProfile: function () {
         const payload = {
           is_shared: this.isShared,
