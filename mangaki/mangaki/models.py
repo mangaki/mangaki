@@ -610,3 +610,15 @@ class UserBackgroundTask(models.Model):
 
     def __str__(self):
         return '<{} owned by {}>'.format(self.tag, self.owner)
+
+
+class UserArchive(models.Model):
+    updated_on = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    local_archive = models.FileField(upload_to='user_archives/')
+
+    def __str__(self):
+        try:
+            return '<UserArchive owned by {} at {}>'.format(self.owner, self.local_archive.path)
+        except ValueError:
+            return '<Empty UserArchive owned by {}>'.format(self.owner)

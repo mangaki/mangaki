@@ -22,3 +22,4 @@ redis==2.10.*
 Pillow>=4.1
 dedupe==1.7.*
 setuptools-scm==1.15.*
+django-sendfile==0.3.*
