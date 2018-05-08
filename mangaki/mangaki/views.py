@@ -51,7 +51,7 @@ from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.tokens import compute_token, KYOTO_SALT
 from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
-from irl.models import Event, Partner, Attendee
+from irl.models import Partner
 
 
 NB_POINTS_DPP = 10
@@ -242,31 +242,6 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         form.instance.user = self.request.user
         form.save()
         return super().form_valid(form)
-
-
-class EventDetail(LoginRequiredMixin, DetailView):
-    model = Event
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if 'next' in request.GET:
-            return redirect(request.GET['next'])
-        return redirect(self.object.work.get_absolute_url())
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        attending = None
-        if 'wontgo' in request.POST:
-            attending = False
-        if 'willgo' in request.POST:
-            attending = True
-        if attending is not None:
-            Attendee.objects.update_or_create(
-                event=self.object, user=request.user,
-                defaults={'attending': attending})
-        elif 'cancel' in request.POST:
-            Attendee.objects.filter(event=self.object, user=request.user).delete()
-        return redirect(request.GET['next'])
 
 
 class WorkListMixin:
