@@ -20,7 +20,7 @@ from django.db.models import QuerySet, Q
 from django.utils.functional import cached_property
 from django.db import transaction
 
-from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle, ExtLanguage
+from mangaki.models import Work, Rating, Category, WorkTitle, ExtLanguage
 
 import logging
 
@@ -547,12 +547,6 @@ def import_mal(mal_username: str, mangaki_username: str,
                                     user_work.title)
             except Exception:
                 logger.exception('Failure to fetch the work from MAL and import it into the Mangaki database.')
-                SearchIssue(
-                    user=user,
-                    title=user_work.title,
-                    poster=user_work.poster,
-                    mal_id=user_work.mal_id,
-                    score=user_work.score).save()
                 fails.append(user_work.title)
 
     # MAL is the source of truth for further imports, rather than our own database of ratings.

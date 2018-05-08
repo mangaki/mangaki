@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
-    Suggestion, Evidence, SearchIssue, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
+    Suggestion, Evidence, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
     FAQEntry, ColdStartRating, Trope, Language,
     ExtLanguage, WorkCluster,
@@ -646,11 +646,6 @@ class SuggestionAdmin(admin.ModelAdmin):
         self.message_user(request, "L'invalidation de %s a été réalisé avec succès." % message_bit)
 
     uncheck_suggestions.short_description = "Invalider les suggestions sélectionnées"
-
-
-@admin.register(SearchIssue)
-class SearchIssueAdmin(admin.ModelAdmin):
-    list_display = ('title', 'date', 'user')
 
 
 @admin.register(Announcement)
