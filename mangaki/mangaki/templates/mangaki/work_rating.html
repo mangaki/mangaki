@@ -1,6 +1,7 @@
 {% load staticfiles %}
 {% load static %}
 {% load posters %}
+{% load i18n %}
 
 {% static 'img/ratings.svg' as rating_svg_link %}
 
@@ -20,7 +21,7 @@
                 </div>
                 <a href="{% if work.id == None %}#{% else %}{% url "work-detail" work.category.slug work.id %}{% endif %}"
                         class="work-card__link">
-                Plus d'infos…
+                {% trans "See more…" %}
                 </a>
             </div>
             </div>

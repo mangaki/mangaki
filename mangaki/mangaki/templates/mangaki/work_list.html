@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load i18n %}
 {% load anonymous_ratings %}
 
 {% block body %}
@@ -8,10 +8,12 @@
         <div class="row well shortcuts-explanations-container">
             <span>
                 <h3><strong>
-                    Cheatsheet pour les raccourcis clavier
+                    {% trans "Cheatsheet for key shortcuts" %}
+                    <!-- Cheatsheet pour les raccourcis clavier -->
                 </strong></h3>
             </span>
-            <h4>Déplacements</h4>
+            <h4>{% trans "Moves" %}</h4>
+            <!-- <h4>Déplacements</h4> -->
             <ul>
                 <li>Aller à gauche: <kbd>←</kbd></li>
                 <li>Aller à droite: <kbd>→</kbd></li>
@@ -33,10 +35,19 @@
                 <div class="col-xs-12">
                     <p class="alert alert-info">
                         {% if user.is_authenticated %}
-                            Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{% url 'reco' %}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;!
+                            {% url "reco" as reco_url %}
+                            {% blocktrans trimmed %}
+                                Rate a few cards below, or using the search bar.<br />
+                                Then click <a class="alert-link" href="{{ reco_url }}">Recommendations</a> to see what <em>Mangaki</em> recommends!
+                            {% endblocktrans %}
+                            <!-- Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{{ reco_url }}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;! -->
                         {% else %}
-                            Nouveau sur Mangaki ? <a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
-                            <a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em>
+                            {% url "account_signup" as signup_url %}
+                            {% blocktrans trimmed %}
+                                New on Mangaki? Start rating some works below! Then see your recommendations, and <a href="{{ signup_url }}?next={{ request.get_full_path|urlencode }}">sign up</a> to keep your ratings.
+                            {% endblocktrans %}
+                            <!-- Nouveau sur Mangaki ? <a href="{{ signup_url }}?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
+                                <a href="{{ login_url }}?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em> -->
                         {% endif %}
                     </p>
                 </div>
@@ -46,27 +57,30 @@
                 <ul class="nav nav-tabs">
                     {% if is_dpp %}
 
-                        <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}"><em>Anime</em> seulement</a></li>
+                        <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}">
+                            {% trans "Anime only</a>" %}
+                            <!-- <em>Anime</em> seulement</a> -->
+                        </li>
 
                         <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'manga' %}"><em>Manga</em> seulement</a></li>
 
                     {% else %}
                         <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}">Mosaïque</a></li>
+                            <a href="{% url 'work-list' category %}">{% trans "Mosaic" %}</a></li>
                         <li role="presentation"{% if sort_mode == 'new' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=new">Récents</a></li>
+                            <a href="{% url 'work-list' category %}?sort=new">{% trans "Recent" %}</a></li>
                         <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=top">Top</a></li>
+                            <a href="{% url 'work-list' category %}?sort=top">{% trans "Top" %}</a></li>
                         <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=popularity">Populaires</a></li>
+                            <a href="{% url 'work-list' category %}?sort=popularity">{% trans "Popular" %}</a></li>
                         <li role="presentation"{% if sort_mode == 'pearls' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=pearls">Perles rares</a></li>
+                            <a href="{% url 'work-list' category %}?sort=pearls">{% trans "Pearls" %}</a></li>
                         <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=controversy">Controversés !</a></li>
+                            <a href="{% url 'work-list' category %}?sort=controversy">{% trans "Controversial" %}</a></li>
                         <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=random">Random</a></li>
+                            <a href="{% url 'work-list' category %}?sort=random">{% trans "Random" %}</a></li>
                         <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">Alphabétique</a></li>
+                            <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">{% trans "Alpha" %}</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -88,12 +102,12 @@
                 {% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' and not is_dpp %}
                     <form method="GET">
                         <div class="input-group">
-                            <input class="search-input form-control {{category}}" placeholder="Entrez le titre d'un {{category}} (actuellement {{ objects_count }} {{ category }}{{ objects_count | pluralize }})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
+                            <input class="search-input form-control {{category}}" placeholder="{% blocktrans %}Enter the title of some {{category}} (currently {{ objects_count }} works)"{% endblocktrans %} type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
                             <span class="input-group-btn">
         <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
           </span>
                         </div>
-                        <span class="help-block" style="float: right">Astuce&nbsp;: Vous pouvez appuyer sur la touche "Entrée" de votre clavier pour lancer la recherche</span>
+                        <span class="help-block" style="float: right">{% trans "Hint: press Enter to trigger the search" %}</span>
                     </form>
                 {% endif %}
             </div>
@@ -111,7 +125,7 @@
                         {% if is_dpp %}
                             <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco_dpp' %}?category={{ category }}">Je n'arrive plus à noter, montrez-moi de nouvelles oeuvres&nbsp;!</a>
                         {% else %}
-                            <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco' %}?category={{ category }}">Je n'arrive plus à noter, conseillez-moi&nbsp;!</a>
+                            <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco' %}?category={{ category }}">{% trans "Get recommendations now" %}</a>
                         {% endif %}
                     </div>
                 </div>

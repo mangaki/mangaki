@@ -1,37 +1,38 @@
-# Mangaki's translation in English.
-# Copyright (C) 2017 Mangaki
-# This file is distributed under the same license as the Mangaki package.
-# Jill-Jênn Vie <vie@jill-jenn.net>, 2017.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.2\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-21 15:05+0000\n"
-"PO-Revision-Date: 2017-06-27 17:23+0000\n"
-"Last-Translator: Ryan Lahfa <masterancpp@gmail.com>\n"
-"Language-Team: English <language@mangaki.fr>\n"
-"Language: English\n"
+"POT-Creation-Date: 2018-04-21 22:51+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: mangaki/choices.py:40 mangaki/templates/base.html:111
+#: mangaki/choices.py:40 mangaki/templates/base.html:108
 msgid "Directors"
-msgstr ""
+msgstr "Réalisateurs"
 
 #: mangaki/settings.py:258
 msgid "Français"
-msgstr "French"
+msgstr ""
 
 #: mangaki/settings.py:259
 msgid "English"
-msgstr "English"
+msgstr ""
 
 #: mangaki/settings.py:260
 msgid "日本語"
-msgstr "Japanese"
+msgstr ""
 
 #: mangaki/settings.py:261
 msgid "中文"
@@ -46,77 +47,68 @@ msgid ""
 "Mangaki est un <strong>site de recommandation de mangas et d'anime</strong> "
 "créé par une association."
 msgstr ""
-"Mangaki is a <strong>non-profit recommender system of manga and anime</"
-"strong>."
 
 #: mangaki/templates/about.html:15
 msgid ""
 "À partir des séries que vous avez vues ou lues, <strong>notre algorithme</"
 "strong> détermine de nouvelles pépites susceptibles de vous plaire&nbsp;!"
 msgstr ""
-"From the anime you watched and the manga you read, <strong>our algorithm</"
-"strong> discover new precious pearls that you will love!"
 
 #: mangaki/templates/about.html:17
 msgid ""
 "Si vous souhaitez participer à l'aventure, il y a plein de choses à "
 "faire&nbsp;!"
-msgstr "If you want to join, there's plenty to do! "
+msgstr ""
 
 #: mangaki/templates/about.html:18 mangaki/templates/about.html:35
 msgid "Nous contacter"
-msgstr "Contact us"
+msgstr ""
 
 #: mangaki/templates/about.html:19
 msgid "Consulter le wiki"
-msgstr "Browse the wiki"
+msgstr ""
 
 #: mangaki/templates/about.html:20
 msgid "Voir le code sur GitHub"
-msgstr "See the code on GitHub"
+msgstr ""
 
 #: mangaki/templates/about.html:24
 msgid "Découvrez la data science à travers Mangaki"
-msgstr "Discover data science with Mangaki"
+msgstr ""
 
 #: mangaki/templates/about.html:30
 msgid ""
 "Notre algorithme est open source, donc vous pouvez l'étudier, et proposer "
 "des améliorations."
-msgstr "Our algorithm is open source, so you can study it and improve it!"
+msgstr ""
 
 #: mangaki/templates/about.html:32
 msgid ""
 "Connaissez-vous ces termes&nbsp;: plus proches voisins, décomposition en "
 "valeurs singulières, prix Netflix, autoencodeur&nbsp;? "
 msgstr ""
-"Do you know these concepts? Nearest neighbors, singular value decomposition, "
-"Netflix Prize, autoencoder? "
 
 #: mangaki/templates/about.html:34
 msgid "Venez apprendre tout cela sur le repo ou dans l'asso."
 msgstr ""
-"Come and learn all of these on the GitHub repo or within the organization!"
 
 #: mangaki/templates/about.html:36
 msgid "Consulter le blog"
-msgstr "Browse the blog"
+msgstr ""
 
 #: mangaki/templates/about.html:40
 msgid "Le bureau de l'association - 団長"
-msgstr "Our Board - 団長"
+msgstr ""
 
 #: mangaki/templates/about.html:48
 msgid "Président"
-msgstr "President"
+msgstr ""
 
 #: mangaki/templates/about.html:50
 msgid ""
 "JJ est chercheur à RIKEN, Tokyo. Il a conçu l'algorithme de recommandation "
 "et pilote l'association depuis le Japon."
 msgstr ""
-"JJ is a researcher in RIKEN, Tokyo. He developed the main recommendation "
-"algorithms and is conducting Mangaki from Japan."
 
 #: mangaki/templates/about.html:57
 #, python-format
@@ -129,16 +121,10 @@ msgid ""
 "href=\"%(haruhi_suzumiya_url)s\">Haruhi Suzumiya</a> (en témoigne son <a "
 "href=\"%(tv_tropes_hs_url)s\" target=\"_blank\">gisement de tropes</a>)."
 msgstr ""
-"Absolute fan of the genius composer <a href=\"%(yoko_kanno_url)s\">Yoko "
-"Kanno</a>, <a href=\"%(satoshi_kon_url)s\">Satoshi Kon</a> and <a href="
-"\"%(cowboy_bebop_url)s\">Cowboy Bebop</a>, he is mostly interested in the "
-"screenplay and the storytelling of anime. For him, the best plot ever made "
-"is <a href=\"%(haruhi_suzumiya_url)s\">Haruhi Suzumiya</a> (notably its <a "
-"href=\"%(tv_tropes_hs_url)s\" target=\"_blank\">gold mine of tropes</a>).</p>"
 
 #: mangaki/templates/about.html:68
 msgid "Trésorier"
-msgstr "Treasurer"
+msgstr ""
 
 #: mangaki/templates/about.html:74
 #, python-format
@@ -149,11 +135,6 @@ msgid ""
 "\">React.js</a>, la bibliothèque JavaScript qui supporte aujourd'hui <a href="
 "\"%(facebook_url)s\" target=\"_blank\">Facebook</a>."
 msgstr ""
-"Ryan actively takes part in open source projects, some are based on the <a "
-"href=\"%(python_url)s\" target=\"_blank\">Python</a> language and web "
-"technologies such as <a href=\"%(react_url)s\" target=\"_blank\">React.js</"
-"a>, the JavaScript library which powers <a href=\"%(facebook_url)s\" target="
-"\"_blank\">Facebook</a>."
 
 #: mangaki/templates/about.html:80
 #, python-format
@@ -163,20 +144,16 @@ msgid ""
 "\">Steins;Gate</a>. Au passage, il est fasciné par <a href="
 "\"%(yu_kamiya_url)s\">Yû Kamiya</a>."
 msgstr ""
-"Seasoned time traveler, he never refrains from challenging the world's "
-"foundations and wants to reach someday the <a href=\"%(steinsgate_url)s"
-"\">Steins;Gate</a>. Also, he is fascinated by <a href=\"%(yu_kamiya_url)s"
-"\">Yû Kamiya</a>."
 
 #: mangaki/templates/about.html:93
 msgid "Vice-président"
-msgstr "Vice-President"
+msgstr ""
 
 #: mangaki/templates/about.html:96
 msgid ""
 "Basile est développeur professionnel, ancien élève de l'École normale "
 "supérieure. Il code entre autres des chatbots."
-msgstr "Basile is a developer, alumni of École normale supérieure."
+msgstr ""
 
 #: mangaki/templates/about.html:99
 #, python-format
@@ -184,12 +161,10 @@ msgid ""
 "Il aime bien <a href=\"%(haruhi_suzumiya_url)s\">Haruhi Suzumiya</a>, et "
 "c'est à peu près tout."
 msgstr ""
-"He loves <a href=\"%(haruhi_suzumiya_url)s\">Haruhi Suzumiya</a>, yep, "
-"that's all."
 
 #: mangaki/templates/about.html:107
 msgid "Le conseil d'administration - 団"
-msgstr "Board of directors — 団"
+msgstr ""
 
 #: mangaki/templates/about.html:112
 #, python-format
@@ -203,13 +178,6 @@ msgid ""
 "Style</a> et <a href=\"%(mangacast_url)s\" target=\"_blank\">ses critiques "
 "d'anime chez Mangacast</a>."
 msgstr ""
-"<p><strong>Sedeto</strong> is a graphic manga designer at the Delcourt "
-"group. She made Mangaki's logo. She loves <a href=\"%(kunihiko_ikuhara_url)s"
-"\">Kunihiko Ikuhara</a> and the studio <a href=\"%(akiyuki_shinbou_url)s"
-"\">Shaft</a>, as well as shōjo and hentai, so many inspirations that appear "
-"in <a href=\"%(doujinstyle_url)s\" target=\"_blank\">her works for Doujin "
-"Style</a> and <a href=\"%(mangacast_url)s\" target=\"_blank\">anime critics "
-"on the French podcast Mangacast</a>."
 
 #: mangaki/templates/about.html:121
 #, python-format
@@ -225,17 +193,10 @@ msgid ""
 "\"%(takeshi_obata_url)s\">Takeshi Obata</a> ainsi que celui des studios "
 "Colorido, KyoAni et Trigger.</p>"
 msgstr ""
-"<p><strong>Soubi</strong> in an Web engineer at a big media group, helping "
-"with frontend and communication in Mangaki. He loves to attend the <a href="
-"\"%(comiket_url)s\">Comiket</a>, yaoi and seinen, and the works of <a href="
-"\"%(yoshiyuki_sadamoto_url)s\">Yoshiyuki Sadamoto</a>, <a href="
-"\"%(hideaki_anno_url)s\">Hideaki Anno</a>, <a href=\"%(satoshi_kon_url)s"
-"\">Satoshi Kon</a>, Sushio, <a href=\"%(takeshi_obata_url)s\">Takeshi Obata</"
-"a> and studios Colorido, KyoAni et Trigger.</p>"
 
 #: mangaki/templates/about.html:126
 msgid "Vous souhaitez nous rejoindre ? Contactez-nous&nbsp;!"
-msgstr "Do you want to join us? Contact us!"
+msgstr ""
 
 #: mangaki/templates/account/email_confirm.html:6
 #: mangaki/templates/account/email_confirm.html:10
@@ -355,7 +316,7 @@ msgstr ""
 msgid "Your password is now changed."
 msgstr ""
 
-#: mangaki/templates/account/signup.html:7 mangaki/templates/base.html:128
+#: mangaki/templates/account/signup.html:7 mangaki/templates/base.html:125
 #: mangaki/templates/socialaccount/signup.html:6
 msgid "Signup"
 msgstr ""
@@ -381,57 +342,55 @@ msgstr ""
 msgid "No, take me back"
 msgstr ""
 
-#: mangaki/templates/base.html:15
+#: mangaki/templates/base.html:14
 msgid "Mangaki is an anime & manga recommendation website"
-msgstr ""
+msgstr "Mangaki est un site de recommandation de mangas et d'anime"
 
-#: mangaki/templates/base.html:42
+#: mangaki/templates/base.html:41
 msgid "Open the menu"
-msgstr ""
+msgstr "Ouvrir le menu"
 
-#: mangaki/templates/base.html:81
+#: mangaki/templates/base.html:78
 msgid "What is Mangaki?"
-msgstr ""
+msgstr "C'est quoi ?"
 
-#: mangaki/templates/base.html:88
+#: mangaki/templates/base.html:85
 msgid "Anime"
-msgstr "Anime"
+msgstr ""
 
-#: mangaki/templates/base.html:93
+#: mangaki/templates/base.html:90
 msgid "Mangas"
-msgstr "Mangas"
+msgstr ""
 
-#: mangaki/templates/base.html:98
-#, fuzzy
-#| msgid "Recommandations"
+#: mangaki/templates/base.html:95
 msgid "Recommendations"
-msgstr "Recommendations"
+msgstr "Recommandations"
 
-#: mangaki/templates/base.html:103
+#: mangaki/templates/base.html:100
 msgid "Events"
-msgstr ""
+msgstr "Événements"
 
-#: mangaki/templates/base.html:108
+#: mangaki/templates/base.html:105
 msgid "Top 20"
-msgstr "Top 20"
+msgstr ""
 
-#: mangaki/templates/base.html:112
+#: mangaki/templates/base.html:109
 msgid "Composers"
-msgstr ""
+msgstr "Compositeurs"
 
-#: mangaki/templates/base.html:113
+#: mangaki/templates/base.html:110
 msgid "Authors"
-msgstr ""
+msgstr "Auteurs"
 
-#: mangaki/templates/base.html:118
+#: mangaki/templates/base.html:115 mangaki/templates/fix/fix_index.html:14
 msgid "Suggestions"
-msgstr ""
+msgstr "Suggestions"
 
-#: mangaki/templates/base.html:126
+#: mangaki/templates/base.html:123
 msgid "Log in"
 msgstr ""
 
-#: mangaki/templates/base.html:131
+#: mangaki/templates/base.html:128
 #, python-format
 msgid ""
 "\n"
@@ -439,45 +398,59 @@ msgid ""
 "                                "
 msgstr ""
 
-#: mangaki/templates/base.html:136
+#: mangaki/templates/base.html:133
 msgid "Log out"
 msgstr ""
 
-#: mangaki/templates/base.html:168
+#: mangaki/templates/base.html:165
 msgid "Mangaki project"
 msgstr ""
 
-#: mangaki/templates/base.html:170
+#: mangaki/templates/base.html:167
 msgid "FAQ"
 msgstr ""
 
-#: mangaki/templates/base.html:172
+#: mangaki/templates/base.html:169
+#, fuzzy
+#| msgid "Recommendations"
 msgid "Legal mentions"
-msgstr ""
+msgstr "Recommandations"
 
-#: mangaki/templates/base.html:174
+#: mangaki/templates/base.html:171
 msgid "Guidelines"
 msgstr ""
 
-#: mangaki/templates/base.html:176
+#: mangaki/templates/base.html:173
 msgid "Contact:"
 msgstr ""
 
-#: mangaki/templates/base.html:179
+#: mangaki/templates/base.html:176
 msgid "Report a bug"
 msgstr ""
 
-#: mangaki/templates/base.html:181
+#: mangaki/templates/base.html:178
 msgid "Donate"
 msgstr ""
 
-#: mangaki/templates/base.html:185
+#: mangaki/templates/base.html:182
 msgid "Version:"
 msgstr ""
 
-#: mangaki/templates/index.html:9
-msgid "Mangaki, anime and manga recommendation"
+#: mangaki/templates/fix/fix_index.html:5
+#, fuzzy
+#| msgid "Suggestions"
+msgid "Liste des suggestions"
+msgstr "Suggestions"
+
+#: mangaki/templates/fix/fix_index.html:12
+msgid "Access to the NSFW grid"
 msgstr ""
+
+#: mangaki/templates/index.html:9
+#, fuzzy
+#| msgid "Mangaki is an anime & manga recommendation website"
+msgid "Mangaki, anime and manga recommendation"
+msgstr "Mangaki est un site de recommandation de mangas et d'anime"
 
 #: mangaki/templates/index.html:11
 msgid "Rate your favorite series and discover new ones!"
@@ -499,6 +472,14 @@ msgstr ""
 msgid "How does it work?"
 msgstr ""
 
+#: mangaki/templates/mangaki/artist_list.html:5
+msgid "Artists"
+msgstr ""
+
+#: mangaki/templates/mangaki/artist_list.html:15
+msgid "Hint: You can press Enter to trigger the search"
+msgstr ""
+
 #: mangaki/templates/mangaki/reco_list.html:10
 msgid ""
 "Here are some recommendations that you might like.<br /> Rate them and "
@@ -510,16 +491,12 @@ msgid "All"
 msgstr ""
 
 #: mangaki/templates/mangaki/reco_list.html:20
-#, fuzzy
-#| msgid "Anime"
 msgid "Anime only"
-msgstr "Anime"
+msgstr ""
 
 #: mangaki/templates/mangaki/reco_list.html:21
-#, fuzzy
-#| msgid "Mangas"
 msgid "Manga only"
-msgstr "Mangas"
+msgstr ""
 
 #: mangaki/templates/mangaki/reco_list.html:28
 msgid ""
@@ -567,10 +544,8 @@ msgid "Recent"
 msgstr ""
 
 #: mangaki/templates/mangaki/work_list.html:73
-#, fuzzy
-#| msgid "Top 20"
 msgid "Top"
-msgstr "Top 20"
+msgstr ""
 
 #: mangaki/templates/mangaki/work_list.html:75
 msgid "Popular"
@@ -600,9 +575,42 @@ msgstr ""
 
 #: mangaki/templates/mangaki/work_list.html:128
 #, fuzzy
-#| msgid "Recommandations"
+#| msgid "Recommendations"
 msgid "Get recommendations now"
-msgstr "Recommendations"
+msgstr "Recommandations"
+
+#: mangaki/templates/profile.html:23
+msgid "Your ratings"
+msgstr ""
+
+#: mangaki/templates/profile.html:24
+msgid "Signup to save them"
+msgstr ""
+
+#: mangaki/templates/profile.html:28
+#, python-format
+msgid "Inscrit depuis %(member_days)s jours"
+msgstr ""
+
+#: mangaki/templates/profile.html:35
+msgid "Profil public&nbsp;:"
+msgstr ""
+
+#: mangaki/templates/profile.html:39
+msgid "Afficher visuels pour public averti&nbsp;:"
+msgstr ""
+
+#: mangaki/templates/profile.html:43
+msgid "Participer à l'amélioration des algorithmes de Mangaki&nbsp;:"
+msgstr ""
+
+#: mangaki/templates/profile.html:47
+msgid "Recevoir la newsletter&nbsp;:"
+msgstr ""
+
+#: mangaki/templates/profile.html:50
+msgid "Activer les raccourcis clavier sur la mosaique&nbsp;:"
+msgstr ""
 
 #: mangaki/templates/socialaccount/connections.html:5
 #: mangaki/templates/socialaccount/connections.html:8
@@ -640,22 +648,8 @@ msgid ""
 "connecter à\n"
 "%(site_name)s. Pour terminer, veuillez compléter le formulaire suivant:"
 msgstr ""
-" You are going to use your %(provider_name)s's account to connect to\n"
-"%(site_name)s. To complete the process, please fill this form:"
 
 #: mangaki/templates/top.html:6
 #, python-format
 msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
-msgstr ""
-
-#~ msgid "Réalisateurs"
-#~ msgstr "Directors"
-
-#~ msgid "Quelle sera votre prochaine série favorite&nbsp;?"
-#~ msgstr "What series should you watch next?"
-
-#~ msgid "C'est quoi ?"
-#~ msgstr "What is Mangaki?"
-
-#~ msgid "Événements"
-#~ msgstr "Events"
+msgstr "Top %(size)s des %(category)s sur Mangaki au %(date)s"

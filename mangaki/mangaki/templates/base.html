@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Mangaki est un site de recommandation de mangas et d'anime">
+    <meta name="description" content="{% trans "Mangaki is an anime & manga recommendation website" %}">
     {% block opengraph %}{% endblock %}
     {% block twittercard %}{% endblock %}
     <title>{% block title %}Mangaki{% endblock %}</title>
@@ -31,7 +31,7 @@
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                             data-target="#menu-collapse">
-                        <span class="sr-only">Ouvrir le menu</span>
+                        <span class="sr-only">{% trans "Open the menu" %}</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
@@ -46,15 +46,29 @@
                         <li class="dropdown">
                             {% get_current_language as LANGUAGE_CODE %}
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-globe"></span>&nbsp;{{ LANGUAGE_CODE }} <span class="caret"></span></a>
+
+                            <script>
+                                function sendlang(lang) {
+                                    $.post('/i18n/setlang/', {language: lang}, data => {
+                                        if (window.location.pathname.substring(0, 6) == '/about') {
+                                            window.location.href = '/about';
+                                        } else {
+                                            window.location.reload();
+                                        }
+                                    });
+                                }
+                            </script>
+
+                            {% get_available_languages as LANGUAGES %}
                             <ul class="dropdown-menu" aria-label="language-submenu" aria-hidden="true">
-                                <li><a href="{% url 'about' 'fr' %}">Français</a></li>
-                                <li><a href="{% url 'about' 'en' %}">English</a></li>
-                                <li><a href="{% url 'about' 'ja' %}">日本語</a></li>
+                                {% for lang_code, lang_name in LANGUAGES %}
+                                    <li><a href="javascript:sendlang('{{ lang_code }}')" class="inactive">{{ lang_name }}</a></li>
+                                {% endfor %}
                             </ul>
                         </li>
                         <li class="dropdown">
                             <a href="{% url 'about' LANGUAGE_CODE %}">
-                                {% trans "C'est quoi ?" %}
+                                {% trans "What is Mangaki?" %}
                             </a>
                         </li>
                     </ul>
@@ -71,7 +85,12 @@
                         </li>
                         <li class="dropdown">
                             <a href="{% url 'reco' %}">
-                                {% trans "Recommandations" %}
+                                {% trans "Recommendations" %}
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="{% url 'events' %}">
+                                {% trans "Events" %}
                             </a>
                         </li>
                         <li class="dropdown">
@@ -79,9 +98,9 @@
                                 {% trans "Top 20" %} <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu" aria-label="top20-submenu" aria-hidden="true">
-                                <li><a href="{% url 'top' 'directors' %}">{% trans "Directeurs" %}</a></li>
-                                <li><a href="{% url 'top' 'composers' %}">{% trans "Compositeurs" %}</a></li>
-                                <li><a href="{% url 'top' 'authors' %}">{% trans "Auteurs" %}</a></li>
+                                <li><a href="{% url 'top' 'directors' %}">{% trans "Directors" %}</a></li>
+                                <li><a href="{% url 'top' 'composers' %}">{% trans "Composers" %}</a></li>
+                                <li><a href="{% url 'top' 'authors' %}">{% trans "Authors" %}</a></li>
                             </ul>
                         </li>
                         <li class="dropdown">
@@ -94,13 +113,17 @@
                     <ul class="nav navbar-nav navbar-right">
                         {% if not user.is_authenticated %}
                             <li><a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"><span
-                                    class="glyphicon glyphicon-log-in"></span>&nbsp;Connexion</a></li>
+                                    class="glyphicon glyphicon-log-in"></span>&nbsp;{% trans "Log in" %}</a></li>
                             <li><a href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}"><span
-                                    class="glyphicon glyphicon-user"></span>&nbsp;Inscription</a></li>
+                                    class="glyphicon glyphicon-user"></span>&nbsp;{% trans "Signup" %}</a></li>
                         {% else %}
-                            <li><a href="{% url 'profile' user.username %}">Bienvenue, <strong>{{ user.username }}</strong> !</a>
+                            <li><a href="{% url 'profile' user.username %}">
+                                {% blocktrans with username=user.username %}
+                                Welcome, <strong>{{ user }}</strong>!
+                                {% endblocktrans %}
+                            </a>
                             </li>
-                            <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Quitter</a>
+                            <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;{% trans "Log out" %}</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -131,22 +154,25 @@
     <nav class="navbar navbar-default">
         <div class="navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="{% url 'about' 'fr' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;Le
-                    projet</a></li>
-                <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;FAQ</a></li>
-                <li><a href="{% url 'legal' %}"><span class="glyphicon glyphicon-copyright-mark"></span>&nbsp;Mentions légales</a></li>
-                <li><a href="{% url 'cgu' %}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;CGU</a></li>
+                <li><a href="{% url 'about' 'fr' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;
+                    {% trans "Mangaki project" %}</a></li>
+                <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;
+                    {% trans "FAQ" %}</a></li>
+                <li><a href="{% url 'legal' %}"><span class="glyphicon glyphicon-copyright-mark"></span>&nbsp;
+                    {% trans "Legal mentions" %}</a></li>
+                <li><a href="{% url 'cgu' %}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;
+                    {% trans "Guidelines" %}</a></li>
                 <li><a href="https://twitter.com/mangakifr" target="_blank">@mangakifr</a></li>
-                <li><a href="mailto:jj@mangaki.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Contact :
+                <li><a href="mailto:jj@mangaki.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;{% trans "Contact:" %}
                     jj@mangaki.fr</a></li>
                 <li><a href="https://github.com/mangaki/mangaki/issues" target="_blank"><span
-                        class="glyphicon glyphicon-fire"></span>&nbsp;Signaler un bug</a></li>
+                        class="glyphicon glyphicon-fire"></span>&nbsp;{% trans "Report a bug" %}</a></li>
                 <li><a href="https://paypal.me/mangaki" target="_blank"><span
-                        class="glyphicon glyphicon-heart"></span>&nbsp;Faire un don</a></li>
+                        class="glyphicon glyphicon-heart"></span>&nbsp;{% trans "Donate" %}</a></li>
                 <li>
                     <a href="https://github.com/mangaki/mangaki/commits/{% mangaki_revision %}">
                         <span class="glyphicon glyphicon-info-sign"></span>
-                        Version: {% mangaki_version %}
+                        {% trans "Version:" %} {% mangaki_version %}
                     </a>
                 </li>
             </ul>
@@ -167,7 +193,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.6.1/mousetrap.min.js" integrity="sha256-z6XYkzzC5o+5PhoIPMpyq5FOZkWFGiWa0NFIDPJ57zU=" crossorigin="anonymous"></script>
 <script>
-    $("nav [href='{{ request.path }}']").parent("li").addClass('active');
+    $("nav [href='{{ request.path }}',~class=inactive]").parent("li").addClass('active');
 
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()

@@ -19,25 +19,6 @@
 
 {% block body %}
 <div id="events">
-    <h1>Carrefour de l'animation 2017 au Forum des images</h1>
-    <p>
-        Quel merveilleux <a href="http://www.forumdesimages.fr/les-programmes/carrefour-du-cinema-danimation-2017/le-japon-a-lhonneur">programme</a> cette année ! Qu'allez-vous voir ?<br />
-        Réservations dès le <strong>30 novembre</strong> ! <a href="https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=M2tiazFoa2FxMTUyNmc4dDk4c3R2cDU4a2YgcGRlbDc2Zzc1ODBrMHVlbWZqNzMzcWt0a29AZw&tmsrc=pdel76g7580k0uemfj733qktko%40group.calendar.google.com">Ajouter à mon calendrier</a>
-    </p>
-    <div class="col-xs-12 cards-grid">
-        {% include "mangaki/work_rating.html" with work=night rating=night_rating banner="Mer 13" %}
-        {% include "mangaki/work_rating.html" with work=coo rating=coo_rating banner="Jeu 14" %}
-        {% include "mangaki/work_rating.html" with work=crayon rating=crayon_rating banner="Jeu 14" %}
-        {% include "mangaki/work_rating.html" with work=colorful rating=colorful_rating banner="Ven 15" %}
-        {% include "mangaki/work_rating.html" with work=nausicaa rating=nausicaa_rating banner="Sam 16" %}
-        {% include "mangaki/work_rating.html" with work=godfathers rating=godfathers_rating banner="Sam 16" %}
-        {% include "mangaki/work_rating.html" with work=souvenirs rating=souvenirs_rating banner="Sam 16" %}
-        {% include "mangaki/work_rating.html" with work=silent rating=silent_rating banner="Dim 17" %}
-        {% include "mangaki/work_rating.html" with work=fireworks rating=fireworks_rating banner="Dim 17" %}
-    </div>
-    <hr style="clear: both" />
-
-
     <h1>Conférence à MANPU 2017, musée du manga à Kyoto</h1>
     <p>Nous avons présenté notre algorithme de recommandation (BALSE !) au workshop <a href="http://manpu2017.imlab.jp">MANPU</a> de la conférence <a href="http://u-pat.org/ICDAR2017/index.php">ICDAR</a> en novembre 2017 à Kyoto.</p>
 
@@ -75,18 +56,10 @@
     <h4 id="deux-albums-utamonogatari-lien-à-gagner">À gagner : deux albums Utamonogatari</h4>
 
     <div class="row">
-      <div class="col-lg-9 col-md-8 col-sm-6 col-xs-12">
         <p>Gagnants : <a href="{% url 'profile' 'KyouyuuSuru' %}">KyouyuuSuru</a> et <a href="{% url 'profile' 'Aldherrian' %}">Aldherrian</a></p>
 
         <blockquote data-cards="hidden" class="twitter-tweet" lang="fr"><p lang="fr" dir="ltr">Et du coup le loot gagné grâce au concours <a href="https://twitter.com/MangakiFR">@MangakiFR</a>. Merci beaucoup à vous c&#39;est super cool ! &lt;3 <a href="https://t.co/382tVh7g9x">pic.twitter.com/382tVh7g9x</a></p>&mdash; KyouyuuSuru (@KyouyuuSuru) <a href="https://twitter.com/KyouyuuSuru/status/693206533207953409">29 Janvier 2016</a></blockquote>
         <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-      </div>
-
-      <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 manga-sheet text-center">
-        <div class="work-sheet data" data-category="album" data-id="{{ utamonogatari.id }}" style="margin: auto">
-          {% include "mangaki/work_rating.html" with work=utamonogatari rating=utamonogatari_rating %}
-        </div>
-      </div>
     </div>
 
     <h2>Concours Final Symphony II (2015)</h2>

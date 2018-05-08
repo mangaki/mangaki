@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load i18n %}
 
-{% block title %}Liste des suggestions {% if suggestions.paginator.page_range|length > 1 %}- Page {{ suggestions.number }} {% endif %}- Mangaki{% endblock %}
+{% block title %}{% trans "Liste des suggestions" %} {% if suggestions.paginator.page_range|length > 1 %}- Page {{ suggestions.number }} {% endif %}- Mangaki{% endblock %}
 
 {% block body %}
 
 <div class="page-header">
     <a href="{% url "nsfw-grid" %}" class="btn btn-sm btn-info pull-right" style="margin-top: 8px;">
-        <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span> Accéder à la grille NSFW
+        <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
+        {% trans "Access to the NSFW grid" %}
     </a>
-    <h1>Suggestions</h1>
+    <h1>{% trans "Suggestions" %}</h1>
 </div>
 
 {% for suggestion in suggestions %}

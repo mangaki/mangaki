@@ -25,6 +25,7 @@ from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.timezone import utc
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.defaults import server_error
 from django.views.generic import View
@@ -79,19 +80,6 @@ RATING_COLORS = {
     'wontsee': {'normal': '#5bc0de', 'highlight': '#31b0d5'}
 }
 
-FEATURED = {
-    'utamonogatari': 14293,
-    'coo': 378,
-    'colorful': 9944,
-    'crayon': 3125,
-    'nausicaa': 1289,
-    'godfathers': 330,
-    'souvenirs': 2696,
-    'silent': 2238,
-    'night': 18416,
-    'fireworks': 18331
-}
-
 DPP_UI_CONFIG_FOR_RATINGS = {
     'ui': [
         {
@@ -114,28 +102,28 @@ VANILLA_UI_CONFIG_FOR_RATINGS = {
     'ui': [
         {
             'name': 'favorite',
-            'title': "J'adore"
+            'title': _("Love")
         },
         {
             'name': "like",
-            'title': "J'aime"
+            'title': _("Like")
         },
         {
             'name': "neutral",
-            'title': "Neutre"
+            'title': _("Neutral")
         },
         {
             'name': "dislike",
-            'title': "Je n'aime pas"
+            'title': _("Dislike")
         },
         {
             'name': 'willsee',
-            'title': "Je veux voir",
+            'title': _("Wanna see"),
             'extra_classes': ['rating_separator']
         },
         {
             'name': 'wontsee',
-            'title': "Je ne veux pas voir"
+            'title': _("Don't want to see")
         }
     ],
     'endpoint': reverse_lazy('vote')
@@ -585,18 +573,10 @@ def about(request, lang):
 
 
 def events(request):
-    user_ratings = {}
-    if request.user.is_authenticated:
-        for rating in Rating.objects.filter(work_id__in=FEATURED.values(), user=request.user):
-            user_ratings[rating.work_id] = rating.choice
-    featured_works = Work.objects.in_bulk(FEATURED.values())
     context = {
         'wakanim': Partner.objects.get(pk=12),
         'config': VANILLA_UI_CONFIG_FOR_RATINGS
     }
-    for work_tag, work_id in FEATURED.items():
-        context[work_tag] = featured_works[work_id]
-        context['{}_rating'.format(work_tag)] = user_ratings.get(work_id)
     return render(
         request, 'events.html', context)
 
