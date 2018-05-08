@@ -503,21 +503,6 @@ class WorkCluster(models.Model):
         return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])
 
 
-class Neighborship(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    neighbor = models.ForeignKey(User, related_name='neighbor', on_delete=models.CASCADE)
-    score = models.DecimalField(decimal_places=3, max_digits=8)
-
-
-class SearchIssue(models.Model):
-    date = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=128)
-    poster = models.CharField(max_length=128, blank=True, null=True)
-    mal_id = models.IntegerField(blank=True, null=True)
-    score = models.IntegerField(blank=True, null=True)
-
-
 class Announcement(models.Model):
     title = models.CharField(max_length=128)
     text = models.CharField(max_length=512)

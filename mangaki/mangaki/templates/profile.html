@@ -166,10 +166,7 @@
     {% endif %}
     {% if meta.can_see %}
         <div class="row mangas-list{% if not meta.is_me and not meta.is_anonymous %} another{% endif %}">
-{#           FIXME: Neighboorhood has disappeared from Mangaki since a long time. #}
-            {% if best_neighbors_list and meta.category == 'neighbor' and not meta.is_anonymous %}
-                {% include "profile_neighbor.html" %}
-            {% elif meta.category == 'recommendation' %}
+            {% if meta.category == 'recommendation' %}
                 {% include "profile_reco.html" %}
             {% else %}
                 {% include "profile_work.html" %}
