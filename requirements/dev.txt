@@ -19,4 +19,4 @@ html-linter
 factory_boy
 coverage
 django_coverage_plugin
-hypothesis
+hypothesis==3.56.5
