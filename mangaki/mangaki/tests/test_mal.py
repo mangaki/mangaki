@@ -6,7 +6,7 @@ import redis
 import responses
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.test import TestCase
+from hypothesis.extra.django import TestCase
 
 from mangaki import tasks
 from mangaki.models import UserBackgroundTask
@@ -26,7 +26,7 @@ class MALTest(TestCase):
         self.mal = MALClient('test_client', 'test_client')
         self.search_fixture = self.read_fixture('code_geass_mal_search.xml')
         self.list_fixture = self.read_fixture('raitobezarius_mal.xml')
-        self.user = User.objects.create(
+        self.user, _ = User.objects.get_or_create(
             username='Raito_Bezarius'
         )
 
