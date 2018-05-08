@@ -503,12 +503,6 @@ class WorkCluster(models.Model):
         return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])
 
 
-class Neighborship(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    neighbor = models.ForeignKey(User, related_name='neighbor', on_delete=models.CASCADE)
-    score = models.DecimalField(decimal_places=3, max_digits=8)
-
-
 class Announcement(models.Model):
     title = models.CharField(max_length=128)
     text = models.CharField(max_length=512)
