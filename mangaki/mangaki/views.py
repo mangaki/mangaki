@@ -44,8 +44,7 @@ from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
-    get_profile_recommendations,
-    get_profile_events
+    get_profile_recommendations
 )
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
@@ -198,32 +197,6 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
                     continue
                 context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': label})
             context['seen_percent'] = round(100 * seen_total / float(total))
-
-        events = self.object.event_set \
-            .filter(date__gte=timezone.now()) \
-            .annotate(nb_attendees=Sum(Case(
-            When(attendee__attending=True, then=Value(1)),
-            default=Value(0),
-            output_field=IntegerField(),
-        )))
-        if len(events) > 0:
-            my_events = {}
-            if self.request.user.is_authenticated:
-                my_events = dict(self.request.user.attendee_set.filter(
-                    event__in=events).values_list('event_id', 'attending'))
-
-            context['events'] = [
-                {
-                    'id': event.id,
-                    'attending': my_events.get(event.id, None),
-                    'type': event.get_event_type_display(),
-                    'channel': event.channel,
-                    'date': event.get_date(),
-                    'link': event.link,
-                    'location': event.location,
-                    'nb_attendees': event.nb_attendees,
-                } for event in events
-            ]
 
         return context
 
@@ -467,7 +440,6 @@ def get_profile(request,
 
     member_time = (datetime.date.today() - user.date_joined.date()
                    if (can_see and not is_anonymous) else None)
-    user_events = get_profile_events(user) if (can_see and not is_anonymous) else []
 
     paginator = Paginator(rating_list, RATINGS_PER_PAGE)
     page = request.GET.get('page')
@@ -513,7 +485,6 @@ def get_profile(request,
             'received': received_recommendation_list,
             'sent': sent_recommendation_list
         },
-        'events': user_events
     }
     return render(request, 'profile.html', data)
 

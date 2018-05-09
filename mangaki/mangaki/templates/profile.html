@@ -26,30 +26,6 @@
             {% if profile.member_days %}
                 <p>Inscrit depuis {{ profile.member_days }} jours</p>
             {% endif %}
-            {% if events %}
-                {% if meta.is_me %}
-                    <h4>Mes événements</h4>
-                {% else %}
-                    <h4>Ses événements</h4>
-                {% endif %}
-                <p>
-                <ul>
-                    {% for event in events %}
-                        <li>{{ event.type|capfirst }} <a
-                                href="{% url 'work-detail' 'anime' event.work_id %}"><em>{{ event.title }}</em></a> le
-                            <strong>{{ event.date }}</strong>{% if event.type == 'tv' %}
-                                sur {{ event.channel }}{% elif event.location %},
-                                {% if event.link %}
-                                    <a href="{{ event.link }}" target="_blank">{{ event.location }}</a>
-                                {% else %}
-                                    {{ event.location }}
-                                {% endif %}
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-                </p>
-            {% endif %}
         </div>
         <div class="col-xs-6 col-lg-4">
             {% if meta.is_me and not meta.is_anonymous %}
