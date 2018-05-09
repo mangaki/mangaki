@@ -35,8 +35,11 @@ $(document).ready(function () {
           method: 'POST',
           credentials: 'same-origin'
         }).then(resp => {
-          console.log('Download will start soon…', resp);
-          return resp.blob();
+          if (resp.ok) {
+            return resp.blob();
+          } else {
+            return Promise.reject(Error(resp))
+          }
         }).then(blob => {
           let fakeLink = document.createElement('a');
           document.body.appendChild(fakeLink);
@@ -46,18 +49,13 @@ $(document).ready(function () {
           fakeLink.click();
           window.URL.revokeObjectURL(targetUrl);
           document.body.removeChild(fakeLink);
-        }).catch(err => {
-          console.log('error happened', err);
-        });
-      },
-      deleteAccount: function () {
-        betterFetch(Urls['api-delete-my-account'](), {
-          method: 'DELETE',
-          credentials: 'same-origin'
-        }).then(resp => {
-          console.log('account deleted, redirecting to template', resp);
-        }).catch(err => {
-          console.log('error happened', err);
+        }).catch(resp => {
+          if (resp.status === 503) {
+            /** We should report back to frontend this error **/
+            console.log('Could not prepare archive, service unavailable.', resp)
+          } else {
+            console.log('Unknown error during archive export.', resp);
+          }
         });
       },
       updateProfile: function () {
