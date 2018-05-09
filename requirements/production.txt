@@ -6,8 +6,6 @@ psycopg2
 numpy>=1.13
 beautifulsoup4
 natsort
-django-analytical
-django-cookie-law
 django-js-reverse
 scikit-learn==0.18.*
 Cython

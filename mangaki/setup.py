@@ -18,8 +18,6 @@ setup(
         'numpy',
         'beautifulsoup4',
         'natsort',
-        'django-analytical',
-        'django-cookie-law',
         'django-js-reverse',
         'scikit-learn>=0.18,<0.19',
         'scipy',
