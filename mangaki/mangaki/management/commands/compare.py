@@ -145,7 +145,7 @@ class Experiment(object):
                 y_test = model.predict(self.anonymized.X[i_test])
                 logger.debug('Predicted: %s' % y_test[:5])
                 logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
-                print('Elapsed:', datetime.now() - start)
+                logger.debug('Elapsed: %s', datetime.now() - start)
 
                 metrics_values = self.compute_metrics(model, y_test, i_test)
                 for metric, value in metrics_values.items():

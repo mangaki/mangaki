@@ -1,12 +1,25 @@
-from collections import defaultdict
-
-import numpy as np
-
 from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
+from collections import defaultdict
+import numpy as np
 
 
 @register_algorithm('als2', {'nb_components': 20})
 class MangakiALS2(RecommendationAlgorithm):
+    '''
+    Alternating Least Squares for "Singular Value Decomposition" model (aka latent factor model)
+    r_{ij} - mean = bias_i + bias_j + u_i^T v_j
+    Modified version of ALS for the SVD model
+    Ratings are preprocessed by removing the overall mean
+    Then (u_i and bias_i), (v_j and bias_j) are updated alternatively in closed form
+
+    ALS:
+    Zhou, Yunhong, et al. "Large-scale parallel collaborative filtering for the netflix prize." International Conference on Algorithmic Applications in Management. Springer, Berlin, Heidelberg, 2008.
+    http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.173.2797&rep=rep1&type=pdf
+
+    SVD:
+    Koren, Yehuda, and Robert Bell. "Advances in collaborative filtering." Recommender systems handbook. Springer, Boston, MA, 2015. 77-118.
+    https://pdfs.semanticscholar.org/6800/fbe3314be9f638fb075e15b489d1aadb3030.pdf
+    '''
     M = None
     U = None
     VT = None
@@ -33,7 +46,7 @@ class MangakiALS2(RecommendationAlgorithm):
         for (user, work), rating in zip(X, y):
             matrix[user][work] = rating
             means[user] += rating
-        for user in matrix:
+        for user in matrix.keys():
             means[user] /= len(matrix[user])
         return matrix, means
 
@@ -66,20 +79,17 @@ class MangakiALS2(RecommendationAlgorithm):
         # Init
         self.U = np.random.rand(self.nb_users, self.nb_components)
         self.VT = np.random.rand(self.nb_components, self.nb_works)
-        self.w = 0.#np.random.random()
+        self.w = 0.
         self.W_user = np.random.rand(self.nb_users)
         self.W_item = np.random.rand(self.nb_works)
         # ALS
         for i in range(self.nb_iterations):
-            # print('Step {}'.format(i), self.compute_rmse(self.y_test, self.predict(self.X_test)))
             for user in matrix:
                 self.fit_user(user, matrix)
             for work in matrixT:
                 self.fit_work(work, matrixT)
 
     def fit(self, X, y):
-        # self.X_test = X_test
-        # self.y_test = y_test
         if self.verbose_level:
             print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         self.w = y.mean()

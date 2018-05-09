@@ -6,6 +6,13 @@ import numpy as np
 
 @register_algorithm('als3', {'nb_components': 20})
 class MangakiALS3(RecommendationAlgorithm):
+    '''
+    Alternating Least Squares for "Singular Value Decomposition" model (aka latent factor model)
+
+    This implementation was supposed to be shorter and easier to read than MangakiALS2,
+    but the performance is slightly worse, maybe because the initialization is different.
+    (Gaussian instead of uniform; but Zhou's paper suggested a Gaussian initialization)
+    '''
     def __init__(self, nb_components=20, nb_iterations=20, lambda_=0.1):
         super().__init__()
         self.nb_components = nb_components
@@ -17,15 +24,12 @@ class MangakiALS3(RecommendationAlgorithm):
         return True
 
     def fit(self, X, y):
-        # self.X_test = X_test
-        # self.y_test = y_test
         self.init_vars()
         self.bias = y.mean()
         self.matrix, self.matrixT = self.to_dict(X, y)
         self.ratings_of_user, self.ratings_of_work = self.to_sparse(X, y)
         users, works = map(np.unique, self.ratings_of_user.nonzero())
         for nb_iter in range(self.nb_iterations):
-            # print('Step', nb_iter, self.compute_rmse(self.y_test, self.predict(self.X_test)))
             for user_id in users:
                 self.fit_user(user_id)
             for work_id in works:

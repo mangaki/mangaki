@@ -1,16 +1,26 @@
-from collections import defaultdict
-
-import numpy as np
-
 from mangaki.algo.recommendation_algorithm import RecommendationAlgorithm, register_algorithm
+from collections import defaultdict
+import numpy as np
 
 
 @register_algorithm('als', {'nb_components': 20})
 class MangakiALS(RecommendationAlgorithm):
+    '''
+    Alternating Least Squares
+    r_{ij} - mean_i = u_i^T v_j
+    Ratings are preprocessed by removing the mean rating of each user
+    Then u_i and v_j are updated alternatively, using the least squares estimator (closed form)
+
+    ALS:
+    Zhou, Yunhong, et al. "Large-scale parallel collaborative filtering for the netflix prize." International Conference on Algorithmic Applications in Management. Springer, Berlin, Heidelberg, 2008.
+    http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.173.2797&rep=rep1&type=pdf
+
+    Implemented by Pierre Vigier, JJ Vie
+    '''
     M = None
     U = None
     VT = None
-    def __init__(self, nb_components=20, nb_iterations=15, lambda_=0.1):
+    def __init__(self, nb_components=20, nb_iterations=20, lambda_=0.1):
         super().__init__()
         self.nb_components = nb_components
         self.nb_iterations = nb_iterations
@@ -62,15 +72,12 @@ class MangakiALS(RecommendationAlgorithm):
         self.VT = np.random.rand(self.nb_components, self.nb_works)
         # ALS
         for i in range(self.nb_iterations):
-            # print('Step {}'.format(i), self.compute_rmse(self.y_test, self.predict(self.X_test)))
             for user in matrix:
                 self.fit_user(user, matrix)
             for work in matrixT:
                 self.fit_work(work, matrixT)
 
     def fit(self, X, y):
-        # self.X_test = X_test
-        # self.y_test = y_test
         if self.verbose_level:
             print("Computing M: (%i × %i)" % (self.nb_users, self.nb_works))
         matrix, self.means = self.make_matrix(X, y)
