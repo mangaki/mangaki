@@ -20,7 +20,7 @@ from django.db.models import QuerySet, Q
 from django.utils.functional import cached_property
 from django.db import transaction
 
-from mangaki.models import Work, Rating, SearchIssue, Category, WorkTitle, ExtLanguage, Reference
+from mangaki.models import Work, Rating, Category, WorkTitle, ExtLanguage, Reference
 
 import logging
 
