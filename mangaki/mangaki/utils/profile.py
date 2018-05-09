@@ -120,21 +120,3 @@ def get_profile_recommendations(is_anonymous: bool,
                      'username': reco.target_user.username})
 
     return received_recommendation_list, sent_recommendation_list
-
-
-def get_profile_events(user: User) -> List[Dict[str, Any]]:
-    return [
-        {
-            'id': attendee.event_id,
-            'work_id': attendee.event.work_id,
-            'attending': True,
-            'type': attendee.event.get_event_type_display(),
-            'channel': attendee.event.channel,
-            'date': attendee.event.get_date(),
-            'link': attendee.event.link,
-            'location': attendee.event.location,
-            'title': attendee.event.work.title,
-        } for attendee in
-        user.attendee_set.filter(event__date__gte=timezone.now(), attending=True).select_related('event',
-                                                                                                 'event__work')
-    ]
