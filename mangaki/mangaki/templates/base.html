@@ -1,5 +1,3 @@
-{% load analytical %}
-{% load cookielaw_tags %}
 {% load anonymous_ratings %}
 {% load bootstrap3 %}
 {% load i18n %}
@@ -8,7 +6,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    {% analytical_head_top %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Mangaki est un site de recommandation de mangas et d'anime">
@@ -24,13 +21,9 @@
     <!-- Social Share Kit CSS -->
     <link rel="stylesheet" href="/static/css/social-share-kit.css"/>
     <link href="https://fonts.googleapis.com/css?family=Economica|Open+Sans" rel="stylesheet">
-    {% analytical_head_bottom %}
 </head>
 
 <body>
-{% analytical_body_top %}
-{% cookielaw_banner %}
-
 <div id="wrapper">
     <header class="navbar navbar-default">
         <nav class="navbar navbar-default" role="navigation">
@@ -171,7 +164,6 @@
 <script src="/static/js/typeahead.bundle.js"></script>
 <script src="/static/js/autocomplete.js"></script>
 <script src="/static/js/tooltip.js"></script>
-<script src="/static/cookielaw/js/cookielaw.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.6.1/mousetrap.min.js" integrity="sha256-z6XYkzzC5o+5PhoIPMpyq5FOZkWFGiWa0NFIDPJ57zU=" crossorigin="anonymous"></script>
 <script>
@@ -182,6 +174,5 @@
     })
 </script>
 {% block extrajs %}{% endblock %}
-{% analytical_body_bottom %}
 </body>
 </html>
