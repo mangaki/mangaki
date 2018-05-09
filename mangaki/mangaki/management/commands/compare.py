@@ -1,6 +1,7 @@
 import json
 import logging
 import os.path
+from datetime import datetime
 from collections import defaultdict
 from typing import Type, List, Any, Dict, Optional
 
@@ -137,12 +138,14 @@ class Experiment(object):
         for pass_index, (i_train, i_test) in enumerate(k_fold.split(self.anonymized.X), start=1):
             for algo in self.algos:
                 model = algo.make_instance()
+                start = datetime.now()
                 logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), nb_split, pass_index))
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
                 model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
                 y_test = model.predict(self.anonymized.X[i_test])
                 logger.debug('Predicted: %s' % y_test[:5])
                 logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
+                logger.debug('Elapsed: %s', datetime.now() - start)
 
                 metrics_values = self.compute_metrics(model, y_test, i_test)
                 for metric, value in metrics_values.items():
