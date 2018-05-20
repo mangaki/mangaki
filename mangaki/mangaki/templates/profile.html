@@ -29,66 +29,18 @@
         </div>
         <div class="col-xs-6 col-lg-4">
             {% if meta.is_me and not meta.is_anonymous %}
-                {% verbatim %}
-                <div id="profile_settings_container">
-                    <bs-light-switch v-model="isShared">
-                        Profil public&nbsp;:
-                    </bs-light-switch>
-                    <hr />
-                    <bs-light-switch v-model="acceptsNSFW">
-                        Afficher visuels pour public averti&nbsp;:
-                    </bs-light-switch>
-                    <hr />
-                    <bs-light-switch v-model="acceptsResearchUsage">
-                        Participer à l'amélioration des algorithmes de Mangaki&nbsp;:
-                    </bs-light-switch>
-                    <hr />
-                    <bs-light-switch v-model="receivesNewsletter">
-                        Recevoir la newsletter&nbsp;:
-                    </bs-light-switch>
-                    <bs-light-switch v-model="enableKbShortcuts">
-                        Activer les raccourcis clavier sur la mosaique&nbsp;:
-                    </bs-light-switch>
-                    <hr />
-                    <button class="btn btn-primary" v-on:click="exportData">
-                        Exporter mes données
-                    </button>
-                    <hr />
-                </div>
-                {% endverbatim %}
-                {% if meta.mal.is_available %}
-                    <hr />
-                    <div id="mal_container">
-                        {% verbatim %}
-                        <transition-group appear name="fade">
-                            <template v-if="showForm">
-                                <p key="form_title">Importer depuis myAnimeList&nbsp;:</p>
-                                <div key="form_input" class="input-group">
-                                    <input v-model.lazy="mal_username" @keyup.enter="importMAL" type="text" class="form-control" placeholder="Ton login"/>
-                                    <span class="input-group-btn">
-                                        <button v-on:click="importMAL" class="btn btn-default">C'est parti!</button>
-                                    </span>
-                                </div>
-                            </template>
-                            <template v-if="followProgress">
-                                <p key="progress_title">Votre myAnimeList est en cours d'importation. Veuillez patienter.</p>
-                                <loading-spinner key="spinner"></loading-spinner>
-                                <p key="work_title" v-if="currentWorkTitle != null">✓✓ {{ currentWorkTitle }} importé.
-                                    <span v-if="workCount && currentWorkIndex">({{ currentWorkIndex }} / {{ workCount }})</span>
-                                </p>
-                            </template>
-                            <template v-if="errorMessage">
-                                <p key="message">Une erreur est survenue, rechargez la page.</p>
-                                <p key="details">Détails : {{ errorMessage }}</p>
-                            </template>
-                            <template v-if="importFinished">
-                                <p key="finished-title">Votre import myAnimeList est désormais terminé.</p>
-                                <button class="btn btn-primary" key="reload-page" v-on:click="reloadPage">Cliquez ici pour recharger la page</button>
-                            </template>
-                        </transition-group>
-                        {% endverbatim %}
-                    </div>
-                {% endif %}
+                <ul class="nav nav-tabs">
+                    <li role="presentation" {% if meta.profile_section == 'works' %} class="active" {% endif %}>
+                        <a href="{% url 'profile-works' profile.username meta.category|default:"anime" meta.status|default:"seen" %}">
+                            Mes œuvres
+                        </a>
+                    </li>
+                    <li role="presentation" {% if meta.profile_section == 'preferences' %} class="active" {% endif %}>
+                        <a href="{% url 'profile-preferences' profile.username %}">
+                            Mes préférences
+                        </a>
+                    </li>
+                </ul>
             {% endif %}
             {% if meta.is_anonymous %}
                 <br />
@@ -100,98 +52,12 @@
             {% endif %}
         </div>
     </div>
-    {% if not meta.is_anonymous and meta.can_see and not meta.is_me %}
-        <ul class="nav nav-tabs">
-
-            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'anime' 'seen' %}"><em>Anime</em> vus de {{ profile.username }} <span
-                    class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'anime' 'unseen' %}"><em>Anime</em> watchlist de {{ profile.username }} <span
-                    class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
-
-            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'manga' 'seen' %}"><em>Mangas</em> lus de {{ profile.username }} <span
-                    class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'manga' 'unseen' %}"><em>Mangas</em> wishlist de {{ profile.username }} <span
-                    class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
-
-            <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Recommandations
-                de {{ profile.username }} <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
-        </ul>
-    {% elif meta.is_anonymous or meta.is_me %}
-        <ul class="nav nav-tabs">
-
-            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'seen' %}"><em>Anime</em> vus <span
-                    class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'unseen' %}"><em>Anime</em> watchlist <span
-                    class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
-
-            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'manga' 'seen' %}"><em>Mangas</em> lus <span
-                    class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'manga' 'unseen' %}"><em>Mangas</em> wishlist <span
-                    class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
-
-            {% if not meta.is_anonymous %}
-                <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
-                        href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Mes recommandations
-                    <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
-            {% endif %}
-        </ul>
-    {% endif %}
-    {% if meta.can_see %}
-        <div class="row mangas-list{% if not meta.is_me and not meta.is_anonymous %} another{% endif %}">
-            {% if meta.category == 'recommendation' %}
-                {% include "profile_reco.html" %}
-            {% else %}
-                {% include "profile_work.html" %}
-            {% endif %}
-        </div>
-    {% else %}
-        <p class="well">Le profil de {{ profile.username }} n'est pas public.</p>
-    {% endif %}
-    <br/>
-    <br/>
-    <br/>
+    {% block profile_section %}
+    {% endblock %}
 {% endblock %}
 
 {% block extrajs %}
-    {% if meta.debug_vue %}
-        <script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
-    {% else %}
-        <script src="https://unpkg.com/vue@2.5.2/dist/vue.min.js"></script>
-    {% endif %}
-    {% if meta.mal.is_available %}
-        <script src="/static/js/mal_import.js"></script>
-    {% endif %}
-    <script src="/static/js/profile_settings.js"></script>
-    <script>
-        window.INITIAL_DATA = {
-            isShared: {{ user.profile.is_shared|yesno:"true,false" }},
-            acceptsNSFW: {{ user.profile.nsfw_ok|yesno:"true,false" }},
-            acceptsResearchUsage: {{ user.profile.research_ok|yesno:"true,false" }},
-            receivesNewsletter: {{ user.profile.newsletter_ok|yesno:"true,false" }},
-            enableKbShortcuts: {{ user.profile.keyboard_shortcuts_enabled|yesno:"true,false" }},
-            hasPendingMALImport: {{ meta.mal.pending_import|yesno:"true,false" }}
-        };
-
-        {% if meta.mal.is_available %}
-            $(document).ready(function () {
-                if (INITIAL_DATA.hasPendingMALImport) {
-                    MALImporterApp.fetchServerSideTaskId()
-                        .then(() => {
-                            MALImporterApp.showForm = false;
-                        })
-                }
-            });
-        {% endif %}
-
+        <script>
         function removeReco(elt) {
             var $elt = $(elt);
             $.post(Urls['remove-reco']($elt.data('work'), $elt.data('user'), $elt.data('target')));

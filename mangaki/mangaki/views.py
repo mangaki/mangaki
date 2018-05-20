@@ -2,7 +2,7 @@ import datetime
 import json
 from collections import Counter, OrderedDict
 from itertools import zip_longest
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from urllib.parse import urlencode
 
 import allauth.account.views
@@ -140,6 +140,46 @@ VANILLA_UI_CONFIG_FOR_RATINGS = {
     ],
     'endpoint': reverse_lazy('vote')
 }
+
+def deep_dict_merge(source: Dict, destination: Dict,
+                    _path: Optional[List] = None) -> Dict:
+    """
+    **In-place** deep dict merge from source to destination.
+
+    Will raise an exception if encounters distinct types for the same key.
+
+    Args:
+        source (dict)
+        destination (dict)
+        _path(str): internal implementation details to track recursive calls
+
+    Returns: destination (dict).
+
+    """
+    if _path is None:
+        _path = []
+
+    for key in source.keys():
+        if key in destination:
+            if isinstance(source[key], dict) and isinstance(destination[key], dict):
+                deep_dict_merge(source[key], destination[key],
+                      _path + [key])
+            elif source[key] == destination[key]:
+                pass
+            else:
+                raise ValueError(
+                    'Conflict at {}'.format(
+                        '.'.join(_path + [key])
+                    )
+                )
+        else:
+            destination[key] = source[key]
+
+    return destination
+
+
+
+
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -379,12 +419,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
 
 
 def get_profile(request,
-                username: str = None,
-                category: str = None,
-                status: str = None):
-    if username is None and request.user.is_authenticated():
-        return redirect('profile', request.user.username, category or 'anime', status or 'seen', permanent=True)
-
+                username: str = None):
     is_anonymous = False
     if username:
         user = get_object_or_404(User.objects.select_related('profile'), username=username)
@@ -399,60 +434,14 @@ def get_profile(request,
     else:
         is_shared = user.profile.is_shared
 
-    if category is None or status is None:
-        if user.username:
-            return redirect('profile', user.username, category or 'anime', status or 'seen', permanent=True)
-        else:
-            return redirect('my-profile', category or 'anime', status or 'seen', permanent=True)
-
     can_see = is_shared or user == request.user
-    seen_works = status == "seen"
     algo_name = request.GET.get('algo', None)
-    categories = ('anime', 'manga', 'album')
-    # FIXME: We should move natural sorting on the database-side.
-    # This way, we can keep a queryset until the end.
-    # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
-    # Currently, we load the *entire set* of ratings for a (seen/willsee|wontsee) category of works.
-    ratings, counts = get_profile_ratings(request,
-                                          category,
-                                          seen_works,
-                                          can_see,
-                                          is_anonymous,
-                                          user)
-
-    compare_function = build_profile_compare_function(algo_name,
-                                                      ratings,
-                                                      user)
-    rating_list = natsorted(ratings, key=compare_function)
-    if category == 'recommendation':
-        received_recommendation_list, sent_recommendation_list = get_profile_recommendations(
-            is_anonymous,
-            can_see,
-            user
-        )
-    else:
-        received_recommendation_list = sent_recommendation_list = []
-
-    if can_see and not is_anonymous and not received_recommendation_list:
-        reco_count = Recommendation.objects.filter(target_user=user).count()
-    else:
-        reco_count = len(received_recommendation_list)
 
     member_time = (datetime.date.today() - user.date_joined.date()
                    if (can_see and not is_anonymous) else None)
 
-    paginator = Paginator(rating_list, RATINGS_PER_PAGE)
-    page = request.GET.get('page')
-
-    try:
-        ratings = paginator.page(page)
-    except PageNotAnInteger:
-        ratings = paginator.page(1)
-    except EmptyPage:
-        ratings = paginator.page(paginator.num_pages)
-
     is_me = request.user == user
-    data = {
+    context = {
         'meta': {
             'debug_vue': settings.DEBUG_VUE_JS,
             'mal': {
@@ -464,8 +453,6 @@ def get_profile(request,
             'username': request.user.username,
             'is_shared': is_shared,
             'is_me': is_me,
-            'category': category,
-            'seen': seen_works,
             'is_anonymous': is_anonymous,
             'ratings_disabled': request.user != user and not is_anonymous,
             'algo_name': algo_name
@@ -473,6 +460,98 @@ def get_profile(request,
         'profile': {
             'avatar_url': user.profile.avatar_url if (not is_anonymous and can_see) else None,
             'member_days': member_time.days if member_time else None,
+            'username': user.username
+        },
+    }
+
+    return user, context
+
+
+def get_profile_preferences(request,
+                            username: str = None):
+    if username is None and request.user.is_authenticated():
+        return redirect('profile-preferences', request.user.username, permanent=True)
+
+    user, ctx = get_profile(request, username)
+
+    if ctx['meta']['is_anonymous']:
+        return redirect('profile')
+
+    new_ctx = {
+        'meta': {
+           'section': 'preferences'
+        }
+    }
+
+    return render(request, 'profile_preferences.html',
+                  deep_dict_merge(ctx, new_ctx))
+
+
+def get_profile_works(request,
+                      username: str = None,
+                      category: str = None,
+                      status: str = None):
+    if username is None and request.user.is_authenticated():
+        return redirect('profile-works', request.user.username, category or 'anime', status or 'seen', permanent=True)
+
+    user, ctx = get_profile(request, username)
+
+    if category is None or status is None:
+        if user.username:
+            return redirect('profile-works', user.username, category or 'anime', status or 'seen', permanent=True)
+        else:
+            return redirect('my-profile', category or 'anime', status or 'seen', permanent=True)
+
+    seen_works = status == "seen"
+    algo_name = request.GET.get('algo', None)
+    # FIXME: We should move natural sorting on the database-side.
+    # This way, we can keep a queryset until the end.
+    # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
+    # Currently, we load the *entire set* of ratings for a (seen/willsee|wontsee) category of works.
+    ratings, counts = get_profile_ratings(request,
+                                          category,
+                                          seen_works,
+                                          ctx['meta']['can_see'],
+                                          ctx['meta']['is_anonymous'],
+                                          user)
+
+    compare_function = build_profile_compare_function(algo_name,
+                                                      ratings,
+                                                      user)
+    rating_list = natsorted(ratings, key=compare_function)
+    if category == 'recommendation':
+        received_recommendation_list, sent_recommendation_list = get_profile_recommendations(
+            ctx['meta']['is_anonymous'],
+            ctx['meta']['can_see'],
+            user
+        )
+    else:
+        received_recommendation_list = sent_recommendation_list = []
+
+    if ctx['meta']['can_see'] and not ctx['meta']['is_anonymous'] and not received_recommendation_list:
+        reco_count = Recommendation.objects.filter(target_user=user).count()
+    else:
+        reco_count = len(received_recommendation_list)
+
+    paginator = Paginator(rating_list, RATINGS_PER_PAGE)
+    page = request.GET.get('page')
+
+    try:
+        ratings = paginator.page(page)
+    except PageNotAnInteger:
+        ratings = paginator.page(1)
+    except EmptyPage:
+        ratings = paginator.page(paginator.num_pages)
+
+    new_ctx = {
+        'meta': {
+            'category': category,
+            'seen': seen_works,
+            'algo_name': algo_name,
+            'section': 'works',
+            'status': status
+        },
+        'profile': {
             'seen_anime_count': counts['seen_anime'],
             'seen_manga_count': counts['seen_manga'],
             'unseen_anime_count': counts['unseen_anime'],
@@ -486,7 +565,8 @@ def get_profile(request,
             'sent': sent_recommendation_list
         },
     }
-    return render(request, 'profile.html', data)
+    return render(request, 'profile_works.html',
+                  deep_dict_merge(ctx, new_ctx))
 
 
 def index(request):
