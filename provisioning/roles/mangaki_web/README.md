@@ -38,4 +38,12 @@ mangaki_web_www_root: '/var/www/mangaki/'
 # first domain in the list is considered to be the canonical one, and every
 # subsequent domains will redirect to the first.
 mangaki_web_domains: ['mangaki.fr', 'www.mangaki.fr']
+
+# NGINX specific — advanced
+# X-SendFile path, this is the URI which will be internal but can be used by the web server.
+mangaki_web_xsendfile_path: '/protected/'
+# X-SendFile root, this is where NGINX is going to read files by concatenating the root and the path.
+mangaki_web_xsendfile_root: '/var/www/mangaki'
+# For example, sending the file /protected/secret.gif will make NGINX send the file /var/www/mangaki/protected/secret.gif ; meanwhile no one can access to /protected/secret.gif using a web browser.
+
 ```

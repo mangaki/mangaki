@@ -37,6 +37,15 @@ nginx_site_domains: ['mangaki.fr']
 nginx_site_upstreams:
   - name: 'mangaki'
     servers: ['127.0.0.1:8000']
+
+# X-SendFile internal locations, tried in order.
+# Each internal location definition should be a dict with the following parameters:
+#  - path: The URI for NGINX, e.g. "/protected/"
+#  - root: The disk path where files are which must be internal
+
+nginx_site_xsendfile_internal_locations:
+  - path: '/protected/'
+    root: '/var/www/staticfiles/'
 ```
 
 # Role handlers

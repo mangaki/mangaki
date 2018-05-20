@@ -66,6 +66,14 @@ server {
         proxy_set_header X-Forwarded-Host $server_name;
     }
     {% endfor %}
+
+    {% for loc in nginx_site_xsendfile_internal_locations %}
+    location {{ loc.path }} {
+        internal;
+        root {{ loc.root }};
+    }
+    {% endfor %}
+
 }
 
 # vim: ft=nginx.conf ts=4 sts=4 sw=4 et:

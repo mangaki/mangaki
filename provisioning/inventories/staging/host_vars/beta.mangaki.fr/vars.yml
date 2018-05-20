@@ -37,4 +37,11 @@ mangaki_source_email_password: '{{ vault_mangaki_source_email_password }}'
 mangaki_web_acme_ca: 'https://acme-v01.api.letsencrypt.org/directory'
 mangaki_web_acme_ca_terms: 'https://acme-v01.api.letsencrypt.org/terms'
 
+# X-SendFile for NGINX
+# (!) Keep in check with mangaki_web defaults.
+mangaki_source_xsendfile: true
+mangaki_source_xsendfile_backend: 'sendfile.backends.nginx'
+mangaki_source_xsendfile_root: '/var/www/mangaki/protected'
+mangaki_source_xsendfile_path: '/protected'
+
 # vi: ft=yaml

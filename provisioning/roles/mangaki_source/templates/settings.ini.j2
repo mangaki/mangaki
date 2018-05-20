@@ -5,6 +5,13 @@
 DEBUG = True
 {% endif %}
 
+{% if mangaki_source_sendfile|bool %}
+[sendfile]
+BACKEND = {{ mangaki_source_sendfile_backend }}
+ROOT = {{ mangaki_source_sendfile_root }}
+URL = {{ mangaki_source_sendfile_url }}
+{% endif %}
+
 [secrets]
 SECRET_KEY = {{ mangaki_source_secret_key }}
 DB_PASSWORD = {{ mangaki_source_db_password }}
