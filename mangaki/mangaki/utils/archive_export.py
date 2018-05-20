@@ -12,8 +12,6 @@ from mangaki.models import (
     Suggestion,
     Evidence,
     WorkCluster,
-    Neighborship,
-    SearchIssue,
     Recommendation,
     Pairing,
     ColdStartRating,
