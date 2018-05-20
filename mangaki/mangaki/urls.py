@@ -33,7 +33,7 @@ urlpatterns = [
 
     url(r'^user/deleted/$', views.deleted_account, name='deleted-account'),
 
-    url(r'^profile/$', views.get_profile_works, name='my-profile'),
+    url(r'^profile/$', views.get_profile, name='my-profile'),
     url(r'^profile/(?P<category>\w+)/$', views.get_profile_works, name='my-profile'),
     url(r'^profile/(?P<category>\w+)/(?P<status>\w+)$', views.get_profile_works, name='my-profile'),
     url(r'^u/(?P<username>.+?)/works/(?P<category>\w+?)/$', views.get_profile_works, name='profile-works'),
