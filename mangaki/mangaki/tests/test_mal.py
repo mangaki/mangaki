@@ -1,16 +1,16 @@
 import os
 import re
+import xml.etree.ElementTree as ET
 from unittest.mock import patch
 
-import redis
 import responses
 from django.conf import settings
 from django.contrib.auth.models import User
 from hypothesis.extra.django import TestCase
 
 from mangaki import tasks
-from mangaki.models import UserBackgroundTask
-from mangaki.utils.mal import MALClient, MALWorks
+from mangaki.models import UserBackgroundTask, Work, WorkTitle
+from mangaki.utils.mal import MALClient, MALWorks, MALUserWork, MALEntry
 
 from hypothesis import given
 from hypothesis import strategies as st
@@ -24,8 +24,14 @@ class MALTest(TestCase):
 
     def setUp(self):
         self.mal = MALClient('test_client', 'test_client')
-        self.search_fixture = self.read_fixture('code_geass_mal_search.xml')
-        self.list_fixture = self.read_fixture('raitobezarius_mal.xml')
+        self.search_fixture = self.read_fixture('mal/code_geass_search.xml')
+        self.list_fixture = self.read_fixture('mal/raitobezarius_mal.xml')
+
+        self.steins_gate_xml = ET.fromstring(self.read_fixture('mal/steins_gate_entry.xml'))
+        self.steins_gate_zero_xml = ET.fromstring(self.read_fixture('mal/steins_gate_zero_entry.xml'))
+        self.steins_gate_movie_xml = ET.fromstring(self.read_fixture('mal/steins_gate_movie_entry.xml'))
+        self.darling_in_the_franxx_xml = ET.fromstring(self.read_fixture('mal/darling_in_the_franxx_entry.xml'))
+
         self.user, _ = User.objects.get_or_create(
             username='Raito_Bezarius'
         )
@@ -104,6 +110,64 @@ class MALTest(TestCase):
         with self.assertLogs(logger=mal_logger, level='ERROR'):
             results = list(self.mal.list_works_from_a_user(MALWorks.animes, 'raitobezarius'))
             self.assertEqual(len(results), 0)
+
+    @patch('mangaki.utils.mal.client', autospec=True, create=True)
+    def test_mal_duplication(self, client_mock):
+        from mangaki.utils.mal import import_mal
+        # prepare list of animes
+        steins_gate_entry = MALEntry(self.steins_gate_xml, MALWorks.animes)
+        darling_entry = MALEntry(self.darling_in_the_franxx_xml, MALWorks.animes)
+        steins_gate_movie_entry = MALEntry(self.steins_gate_movie_xml, MALWorks.animes)
+        steins_gate_zero_entry = MALEntry(self.steins_gate_zero_xml, MALWorks.animes)
+
+        entries_per_title = {
+            steins_gate_entry.title: steins_gate_entry,
+            darling_entry.title: darling_entry,
+            steins_gate_movie_entry.title: steins_gate_movie_entry,
+            steins_gate_zero_entry.title: steins_gate_zero_entry
+        }
+
+        mal_user_works = [
+            MALUserWork(steins_gate_entry.title, steins_gate_entry.synonyms, 'mal_something',
+                        str(steins_gate_entry.mal_id),
+                        10,
+                        2),
+            MALUserWork(darling_entry.title, darling_entry.synonyms, 'zero_two',
+                        str(steins_gate_entry.mal_id),
+                        10,
+                        1),
+            MALUserWork(steins_gate_movie_entry.title, steins_gate_movie_entry.synonyms, 'non_canon',
+                        str(steins_gate_movie_entry.mal_id),
+                        5,
+                        2),
+            MALUserWork(steins_gate_zero_entry.title, steins_gate_zero_entry.synonyms, 'brain_science_institute',
+                        str(steins_gate_zero_entry.mal_id),
+                        10,
+                        1)
+        ]
+
+        # FIXME: randomize results using hypothesis to reflect MAL randomness :-) ?
+        search_results = {
+            steins_gate_entry.title: [steins_gate_movie_entry, steins_gate_entry, steins_gate_zero_entry],
+            darling_entry.title: [darling_entry],
+            steins_gate_zero_entry.title: [steins_gate_zero_entry, steins_gate_movie_entry],
+            steins_gate_movie_entry.title: [steins_gate_movie_entry]
+        }
+
+        client_mock.list_works_from_a_user.return_value = (item for item in mal_user_works)
+        client_mock.search_works.side_effect = lambda _, query: search_results.get(query, [])
+
+        import_mal(self.user.username, self.user.username)
+        n_works = Work.objects.count()
+
+        # Kill the WorkTitle. Remove evidences.
+        WorkTitle.objects.all().delete()
+
+        for _ in range(10):
+            import_mal(self.user.username, self.user.username)
+
+        # Assumption: no duplicates.
+        self.assertEqual(n_works, Work.objects.count())
 
     @patch('mangaki.utils.mal.import_mal')
     @patch('redis.StrictRedis', autospec=True, create=True)
