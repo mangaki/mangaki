@@ -127,6 +127,7 @@ def export_generic(model, fields):
 
 def export(archive: UserDataArchiveBuilder):
     for model, fields_or_exporter in target_models.items():
+        # FIXME: evaluate if a model is empty or not before opening its file.
         with archive.create_file_in_archive(target_filenames[model]) as file:
             writer = csv.writer(file)
             if inspect.isfunction(fields_or_exporter):
