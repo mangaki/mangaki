@@ -30,6 +30,34 @@ $(document).ready(function () {
       this.updateProfile();
     },
     methods: {
+      exportData: function () {
+        betterFetch(Urls['api-export-my-data'](), {
+          method: 'POST',
+          credentials: 'same-origin'
+        }).then(resp => {
+          if (resp.ok) {
+            return resp.blob();
+          } else {
+            return Promise.reject(Error(resp))
+          }
+        }).then(blob => {
+          let fakeLink = document.createElement('a');
+          document.body.appendChild(fakeLink);
+          let targetUrl = window.URL.createObjectURL(blob);
+          fakeLink.href = targetUrl;
+          fakeLink.download = 'user_archive.zip';
+          fakeLink.click();
+          window.URL.revokeObjectURL(targetUrl);
+          document.body.removeChild(fakeLink);
+        }).catch(resp => {
+          if (resp.status === 503) {
+            /** We should report back to frontend this error **/
+            console.log('Could not prepare archive, service unavailable.', resp)
+          } else {
+            console.log('Unknown error during archive export.', resp);
+          }
+        });
+      },
       updateProfile: function () {
         const payload = {
           is_shared: this.isShared,

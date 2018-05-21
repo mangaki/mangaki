@@ -49,6 +49,11 @@
                     <bs-light-switch v-model="enableKbShortcuts">
                         Activer les raccourcis clavier sur la mosaique&nbsp;:
                     </bs-light-switch>
+                    <hr />
+                    <button class="btn btn-primary" v-on:click="exportData">
+                        Exporter mes données
+                    </button>
+                    <hr />
                 </div>
                 {% endverbatim %}
                 {% if meta.mal.is_available %}

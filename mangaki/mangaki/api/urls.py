@@ -4,7 +4,7 @@ from django.conf.urls import url
 from mangaki.api.cards import get_card
 from mangaki.api.tasks import task_status, user_tasks
 from mangaki.api.mal import import_from_mal
-from mangaki.api.user import update_user_profile
+from mangaki.api.user import update_user_profile, delete_user_profile, export_user_data
 
 urlpatterns = [
     url(r'^tasks/(?P<task_id>[\w\d\-\.]+)/?$',
@@ -17,5 +17,9 @@ urlpatterns = [
         import_from_mal, name='api-mal-import'),
     url(r'^user/profile$',
         update_user_profile, name='api-update-my-profile'),
+    url(r'^user/delete$',
+        delete_user_profile, name='api-delete-my-account'),
+    url(r'^user/export$',
+        export_user_data, name='api-export-my-data'),
     url(r'^doc', include_docs_urls(title='Mangaki API'))
 ]

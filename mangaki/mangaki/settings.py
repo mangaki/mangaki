@@ -274,6 +274,13 @@ DATA_ROOT = config.get('deployment', 'DATA_ROOT', fallback=os.path.join(BASE_DIR
 DATA_DIR = DATA_ROOT  # FIXME: replace every occurrence of DATA_DIR with DATA_ROOT
 PICKLE_DIR = os.path.join(DATA_ROOT, 'snapshots')  # FIXME: rename PICKLE_DIR to SNAPSHOT_DIR
 
+if config.has_section('sendfile'):
+    SENDFILE_BACKEND = config.get('sendfile', 'backend', fallback='sendfile.backends.simple')
+    SENDFILE_ROOT = config.get('sendfile', 'root', fallback='')
+    SENDFILE_URL = config.get('sendfile', 'url', fallback='')
+else:
+    SENDFILE_BACKEND = 'sendfile.backends.simple'
+
 # External services
 if config.has_section('mal'):
     MAL_USER = config.get('mal', 'MAL_USER')
