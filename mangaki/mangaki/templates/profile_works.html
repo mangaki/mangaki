@@ -1,0 +1,63 @@
+{% extends "profile.html" %}
+
+{% block profile_section %}
+{% if not meta.is_anonymous and meta.can_see and not meta.is_me %}
+        <ul class="nav nav-tabs">
+
+            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'profile-works' profile.username 'anime' 'seen' %}"><em>Anime</em> vus de {{ profile.username }} <span
+                    class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'profile-works' profile.username 'anime' 'unseen' %}"><em>Anime</em> watchlist de {{ profile.username }} <span
+                    class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
+
+            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'profile-works' profile.username 'manga' 'seen' %}"><em>Mangas</em> lus de {{ profile.username }} <span
+                    class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'profile-works' profile.username 'manga' 'unseen' %}"><em>Mangas</em> wishlist de {{ profile.username }} <span
+                    class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
+
+            <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
+                    href="{% url 'profile-works' profile.username 'recommendation' %}?category=recommendation">Recommandations
+                de {{ profile.username }} <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
+        </ul>
+    {% elif meta.is_anonymous or meta.is_me %}
+        <ul class="nav nav-tabs">
+
+            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'my-profile' 'anime' 'seen' %}"><em>Anime</em> vus <span
+                    class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'my-profile' 'anime' 'unseen' %}"><em>Anime</em> watchlist <span
+                    class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
+
+            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'my-profile' 'manga' 'seen' %}"><em>Mangas</em> lus <span
+                    class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
+            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
+                    href="{% url 'my-profile' 'manga' 'unseen' %}"><em>Mangas</em> wishlist <span
+                    class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
+
+            {% if not meta.is_anonymous %}
+                <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
+                        href="{% url 'profile-works' profile.username 'recommendation' %}?category=recommendation">Mes recommandations
+                    <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+    {% if meta.can_see %}
+        <div class="row mangas-list{% if not meta.is_me and not meta.is_anonymous %} another{% endif %}">
+            {% if meta.category == 'recommendation' %}
+                {% include "profile_reco.html" %}
+            {% else %}
+                {% include "profile_work.html" %}
+            {% endif %}
+        </div>
+    {% else %}
+        <p class="well">Le profil de {{ profile.username }} n'est pas public.</p>
+    {% endif %}
+    <br/>
+    <br/>
+    <br/>
+{% endblock %}

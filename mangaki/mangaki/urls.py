@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^user/login/$', views.login, name="account_login"),
     url(r'^user/', include('allauth.urls')),
 
+    url(r'^user/deleted/$', views.deleted_account, name='deleted-account'),
+
     url(r'^profile/$', views.get_profile, name='my-profile'),
     url(r'^profile/(?P<category>\w+)/$', views.get_profile_works, name='my-profile'),
     url(r'^profile/(?P<category>\w+)/(?P<status>\w+)$', views.get_profile_works, name='my-profile'),

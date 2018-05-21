@@ -177,11 +177,6 @@ def deep_dict_merge(source: Dict, destination: Dict,
 
     return destination
 
-
-
-
-
-
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
     form_class = SuggestionForm
@@ -1128,3 +1123,7 @@ class LoginView(AnonymousRatingsMixin, allauth.account.views.LoginView):
 
 
 login = LoginView.as_view()
+
+
+def deleted_account(request):
+    return render(request, 'account/account_deleted.html')

@@ -16,6 +16,25 @@ Vue.component('bs-light-switch', {
   }
 });
 
+Vue.component('modal', {
+  template: '<transition name="modal">\n' +
+  '<div class="modal-mask">\n' +
+  '<div role="dialog" aria-labelledby="modalTitle" aria-describedby="modalBody"' +
+  'class="modal-wrapper">\n' +
+    '<div class="modal-container">\n' +
+    '<header id="modalTitle" class="modal-header">\n' +
+    '<slot name="header"></slot>\n' +
+    '</header>\n' +
+    '<section id="modalBody" class="modal-body">\n' +
+      '<slot name="body"></slot>\n' +
+    '</section>\n' +
+    '<footer class="modal-footer">\n' +
+      '<slot name="footer"></slot>\n' +
+    '</footer>\n' +
+    '</div>\n' +
+  '</div>\n</div>\n</transition>',
+});
+
 $(document).ready(function () {
   window.ProfileSettingsApp = new Vue({
     el: $('#profile_settings_container')[0],
@@ -24,12 +43,29 @@ $(document).ready(function () {
       acceptsNSFW: window.INITIAL_DATA.acceptsNSFW,
       acceptsResearchUsage: window.INITIAL_DATA.acceptsResearchUsage,
       receivesNewsletter: window.INITIAL_DATA.receivesNewsletter,
-      enableKbShortcuts: window.INITIAL_DATA.enableKbShortcuts
+      enableKbShortcuts: window.INITIAL_DATA.enableKbShortcuts,
+      deleteAccountModal: false
     },
     beforeUpdate: function () {
       this.updateProfile();
     },
     methods: {
+      deleteAccount: function () {
+        this.deleteAccountModal = false;
+        betterFetch(Urls['api-delete-my-account'](), {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        }).then(resp => {
+          if (resp.ok) {
+            window.location.href = Urls['deleted-account']();
+          } else {
+            return Promise.reject(Error(resp))
+          }
+        }).catch(err => {
+          // FIXME: we should report back to the frontend.
+          console.log('Error while deleting', err);
+        })
+      },
       exportData: function () {
         betterFetch(Urls['api-export-my-data'](), {
           method: 'POST',
@@ -76,7 +112,9 @@ $(document).ready(function () {
         }).then(resp => {
           return resp.json();
         }).then(data => {
-          console.log(data)
+          Object.getOwnPropertyNames(data).map(key => {
+            this[key] = data[key];
+          });
         }).catch(err => {
           console.log(err)
         });
