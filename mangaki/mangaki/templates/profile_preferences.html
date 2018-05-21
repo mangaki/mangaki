@@ -11,7 +11,7 @@
                         <button class="btn btn-danger btn-nowrap center-block" @click="deleteAccountModal = true">
                             Supprimer mon compte
                         </button>
-                        <modal v-if="deleteAccountModal">
+                        <modal v-cloak v-if="deleteAccountModal">
                             <h3 slot="header">
                                 Êtes-vous sûrs de vouloir supprimer votre compte ?
                             </h3>
