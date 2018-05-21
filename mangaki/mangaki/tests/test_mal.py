@@ -140,15 +140,16 @@ class MALTest(TestCase):
                         1)
         ]
 
-        # Here, we shuffle lists. using Hypothesis' controlled Random instance.
         search_results = {
-            steins_gate_entry.title: rand.shuffle(
-                [steins_gate_movie_entry, steins_gate_entry, steins_gate_zero_entry]),
+            steins_gate_entry.title: [steins_gate_movie_entry, steins_gate_entry, steins_gate_zero_entry],
             darling_entry.title: [darling_entry],
-            steins_gate_zero_entry.title: rand.shuffle(
-                [steins_gate_zero_entry, steins_gate_movie_entry]),
+            steins_gate_zero_entry.title: [steins_gate_zero_entry, steins_gate_movie_entry],
             steins_gate_movie_entry.title: [steins_gate_movie_entry]
         }
+
+        # Here, we shuffle lists. using Hypothesis' controlled Random instance.
+        rand.shuffle(search_results[steins_gate_entry.title])
+        rand.shuffle(search_results[steins_gate_zero_entry.title])
 
         client_mock.list_works_from_a_user.return_value = (item for item in mal_user_works)
         client_mock.search_works.side_effect = lambda _, query: search_results.get(query, [])
