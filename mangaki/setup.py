@@ -32,7 +32,7 @@ setup(
         'redis>=2.10,<3',
         'Pillow>=4.1,<5',
         'setuptools_scm>=1.15,<2',
-        'django-setupfile>=0.3,<1'
+        'django-sendfile>=0.3,<1'
     ],
     packages=find_packages(),
     include_package_data=True,
