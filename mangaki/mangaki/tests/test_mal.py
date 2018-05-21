@@ -112,20 +112,14 @@ class MALTest(TestCase):
             self.assertEqual(len(results), 0)
 
     @patch('mangaki.utils.mal.client', autospec=True, create=True)
-    def test_mal_duplication(self, client_mock):
+    @given(st.randoms())
+    def test_mal_duplication(self, client_mock, rand):
         from mangaki.utils.mal import import_mal
         # prepare list of animes
         steins_gate_entry = MALEntry(self.steins_gate_xml, MALWorks.animes)
         darling_entry = MALEntry(self.darling_in_the_franxx_xml, MALWorks.animes)
         steins_gate_movie_entry = MALEntry(self.steins_gate_movie_xml, MALWorks.animes)
         steins_gate_zero_entry = MALEntry(self.steins_gate_zero_xml, MALWorks.animes)
-
-        entries_per_title = {
-            steins_gate_entry.title: steins_gate_entry,
-            darling_entry.title: darling_entry,
-            steins_gate_movie_entry.title: steins_gate_movie_entry,
-            steins_gate_zero_entry.title: steins_gate_zero_entry
-        }
 
         mal_user_works = [
             MALUserWork(steins_gate_entry.title, steins_gate_entry.synonyms, 'mal_something',
@@ -146,11 +140,13 @@ class MALTest(TestCase):
                         1)
         ]
 
-        # FIXME: randomize results using hypothesis to reflect MAL randomness :-) ?
+        # Here, we shuffle lists. using Hypothesis' controlled Random instance.
         search_results = {
-            steins_gate_entry.title: [steins_gate_movie_entry, steins_gate_entry, steins_gate_zero_entry],
+            steins_gate_entry.title: rand.shuffle(
+                [steins_gate_movie_entry, steins_gate_entry, steins_gate_zero_entry]),
             darling_entry.title: [darling_entry],
-            steins_gate_zero_entry.title: [steins_gate_zero_entry, steins_gate_movie_entry],
+            steins_gate_zero_entry.title: rand.shuffle(
+                [steins_gate_zero_entry, steins_gate_movie_entry]),
             steins_gate_movie_entry.title: [steins_gate_movie_entry]
         }
 
@@ -159,11 +155,19 @@ class MALTest(TestCase):
 
         import_mal(self.user.username, self.user.username)
         n_works = Work.objects.count()
+        expected = len(mal_user_works)
+
+        # Assumption: all users' works were imported.
+        self.assertEqual(n_works, expected)
 
         # Kill the WorkTitle. Remove evidences.
         WorkTitle.objects.all().delete()
 
-        for _ in range(10):
+        for _ in range(3):
+            # Reset mocks.
+            client_mock.list_works_from_a_user.return_value = (item for item in mal_user_works)
+            client_mock.search_works.side_effect = lambda _, query: search_results.get(query, [])
+
             import_mal(self.user.username, self.user.username)
 
         # Assumption: no duplicates.
