@@ -10,7 +10,7 @@ from rest_framework.throttling import UserRateThrottle
 from mangaki.models import Category, Work
 from mangaki.utils.ratings import current_user_ratings
 
-NB_POINTS_DPP = 10
+NB_POINTS_DPP = 8
 POSTERS_PER_PAGE = 24
 
 
@@ -113,8 +113,7 @@ def get_card(request: Request, category: str, slot_sort_type: str):
     rated_works = current_user_ratings(request)
     slot_type_chosen = SlotCardTypes[card_slot_query['slot_type']]
     queryset = (
-        slot_dispatchers[slot_type_chosen](queryset)
-            .exclude(id__in=list(rated_works))
+        slot_dispatchers[slot_type_chosen](queryset.exclude(id__in=list(rated_works)))
     )
 
     works = queryset[:POSTERS_PER_PAGE]
