@@ -1,0 +1,111 @@
+{% extends "profile.html" %}
+
+{% block profile_section %}
+    {% verbatim %}
+    <div class="row">
+        <div id="profile_settings_container">
+            <div class="col-sm-4 col-xs-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Options de vie privée</div>
+                    <div class="panel-body">
+                        <button class="btn btn-danger btn-nowrap center-block" @click="deleteAccountModal = true">
+                            Supprimer mon compte
+                        </button>
+                        <modal v-if="deleteAccountModal">
+                            <h3 slot="header">
+                                Êtes-vous sûrs de vouloir supprimer votre compte ?
+                            </h3>
+                            <div slot="body">
+                                Cette action est <strong>irréversible</strong> et toutes vos données seront immédiatement effacées.
+
+                                Au préalable, il est recommandé d'exporter vos données, si vous veniez à changer d'avis.
+                            </div>
+                            <div class="modal-buttons-right" slot="footer">
+                                <button class="btn btn-danger" @click="deleteAccount">Supprimer</button>
+                                <button class="btn btn-default" @click="deleteAccountModal = false">Annuler</button>
+                            </div>
+                        </modal>
+                        <hr />
+                        <button class="btn btn-primary btn-nowrap center-block" v-on:click="exportData">
+                            Exporter mes données
+                        </button>
+                        <hr />
+                        <bs-light-switch v-model="isShared">
+                            Profil public&nbsp;:
+                        </bs-light-switch>
+                        <hr />
+                        <bs-light-switch v-model="acceptsResearchUsage">
+                            Participer à l'amélioration des algorithmes de Mangaki&nbsp;:
+                        </bs-light-switch>
+                        <hr />
+                        <bs-light-switch v-model="receivesNewsletter">
+                            Recevoir la newsletter&nbsp;:
+                        </bs-light-switch>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4 col-xs-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Préférences en vrac</div>
+                    <div class="panel-body">
+                        <bs-light-switch v-model="acceptsNSFW">
+                            Afficher visuels pour public averti&nbsp;:
+                        </bs-light-switch>
+                        <hr />
+                        <bs-light-switch v-model="enableKbShortcuts">
+                            Activer les raccourcis clavier sur la mosaique&nbsp;:
+                        </bs-light-switch>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endverbatim %}
+        {% if meta.mal.is_available %}
+            <div class="col-sm-4 col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Imports de données</div>
+                    <div class="panel-body">
+                        {% include "profile_mal_importer.html" %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+    {% if meta.debug_vue %}
+        <script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
+    {% else %}
+        <script src="https://unpkg.com/vue@2.5.2/dist/vue.min.js"></script>
+    {% endif %}
+
+    {% if meta.mal.is_available %}
+        <script src="/static/js/mal_import.js"></script>
+    {% endif %}
+
+    {% if meta.mal.is_available %}
+        <script>
+        $(document).ready(function () {
+            if (INITIAL_DATA.hasPendingMALImport) {
+                MALImporterApp.fetchServerSideTaskId()
+                    .then(() => {
+                        MALImporterApp.showForm = false;
+                    })
+            }
+        });
+        </script>
+    {% endif %}
+    <script src="/static/js/profile_settings.js"></script>
+    <script>
+        window.INITIAL_DATA = {
+            isShared: {{ user.profile.is_shared|yesno:"true,false" }},
+            acceptsNSFW: {{ user.profile.nsfw_ok|yesno:"true,false" }},
+            acceptsResearchUsage: {{ user.profile.research_ok|yesno:"true,false" }},
+            receivesNewsletter: {{ user.profile.newsletter_ok|yesno:"true,false" }},
+            enableKbShortcuts: {{ user.profile.keyboard_shortcuts_enabled|yesno:"true,false" }},
+            hasPendingMALImport: {{ meta.mal.pending_import|yesno:"true,false" }}
+        };
+    </script>
+{% endblock %}

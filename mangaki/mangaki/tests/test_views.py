@@ -216,7 +216,7 @@ class AnonymousViewsTest(WorkFactoryMixin, TestCase):
         response = self.client.get('/u/dummy')
         self.assertEqual(response.status_code, 301)
 
-        response = self.client.get('/u/dummy/anime/seen')
+        response = self.client.get('/u/dummy/works/anime/seen')
         self.assertEqual(response.status_code, 200)
 
 
