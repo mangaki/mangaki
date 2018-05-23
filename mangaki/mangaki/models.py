@@ -530,8 +530,15 @@ class Pairing(models.Model):
 
 class Reference(models.Model):
     work = models.ForeignKey('Work', on_delete=models.CASCADE)
+    source = models.CharField(max_length=100)
+    identifier = models.CharField(max_length=512)
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
+
+    class Meta:
+        unique_together = (
+            ('work', 'source', 'identifier'),
+        )
 
 
 class Top(models.Model):

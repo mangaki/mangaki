@@ -10,7 +10,20 @@ from django.utils.functional import cached_property
 from django.db.models import Q
 
 from mangaki import settings
-from mangaki.models import Work, WorkTitle, Category, ExtLanguage, Role, Staff, Studio, Artist, Tag, TaggedWork, RelatedWork
+from mangaki.models import (
+    Work,
+    WorkTitle,
+    Category,
+    ExtLanguage,
+    Role,
+    Staff,
+    Studio,
+    Artist,
+    Tag,
+    TaggedWork,
+    RelatedWork,
+    Reference
+)
 
 
 def to_python_datetime(date):
@@ -464,10 +477,11 @@ class AniDB:
         creators, studio = self.get_creators(creators_soup=anime.creators)
         tags = self.get_tags(tags_soup=anime.tags)
         related_animes = self.get_related_animes(related_animes_soup=anime.relatedanime)
+        url = str(anime.url.string) if anime.url else None
 
         anime = {
             'title': main_title,
-            'source': 'AniDB: ' + str(anime.url.string) if anime.url else '',
+            'source': 'AniDB: ' + url or '',
             'ext_poster': urljoin('http://img7.anidb.net/pics/anime/', str(anime.picture.string)) if anime.picture else '',
             'nsfw': anime.get('restricted') == 'true',
             'date': to_python_datetime(anime.startdate.string),
@@ -496,6 +510,13 @@ class AniDB:
 
         if created:
             self._build_related_animes(work, related_animes)
+            # Theorically, there should be no other reference than this one.
+            Reference.objects.create(
+                work=work,
+                source='AniDB',
+                identifier=anidb_aid,
+                url=url
+            )
 
         return work
 
