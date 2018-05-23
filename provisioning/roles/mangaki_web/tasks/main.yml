@@ -18,6 +18,9 @@
     nginx_site_upstreams:
       - name: '{{ mangaki_web_name }}'
         servers: '{{ mangaki_web_app_servers }}'
+    nginx_site_xsendfile_internal_locations:
+      - path: '{{ mangaki_web_xsendfile_path }}'
+        root: '{{ mangaki_web_xsendfile_root }}'
 
 - name: Configure Let's Encrypt certificates.
   include_role:
