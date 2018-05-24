@@ -74,48 +74,6 @@
 	{% endif %}
     </div>
     <div class="col-sm-6 col-md-5">
-        {% if events %}
-          <div class="alert alert-info">
-          {% for event in events %}
-            <form class="event" action="{% url 'event-detail' pk=event.id %}?next={{ request.get_full_path|urlencode }}" method="post">
-              {% csrf_token %}
-              {{ event.type|capfirst }} le <strong>{{ event.date }}</strong>{% if event.type == 'tv' %}
-              sur {{ event.channel }}{% elif event.location %},
-              {% if event.link %}
-                  <a href="{{ event.link }}" target="_blank">{{ event.location }}</a>
-              {% else %}
-                  {{ event.location }}
-              {% endif %}
-              {% endif %}
-                <div class="event-attending">
-                  <small style="margin-right: 1ex;">
-                  {% if event.nb_attendees == 1 %}Une personne y va.{% elif event.nb_attendees %}{{ event.nb_attendees }} personnes y vont.{% endif %}
-                  </small>
-                  <div class="btn-group">
-                    <button
-                       type="submit"
-                       name="{% if event.attending == True %}cancel{% else %}willgo{% endif %}"
-                       class="btn btn-success btn-xs
-                              {% if event.attending == False %}not-chosen
-                              {% elif event.attending == True %}active
-                              {% endif %}" title="J'y vais&nbsp;!">
-                      J'y vais&nbsp;!
-                    </button>
-                    <button
-                       type="submit"
-                       name="{% if event.attending == False %}cancel{% else %}wontgo{% endif %}"
-                       class="btn btn-warning btn-xs
-                              {% if event.attending == True %}not-chosen
-                              {% elif event.attending == False %}active
-                              {% endif %}" title="J n'y vais pas.">
-                            Je n'y vais pas.
-                    </button>
-                    </div>
-                  </div>
-                </form>
-          {% endfor %}
-          </div>
-        {% endif %}
         {% if stats %}
         <h3>Statistiques <small>({% if object.category.slug == 'anime' %}vu{% elif object.category.slug == 'manga' %}lu{% endif %} par {{ seen_percent }}&nbsp;% des membres qui l'ont noté)</small></h3>
         <div style="max-width: 420px; max-height: 200px">

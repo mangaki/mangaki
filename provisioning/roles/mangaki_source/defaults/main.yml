@@ -33,3 +33,6 @@ mangaki_source_has_mal: false
 
 # Sentry
 mangaki_source_has_sentry: false
+
+# Sendfile
+mangaki_source_sendfile: false

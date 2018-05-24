@@ -1,5 +1,5 @@
 from django import forms
-from mangaki.models import Suggestion, Rating
+from mangaki.models import Suggestion, Rating, Profile
 from mangaki.utils.ratings import get_anonymous_ratings, clear_anonymous_ratings
 from mangaki.choices import SUGGESTION_PROBLEM_CHOICES
 
@@ -23,6 +23,9 @@ class SuggestionForm(forms.ModelForm):
 
 class SignupForm(forms.Form):
     import_ratings = forms.BooleanField(required=False, initial=True, label="Importer mes notes")
+    newsletter_ok = forms.BooleanField(required=False, initial=False, label="S'abonner à la newsletter de Mangaki")
+    research_ok = forms.BooleanField(required=False, initial=False,
+                                     label="Participer à l'amélioration des algorithmes de Mangaki")
 
     def signup(self, request, user):
         if self.cleaned_data['import_ratings']:
@@ -32,3 +35,8 @@ class SignupForm(forms.Form):
                 Rating(user=user, work_id=work_id, choice=choice)
                 for work_id, choice in ratings.items()
             ])
+
+        Profile.objects.filter(id=user.profile.pk).update(
+            newsletter_ok=self.cleaned_data['newsletter_ok'],
+            research_ok=self.cleaned_data['research_ok']
+        )

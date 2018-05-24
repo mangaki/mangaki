@@ -8,8 +8,9 @@ from django.test import TestCase
 
 from mangaki.models import (Work, WorkTitle, RelatedWork, Category, Genre,
                             Language, ExtLanguage, Artist, Staff, Studio)
-from mangaki.wrappers.anilist import (to_python_datetime, to_anime_season, AniList, AniListStatus,
-                                      AniListWorks, AniListException,
+from mangaki.wrappers.anilist import (fuzzydate_to_python_datetime, to_anime_season, read_graphql_query,
+                                      AniList, AniListException, AniListStatus, AniListWorkType, AniListSeason,
+                                      AniListMediaFormat, AniListRelation, AniListRelationType,
                                       insert_works_into_database_from_anilist, insert_work_into_database_from_anilist)
 
 
@@ -19,236 +20,183 @@ class AniListTest(TestCase):
         with open(os.path.join(settings.TEST_DATA_DIR, filename), 'r', encoding='utf-8') as f:
             return f.read()
 
-    @staticmethod
-    def add_fake_auth():
+    def setUp(self):
+        self.anilist = AniList()
+
+    def test_fuzzydate_to_python_datetime(self):
+        self.assertEqual(fuzzydate_to_python_datetime({'year': 2017, 'month': 12, 'day': 25}), datetime(2017, 12, 25, 0, 0))
+        self.assertEqual(fuzzydate_to_python_datetime({'year': 2017, 'month': 12, 'day': None}), datetime(2017, 12, 1, 0, 0))
+        self.assertEqual(fuzzydate_to_python_datetime({'year': 2017, 'month': None, 'day': None}), datetime(2017, 1, 1, 0, 0))
+
+        self.assertIsNone(fuzzydate_to_python_datetime({'year': None, 'month': None, 'day': 25}))
+        self.assertIsNone(fuzzydate_to_python_datetime({'year': None, 'month': 12, 'day': 25}))
+        self.assertIsNone(fuzzydate_to_python_datetime({'year': None, 'month': 12, 'day': None}))
+        self.assertIsNone(fuzzydate_to_python_datetime({'year': None, 'month': None, 'day': None}))
+
+    def test_to_anime_season(self):
+        self.assertEqual(to_anime_season(datetime(2017, 1, 1, 0, 0)), AniListSeason.WINTER)
+        self.assertEqual(to_anime_season(datetime(2017, 4, 1, 0, 0)), AniListSeason.SPRING)
+        self.assertEqual(to_anime_season(datetime(2017, 7, 1, 0, 0)), AniListSeason.SUMMER)
+        self.assertEqual(to_anime_season(datetime(2017, 10, 1, 0, 0)), AniListSeason.FALL)
+
+    @responses.activate
+    def test_api_errors(self):
         responses.add(
             responses.POST,
-            urljoin(AniList.BASE_URL, AniList.AUTH_PATH),
-            body='{"access_token":"fake_token","token_type":"Bearer","expires_in":3600,"expires":946684800}',
+            self.anilist.BASE_URL,
+            body='{ "data": { "Media": null }, "errors": [ { "message": "Not Found.", "status": 404, "locations": [{"line": 2, "column": 3}] } ] }',
+            status=404,
+            content_type='application/json'
+        )
+
+        with self.assertRaisesRegexp(AniListException, 'Error 404 : Not Found.'):
+            self.anilist._request(
+                query=read_graphql_query('work-info'),
+                variables={'id': 0}
+            )
+
+    @responses.activate
+    def test_get_work(self):
+        responses.add(
+            responses.POST,
+            self.anilist.BASE_URL,
+            body=self.read_fixture('anilist/hibike_euphonium.json'),
             status=200,
             content_type='application/json'
         )
 
-    def setUp(self):
-        self.anilist = AniList('test_client', 'client_secret')
-        self.no_anilist = AniList()
+        hibike_by_id = self.anilist.get_work(search_id=20912)
+        hibike_by_title = self.anilist.get_work(search_title='Hibike')
+        hibike_by_id_and_title = self.anilist.get_work(search_id=20912, search_title='Hibike')
+        hibike = hibike_by_id_and_title
 
-    def test_to_python_datetime(self):
-        self.assertEqual(to_python_datetime('20171225'), datetime(2017, 12, 25, 0, 0))
-        self.assertEqual(to_python_datetime('20171200'), datetime(2017, 12, 1, 0, 0))
-        self.assertEqual(to_python_datetime('20170000'), datetime(2017, 1, 1, 0, 0))
-        self.assertRaises(ValueError, to_python_datetime, '2017')
-
-    def test_to_anime_season(self):
-        self.assertEqual(to_anime_season(datetime(2017, 1, 1, 0, 0)), 'winter')
-        self.assertEqual(to_anime_season(datetime(2017, 4, 1, 0, 0)), 'spring')
-        self.assertEqual(to_anime_season(datetime(2017, 7, 1, 0, 0)), 'summer')
-        self.assertEqual(to_anime_season(datetime(2017, 10, 1, 0, 0)), 'fall')
-
-    def test_missing_client(self):
-        self.assertRaises(RuntimeError, self.no_anilist._authenticate)
-        self.assertFalse(self.no_anilist._is_authenticated())
+        self.assertEqual(hibike, hibike_by_id)
+        self.assertEqual(hibike, hibike_by_title)
 
     @responses.activate
-    def test_authentication(self):
-        self.add_fake_auth()
+    def test_work_properties(self):
+        responses.add(
+            responses.POST,
+            self.anilist.BASE_URL,
+            body=self.read_fixture('anilist/hibike_euphonium.json'),
+            status=200,
+            content_type='application/json'
+        )
 
-        self.assertFalse(self.anilist._is_authenticated())
+        hibike = self.anilist.get_work(search_id=20912)
 
-        auth = self.anilist._authenticate()
-        self.assertEqual(auth["access_token"], "fake_token")
-        self.assertEqual(auth["token_type"], "Bearer")
-        self.assertEqual(auth["expires_in"], 3600)
-        self.assertEqual(auth["expires"], 946684800)
+        self.assertEqual(hibike.anilist_id, 20912)
+        self.assertEqual(hibike.anilist_url, 'https://anilist.co/anime/20912')
+        self.assertEqual(hibike.media_format, AniListMediaFormat.TV)
 
-    @responses.activate
-    def test_api_errors(self):
-        self.add_fake_auth()
+        self.assertEqual(hibike.title, 'Hibike! Euphonium')
+        self.assertEqual(hibike.english_title, 'Sound! Euphonium')
+        self.assertEqual(hibike.japanese_title, '響け！ユーフォニアム')
+        self.assertCountEqual(hibike.synonyms, [])
 
-        error_tests = [{
-            'route': 'unknown_route', 'status': 404, 'exception': '"unknown_route" API route does not exist',
-            'body': '{"error":{"status":404,"messages":["API route not found."]}}'
-        },
-        {
-            'route': 'token_expired', 'status': 200, 'exception': 'token no longer valid or not found',
-            'body': '{"error":"access_denied","error_description":"The resource owner or authorization server denied the request."}'
-        },
-        {
-            'route': 'token_missing', 'status': 401, 'exception': 'token no longer valid or not found',
-            'body': '{"status":401,"error":"unauthorized","error_message":"Access token is missing"}'
-        },
-        {
-            'route': 'other_error', 'status': 404, 'exception': 'unknown_error - handle too',
-            'body': '{"status":404,"error":{"unknown_error":"handle too"}}'
-        }]
+        self.assertEqual(hibike.start_date, datetime(2015, 4, 8, 0, 0))
+        self.assertEqual(hibike.end_date, datetime(2015, 7, 1, 0, 0))
+        self.assertEqual(hibike.season, AniListSeason.SPRING)
 
-        for error_test in error_tests:
-            with self.subTest(error_test['route'], exception=error_test['exception']):
-                responses.add(
-                    responses.GET, urljoin(AniList.BASE_URL, error_test['route']),
-                    body=error_test['body'], status=error_test['status'], content_type='application/json'
-                )
+        self.assertEqual(hibike.description, 'The anime begins when Kumiko Oumae, a girl who was in the brass band club in junior high school, visits her high school\'s brass band club as a first year. Kumiko\'s classmates Hazuki and Sapphire decide to join the club, but Kumiko sees her old classmate Reina there and hesitates. She remembers an incident she had with Reina at a brass band club contest in junior high school...<br>\n<br>\n(Source: ANN)')
+        self.assertCountEqual(hibike.genres, ['Music', 'Slice of Life', 'Drama'])
+        self.assertFalse(hibike.is_nsfw)
+        self.assertEqual(hibike.poster_url, 'https://cdn.anilist.co/img/dir/anime/reg/20912-vpZDPyqs22Rz.jpg')
 
-                with self.assertRaisesRegexp(AniListException, error_test['exception']):
-                    self.anilist._request(error_test['route'])
+        self.assertEqual(hibike.nb_episodes, 13)
+        self.assertEqual(hibike.episode_length, 24)
+        self.assertIsNone(hibike.nb_chapters)
+
+        self.assertEqual(hibike.status, AniListStatus.FINISHED)
+        self.assertEqual(hibike.studio, 'Kyoto Animation')
+
+        self.assertCountEqual(hibike.external_links, {
+            'Official Site': 'http://anime-eupho.com/',
+            'Crunchyroll': 'http://www.crunchyroll.com/sound-euphonium',
+            'Twitter': 'https://twitter.com/anime_eupho'
+        })
+
+        self.assertCountEqual(hibike.tags, [
+            { 'anilist_tag_id': 110, 'name': 'Band', 'spoiler': False, 'votes': 100 },
+            { 'anilist_tag_id': 46, 'name': 'School', 'spoiler': False, 'votes': 79 },
+            { 'anilist_tag_id': 98, 'name': 'Female Protagonist', 'spoiler': False, 'votes': 79 },
+            { 'anilist_tag_id': 84, 'name': 'School Club', 'spoiler': False, 'votes': 73 },
+            { 'anilist_tag_id': 50, 'name': 'Seinen', 'spoiler': False, 'votes': 33 }
+        ])
+
+        self.assertEqual(len(hibike.staff), 13)
+
+        self.assertCountEqual(hibike.relations, [
+            AniListRelation(related_id=86133, relation_type=AniListRelationType.ADAPTATION),
+            AniListRelation(related_id=21255, relation_type=AniListRelationType.SIDE_STORY),
+            AniListRelation(related_id=21376, relation_type=AniListRelationType.SIDE_STORY),
+            AniListRelation(related_id=21460, relation_type=AniListRelationType.SEQUEL),
+            AniListRelation(related_id=21638, relation_type=AniListRelationType.SUMMARY),
+            AniListRelation(related_id=100178, relation_type=AniListRelationType.SIDE_STORY)
+        ])
 
     @responses.activate
     def test_get_seasonal_anime(self):
-        self.add_fake_auth()
-
         responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'browse/anime'),
-            body=self.read_fixture('anilist/airing_summer_2017_trimmed.json'),
-            status=200, content_type='application/json'
+            responses.POST,
+            self.anilist.BASE_URL,
+            body=self.read_fixture('anilist/airing_fall_2017.json'),
+            status=200,
+            content_type='application/json'
         )
 
-        for anime in self.anilist.list_seasonal_animes(year=2017, season='summer'):
-            if anime.title == 'Made in Abyss':
-                self.assertEqual(anime.anilist_id, 97986)
-                self.assertEqual(anime.english_title, 'Made in Abyss')
-                self.assertEqual(anime.japanese_title, 'メイドインアビス')
-                self.assertEqual(anime.media_type, 'TV')
-                self.assertEqual(anime.start_date, datetime(2017, 7, 7))
-                self.assertIsNone(anime.end_date)
-                self.assertIsNone(anime.description)
-                self.assertEqual(anime.synonyms, [])
-                self.assertEqual(anime.genres, ['Adventure', 'Fantasy', 'Sci-Fi'])
-                self.assertFalse(anime.is_nsfw)
-                self.assertEqual(anime.poster_url, 'https://cdn.anilist.co/img/dir/anime/reg/97986-ZL0DkAyNWyxG.jpg')
-                self.assertEqual(anime.nb_episodes, 13)
-                self.assertEqual(anime.status, AniListStatus.airing)
-                self.assertEqual(anime.tags[1], {'anilist_tag_id': 175, 'name': 'Robots', 'spoiler': False, 'votes': 53})
-                break
+        airing_animes = list(self.anilist.list_seasonal_animes(year=2017, season=AniListSeason.SUMMER))
+        self.assertEqual(len(airing_animes), 36)
 
     @responses.activate
-    def test_get_work_by_id(self):
-        self.add_fake_auth()
-
+    def test_get_animelist(self):
         responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'anime/20912/page'),
-            body=self.read_fixture('anilist/hibike_euphonium.json'),
-            status=200, content_type='application/json'
+            responses.POST,
+            self.anilist.BASE_URL,
+            body=self.read_fixture('anilist/mrsalixor_anilist_animelist.json'),
+            status=200,
+            content_type='application/json'
         )
 
-        hibike = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
-
-        self.assertEqual(hibike.english_title, 'Sound! Euphonium')
-        self.assertEqual(hibike.japanese_title, '響け！ユーフォニアム')
-        self.assertEqual(hibike.studio, 'Kyoto Animation')
-        self.assertEqual(hibike.episode_length, 24)
-
-        self.assertEqual(hibike.youtube_url, 'https://www.youtube.com/watch?v=r_Kk9xhVkB8')
-        self.assertEqual(hibike.crunchyroll_url, 'http://www.crunchyroll.com/sound-euphonium')
-        self.assertEqual(hibike.twitter_url, 'https://twitter.com/anime_eupho')
-        self.assertEqual(hibike.official_url, 'http://anime-eupho.com/')
-        self.assertEqual(len(hibike.relations), 4)
-
-        responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'anime/99999999999/page'),
-            body='{"error":{"status":404,"messages":["No query results for model [App/AniList/v1/Series/Series] 99999999999"]}}',
-            status=404, content_type='application/json'
-        )
-
-        inexistant_work = self.anilist.get_work_by_id(AniListWorks.animes, 99999999999)
-        self.assertIsNone(inexistant_work)
+        anime_list = list(self.anilist.get_user_list(AniListWorkType.ANIME, 'mrsalixor'))
+        self.assertEqual(len(anime_list), 450)
 
     @responses.activate
-    def test_get_work_by_title(self):
-        self.add_fake_auth()
-
+    def test_get_mangalist(self):
         responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'anime/search/Hibike!'),
-            body=self.read_fixture('anilist/hibike_euphonium_search.json'),
-            status=200, content_type='application/json'
+            responses.POST,
+            self.anilist.BASE_URL,
+            body=self.read_fixture('anilist/mrsalixor_anilist_mangalist.json'),
+            status=200,
+            content_type='application/json'
         )
 
-        hibike = self.anilist.get_work_by_title(AniListWorks.animes, 'Hibike!')
-
-        self.assertEqual(hibike.english_title, 'Sound! Euphonium')
-        self.assertEqual(hibike.japanese_title, '響け！ユーフォニアム')
-
-        responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'anime/search/no%20such%20anime'),
-            body='{"error":{"status":200,"messages":["No Results."]}}',
-            status=200, content_type='application/json'
-        )
-
-        inexistant_work = self.anilist.get_work_by_title(AniListWorks.animes, 'no such anime')
-        self.assertIsNone(inexistant_work)
-
-    @responses.activate
-    def test_get_userlist(self):
-        self.add_fake_auth()
-
-        for work_type in AniListWorks:
-            responses.add(
-                responses.GET,
-                urljoin(AniList.BASE_URL, 'user/mrsalixor/{}list'.format(work_type.value)),
-                body=self.read_fixture('anilist/mrsalixor_anilist_{}list.json'.format(work_type.value)),
-                status=200, content_type='application/json'
-            )
-
-        anime_list = self.anilist.get_user_list(AniListWorks.animes, 'mrsalixor')
-        animes = set(anime_list)
-        self.assertEqual(len(animes), 52)
-
-        manga_list = self.anilist.get_user_list(AniListWorks.mangas, 'mrsalixor')
-        mangas = set(manga_list)
-        self.assertEqual(len(mangas), 57)
-
-        for work_type in AniListWorks:
-            responses.add(
-                responses.GET,
-                urljoin(AniList.BASE_URL, 'user/aaaaaaaaaaaaa/{}list'.format(work_type.value)),
-                body='{"error":{"status":404,"messages":["No query results for model [App/AniList/v1/User/User] aaaaaaaaaaaaa"]}}',
-                status=404, content_type='application/json'
-            )
-
-        inexistant_user_animelist = list(self.anilist.get_user_list(AniListWorks.animes, 'aaaaaaaaaaaaa'))
-        inexistant_user_mangalist = list(self.anilist.get_user_list(AniListWorks.mangas, 'aaaaaaaaaaaaa'))
-        self.assertCountEqual(inexistant_user_animelist, [])
-        self.assertCountEqual(inexistant_user_mangalist, [])
+        anime_list = list(self.anilist.get_user_list(AniListWorkType.MANGA, 'mrsalixor'))
+        self.assertEqual(len(anime_list), 100)
 
     @responses.activate
     def test_insert_into_database(self):
-        self.add_fake_auth()
         artist = Artist(name='Ishihara Tatsuya').save()
 
         # Test insert AniListEntry into database
         responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'browse/anime'),
-            body=self.read_fixture('anilist/airing_summer_2017_trimmed.json'),
-            status=200, content_type='application/json'
-        )
-
-        seasonal = list(self.anilist.list_seasonal_animes(year=2017, season='summer'))
-        self.assertEqual(len(insert_works_into_database_from_anilist(seasonal)), 7)
-
-        # Test insert AniListRichEntry into database
-        responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'anime/20912/page'),
+            responses.POST,
+            self.anilist.BASE_URL,
             body=self.read_fixture('anilist/hibike_euphonium.json'),
-            status=200, content_type='application/json'
+            status=200,
+            content_type='application/json'
         )
 
-        hibike_entry = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
-        hibike = insert_work_into_database_from_anilist(hibike_entry)
+        hibike_entry = self.anilist.get_work(search_id=20912)
+        hibike = insert_work_into_database_from_anilist(hibike_entry, build_related=False)
 
-        titles_hibike = WorkTitle.objects.filter(work=hibike)
+        titles_hibike = WorkTitle.objects.filter(work=hibike).values_list('title', flat=True)
         genres_hibike = hibike.genre.values_list('title', flat=True)
         related_hibike = RelatedWork.objects.filter(parent_work=hibike)
         staff_hibike = Work.objects.get(pk=hibike.pk).staff_set.all().values_list('artist__name', flat=True)
 
         self.assertEqual(hibike.studio.title, 'Kyoto Animation')
-        self.assertEqual(len(titles_hibike), 3)
-        self.assertEqual(len(related_hibike), 4)
+        self.assertCountEqual(titles_hibike, ['Hibike! Euphonium', 'Sound! Euphonium', '響け！ユーフォニアム'])
         self.assertCountEqual(genres_hibike, ['Slice of Life', 'Music', 'Drama'])
         self.assertCountEqual(staff_hibike, ['Ishihara Tatsuya', 'Matsuda Akito', 'Takeda Ayano'])
 
@@ -258,13 +206,11 @@ class AniListTest(TestCase):
         self.assertEqual(artist.first().anilist_creator_id, 100055)
 
         # Try adding this work to the DB again
-        hibike_again = insert_work_into_database_from_anilist(hibike_entry)
+        hibike_again = insert_work_into_database_from_anilist(hibike_entry, build_related=False)
         self.assertEqual(hibike, hibike_again)
 
     @responses.activate
     def test_update_work(self):
-        self.add_fake_auth()
-
         fake_studio = Studio.objects.create(title='Fake Studio')
         hibike_outdated = Work.objects.create(
             category=Category.objects.get(slug='anime'),
@@ -274,24 +220,25 @@ class AniListTest(TestCase):
         hibike_outdated.genre.add(Genre.objects.create(title='Fake genre'))
 
         responses.add(
-            responses.GET,
-            urljoin(AniList.BASE_URL, 'anime/20912/page'),
+            responses.POST,
+            self.anilist.BASE_URL,
             body=self.read_fixture('anilist/hibike_euphonium.json'),
-            status=200, content_type='application/json'
+            status=200,
+            content_type='application/json'
         )
 
-        hibike_entry = self.anilist.get_work_by_id(AniListWorks.animes, 20912)
-        insert_work_into_database_from_anilist(hibike_entry) # Update this work from AniList
+        hibike_entry = self.anilist.get_work(search_id=20912)
+        # FIXME: properly mock the insertion of related works
+        insert_work_into_database_from_anilist(hibike_entry, build_related=False)
 
         hibike_updated = Work.objects.get(title='Hibike! Euphonium')
 
-        titles_hibike = WorkTitle.objects.filter(work=hibike_updated)
+        titles_hibike = WorkTitle.objects.filter(work=hibike_updated).values_list('title', flat=True)
         genres_hibike = hibike_updated.genre.values_list('title', flat=True)
         related_hibike = RelatedWork.objects.filter(parent_work=hibike_updated)
         staff_hibike = Work.objects.get(pk=hibike_updated.pk).staff_set.all().values_list('artist__name', flat=True)
 
         self.assertEqual(hibike_updated.studio.title, 'Kyoto Animation')
-        self.assertEqual(len(titles_hibike), 3)
-        self.assertEqual(len(related_hibike), 4)
+        self.assertCountEqual(titles_hibike, ['Hibike! Euphonium', 'Sound! Euphonium', '響け！ユーフォニアム'])
         self.assertCountEqual(genres_hibike, ['Slice of Life', 'Music', 'Drama'])
         self.assertCountEqual(staff_hibike, ['Ishihara Tatsuya', 'Matsuda Akito', 'Takeda Ayano'])

@@ -24,4 +24,4 @@ class Command(BaseCommand):
             categories = {work_id: cat_id for work_id, _, cat_id in meta_triplets}
 
         _, algo = fit_algo(algo_name, triplets, titles=titles, categories=categories, output_csv=output_csv)
-        self.stdout.write(self.style.SUCCESS('Successfully fit %s (%.1f MB)' % (algo_name, algo.size)))
+        self.stdout.write(self.style.SUCCESS('Successfully fit %s (%.1f MB)' % (algo_name, algo.size / 1e6)))

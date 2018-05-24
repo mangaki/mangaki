@@ -2,7 +2,7 @@ import datetime
 import json
 from collections import Counter, OrderedDict
 from itertools import zip_longest
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from urllib.parse import urlencode
 
 import allauth.account.views
@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When, Count
+from django.db.models import Case, IntegerField, Sum, Value, When, Count, Q
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -44,14 +44,13 @@ from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
-    get_profile_recommendations,
-    get_profile_events
+    get_profile_recommendations
 )
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.tokens import compute_token, KYOTO_SALT
 from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
-from irl.models import Event, Partner, Attendee
+from irl.models import Partner
 
 
 NB_POINTS_DPP = 10
@@ -142,6 +141,41 @@ VANILLA_UI_CONFIG_FOR_RATINGS = {
     'endpoint': reverse_lazy('vote')
 }
 
+def deep_dict_merge(source: Dict, destination: Dict,
+                    _path: Optional[List] = None) -> Dict:
+    """
+    **In-place** deep dict merge from source to destination.
+
+    Will raise an exception if encounters distinct types for the same key.
+
+    Args:
+        source (dict)
+        destination (dict)
+        _path(str): internal implementation details to track recursive calls
+
+    Returns: destination (dict).
+
+    """
+    if _path is None:
+        _path = []
+
+    for key in source.keys():
+        if key in destination:
+            if isinstance(source[key], dict) and isinstance(destination[key], dict):
+                deep_dict_merge(source[key], destination[key],
+                      _path + [key])
+            elif source[key] == destination[key]:
+                pass
+            else:
+                raise ValueError(
+                    'Conflict at {}'.format(
+                        '.'.join(_path + [key])
+                    )
+                )
+        else:
+            destination[key] = source[key]
+
+    return destination
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
@@ -199,32 +233,6 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
                 context['stats'].append({'value': nb[rating], 'colors': RATING_COLORS[rating], 'label': label})
             context['seen_percent'] = round(100 * seen_total / float(total))
 
-        events = self.object.event_set \
-            .filter(date__gte=timezone.now()) \
-            .annotate(nb_attendees=Sum(Case(
-            When(attendee__attending=True, then=Value(1)),
-            default=Value(0),
-            output_field=IntegerField(),
-        )))
-        if len(events) > 0:
-            my_events = {}
-            if self.request.user.is_authenticated:
-                my_events = dict(self.request.user.attendee_set.filter(
-                    event__in=events).values_list('event_id', 'attending'))
-
-            context['events'] = [
-                {
-                    'id': event.id,
-                    'attending': my_events.get(event.id, None),
-                    'type': event.get_event_type_display(),
-                    'channel': event.channel,
-                    'date': event.get_date(),
-                    'link': event.link,
-                    'location': event.location,
-                    'nb_attendees': event.nb_attendees,
-                } for event in events
-            ]
-
         return context
 
     def post(self, request, *args, **kwargs):
@@ -242,31 +250,6 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
         form.instance.user = self.request.user
         form.save()
         return super().form_valid(form)
-
-
-class EventDetail(LoginRequiredMixin, DetailView):
-    model = Event
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if 'next' in request.GET:
-            return redirect(request.GET['next'])
-        return redirect(self.object.work.get_absolute_url())
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        attending = None
-        if 'wontgo' in request.POST:
-            attending = False
-        if 'willgo' in request.POST:
-            attending = True
-        if attending is not None:
-            Attendee.objects.update_or_create(
-                event=self.object, user=request.user,
-                defaults={'attending': attending})
-        elif 'cancel' in request.POST:
-            Attendee.objects.filter(event=self.object, user=request.user).delete()
-        return redirect(request.GET['next'])
 
 
 class WorkListMixin:
@@ -346,7 +329,7 @@ class WorkList(WorkListMixin, ListView):
             raise Http404
 
         if search_text:
-            self.queryset = self.queryset.search(search_text)
+            self.queryset = self.queryset.filter(Q(title__icontains=search_text) | Q(worktitle__title__icontains=search_text))
 
         self.queryset = self.queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
@@ -366,6 +349,8 @@ class WorkList(WorkListMixin, ListView):
         context['category'] = self.category.slug
         context['is_dpp'] = self.is_dpp
         context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS if not self.is_dpp else DPP_UI_CONFIG_FOR_RATINGS
+        context['enable_kb_shortcuts'] = (False if self.request.user.is_anonymous
+        else self.request.user.profile.keyboard_shortcuts_enabled)
         context['objects_count'] = self.category.work_set.count()
 
         if sort_mode == 'mosaic' and not self.is_dpp:
@@ -429,12 +414,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
 
 
 def get_profile(request,
-                username: str = None,
-                category: str = None,
-                status: str = None):
-    if username is None and request.user.is_authenticated():
-        return redirect('profile', request.user.username, category or 'anime', status or 'seen', permanent=True)
-
+                username: str = None):
     is_anonymous = False
     if username:
         user = get_object_or_404(User.objects.select_related('profile'), username=username)
@@ -449,61 +429,14 @@ def get_profile(request,
     else:
         is_shared = user.profile.is_shared
 
-    if category is None or status is None:
-        if user.username:
-            return redirect('profile', user.username, category or 'anime', status or 'seen', permanent=True)
-        else:
-            return redirect('my-profile', category or 'anime', status or 'seen', permanent=True)
-
     can_see = is_shared or user == request.user
-    seen_works = status == "seen"
     algo_name = request.GET.get('algo', None)
-    categories = ('anime', 'manga', 'album')
-    # FIXME: We should move natural sorting on the database-side.
-    # This way, we can keep a queryset until the end.
-    # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
-    # Currently, we load the *entire set* of ratings for a (seen/willsee|wontsee) category of works.
-    ratings, counts = get_profile_ratings(request,
-                                          category,
-                                          seen_works,
-                                          can_see,
-                                          is_anonymous,
-                                          user)
-
-    compare_function = build_profile_compare_function(algo_name,
-                                                      ratings,
-                                                      user)
-    rating_list = natsorted(ratings, key=compare_function)
-    if category == 'recommendation':
-        received_recommendation_list, sent_recommendation_list = get_profile_recommendations(
-            is_anonymous,
-            can_see,
-            user
-        )
-    else:
-        received_recommendation_list = sent_recommendation_list = []
-
-    if can_see and not is_anonymous and not received_recommendation_list:
-        reco_count = Recommendation.objects.filter(target_user=user).count()
-    else:
-        reco_count = len(received_recommendation_list)
 
     member_time = (datetime.date.today() - user.date_joined.date()
                    if (can_see and not is_anonymous) else None)
-    user_events = get_profile_events(user) if (can_see and not is_anonymous) else []
-
-    paginator = Paginator(rating_list, RATINGS_PER_PAGE)
-    page = request.GET.get('page')
-
-    try:
-        ratings = paginator.page(page)
-    except PageNotAnInteger:
-        ratings = paginator.page(1)
-    except EmptyPage:
-        ratings = paginator.page(paginator.num_pages)
 
     is_me = request.user == user
-    data = {
+    context = {
         'meta': {
             'debug_vue': settings.DEBUG_VUE_JS,
             'mal': {
@@ -515,8 +448,6 @@ def get_profile(request,
             'username': request.user.username,
             'is_shared': is_shared,
             'is_me': is_me,
-            'category': category,
-            'seen': seen_works,
             'is_anonymous': is_anonymous,
             'ratings_disabled': request.user != user and not is_anonymous,
             'algo_name': algo_name
@@ -524,6 +455,98 @@ def get_profile(request,
         'profile': {
             'avatar_url': user.profile.avatar_url if (not is_anonymous and can_see) else None,
             'member_days': member_time.days if member_time else None,
+            'username': user.username
+        },
+    }
+
+    return user, context
+
+
+def get_profile_preferences(request,
+                            username: str = None):
+    if username is None and request.user.is_authenticated():
+        return redirect('profile-preferences', request.user.username, permanent=True)
+
+    user, ctx = get_profile(request, username)
+
+    if ctx['meta']['is_anonymous']:
+        return redirect('profile')
+
+    new_ctx = {
+        'meta': {
+           'section': 'preferences'
+        }
+    }
+
+    return render(request, 'profile_preferences.html',
+                  deep_dict_merge(ctx, new_ctx))
+
+
+def get_profile_works(request,
+                      username: str = None,
+                      category: str = None,
+                      status: str = None):
+    if username is None and request.user.is_authenticated():
+        return redirect('profile-works', request.user.username, category or 'anime', status or 'seen', permanent=True)
+
+    user, ctx = get_profile(request, username)
+
+    if category is None or status is None:
+        if user.username:
+            return redirect('profile-works', user.username, category or 'anime', status or 'seen', permanent=True)
+        else:
+            return redirect('my-profile', category or 'anime', status or 'seen', permanent=True)
+
+    seen_works = status == "seen"
+    algo_name = request.GET.get('algo', None)
+    # FIXME: We should move natural sorting on the database-side.
+    # This way, we can keep a queryset until the end.
+    # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
+    # Currently, we load the *entire set* of ratings for a (seen/willsee|wontsee) category of works.
+    ratings, counts = get_profile_ratings(request,
+                                          category,
+                                          seen_works,
+                                          ctx['meta']['can_see'],
+                                          ctx['meta']['is_anonymous'],
+                                          user)
+
+    compare_function = build_profile_compare_function(algo_name,
+                                                      ratings,
+                                                      user)
+    rating_list = natsorted(ratings, key=compare_function)
+    if category == 'recommendation':
+        received_recommendation_list, sent_recommendation_list = get_profile_recommendations(
+            ctx['meta']['is_anonymous'],
+            ctx['meta']['can_see'],
+            user
+        )
+    else:
+        received_recommendation_list = sent_recommendation_list = []
+
+    if ctx['meta']['can_see'] and not ctx['meta']['is_anonymous'] and not received_recommendation_list:
+        reco_count = Recommendation.objects.filter(target_user=user).count()
+    else:
+        reco_count = len(received_recommendation_list)
+
+    paginator = Paginator(rating_list, RATINGS_PER_PAGE)
+    page = request.GET.get('page')
+
+    try:
+        ratings = paginator.page(page)
+    except PageNotAnInteger:
+        ratings = paginator.page(1)
+    except EmptyPage:
+        ratings = paginator.page(paginator.num_pages)
+
+    new_ctx = {
+        'meta': {
+            'category': category,
+            'seen': seen_works,
+            'algo_name': algo_name,
+            'section': 'works',
+            'status': status
+        },
+        'profile': {
             'seen_anime_count': counts['seen_anime'],
             'seen_manga_count': counts['seen_manga'],
             'unseen_anime_count': counts['unseen_anime'],
@@ -536,9 +559,9 @@ def get_profile(request,
             'received': received_recommendation_list,
             'sent': sent_recommendation_list
         },
-        'events': user_events
     }
-    return render(request, 'profile.html', data)
+    return render(request, 'profile_works.html',
+                  deep_dict_merge(ctx, new_ctx))
 
 
 def index(request):
@@ -776,23 +799,6 @@ def get_reco_dpp(request):
                       'config': DPP_UI_CONFIG_FOR_RATINGS
                   })
 
-def update_shared(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(is_shared=request.POST['is_shared'] == 'true')
-    return HttpResponse()
-
-
-def update_nsfw(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(nsfw_ok=request.POST['nsfw_ok'] == 'true')
-    return HttpResponse()
-
-
-def update_newsletter(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(newsletter_ok=request.POST['newsletter_ok'] == 'true')
-    return HttpResponse()
-
 
 def update_research(request):
     is_ok = None
@@ -825,10 +831,6 @@ def update_research(request):
     return render(request, 'research.html', {'username': username, 'token': token})
 
 
-def update_reco_willsee(request):
-    if request.user.is_authenticated and request.method == 'POST':
-        Profile.objects.filter(user=request.user).update(reco_willsee_ok=request.POST['reco_willsee_ok'] == 'true')
-    return HttpResponse()
 
 
 def add_pairing(request, artist_id, work_id):
@@ -928,6 +930,9 @@ def fix_suggestion(request, suggestion_id):
         'suggestion': suggestion,
         'clusters': zip(clusters, colors) if clusters and colors else None,
         'evidence': evidence,
+        'can_auto_fix': suggestion.can_auto_fix and request.user.is_staff,
+        'can_close': request.user.is_staff,
+        'can_reopen': request.user.is_staff,
         'next_id': next_suggestions_ids[0] if next_suggestions_ids else None,
         'previous_id': previous_suggestions_ids[0] if previous_suggestions_ids else None
     }
@@ -997,10 +1002,21 @@ def update_evidence(request):
     needs_help_values = map(lambda x: x == 'True', request.POST.getlist('needs_help'))
     delete_values = request.POST.getlist('delete')
     suggestion_ids = map(int, request.POST.getlist('suggestion'))
+    close_values = map(lambda x: x == 'True', request.POST.getlist('close_suggestion'))
+    reopen_values = map(lambda x: x == 'True', request.POST.getlist('re_open'))
+    auto_fix_values = map(lambda x: x == 'True', request.POST.getlist('auto_fix'))
 
-    informations = zip_longest(suggestion_ids, agrees_values, needs_help_values, delete_values, fillvalue=False)
+    informations = zip_longest(
+        suggestion_ids,
+        agrees_values,
+        needs_help_values,
+        delete_values,
+        close_values,
+        reopen_values,
+        auto_fix_values,
+        fillvalue=False)
 
-    for suggestion_id, agrees, needs_help, delete in informations:
+    for suggestion_id, agrees, needs_help, delete, close, reopen, auto_fix in informations:
         if not suggestion_id:
             continue
 
@@ -1011,6 +1027,24 @@ def update_evidence(request):
                     suggestion=Suggestion.objects.get(pk=suggestion_id)
                 ).delete()
             except ObjectDoesNotExist:
+                pass
+        elif close:
+            try:
+               Suggestion.objects.filter(pk=suggestion_id).update(is_checked=True)
+            except ObjectDoesNotExist:
+                pass
+        elif reopen:
+            try:
+                Suggestion.objects.filter(pk=suggestion_id).update(is_checked=False)
+            except ObjectDoesNotExist:
+                pass
+        elif auto_fix:
+            try:
+                suggestion = Suggestion.objects.get(pk=suggestion_id)
+                suggestion.auto_fix()
+            except ObjectDoesNotExist:
+                pass
+            except ValueError:
                 pass
         else:
             evidence, created = Evidence.objects.get_or_create(
@@ -1089,3 +1123,7 @@ class LoginView(AnonymousRatingsMixin, allauth.account.views.LoginView):
 
 
 login = LoginView.as_view()
+
+
+def deleted_account(request):
+    return render(request, 'account/account_deleted.html')

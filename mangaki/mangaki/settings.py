@@ -67,8 +67,6 @@ INSTALLED_APPS = (
     'allauth.account',
     'allauth.socialaccount',
     'bootstrap3',
-    'analytical',
-    'cookielaw',
     'django_js_reverse',
     'rest_framework'
 )
@@ -276,6 +274,13 @@ DATA_ROOT = config.get('deployment', 'DATA_ROOT', fallback=os.path.join(BASE_DIR
 DATA_DIR = DATA_ROOT  # FIXME: replace every occurrence of DATA_DIR with DATA_ROOT
 PICKLE_DIR = os.path.join(DATA_ROOT, 'snapshots')  # FIXME: rename PICKLE_DIR to SNAPSHOT_DIR
 
+if config.has_section('sendfile'):
+    SENDFILE_BACKEND = config.get('sendfile', 'backend', fallback='sendfile.backends.simple')
+    SENDFILE_ROOT = config.get('sendfile', 'root', fallback='')
+    SENDFILE_URL = config.get('sendfile', 'url', fallback='')
+else:
+    SENDFILE_BACKEND = 'sendfile.backends.simple'
+
 # External services
 if config.has_section('mal'):
     MAL_USER = config.get('mal', 'MAL_USER')
@@ -285,10 +290,6 @@ if config.has_section('mal'):
 if config.has_section('anidb'):
     ANIDB_CLIENT = config.get('anidb', 'ANIDB_CLIENT')
     ANIDB_VERSION = config.get('anidb', 'ANIDB_VERSION')
-
-if config.has_section('anilist'):
-    ANILIST_CLIENT = config.get('anilist', 'ANILIST_CLIENT')
-    ANILIST_SECRET = config.get('anilist', 'ANILIST_SECRET')
 
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-63869890-1'
 

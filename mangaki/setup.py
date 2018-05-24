@@ -18,12 +18,11 @@ setup(
         'numpy',
         'beautifulsoup4',
         'natsort',
-        'django-analytical',
-        'django-cookie-law',
         'django-js-reverse',
         'scikit-learn>=0.18,<0.19',
         'scipy',
         'pandas',
+        'fastFM',
         'typing>=3.6,<4',
         'tensorflow>=1.1.0,<1.2',
         'raven>=6.1.0,<7',
@@ -32,7 +31,8 @@ setup(
         'celery>=4.0,<5',
         'redis>=2.10,<3',
         'Pillow>=4.1,<5',
-        'setuptools_scm>=1.15,<2'
+        'setuptools_scm>=1.15,<2',
+        'django-sendfile>=0.3,<1'
     ],
     packages=find_packages(),
     include_package_data=True,

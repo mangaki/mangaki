@@ -31,12 +31,15 @@ urlpatterns = [
     url(r'^user/login/$', views.login, name="account_login"),
     url(r'^user/', include('allauth.urls')),
 
-    url(r'^profile/$', views.get_profile, name='my-profile'),
-    url(r'^profile/(?P<category>\w+)/$', views.get_profile, name='my-profile'),
-    url(r'^profile/(?P<category>\w+)/(?P<status>\w+)$', views.get_profile, name='my-profile'),
-    url(r'^u/(?P<username>.+?)/(?P<category>\w+?)/$', views.get_profile, name='profile'),  # login_required?
-    url(r'^u/(?P<username>.+?)/(?P<category>\w+?)/(?P<status>\w+)$', views.get_profile, name='profile'),  # login_required?
-    url(r'^u/(?P<username>.+?)/?$', views.get_profile, name='profile'),  # login_required?
+    url(r'^user/deleted/$', views.deleted_account, name='deleted-account'),
+
+    url(r'^profile/$', views.get_profile_works, name='my-profile'),
+    url(r'^profile/(?P<category>\w+)/$', views.get_profile_works, name='my-profile'),
+    url(r'^profile/(?P<category>\w+)/(?P<status>\w+)$', views.get_profile_works, name='my-profile'),
+    url(r'^u/(?P<username>.+?)/works/(?P<category>\w+?)/$', views.get_profile_works, name='profile-works'),
+    url(r'^u/(?P<username>.+?)/works/(?P<category>\w+?)/(?P<status>\w+)$', views.get_profile_works, name='profile-works'),
+    url(r'^u/(?P<username>.+?)/preferences$', views.get_profile_preferences, name='profile-preferences'),
+    url(r'^u/(?P<username>.+?)/?$', views.get_profile_works, name='profile'),
 
     url(r'^reco/$', views.get_reco, name='reco'),
     url(r'^reco_dpp/$', views.get_reco_dpp, name='reco_dpp'),
@@ -45,11 +48,7 @@ urlpatterns = [
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing, name='add-pairing'),
     url(r'^vote_dpp/(?P<work_id>\d+)$', views.dpp_work, name='vote-dpp'),
     url(r'^vote/(?P<work_id>\d+)$', views.rate_work, name='vote'),
-    url(r'^shared/$', views.update_shared, name='shared'),
-    url(r'^nsfw/$', views.update_nsfw, name='nsfw'),
-    url(r'^newsletter/$', views.update_newsletter, name='newsletter'),
     url(r'^research/$', views.update_research, name='research'),
-    url(r'^reco_willsee/$', views.update_reco_willsee, name='reco-willsee'),
     url(r'^admin/', admin.site.urls),
     url(r'^about/(?P<lang>\w*)$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),
@@ -65,7 +64,6 @@ urlpatterns = [
 
     # url(r'^lookup/$', views.lookup_work'),
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top, name='top'),
-    url(r'^event/(?P<pk>\d+)$', views.EventDetail.as_view(), name='event-detail'),
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
     url(r'^dpp/(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='dpp-works', kwargs={'dpp': True})

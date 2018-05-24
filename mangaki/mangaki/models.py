@@ -11,7 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.core.urlresolvers import reverse
-from django.db import models
+from django.db import models, transaction
 from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
 from django.db.models.functions import Cast
 from django.utils.functional import cached_property
@@ -21,7 +21,7 @@ from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
 from mangaki.utils.ranking import (TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO,
                                    PEARLS_MIN_RATINGS, PEARLS_MAX_RATINGS, PEARLS_MAX_DISLIKE_RATE)
 from mangaki.utils.dpp import MangakiDPP
-from mangaki.utils.ratingsmatrix import RatingsMatrix
+
 
 TOP_POPULAR_WORKS_FOR_SAMPLING = 200
 
@@ -430,6 +430,7 @@ class Profile(models.Model):
     newsletter_ok = models.BooleanField(default=True)
     reco_willsee_ok = models.BooleanField(default=False)
     research_ok = models.BooleanField(default=True)
+    keyboard_shortcuts_enabled = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
 
@@ -449,6 +450,28 @@ class Suggestion(models.Model):
         return 'Suggestion#{} de {} : {} - {}'.format(
             self.pk, self.user, self.work.title, self.get_problem_display()
         )
+
+    @property
+    def can_auto_fix(self):
+        # FIXME: use Enum + dynamic based on evidences / message (links).
+        return self.problem in ('nsfw', 'n_nsfw')
+
+    @transaction.atomic
+    def auto_fix(self):
+        """
+        Apply automatically a fix on the issue.
+        e.g. for a NSFW (resp. non-NSFW) problem, it'll set the work as NSFW (resp. non-NSFW).
+
+        It'll raise ValueError when it is impossible to automatically fix the issue.
+        """
+        if self.problem in ('nsfw', 'n_nsfw'):
+            self.work.nsfw = True if self.problem == 'nsfw' else False
+            self.work.save()
+        else:
+            raise ValueError('Unable to auto-fix `{}`-type suggestions.'.format(self.problem))
+
+        self.is_checked = True
+        self.save()
 
 
 class Evidence(models.Model):
@@ -480,21 +503,6 @@ class WorkCluster(models.Model):
         return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])
 
 
-class Neighborship(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    neighbor = models.ForeignKey(User, related_name='neighbor', on_delete=models.CASCADE)
-    score = models.DecimalField(decimal_places=3, max_digits=8)
-
-
-class SearchIssue(models.Model):
-    date = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=128)
-    poster = models.CharField(max_length=128, blank=True, null=True)
-    mal_id = models.IntegerField(blank=True, null=True)
-    score = models.IntegerField(blank=True, null=True)
-
-
 class Announcement(models.Model):
     title = models.CharField(max_length=128)
     text = models.CharField(max_length=512)
@@ -522,8 +530,15 @@ class Pairing(models.Model):
 
 class Reference(models.Model):
     work = models.ForeignKey('Work', on_delete=models.CASCADE)
+    source = models.CharField(max_length=100)
+    identifier = models.CharField(max_length=512)
     url = models.CharField(max_length=512)
     suggestions = models.ManyToManyField('Suggestion', blank=True)
+
+    class Meta:
+        unique_together = (
+            ('work', 'source', 'identifier'),
+        )
 
 
 class Top(models.Model):
@@ -574,6 +589,9 @@ class FAQTheme(models.Model):
     def __str__(self):
         return self.theme
 
+    class Meta:
+        verbose_name_plural = "FAQ themes"
+
 
 class FAQEntry(models.Model):
     theme = models.ForeignKey(FAQTheme, on_delete=models.CASCADE, related_name="entries")
@@ -584,6 +602,9 @@ class FAQEntry(models.Model):
 
     def __str__(self):
         return self.question
+
+    class Meta:
+        verbose_name_plural = "FAQ entries"
 
 class Trope(models.Model):
     trope = models.CharField(max_length=320)
@@ -602,3 +623,15 @@ class UserBackgroundTask(models.Model):
 
     def __str__(self):
         return '<{} owned by {}>'.format(self.tag, self.owner)
+
+
+class UserArchive(models.Model):
+    updated_on = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    local_archive = models.FileField(upload_to='user_archives/')
+
+    def __str__(self):
+        try:
+            return '<UserArchive owned by {} at {}>'.format(self.owner, self.local_archive.path)
+        except ValueError:
+            return '<Empty UserArchive owned by {}>'.format(self.owner)

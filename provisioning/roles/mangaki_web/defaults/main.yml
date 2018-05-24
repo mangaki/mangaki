@@ -6,3 +6,5 @@ mangaki_web_acme_wellknown_path: '/var/www/acme-challenge/'
 mangaki_web_acme_ca: 'https://acme-staging.api.letsencrypt.org/directory'
 mangaki_web_acme_ca_terms: 'https://acme-staging.api.letsencrypt.org/terms'
 mangaki_web_app_servers: ['127.0.0.1:8000']
+mangaki_web_xsendfile_path: '/protected/'
+mangaki_web_xsendfile_root: '{{ mangaki_web_www_root }}'

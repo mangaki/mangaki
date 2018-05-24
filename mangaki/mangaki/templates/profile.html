@@ -15,7 +15,7 @@
             </div>
         {% endif %}
 
-        <div class="col-xs-4 col-lg-6">
+        <div class="col-xs-6 col-lg-6">
             {% if not meta.is_anonymous %}
                 <h1>{{ profile.username }}</h1>
             {% else %}
@@ -26,74 +26,21 @@
             {% if profile.member_days %}
                 <p>Inscrit depuis {{ profile.member_days }} jours</p>
             {% endif %}
-            {% if events %}
-                {% if meta.is_me %}
-                    <h4>Mes événements</h4>
-                {% else %}
-                    <h4>Ses événements</h4>
-                {% endif %}
-                <p>
-                <ul>
-                    {% for event in events %}
-                        <li>{{ event.type|capfirst }} <a
-                                href="{% url 'work-detail' 'anime' event.work_id %}"><em>{{ event.title }}</em></a> le
-                            <strong>{{ event.date }}</strong>{% if event.type == 'tv' %}
-                                sur {{ event.channel }}{% elif event.location %},
-                                {% if event.link %}
-                                    <a href="{{ event.link }}" target="_blank">{{ event.location }}</a>
-                                {% else %}
-                                    {{ event.location }}
-                                {% endif %}
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-                </p>
-            {% endif %}
         </div>
-        <div class="col-xs-6 col-lg-4">
+        <div class="col-xs-4 col-lg-4">
             {% if meta.is_me and not meta.is_anonymous %}
-                Profil public&nbsp;:
-                <input type="checkbox" name="is_shared" {% if user.profile.is_shared %} checked{% endif %}/>
-                <hr />
-                Afficher visuels pour public averti&nbsp;:
-                <input type="checkbox" name="nsfw_ok" {% if user.profile.nsfw_ok %} checked{% endif %}/>
-                <hr />
-                Recevoir la newsletter&nbsp;:
-                <input type="checkbox" name="newsletter_ok" {% if user.profile.newsletter_ok %} checked{% endif %}/>
-                {% if meta.mal.is_available %}
-                    <hr />
-                    <div id="mal_container">
-                        {% verbatim %}
-                        <transition-group appear name="fade">
-                            <template v-if="showForm">
-                                <p key="form_title">Importer depuis myAnimeList&nbsp;:</p>
-                                <div key="form_input" class="input-group">
-                                    <input v-model.lazy="mal_username" @keyup.enter="importMAL" type="text" class="form-control" placeholder="Ton login"/>
-                                    <span class="input-group-btn">
-                                        <button v-on:click="importMAL" class="btn btn-default">C'est parti!</button>
-                                    </span>
-                                </div>
-                            </template>
-                            <template v-if="followProgress">
-                                <p key="progress_title">Votre myAnimeList est en cours d'importation. Veuillez patienter.</p>
-                                <loading-spinner key="spinner"></loading-spinner>
-                                <p key="work_title" v-if="currentWorkTitle != null">✓✓ {{ currentWorkTitle }} importé.
-                                    <span v-if="workCount && currentWorkIndex">({{ currentWorkIndex }} / {{ workCount }})</span>
-                                </p>
-                            </template>
-                            <template v-if="errorMessage">
-                                <p key="message">Une erreur est survenue, rechargez la page.</p>
-                                <p key="details">Détails : {{ errorMessage }}</p>
-                            </template>
-                            <template v-if="importFinished">
-                                <p key="finished-title">Votre import myAnimeList est désormais terminé.</p>
-                                <button class="btn btn-primary" key="reload-page" v-on:click="reloadPage">Cliquez ici pour recharger la page</button>
-                            </template>
-                        </transition-group>
-                        {% endverbatim %}
-                    </div>
-                {% endif %}
+                <ul class="nav nav-tabs">
+                    <li role="presentation" {% if meta.profile_section == 'works' %} class="active" {% endif %}>
+                        <a href="{% url 'profile-works' profile.username meta.category|default:"anime" meta.status|default:"seen" %}">
+                            Mes œuvres
+                        </a>
+                    </li>
+                    <li role="presentation" {% if meta.profile_section == 'preferences' %} class="active" {% endif %}>
+                        <a href="{% url 'profile-preferences' profile.username %}">
+                            Mes préférences
+                        </a>
+                    </li>
+                </ul>
             {% endif %}
             {% if meta.is_anonymous %}
                 <br />
@@ -105,108 +52,12 @@
             {% endif %}
         </div>
     </div>
-    {% if not meta.is_anonymous and meta.can_see and not meta.is_me %}
-        <ul class="nav nav-tabs">
-
-            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'anime' 'seen' %}"><em>Anime</em> vus de {{ profile.username }} <span
-                    class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'anime' 'unseen' %}"><em>Anime</em> watchlist de {{ profile.username }} <span
-                    class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
-
-            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'manga' 'seen' %}"><em>Mangas</em> lus de {{ profile.username }} <span
-                    class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'manga' 'unseen' %}"><em>Mangas</em> wishlist de {{ profile.username }} <span
-                    class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
-
-            <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
-                    href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Recommandations
-                de {{ profile.username }} <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
-        </ul>
-    {% elif meta.is_anonymous or meta.is_me %}
-        <ul class="nav nav-tabs">
-
-            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'seen' %}"><em>Anime</em> vus <span
-                    class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'unseen' %}"><em>Anime</em> watchlist <span
-                    class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
-
-            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'manga' 'seen' %}"><em>Mangas</em> lus <span
-                    class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'manga' 'unseen' %}"><em>Mangas</em> wishlist <span
-                    class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
-
-            {% if not meta.is_anonymous %}
-                <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
-                        href="{% url 'profile' profile.username 'recommendation' %}?category=recommendation">Mes recommandations
-                    <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
-            {% endif %}
-        </ul>
-    {% endif %}
-    {% if meta.can_see %}
-        <div class="row mangas-list{% if not meta.is_me and not meta.is_anonymous %} another{% endif %}">
-{#           FIXME: Neighboorhood has disappeared from Mangaki since a long time. #}
-            {% if best_neighbors_list and meta.category == 'neighbor' and not meta.is_anonymous %}
-                {% include "profile_neighbor.html" %}
-            {% elif meta.category == 'recommendation' %}
-                {% include "profile_reco.html" %}
-            {% else %}
-                {% include "profile_work.html" %}
-            {% endif %}
-        </div>
-    {% else %}
-        <p class="well">Le profil de {{ profile.username }} n'est pas public.</p>
-    {% endif %}
-    <br/>
-    <br/>
-    <br/>
+    {% block profile_section %}
+    {% endblock %}
 {% endblock %}
 
 {% block extrajs %}
-    {% if meta.mal.is_available %}
-        {% if meta.debug_vue %}
-            <script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
-        {% else %}
-            <script src="https://unpkg.com/vue@2.5.2/dist/vue.min.js"></script>
-        {% endif %}
-    <script src="/static/js/mal_import.js"></script>
-    {% endif %}
-    <script>
-        $("[name='research_ok']").bootstrapSwitch();
-        $("[name='research_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['research'](), {research_ok: state});
-        });
-        $("[name='is_shared']").bootstrapSwitch();
-        $("[name='is_shared']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['shared'](), {is_shared: state});
-        });
-        $("[name='nsfw_ok']").bootstrapSwitch();
-        $("[name='nsfw_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['nsfw'](), {nsfw_ok: state});
-        });
-        $("[name='newsletter_ok']").bootstrapSwitch();
-        $("[name='newsletter_ok']").on('switchChange.bootstrapSwitch', function (event, state) {
-            $.post(Urls['newsletter'](), {newsletter_ok: state});
-        });
-
-        {% if meta.mal.is_available %}
-            $(document).ready(function () {
-                if ({{meta.mal.pending_import|yesno:"true,false"}}) {
-                    MALImporterApp.fetchServerSideTaskId()
-                        .then(() => {
-                            MALImporterApp.showForm = false;
-                        })
-                }
-            });
-        {% endif %}
-
+        <script>
         function removeReco(elt) {
             var $elt = $(elt);
             $.post(Urls['remove-reco']($elt.data('work'), $elt.data('user'), $elt.data('target')));

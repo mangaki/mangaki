@@ -15,6 +15,10 @@ class MangakiXALS(RecommendationAlgorithm):
         self.nb_iterations = nb_iterations
         self.lambda_ = lambda_
 
+    @property
+    def is_serializable(self):
+        return True
+
     def load(self, filename):
         backup = super().load(filename)
         self.M = backup.M
