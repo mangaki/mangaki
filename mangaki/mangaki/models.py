@@ -589,6 +589,9 @@ class FAQTheme(models.Model):
     def __str__(self):
         return self.theme
 
+    class Meta:
+        verbose_name_plural = "FAQ themes"
+
 
 class FAQEntry(models.Model):
     theme = models.ForeignKey(FAQTheme, on_delete=models.CASCADE, related_name="entries")
@@ -599,6 +602,9 @@ class FAQEntry(models.Model):
 
     def __str__(self):
         return self.question
+
+    class Meta:
+        verbose_name_plural = "FAQ entries"
 
 class Trope(models.Model):
     trope = models.CharField(max_length=320)

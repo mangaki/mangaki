@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('mangaki', '0088_profile_keyboard_shortcuts_enabled'),
+        ('mangaki', '0091_auto_20180508_0937'),
     ]
 
     operations = [
