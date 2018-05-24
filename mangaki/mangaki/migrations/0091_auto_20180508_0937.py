@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mangaki', '0088_profile_keyboard_shortcuts_enabled'),
+        ('mangaki', '0090_profile_keyboard_shortcuts_enabled'),
     ]
 
     operations = [
