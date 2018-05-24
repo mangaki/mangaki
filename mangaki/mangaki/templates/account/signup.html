@@ -48,6 +48,16 @@
     {% bootstrap_field form.email show_label=False addon_before='<span class="glyphicon glyphicon-envelope"></span>' %}
     {% bootstrap_field form.password1 show_label=False addon_before='<span class="glyphicon glyphicon-lock"></span>' %}
     {% bootstrap_field form.password2 show_label=False addon_before='<span class="glyphicon glyphicon-lock"></span>' %}
+  <div class="checkbox">
+      <label>
+          {{ form.newsletter_ok }} S'abonner à la newsletter de Mangaki (un peu de waifus dans vos emails ?)
+      </label>
+  </div>
+  <div class="checkbox">
+      <label>
+          {{ form.research_ok }} Participer à l'amélioration des algorithmes de Mangaki
+      </label>
+  </div>
     {% if ratings %}
     <div class="checkbox">
       <label>

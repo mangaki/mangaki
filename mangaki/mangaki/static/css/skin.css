@@ -15,6 +15,10 @@ body {
     background: #fdfdfd;
 }
 
+[v-cloak] {
+    display: none;
+}
+
 /*************
  *  LAYOUT  *
  *************/
