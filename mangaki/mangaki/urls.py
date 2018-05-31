@@ -14,6 +14,8 @@ urlpatterns = [
     # url(r'^$', views.home, name='home'),
     # url(r'^blog/', include('blog.urls')),
 
+    url('i18n/', include('django.conf.urls.i18n')),
+
     url(r'^jsreverse/$', urls_js, name='js_reverse'),
     url(r'^api/', include(apipatterns)),
     url(r'^$', views.index, name='home'),
@@ -50,7 +52,7 @@ urlpatterns = [
     url(r'^vote/(?P<work_id>\d+)$', views.rate_work, name='vote'),
     url(r'^research/$', views.update_research, name='research'),
     url(r'^admin/', admin.site.urls),
-    url(r'^about/(?P<lang>\w*)$', views.about, name='about'),
+    url(r'^about/(?P<lang>[\w-]*)$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),
     url(r'^legal/$', views.legal_mentions, name='legal'),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}, name='cgu'),

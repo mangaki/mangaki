@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block anonymous_rating_banner %} {% endblock %}
 {% block body %}
@@ -19,12 +20,12 @@
             {% if not meta.is_anonymous %}
                 <h1>{{ profile.username }}</h1>
             {% else %}
-                <h1>Mes notes</h1>
-                <h2>Inscrivez-vous pour pouvoir les sauvegarder!</h2>
+                <h1>{% trans "Your ratings" %}</h1>
+                <h2>{% trans "Signup to save them" %}</h2>
             {% endif %}
 
             {% if profile.member_days %}
-                <p>Inscrit depuis {{ profile.member_days }} jours</p>
+                <p>{% blocktrans with member_days=profile.member_days %}Inscrit depuis {{ member_days }} jours{% endblocktrans %}</p>
             {% endif %}
         </div>
         <div class="col-xs-4 col-lg-4">

@@ -1,3 +1,6 @@
+from django.utils.translation import ugettext_lazy as _
+
+
 ORIGIN_CHOICES = (
     ("japon", "Japon"),
     ("coree", "Coree"),
@@ -34,9 +37,9 @@ TYPE_CHOICES = (
 )
 
 TOP_CATEGORY_CHOICES = (
-    ("directors", "Réalisateurs"),
-    ("authors", "Auteurs"),
-    ("composers", "Compositeurs"),
+    ("directors", _("Directors")),
+    ("authors", _("Authors")),
+    ("composers", _("Composers"))
 )
 
 CLUSTER_CHOICES = (

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-02 15:12+0000\n"
+"POT-Creation-Date: 2018-04-21 07:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: mangaki/settings.py:178
+#: mangaki/settings.py:258
 msgid "Français"
 msgstr "フランス語"
 
-#: mangaki/settings.py:179
+#: mangaki/settings.py:259
 msgid "English"
 msgstr "英語"
 
-#: mangaki/settings.py:180
+#: mangaki/settings.py:260
 msgid "日本語"
 msgstr "日本語"
 
@@ -189,10 +189,10 @@ msgid ""
 "Style</a> et <a href=\"%(mangacast_url)s\" target=\"_blank\">ses critiques "
 "d'anime chez Mangacast</a>."
 msgstr ""
-"<p><strong>Sedeto</strong>はグラフィックデザイナーです。Mangakiのロゴが作った。"
-"<br />好き：<a href=\"%(kunihiko_ikuhara_url)s\">幾原邦彦</a>、<a href="
-"\"%(akiyuki_shinbou_url)s\">シャフトのアニメ</a>、少女マンガ、えろマンガ。<a href="
-"\"%(doujinstyle_url)s\" target=\"_blank\">Doujin Style</a>、<a href="
+"<p><strong>Sedeto</strong>はグラフィックデザイナーです。Mangakiのロゴが作っ"
+"た。<br />好き：<a href=\"%(kunihiko_ikuhara_url)s\">幾原邦彦</a>、<a href="
+"\"%(akiyuki_shinbou_url)s\">シャフトのアニメ</a>、少女マンガ、えろマンガ。<a "
+"href=\"%(doujinstyle_url)s\" target=\"_blank\">Doujin Style</a>、<a href="
 "\"%(mangacast_url)s\" target=\"_blank\">Mangacast</a>。"
 
 #: mangaki/templates/about.html:120
@@ -344,43 +344,65 @@ msgstr ""
 msgid "Signup"
 msgstr ""
 
+#: mangaki/templates/admin/change_default_work_title.html:8
 #: mangaki/templates/admin/merge_selected_confirmation.html:8
 #: mangaki/templates/admin/refresh_poster_confirmation.html:8
+#: mangaki/templates/admin/update_tags_via_anidb.html:8
 msgid "Home"
 msgstr ""
 
-#: mangaki/templates/admin/merge_selected_confirmation.html:63
+#: mangaki/templates/admin/change_default_work_title.html:55
+#: mangaki/templates/admin/merge_selected_confirmation.html:62
 #: mangaki/templates/admin/refresh_poster_confirmation.html:38
+#: mangaki/templates/admin/update_tags_via_anidb.html:126
 msgid "Yes, I'm sure"
 msgstr ""
 
-#: mangaki/templates/admin/merge_selected_confirmation.html:64
+#: mangaki/templates/admin/change_default_work_title.html:56
+#: mangaki/templates/admin/merge_selected_confirmation.html:63
 #: mangaki/templates/admin/refresh_poster_confirmation.html:39
+#: mangaki/templates/admin/update_tags_via_anidb.html:127
 msgid "No, take me back"
 msgstr ""
 
-#: mangaki/templates/base.html:74
-msgid "C'est quoi ?"
-msgstr "Mangakiとは？"
+#: mangaki/templates/base.html:64
+msgid "What is Mangaki?"
+msgstr ""
 
-#: mangaki/templates/base.html:81
+#: mangaki/templates/base.html:71
 msgid "Anime"
 msgstr ""
 
-#: mangaki/templates/base.html:86
+#: mangaki/templates/base.html:76
 msgid "Mangas"
 msgstr ""
 
-#: mangaki/templates/base.html:91
-msgid "Recommandations"
+#: mangaki/templates/base.html:81
+msgid "Recommendations"
 msgstr ""
 
-#: mangaki/templates/base.html:96
+#: mangaki/templates/base.html:86
 msgid "Événements"
 msgstr ""
 
-#: mangaki/templates/base.html:101
+#: mangaki/templates/base.html:91
 msgid "Top 20"
+msgstr ""
+
+#: mangaki/templates/base.html:94
+msgid "Directeurs"
+msgstr ""
+
+#: mangaki/templates/base.html:95
+msgid "Compositeurs"
+msgstr ""
+
+#: mangaki/templates/base.html:96
+msgid "Auteurs"
+msgstr ""
+
+#: mangaki/templates/base.html:101
+msgid "Suggestions"
 msgstr ""
 
 #: mangaki/templates/socialaccount/connections.html:5
@@ -419,3 +441,6 @@ msgid ""
 "connecter à\n"
 "%(site_name)s. Pour terminer, veuillez compléter le formulaire suivant:"
 msgstr ""
+
+#~ msgid "C'est quoi ?"
+#~ msgstr "Mangakiとは？"

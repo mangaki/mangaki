@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load l10n %}
 
 {% block body %}
-<h1>Top {{ size }} des {{ category }} sur Mangaki au {{ date }}</h1>
+<h1>{% blocktrans %}Top {{ size }} of {{ category }} on Mangaki on {{ date }}{% endblocktrans %}</h1>
 <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://mangaki.fr/top/{{ category_slug }}/" data-text="Top 20 des {{ category }} sur Mangaki" data-via="MangakiFR" data-lang="fr" data-size="large" data-related="MangakiFR">Tweeter</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 <table class="table table-condensed table-hover">
     <tr><th></th><th>Nom</th><th>Score</th><th>Nombre de notes</th><th>Nombre de favoris</th></tr>
