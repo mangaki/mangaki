@@ -1,6 +1,8 @@
+import time
+
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Tuple, Optional, Any, Generator
+from typing import Dict, List, Tuple, Optional, Any, Generator, Set
 import os
 
 import requests
@@ -359,6 +361,7 @@ class AniList(metaclass=Singleton):
         self.remaining_requests = None
         self.retry_after = None
         self.rate_limit_reset_timestamp = None
+        self.auto_sleep_when_rate_limited = False
 
     @property
     def rate_limited(self):
@@ -384,6 +387,13 @@ class AniList(metaclass=Singleton):
         :raises: an AniListException in case of error
         """
 
+        # Auto-sleep.
+        # FIXME: log that we're sleeping.
+        if self.auto_sleep_when_rate_limited and self.rate_limited:
+            time.sleep(max(0, int(
+                self.rate_limit_reset_timestamp - datetime.now().timestamp()
+            )))
+
         r = requests.post(
             self.BASE_URL,
             json={
@@ -400,12 +410,16 @@ class AniList(metaclass=Singleton):
         self.requests_limit = int(r.headers['X-RateLimit-Limit']) if 'X-RateLimit-Limit' in r.headers else None
         self.remaining_requests = int(r.headers['X-RateLimit-Remaining']) if 'X-RateLimit-Remaining' in r.headers else None
         if r.status_code == 429:
-            self.retry_after = r.headers.get('Retry-After')
-            self.rate_limit_reset_timestamp = r.headers.get('X-RateLimit-Reset')
+            self.retry_after = int(r.headers.get('Retry-After'))
+            self.rate_limit_reset_timestamp = int(r.headers.get('X-RateLimit-Reset'))
 
-            raise AniListRateLimitError(self.requests_limit,
-                                        self.retry_after,
-                                        self.rate_limit_reset_timestamp)
+            # Silence the exception and let the client handle it gracefully.
+            if self.auto_sleep_when_rate_limited:
+                return self._request(query, variables)
+            else:
+                raise AniListRateLimitError(self.requests_limit,
+                                            self.retry_after,
+                                            self.rate_limit_reset_timestamp)
 
         if data.get('errors'):
             raise AniListException(data['errors'])
@@ -586,7 +600,8 @@ def build_work_titles(work: Work,
 
 
 def build_related_works(work: Work,
-                        relations: List[AniListRelation]) -> List[RelatedWork]:
+                        relations: List[AniListRelation],
+                        ignored_related_ids: Set) -> List[RelatedWork]:
     """
     Insert RelatedWork objects for a given Work when required into Mangaki's database.
     This also inserts the related works into the database when they don't exist.
@@ -603,8 +618,12 @@ def build_related_works(work: Work,
 
     # It's okay here to create an instance, it'll be shared due to the Singleton pattern used on AniList.
     client = AniList()
+    print('Ignored related IDs: {}'.format(', '.join(map(str, ignored_related_ids))))
+    new_ids = {relation.related_id for relation in relations}
     related_works = [
-        insert_work_into_database_from_anilist(client.get_work(search_id=relation.related_id))
+        insert_work_into_database_from_anilist(client.get_work(search_id=relation.related_id),
+                                               ignored_related_ids=ignored_related_ids | new_ids)
+            if relation.related_id not in ignored_related_ids else None
         for relation in relations
     ]
 
@@ -649,12 +668,12 @@ def build_staff(work: Work,
         'Original Creator': 'author'
     }
 
-    artists_to_add = []
+    artists_to_add = {}
     artists = []
     for creator in staff:
         name = '{} {}'.format(creator.name_last or '', creator.name_first or '').strip()
 
-        try: # This artist exists : prevent duplicates by updating with the AniList id
+        try:  # This artist exists : prevent duplicates by updating with the AniList id
             artist = Artist.objects.get(Q(name=name) | Q(anilist_creator_id=creator.id))
             artist.name = name
             artist.anilist_creator_id = creator.id
@@ -662,9 +681,9 @@ def build_staff(work: Work,
             artists.append(artist)
         except Artist.DoesNotExist: # This artist does not yet exist : will be bulk created
             artist = Artist(name=name, anilist_creator_id=creator.id)
-            artists_to_add.append(artist)
+            artists_to_add[creator.id] = artist
 
-    artists.extend(Artist.objects.bulk_create(artists_to_add))
+    artists.extend(Artist.objects.bulk_create(list(artists_to_add.values())))
 
     existing_staff_artists = set(s.artist for s in Staff.objects.filter(work=work, artist__in=artists))
 
@@ -685,7 +704,8 @@ def build_staff(work: Work,
 
 
 def insert_works_into_database_from_anilist(entries: List[AniListEntry],
-                                            build_related: Optional[bool] = True) -> Optional[List[Work]]:
+                                            build_related: Optional[bool] = True,
+                                            ignored_related_ids: Optional[Set] = None) -> Optional[List[Work]]:
     """
     Insert works into Mangaki's database from AniList data, and return Works inserted.
     :param entries: a list of entries from AniList
@@ -696,6 +716,9 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
     :rtype: Optional[List[Work]]
     """
 
+    if not ignored_related_ids:
+        ignored_related_ids = set()
+
     category_map = {
         AniListWorkType.ANIME: work_categories.anime,
         AniListWorkType.MANGA: work_categories.manga
@@ -704,9 +727,15 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
 
     for entry in entries:
         titles = {synonym: ('unknown', 'synonym') for synonym in entry.synonyms}
-        titles.update({entry.title: ('romaji', 'official')})
-        titles.update({entry.english_title: ('english', 'main')})
-        titles.update({entry.japanese_title: ('japanese', 'official')})
+        if entry.title:
+            titles.update({entry.title: ('romaji', 'official')})
+        if entry.english_title:
+            titles.update({entry.english_title: ('english', 'main')})
+        if entry.japanese_title:
+            titles.update({entry.japanese_title: ('japanese', 'official')})
+
+        if not titles:
+            raise RuntimeError('During insertion of {}, there were no titles attached to it, malformed data!'.format(str(entry)))
 
         anime_type = entry.media_format.name if entry.work_type == AniListWorkType.ANIME else ''
         manga_type = entry.media_format.name if entry.work_type == AniListWorkType.MANGA else ''
@@ -718,17 +747,18 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
 
         # Create or update the Work entry in the database
         work, created_work = Work.objects.update_or_create(
-            title__in=titles,
+            title__in=list(titles.keys()),
             category__slug=entry.work_type.value,
             defaults={
+                'source': entry.anilist_url,
                 'category': category_map.get(entry.work_type),
-                'title': entry.title,
+                'title': entry.title or entry.english_title or entry.japanese_title,
                 'ext_poster': entry.poster_url,
                 'nsfw': entry.is_nsfw,
                 'date': entry.start_date,
                 'end_date': entry.end_date,
                 'ext_synopsis': entry.description or '',
-                'nb_episodes': entry.nb_episodes or entry.nb_chapters,
+                'nb_episodes': entry.nb_episodes or entry.nb_chapters or 0,
                 'anime_type': anime_type,
                 'manga_type': manga_type,
                 'studio': studio
@@ -744,7 +774,7 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
 
         # Build RelatedWorks (and add those Works too) if wanted
         if build_related:
-            build_related_works(work, entry.relations)
+            build_related_works(work, entry.relations, ignored_related_ids)
 
         # Build Artist and Staff
         build_staff(work, entry.staff)
@@ -761,7 +791,8 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
 
 
 def insert_work_into_database_from_anilist(entry: AniListEntry,
-                                           build_related: Optional[bool] = True) -> Optional[Work]:
+                                           build_related: Optional[bool] = True,
+                                           ignored_related_ids: Optional[Set] = None) -> Optional[Work]:
     """
     Insert a single work into Mangaki's database from AniList data, and return Work inserted.
     :param entry: an entry from AniList
@@ -772,5 +803,5 @@ def insert_work_into_database_from_anilist(entry: AniListEntry,
     :rtype: Optional[Work]
     """
 
-    work_result = insert_works_into_database_from_anilist([entry], build_related)
+    work_result = insert_works_into_database_from_anilist([entry], build_related, ignored_related_ids)
     return work_result[0] if work_result else None
