@@ -41,7 +41,7 @@ class AlgoTest(TestCase):
             with self.settings(PICKLE_DIR=SNAPSHOT_DIR_TEST):
                 if algo.is_serializable:
                     algo.save(None)
-                    algo.load(algo.get_backup_filename())
+                    algo.load(None)
                     os.remove(os.path.join(SNAPSHOT_DIR_TEST, algo.get_backup_filename()))
             y_pred = algo.predict(self.X_test)
             logging.debug('rmse=%.3f algo=%s',
