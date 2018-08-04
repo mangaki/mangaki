@@ -317,9 +317,9 @@ class WorkList(WorkListMixin, ListView):
             raise Http404
 
         if search_text:
-            self.queryset = self.queryset.filter(Q(title__icontains=search_text) | Q(worktitle__title__icontains=search_text))
+            self.queryset = self.queryset.filter(Q(title__icontains=search_text) | Q(worktitle__title__icontains=search_text)).distinct('id', 'nb_ratings')  # https://stackoverflow.com/questions/20582966/django-order-by-filter-with-distinct
 
-        self.queryset = self.queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
+        self.queryset = self.queryset.only('id', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
         return self.queryset
 
