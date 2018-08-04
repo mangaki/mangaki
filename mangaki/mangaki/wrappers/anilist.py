@@ -1,17 +1,23 @@
 import time
 
+import logging
 from datetime import datetime
+from django.db import transaction, IntegrityError
 from enum import Enum
 from typing import Dict, List, Tuple, Optional, Any, Generator, Set
 import os
 
 import requests
 import typing
+from django.contrib.auth.models import User
 from django.utils.functional import cached_property
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
-from mangaki.models import (Work, RelatedWork, WorkTitle, Reference, Category,
-                            ExtLanguage, Studio, Genre, Artist, Staff, Role)
+from mangaki.models import (
+    Work, RelatedWork, WorkTitle, Reference, Category,
+    ExtLanguage, Studio, Genre, Artist, Staff, Role,
+    Rating
+)
 
 from mangaki.utils.singleton import Singleton
 
@@ -25,9 +31,10 @@ ANILIST_QUERIES = {
 
 
 def read_graphql_query(filename):
-    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'anilist-graphql-queries', filename+'.graphql')
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'anilist-graphql-queries', filename + '.graphql')
     with open(path, 'r', encoding='utf-8') as f:
         return f.read()
+
 
 def fuzzydate_to_python_datetime(date):
     """
@@ -51,6 +58,7 @@ def fuzzydate_to_python_datetime(date):
     if (date['year'] is None) and (date['month'] is None) and (date['day'] is not None):
         return None
     return datetime(date['year'], date['month'] or 1, date['day'] or 1)
+
 
 def to_anime_season(date):
     """
@@ -150,6 +158,20 @@ class AniListStatus(Enum):
     CANCELLED = 'Ended before the work could be finished'
 
 
+class AniListUserWorkStatus(Enum):
+    """
+    This class enumerates the different kinds of statuses for a work to be
+    from a user point of view on AniList
+    """
+
+    CURRENT = 'Currently watching / reading'
+    PLANNING = 'Planning to watch / read'
+    COMPLETED = 'Finished watching / reading'
+    DROPPED = 'Stopped watching / reading before completing'
+    PAUSED = 'Paused watching / reading'
+    REPEATING = 'Re-watching / reading'
+
+
 class AniListRelationType(Enum):
     """
     This class enumerates the different kinds of relations between works found
@@ -177,8 +199,10 @@ class AniListMediaFormat(Enum):
     TV_SHORT = 'Anime which are under 15 minutes in length and broadcast on television'
     MOVIE = 'Anime movies with a theatrical release'
     SPECIAL = 'Special episodes that have been included in DVD/Blu-ray releases, picture dramas, pilots, etc'
-    OVA = '(Original Video Animation) Anime that have been released directly on DVD/Blu-ray without originally going through a theatrical release or television broadcast'
-    ONA = '(Original Net Animation) Anime that have been originally released online or are only available through streaming services.'
+    OVA = '(Original Video Animation) Anime that have been released directly on DVD/Blu-ray without originally going ' \
+          'through a theatrical release or television broadcast'
+    ONA = '(Original Net Animation) Anime that have been originally released online or are only available through ' \
+          'streaming services.'
     MUSIC = 'Short anime released as a music video'
     MANGA = 'Professionally published manga with more than one chapter'
     NOVEL = 'Written books released as a novel or series of light novels'
@@ -263,15 +287,15 @@ class AniListEntry:
     def poster_url(self) -> str:
         return self.work_info['coverImage']['large']
 
-    @property # Only for animes
+    @property  # Only for animes
     def nb_episodes(self) -> Optional[int]:
         return self.work_info['episodes']
 
-    @property # Only for animes
+    @property  # Only for animes
     def episode_length(self) -> Optional[int]:
         return self.work_info['duration']
 
-    @property # Only for mangas
+    @property  # Only for mangas
     def nb_chapters(self) -> Optional[int]:
         return self.work_info['chapters']
 
@@ -279,7 +303,7 @@ class AniListEntry:
     def status(self) -> Optional[AniListStatus]:
         return AniListStatus[self.work_info['status']] if self.work_info['status'] else None
 
-    @property # Only for animes
+    @property  # Only for animes
     def studio(self) -> Optional[str]:
         for studio in self.work_info['studios']['edges']:
             if studio['isMain']:
@@ -336,6 +360,7 @@ class AniListEntry:
 
 
 AniListUserEntry = typing.NamedTuple('AniListUserEntry', [
+    ('status', AniListUserWorkStatus),
     ('work', AniListEntry),
     ('score', float)])
 
@@ -408,7 +433,8 @@ class AniList(metaclass=Singleton):
         data = r.json()
 
         self.requests_limit = int(r.headers['X-RateLimit-Limit']) if 'X-RateLimit-Limit' in r.headers else None
-        self.remaining_requests = int(r.headers['X-RateLimit-Remaining']) if 'X-RateLimit-Remaining' in r.headers else None
+        self.remaining_requests = int(
+            r.headers['X-RateLimit-Remaining']) if 'X-RateLimit-Remaining' in r.headers else None
         if r.status_code == 429:
             self.retry_after = int(r.headers.get('Retry-After'))
             self.rate_limit_reset_timestamp = int(r.headers.get('X-RateLimit-Reset'))
@@ -505,7 +531,8 @@ class AniList(metaclass=Singleton):
                 raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
         if data['Page']['pageInfo']['hasNextPage'] and current_page < data['Page']['pageInfo']['lastPage']:
-            yield from self.list_seasonal_animes(year=year, season=season, only_airing=only_airing, current_page=current_page+1)
+            yield from self.list_seasonal_animes(year=year, season=season, only_airing=only_airing,
+                                                 current_page=current_page + 1)
 
     def get_user_list(self,
                       worktype: AniListWorkType,
@@ -545,6 +572,7 @@ class AniList(metaclass=Singleton):
         for list_entry in data['Page']['mediaList']:
             try:
                 yield AniListUserEntry(
+                    status=AniListUserWorkStatus[list_entry['status']],
                     work=AniListEntry(list_entry['media'], worktype),
                     score=int(list_entry['score'])
                 )
@@ -552,7 +580,7 @@ class AniList(metaclass=Singleton):
                 raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
         if data['Page']['pageInfo']['hasNextPage'] and current_page < data['Page']['pageInfo']['lastPage']:
-            yield from self.get_user_list(worktype, username, current_page+1)
+            yield from self.get_user_list(worktype, username, current_page + 1)
 
 
 anilist_langs = AniListLanguages()
@@ -630,7 +658,8 @@ def build_related_works(work: Work,
         for relation in relations
     }
 
-    existing_relations = RelatedWork.objects.filter(parent_work=work, child_work__in=filter(None, related_works.values()))
+    existing_relations = RelatedWork.objects.filter(parent_work=work,
+                                                    child_work__in=filter(None, related_works.values()))
     existing_child_works = set(existing_relations.values_list('child_work__pk', flat=True))
     existing_parent_works = set(existing_relations.values_list('parent_work__pk', flat=True))
 
@@ -642,9 +671,9 @@ def build_related_works(work: Work,
             type=relation.relation_type.name.lower()
         ) for relation in relations
         if related_works[relation.related_id] is not None
-       and related_works[relation.related_id].pk not in existing_child_works
-       and work.pk not in existing_parent_works
-       and work.pk != related_works[relation.related_id].pk  # no self reference.
+           and related_works[relation.related_id].pk not in existing_child_works
+           and work.pk not in existing_parent_works
+           and work.pk != related_works[relation.related_id].pk  # no self reference.
     }
 
     RelatedWork.objects.bulk_create(list(new_relations.values()))
@@ -685,7 +714,7 @@ def build_staff(work: Work,
             artist.anilist_creator_id = creator.id
             artist.save()
             artists[creator.id] = artist
-        except Artist.DoesNotExist: # This artist does not yet exist : will be bulk created
+        except Artist.DoesNotExist:  # This artist does not yet exist : will be bulk created
             artist = Artist(name=name, anilist_creator_id=creator.id)
             artists_to_add[creator.id] = artist
 
@@ -702,11 +731,12 @@ def build_staff(work: Work,
     role_map = staff_roles.role_map
 
     missing_staff = {creator.id: Staff(
-           work=work,
-           role=role_map.get(anilist_roles_map[creator.role]),
-           artist=artists[creator.id]
-        ) for creator in staff if anilist_roles_map.get(creator.role)
-        and (work.id, artists[creator.id].id, role_map.get(anilist_roles_map[creator.role]).id) not in existing_staff_artists
+        work=work,
+        role=role_map.get(anilist_roles_map[creator.role]),
+        artist=artists[creator.id]
+    ) for creator in staff if anilist_roles_map.get(creator.role)
+                              and (work.id, artists[creator.id].id,
+                                   role_map.get(anilist_roles_map[creator.role]).id) not in existing_staff_artists
     }
 
     Staff.objects.bulk_create(list(missing_staff.values()))
@@ -755,7 +785,8 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
             titles.update({entry.japanese_title: ('japanese', 'official')})
 
         if not titles:
-            raise RuntimeError('During insertion of {}, there were no titles attached to it, malformed data!'.format(str(entry)))
+            raise RuntimeError(
+                'During insertion of {}, there were no titles attached to it, malformed data!'.format(str(entry)))
 
         anime_type = entry.media_format.name if entry.work_type == AniListWorkType.ANIME else ''
         manga_type = entry.media_format.name if entry.work_type == AniListWorkType.MANGA else ''
@@ -764,7 +795,6 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
         studio = None
         if entry.studio:
             studio, _ = Studio.objects.get_or_create(title=entry.studio)
-
 
         work_defaults = {
             'source': entry.anilist_url,
@@ -822,7 +852,7 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
 
 
 def insert_work_into_database_from_anilist(entry: AniListEntry,
-                                           build_related: Optional[bool] = True,
+                                           build_related: Optional[bool] = False,
                                            ignored_related_ids: Optional[Set] = None,
                                            ignored_works_ids: Optional[Set] = None,
                                            ignore_duplicates: bool = False) -> Optional[Work]:
@@ -839,3 +869,47 @@ def insert_work_into_database_from_anilist(entry: AniListEntry,
     work_result = insert_works_into_database_from_anilist([entry], build_related, ignored_related_ids,
                                                           ignored_works_ids, ignore_duplicates)
     return work_result[0] if work_result else None
+
+
+logger = logging.getLogger(__name__)
+
+SUPPORTED_MANGAKI_WORKS = [AniListWorkType.animes, AniListWorkType.mangas]
+
+
+def get_or_create_from_anilist(work_list: QuerySet,
+                               entry: AniListEntry,
+                               build_related: Optional[bool] = False) -> Optional[Work]:
+    """
+    Get a work from the current `work_list` (a queryset, filtered by category)
+    or create from scratch using AniList as reference.
+
+    :param work_list: a QuerySet of works
+    :type work_list: QuerySet<Work>
+    :param work_type: type of the work considered (e.g. AniListWorkType.animes)
+    :type work_type: AniListWorkType enum
+    :param entry: an AniList representation of work
+    :type entry: AniListEntry
+    :return: a new work or already existing work!
+    :rtype: Work
+    """
+    # Either, we find something with the good poster or one of the good titles.
+    # Also looking into WorkTitle as it is available.
+    work_ids_matched = set(
+        work_list.filter(reference__source='AniList', reference__identifier=entry.anilist_id)
+            .values_list('id', flat=True)
+    )
+
+    if len(work_ids_matched) > 1:
+        logger.critical('Duplicates detected for the work <{}> -- aborting the import.'
+                        .format(entry.title))
+        raise IntegrityError
+    elif len(work_ids_matched) == 1:
+        return work_list.get(list(work_ids_matched)[0])
+    else:
+        logger.info('Fetching new works using AniList ({})'.format(entry.title))
+        client = AniList()
+        work = client.get_work(search_id=entry.anilist_id)
+        # Return the first matching work while inserting into DB.
+        return insert_work_into_database_from_anilist(work, build_related=build_related)
+
+
