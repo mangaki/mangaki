@@ -1,12 +1,16 @@
 # Here goes the Celery tasks.
+import functools
 import json
 
 import redis
+from celery.app.task import Task
 from celery.utils.log import get_task_logger
 from django.db import IntegrityError
 from django.db.models import Count, Q
 
 from mangaki.utils.work_merge import create_work_cluster, merge_work_clusters
+from mangaki.utils.singleton import Singleton
+from mangaki.wrappers import anilist
 from .celery import app
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -14,8 +18,6 @@ from django.conf import settings
 from mangaki.models import UserBackgroundTask, Work, WorkCluster
 import mangaki.utils.mal as mal
 import redis_lock
-
-MAL_IMPORT_TAG = 'MAL_IMPORT'
 
 logger = get_task_logger(__name__)
 if settings.REDIS_URL:
@@ -28,11 +30,6 @@ if settings.REDIS_URL:
         redis_pool = None
 else:
     redis_pool = None
-
-
-def get_current_mal_import(user: User):
-    return user.background_tasks.filter(tag=MAL_IMPORT_TAG).first()
-
 
 # 10 minutes.
 DEFAULT_LOCK_EXPIRATION_TIME = 10*60
@@ -78,36 +75,83 @@ def look_for_workclusters(steal_workcluster: bool = False):
                 logger.info('{} clusters merged.'.format(len(clusters)))
         logger.info('Compression done.')
 
+class BaseImporter:
+    name = None
 
-@app.task(name='import_mal', bind=True, ignore_result=True)
-def import_mal(self, mal_username: str, mangaki_username: str):
-    r = redis.StrictRedis(connection_pool=redis_pool)
+    @property
+    def tag(self):
+        return '{}_IMPORT_TAG'.format(self.name.upper())
 
-    def update_details(count, current_index, current_title):
-        payload = {
-            'count': count,
-            'currentWork': {
-                'index': current_index,
-                'title': current_title
-            }
-        }
+    @property
+    def task_suffix(self):
+        return self.name.lower()
 
-        r.set('tasks:{task_id}:details'.format(task_id=self.request.id),
-              json.dumps(payload))
+    @staticmethod
+    def _update_details_cb(r, request, payload):
+        r.set('tasks:{task_id}:details'.format(
+            task_id=request.id
+        ), json.dumps(payload))
 
-    user = User.objects.get(username=mangaki_username)
-    if user.background_tasks.filter(tag=MAL_IMPORT_TAG).exists():
-        logger.debug('[{}] MAL import already in progress. Ignoring.'.format(user))
-        return
+    def get_current_import_for(self, user: User):
+        if self.name is None:
+            raise NotImplementedError
 
-    bg_task = UserBackgroundTask(owner=user, task_id=self.request.id, tag=MAL_IMPORT_TAG)
-    bg_task.save()
-    logger.info('[{}] MAL import task created: {}.'.format(user, bg_task.task_id))
-    try:
-        mal.import_mal(mal_username, mangaki_username, update_callback=update_details)
-    except IntegrityError:
-        logger.exception('MAL import failed due to integrity error')
-    finally:
-        bg_task.delete()
-        r.delete('tasks:{}:details'.format(self.request.id))
-        logger.info('[{}] MAL import task recycled and deleted.'.format(user))
+        return user.background_tasks.filter(tag=self.tag).first()
+
+    def run(self, mangaki_username: str, update_callback, *args):
+        raise NotImplementedError
+
+    def start(self, task: Task, mangaki_username: str, user_arguments):
+        r = redis.StrictRedis(connection_pool=redis_pool)
+
+        user = User.objects.get(username=mangaki_username)
+        if user.background_tasks.filter(tag=self.tag).exists():
+            logger.debug('[{}] {} import already in progress. Ignoring.'.format(user,
+                                                                                self.name))
+            return
+
+        bg_task = UserBackgroundTask(owner=user, task_id=task.request.id, tag=self.tag)
+        bg_task.save()
+        logger.info('[{}] {} import task created: {}.'.format(user,
+                                                              self.name, bg_task.task_id))
+        try:
+            update_cb = functools.partial(self._update_details_cb, r, task.request)
+            self.run(mangaki_username, update_cb, *user_arguments)
+        except IntegrityError:
+            logger.exception('{} import failed due to integrity error'.format(self.name))
+        finally:
+            bg_task.delete()
+            r.delete('tasks:{}:details'.format(task.request.id))
+            logger.info('[{}] {} import task recycled and deleted.'.format(user, self.name))
+
+
+class MALImporter(BaseImporter, metaclass=Singleton):
+    name = 'MAL'
+
+    def run(self, mangaki_username: str, update_cb, *args):
+        mal_username, = args
+
+        mal.import_mal(mal_username, mangaki_username, update_callback=update_cb)
+
+
+class AniListImporter(BaseImporter, metaclass=Singleton):
+    name = 'AniList'
+
+    def run(self, mangaki_username: str, update_cb, *args):
+        anilist_username, = args
+
+        anilist.import_anilist(anilist_username, mangaki_username, update_callback=update_cb,
+                               build_related=settings.ANILIST_IMPORT.BUILD_RELATED_DURING_IMPORT)
+
+
+def build_import_task(importer_class):
+    @app.task(name='import_{}'.format(importer_class.task_suffix), bind=True, ignore_result=True)
+    def perform_import(self, mangaki_username: str, *user_args):
+        klass = importer_class()
+        klass.start(self, mangaki_username, *user_args)
+
+    return perform_import
+
+
+import_anilist = build_import_task(AniListImporter)
+import_mal = build_import_task(MALImporter)

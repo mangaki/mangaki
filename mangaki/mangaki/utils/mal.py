@@ -550,9 +550,15 @@ def import_mal(mal_username: str, mangaki_username: str,
                         willsee.add(work.id)
 
                 if update_callback:
-                    update_callback(len(user_works),
-                                    current_index + 1,
-                                    user_work.title)
+                    payload = {
+                        'count': len(user_works),
+                        'currentWork': {
+                            'index': current_index + 1,
+                            'title': user_work.title
+                        }
+                    }
+                    update_callback(payload)
+
             except Exception:
                 logger.exception('Failure to fetch the work from MAL and import it into the Mangaki database.')
                 fails.append(user_work.title)
