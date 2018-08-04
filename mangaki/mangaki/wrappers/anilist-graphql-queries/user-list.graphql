@@ -10,6 +10,7 @@ query ($username: String, $mediaType: MediaType, $perPage: Int) {
     mediaList(userName: $username, type: $mediaType) {
       id
       score
+      status
       media {
         id
         type
