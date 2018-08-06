@@ -105,6 +105,7 @@ class MergeTest(TestCase):
         self.assertEqual(Work.objects.get(id=self.work_ids[0]).genre.count(), 2)
 
     # noinspection PyPep8Naming
+    # FIXME: classical scenario, we should have a simpler decorator to perform those tests
     @patch('redis.StrictRedis', autospec=True, create=True)
     @patch('redis_lock.Lock', autospec=True, create=True)
     def test_look_for_workcluster_deduplication_task(self, Lock, _):
