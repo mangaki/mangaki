@@ -100,7 +100,7 @@ class RecommendationAlgorithm:
 
     def compute_dcg(self, y_pred, y_true):
         '''
-        Computes the discounted gain as stated in:
+        Computes the discounted cumulative gain as stated in:
         https://gist.github.com/bwhite/3726239
         '''
         ranked_gains = self.get_ranked_gains(y_pred, y_true)
