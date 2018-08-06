@@ -573,6 +573,10 @@ class WorkClusterAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'works', 'checker', 'resulting_work')
     actions = ('trigger_merge', 'reject')
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.prefetch_related('works')
+
     def trigger_merge(self, request, queryset):
         cluster = queryset.first()
         nb_merged, final_work, response = merge_works(request, queryset)
@@ -594,8 +598,7 @@ class WorkClusterAdmin(admin.ModelAdmin):
     reject.short_description = "Rejeter les clusters sélectionnés"
 
     def get_work_titles(self, obj):
-        return 'test'
-        cluster_works = list(Work.all_objects.filter(workcluster=obj))
+        cluster_works = obj.works.all()  # Does not include redirected works
         if cluster_works:
             def get_admin_url(work):
                 if work.redirect is None:
