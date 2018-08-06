@@ -569,6 +569,7 @@ class TaggedWorkAdmin(admin.ModelAdmin):
 @admin.register(WorkCluster)
 class WorkClusterAdmin(admin.ModelAdmin):
     list_display = ('user', 'get_work_titles', 'resulting_work', 'reported_on', 'merged_on', 'checker', 'status')
+    list_select_related = ('user', 'resulting_work', 'checker')
     raw_id_fields = ('user', 'works', 'checker', 'resulting_work')
     actions = ('trigger_merge', 'reject')
 
@@ -593,6 +594,7 @@ class WorkClusterAdmin(admin.ModelAdmin):
     reject.short_description = "Rejeter les clusters sélectionnés"
 
     def get_work_titles(self, obj):
+        return 'test'
         cluster_works = list(Work.all_objects.filter(workcluster=obj))
         if cluster_works:
             def get_admin_url(work):
