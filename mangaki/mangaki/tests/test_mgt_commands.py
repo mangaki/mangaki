@@ -61,7 +61,8 @@ class CommandTest(TestCase):
         self.assertIn('---', self.stdout.getvalue())
 
     def test_compare(self):
-        management.call_command('compare', 'dummy', '--experiment-filename',
+        management.call_command('compare', 'dummy', '-em', 'dcg', '-em', 'mae',
+                                '-em', 'ndcg', '--experiment-filename',
                                 os.path.join(settings.TEST_DATA_DIR,
                                              'experiments', 'default.json'),
                                 stdout=self.stdout)
