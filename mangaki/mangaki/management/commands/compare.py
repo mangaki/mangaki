@@ -5,6 +5,7 @@ from datetime import datetime
 from collections import defaultdict
 from typing import Type, List, Any, Dict, Optional
 
+import pandas as pd
 import numpy as np
 from django.core.management.base import BaseCommand
 from sklearn.model_selection import ShuffleSplit
@@ -136,18 +137,36 @@ class Experiment(object):
         metrics = defaultdict(lambda: defaultdict(list))
 
         for pass_index, (i_train, i_test) in enumerate(k_fold.split(self.anonymized.X), start=1):
+            X_train = self.anonymized.X[i_train]
+            y_train = self.anonymized.y[i_train]
+            X_test = self.anonymized.X[i_test]
+            y_test = self.anonymized.y[i_test]
+            print(y_train[:5], y_test[:5])
+            df_train = pd.DataFrame(np.column_stack((X_train, y_train)), columns=['user_id', 'work_id', 'rating'], dtype=float)
+            print(df_train.head())
+            df_test = pd.DataFrame(np.column_stack((X_test, y_test)), columns=['user_id', 'work_id', 'rating'], dtype=float)
+            mean_rating_by_user_id = df_train.groupby('user_id')['rating'].mean()
+            print(mean_rating_by_user_id.head())
+            df_train['user_mean_rating'] = df_train['user_id'].map(mean_rating_by_user_id)
+            df_train['corrected_rating'] = df_train['rating'] - df_train['user_mean_rating']
+            df_test['corrected_rating']  = df_test['rating']  - df_train['user_mean_rating']
+            df_train[['user_id', 'work_id', 'rating']].to_csv('/tmp/train.dat', header=False, index=False)
+            df_test[['user_id', 'work_id', 'rating']].to_csv('/tmp/test.dat', header=False, index=False)
+            # pd.DataFrame(np.column_stack((X_train, y_train))).to_csv('/tmp/train.dat', header=False, index=False)
+            # pd.DataFrame(np.column_stack((X_test, y_test))).to_csv('/tmp/test.dat', header=False, index=False)
+
             for algo in self.algos:
                 model = algo.make_instance()
                 start = datetime.now()
                 logger.info('[{0} {1}-folding] pass={2}/{1}'.format(model.get_shortname(), nb_split, pass_index))
                 model.set_parameters(self.anonymized.nb_users, self.anonymized.nb_works)
-                model.fit(self.anonymized.X[i_train], self.anonymized.y[i_train])
-                y_test = model.predict(self.anonymized.X[i_test])
-                logger.debug('Predicted: %s' % y_test[:5])
+                model.fit(X_train, y_train)
+                y_pred = model.predict(self.anonymized.X[i_test])
+                logger.debug('Predicted: %s' % y_pred[:5])
                 logger.debug('Was: %s' % self.anonymized.y[i_test][:5])
                 logger.debug('Elapsed: %s', datetime.now() - start)
 
-                metrics_values = self.compute_metrics(model, y_test, i_test)
+                metrics_values = self.compute_metrics(model, y_pred, i_test)
                 for metric, value in metrics_values.items():
                     metrics[metric][model.get_shortname()].append(value)
             if not full_cv:
