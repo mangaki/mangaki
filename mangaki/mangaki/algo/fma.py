@@ -32,7 +32,7 @@ class MangakiFMA(RecommendationAlgorithm):
 
         nb_samples = len(X)
         user_ids = X[:, 0]
-        work_ids = X[:, 1].astype(np.int32)
+        work_ids = X[:, 1].astype(np.int32)  # Otherwise we can't slice self.T
         # For the k-th user_id-work_id pair, we need (k, user_id) and (k, N + work_id), so two copies of range(nb_samples)
         rows = list(range(nb_samples)) * 2
         cols = np.concatenate((user_ids, self.nb_users + work_ids))
@@ -49,7 +49,7 @@ class MangakiFMA(RecommendationAlgorithm):
         X_fm = self.prepare_fm(X)
         self.chrono.save('prepare data in sparse FM format')
 
-        os.environ['LIBFM_PATH'] = '/Users/jilljenn/code/libfm/bin/'  # If applicable
+        os.environ['LIBFM_PATH'] = 'XXX'  # If applicable
         fm = pywFM.FM(task='regression', num_iter=self.nb_iterations, k2=self.rank, rlog=False)  # MCMC method
         # rlog contains the RMSE at each epoch, we do not need it here
         model = fm.run(X_fm, y, X_fm, y)

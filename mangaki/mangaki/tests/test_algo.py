@@ -34,7 +34,7 @@ class AlgoTest(TestCase):
         for algo_name in RecommendationAlgorithm.list_available_algorithms():
             algo = RecommendationAlgorithm.instantiate_algorithm(algo_name)
             algo.set_parameters(self.nb_users, self.nb_works)
-            if algo_name in {'balse', 'lasso', 'xals', 'gbr'}:
+            if algo_name in {'balse', 'fma', 'gbr', 'lasso', 'xals'}:
                 algo.nb_tags = self.nb_tags
                 algo.T = self.T
             algo.fit(self.X_train, self.y_train)
