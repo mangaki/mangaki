@@ -30,6 +30,8 @@ setup(
         'coreapi>=2.3,<3',
         'celery>=4.2,<5',
         'redis>=2.10,<3',
+        'python-redis-lock>=3.2,<4',
+        'django-celery-beat>=1.1,<2',
         'Pillow>=4.1,<5',
         'setuptools_scm>=1.15,<2',
         'django-sendfile>=0.3,<1'

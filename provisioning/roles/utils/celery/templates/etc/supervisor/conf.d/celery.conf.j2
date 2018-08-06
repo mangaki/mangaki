@@ -5,6 +5,13 @@ command = {{ celery_venv_path }}/bin/celery worker -A {{ celery_app_module }}:{{
 user = {{ celery_user }}
 environment = {% for key, value in celery_env.items() %}{{ key }}="{{ value }}",{% endfor %}
 
+{% if celery_beat %}
+[program:{{ celery_beat_name }}]
+command = {{ celery_venv_path }}/bin/celery beat -A {{ celery_app_module }}:{{ celery_app_name }} --loglevel={{ celery_log_level }}
+user = {{ celery_user }}
+environment = {% for key, value in celery_env.items() %} {{ key }}="{{ value }}", {% endfor %}
+{% endif %}
+
 ; Need to wait for currently executing tasks to finish at shutdown.
 stopwaitsecs = 600
 

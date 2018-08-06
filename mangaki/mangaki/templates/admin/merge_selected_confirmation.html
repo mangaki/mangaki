@@ -23,13 +23,19 @@
         {% for choice in row.choices %}
             <td style="max-width: 450px;">
                 <label>
-                    {% if row.merge_type != 'INFO_ONLY' %}
+                    {% if row.action_type != 'DO_NOTHING' %}
                         <input type="radio" name="{{ row.field }}"
                                value="{% if row.field == 'date' or row.field == 'end_date' %}{{ choice|date:'Y-m-d' }}{% else %}{{ choice }}{% endif %}"
                                {% if choice == row.suggested %} checked{% endif %} />
                     {% endif %}
                     {% if row.field == 'ext_poster' %}
                         <img src="{{ choice }}" alt="{{ choice }}" style="max-height: 300px;" />
+                    {% elif row.field == 'int_poster' %}
+                        {% if choice.size %}
+                            <img src="{{ choice.url }}" alt="{{ choice.name }} - {{ choice.size }}" style="max-height: 300px;" />
+                        {% else %}
+                            Rien n'est stocké sur le disque.
+                        {% endif %}
                     {% elif row.field == 'source' %}
                         <a href="{{ choice }}">{{ choice }}</a>
                     {% else %}

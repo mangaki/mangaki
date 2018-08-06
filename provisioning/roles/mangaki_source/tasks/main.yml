@@ -115,7 +115,7 @@
       if [ $? -ne 0 ]; then
       tmux new-session -d -c {{ mangaki_source_package }} -n "Django" -s {{ mangaki_source_name }} '{{ mangaki_source_manage }} runserver 0.0.0.0:8000' 2> /dev/null || true
         tmux set-option -t {{ mangaki_source_name }} set-remain-on-exit on
-        tmux new-window -c {{ mangaki_source_package }} -n "Celery" -t {{ mangaki_source_name }} '{{ mangaki_source_venv_path }}/bin/celery -A mangaki:celery_app worker -l INFO' 2>/dev/null || true
+        tmux new-window -c {{ mangaki_source_package }} -n "Celery" -t {{ mangaki_source_name }} '{{ mangaki_source_venv_path }}/bin/celery -B -A mangaki:celery_app worker -l INFO' 2>/dev/null || true
         tmux attach-session -t {{ mangaki_source_name }}
       fi
       echo "Development server is running on port 8000; attach with 'tmux attach -t {{ mangaki_source_name }}'"

@@ -133,7 +133,8 @@ class Work(models.Model):
     ext_poster = models.CharField(max_length=128, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
-    date = models.DateField(blank=True, null=True) # Should be renamed to start_date
+    # Should be renamed to start_date
+    date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
     ext_synopsis = models.TextField(blank=True, default='')
@@ -500,7 +501,7 @@ class WorkCluster(models.Model):
     origin = models.ForeignKey(Suggestion, related_name='origin_suggestion', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])
+        return 'WorkCluster ({})'.format(', '.join(self.works))
 
 
 class Announcement(models.Model):

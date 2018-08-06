@@ -68,7 +68,8 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'bootstrap3',
     'django_js_reverse',
-    'rest_framework'
+    'rest_framework',
+    'django_celery_beat'
 )
 
 if config.has_section('sentry'):
@@ -236,6 +237,7 @@ REST_FRAMEWORK = {
 REDIS_URL = config.get('celery', 'broker_url', fallback='redis://')
 CELERY_BROKER_URL = config.get('celery', 'broker_url', fallback='redis://')
 CELERY_RESULT_BACKEND = config.get('celery', 'result_backend', fallback='redis://')
+CELERY_BEAT_SCHEDULER = config.get('celery', 'scheduler', fallback='django_celery_beat.schedulers:DatabaseScheduler')
 
 EMAIL_BACKEND = config.get('email', 'EMAIL_BACKEND', fallback='django.core.mail.backends.smtp.EmailBackend')
 if config.has_section('smtp'):
