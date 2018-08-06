@@ -66,7 +66,7 @@ def look_for_workclusters(steal_workcluster: bool = False):
             logger.info('Clustered {} works. ({})'.format(len(works), cluster.id))
 
         logger.info('Clustering done.')
-        logger.info('Compresssing redundant work clusters.')
+        logger.info('Compressing redundant work clusters.')
         for work in Work.objects.prefetch_related('workcluster_set').iterator():
             # Only merge automatic unprocessed work clusters.
             cluster_filter = Q(status='unprocessed')
