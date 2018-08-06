@@ -17,7 +17,7 @@ lxml==3.6.*
 raven==6.1.*
 djangorestframework==3.6.*
 coreapi==2.3.*
-celery==4.0.*
+celery>=4.2
 redis==2.10.*
 Pillow>=4.1
 dedupe==1.7.*

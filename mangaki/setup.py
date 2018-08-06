@@ -28,7 +28,7 @@ setup(
         'raven>=6.1.0,<7',
         'djangorestframework>=3.6,<4',
         'coreapi>=2.3,<3',
-        'celery>=4.0,<5',
+        'celery>=4.2,<5',
         'redis>=2.10,<3',
         'Pillow>=4.1,<5',
         'setuptools_scm>=1.15,<2',
