@@ -17,7 +17,7 @@ class SideInformation:
         # Load in CSC format if no matrix provided.
         if self.T is None:
             self.T = load_npz(os.path.join(settings.DATA_DIR, 'tags',
-                                           'tag-matrix.npz')).tocsc()
+                                           'tag-matrix.npz'))
         _, self.nb_tags = self.T.shape
 
     def preprocess(self, perform_scaling, with_mean):
