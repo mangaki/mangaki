@@ -3,6 +3,7 @@ from django.conf import settings
 from mangaki.algo.side import SideInformation
 from mangaki.utils.chrono import Chrono
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+import numpy as np
 import pickle
 import os.path
 
@@ -94,6 +95,33 @@ class RecommendationAlgorithm:
     def compute_mae(y_pred, y_true):
         return mean_absolute_error(y_true, y_pred)
 
+    def get_ranked_gains(self, y_pred, y_true):
+        return y_true[np.argsort(y_pred)[::-1]]
+
+    def compute_dcg(self, y_pred, y_true):
+        '''
+        Computes the discounted gain as stated in:
+        https://gist.github.com/bwhite/3726239
+        '''
+        ranked_gains = self.get_ranked_gains(y_pred, y_true)
+        return self.dcg_at_k(ranked_gains, 100)
+
+    def compute_ndcg(self, y_pred, y_true):
+        ranked_gains = self.get_ranked_gains(y_pred, y_true)
+        return self.ndcg_at_k(ranked_gains, 100)
+
+    def dcg_at_k(self, r, k):
+        r = np.asfarray(r)[:k]
+        if r.size:
+            return np.sum(np.subtract(np.power(2, r), 1) / np.log2(np.arange(2, r.size + 2)))
+        return 0.
+
+    def ndcg_at_k(self, r, k):
+        idcg = self.dcg_at_k(sorted(r, reverse=True), k)
+        if not idcg:
+            return 0.
+        return self.dcg_at_k(r, k) / idcg
+
     def compute_all_errors(self, X_train, y_train, X_test, y_test):
         y_train_pred = self.predict(X_train)
         logging.info('Train RMSE=%f', self.compute_rmse(y_train, y_train_pred))
@@ -102,7 +130,7 @@ class RecommendationAlgorithm:
 
     @staticmethod
     def available_evaluation_metrics():
-        return ['rmse', 'mae']
+        return ['rmse', 'mae', 'dcg', 'ndcg']
 
     @classmethod
     def register_algorithm(cls, name, klass, default_kwargs=None):
