@@ -67,7 +67,6 @@ class MangakiFMA(RecommendationAlgorithm):
             self.W = np.pad(np.array(model.weights), (0, nb_agents - current), mode='constant')  # Just in case X_fm had too many zero columns on the right
             self.V = np.pad(model.pairwise_interactions, [(0, nb_agents - current), (0, 0)], mode='constant')
         self.V2 = np.power(self.V, 2)
-        self.save(self.get_backup_path(None))
 
     def predict(self, X):
         X_fm = self.prepare_fm(X)
