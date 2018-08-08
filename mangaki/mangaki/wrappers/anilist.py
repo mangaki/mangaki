@@ -16,7 +16,8 @@ from django.db.models import Q, QuerySet
 from mangaki.models import (
     Work, RelatedWork, WorkTitle, Reference, Category,
     ExtLanguage, Studio, Genre, Artist, Staff, Role,
-    Rating
+    Rating,
+    ExternalRating
 )
 
 from mangaki.utils.singleton import Singleton
@@ -873,7 +874,7 @@ def insert_work_into_database_from_anilist(entry: AniListEntry,
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_MANGAKI_WORKS = [AniListWorkType.animes, AniListWorkType.mangas]
+SUPPORTED_MANGAKI_WORKS = [AniListWorkType.ANIME, AniListWorkType.MANGA]
 
 
 def get_or_create_from_anilist(work_list: QuerySet,
@@ -885,7 +886,7 @@ def get_or_create_from_anilist(work_list: QuerySet,
 
     :param work_list: a QuerySet of works
     :type work_list: QuerySet<Work>
-    :param work_type: type of the work considered (e.g. AniListWorkType.animes)
+    :param work_type: type of the work considered (e.g. AniListWorkType.ANIME)
     :type work_type: AniListWorkType enum
     :param entry: an AniList representation of work
     :type entry: AniListEntry
@@ -913,3 +914,95 @@ def get_or_create_from_anilist(work_list: QuerySet,
         return insert_work_into_database_from_anilist(work, build_related=build_related)
 
 
+@transaction.atomic
+def import_anilist(anilist_username: str, mangaki_username: str,
+                   update_callback: Optional[typing.Callable] = None,
+                   build_related: Optional[bool] = False):
+    """
+    Import AniList by username
+    """
+
+    client = AniList()
+    user = User.objects.get(username=mangaki_username)
+    fails = []
+    mangaki_lists = {
+        AniListWorkType.ANIME: Work.objects.filter(category__slug='anime'),
+        AniListWorkType.MANGA: Work.objects.filter(category__slug='manga')
+    }
+    scores = {}
+    willsee = set()
+    wontsee = set()
+
+    for work_type in SUPPORTED_MANGAKI_WORKS:
+        user_works = set(
+            client.get_user_list(work_type, anilist_username)
+        )
+        logger.info('Fetching {} works from {}\'s AniList.'.format(len(user_works), anilist_username))
+        for current_index, user_work in enumerate(user_works):
+            try:
+                work = get_or_create_from_anilist(
+                    mangaki_lists[work_type],
+                    user_work.work,
+                    build_related=build_related)
+
+                if (work and
+                    not any(work.id in container for container in (scores, wontsee, willsee))):
+                    if user_work.status in (
+                        AniListUserWorkStatus.COMPLETED,
+                        AniListUserWorkStatus.REPEATING):
+                        scores[work.id] = user_work.score
+                    elif user_work.status == AniListUserWorkStatus.DROPPED:
+                        wontsee.add(work.id)
+                    elif user_work.status in (
+                        AniListUserWorkStatus.PLANNING,
+                        AniListUserWorkStatus.PAUSED,
+                        AniListUserWorkStatus.CURRENT):
+                        willsee.add(work.id)
+
+                if update_callback:
+                    payload = {
+                        'count': len(user_works),
+                        'currentWork': {
+                            'index': current_index + 1,
+                            'title': user_work.work.title
+                        }
+                    }
+                    update_callback(payload)
+
+            except Exception:
+                logger.exception('Failure to fetch the work from AniList and import it into the Mangaki database.')
+                fails.append(user_work.work.title)
+
+    ExternalRating.objects.filter(user=user,
+                                  work__in=list(scores.keys()) + list(willsee | wontsee)).delete()
+    ratings = []
+    ext_ratings = []
+    for work_id, score in scores.items():
+        ext_ratings.append(
+            ExternalRating(
+                user=user,
+                work=work_id,
+                value=float(score)
+            )
+        )
+
+    for work_id in willsee:
+        rating = Rating(
+            user=user,
+            choice='willsee',
+            work_id=work_id
+        )
+        ratings.append(rating)
+
+    for work_id in wontsee:
+        rating = Rating(
+            user=user,
+            choice='wontsee',
+            work_id=work_id
+        )
+        ratings.append(rating)
+
+    Rating.objects.bulk_create(ratings)
+    ExternalRating.objects.bulk_create(ext_ratings)
+
+    return len(ratings) + len(ext_ratings), fails

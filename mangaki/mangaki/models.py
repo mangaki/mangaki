@@ -642,6 +642,25 @@ class Reference(models.Model):
         )
 
 
+class ExternalRating(models.Model):
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    value = models.FloatField()
+
+    created_on = models.DateTimeField(auto_now=True)
+    updated_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = (
+            ('work', 'user')
+        )
+
+    def __str__(self):
+        return '{} rated {} for {} (external)'.format(self.user,
+                                                          self.work,
+                                                          self.value)
+
+
 class Top(models.Model):
     date = models.DateField(auto_now_add=True)
     category = models.CharField(max_length=10, choices=TOP_CATEGORY_CHOICES, unique_for_date='date')

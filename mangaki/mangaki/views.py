@@ -42,7 +42,7 @@ from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
 from mangaki.utils.mal import client
-from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
+from mangaki.tasks import import_mal, MALImporter, redis_pool
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
@@ -390,6 +390,7 @@ class ArtistDetail(SingleObjectMixin, WorkListMixin, ListView):
 def get_profile(request,
                 username: str = None):
     is_anonymous = False
+    mal_importer = MALImporter()  # singleton class
     if username:
         user = get_object_or_404(User.objects.select_related('profile'), username=username)
     else:
@@ -415,7 +416,7 @@ def get_profile(request,
             'debug_vue': settings.DEBUG_VUE_JS,
             'mal': {
                 'is_available': client.is_available and (redis_pool is not None),
-                'pending_import': None if (not is_me) or is_anonymous else get_current_mal_import(request.user),
+                'pending_import': None if (not is_me) or is_anonymous else mal_importer.get_current_import_for(request.user),
             },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,

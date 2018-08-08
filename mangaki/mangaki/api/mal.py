@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
-from mangaki.tasks import get_current_mal_import, import_mal
+from mangaki.tasks import MALImporter, import_mal
 from mangaki.utils.mal import client
 
 
@@ -24,7 +24,8 @@ class MALImportUnavailable(APIException):
 @throttle_classes([MALImportRateThrottle])
 def import_from_mal(request: Request, mal_username: str) -> Response:
     if client.is_available:
-        pending_import = get_current_mal_import(request.user)
+        importer = MALImporter()
+        pending_import = importer.get_current_import_for(request.user)
         if not pending_import:
             result = import_mal.s(mal_username, request.user.username).apply_async()
             task_id = result.task_id
