@@ -390,6 +390,10 @@ class AniList(metaclass=Singleton):
         self.auto_sleep_when_rate_limited = False
 
     @property
+    def is_available(self) -> bool:
+        return True
+
+    @property
     def rate_limited(self):
         return (
             self.rate_limit_reset_timestamp is not None

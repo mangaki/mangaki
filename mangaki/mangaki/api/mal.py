@@ -27,7 +27,7 @@ def import_from_mal(request: Request, mal_username: str) -> Response:
         importer = MALImporter()
         pending_import = importer.get_current_import_for(request.user)
         if not pending_import:
-            result = import_mal.s(mal_username, request.user.username).apply_async()
+            result = import_mal.s(request.user.username, mal_username).apply_async()
             task_id = result.task_id
         else:
             task_id = pending_import.task_id
