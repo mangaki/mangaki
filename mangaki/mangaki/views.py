@@ -42,7 +42,8 @@ from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
 from mangaki.utils.mal import client
-from mangaki.tasks import import_mal, MALImporter, redis_pool
+from mangaki.wrappers.anilist import AniList
+from mangaki.tasks import MALImporter, redis_pool, AniListImporter
 from mangaki.utils.profile import (
     get_profile_ratings,
     build_profile_compare_function,
@@ -391,6 +392,7 @@ def get_profile(request,
                 username: str = None):
     is_anonymous = False
     mal_importer = MALImporter()  # singleton class
+    anilist_importer = AniListImporter()
     if username:
         user = get_object_or_404(User.objects.select_related('profile'), username=username)
     else:
@@ -417,6 +419,10 @@ def get_profile(request,
             'mal': {
                 'is_available': client.is_available and (redis_pool is not None),
                 'pending_import': None if (not is_me) or is_anonymous else mal_importer.get_current_import_for(request.user),
+            },
+            'anilist': {
+                'is_available': AniList().is_available and (redis_pool is not None),
+                'pending_import': None if (not is_me) or is_anonymous else anilist_importer.get_current_import_for(request.user)
             },
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,

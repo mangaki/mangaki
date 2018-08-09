@@ -78,13 +78,13 @@ def look_for_workclusters(steal_workcluster: bool = False):
 class BaseImporter:
     name = None
 
-    @property
-    def tag(self):
-        return '{}_IMPORT_TAG'.format(self.name.upper())
+    @classmethod
+    def tag(cls):
+        return '{}_IMPORT_TAG'.format(cls.name.upper())
 
-    @property
-    def task_suffix(self):
-        return self.name.lower()
+    @classmethod
+    def task_suffix(cls):
+        return cls.name.lower()
 
     @staticmethod
     def _update_details_cb(r, request, payload):
@@ -96,21 +96,21 @@ class BaseImporter:
         if self.name is None:
             raise NotImplementedError
 
-        return user.background_tasks.filter(tag=self.tag).first()
+        return user.background_tasks.filter(tag=self.tag()).first()
 
     def run(self, mangaki_username: str, update_callback, *args):
         raise NotImplementedError
 
-    def start(self, task: Task, mangaki_username: str, user_arguments):
+    def start(self, task: Task, mangaki_username: str, *user_arguments):
         r = redis.StrictRedis(connection_pool=redis_pool)
 
         user = User.objects.get(username=mangaki_username)
-        if user.background_tasks.filter(tag=self.tag).exists():
+        if user.background_tasks.filter(tag=self.tag()).exists():
             logger.debug('[{}] {} import already in progress. Ignoring.'.format(user,
                                                                                 self.name))
             return
 
-        bg_task = UserBackgroundTask(owner=user, task_id=task.request.id, tag=self.tag)
+        bg_task = UserBackgroundTask(owner=user, task_id=task.request.id, tag=self.tag())
         bg_task.save()
         logger.info('[{}] {} import task created: {}.'.format(user,
                                                               self.name, bg_task.task_id))
@@ -145,7 +145,7 @@ class AniListImporter(BaseImporter, metaclass=Singleton):
 
 
 def build_import_task(importer_class):
-    @app.task(name='import_{}'.format(importer_class.task_suffix), bind=True, ignore_result=True)
+    @app.task(name='import_{}'.format(importer_class.task_suffix()), bind=True, ignore_result=True)
     def perform_import(self, mangaki_username: str, *user_args):
         klass = importer_class()
         klass.start(self, mangaki_username, *user_args)

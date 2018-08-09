@@ -387,7 +387,7 @@ class AniList(metaclass=Singleton):
         self.remaining_requests = None
         self.retry_after = None
         self.rate_limit_reset_timestamp = None
-        self.auto_sleep_when_rate_limited = False
+        self.auto_sleep_when_rate_limited = True
 
     @property
     def is_available(self) -> bool:
@@ -909,7 +909,7 @@ def get_or_create_from_anilist(work_list: QuerySet,
                         .format(entry.title))
         raise IntegrityError
     elif len(work_ids_matched) == 1:
-        return work_list.get(list(work_ids_matched)[0])
+        return work_list.get(id=list(work_ids_matched)[0])
     else:
         logger.info('Fetching new works using AniList ({})'.format(entry.title))
         client = AniList()
@@ -938,11 +938,8 @@ def import_anilist(anilist_username: str, mangaki_username: str,
     wontsee = set()
 
     for work_type in SUPPORTED_MANGAKI_WORKS:
-        user_works = set(
-            client.get_user_list(work_type, anilist_username)
-        )
-        logger.info('Fetching {} works from {}\'s AniList.'.format(len(user_works), anilist_username))
-        for current_index, user_work in enumerate(user_works):
+        logger.info('Fetching many works from {}\'s AniList.'.format(anilist_username))
+        for current_index, user_work in enumerate(client.get_user_list(work_type, anilist_username)):
             try:
                 work = get_or_create_from_anilist(
                     mangaki_lists[work_type],
@@ -965,7 +962,7 @@ def import_anilist(anilist_username: str, mangaki_username: str,
 
                 if update_callback:
                     payload = {
-                        'count': len(user_works),
+                        'count': '???',
                         'currentWork': {
                             'index': current_index + 1,
                             'title': user_work.work.title
@@ -979,13 +976,15 @@ def import_anilist(anilist_username: str, mangaki_username: str,
 
     ExternalRating.objects.filter(user=user,
                                   work__in=list(scores.keys()) + list(willsee | wontsee)).delete()
+    Rating.objects.filter(user=user,
+                          work__in=list(scores.keys()) + list(willsee | wontsee)).delete()
     ratings = []
     ext_ratings = []
     for work_id, score in scores.items():
         ext_ratings.append(
             ExternalRating(
                 user=user,
-                work=work_id,
+                work_id=work_id,
                 value=float(score)
             )
         )
