@@ -71,7 +71,9 @@ def create_merge_form(works_to_merge_qs):
     fields_required = []
     template_rows = []
 
-    for field, choices, action, suggested in field_changeset(work_dicts_to_merge):
+    difficulty = 0
+    for field, choices, action, suggested, difficulty_field in field_changeset(work_dicts_to_merge):
+        difficulty += difficulty_field
         template_rows.append({
             'field': field,
             'choices': choices,
@@ -88,8 +90,8 @@ def create_merge_form(works_to_merge_qs):
 
     template_rows.sort(key=lambda row: int(row['action_type']), reverse=True)
     rating_samples = [(Rating.objects.filter(work_id=work_dict['id']).count(),
-                       Rating.objects.filter(work_id=work_dict['id'])[:10]) for work_dict in work_dicts_to_merge]
-    return fields_to_choose, fields_required, template_rows, rating_samples
+                       Rating.objects.filter(work_id=work_dict['id'])[:10]) for work_dict in work_dicts_to_merge]  # FIXME: too many queries
+    return fields_to_choose, fields_required, template_rows, rating_samples, difficulty
 
 
 @transaction.atomic  # In case trouble happens
@@ -98,13 +100,13 @@ def merge_works(request, selected_queryset):
         from_cluster = True
         cluster = selected_queryset.first()
         works_to_merge_qs = cluster.works.order_by('id').prefetch_related('rating_set', 'genre')
-        works_to_merge = list(works_to_merge_qs)
     else:  # Author is merging those works from a Work queryset
         from_cluster = False
         works_to_merge_qs = selected_queryset.prefetch_related('rating_set', 'genre')
-        works_to_merge = list(works_to_merge_qs)
+    nb_works_to_merge = works_to_merge_qs.count()
 
     if request.POST.get('confirm'):  # Merge has been confirmed
+        works_to_merge = list(works_to_merge_qs)
         if not from_cluster:
             cluster = WorkCluster(user=request.user, checker=request.user)
             cluster.save()  # Otherwise we cannot add works
@@ -138,10 +140,10 @@ def merge_works(request, selected_queryset):
         return len(works_to_merge), merge_handler.target_work, None
 
     # Just show a warning if only one work was checked
-    if len(works_to_merge) < 2:
+    if nb_works_to_merge < 2:
         return None, None, MergeErrors.NOT_ENOUGH_WORKS
 
-    fields_to_choose, fields_required, template_rows, rating_samples = create_merge_form(works_to_merge_qs)
+    fields_to_choose, fields_required, template_rows, rating_samples, difficulty = create_merge_form(works_to_merge_qs)
     context = {
         'fields_to_choose': ','.join(fields_to_choose),
         'fields_required': ','.join(fields_required),
@@ -152,7 +154,7 @@ def merge_works(request, selected_queryset):
         'action': 'merge' if not from_cluster else 'trigger_merge',
         'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
     }
-    return len(works_to_merge), None, TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
+    return nb_works_to_merge, None, TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
 
 logger = logging.getLogger(__name__)
 
@@ -505,7 +507,7 @@ class TaggedWorkAdmin(admin.ModelAdmin):
 
 @admin.register(WorkCluster)
 class WorkClusterAdmin(admin.ModelAdmin):
-    list_display = ('user', 'get_work_titles', 'resulting_work', 'reported_on', 'merged_on', 'checker', 'status')
+    list_display = ('user', 'get_work_titles', 'resulting_work', 'reported_on', 'merged_on', 'checker', 'status', 'get_difficulty')
     list_select_related = ('user', 'resulting_work', 'checker')
     raw_id_fields = ('user', 'works', 'checker', 'resulting_work')
     actions = ('trigger_merge', 'reject')
@@ -531,6 +533,11 @@ class WorkClusterAdmin(admin.ModelAdmin):
         self.message_user(request, "Le rejet de %s a été réalisé avec succès." % message_bit)
 
     reject.short_description = "Rejeter les clusters sélectionnés"
+
+    def get_difficulty(self, obj):
+        works_to_merge_qs = obj.works.order_by('id').prefetch_related('rating_set', 'genre')
+        _, _, _, _, difficulty = create_merge_form(works_to_merge_qs)
+        return difficulty
 
     def get_work_titles(self, obj):
         cluster_works = obj.works.all()  # Does not include redirected works
