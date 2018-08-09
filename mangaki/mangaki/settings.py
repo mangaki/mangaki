@@ -299,3 +299,8 @@ JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'
 RECO_ALGORITHMS_VERBOSE_LEVEL = 1
 
 ANONYMOUS_RATINGS_SESSION_KEY = 'mangaki_ratings'
+
+# Import parameters
+ANILIST_IMPORT = {
+    'BUILD_RELATED_WORKS': False
+}

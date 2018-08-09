@@ -141,7 +141,7 @@ class AniListImporter(BaseImporter, metaclass=Singleton):
         anilist_username, = args
 
         anilist.import_anilist(anilist_username, mangaki_username, update_callback=update_cb,
-                               build_related=settings.ANILIST_IMPORT.BUILD_RELATED_DURING_IMPORT)
+                               build_related=settings.ANILIST_IMPORT.get('BUILD_RELATED_WORKS'))
 
 
 def build_import_task(importer_class):

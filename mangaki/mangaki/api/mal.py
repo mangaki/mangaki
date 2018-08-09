@@ -37,4 +37,4 @@ def import_from_mal(request: Request, mal_username: str) -> Response:
             'message': 'Already importing' if pending_import else 'Import is starting'
         })
     else:
-        raise MALImportUnavailable()
+        raise MALImportUnavailable
