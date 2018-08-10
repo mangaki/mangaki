@@ -60,6 +60,9 @@ class CommandTest(TestCase):
                                 stdout=self.stdout)
         self.assertIn('---', self.stdout.getvalue())
 
+    def test_anilist_tags_to_json(self):
+        pass
+
     def test_compare(self):
         management.call_command('compare', 'dummy', '-em', 'dcg', '-em', 'mae',
                                 '-em', 'ndcg', '--experiment-filename',
@@ -109,6 +112,10 @@ class CommandTest(TestCase):
                                 stdout=self.stdout)
         self.assertEquals(self.stdout.getvalue(),
                           'DR {:s}\n'.format(compute_token('PEPPER', 'DR')))
+
+    def test_top(self):
+        management.call_command('top', '--all', stdout=self.stdout)
+        self.assertEquals(len(self.stdout.getvalue().splitlines()), 6)
 
     @responses.activate
     def test_vgmdb(self):
