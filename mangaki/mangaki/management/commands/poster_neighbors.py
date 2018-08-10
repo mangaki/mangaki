@@ -25,7 +25,7 @@ def create_collage(width, height, poster_ids, stdout):
             im.thumbnail((width, height))
             ims.append(im)
         except FileNotFoundError:
-            stdout.write(f'Poster {poster} not found')
+            stdout.write('Poster {:s} not found'.format(poster))
 
     cols = len(ims)
     collage = Image.new('RGB', (width*cols, height))
