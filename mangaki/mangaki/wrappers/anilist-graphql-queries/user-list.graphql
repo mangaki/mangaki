@@ -1,5 +1,5 @@
-query ($username: String, $mediaType: MediaType, $perPage: Int) {
-  Page(perPage: $perPage) {
+query ($username: String, $mediaType: MediaType, $perPage: Int, $page: Int) {
+  Page(perPage: $perPage, page: $page) {
     pageInfo {
       total
       perPage
