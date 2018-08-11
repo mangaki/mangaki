@@ -226,7 +226,8 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'mosaic_slot_card': '4/sec',
         'mal_import': '3/hour',
-        'anilist_import': '3/hour'
+        'anilist_import': '3/hour',
+        'external_rating_conversion': '10/min'
     }
 }
 

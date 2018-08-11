@@ -19,8 +19,10 @@ from django.db.models.functions import Cast
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 
-from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
-                             CLUSTER_CHOICES, RELATION_TYPE_CHOICES, SUGGESTION_PROBLEM_CHOICES)
+from mangaki.choices import (
+    ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
+    CLUSTER_CHOICES, RELATION_TYPE_CHOICES, SUGGESTION_PROBLEM_CHOICES, RATINGS_MAPPING_CHOICES
+)
 from mangaki.utils.ranking import (TOP_MIN_RATINGS, RANDOM_MIN_RATINGS, RANDOM_MAX_DISLIKES, RANDOM_RATIO,
                                    PEARLS_MIN_RATINGS, PEARLS_MAX_RATINGS, PEARLS_MAX_DISLIKE_RATE)
 from mangaki.utils.dpp import MangakiDPP
@@ -437,6 +439,7 @@ class Profile(models.Model):
     keyboard_shortcuts_enabled = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
+    policy = models.CharField(max_length=64, choices=RATINGS_MAPPING_CHOICES, blank=True, null=True)
 
     def get_anime_count(self):
         return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike', 'favorite']).count()

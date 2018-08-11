@@ -44,12 +44,30 @@ $(document).ready(function () {
       acceptsResearchUsage: window.INITIAL_DATA.acceptsResearchUsage,
       receivesNewsletter: window.INITIAL_DATA.receivesNewsletter,
       enableKbShortcuts: window.INITIAL_DATA.enableKbShortcuts,
+      extRatingPolicy: window.INITIAL_DATA.extRatingPolicy,
+      convertingExternalRatings: window.INITIAL_DATA.convertingExternalRatings,
       deleteAccountModal: false
     },
     beforeUpdate: function () {
       this.updateProfile();
     },
     methods: {
+      convertExtRatings: function () {
+        this.convertingExternalRatings = true;
+        betterFetch(Urls['api-convert-external-ratings'](), {
+          method: 'POST',
+          credentials: 'same-origin'
+        }).then(resp => {
+          if (resp.ok) {
+            this.convertingExternalRatings = false;
+          } else {
+            return Promise.reject(Error(resp))
+          }
+        }).catch(err => {
+          this.convertingExternalRatings = false;
+          console.log('Error while converting ratings', err);
+        });
+      },
       deleteAccount: function () {
         this.deleteAccountModal = false;
         betterFetch(Urls['api-delete-my-account'](), {
@@ -100,7 +118,8 @@ $(document).ready(function () {
           nsfw_ok: this.acceptsNSFW,
           research_ok: this.acceptsResearchUsage,
           newsletter_ok: this.receivesNewsletter,
-          keyboard_shortcuts_enabled: this.enableKbShortcuts
+          keyboard_shortcuts_enabled: this.enableKbShortcuts,
+          policy: this.extRatingPolicy
         };
         betterFetch(Urls['api-update-my-profile'](), {
           method: 'PUT',

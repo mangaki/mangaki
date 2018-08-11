@@ -97,3 +97,9 @@ SORT_MODE_CHOICES = (
     ('random', _('Random')),
     ('alpha', _('A-Z'))
 )
+
+RATINGS_MAPPING_CHOICES = (
+    ("standard", "Standard"),
+    ("strict", "Strict"),
+    ("gentle", "Noble")
+)

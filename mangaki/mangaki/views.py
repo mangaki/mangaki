@@ -39,8 +39,11 @@ from mangaki.choices import (TOP_CATEGORY_CHOICES, WORK_CATEGORY_CHOICES,
                              SORT_MODE_CHOICES)
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
-from mangaki.models import (Artist, Category, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
-                            Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
+from mangaki.models import (
+    Artist, Category, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
+    Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster,
+    UserBackgroundTask
+)
 from mangaki.utils.mal import client
 from mangaki.wrappers.anilist import AniList
 from mangaki.tasks import MALImporter, redis_pool, AniListImporter
@@ -424,6 +427,9 @@ def get_profile(request,
                 'is_available': AniList().is_available and (redis_pool is not None),
                 'pending_import': None if (not is_me) or is_anonymous else anilist_importer.get_current_import_for(request.user)
             },
+            'converting_external_ratings': False if (not is_me) or is_anonymous else (
+                UserBackgroundTask.objects.filter(owner=user, tag='EXTERNAL_RATINGS').exists()
+            ),
             'config': VANILLA_UI_CONFIG_FOR_RATINGS,
             'can_see': can_see,
             'username': request.user.username,
