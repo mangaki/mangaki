@@ -975,7 +975,7 @@ def import_anilist(anilist_username: str, mangaki_username: str,
                 fails.append(user_work.work.title)
 
     ExternalRating.objects.filter(user=user,
-                                  work__in=list(scores.keys()) + list(willsee | wontsee)).delete()
+                                  work__in=list(scores.keys())).delete()
     Rating.objects.filter(user=user,
                           work__in=list(scores.keys()) + list(willsee | wontsee)).delete()
     ratings = []
