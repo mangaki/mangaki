@@ -88,6 +88,7 @@ class Command(BaseCommand):
         subdiv = options['n']
         
         if other_algorithm:
-            print(morphing2(a, b, subdiv))
+            work_ids = morphing2(a, b, subdiv)
         else:
-            print(morphing(a, b, subdiv))
+            work_ids = morphing(a, b, subdiv)
+        self.stdout.write(','.join(str(work_id) for work_id in work_ids))

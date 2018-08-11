@@ -9,6 +9,7 @@ from django.core import management
 from django.conf import settings
 from mangaki.models import Work, Category, Artist
 from mangaki.utils.anidb import AniDB
+from mangaki.wrappers.anilist import AniList
 from mangaki.utils.tokens import compute_token
 
 
@@ -24,7 +25,8 @@ class CommandTest(TestCase):
                         ext_poster='https://mangaki.fr/static/img/favicon.png',
                         category=Category.objects.get(slug='anime'),
                         title='Sangatsu no Lion')
-        self.anime_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
+        self.anidb_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
+        self.anilist_fixture = self.read_fixture('anilist/hibike_euphonium.json')
         self.album = Work.objects.create(
                         vgmdb_aid=22495,
                         category=Category.objects.get(slug='album'),
@@ -38,7 +40,7 @@ class CommandTest(TestCase):
         responses.add(
             responses.GET,
             AniDB.BASE_URL,
-            body=self.anime_fixture,
+            body=self.anidb_fixture,
             status=200,
             content_type='application/xml'
         )
@@ -52,11 +54,24 @@ class CommandTest(TestCase):
         responses.add(
             responses.GET,
             AniDB.BASE_URL,
-            body=self.anime_fixture,
+            body=self.anidb_fixture,
             status=200,
             content_type='application/xml'
         )
         management.call_command('anidb_tags_to_json', self.anime.id,
+                                stdout=self.stdout)
+        self.assertIn('---', self.stdout.getvalue())
+
+    @responses.activate
+    def test_anilist_tags_to_json(self):
+        responses.add(
+            responses.GET,
+            AniList.BASE_URL,
+            body=self.anilist_fixture,
+            status=200,
+            content_type='application/json'
+        )
+        management.call_command('anilist_tags_to_json', self.anime.id,
                                 stdout=self.stdout)
         self.assertIn('---', self.stdout.getvalue())
 
@@ -86,6 +101,18 @@ class CommandTest(TestCase):
         management.call_command('lookup', 'lion', stdout=self.stdout)
         self.assertIn(str(self.anime.id), self.stdout.getvalue())
 
+    def test_morphing1(self):
+        management.call_command('morphing', self.anime.id, 2, stdout=self.stdout)
+        self.assertIn(str(self.anime.id), self.stdout.getvalue())
+
+    def test_morphing2(self):
+        management.call_command('morphing', self.anime.id, 2, '--other', stdout=self.stdout)
+        self.assertIn(str(self.anime.id), self.stdout.getvalue())
+
+    def test_poster_neighbors(self):
+        management.call_command('poster_neighbors', self.anime.id, '--collage', stdout=self.stdout)
+        self.assertIn(str(self.anime.id), self.stdout.getvalue())
+
     def test_ranking(self):
         management.call_command('ranking')
         self.assertTrue(True)
@@ -95,7 +122,7 @@ class CommandTest(TestCase):
         responses.add(
             responses.GET,
             re.compile(r'https://mangaki\.fr/.*'),
-            body=self.anime_fixture,
+            body=self.anidb_fixture,
             status=200,
             content_type='application/xml'
         )
@@ -109,6 +136,10 @@ class CommandTest(TestCase):
                                 stdout=self.stdout)
         self.assertEquals(self.stdout.getvalue(),
                           'DR {:s}\n'.format(compute_token('PEPPER', 'DR')))
+
+    def test_top(self):
+        management.call_command('top', '--all', stdout=self.stdout)
+        self.assertEquals(len(self.stdout.getvalue().splitlines()), 6)
 
     @responses.activate
     def test_vgmdb(self):

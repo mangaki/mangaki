@@ -47,7 +47,9 @@ class Command(BaseCommand):
         self.stdout.write('Number of works : '+str(count)+'\n\n')
 
         for work in works:
-            title_display = work.title.encode('utf8').decode(self.stdout.encoding)
+            title_display = work.title.encode('utf8')
+            if self.stdout.encoding is not None:
+                title_display = title_display.decode(self.stdout.encoding)
             anilist_result = None
 
             # Try to fetch data from AniList with an exponential backoff
