@@ -20,7 +20,7 @@ from django.db.models import QuerySet, Q
 from django.utils.functional import cached_property
 from django.db import transaction
 
-from mangaki.models import Work, Rating, Category, WorkTitle, ExtLanguage, Reference
+from mangaki.models import Work, Rating, Category, WorkTitle, ExtLanguage, Reference, ExternalRating
 
 import logging
 
@@ -566,14 +566,16 @@ def import_mal(mal_username: str, mangaki_username: str,
     # MAL is the source of truth for further imports, rather than our own database of ratings.
     Rating.objects.filter(user=user,
                           work__in=list(scores.keys()) + list(willsee | wontsee)).delete()
-    ratings = []
-    for work_id, score in scores.items():
-        choice = compute_rating_choice_from_mal_score(score)
-        if not choice:
-            raise RuntimeError('No choice was deduced from MAL score!')
+    ExternalRating.objects.filter(
+        user=user,
+        work__in=list(scores.keys())
+    ).delete()
 
-        rating = Rating(user=user, choice=choice, work_id=work_id)
-        ratings.append(rating)
+    ratings = []
+    ext_ratings = []
+    for work_id, score in scores.items():
+        rating = ExternalRating(user=user, value=float(score), work_id=work_id)
+        ext_ratings.append(rating)
 
     for work_id in willsee:
         rating = Rating(
@@ -592,5 +594,6 @@ def import_mal(mal_username: str, mangaki_username: str,
         ratings.append(rating)
 
     Rating.objects.bulk_create(ratings)
+    ExternalRating.objects.bulk_create(ext_ratings)
 
-    return len(ratings), fails
+    return len(ratings) + len(ext_ratings), fails
