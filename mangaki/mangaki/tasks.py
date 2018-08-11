@@ -106,7 +106,7 @@ class BaseImporter:
     def start(self, task: Task, mangaki_username: str, *user_arguments):
         r = redis.StrictRedis(connection_pool=redis_pool)
 
-        user = User.objects.get(username=mangaki_username)
+        user = User.objects.select_related('profile__policy').get(username=mangaki_username)
         if user.background_tasks.filter(tag=self.tag()).exists():
             logger.debug('[{}] {} import already in progress. Ignoring.'.format(user,
                                                                                 self.name))
@@ -119,6 +119,7 @@ class BaseImporter:
         try:
             update_cb = functools.partial(self._update_details_cb, r, task.request)
             self.run(mangaki_username, update_cb, *user_arguments)
+            convert_external_ratings.delay()
         except IntegrityError:
             logger.exception('{} import failed due to integrity error'.format(self.name))
         finally:
