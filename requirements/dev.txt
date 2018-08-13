@@ -8,6 +8,8 @@ flake8
 tensorflow
 fastFM
 pywFM
+surprise
+git+https://github.com/maciejkula/spotlight
 typing
 # Linting
 git-lint
