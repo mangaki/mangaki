@@ -62,7 +62,7 @@
 
 - name: Ensure debug-mode dependencies are installed.
   pip:
-    requirements: '{{ mangaki_source_package }}/../requirements/dev.txt'
+    requirements: '{{ mangaki_source_package }}../requirements/dev.txt'
     virtualenv: '{{ mangaki_source_venv_path }}'
   when: 'mangaki_source_debug|bool'
   become: true

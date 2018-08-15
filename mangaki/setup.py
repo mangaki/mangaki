@@ -23,6 +23,7 @@ setup(
         'scipy',
         'pandas',
         'fastFM',
+        'surprise',
         'typing>=3.6,<4',
         'tensorflow>=1.1.0,<1.2',
         'raven>=6.1.0,<7',
