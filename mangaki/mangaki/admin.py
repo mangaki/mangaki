@@ -18,7 +18,7 @@ from mangaki.models import (
     ExtLanguage, WorkCluster,
     UserBackgroundTask,
     ActionType,
-    scan_workcluster
+    get_field_changeset
 )
 from mangaki.utils.anidb import AniDBTag, client, diff_between_anidb_and_local_tags
 from mangaki.utils.db import get_potential_posters
@@ -65,17 +65,16 @@ def handle_merge_errors(response, request, final_work, nb_merged,
 
 
 def create_merge_form(works_to_merge_qs):
-    field_changeset = scan_workcluster(works_to_merge_qs)
+    work_dicts_to_merge = list(works_to_merge_qs.values())
+    field_changeset = get_field_changeset(work_dicts_to_merge)
 
     fields_to_choose = []
     fields_required = []
     template_rows = []
 
-    # difficulty = 0
     suggestions = {}
-    for field, choices, action, suggested, difficulty_field in field_changeset:
+    for field, choices, action, suggested, _ in field_changeset:
         suggestions[field] = suggested
-        # difficulty += difficulty_field
         template_rows.append({
             'field': field,
             'choices': choices,
@@ -91,8 +90,8 @@ def create_merge_form(works_to_merge_qs):
             fields_required.append(field)
 
     template_rows.sort(key=lambda row: int(row['action_type']), reverse=True)
-    rating_samples = []#(Rating.objects.filter(work_id=work_dict['id']).count(),
-                       #Rating.objects.filter(work_id=work_dict['id'])[:10]) for work_dict in work_dicts_to_merge]  # FIXME: too many queries
+    rating_samples = [(Rating.objects.filter(work_id=work_dict['id']).count(),
+                       Rating.objects.filter(work_id=work_dict['id'])[:10]) for work_dict in work_dicts_to_merge]  # FIXME: too many queries
     return fields_to_choose, fields_required, template_rows, rating_samples, suggestions
 
 
@@ -550,7 +549,8 @@ class WorkClusterAdmin(admin.ModelAdmin):
 
     def get_difficulty(self, obj):
         works_to_merge_qs = obj.works.order_by('id').prefetch_related('rating_set', 'genre')
-        field_changeset = scan_workcluster(works_to_merge_qs)
+        work_dicts_to_merge = list(works_to_merge_qs.values())
+        field_changeset = get_field_changeset(work_dicts_to_merge)
         difficulty = sum(data[4] for data in field_changeset)
         return difficulty
 

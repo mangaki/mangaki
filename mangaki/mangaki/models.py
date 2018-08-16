@@ -491,9 +491,13 @@ class Evidence(models.Model):
             self.suggestion.pk
         )
 
-UNK_VALUES = {'Inconnu', ''}
+UNKNOWN_VALUES = {
+    'anidb_aid': {0},
+    'editor_id': {1},
+    'studio_id': {1}
+}
 
-def not_empty_field(field):
+def not_empty_field(choice, field=None):
     """
     Test if a work field is not empty, i.e. None or value in default unknown values.
 
@@ -510,9 +514,14 @@ def not_empty_field(field):
     False
     >>> not_empty_field('anime')
     True
-
+    >>> not_empty_field(1, 'studio_id')
+    False
+    >>> not_empty_field(0, 'anidb_aid')
+    False
     """
-    return field is not None and field not in UNK_VALUES
+    return (choice is not None and
+            choice not in {'Inconnu', ''} and
+            choice not in UNKNOWN_VALUES.get(field, []))
 
 PRECOMPUTED_FIELDS = {'sum_ratings',
                       'nb_ratings',
@@ -527,22 +536,17 @@ class ActionType(IntEnum):
     JUST_CONFIRM = 1
     CHOICE_REQUIRED = 2
 
-def scan_workcluster(works_to_merge_qs):
-    work_dicts_to_merge = list(works_to_merge_qs.values())
-    return get_field_changeset(work_dicts_to_merge)
-
 def get_field_changeset(works):
     rows = defaultdict(list)
     for work in works:
         for field in work:
             rows[field].append(work[field])
 
-    # strip_protocol = re.compile(r'https?://')
     for field, choices in rows.items():
         difficulty = 0
         suggested = None
 
-        filtered_choices = list(set(filter(not_empty_field, choices)))
+        filtered_choices = list(set(filter(lambda choice: not_empty_field(choice, field), choices)))
 
         if field == 'id':
             action = ActionType.JUST_CONFIRM
@@ -557,10 +561,6 @@ def get_field_changeset(works):
         elif len(filtered_choices) == 1:
             action = ActionType.JUST_CONFIRM
             suggested = filtered_choices[0]
-        # elif field == 'ext_poster' and all(strip_protocol.sub('', choice) == strip_protocol.sub('', choices[0]) for choice in choices):
-        #     difficulty = 0.1
-        #     action = ActionType.JUST_CONFIRM
-        #     suggested = 'https://' + strip_protocol.sub('', choices[0])  # HTTPS has priority
         elif field == 'ext_poster':
             difficulty = 0.5
             action = ActionType.JUST_CONFIRM
@@ -570,6 +570,9 @@ def get_field_changeset(works):
             action = ActionType.CHOICE_REQUIRED
         elif field == 'date':
             difficulty = 1000
+            action = ActionType.CHOICE_REQUIRED
+        elif field == 'category_id':
+            difficulty = 10000
             action = ActionType.CHOICE_REQUIRED
         else:
             difficulty = 1
@@ -590,7 +593,8 @@ class WorkCluster(models.Model):
 
     def get_difficulty(self):
         works_to_merge_qs = self.works.order_by('id').prefetch_related('rating_set', 'genre')
-        field_changeset = scan_workcluster(works_to_merge_qs)
+        work_dicts_to_merge = list(works_to_merge_qs.values())
+        field_changeset = get_field_changeset(work_dicts_to_merge)
         difficulty = sum(data[4] for data in field_changeset)
         return difficulty
 
