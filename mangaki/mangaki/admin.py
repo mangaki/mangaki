@@ -16,7 +16,9 @@ from mangaki.models import (
     Role, Staff, FAQTheme,
     FAQEntry, ColdStartRating, Trope, Language,
     ExtLanguage, WorkCluster,
-    UserBackgroundTask
+    UserBackgroundTask,
+    ActionType,
+    scan_workcluster
 )
 from mangaki.utils.anidb import AniDBTag, client, diff_between_anidb_and_local_tags
 from mangaki.utils.db import get_potential_posters
@@ -24,7 +26,7 @@ from mangaki.utils.db import get_potential_posters
 from collections import defaultdict
 from enum import Enum
 
-from mangaki.utils.work_merge import WorkClusterMergeHandler, field_changeset, ActionType
+from mangaki.utils.work_merge import WorkClusterMergeHandler
 
 ActionTypeColors = {
     ActionType.DO_NOTHING: 'black',  # INFO_ONLY
@@ -60,20 +62,20 @@ def handle_merge_errors(response, request, final_work, nb_merged,
                                  .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
 
 
+
+
 def create_merge_form(works_to_merge_qs):
-    work_dicts_to_merge = list(works_to_merge_qs.values())
-    rows = defaultdict(list)
-    for work_dict in work_dicts_to_merge:
-        for field in work_dict:
-            rows[field].append(work_dict[field])
+    field_changeset = scan_workcluster(works_to_merge_qs)
 
     fields_to_choose = []
     fields_required = []
     template_rows = []
 
-    difficulty = 0
-    for field, choices, action, suggested, difficulty_field in field_changeset(work_dicts_to_merge):
-        difficulty += difficulty_field
+    # difficulty = 0
+    suggestions = {}
+    for field, choices, action, suggested, difficulty_field in field_changeset:
+        suggestions[field] = suggested
+        # difficulty += difficulty_field
         template_rows.append({
             'field': field,
             'choices': choices,
@@ -89,34 +91,56 @@ def create_merge_form(works_to_merge_qs):
             fields_required.append(field)
 
     template_rows.sort(key=lambda row: int(row['action_type']), reverse=True)
-    rating_samples = [(Rating.objects.filter(work_id=work_dict['id']).count(),
-                       Rating.objects.filter(work_id=work_dict['id'])[:10]) for work_dict in work_dicts_to_merge]  # FIXME: too many queries
-    return fields_to_choose, fields_required, template_rows, rating_samples, difficulty
+    rating_samples = []#(Rating.objects.filter(work_id=work_dict['id']).count(),
+                       #Rating.objects.filter(work_id=work_dict['id'])[:10]) for work_dict in work_dicts_to_merge]  # FIXME: too many queries
+    return fields_to_choose, fields_required, template_rows, rating_samples, suggestions
 
 
 @transaction.atomic  # In case trouble happens
-def merge_works(request, selected_queryset):
+def merge_works(request, selected_queryset, force=False):
+    user = request.user if request else None
     if selected_queryset.model == WorkCluster:  # Author is reviewing an existing WorkCluster
         from_cluster = True
         cluster = selected_queryset.first()
         works_to_merge_qs = cluster.works.order_by('id').prefetch_related('rating_set', 'genre')
     else:  # Author is merging those works from a Work queryset
         from_cluster = False
-        works_to_merge_qs = selected_queryset.prefetch_related('rating_set', 'genre')
+        works_to_merge_qs = selected_queryset.order_by('id').prefetch_related('rating_set', 'genre')
     nb_works_to_merge = works_to_merge_qs.count()
 
-    if request.POST.get('confirm'):  # Merge has been confirmed
+    if request and request.POST.get('confirm'):  # Merge has been confirmed
+        rich_context = request.POST
+    else:
+        fields_to_choose, fields_required, template_rows, rating_samples, suggestions = create_merge_form(works_to_merge_qs)
+        context = {
+            'fields_to_choose': ','.join(fields_to_choose),
+            'fields_required': ','.join(fields_required),
+            'template_rows': template_rows,
+            'rating_samples': rating_samples,
+            'queryset': selected_queryset,
+            'opts': Work._meta if not from_cluster else WorkCluster._meta,
+            'action': 'merge' if not from_cluster else 'trigger_merge',
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
+        }
+        if all(field in suggestions for field in fields_required):
+            rich_context = dict(context)
+            for field in suggestions:
+                rich_context[field] = suggestions[field]
+            if force:
+                rich_context['confirm'] = True
+
+    if rich_context.get('confirm'):  # Merge has been confirmed
         works_to_merge = list(works_to_merge_qs)
         if not from_cluster:
-            cluster = WorkCluster(user=request.user, checker=request.user)
+            cluster = WorkCluster(user=user, checker=user)
             cluster.save()  # Otherwise we cannot add works
             cluster.works.add(*works_to_merge)
 
         # Happens when no ID was provided
-        if not request.POST.get('id'):
+        if not rich_context.get('id'):
             return None, None, MergeErrors.NO_ID
 
-        final_id = int(request.POST.get('id'))
+        final_id = int(rich_context.get('id'))
         final_work = Work.objects.get(id=final_id)
 
         # Notice how `cluster` always exist in this scope.
@@ -127,33 +151,22 @@ def merge_works(request, selected_queryset):
                                                 final_work)
 
         missing_required_fields = merge_handler.overwrite_fields(
-            set(filter(None, request.POST.get('fields_to_choose').split(','))),
-            set(filter(None, request.POST.get('fields_required').split(','))),
-            request.POST)
+            set(filter(None, rich_context.get('fields_to_choose').split(','))),
+            set(filter(None, rich_context.get('fields_required').split(','))),
+            rich_context)
 
         # Happens when a required field was left empty
         if missing_required_fields:
             return None, missing_required_fields, MergeErrors.FIELDS_MISSING
 
         merge_handler.perform_redirections()
-        merge_handler.accept_cluster(request.user)
+        merge_handler.accept_cluster(user)
         return len(works_to_merge), merge_handler.target_work, None
 
     # Just show a warning if only one work was checked
     if nb_works_to_merge < 2:
         return None, None, MergeErrors.NOT_ENOUGH_WORKS
 
-    fields_to_choose, fields_required, template_rows, rating_samples, difficulty = create_merge_form(works_to_merge_qs)
-    context = {
-        'fields_to_choose': ','.join(fields_to_choose),
-        'fields_required': ','.join(fields_required),
-        'template_rows': template_rows,
-        'rating_samples': rating_samples,
-        'queryset': selected_queryset,
-        'opts': Work._meta if not from_cluster else WorkCluster._meta,
-        'action': 'merge' if not from_cluster else 'trigger_merge',
-        'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME
-    }
     return nb_works_to_merge, None, TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
 
 logger = logging.getLogger(__name__)
@@ -508,6 +521,7 @@ class TaggedWorkAdmin(admin.ModelAdmin):
 @admin.register(WorkCluster)
 class WorkClusterAdmin(admin.ModelAdmin):
     list_display = ('user', 'get_work_titles', 'resulting_work', 'reported_on', 'merged_on', 'checker', 'status', 'get_difficulty')
+    list_filter = ('status',)
     list_select_related = ('user', 'resulting_work', 'checker')
     raw_id_fields = ('user', 'works', 'checker', 'resulting_work')
     actions = ('trigger_merge', 'reject')
@@ -536,7 +550,8 @@ class WorkClusterAdmin(admin.ModelAdmin):
 
     def get_difficulty(self, obj):
         works_to_merge_qs = obj.works.order_by('id').prefetch_related('rating_set', 'genre')
-        _, _, _, _, difficulty = create_merge_form(works_to_merge_qs)
+        field_changeset = scan_workcluster(works_to_merge_qs)
+        difficulty = sum(data[4] for data in field_changeset)
         return difficulty
 
     def get_work_titles(self, obj):

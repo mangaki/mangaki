@@ -1,5 +1,3 @@
-from collections import defaultdict
-from enum import IntEnum
 from typing import List
 import re
 
@@ -42,92 +40,6 @@ def is_param_null(param):
 
     """
     return param == 'None' or (not param) or param is None
-
-
-UNK_VALUES = {'Inconnu', ''}
-
-
-def is_empty_field(field):
-    """
-    Test if a work field is empty, i.e. None or value in default unknown values.
-
-    Args:
-        field (Any): value of the field
-
-    Returns: True if empty, False otherwise.
-
-    >>> is_empty_field('Inconnu')
-    True
-    >>> is_empty_field('')
-    True
-    >>> is_empty_field(None)
-    True
-    >>> is_empty_field('anime')
-    False
-
-    """
-    return field is None or field in UNK_VALUES
-
-
-PRECOMPUTED_FIELDS = {'sum_ratings',
-                      'nb_ratings',
-                      'nb_likes',
-                      'nb_dislikes',
-                      'controversy',
-                      'title_search',
-                      'redirect_id'}
-
-
-class ActionType(IntEnum):
-    DO_NOTHING = 0
-    JUST_CONFIRM = 1
-    CHOICE_REQUIRED = 2
-
-
-def field_changeset(works):
-    rows = defaultdict(list)
-
-    for work in works:
-        for field in work:
-            rows[field].append(work[field])
-
-    strip_protocol = re.compile(r'https?://')
-    for field, choices in rows.items():
-        difficulty = 0
-        suggested = None
-
-        if field == 'id':
-            action = ActionType.JUST_CONFIRM
-            suggested = min(int(choice) for choice in choices)
-        elif field in PRECOMPUTED_FIELDS:
-            action = ActionType.DO_NOTHING
-        # All mostly None
-        elif all(is_empty_field(choice) for choice in choices):
-            action = ActionType.JUST_CONFIRM
-            suggested = None
-        # Equality on all values.
-        elif all(choice == choices[0] for choice in choices):
-            action = ActionType.JUST_CONFIRM
-            suggested = choices[0]
-        # All but one field empty.
-        elif sum(is_empty_field(choice) for choice in choices) == len(choices) - 1:
-            action = ActionType.JUST_CONFIRM
-            suggested = [choice for choice in choices if not is_empty_field(choice)][0]
-        elif field == 'ext_poster' and all(strip_protocol.sub('', choice) == strip_protocol.sub('', choices[0]) for choice in choices):
-            difficulty = 0.5
-            action = ActionType.JUST_CONFIRM
-            suggested = 'https://' + strip_protocol.sub('', choices[0])  # HTTPS has priority
-        elif field == 'source':
-            difficulty = 100
-            action = ActionType.CHOICE_REQUIRED
-        elif field == 'date':
-            difficulty = 1000
-            action = ActionType.CHOICE_REQUIRED
-        else:
-            difficulty = 1
-            action = ActionType.CHOICE_REQUIRED
-
-        yield (field, choices, action, suggested, difficulty)
 
 
 class WorkClusterMergeHandler:

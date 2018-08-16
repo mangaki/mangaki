@@ -1,7 +1,9 @@
 # coding=utf-8
 import os.path
 import tempfile
+from enum import IntEnum
 from urllib.parse import urlparse
+from collections import defaultdict
 
 import requests
 from django.conf import settings
@@ -489,6 +491,92 @@ class Evidence(models.Model):
             self.suggestion.pk
         )
 
+UNK_VALUES = {'Inconnu', ''}
+
+def not_empty_field(field):
+    """
+    Test if a work field is not empty, i.e. None or value in default unknown values.
+
+    Args:
+        field (Any): value of the field
+
+    Returns: False if empty, True otherwise.
+
+    >>> not_empty_field('Inconnu')
+    False
+    >>> not_empty_field('')
+    False
+    >>> not_empty_field(None)
+    False
+    >>> not_empty_field('anime')
+    True
+
+    """
+    return field is not None and field not in UNK_VALUES
+
+PRECOMPUTED_FIELDS = {'sum_ratings',
+                      'nb_ratings',
+                      'nb_likes',
+                      'nb_dislikes',
+                      'controversy',
+                      'title_search',
+                      'redirect_id'}
+
+class ActionType(IntEnum):
+    DO_NOTHING = 0
+    JUST_CONFIRM = 1
+    CHOICE_REQUIRED = 2
+
+def scan_workcluster(works_to_merge_qs):
+    work_dicts_to_merge = list(works_to_merge_qs.values())
+    return get_field_changeset(work_dicts_to_merge)
+
+def get_field_changeset(works):
+    rows = defaultdict(list)
+    for work in works:
+        for field in work:
+            rows[field].append(work[field])
+
+    # strip_protocol = re.compile(r'https?://')
+    for field, choices in rows.items():
+        difficulty = 0
+        suggested = None
+
+        filtered_choices = list(set(filter(not_empty_field, choices)))
+
+        if field == 'id':
+            action = ActionType.JUST_CONFIRM
+            suggested = min(int(choice) for choice in choices)
+        elif field in PRECOMPUTED_FIELDS:
+            action = ActionType.DO_NOTHING
+        # All mostly None
+        elif len(filtered_choices) == 0:
+            action = ActionType.JUST_CONFIRM
+            suggested = 'Inconnu' if 'Inconnu' in choices else None
+        # Only one choice if we remove all empty choices
+        elif len(filtered_choices) == 1:
+            action = ActionType.JUST_CONFIRM
+            suggested = filtered_choices[0]
+        # elif field == 'ext_poster' and all(strip_protocol.sub('', choice) == strip_protocol.sub('', choices[0]) for choice in choices):
+        #     difficulty = 0.1
+        #     action = ActionType.JUST_CONFIRM
+        #     suggested = 'https://' + strip_protocol.sub('', choices[0])  # HTTPS has priority
+        elif field == 'ext_poster':
+            difficulty = 0.5
+            action = ActionType.JUST_CONFIRM
+            suggested = filtered_choices[-1]
+        elif field == 'source':
+            difficulty = 100
+            action = ActionType.CHOICE_REQUIRED
+        elif field == 'date':
+            difficulty = 1000
+            action = ActionType.CHOICE_REQUIRED
+        else:
+            difficulty = 1
+            action = ActionType.CHOICE_REQUIRED
+
+        yield (field, choices, action, suggested, difficulty)
+
 
 class WorkCluster(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -500,8 +588,14 @@ class WorkCluster(models.Model):
     merged_on = models.DateTimeField(blank=True, null=True)
     origin = models.ForeignKey(Suggestion, related_name='origin_suggestion', on_delete=models.CASCADE, blank=True, null=True)
 
+    def get_difficulty(self):
+        works_to_merge_qs = self.works.order_by('id').prefetch_related('rating_set', 'genre')
+        field_changeset = scan_workcluster(works_to_merge_qs)
+        difficulty = sum(data[4] for data in field_changeset)
+        return difficulty
+
     def __str__(self):
-        return 'WorkCluster ({})'.format(', '.join(self.works))
+        return 'WorkCluster ({})'.format(', '.join(str(work) for work in self.works.all()))
 
 
 class Announcement(models.Model):
