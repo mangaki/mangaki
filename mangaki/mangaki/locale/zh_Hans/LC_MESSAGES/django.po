@@ -1,0 +1,419 @@
+# This file was generated from test2.xlsx
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2018-08-17 20:23+0900\n"
+"Language: zh-hans\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: xls-to-po 1.0\n"
+
+msgid "Directors"
+msgstr "董事"
+
+msgid "Authors"
+msgstr "作者"
+
+msgid "Composers"
+msgstr "作曲家"
+
+msgid "Français"
+msgstr "法语"
+
+msgid "English"
+msgstr "英语"
+
+msgid "日本語"
+msgstr "日本语"
+
+msgid "中文"
+msgstr "中文"
+
+msgid "What series should you watch next?"
+msgstr "什么系列，你应该看未来？"
+
+msgid ""
+"Mangaki est un <strong>site de recommandation de mangas et d'anime</strong> "
+"créé par une association."
+msgstr "Mangaki EST未<strong>网站德recommandation德曼加斯等D'动画</强> CREE帕UNE关联。"
+
+msgid ""
+"À partir des séries que vous avez vues ou lues, <strong>notre "
+"algorithme</strong> détermine de nouvelles pépites susceptibles de vous "
+"plaire&nbsp;!"
+msgstr ""
+"Àpartir DES系列阙VOUS avez VUES OU梅毒，的<strong>巴黎algorithme "
+"</强>确定德新生力量pépites易感德VOUS plaire＆NBSP ;!"
+
+msgid ""
+"Si vous souhaitez participer à l'aventure, il y a plein de choses à "
+"faire&nbsp;!"
+msgstr "硅VOUS souhaitez PARTICIPER A L'艳遇，IL Y A PLEIN日的动产à放任＆NBSP ;!"
+
+msgid "Nous contacter"
+msgstr "奴斯接触器"
+
+msgid "Consulter le wiki"
+msgstr "咨询者乐维基"
+
+msgid "Voir le code sur GitHub"
+msgstr "案中案勒代码GitHub的河畔"
+
+msgid "Découvrez la data science à travers Mangaki"
+msgstr "DécouvrezLA数据科学特拉弗斯Mangaki"
+
+msgid ""
+"Notre algorithme est open source, donc vous pouvez l'étudier, et proposer "
+"des améliorations."
+msgstr "巴黎algorithme EST开源，donc VOUS pouvez L'étudier等提议者DES改良剂。"
+
+msgid ""
+"Connaissez-vous ces termes&nbsp;: plus proches voisins, décomposition en "
+"valeurs singulières, prix Netflix, autoencodeur&nbsp;? "
+msgstr ""
+"Connaissez-VOUS CES TERMES＆NBSP;：加proches的Voisins，分解EN "
+"valeurssingulières，大奖赛的Netflix，autoencodeur＆NBSP;？"
+
+msgid "Venez apprendre tout cela sur le repo ou dans l'asso."
+msgstr "Venez apprendre兜售CELA河畔乐回购欧丹斯欧莱雅ASSO。"
+
+msgid "Consulter le blog"
+msgstr "咨询者乐博客"
+
+msgid "Account Deleted"
+msgstr "帐户已删除"
+
+msgid "Account deleted!"
+msgstr "帐户删除！"
+
+msgid "Confirm E-mail Address"
+msgstr "确认电子邮箱地址"
+
+msgid ""
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
+"address for user %(user_display)s."
+msgstr "请确认<a href=\"mailto:%(email)s\">％（电子邮件）■</a>是一个电子邮件地址的用户％（user_display）秒。"
+
+msgid "Confirm"
+msgstr "确认"
+
+msgid ""
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+msgstr "该E-mail确认链接过期或无效。请<a href=\"%(email_url)s\">发出新的电子邮件确认申请</a>。"
+
+msgid "Sign In"
+msgstr "签到"
+
+msgid ""
+"Please sign in with one\n"
+"of your existing third party accounts. Or, <a href=\"%(signup_url)s\">sign up</a>\n"
+"for a %(site_name)s account and sign in below:"
+msgstr ""
+"请登录|注册\n"
+"您现有的第三方账户。或者，<a href=\"%(signup_url)s\">注册</a>\n"
+"为％（SITE_NAME）的帐户和从下面登录："
+
+msgid "or"
+msgstr "要么"
+
+msgid ""
+"If you have not created an account yet, then please\n"
+"<a href=\"%(signup_url)s\">sign up</a> first."
+msgstr ""
+"如果您尚未创建一个帐户，然后请\n"
+"<a href=\"%(signup_url)s\">第一注册</a>。"
+
+msgid "Forgot Password?"
+msgstr "忘记密码？"
+
+msgid "Sign Out"
+msgstr "登出"
+
+msgid "Are you sure you want to sign out?"
+msgstr "您确定要退出吗？"
+
+msgid "Password Reset"
+msgstr "重设密码"
+
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll send you"
+" an e-mail allowing you to reset it."
+msgstr "忘记了你的密码？请在下面输入您的E-mail地址，我们会向您发送一封电子邮件，让您重置。"
+
+msgid "Reset My Password"
+msgstr "重置我的密码"
+
+msgid "Please contact us if you have any trouble resetting your password."
+msgstr "如果您有重置密码的任何问题，请联系我们。"
+
+msgid ""
+"We have sent you an e-mail. Please contact us if you do not receive it "
+"within a few minutes."
+msgstr "我们已经向您发出一封电子邮件。请联系我们，如果你没有在几分钟之内收到它。"
+
+msgid "Change Password"
+msgstr "更改密码"
+
+msgid "Bad Token"
+msgstr "坏令牌"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
+"reset</a>."
+msgstr "密码重置链接是无效的，可能是因为它已经被使用。请申请一个<a href=\"%(passwd_reset_url)s\">新的密码重置</A>。"
+
+msgid "change password"
+msgstr "更改密码"
+
+msgid "Your password is now changed."
+msgstr "您的密码现已更改。"
+
+msgid "Signup"
+msgstr "注册"
+
+msgid "Home"
+msgstr "家"
+
+msgid "Yes, I'm sure"
+msgstr "是，我确定"
+
+msgid "No, take me back"
+msgstr "不，我回来"
+
+msgid "Mangaki is an anime & manga recommendation website"
+msgstr "Mangaki是动画和漫画推荐网站"
+
+msgid "Open the menu"
+msgstr "打开菜单"
+
+msgid "What is Mangaki?"
+msgstr "什么是Mangaki？"
+
+msgid "Anime"
+msgstr "动漫"
+
+msgid "Mangas"
+msgstr "曼加斯"
+
+msgid "Recommendations"
+msgstr "建议"
+
+msgid "Top 20"
+msgstr "前20名"
+
+msgid "Suggestions"
+msgstr "建议"
+
+msgid "Log in"
+msgstr "登录"
+
+msgid ""
+"\n"
+"                                Welcome, <strong>%(user)s</strong>!\n"
+"                                "
+msgstr ""
+"\n"
+"                                欢迎，的<strong>％（用户）类</强>！\n"
+"                                "
+
+msgid "Log out"
+msgstr "登出"
+
+msgid ""
+"You rated a few works anonymously, you can see them, don't forget to "
+"subscribe to save them!"
+msgstr "您的评价几个匿名的作品，你可以看到他们，不要忘记订阅来拯救他们！"
+
+msgid "Mangaki project"
+msgstr "Mangaki项目"
+
+msgid "FAQ"
+msgstr "常问问题"
+
+msgid "Legal mentions"
+msgstr "相关法律"
+
+msgid "Guidelines"
+msgstr "方针"
+
+msgid "Blog"
+msgstr "博客"
+
+msgid "Contact us"
+msgstr "联系我们"
+
+msgid "Report a bug"
+msgstr "报告bug"
+
+msgid "Donate"
+msgstr "捐"
+
+msgid "Version:"
+msgstr "版："
+
+msgid "Liste des suggestions"
+msgstr "清单当然德建议"
+
+msgid "Access to the NSFW grid"
+msgstr "访问NSFW电网"
+
+msgid "Mangaki, anime and manga recommendation"
+msgstr "Mangaki，动画和漫画推荐"
+
+msgid "Rate your favorite series and discover new ones!"
+msgstr "给您喜爱的系列，并发现新的！"
+
+msgid "I prefer anime"
+msgstr "我喜欢动漫"
+
+msgid "I prefer manga"
+msgstr "我更喜欢漫画"
+
+msgid "Artists"
+msgstr "艺术家"
+
+msgid "Hint: You can press Enter to trigger the search"
+msgstr "提示：您可以按Enter键触发搜索"
+
+msgid ""
+"Here are some recommendations that you might like.<br /> Rate them and "
+"reload to get new ones."
+msgstr "下面是一些你可能会喜欢的建议。<br />评价他们，并重新加载以获取新的。"
+
+msgid "All"
+msgstr "所有"
+
+msgid "Anime only"
+msgstr "仅动漫"
+
+msgid "Manga only"
+msgstr "只有漫画"
+
+msgid ""
+"I want new recommendations! <br class=\"visible-xs\">(After you rate those.)"
+msgstr "我想新的建议！ <br class=\"visible-xs\">（后您的评分。）"
+
+msgid "To receive recommandations, you should at least <a href=\\"
+msgstr "要接收recommandations，你至少应该的<a href = \\"
+
+msgid "Cheatsheet for key shortcuts"
+msgstr "为的cheatsheet快捷键"
+
+msgid "Moves"
+msgstr "移动"
+
+msgid ""
+"Rate a few cards below, or using the search bar.<br /> Then click <a "
+"class=\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what "
+"<em>Mangaki</em> recommends!"
+msgstr ""
+"为一些卡的下方，或者使用搜索栏。<br />然后点击<a class=\"alert-link\" "
+"href=\"%(reco_url)s\">建议</a>来看看的<em> Mangaki < / em>的建议！"
+
+msgid ""
+"New on Mangaki? Start rating some works below! Then see your "
+"recommendations, and <a "
+"href=\"%(signup_url)s?next=%(request.get_full_path|urlencode)s\">sign up</a>"
+" to keep your ratings."
+msgstr ""
+"新上Mangaki？开始评分低于一些作品！然后看到你的建议，并<a "
+"href=\"%(signup_url)s?next=%(request.get_full_path|urlencode)s\">注册以保证您的评级。"
+
+msgid "Anime only</a>"
+msgstr "动漫仅</A>"
+
+msgid "Mosaic"
+msgstr "镶嵌"
+
+msgid "Recent"
+msgstr "最近"
+
+msgid "Top"
+msgstr "最佳"
+
+msgid "Popular"
+msgstr "流行"
+
+msgid "Pearls"
+msgstr "珍珠"
+
+msgid "Controversial"
+msgstr "争论的"
+
+msgid "Random"
+msgstr "随机"
+
+msgid "Alpha"
+msgstr "Α"
+
+msgid ""
+"Enter the title of some %(category)s (currently %(objects_count)s works)\""
+msgstr "输入的某些％（类别）S（当前％（objects_count）的作品）的标题”"
+
+msgid "Hint: press Enter to trigger the search"
+msgstr "提示：按Enter键触发搜索"
+
+msgid "Get recommendations now"
+msgstr "现在获取建议"
+
+msgid "See more…"
+msgstr "查看更多…"
+
+msgid "Your ratings"
+msgstr "您的评分"
+
+msgid "Signup to save them"
+msgstr "注册拯救他们"
+
+msgid "Inscrit depuis %(member_days)s jours"
+msgstr "Inscrit depuis％（member_days）■JOURS"
+
+msgid "Account Connections"
+msgstr "帐户连接"
+
+msgid ""
+"You can sign in to your account using any of the following third party "
+"accounts:"
+msgstr "您可以登录到使用下列任何第三方账户的您的帐户："
+
+msgid "Remove"
+msgstr "去掉"
+
+msgid ""
+"You currently have no social network accounts connected to this account."
+msgstr "您目前没有连接到这个帐户没有社交网络帐户。"
+
+msgid "Add a 3rd Party Account"
+msgstr "添加第三方帐号"
+
+msgid "Sign Up"
+msgstr "注册"
+
+msgid ""
+" Vous êtes sur le point d'utiliser votre compte %(provider_name)s pour vous connecter à\n"
+"%(site_name)s. Pour terminer, veuillez compléter le formulaire suivant:"
+msgstr ""
+" VOUS ETES河畔乐德点utiliser VOTRE孔特％（PROVIDER_NAME）■倒VOUS连接器à\n"
+"％（SITE_NAME）秒。倒入terminer，veuillez完成者乐formulaire suivant："
+
+msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
+msgstr "顶部％（大小）的％S（类别）S于Mangaki在％（日）■"
+
+msgid "Love"
+msgstr "爱"
+
+msgid "Like"
+msgstr "喜欢"
+
+msgid "Neutral"
+msgstr "中性"
+
+msgid "Dislike"
+msgstr "反感"
+
+msgid "Wanna see"
+msgstr "想看"
+
+msgid "Don't want to see"
+msgstr "不想看"

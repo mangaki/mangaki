@@ -258,7 +258,8 @@ LANGUAGES = [
     ('fr', _('Français')),
     ('en', _('English')),
     ('ja', _('日本語')),
-    ('zh-hant', _('中文'))
+    ('zh-hans', _('简体中文')),
+    ('zh-hant', _('繁體中文'))
 ]
 TIME_ZONE = 'UTC'
 USE_I18N = True
