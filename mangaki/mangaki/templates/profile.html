@@ -21,11 +21,20 @@
                 <h1>{{ profile.username }}</h1>
             {% else %}
                 <h1>{% trans "Your ratings" %}</h1>
-                <h2>{% trans "Signup to save them" %}</h2>
+                {% url 'account_signup' as signup_url %}
+                <h2>
+                    {% blocktrans %}
+                    <a href="{{ signup_url }}">Signup</a> to save them
+                    {% endblocktrans %}
+                </h2>
             {% endif %}
 
             {% if profile.member_days %}
-                <p>{% blocktrans with member_days=profile.member_days %}Inscrit depuis {{ member_days }} jours{% endblocktrans %}</p>
+                <p>
+                    {% blocktrans with member_days=profile.member_days %}
+                    Subscribed since {{ member_days }} days
+                    {% endblocktrans %}
+                </p>
             {% endif %}
         </div>
         <div class="col-xs-4 col-lg-4">
@@ -33,12 +42,12 @@
                 <ul class="nav nav-tabs">
                     <li role="presentation" {% if meta.profile_section == 'works' %} class="active" {% endif %}>
                         <a href="{% url 'profile-works' profile.username meta.category|default:"anime" meta.status|default:"seen" %}">
-                            Mes œuvres
+                            {% trans "Rated works" %}
                         </a>
                     </li>
                     <li role="presentation" {% if meta.profile_section == 'preferences' %} class="active" {% endif %}>
                         <a href="{% url 'profile-preferences' profile.username %}">
-                            Mes préférences
+                            {% trans "My settings" %}
                         </a>
                     </li>
                 </ul>
@@ -48,7 +57,7 @@
                 <br />
                 <form method="POST" action="{% url 'remove-all-anon-ratings' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Supprimer toutes mes notes</button>
+                    <button type="submit" class="btn btn-primary">{% trans "Delete all my ratings" %}</button>
                 </form>
             {% endif %}
         </div>

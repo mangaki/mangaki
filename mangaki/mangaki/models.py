@@ -15,6 +15,7 @@ from django.db import models, transaction
 from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
 from django.db.models.functions import Cast
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
 
 from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
                              CLUSTER_CHOICES, RELATION_TYPE_CHOICES, SUGGESTION_PROBLEM_CHOICES)
@@ -443,8 +444,8 @@ class Suggestion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
-    problem = models.CharField(verbose_name='Partie concernée', max_length=8, choices=SUGGESTION_PROBLEM_CHOICES, default='ref')
-    message = models.TextField(verbose_name='Proposition', blank=True)
+    problem = models.CharField(verbose_name=_('Type'), max_length=8, choices=SUGGESTION_PROBLEM_CHOICES, default='ref')
+    message = models.TextField(verbose_name=_('Suggestion'), blank=True)
     is_checked = models.BooleanField(default=False)
 
     def __str__(self):

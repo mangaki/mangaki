@@ -1027,6 +1027,7 @@ class AnonymousRatingsMixin:
             ])
             for category_id, works_list in works.items()
         ]
+        context['meta'] = {'config': VANILLA_UI_CONFIG_FOR_RATINGS}  
         return context
 
 

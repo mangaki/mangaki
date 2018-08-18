@@ -132,7 +132,11 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="alert alert-warning">
-                    {% trans "You rated a few works anonymously, you can see them, don't forget to subscribe to save them!" %}
+                    {% url 'my-profile' as profile %}
+                    {% url 'account_signup' as signup_url %}
+                    {% blocktrans %}
+                    You rated a few works anonymously, you can <a href="{{ profile }}">see them</a>, don't forget to <a href="{{ signup_url }}">subscribe</a> to save them!
+                    {% endblocktrans %}
                     <!-- Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les sauvegarder! -->
                 </div>
             </div>

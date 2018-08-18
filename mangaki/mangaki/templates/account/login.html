@@ -32,10 +32,13 @@ for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
   {% if ratings %}
   <div class="col-xs-12 col-sm-6 col-sm-offset-3">
     <div class="alert alert-warning" role="alert">
-      Vous avez not&eacute; certaines œuvres anonymement sur cet ordinateur.
+      {% blocktrans %}
+      You rated a few works anonymously on this computer. These ratings will be lost if you login to an existing account. You should <a href="{{ signup_url }}">sign up</a> to save them."
+      {% endblocktrans %}
+      <!-- Vous avez not&eacute; certaines œuvres anonymement sur cet ordinateur.
       Ces notes seront perdues si vous vous connectez &agrave; un compte
-      existant ; vous devez <a href="{{ signup_url }}">enregistrer un nouveau
-      compte</a> pour les conserver.
+      existant ; vous devez enregistrer un nouveau
+      compte</a> pour les conserver. -->
     </div>
   </div>
   {% endif %}

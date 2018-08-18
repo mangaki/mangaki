@@ -3,7 +3,7 @@ create:
 	cd mangaki && ./manage.py makemessages --locale ja
 	cd mangaki && ./manage.py makemessages --locale zh_Hant
 	cd mangaki && ./manage.py makemessages --locale zh_Hans
-	po-to-xls -o test.xlsx fr:mangaki/mangaki/locale/fr/LC_MESSAGES/django.po ja:mangaki/mangaki/locale/ja/LC_MESSAGES/django.po zh-hans:mangaki/mangaki/locale/zh-hans/LC_MESSAGES/django.po zh-hant:mangaki/mangaki/locale/zh-hant/LC_MESSAGES/django.po
+	po-to-xls -o test.xlsx fr:mangaki/mangaki/locale/fr/LC_MESSAGES/django.po ja:mangaki/mangaki/locale/ja/LC_MESSAGES/django.po zh-hans:mangaki/mangaki/locale/zh_Hans/LC_MESSAGES/django.po zh-hant:mangaki/mangaki/locale/zh_Hant/LC_MESSAGES/django.po
 	open test.xlsx
 
 compile:

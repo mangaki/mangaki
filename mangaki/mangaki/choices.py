@@ -62,13 +62,13 @@ RELATION_TYPE_CHOICES = (
 )
 
 SUGGESTION_PROBLEM_CHOICES = (
-    ("title", "Le titre n'est pas le bon"),
-    ("poster", "Le poster ne convient pas"),
-    ("synopsis", "Le synopsis comporte des erreurs"),
-    ("author", "L'auteur n'est pas le bon"),
-    ("composer", "Le compositeur n'est pas le bon"),
-    ("double", "Ceci est un doublon"),
-    ("nsfw", "L'oeuvre est NSFW"),
-    ("n_nsfw", "L'oeuvre n'est pas NSFW"),
-    ("ref", "Proposer une URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)")
+    ("title", _("Wrong title")),
+    ("poster", _("Wrong poster")),
+    ("synopsis", _("Synopsis contains mistakes")),
+    ("author", _("Wrong author")),
+    ("composer", _("Wrong composer")),
+    ("double", _("This is a duplicate")),
+    ("nsfw", _("Work is Not Safe for Work")),
+    ("n_nsfw", _("Work is actually Safe for Work")),
+    ("ref", _("Suggest a reference URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"))
 )
