@@ -1,7 +1,9 @@
+{% load i18n %}
+
 <div class="col-md-12">
 {#  TODO: Once ALS is online, it may be interesting to keep « perles ». #}
     {% if not meta.is_anonymous %}
-        <p class="well">✨🍰✨ Trier selon Mangaki !
+        <p class="well">✨🍰✨ {% trans "Ask Mangaki to sort!" %}
             <a href="?page={{ ratings.number }}&algo=svd">mainstream</a> /
             <a href="?page={{ ratings.number }}&algo=als">perles</a>
         </p>

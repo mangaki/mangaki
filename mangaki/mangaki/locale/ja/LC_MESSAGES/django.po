@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-18 02:37+0000\n"
+"POT-Creation-Date: 2018-08-18 15:54+0000\n"
 "PO-Revision-Date: 2018-08-17 20:23+0900\n"
 "Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -77,7 +77,9 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: mangaki/models.py:448
+#: mangaki/models.py:448 mangaki/templates/fix/fix_index.html:20
+#: mangaki/templates/fix/fix_suggestion.html:6
+#: mangaki/templates/fix/fix_suggestion.html:11
 #, fuzzy
 #| msgid "Suggestions"
 msgid "Suggestion"
@@ -440,11 +442,17 @@ msgstr "メニューを開きます。"
 msgid "What is Mangaki?"
 msgstr "Mangakiは何ですか？"
 
-#: mangaki/templates/base.html:76
+#: mangaki/templates/base.html:76 mangaki/templates/profile_works.html:9
+#: mangaki/templates/profile_works.html:12
+#: mangaki/templates/profile_works.html:29
+#: mangaki/templates/profile_works.html:32
 msgid "Anime"
 msgstr "アニメ"
 
-#: mangaki/templates/base.html:81
+#: mangaki/templates/base.html:81 mangaki/templates/profile_works.html:16
+#: mangaki/templates/profile_works.html:19
+#: mangaki/templates/profile_works.html:36
+#: mangaki/templates/profile_works.html:39
 msgid "Mangas"
 msgstr "マンガ"
 
@@ -532,12 +540,246 @@ msgid "Version:"
 msgstr "バージョン："
 
 #: mangaki/templates/fix/fix_index.html:5
-msgid "Liste des suggestions"
-msgstr "LISTEデ提案"
+#, fuzzy
+#| msgid "Suggestions"
+msgid "Suggestion list"
+msgstr "提案"
+
+#: mangaki/templates/fix/fix_index.html:5
+#: mangaki/templates/fix/nsfw_grid.html:6
+msgid "Page"
+msgstr ""
 
 #: mangaki/templates/fix/fix_index.html:12
-msgid "Access to the NSFW grid"
+#, fuzzy
+#| msgid "Access to the NSFW grid"
+msgid "Go to the NSFW grid"
 msgstr "NSFWグリッドへのアクセス"
+
+#: mangaki/templates/fix/fix_index.html:23
+msgid "This problem is solved,This problem is ongoing"
+msgstr ""
+
+#: mangaki/templates/fix/fix_index.html:36
+#: mangaki/templates/fix/fix_suggestion.html:56
+msgid "Problem:"
+msgstr ""
+
+#: mangaki/templates/fix/fix_index.html:38
+#: mangaki/templates/fix/fix_suggestion.html:62
+#, fuzzy
+#| msgid "Report a bug"
+msgid "Reported by:"
+msgstr "バグを報告"
+
+#: mangaki/templates/fix/fix_index.html:43
+msgid "Target:"
+msgstr ""
+
+#: mangaki/templates/fix/fix_index.html:54
+msgid ""
+"\n"
+"                You <strong><span class=\"text-success\">approved <span "
+"class=\"glyphicon glyphicon-thumbs-up\" aria-hidden=\"true\"></span></span></"
+"strong> this suggestion.\n"
+"                "
+msgstr ""
+
+#: mangaki/templates/fix/fix_index.html:60
+msgid ""
+"\n"
+"                You <strong><span class=\"text-danger\">rejected <span class="
+"\"glyphicon glyphicon-thumbs-down\" aria-hidden=\"true\"></span></span></"
+"strong> this suggestion.\n"
+"                "
+msgstr ""
+
+#: mangaki/templates/fix/fix_index.html:66
+#: mangaki/templates/fix/fix_suggestion.html:148
+msgid "You asked <strong>an admin for help</strong>."
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:16
+msgid "This problem was marked as solved!"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:33
+msgid "Copy"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:34
+msgid "Sharing link"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:101
+msgid "Solve the problem automatically"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:107
+#, fuzzy
+#| msgid "Liste des suggestions"
+msgid "Close this suggestion"
+msgstr "LISTEデ提案"
+
+#: mangaki/templates/fix/fix_suggestion.html:113
+msgid "Ask an admin for help"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:115
+msgid "You asked an admin for help"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:126
+msgid ""
+"\n"
+"                    You <strong><span class=\"text-success\">approved <span "
+"class=\"glyphicon glyphicon-thumbs-up\" aria-hidden=\"true\"></span></span></"
+"strong> this suggestion.\n"
+"                    "
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:130
+msgid ""
+"\n"
+"                    You <strong><span class=\"text-danger\">rejected <span "
+"class=\"glyphicon glyphicon-thumbs-down\" aria-hidden=\"true\"></span></"
+"span></strong> this suggestion.\n"
+"                    "
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:141
+#, fuzzy
+#| msgid "Liste des suggestions"
+msgid "Reopen cette suggestion"
+msgstr "LISTEデ提案"
+
+#: mangaki/templates/fix/fix_suggestion.html:155
+msgid "This work belongs to this cluster:"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:165
+msgid "This cluster is"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:166
+#: mangaki/templates/fix/nsfw_grid.html:78
+#: mangaki/templates/profile_works.html:12
+#: mangaki/templates/profile_works.html:19
+msgid "by"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:170
+msgid "This cluster was merged:"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:188
+msgid "Previous"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:192
+msgid "Back"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:196
+msgid "Next"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:218
+msgid "Copied link!"
+msgstr ""
+
+#: mangaki/templates/fix/fix_suggestion.html:218
+msgid "Link was not copied"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:6
+#: mangaki/templates/fix/nsfw_grid.html:15
+msgid "NSFW grid"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:12
+#, fuzzy
+#| msgid "Suggestions"
+msgid "Back to suggestions"
+msgstr "提案"
+
+#: mangaki/templates/fix/nsfw_grid.html:24
+msgid "works in the grid"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:34
+msgid "Mark remaining works as SFW"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:34
+msgid "and continue"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:43
+msgid "Attention!"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:43
+msgid ""
+"You are not logged in so by default you can't browse NSFW works,In your "
+"profile you stated that you didn't want to browse NSFW works"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:44
+msgid "Display anyway?"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:44
+msgid "Yes"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:44
+msgid "No"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:50
+msgid "Remainder:"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:50
+msgid "You agreed to see NSFW works on this grid temporarily."
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:52
+#, python-format
+msgid ""
+"\n"
+"        <a href=\"%(go_back_url)s\">Click here</a> to go back.\n"
+"        "
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:73
+msgid "It's NSFW!"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:78
+#, fuzzy
+#| msgid "Report a bug"
+msgid "Reported"
+msgstr "バグを報告"
+
+#: mangaki/templates/fix/nsfw_grid.html:78
+msgid "NSFW,SFW"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:84
+msgid "Thanks for voting. An admin will help asap!"
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:99
+msgid ""
+"<strong>No result:</strong> either no work was reported as NSFW/SFW, or you "
+"gave your advice already."
+msgstr ""
+
+#: mangaki/templates/fix/nsfw_grid.html:130
+msgid "Refresh and see more"
+msgstr ""
 
 #: mangaki/templates/index.html:9
 msgid "Mangaki, anime and manga recommendation"
@@ -562,6 +804,19 @@ msgstr "アーティスト"
 #: mangaki/templates/mangaki/artist_list.html:15
 msgid "Hint: You can press Enter to trigger the search"
 msgstr "ヒント：検索をトリガするためにEnterキーを押すことができます"
+
+#: mangaki/templates/mangaki/legal.html:5
+msgid "Icons"
+msgstr ""
+
+#: mangaki/templates/mangaki/legal.html:7
+msgid ""
+"\n"
+"The icons we used for the ratings are created by <a href=\"http://www."
+"flaticon.com/authors/dave-gandy\">Dave Gandy</a> for <a href=\"http://"
+"fontawesome.io\">fontawesome</a>. The SVG version comes from <a href="
+"\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>.\n"
+msgstr ""
 
 #: mangaki/templates/mangaki/reco_list.html:9
 msgid ""
@@ -818,6 +1073,84 @@ msgstr ""
 msgid "My profile is public"
 msgstr ""
 
+#: mangaki/templates/profile_reco.html:4
+#, fuzzy
+#| msgid "Get recommendations now"
+msgid "Sent recommendations"
+msgstr "今の勧告を見ます"
+
+#: mangaki/templates/profile_reco.html:7
+#, fuzzy
+#| msgid "Recommendations"
+msgid "was recommended to"
+msgstr "勧告"
+
+#: mangaki/templates/profile_reco.html:20
+#, fuzzy
+#| msgid "Recommendations"
+msgid "Received recommandations"
+msgstr "勧告"
+
+#: mangaki/templates/profile_reco.html:23
+msgid "was recommended to you by"
+msgstr ""
+
+#: mangaki/templates/profile_reco.html:31
+msgid "(This list is empty.)"
+msgstr ""
+
+#: mangaki/templates/profile_reco.html:37
+#, fuzzy
+#| msgid "Get recommendations now"
+msgid "Delete all received recommendations"
+msgstr "今の勧告を見ます"
+
+#: mangaki/templates/profile_work.html:6
+msgid "Ask Mangaki to sort!"
+msgstr ""
+
+#: mangaki/templates/profile_works.html:9
+msgid "seen by"
+msgstr ""
+
+#: mangaki/templates/profile_works.html:12
+#: mangaki/templates/profile_works.html:32
+msgid "watchlist"
+msgstr ""
+
+#: mangaki/templates/profile_works.html:16
+msgid "read by"
+msgstr ""
+
+#: mangaki/templates/profile_works.html:19
+#: mangaki/templates/profile_works.html:39
+msgid "wishlist"
+msgstr ""
+
+#: mangaki/templates/profile_works.html:23
+#, fuzzy
+#| msgid "Recommendations"
+msgid "Recommendations to"
+msgstr "勧告"
+
+#: mangaki/templates/profile_works.html:29
+msgid "seen"
+msgstr ""
+
+#: mangaki/templates/profile_works.html:36
+msgid "read"
+msgstr ""
+
+#: mangaki/templates/profile_works.html:44
+#, fuzzy
+#| msgid "Recommendations"
+msgid "My recommendations"
+msgstr "勧告"
+
+#: mangaki/templates/profile_works.html:58
+msgid "{{ profile.username }}'s profile is not disclosed publicly."
+msgstr ""
+
 #: mangaki/templates/socialaccount/connections.html:5
 #: mangaki/templates/socialaccount/connections.html:8
 msgid "Account Connections"
@@ -871,6 +1204,34 @@ msgstr ""
 #| msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
 msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
 msgstr "％のトップ％（サイズ）S（カテゴリ）は（日）■％にMangakiによ"
+
+#: mangaki/templates/top.html:7
+#, fuzzy
+#| msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
+msgid "Top 20 of {{ category }} on Mangaki"
+msgstr "％のトップ％（サイズ）S（カテゴリ）は（日）■％にMangakiによ"
+
+#: mangaki/templates/top.html:9
+msgid "Name"
+msgstr ""
+
+#: mangaki/templates/top.html:9
+msgid "Score"
+msgstr ""
+
+#: mangaki/templates/top.html:9
+#, fuzzy
+#| msgid "Your ratings"
+msgid "Number of ratings"
+msgstr "あなたの評価"
+
+#: mangaki/templates/top.html:9
+msgid "Number of favorites"
+msgstr ""
+
+#: mangaki/templates/works.html:18
+msgid "No results."
+msgstr ""
 
 #: mangaki/urls.py:71
 msgid "The page you're looking for was not found (yet?)."
