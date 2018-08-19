@@ -49,7 +49,7 @@
     <div class="alert alert-warning">
         <strong>{% trans "Remainder:" %}</strong> {% trans "You agreed to see NSFW works on this grid temporarily." %}
         {% url "fix-index" as go_back_url %}
-        {% blocktrans %}
+        {% blocktrans trimmed %}
         <a href="{{ go_back_url }}">Click here</a> to go back.
         {% endblocktrans %}
     </div>

@@ -21,7 +21,7 @@
     </ul>
     <br />
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
-{% include "works.html" with works=reco_list is_dpp=False %}
+{% include "works.html" with works=reco_list %}
 <div class="row margin">
     <div class="col-xs-12">
         <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}&amp;algo={{ algo }}" style="display: block; margin: auto">{% blocktrans %}I want new recommendations! <br class="visible-xs">(After you rate those.){% endblocktrans %}</a>
@@ -29,7 +29,9 @@
 </div>
 {% else %}
     {% url 'work-list' 'anime' as work_list_url %}
-    <p class="well">{% trans "To receive recommandations, you should at least <a href=\"{{ work_list_url }}\">rate an anime</a>!" %}</p>
+    <p class="well">{% blocktrans trimmed %}
+        To receive recommandations, you should at least <a href="{{ work_list_url }}">rate an anime</a>!
+        {% endblocktrans %}</p>
     <!-- Pour obtenir une recommandation, il faut au moins avoir <a href=\"{{ work_list_url }}\">noté un <em>anime</em></a>&nbsp;! -->
 {% endif %}
 {% endblock %}

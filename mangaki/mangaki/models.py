@@ -15,7 +15,7 @@ from django.db import models, transaction
 from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
 from django.db.models.functions import Cast
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
                              CLUSTER_CHOICES, RELATION_TYPE_CHOICES, SUGGESTION_PROBLEM_CHOICES)
@@ -124,7 +124,7 @@ class Category(models.Model):
     name = models.CharField(max_length=128)
 
     def __str__(self):
-        return self.name
+        return _(self.name)
 
 
 class Work(models.Model):

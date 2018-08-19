@@ -23,7 +23,7 @@
                 <h1>{% trans "Your ratings" %}</h1>
                 {% url 'account_signup' as signup_url %}
                 <h2>
-                    {% blocktrans %}
+                    {% blocktrans trimmed %}
                     <a href="{{ signup_url }}">Signup</a> to save them
                     {% endblocktrans %}
                 </h2>
@@ -31,7 +31,7 @@
 
             {% if profile.member_days %}
                 <p>
-                    {% blocktrans with member_days=profile.member_days %}
+                    {% blocktrans with member_days=profile.member_days trimmed %}
                     Subscribed since {{ member_days }} days
                     {% endblocktrans %}
                 </p>

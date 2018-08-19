@@ -100,12 +100,12 @@ VANILLA_UI_CONFIG_FOR_RATINGS = {
         },
         {
             'name': 'willsee',
-            'title': _("Wanna see"),
+            'title': _("I want to see"),
             'extra_classes': ['rating_separator']
         },
         {
             'name': 'wontsee',
-            'title': _("Don't want to see")
+            'title': _("I don't want to see")
         }
     ],
     'endpoint': reverse_lazy('vote')

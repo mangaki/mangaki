@@ -123,11 +123,11 @@
             <hr/>
             <p align="center">
                 {% if evidence.agrees %}
-                    {% blocktrans %}
+                    {% blocktrans trimmed %}
                     You <strong><span class="text-success">approved <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span></span></strong> this suggestion.
                     {% endblocktrans %}
                 {% else %}
-                    {% blocktrans %}
+                    {% blocktrans trimmed %}
                     You <strong><span class="text-danger">rejected <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span></span></strong> this suggestion.
                     {% endblocktrans %}
                 {% endif %}

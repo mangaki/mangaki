@@ -11,7 +11,7 @@
 <h2 class="text-center">{% trans "Join Mangaki" %} <span class="text-nowrap">／人◕ ‿‿ ◕人＼</span></h2>
 <p class="text-center">
   {% trans "And contribute to the creation of a better world." %}<br />
-  {% blocktrans %}
+  {% blocktrans trimmed %}
   If you have already an account, you can <a href="{{ login_url }}">login</a>.
   {% endblocktrans %}
 </p>
@@ -31,7 +31,7 @@
   {% if ratings %}
   <div class="col-xs-12">
     <div class="alert alert-info" role="alert">
-      {% trans "You already rated a few works. They will be imported to your profile if you check the box \"Import my ratings\" below!" %}
+      {% trans "You already rated a few works. They will be imported to your profile if you check the box <strong>Import my ratings</strong> below!" %}
     </div>
   </div>
   {% endif %}

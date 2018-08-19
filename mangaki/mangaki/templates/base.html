@@ -67,11 +67,6 @@
                             </ul>
                         </li>
                         <li class="dropdown">
-                            <a href="{% url 'about' LANGUAGE_CODE %}">
-                                {% trans "What is Mangaki?" %}
-                            </a>
-                        </li>
-                        <li class="dropdown">
                             <a href="{% url 'work-list' 'anime' %}">
                                 {% trans "Anime" %}
                             </a>
@@ -111,7 +106,7 @@
                                     class="glyphicon glyphicon-user"></span>&nbsp;{% trans "Signup" %}</a></li>
                         {% else %}
                             <li><a href="{% url 'profile' user.username %}">
-                                {% blocktrans with username=user.username %}
+                                {% blocktrans with username=user.username trimmed %}
                                 Welcome, <strong>{{ user }}</strong>!
                                 {% endblocktrans %}
                             </a>
@@ -134,7 +129,7 @@
                 <div class="alert alert-warning">
                     {% url 'my-profile' as profile %}
                     {% url 'account_signup' as signup_url %}
-                    {% blocktrans %}
+                    {% blocktrans trimmed %}
                     You rated a few works anonymously, you can <a href="{{ profile }}">see them</a>, don't forget to <a href="{{ signup_url }}">subscribe</a> to save them!
                     {% endblocktrans %}
                     <!-- Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les sauvegarder! -->
@@ -162,7 +157,7 @@
 
         <div class="collapse navbar-collapse" id="footer-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="{% url 'about' 'fr' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;
+                <li><a href="{% url 'about' LANGUAGE_CODE %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;
                     {% trans "Mangaki project" %}</a></li>
                 <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;
                     {% trans "FAQ" %}</a></li>

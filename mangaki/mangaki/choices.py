@@ -2,38 +2,38 @@ from django.utils.translation import ugettext_lazy as _
 
 
 ORIGIN_CHOICES = (
-    ("japon", "Japon"),
-    ("coree", "Coree"),
-    ("france", "France"),
-    ("chine", "Chine"),
-    ("usa", "USA"),
-    ("allemagne", "Allemagne"),
-    ("taiwan", "Taiwan"),
-    ("espagne", "Espagne"),
-    ("angleterre", "Angleterre"),
-    ("hong-kong", "Hong Kong"),
-    ("italie", "Italie"),
-    ("inconnue", "Inconnue"),
-    ("intl", "International")
+    ("japon", _("Japan")),
+    ("coree", _("Korea")),
+    ("france", _("France")),
+    ("chine", _("China")),
+    ("usa", _("US")),
+    ("allemagne", _("Germany")),
+    ("taiwan", _("Taiwan")),
+    ("espagne", _("Spain")),
+    ("angleterre", _("UK")),
+    ("hong-kong", _("Hong Kong")),
+    ("italie", _("Italia")),
+    ("inconnue", _("Unknown")),
+    ("intl", _("International"))
 )
 
 TYPE_CHOICES = (
-    ("seinen", "Seinen"),
-    ("shonen", "Shonen"),
-    ("shojo", "Shojo"),
-    ("yaoi", "Yaoi"),
-    ("sonyun-manhwa", "Sonyun-Manhwa"),
-    ("kodomo", "Kodomo"),
-    ("ecchi-hentai", "Ecchi-Hentai"),
-    ("global-manga", "Global-Manga"),
-    ("manhua", "Manhua"),
-    ("josei", "Josei"),
-    ("sunjung-sunjeong", "Sunjung-Sunjeong"),
-    ("chungnyun", "Chungnyun"),
-    ("yuri", "Yuri"),
-    ("dojinshi-parodie", "Dojinshi-Parodie"),
-    ("manhwa", "Manhwa"),
-    ("yonkoma", "Yonkoma")
+    ("seinen", _("Seinen")),
+    ("shonen", _("Shonen")),
+    ("shojo", _("Shojo")),
+    ("yaoi", _("Yaoi")),
+    ("sonyun-manhwa", _("Sonyun-Manhwa")),
+    ("kodomo", _("Kodomo")),
+    ("ecchi-hentai", _("Ecchi-Hentai")),
+    ("global-manga", _("Global-Manga")),
+    ("manhua", _("Manhua")),
+    ("josei", _("Josei")),
+    ("sunjung-sunjeong", _("Sunjung-Sunjeong")),
+    ("chungnyun", _("Chungnyun")),
+    ("yuri", _("Yuri")),
+    ("dojinshi-parodie", _("Dojinshi-Parody")),
+    ("manhwa", _("Manhwa")),
+    ("yonkoma", _("Yonkoma"))
 )
 
 TOP_CATEGORY_CHOICES = (
@@ -43,22 +43,22 @@ TOP_CATEGORY_CHOICES = (
 )
 
 CLUSTER_CHOICES = (
-    ('unprocessed', 'Non traité'),
-    ('accepted', 'Accepté'),
-    ('rejected', 'Rejeté')
+    ('unprocessed', _("Unprocessed")),
+    ('accepted', _("Accepted")),
+    ('rejected', _("Rejected"))
 )
 
 RELATION_TYPE_CHOICES = (
-    ('', 'Inconnu'),
-    ('prequel', 'Préquelle'),
-    ('sequel', 'Suite'),
-    ('summary', 'Résumé'),
-    ('side_story', 'Histoire parallèle'),
-    ('parent_story', 'Histoire mère'),
-    ('alternative_setting', 'Univers alternatif'),
-    ('same_setting', 'Univers commun'),
-    ('other', 'Spécial'),
-    ('adaptation', 'Adaptation')
+    ('', _("Unknown")),
+    ('prequel', _("Prequel")),
+    ('sequel', _("Sequel")),
+    ('summary', _("Summary")),
+    ('side_story', _("Side story")),
+    ('parent_story', _("Parent story")),
+    ('alternative_setting', _("Alternative setting")),
+    ('same_setting', _("Same setting")),
+    ('other', _("Special")),
+    ('adaptation', _("Adaptation"))
 )
 
 SUGGESTION_PROBLEM_CHOICES = (
@@ -71,4 +71,12 @@ SUGGESTION_PROBLEM_CHOICES = (
     ("nsfw", _("Work is Not Safe for Work")),
     ("n_nsfw", _("Work is actually Safe for Work")),
     ("ref", _("Suggest a reference URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"))
+)
+
+STAFF_TYPICAL_CHOICES = (
+    _('Director'),
+    _('Composer'),
+    _('Author'),
+    _('Mangaka'),
+    _('Screenwriter')
 )
