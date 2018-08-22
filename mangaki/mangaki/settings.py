@@ -255,10 +255,11 @@ if config.has_section('smtp'):
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 LANGUAGE_CODE = 'en'
 LANGUAGES = [
-    ('fr', _('Français')),
-    ('en', _('English')),
-    ('ja', _('日本語')),
-    ('zh-hant', _('中文'))
+    ('fr', 'Français'),
+    ('en', 'English'),
+    ('ja', '日本語'),
+    ('zh-hans', '简体中文'),
+    ('zh-hant', '繁體中文')
 ]
 TIME_ZONE = 'UTC'
 USE_I18N = True

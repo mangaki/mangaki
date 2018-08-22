@@ -10,50 +10,9 @@
     <!-- Mangaki, la recommandation d'anime et manga. -->
     <h3 style="margin-bottom: 1em">{% trans "Rate your favorite series and discover new ones!" %}</h3>
     <!-- Notez vos séries favorites, on vous en fera découvrir d'autres&nbsp;! -->
-{% if not user.is_authenticated %}
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">{% trans "Start" %}</a>
-    </div>
-    <div class="col-md-4 col-sm-12 margin">
-        {% include "socialaccount/snippets/provider_list.html" with process="login" verb="try" %}
-    </div>
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <img src="/static/img/pins.png" align="left" />
-        <iframe src="https://ghbtns.com/github-btn.html?user=mangaki&repo=mangaki&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
-        <iframe src="https://ghbtns.com/github-btn.html?user=mangaki&repo=mangaki&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
-    </div>
-{% else %}
-    {% if is_mal_import_available %}
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="{% url 'profile' user.username %}">Import myAnimeList</a>
-    </div>
-    {% endif %}
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">{% trans "Start" %}</a>
-    </div>
-    <div class="col-md-4 col-sm-12 text-center margin">
-        <a class="btn btn-mangaki btn-lg" href="https://github.com/mangaki/mangaki/wiki" target="_blank">{% trans "Contribute to Mangaki" %}</a>
-    </div>
-{% endif %}
-</div>
-<div class="row featured">
-    <div class="col-md-6 col-sm-12">
-      <div style="width: 80%; margin: auto;">
-        <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; text-align: center;">
-            {% trans "Latest news" %}
-        </h2>
-        <a class="twitter-timeline" data-height="400"
-          href="https://twitter.com/MangakiFR">
-        Tweets by @MangakiFR
-        </a>
-        <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-      </div>
-    </div>
-    <div class="col-md-6 col-sm-12">
-        <h2 class="col-xs-12" style="font-size: 1.9em; margin-top: 0; margin-bottom: 1em; text-align: center;">
-            {% trans "How does it work?" %}
-        </h2>
-        <img src="/static/img/help.jpg" style="max-width: 100%" />
+    <div class="row text-center margin">
+        <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">{% trans "I prefer anime" %}</a>
+        <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'manga' %}">{% trans "I prefer manga" %}</a>
     </div>
 </div>
 
@@ -65,7 +24,4 @@
 	{% endfor %}
 </div>
 
-<br />
-<br />
-<br />
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "profile.html" %}
+{% load i18n %}
 
 {% block profile_section %}
-    {% verbatim %}
     <div class="row">
         <div id="profile_settings_container">
             <div class="col-sm-4 col-xs-6">
@@ -27,11 +27,11 @@
                         </modal>
                         <hr />
                         <button class="btn btn-primary btn-nowrap center-block" v-on:click="exportData">
-                            Exporter mes données
+                            {% trans "Export all my data" %}
                         </button>
                         <hr />
                         <bs-light-switch v-model="isShared">
-                            Profil public&nbsp;:
+                            {% trans "My profile is public" %}
                         </bs-light-switch>
                         <hr />
                         <bs-light-switch v-model="acceptsResearchUsage">
@@ -60,7 +60,6 @@
                 </div>
             </div>
         </div>
-        {% endverbatim %}
         {% if meta.mal.is_available %}
             <div class="col-sm-4 col-xs-12">
                 <div class="panel panel-default">

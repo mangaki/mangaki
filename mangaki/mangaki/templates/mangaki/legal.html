@@ -1,7 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block body %}
-<h2>Icônes</h2>
+<h2>{% trans "Icons" %}</h2>
 
-Les icônes utilisées pour la notation ont été créés par <a href="http://www.flaticon.com/authors/dave-gandy">Dave Gandy</a> pour <a href="http://fontawesome.io">fontawesome</a>. La version SVG utilisée par Mangaki provient de <a href="http://www.flaticon.com/packs/font-awesome">flaticon</a>.
+{% blocktrans trimmed %}
+The icons we used for the ratings are created by <a href="http://www.flaticon.com/authors/dave-gandy">Dave Gandy</a> for <a href="http://fontawesome.io">fontawesome</a>. The SVG version comes from <a href="http://www.flaticon.com/packs/font-awesome">flaticon</a>.
+{% endblocktrans %}
 {% endblock %}

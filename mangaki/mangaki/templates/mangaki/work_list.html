@@ -31,14 +31,14 @@
         {% endif %}
         
         <div class="row mosaic">
-            {% if not is_dpp and not request|has_anonymous_ratings %}
+            {% if not request|has_anonymous_ratings %}
                 <div class="col-xs-12">
                     <p class="alert alert-info">
                         {% if user.is_authenticated %}
                             {% url "reco" as reco_url %}
                             {% blocktrans trimmed %}
                                 Rate a few cards below, or using the search bar.<br />
-                                Then click <a class="alert-link" href="{{ reco_url }}">Recommendations</a> to see what <em>Mangaki</em> recommends!
+                                Then click <a class="alert-link" href="{{ reco_url }}">Recommendations</a> to see what Mangaki recommends!
                             {% endblocktrans %}
                             <!-- Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{{ reco_url }}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;! -->
                         {% else %}
@@ -55,33 +55,22 @@
 
             <div class="col-xs-12">
                 <ul class="nav nav-tabs">
-                    {% if is_dpp %}
-
-                        <li role="presentation"{% if sort_mode == 'dpp' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'anime' %}">
-                            {% trans "Anime only</a>" %}
-                            <!-- <em>Anime</em> seulement</a> -->
-                        </li>
-
-                        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'dpp-works' 'manga' %}"><em>Manga</em> seulement</a></li>
-
-                    {% else %}
-                        <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}">{% trans "Mosaic" %}</a></li>
-                        <li role="presentation"{% if sort_mode == 'new' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=new">{% trans "Recent" %}</a></li>
-                        <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=top">{% trans "Top" %}</a></li>
-                        <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=popularity">{% trans "Popular" %}</a></li>
-                        <li role="presentation"{% if sort_mode == 'pearls' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=pearls">{% trans "Pearls" %}</a></li>
-                        <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=controversy">{% trans "Controversial" %}</a></li>
-                        <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=random">{% trans "Random" %}</a></li>
-                        <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
-                            <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">{% trans "Alpha" %}</a></li>
-                    {% endif %}
+                    <li role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
+                        <a href="{% url 'work-list' category %}">{% trans "Mosaic" %}</a></li>
+                    <li role="presentation"{% if sort_mode == 'new' %} class="active"{% endif %}>
+                        <a href="{% url 'work-list' category %}?sort=new">{% trans "Recent" %}</a></li>
+                    <li role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
+                        <a href="{% url 'work-list' category %}?sort=top">{% trans "Top" %}</a></li>
+                    <li role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
+                        <a href="{% url 'work-list' category %}?sort=popularity">{% trans "Popular" %}</a></li>
+                    <li role="presentation"{% if sort_mode == 'pearls' %} class="active"{% endif %}>
+                        <a href="{% url 'work-list' category %}?sort=pearls">{% trans "Pearls" %}</a></li>
+                    <li role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
+                        <a href="{% url 'work-list' category %}?sort=controversy">{% trans "Controversial" %}</a></li>
+                    <li role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
+                        <a href="{% url 'work-list' category %}?sort=random">{% trans "Random" %}</a></li>
+                    <li role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
+                        <a href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">{% trans "A-Z" %}</a></li>
                 </ul>
             </div>
 
@@ -115,18 +104,14 @@
                 {% if flat %}
                     {% include "works_no_poster.html" with works=object_list %}
                 {% else %}
-                    {% include "works.html" with works=object_list is_dpp=is_dpp %}
+                    {% include "works.html" with works=object_list %}
                 {% endif %}
             </div>
 
             {% if user.is_authenticated %}
                 <div class="row">
                     <div class="col-md-12 col-sm-12">
-                        {% if is_dpp %}
-                            <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco_dpp' %}?category={{ category }}">Je n'arrive plus à noter, montrez-moi de nouvelles oeuvres&nbsp;!</a>
-                        {% else %}
-                            <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco' %}?category={{ category }}">{% trans "Get recommendations now" %}</a>
-                        {% endif %}
+                        <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco' %}?category={{ category }}">{% trans "Get recommendations now" %}</a>
                     </div>
                 </div>
             {% endif %}
@@ -137,7 +122,6 @@
 {% endblock %}
 
 {% block extrajs %}
-{% if not is_dpp %}
 <script>
     var category = '{{ category }}';
     loadMenu();
@@ -145,5 +129,4 @@
     new Mosaic('.cards-grid', '{{ category }}', {{ enable_kb_shortcuts|yesno:"true,false" }});
     {% endif %}
 </script>
-{% endif %}
 {% endblock %}

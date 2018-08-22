@@ -12,7 +12,7 @@
 
 {% get_providers as socialaccount_providers %}
 {% if socialaccount_providers  %}
-<p>{% blocktrans with site.name as site_name %}Please sign in with one
+<p>{% blocktrans with site.name as site_name trimmed %}Please sign in with one
 of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
 for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
 
@@ -24,7 +24,7 @@ for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
 </div>
 {% include "socialaccount/snippets/login_extra.html" %}
 {% else %}
-<p class="text-center">{% blocktrans %}If you have not created an account yet, then please
+<p class="text-center">{% blocktrans trimmed %}If you have not created an account yet, then please
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 {% endif %}
 
@@ -32,10 +32,13 @@ for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
   {% if ratings %}
   <div class="col-xs-12 col-sm-6 col-sm-offset-3">
     <div class="alert alert-warning" role="alert">
-      Vous avez not&eacute; certaines œuvres anonymement sur cet ordinateur.
+      {% blocktrans trimmed %}
+      You rated a few works anonymously on this computer. These ratings will be lost if you login to an existing account. You should <a href="{{ signup_url }}">sign up</a> to save them."
+      {% endblocktrans %}
+      <!-- Vous avez not&eacute; certaines œuvres anonymement sur cet ordinateur.
       Ces notes seront perdues si vous vous connectez &agrave; un compte
-      existant ; vous devez <a href="{{ signup_url }}">enregistrer un nouveau
-      compte</a> pour les conserver.
+      existant ; vous devez enregistrer un nouveau
+      compte</a> pour les conserver. -->
     </div>
   </div>
   {% endif %}

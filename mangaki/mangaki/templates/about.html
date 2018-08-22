@@ -10,120 +10,37 @@
         <img src="/static/img/chiro.png" alt="Chiro" height="128">
     </figure>
 
-    <p>{% trans "Mangaki est un <strong>site de recommandation de mangas et d'anime</strong> créé par une association." %}</p>
+    <p>{% trans "Mangaki is an anime/manga recommendation website made by an organization of otakus." %}</p>
+    <!-- Mangaki est un <strong>site de recommandation de mangas et d'anime</strong> créé par une association. -->
 
-    <p>{% trans "À partir des séries que vous avez vues ou lues, <strong>notre algorithme</strong> détermine de nouvelles pépites susceptibles de vous plaire&nbsp;!" %}</p>
+    <p>{% trans "Tell him what you watched or read, and our algorithm (open source) will find new precious pearls for you to discover!" %}</p>
+    <!-- À partir des séries que vous avez vues ou lues, <strong>notre algorithme</strong> détermine de nouvelles pépites susceptibles de vous plaire&nbsp;! -->
 
-    <p>{% trans "Si vous souhaitez participer à l'aventure, il y a plein de choses à faire&nbsp;!" %}</p>
-    <a href="mailto:jj@mangaki.fr" class="btn btn-danger">{% trans "Nous contacter" %}</a>
-    <a href="https://github.com/mangaki/mangaki/wiki" target="_blank" class="btn btn-primary">{% trans "Consulter le wiki" %}</a>
-    <a href="https://github.com/mangaki/mangaki/" target="_blank" class="btn btn-primary">{% trans "Voir le code sur GitHub" %}</a>
+    <p>{% trans "Join us!" %}</p>
+    <a href="mailto:jj@mangaki.fr" class="btn btn-danger">{% trans "Contact us" %}</a>
+    <a href="https://github.com/mangaki/mangaki/wiki" target="_blank" class="btn btn-primary">{% trans "Browse the wiki" %}</a>
+    <a href="https://github.com/mangaki/mangaki/" target="_blank" class="btn btn-primary">{% trans "See the code on GitHub" %}</a>
 </div>
 <hr />
 <div>
-    <h1 style="margin-bottom: 0.6em; text-align: center">{% trans "Découvrez la data science à travers Mangaki" %}</h1>
+    <h1 style="margin-bottom: 0.6em; text-align: center">{% trans "Learn data science through Mangaki" %}</h1>
+    <!-- Découvrez la data science à travers Mangaki -->
 
     <figure style="float: left; margin-top: 1em; margin-right: 1em">
         <img src="/static/img/chiro.png" alt="Chiro" height="128">
     </figure>
 
-    <p>{% trans "Notre algorithme est open source, donc vous pouvez l'étudier, et proposer des améliorations." %}</p>
+    <p>{% trans "Our algorithm is open source, so you can understand it, and improve it!" %}</p>
+    <!-- Notre algorithme est open source, donc vous pouvez l'étudier, et proposer des améliorations. -->
 
-    <p>{% trans "Connaissez-vous ces termes&nbsp;: plus proches voisins, décomposition en valeurs singulières, prix Netflix, autoencodeur&nbsp;? "%}</p>
+    <p>{% trans "Do you know: nearest neighbors, singular value decomposition, Netflix prize, autoencoder?"%}</p>
+    <!-- Connaissez-vous ces termes&nbsp;: plus proches voisins, décomposition en valeurs singulières, prix Netflix, autoencodeur&nbsp;? -->
 
-    <p>{% trans "Venez apprendre tout cela sur le repo ou dans l'asso." %}</p>
-    <a href="mailto:jj@mangaki.fr" class="btn btn-danger">{% trans "Nous contacter" %}</a>
-    <a href="http://research.mangaki.fr" target="_blank" class="btn btn-primary">{% trans "Consulter le blog" %}</a>
-</div>
-<hr />
-<div>
-    <h1 style="margin-bottom: 0.6em; text-align: center">{% trans "Le bureau de l'association - 団長" %}</h1>
-</div>
-<div class="row">
-    <div class="col-sm-12 col-md-4">
-        <aside class="performer">
-            <img src="/static/img/jj.jpg" alt="JJ" />
-        </aside>
-        <h2><a href="{% url 'profile' 'jj' %}">JJ</a></h2>Jill-Jênn Vie
-        <h3>{% trans "Président" %}</h3>
-        <hr />
-        <p>{% trans "JJ est chercheur à RIKEN, Tokyo. Il a conçu l'algorithme de recommandation et pilote l'association depuis le Japon." %}</p>
-        {% url "artist-detail" 2159 as yoko_kanno_url %}
-        {% url "artist-detail" 1148 as satoshi_kon_url %}
-        {% url "work-detail" "anime" 26 as cowboy_bebop_url %}
-        {% url "work-detail" "anime" 23 as haruhi_suzumiya_url %}
-        {% with tvtropes_hs_url="http://tvtropes.org/pmwiki/pmwiki.php/LightNovel/HaruhiSuzumiya" %}
-            <p>
-            {% blocktrans trimmed %}
-            Fan absolu de la compositrice <a href="{{ yoko_kanno_url }}">Yoko Kanno</a>, du réalisateur <a href="{{ satoshi_kon_url }}">Satoshi Kon</a> et de la série <a href="{{ cowboy_bebop_url }}">Cowboy Bebop</a>, il attache beaucoup d'importance à la <strong>narration</strong> et au <strong>scénario</strong> des anime. Pour lui, le meilleur plot jamais conçu se trouve en la saga <a href="{{ haruhi_suzumiya_url }}">Haruhi Suzumiya</a> (en témoigne son <a href="{{ tv_tropes_hs_url }}" target="_blank">gisement de tropes</a>).
-            {% endblocktrans %}
-            </p>
-        {% endwith %}
-    </div>
-    <div class="col-sm-12 col-md-4">
-        <aside class="performer">
-            <a href="https://github.com/RaitoBezarius"><img src="/static/img/ryan.jpg" alt="Hououin Kyouma (le vrai)" /></a>
-        </aside>
-        <h2><a href="{% url 'profile' 'RaitoBezarius' %}">RaitoBezarius</a></h2>Ryan Lahfa
-        <h3>{% trans "Trésorier" %}</h3>
-        <hr />
-        {% url "work-detail" "anime" 16 as steinsgate_url %}
-        {% url "artist-detail" 2038 as yu_kamiya_url %}
-        {% with python_url="https://www.python.org" react_url="https://facebook.github.io/react" facebook_url="https://facebook.com" %}
-            <p>
-            {% blocktrans trimmed %}
-            Ryan participe activement à des projets open source, notamment basés sur le langage <a href="{{ python_url }}" target="_blank">Python</a> et les technologies Web telles que <a href="{{ react_url }}" target="_blank">React.js</a>, la bibliothèque JavaScript qui supporte aujourd'hui <a href="{{ facebook_url }}" target="_blank">Facebook</a>.
-            {% endblocktrans %}
-            </p>
-
-            <p>
-            {% blocktrans trimmed %}
-            Voyageur du temps aguerri, il ne cesse de remettre en cause les fondations du monde et désire un jour atteindre le <a href="{{ steinsgate_url }}">Steins;Gate</a>.
-            Au passage, il est fasciné par <a href="{{ yu_kamiya_url }}">Yû Kamiya</a>.
-            {% endblocktrans %}
-            </p>
-        {% endwith %}
-
-    </div>
-    <div class="col-sm-12 col-md-4">
-        <aside class="performer">
-            <img src="/static/img/chiro.png" width="120" alt="Elarnon" />
-        </aside>
-        <h2><a href="{% url 'profile' 'Maduesu' %}">Elarnon</a></h2>Basile Clement
-        <h3>{% trans "Vice-président" %}</h3>
-        <hr />
-        <p>
-        {% trans "Basile est développeur professionnel, ancien élève de l'École normale supérieure. Il code entre autres des chatbots." %}
-        </p>
-        <p>
-        {% blocktrans trimmed %}
-        Il aime bien <a href="{{ haruhi_suzumiya_url }}">Haruhi Suzumiya</a>, et c'est à peu près tout.
-        {% endblocktrans %}
-        </p>
-    </div>
-</div>
-<hr />
-<div>
-    <h1 style="margin-bottom: 0.6em; text-align: center">{% trans "Le conseil d'administration - 団" %}</h1>
-
-    {% url "artist-detail" 2435 as kunihiko_ikuhara_url %}
-    {% url "artist-detail" 2352 as akiyuki_shinbou_url %}
-    {% with doujinstyle_url="https://www.facebook.com/DoujinStyle/" mangacast_url="http://www.mangacast.fr/mot-cle/sedeto/" %}
-    {% blocktrans trimmed %}
-    <p><strong>Sedeto</strong> est graphiste manga pour le Groupe Delcourt. C'est elle qui a réalisé le logo de Mangaki. Mais c'est avant tout une otaku passionnée qui aime <a href="{{ kunihiko_ikuhara_url }}">Kunihiko Ikuhara</a> et le studio <a href="{{ akiyuki_shinbou_url }}">Shaft</a>, ainsi que les shōjo et les hentai, tant d'inspirations qui se retrouvent dans <a href="{{ doujinstyle_url }}" target="_blank">ses illustrations chez Doujin Style</a> et <a href="{{ mangacast_url }}" target="_blank">ses critiques d'anime chez Mangacast</a>.
-    {% endblocktrans %}
-    {% endwith %}
-
-    {% url "artist-detail" 829 as yoshiyuki_sadamoto_url %}
-    {% url "artist-detail" 2040 as hideaki_anno_url %}
-    {% url "artist-detail" 2034 as takeshi_obata_url %}
-    {% with comiket_url="https://www.kanpai.fr/tokyo/comiket" %}
-    {% blocktrans trimmed %}
-    <p><strong>Soubi</strong> est ingénieur en SSII et en prestation pour du développement Drupal chez un grand groupe média. Il file un coup de main du côté frontend de Mangaki, nettoie la base de données et fait des voyages au Japon (si possible avec une escale <a href="{{ comiket_url }}">Comiket</a>) dès qu'il en a l'occasion. C'est un otaku passionné par le yaoi et les seinen, le travail de <a href="{{ yoshiyuki_sadamoto_url }}">Yoshiyuki Sadamoto</a>, <a href="{{ hideaki_anno_url }}">Hideaki Anno</a>, <a href="{{ satoshi_kon_url }}">Satoshi Kon</a>, Sushio, <a href="{{ takeshi_obata_url }}">Takeshi Obata</a> ainsi que celui des studios Colorido, KyoAni et Trigger.</p>
-    {% endblocktrans %}
-    {% endwith %}
-
-    <a href="mailto:jj@mangaki.fr" class="btn btn-primary" style="display: block; margin: auto; width: 400px; margin-top: 2em">{% trans "Vous souhaitez nous rejoindre ? Contactez-nous&nbsp;!" %}</a>
+    <p>{% trans "Come and learn all that on our GitHub repo or in our organization!" %}</p>
+    <!-- Venez apprendre tout cela sur le repo ou dans l'asso. -->
+    <a href="mailto:jj@mangaki.fr" class="btn btn-danger">{% trans "Contact us" %}</a>
+    <a href="http://research.mangaki.fr" target="_blank" class="btn btn-primary">{% trans "Browse the research blog" %}</a>
+    <a href="https://github.com/mangaki/mangaki/" target="_blank" class="btn btn-primary">{% trans "See the code on GitHub" %}</a>
 </div>
 <br />
 <br />

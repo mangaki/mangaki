@@ -1,446 +1,943 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# This file was generated from test2.xlsx
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-21 07:57+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
-"MIME-Version: 1.0\n"
+"PO-Revision-Date: 2018-08-19 21:44+0900\n"
+"Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: xls-to-po 1.0\n"
 
-#: mangaki/settings.py:258
-msgid "Français"
-msgstr "フランス語"
+msgid "Japan"
+msgstr "日本"
 
-#: mangaki/settings.py:259
-msgid "English"
-msgstr "英語"
+msgid "Korea"
+msgstr "韓国"
 
-#: mangaki/settings.py:260
-msgid "日本語"
-msgstr "日本語"
+msgid "France"
+msgstr "フランス"
 
-#: mangaki/templates/about.html:6
-msgid "Quelle sera votre prochaine série favorite&nbsp;?"
-msgstr "あなたが次見るべきアニメは？"
+msgid "China"
+msgstr "中国"
 
-#: mangaki/templates/about.html:12
+msgid "United States"
+msgstr "アメリカ"
+
+msgid "Germany"
+msgstr "ドイツ"
+
+msgid "Taiwan"
+msgstr "台湾"
+
+msgid "Spain"
+msgstr "スペイン"
+
+msgid "UK"
+msgstr "イギリス"
+
+msgid "Hong Kong"
+msgstr "香港"
+
+msgid "Italia"
+msgstr "イタリア"
+
+msgid "International"
+msgstr "国際"
+
+msgid "Seinen"
+msgstr "青年"
+
+msgid "Shonen"
+msgstr "少年"
+
+msgid "Shojo"
+msgstr "少女"
+
+msgid "Yaoi"
+msgstr "やおい"
+
+msgid "Sonyun-Manhwa"
+msgstr "Sonyun、韓国の漫画"
+
+msgid "Kodomo"
+msgstr "こども"
+
+msgid "Ecchi-Hentai"
+msgstr "エッチ、変態"
+
+msgid "Global-Manga"
+msgstr "グローバル・マンガ"
+
+msgid "Manhua"
+msgstr "中国の漫画"
+
+msgid "Josei"
+msgstr "城西"
+
+msgid "Sunjung-Sunjeong"
+msgstr "Sunjung-Sunjeong"
+
+msgid "Chungnyun"
+msgstr "Chungnyun"
+
+msgid "Yuri"
+msgstr "ユーリ"
+
+msgid "Dojinshi-Parody"
+msgstr "同人誌、パロディー"
+
+msgid "Manhwa"
+msgstr "韓国の漫画"
+
+msgid "Yonkoma"
+msgstr "4コマ漫画"
+
+msgid "Directors"
+msgstr "監督"
+
+msgid "Authors"
+msgstr "著者"
+
+msgid "Composers"
+msgstr "作曲"
+
+msgid "Unprocessed"
+msgstr "未処理"
+
+msgid "Accepted"
+msgstr "容認されました"
+
+msgid "Rejected"
+msgstr "拒否されました"
+
+msgid "Unknown"
+msgstr "未知の"
+
+msgid "Prequel"
+msgstr "前編"
+
+msgid "Sequel"
+msgstr "後編"
+
+msgid "Summary"
+msgstr "概要"
+
+msgid "Side story"
+msgstr "サイドストーリー"
+
+msgid "Parent story"
+msgstr "親の話"
+
+msgid "Alternative setting"
+msgstr "代替設定"
+
+msgid "Same setting"
+msgstr "同じ設定"
+
+msgid "Special"
+msgstr "特別"
+
+msgid "Adaptation"
+msgstr "適応"
+
+msgid "Wrong title"
+msgstr "間違ったタイトル"
+
+msgid "Wrong poster"
+msgstr "間違ったポスター"
+
+msgid "Synopsis contains mistakes"
+msgstr "あらすじは、ミスを含んでいます"
+
+msgid "Wrong author"
+msgstr "間違った作者"
+
+msgid "Wrong composer"
+msgstr "間違った作曲家"
+
+msgid "This is a duplicate"
+msgstr "これは重複しています"
+
+msgid "Work is Not Safe for Work"
+msgstr "仕事は仕事のために安全ではありません"
+
+msgid "Work is actually Safe for Work"
+msgstr "仕事は仕事のために、実際に安全です"
+
+msgid "Suggest a reference URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"
+msgstr "参照URLを示唆する（MyAnimeList、AniDB、Icotaku、VGMdb、等）"
+
+msgid "Director"
+msgstr "監督"
+
+msgid "Composer"
+msgstr "作曲家"
+
+msgid "Author"
+msgstr "著者"
+
+msgid "Mangaka"
+msgstr "漫画家"
+
+msgid "Screenwriter"
+msgstr "脚本"
+
+msgid "Import my ratings"
+msgstr "私の評価をインポート"
+
+msgid "Subscribe to Mangaki newsletter"
+msgstr "Mangakiニュースレターを購読します"
+
+msgid "My data can be released anonymously for research"
+msgstr "私のデータは、研究のために匿名で解放することができます"
+
+msgid "Type"
+msgstr "タイプ"
+
+msgid "Suggestion"
+msgstr "提案"
+
+msgid "What series should you watch next?"
+msgstr "どのシリーズ次回見るべきですか？"
+
 msgid ""
-"Mangaki est un <strong>site de recommandation de mangas et d'anime</strong> "
-"créé par une association."
-msgstr ""
-"Mangakiは漫画とアニメのお勧めシステムWEBサイトです。このWEBサイトはフランスの"
-"クレイジーな学生達が作ったNPO法人です"
+"Mangaki is an anime/manga recommendation website made by an organization of "
+"otakus."
+msgstr "Mangakiはオタクの組織によって作られたアニメ/漫画の推薦サイトです。"
 
-#: mangaki/templates/about.html:14
 msgid ""
-"À partir des séries que vous avez vues ou lues, <strong>notre algorithme</"
-"strong> détermine de nouvelles pépites susceptibles de vous plaire&nbsp;!"
-msgstr ""
-"あなたが見たアニメや漫画を入力すると、アルゴリズムがあなたのが好きなアニメや"
-"漫画を特定し、教えてくれます"
+"Tell him what you watched or read, and our algorithm (open source) will find"
+" new precious pearls for you to discover!"
+msgstr "あなたが見たものを彼に言うか、読んで、そして私たちのアルゴリズム（オープンソース）は、あなたが発見するための新しい貴重な真珠を見つけます！"
 
-#: mangaki/templates/about.html:16
-msgid ""
-"Si vous souhaitez participer à l'aventure, il y a plein de choses à "
-"faire&nbsp;!"
-msgstr "もし興味があれば、一緒にアルゴリズムを学びませんか "
+msgid "Join us!"
+msgstr "参加しませんか！"
 
-#: mangaki/templates/about.html:17 mangaki/templates/about.html:34
-msgid "Nous contacter"
+msgid "Contact us"
 msgstr "お問い合わせ"
 
-#: mangaki/templates/about.html:18
-msgid "Consulter le wiki"
-msgstr "ウィキはこちら！"
+msgid "Browse the wiki"
+msgstr "Wikiを閲覧"
 
-#: mangaki/templates/about.html:19
-msgid "Voir le code sur GitHub"
-msgstr "GitHubでコードを見る"
+msgid "See the code on GitHub"
+msgstr "GitHubの上のコードを参照してください。"
 
-#: mangaki/templates/about.html:23
-msgid "Découvrez la data science à travers Mangaki"
-msgstr "Mangakiでデータサイエンスを学ぶ"
+msgid "Learn data science through Mangaki"
+msgstr "Mangakiを介してデータの科学を学びます"
 
-#: mangaki/templates/about.html:29
 msgid ""
-"Notre algorithme est open source, donc vous pouvez l'étudier, et proposer "
-"des améliorations."
-msgstr ""
-"Mangakiのアルゴリズムはオープンソースだから、Mangakiでアルゴリズムを学ぶこと"
-"もできるし、練習することもできる！"
+"Our algorithm is open source, so you can understand it, and improve it!"
+msgstr "当社のアルゴリズムはオープンソースですので、あなたはそれを理解し、それを改善することができます！"
 
-#: mangaki/templates/about.html:31
 msgid ""
-"Connaissez-vous ces termes&nbsp;: plus proches voisins, décomposition en "
-"valeurs singulières, prix Netflix, autoencodeur&nbsp;? "
-msgstr ""
-"このコンセプト知ってる? Nearest neighbors, singular value decomposition, "
-"Netflix Prize, autoencoder? "
+"Do you know: nearest neighbors, singular value decomposition, Netflix prize,"
+" autoencoder?"
+msgstr "あなたは知っています：最も近い隣人、特異値分解、Netflixの賞、オートエンコーダ？"
 
-#: mangaki/templates/about.html:33
-msgid "Venez apprendre tout cela sur le repo ou dans l'asso."
-msgstr "一緒に学ぼう"
+msgid "Come and learn all that on our GitHub repo or in our organization!"
+msgstr "是非、私たちのGitHubのレポ上または当社の組織内のすべてのことを学びます！"
 
-#: mangaki/templates/about.html:35
-msgid "Consulter le blog"
-msgstr "ブログはこちら"
+msgid "Browse the research blog"
+msgstr "研究のブログを閲覧"
 
-#: mangaki/templates/about.html:39
-msgid "Le bureau de l'association - 団長"
-msgstr "理事"
+msgid "Account Deleted"
+msgstr "アカウント削除されました"
 
-#: mangaki/templates/about.html:47
-msgid "Président"
-msgstr "理事長"
+msgid "Account deleted!"
+msgstr "アカウントが削除されました！"
 
-#: mangaki/templates/about.html:49
-msgid ""
-"JJ est chercheur à RIKEN, Tokyo. Il a conçu l'algorithme de recommandation "
-"et pilote l'association depuis le Japon."
-msgstr ""
-"JJは東京のRIKENの研究員。彼はMangakiのアルゴリズムを作り、今は日本からMangaki"
-"へ指示を飛ばしています！"
-
-#: mangaki/templates/about.html:56
-#, python-format
-msgid ""
-"Fan absolu de la compositrice <a href=\"%(yoko_kanno_url)s\">Yoko Kanno</a>, "
-"du réalisateur <a href=\"%(satoshi_kon_url)s\">Satoshi Kon</a> et de la "
-"série <a href=\"%(cowboy_bebop_url)s\">Cowboy Bebop</a>, il attache beaucoup "
-"d'importance à la <strong>narration</strong> et au <strong>scénario</strong> "
-"des anime. Pour lui, le meilleur plot jamais conçu se trouve en la saga <a "
-"href=\"%(haruhi_suzumiya_url)s\">Haruhi Suzumiya</a> (en témoigne son <a "
-"href=\"%(tv_tropes_hs_url)s\" target=\"_blank\">gisement de tropes</a>)."
-msgstr ""
-"好き：<a href=\"%(yoko_kanno_url)s\">菅野よう子</a>、<a href="
-"\"%(satoshi_kon_url)s\">今敏</a>、<a href=\"%(cowboy_bebop_url)s\">カウボーイ"
-"ビバップ</a>、話芸、脚本、取り分け<a href=\"%(haruhi_suzumiya_url)s\">涼宮ハ"
-"ルヒ</a> (<a href=\"%(tv_tropes_hs_url)s\" target=\"_blank\">TVtropes</a>)。"
-"</p>"
-
-#: mangaki/templates/about.html:67
-msgid "Trésorier"
-msgstr "会計"
-
-#: mangaki/templates/about.html:73
-#, python-format
-msgid ""
-"Ryan participe activement à des projets open source, notamment basés sur le "
-"langage <a href=\"%(python_url)s\" target=\"_blank\">Python</a> et les "
-"technologies Web telles que <a href=\"%(react_url)s\" target=\"_blank"
-"\">React.js</a>, la bibliothèque JavaScript qui supporte aujourd'hui <a href="
-"\"%(facebook_url)s\" target=\"_blank\">Facebook</a>."
-msgstr ""
-"Ryanはopen sourceが好き：<a href=\"%(python_url)s\" target=\"_blank"
-"\">Python</a>、<a href=\"%(facebook_url)s\" target=\"_blank\">Facebook</a>の"
-"<a href=\"%(react_url)s\" target=\"_blank\">React.js</a>."
-
-#: mangaki/templates/about.html:79
-#, python-format
-msgid ""
-"Voyageur du temps aguerri, il ne cesse de remettre en cause les fondations "
-"du monde et désire un jour atteindre le <a href=\"%(steinsgate_url)s"
-"\">Steins;Gate</a>. Au passage, il est fasciné par <a href="
-"\"%(yu_kamiya_url)s\">Yû Kamiya</a>."
-msgstr ""
-"好き：<a href=\"%(steinsgate_url)s\">シュタインズ・ゲート</a>、<a href="
-"\"%(yu_kamiya_url)s\">榎宮祐</a>。"
-
-#: mangaki/templates/about.html:92
-msgid "Vice-président"
-msgstr "副理事長"
-
-#: mangaki/templates/about.html:95
-msgid ""
-"Basile est développeur professionnel, ancien élève de l'École normale "
-"supérieure. Il code entre autres des chatbots."
-msgstr "バジルは開発。彼はENS出身です。"
-
-#: mangaki/templates/about.html:98
-#, python-format
-msgid ""
-"Il aime bien <a href=\"%(haruhi_suzumiya_url)s\">Haruhi Suzumiya</a>, et "
-"c'est à peu près tout."
-msgstr "好き：<a href=\"%(haruhi_suzumiya_url)s\">涼宮ハルヒ</a>。だけ。"
-
-#: mangaki/templates/about.html:106
-msgid "Le conseil d'administration - 団"
-msgstr "取締役会"
-
-#: mangaki/templates/about.html:111
-#, python-format
-msgid ""
-"<p><strong>Sedeto</strong> est graphiste manga pour le Groupe Delcourt. "
-"C'est elle qui a réalisé le logo de Mangaki. Mais c'est avant tout une otaku "
-"passionnée qui aime <a href=\"%(kunihiko_ikuhara_url)s\">Kunihiko Ikuhara</"
-"a> et le studio <a href=\"%(akiyuki_shinbou_url)s\">Shaft</a>, ainsi que les "
-"shōjo et les hentai, tant d'inspirations qui se retrouvent dans <a href="
-"\"%(doujinstyle_url)s\" target=\"_blank\">ses illustrations chez Doujin "
-"Style</a> et <a href=\"%(mangacast_url)s\" target=\"_blank\">ses critiques "
-"d'anime chez Mangacast</a>."
-msgstr ""
-"<p><strong>Sedeto</strong>はグラフィックデザイナーです。Mangakiのロゴが作っ"
-"た。<br />好き：<a href=\"%(kunihiko_ikuhara_url)s\">幾原邦彦</a>、<a href="
-"\"%(akiyuki_shinbou_url)s\">シャフトのアニメ</a>、少女マンガ、えろマンガ。<a "
-"href=\"%(doujinstyle_url)s\" target=\"_blank\">Doujin Style</a>、<a href="
-"\"%(mangacast_url)s\" target=\"_blank\">Mangacast</a>。"
-
-#: mangaki/templates/about.html:120
-#, python-format
-msgid ""
-"<p><strong>Soubi</strong> est ingénieur en SSII et en prestation pour du "
-"développement Drupal chez un grand groupe média. Il file un coup de main du "
-"côté frontend de Mangaki, nettoie la base de données et fait des voyages au "
-"Japon (si possible avec une escale <a href=\"%(comiket_url)s\">Comiket</a>) "
-"dès qu'il en a l'occasion. C'est un otaku passionné par le yaoi et les "
-"seinen, le travail de <a href=\"%(yoshiyuki_sadamoto_url)s\">Yoshiyuki "
-"Sadamoto</a>, <a href=\"%(hideaki_anno_url)s\">Hideaki Anno</a>, <a href="
-"\"%(satoshi_kon_url)s\">Satoshi Kon</a>, Sushio, <a href="
-"\"%(takeshi_obata_url)s\">Takeshi Obata</a> ainsi que celui des studios "
-"Colorido, KyoAni et Trigger.</p>"
-msgstr ""
-"<p><strong>Soubi</strong>はコミュニケーションとCSS。<br />すき：<a href="
-"\"%(comiket_url)s\">コミケット</a>、BL、青年、<a href="
-"\"%(yoshiyuki_sadamoto_url)s\">貞本義行</a>, <a href=\"%(hideaki_anno_url)s"
-"\">庵野秀明</a>, <a href=\"%(satoshi_kon_url)s\">今敏</a>、すしお、<a href="
-"\"%(takeshi_obata_url)s\">小畑健</a>、スタジオコロリド、京都アニメーション、"
-"トリガ.</p>"
-
-#: mangaki/templates/about.html:125
-msgid "Vous souhaitez nous rejoindre ? Contactez-nous&nbsp;!"
-msgstr "もし興味があれば、ご連絡ください"
-
-# Now is enough!
-#: mangaki/templates/account/email_confirm.html:6
-#: mangaki/templates/account/email_confirm.html:10
 msgid "Confirm E-mail Address"
-msgstr ""
+msgstr "メールアドレスを確認"
 
-#: mangaki/templates/account/email_confirm.html:16
-#, python-format
 msgid ""
 "Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
 "address for user %(user_display)s."
 msgstr ""
+"その<aのhref=\"mailto:%(email)s\">の％（Eメール）■</a>のはユーザー％（user_display）のための電子メールアドレスであることを確認してください。"
 
-#: mangaki/templates/account/email_confirm.html:20
 msgid "Confirm"
-msgstr ""
+msgstr "確かめます"
 
-#: mangaki/templates/account/email_confirm.html:27
-#, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a href="
-"\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
+"このメールの確認リンクが期限切れまたは無効です。 "
+"href=\"%(email_url)s\">は、新しい電子メール確認要求</a>を発行<aしてください。"
 
-#: mangaki/templates/account/login.html:7
-#: mangaki/templates/account/login.html:11
-#: mangaki/templates/account/login.html:53
 msgid "Sign In"
-msgstr ""
+msgstr "サインイン"
 
-#: mangaki/templates/account/login.html:15
-#, python-format
 msgid ""
-"Please sign in with one\n"
-"of your existing third party accounts. Or, <a href=\"%(signup_url)s\">sign "
-"up</a>\n"
-"for a %(site_name)s account and sign in below:"
+"Please sign in with one of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign in "
+"below:"
 msgstr ""
+"既存のサードパーティのアカウントのいずれかでログインしてください。または、<aは％（SITE_NAME）■アカウントの</a>にサインアップすると、以下に署名しhref=\"%(signup_url)s\">："
 
-#: mangaki/templates/account/login.html:23
 msgid "or"
-msgstr ""
+msgstr "若しくは"
 
-#: mangaki/templates/account/login.html:27
-#, python-format
 msgid ""
-"If you have not created an account yet, then please\n"
-"<a href=\"%(signup_url)s\">sign up</a> first."
-msgstr ""
+"If you have not created an account yet, then please <a "
+"href=\"%(signup_url)s\">sign up</a> first."
+msgstr "まだアカウントを作成していない場合は、href=\"%(signup_url)s\">は最初</a>にサインアップ<aしてください。"
 
-#: mangaki/templates/account/login.html:54
+msgid ""
+"You rated a few works anonymously on this computer. These ratings will be "
+"lost if you login to an existing account. You should <a "
+"href=\"%(signup_url)s\">sign up</a> to save them.\""
+msgstr ""
+"あなたはこのコンピュータに匿名でいくつかの作品を評価しました。既存のアカウントにログインする場合、これらの評価は失われます。あなたはhref=\"%(signup_url)s\">は、それらを保存するために</a>にサインアップ<a必要があります。」"
+
 msgid "Forgot Password?"
-msgstr ""
+msgstr "パスワードをお忘れですか？"
 
-#: mangaki/templates/account/logout.html:5
-#: mangaki/templates/account/logout.html:8
-#: mangaki/templates/account/logout.html:17
 msgid "Sign Out"
-msgstr ""
+msgstr "サインアウト"
 
-#: mangaki/templates/account/logout.html:10
 msgid "Are you sure you want to sign out?"
-msgstr ""
+msgstr "あなたがサインアウトしてもよろしいですか？"
 
-#: mangaki/templates/account/password_reset.html:7
-#: mangaki/templates/account/password_reset.html:11
-#: mangaki/templates/account/password_reset_done.html:6
-#: mangaki/templates/account/password_reset_done.html:9
 msgid "Password Reset"
-msgstr ""
+msgstr "パスワードのリセット"
 
-#: mangaki/templates/account/password_reset.html:16
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll send you "
-"an e-mail allowing you to reset it."
-msgstr ""
+"Forgotten your password? Enter your e-mail address below, and we'll send you"
+" an e-mail allowing you to reset it."
+msgstr "パスワードを忘れましたか？下にメールアドレスを入力して、我々はあなたがそれをリセットすることができ、あなたに電子メールをお送りします。"
 
-#: mangaki/templates/account/password_reset.html:21
 msgid "Reset My Password"
-msgstr ""
+msgstr "私のパスワードをリセットする"
 
-#: mangaki/templates/account/password_reset.html:24
 msgid "Please contact us if you have any trouble resetting your password."
-msgstr ""
+msgstr "あなたのパスワードをリセットするすべての問題がある場合は、お問い合わせください。"
 
-#: mangaki/templates/account/password_reset_done.html:15
 msgid ""
 "We have sent you an e-mail. Please contact us if you do not receive it "
 "within a few minutes."
-msgstr ""
+msgstr "私たちはあなたの電子メールを送ってきました。あなたは数分以内にそれを受信しない場合は、お問い合わせください。"
 
-#: mangaki/templates/account/password_reset_from_key.html:6
-#: mangaki/templates/account/password_reset_from_key.html:9
-#: mangaki/templates/account/password_reset_from_key_done.html:4
-#: mangaki/templates/account/password_reset_from_key_done.html:7
 msgid "Change Password"
-msgstr ""
+msgstr "パスワードを変更する"
 
-#: mangaki/templates/account/password_reset_from_key.html:9
 msgid "Bad Token"
-msgstr ""
+msgstr "バート・トークン"
 
-#: mangaki/templates/account/password_reset_from_key.html:13
-#, python-format
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
-"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
-"a>."
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
+"reset</a>."
 msgstr ""
+"パスワードリセットのリンクは、それが既に使用されている可能性があるため、無効でした。新しいパスワードがリセットする</a> "
+"href=\"%(passwd_reset_url)s\"> <aをリクエストしてください。"
 
-#: mangaki/templates/account/password_reset_from_key.html:19
 msgid "change password"
-msgstr ""
+msgstr "パスワードを変更する"
 
-#: mangaki/templates/account/password_reset_from_key.html:22
-#: mangaki/templates/account/password_reset_from_key_done.html:8
 msgid "Your password is now changed."
-msgstr ""
+msgstr "パスワードが変更されました。"
 
-#: mangaki/templates/account/signup.html:7
-#: mangaki/templates/socialaccount/signup.html:6
 msgid "Signup"
-msgstr ""
+msgstr "サインアップ"
 
-#: mangaki/templates/admin/change_default_work_title.html:8
-#: mangaki/templates/admin/merge_selected_confirmation.html:8
-#: mangaki/templates/admin/refresh_poster_confirmation.html:8
-#: mangaki/templates/admin/update_tags_via_anidb.html:8
+msgid "Join Mangaki"
+msgstr "Mangakiに参加"
+
+msgid "And contribute to the creation of a better world."
+msgstr "そして、よりよい世界の創造に貢献しています。"
+
+msgid ""
+"If you have already an account, you can <a href=\"%(login_url)s\">login</a>."
+msgstr "すでにアカウントをお持ちの場合は、href=\"%(login_url)s\">ログイン</a>にすることができます。"
+
+msgid ""
+"You already rated a few works. They will be imported to your profile if you "
+"check the box <strong>Import my ratings</strong> below!"
+msgstr ""
+"あなたはすでにいくつかの作品を評価しました。彼らはあなたが<strong>をインポート私の評価</ "
+"strong>の下のボックスをチェックすると、あなたのプロファイルにインポートされます！"
+
+msgid "Subscribe to Mangaki's newsletter"
+msgstr "Mangakiのニュースレターを購読します"
+
+msgid "some waifus/husbandos in your mails?"
+msgstr "あなたのメールでのいくつかのwaifus / husbandos？"
+
+msgid "My data can be used anonymously for research"
+msgstr "私のデータは、研究のために匿名で使用することができます"
+
+msgid "Import my ratings"
+msgstr "私の評価をインポート"
+
+msgid "Sign In &raquo;"
+msgstr "で表示＆raquoに署名。"
+
+msgid "My works"
+msgstr "私の仕事"
+
+msgid ""
+"By subscribing, you accept that your ratings may be saved by Mangaki to keep"
+" your profile up-to-date, recommend anime to you, and improve other users' "
+"recommendations."
+msgstr ""
+"サブスクライブすることで、あなたの評価は、あなたにアニメをお勧め最新プロフィールを維持し、他のユーザの推奨を改善するためにMangakiによって保存することができることを受け入れます。"
+
+msgid "How does it work?"
+msgstr "それがどのように動作しますか？"
+
+msgid "You can update your options in your profile."
+msgstr "あなたのプロフィールにあなたのオプションを更新することができます。"
+
 msgid "Home"
-msgstr ""
+msgstr "家"
 
-#: mangaki/templates/admin/change_default_work_title.html:55
-#: mangaki/templates/admin/merge_selected_confirmation.html:62
-#: mangaki/templates/admin/refresh_poster_confirmation.html:38
-#: mangaki/templates/admin/update_tags_via_anidb.html:126
 msgid "Yes, I'm sure"
-msgstr ""
+msgstr "はい、確かです"
 
-#: mangaki/templates/admin/change_default_work_title.html:56
-#: mangaki/templates/admin/merge_selected_confirmation.html:63
-#: mangaki/templates/admin/refresh_poster_confirmation.html:39
-#: mangaki/templates/admin/update_tags_via_anidb.html:127
 msgid "No, take me back"
-msgstr ""
+msgstr "いいえ、私を取り戻します"
 
-#: mangaki/templates/base.html:64
+msgid "Mangaki is an anime & manga recommendation website"
+msgstr "Mangakiは、アニメ＆漫画の推薦サイトです"
+
+msgid "Open the menu"
+msgstr "メニューを開きます。"
+
 msgid "What is Mangaki?"
-msgstr ""
+msgstr "Mangakiは何ですか？"
 
-#: mangaki/templates/base.html:71
 msgid "Anime"
-msgstr ""
+msgstr "アニメ"
 
-#: mangaki/templates/base.html:76
 msgid "Mangas"
-msgstr ""
+msgstr "マンガ"
 
-#: mangaki/templates/base.html:81
 msgid "Recommendations"
-msgstr ""
+msgstr "勧告"
 
-#: mangaki/templates/base.html:86
-msgid "Événements"
-msgstr ""
-
-#: mangaki/templates/base.html:91
 msgid "Top 20"
-msgstr ""
+msgstr "トップ20"
 
-#: mangaki/templates/base.html:94
-msgid "Directeurs"
-msgstr ""
-
-#: mangaki/templates/base.html:95
-msgid "Compositeurs"
-msgstr ""
-
-#: mangaki/templates/base.html:96
-msgid "Auteurs"
-msgstr ""
-
-#: mangaki/templates/base.html:101
 msgid "Suggestions"
-msgstr ""
+msgstr "提案"
 
-#: mangaki/templates/socialaccount/connections.html:5
-#: mangaki/templates/socialaccount/connections.html:8
+msgid "Log in"
+msgstr "ログイン"
+
+msgid "Welcome, <strong>%(user)s</strong>!"
+msgstr "ようこそ、<強い>％（利用者）の</ strong>の！"
+
+msgid "Log out"
+msgstr "ログアウト"
+
+msgid ""
+"You rated a few works anonymously, you can <a href=\"%(profile)s\">see "
+"them</a>, don't forget to <a href=\"%(signup_url)s\">subscribe</a> to save "
+"them!"
+msgstr ""
+"あなたはhref=\"%(signup_url)s\"> "
+"</a>を購読<aすることを忘れないでください、href=\"%(profile)s\">がそれらを</a>を見る<aことができ、匿名でいくつかの作品を評価しましたそれらを保存します！"
+
+msgid "Mangaki project"
+msgstr "Mangakiプロジェクト"
+
+msgid "FAQ"
+msgstr "よくある質問"
+
+msgid "Legal mentions"
+msgstr "法的には言及します"
+
+msgid "Guidelines"
+msgstr "ガイドライン"
+
+msgid "Blog"
+msgstr "ブログ"
+
+msgid "Report a bug"
+msgstr "バグを報告"
+
+msgid "Donate"
+msgstr "寄付します"
+
+msgid "Version:"
+msgstr "バージョン："
+
+msgid "Suggestion list"
+msgstr "候補リスト"
+
+msgid "Page"
+msgstr "ページ"
+
+msgid "Go to the NSFW grid"
+msgstr "NSFWグリッドに移動します"
+
+msgid "This problem is solved,This problem is ongoing"
+msgstr "この問題は解決され、この問題は現在進行中です"
+
+msgid "Problem:"
+msgstr "問題："
+
+msgid "Reported by:"
+msgstr "によって報告されました："
+
+msgid "Target:"
+msgstr "ターゲット："
+
+msgid ""
+"You <strong><span class=\"text-success\">approved <span class=\"glyphicon "
+"glyphicon-thumbs-up\" aria-hidden=\"true\"></span></span></strong> this "
+"suggestion."
+msgstr ""
+"あなたは、<スパンクラス= \"テキスト成功\">承認<スパンクラス= \"glyphicon glyphicon-親指アップ\" ARIA-隠さ= "
+"\"真の\"> </ span>を</ span>を</ strong>のこの提案の<strong>。"
+
+msgid ""
+"You <strong><span class=\"text-danger\">rejected <span class=\"glyphicon "
+"glyphicon-thumbs-down\" aria-hidden=\"true\"></span></span></strong> this "
+"suggestion."
+msgstr ""
+"あなたは、<スパンクラス= \"テキスト-危険\">拒否<スパンクラス= \"glyphicon glyphicon-親指ダウン\" ARIA-隠さ= "
+"\"真の\"> </ span>を</ span>を</ strong>のこの提案の<strong>。"
+
+msgid "You asked <strong>an admin for help</strong>."
+msgstr "あなたは、ヘルプ</ strong>のための<strong>管理者に尋ねました。"
+
+msgid "This problem was marked as solved!"
+msgstr "解決としてこの問題が顕著でした！"
+
+msgid "Copy"
+msgstr "コピー"
+
+msgid "Sharing link"
+msgstr "リンクを共有"
+
+msgid "Solve the problem automatically"
+msgstr "自動的に問題を解決します"
+
+msgid "Close this suggestion"
+msgstr "この提案を閉じます"
+
+msgid "Ask an admin for help"
+msgstr "助けのための管理を依頼"
+
+msgid "You asked an admin for help"
+msgstr "あなたは助けのために管理者を尋ねました"
+
+msgid "Reopen cette suggestion"
+msgstr "cetteの提案を再度開きます"
+
+msgid "This work belongs to this cluster:"
+msgstr "この作品は、このクラスタに属しています："
+
+msgid "This cluster is"
+msgstr "このクラスタはあります"
+
+msgid "by"
+msgstr "によって"
+
+msgid "This cluster was merged:"
+msgstr "このクラスタは、マージされました："
+
+msgid "Previous"
+msgstr "前"
+
+msgid "Back"
+msgstr "バック"
+
+msgid "Next"
+msgstr "次"
+
+msgid "Copied link!"
+msgstr "コピーしたリンク！"
+
+msgid "Link was not copied"
+msgstr "リンクがコピーされませんでした。"
+
+msgid "NSFW grid"
+msgstr "NSFWグリッド"
+
+msgid "Back to suggestions"
+msgstr "戻る提案へ"
+
+msgid "works in the grid"
+msgstr "グリッドの作品"
+
+msgid "Mark remaining works as SFW"
+msgstr "SFWとしてマーク残りの作品"
+
+msgid "and continue"
+msgstr "そして、継続"
+
+msgid "Attention!"
+msgstr "注意！"
+
+msgid ""
+"You are not logged in so by default you can't browse NSFW works,In your "
+"profile you stated that you didn't want to browse NSFW works"
+msgstr ""
+"あなたは、自分のプロフィールでは、あなたがNSFW作品を閲覧したくなかったと述べ、あなたがNSFW作品を閲覧することはできませんデフォルトではそうでは記録されません"
+
+msgid "Display anyway?"
+msgstr "とにかく表示？"
+
+msgid "Yes"
+msgstr "はい"
+
+msgid "No"
+msgstr "ノー"
+
+msgid "Remainder:"
+msgstr "残り："
+
+msgid "You agreed to see NSFW works on this grid temporarily."
+msgstr "あなたはNSFWが一時的にこのグリッド上で動作確認するために合意しました。"
+
+msgid "<a href=\"%(go_back_url)s\">Click here</a> to go back."
+msgstr "<aこちらをクリックして戻って</a>をhref=\"%(go_back_url)s\">。"
+
+msgid "It's NSFW!"
+msgstr "それはNSFWです！"
+
+msgid "Reported"
+msgstr "報告"
+
+msgid "NSFW,SFW"
+msgstr "NSFW、SFW"
+
+msgid "Thanks for voting. An admin will help asap!"
+msgstr "投票していただきありがとうございます。管理者はできるだけ早く助けます！"
+
+msgid ""
+"<strong>No result:</strong> either no work was reported as NSFW/SFW, or you "
+"gave your advice already."
+msgstr ""
+"<strong>いいえ結果は：</ strong>のいずれかに何の仕事がNSFW / "
+"SFWとして報告されていない、またはあなたはすでにあなたのアドバイスを与えました。"
+
+msgid "Refresh and see more"
+msgstr "更新し、より多くのを参照してください"
+
+msgid "Mangaki, anime and manga recommendation"
+msgstr "Mangaki、アニメやマンガの勧告"
+
+msgid "Rate your favorite series and discover new ones!"
+msgstr "お気に入りのシリーズを評価し、新しいものを発見！"
+
+msgid "I prefer anime"
+msgstr "私はアニメを好みます"
+
+msgid "I prefer manga"
+msgstr "私は漫画を好みます"
+
+msgid "Artists"
+msgstr "アーティスト"
+
+msgid "Hint: You can press Enter to trigger the search"
+msgstr "ヒント：検索をトリガするためにEnterキーを押すことができます"
+
+msgid "Icons"
+msgstr "アイコン"
+
+msgid ""
+"The icons we used for the ratings are created by <a "
+"href=\"http://www.flaticon.com/authors/dave-gandy\">Dave Gandy</a> for <a "
+"href=\"http://fontawesome.io\">fontawesome</a>. The SVG version comes from "
+"<a href=\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
+msgstr ""
+"// fontawesome：我々は評価のために使用されるアイコンは、デイブGANDYは<HREF = "
+"\"HTTPの</a>にhref=\"http://www.flaticon.com/authors/dave-gandy\"> "
+"<aによって作成されます。 IO \"> fontawesome </a>を。 SVGのバージョンは<a "
+"href=\"http://www.flaticon.com/packs/font-awesome\"> flaticon </a>に由来しています。"
+
+msgid ""
+"Here are some recommendations that you might like.<br /> Rate them and "
+"reload to get new ones."
+msgstr "ここであなたが好きかもしれないいくつかの推奨事項がある。/> <brそれらを評価し、新しいものを得るために再ロードします。"
+
+msgid "All"
+msgstr "すべて"
+
+msgid "Anime only"
+msgstr "アニメのみ"
+
+msgid "Manga only"
+msgstr "マンガだけ"
+
+msgid ""
+"I want new recommendations! <br class=\"visible-xs\">(After you rate those.)"
+msgstr "私は新しい提案をしたいです！ （あなたがそれらを評価した後。）class=\"visible-xs\"> <br"
+
+msgid ""
+"To receive recommandations, you should at least <a "
+"href=\"%(work_list_url)s\">rate an anime</a>!"
+msgstr ""
+"少なくとも<a href=\"%(work_list_url)s\">アニメ</a>を評価recommandationsを受信するには、あなたがすべき！"
+
+msgid "Number of episodes:"
+msgstr "エピソードの数："
+
+msgid "Original title:"
+msgstr "原題："
+
+msgid "Editor:"
+msgstr "編集者："
+
+msgid "Origin:"
+msgstr "原点："
+
+msgid "Genres:"
+msgstr "ジャンル："
+
+msgid "Type:"
+msgstr "タイプ："
+
+msgid "Catalog number:"
+msgstr "カタログ番号："
+
+msgid "Find this album on VGMdb"
+msgstr "VGMdbにこのアルバムを探します"
+
+msgid "Stats"
+msgstr "統計"
+
+msgid "References"
+msgstr "リファレンス"
+
+msgid "See on %(name)s"
+msgstr "S％に（名前）を参照してください。"
+
+msgid "Suggest an edit for this page"
+msgstr "このページの編集を提案します"
+
+msgid "Suggest this work to a user on Mangaki"
+msgstr "Mangaki上のユーザーに、この作品を提案します"
+
+msgid "This user already knows this work"
+msgstr "このユーザーはすでにこの作品を知っています"
+
+msgid "Suggestion successfully sent!"
+msgstr "提案は正常に送信します！"
+
+msgid "Suggest an edit for"
+msgstr "編集のための提案"
+
+msgid "Thanks for improving Mangaki!"
+msgstr "Mangakiを改善するためのありがとう！"
+
+msgid "Please indicate what part of the work has a problem."
+msgstr "問題を抱えている仕事のどの部分明記してください。"
+
+msgid "Sketch your solution, and submit it!"
+msgstr "あなたのソリューションをスケッチし、それを提出します！"
+
+msgid "Close"
+msgstr "閉じる"
+
+msgid "Submit"
+msgstr "提出します"
+
+msgid "Cheatsheet for key shortcuts"
+msgstr "キーショートカットのチートシート"
+
+msgid "Moves"
+msgstr "動きます"
+
+msgid ""
+"Rate a few cards below, or using the search bar.<br /> Then click <a "
+"class=\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what "
+"Mangaki recommends!"
+msgstr ""
+"以下、いくつかのカードを評価するか、検索バーを使用して。<br /> <aその後class=\"alert-link\" "
+"href=\"%(reco_url)s\">をクリック勧告がMangakiが推奨するか見て</a>を！"
+
+msgid ""
+"New on Mangaki? Start rating some works below! Then see your "
+"recommendations, and <a "
+"href=\"%(signup_url)s?next=%(request.get_full_path|urlencode)s\">sign up</a>"
+" to keep your ratings."
+msgstr ""
+"Mangakiの新しいですか？以下のいくつかの作品を評価開始！次に、あなたの提言を見て、<aは、あなたの評価を維持するために</a>にサインアップhref=\"%(signup_url)s?next=%(request.get_full_path|urlencode)s\">。"
+
+msgid "Mosaic"
+msgstr "モザイク"
+
+msgid "Recent"
+msgstr "最近"
+
+msgid "Top"
+msgstr "上"
+
+msgid "Popular"
+msgstr "人気のあります"
+
+msgid "Pearls"
+msgstr "真珠"
+
+msgid "Controversial"
+msgstr "物議を醸します"
+
+msgid "Random"
+msgstr "ランダム"
+
+msgid "A-Z"
+msgstr "-Z"
+
+msgid ""
+"Enter the title of some %(category)s (currently %(objects_count)s works)\""
+msgstr "「いくつか％（カテゴリ）S（現在％（objects_count）の作品）のタイトルを入力します。"
+
+msgid "Hint: press Enter to trigger the search"
+msgstr "ヒント：Enterキーを押して検索をトリガします"
+
+msgid "Get recommendations now"
+msgstr "今の勧告を見ます"
+
+msgid "See more…"
+msgstr "続きを見る…"
+
+msgid "Your ratings"
+msgstr "あなたの評価"
+
+msgid "<a href=\"%(signup_url)s\">Signup</a> to save them"
+msgstr "<a href=\"%(signup_url)s\">申し込み</a>に保存します"
+
+msgid "Subscribed since %(member_days)s days"
+msgstr "％（member_days）の時代から加入"
+
+msgid "Rated works"
+msgstr "定格作品"
+
+msgid "My settings"
+msgstr "私の設定"
+
+msgid "Delete all my ratings"
+msgstr "すべての私の評価を削除します。"
+
+msgid "Export all my data"
+msgstr "すべての私のデータをエクスポートします。"
+
+msgid "My profile is public"
+msgstr "私のプロフィールは公開され"
+
+msgid "Sent recommendations"
+msgstr "送信された勧告"
+
+msgid "was recommended to"
+msgstr "に推奨されていました"
+
+msgid "Received recommandations"
+msgstr "受信recommandations"
+
+msgid "was recommended to you by"
+msgstr "によってあなたに推奨されました"
+
+msgid "(This list is empty.)"
+msgstr "（このリストは空です。）"
+
+msgid "Delete all received recommendations"
+msgstr "受信したすべての勧告を削除します。"
+
+msgid "Ask Mangaki to sort!"
+msgstr "ソートするMangakiを依頼！"
+
+msgid "seen by"
+msgstr "で見られる"
+
+msgid "watchlist"
+msgstr "ウォッチリスト"
+
+msgid "read by"
+msgstr "で読み取り"
+
+msgid "wishlist"
+msgstr "ウィッシュリスト"
+
+msgid "Recommendations to"
+msgstr "への提言"
+
+msgid "seen"
+msgstr "見て"
+
+msgid "read"
+msgstr "読む"
+
+msgid "My recommendations"
+msgstr "私の提言"
+
+msgid "{{ profile.username }}'s profile is not disclosed publicly."
+msgstr "{{profile.username}}のプロファイルは公に開示されていません。"
+
 msgid "Account Connections"
-msgstr ""
+msgstr "アカウントの接続"
 
-#: mangaki/templates/socialaccount/connections.html:11
 msgid ""
 "You can sign in to your account using any of the following third party "
 "accounts:"
-msgstr ""
+msgstr "あなたは、次のサードパーティのアカウントのいずれかを使用して、あなたのアカウントにログインすることができます："
 
-#: mangaki/templates/socialaccount/connections.html:35
 msgid "Remove"
-msgstr ""
+msgstr "取り除きます"
 
-#: mangaki/templates/socialaccount/connections.html:43
 msgid ""
 "You currently have no social network accounts connected to this account."
-msgstr ""
+msgstr "現在、このアカウントに接続されていないソーシャルネットワークのアカウントを持っていません。"
 
-#: mangaki/templates/socialaccount/connections.html:46
 msgid "Add a 3rd Party Account"
-msgstr ""
+msgstr "サードパーティのアカウントを追加"
 
-#: mangaki/templates/socialaccount/signup.html:9
-#: mangaki/templates/socialaccount/signup.html:20
 msgid "Sign Up"
-msgstr ""
+msgstr "サインアップ"
 
-#: mangaki/templates/socialaccount/signup.html:11
-#, python-format
 msgid ""
-" Vous êtes sur le point d'utiliser votre compte %(provider_name)s pour vous "
-"connecter à\n"
-"%(site_name)s. Pour terminer, veuillez compléter le formulaire suivant:"
+"You are about to use your %(provider_name)s account to connect to "
+"%(site_name)s. In order to do so, please fill the following form:"
 msgstr ""
+"あなたは（SITE_NAME）■％に接続します％（PROVIDER_NAME）のアカウントを使用しようとしています。そうするためには、以下のフォームに必要事項を記入してください。"
 
-#~ msgid "C'est quoi ?"
-#~ msgstr "Mangakiとは？"
+msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
+msgstr "%(date)sのMangakiの%(category)sトップ%(size)s"
+
+msgid "Top 20 of %(category)s on Mangaki"
+msgstr "％のトップ20 Mangaki上（カテゴリ）■"
+
+msgid "Name"
+msgstr "名"
+
+msgid "Score"
+msgstr "スコア"
+
+msgid "Number of ratings"
+msgstr "評価の数"
+
+msgid "Number of favorites"
+msgstr "お気に入り数"
+
+msgid "No results."
+msgstr "結果がありません。"
+
+msgid "The page you're looking for was not found (yet?)."
+msgstr "あなたが探しているページは（まだ？）が見つかりませんでした。"
+
+msgid "You don't have access to this page."
+msgstr "このページへのアクセス権を持っていません。"
+
+msgid "This request is incorrect. What did you try to do?"
+msgstr "この要求が正しくありません。何を試しましたか？"
+
+msgid "Love"
+msgstr "愛"
+
+msgid "Like"
+msgstr "以下のような"
+
+msgid "Neutral"
+msgstr "中性"
+
+msgid "Dislike"
+msgstr "嫌い"
+
+msgid "I want to see"
+msgstr "見たい"
+
+msgid "I don't want to see"
+msgstr "私は見たくありません"

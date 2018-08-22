@@ -67,13 +67,6 @@
                             </ul>
                         </li>
                         <li class="dropdown">
-                            <a href="{% url 'about' LANGUAGE_CODE %}">
-                                {% trans "What is Mangaki?" %}
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
                             <a href="{% url 'work-list' 'anime' %}">
                                 {% trans "Anime" %}
                             </a>
@@ -86,11 +79,6 @@
                         <li class="dropdown">
                             <a href="{% url 'reco' %}">
                                 {% trans "Recommendations" %}
-                            </a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="{% url 'events' %}">
-                                {% trans "Events" %}
                             </a>
                         </li>
                         <li class="dropdown">
@@ -118,7 +106,7 @@
                                     class="glyphicon glyphicon-user"></span>&nbsp;{% trans "Signup" %}</a></li>
                         {% else %}
                             <li><a href="{% url 'profile' user.username %}">
-                                {% blocktrans with username=user.username %}
+                                {% blocktrans with username=user.username trimmed %}
                                 Welcome, <strong>{{ user }}</strong>!
                                 {% endblocktrans %}
                             </a>
@@ -139,9 +127,12 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="alert alert-warning">
-                    Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les
-                    voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les
-                    sauvegarder!
+                    {% url 'my-profile' as profile %}
+                    {% url 'account_signup' as signup_url %}
+                    {% blocktrans trimmed %}
+                    You rated a few works anonymously, you can <a href="{{ profile }}">see them</a>, don't forget to <a href="{{ signup_url }}">subscribe</a> to save them!
+                    {% endblocktrans %}
+                    <!-- Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les sauvegarder! -->
                 </div>
             </div>
         </div>
@@ -152,11 +143,21 @@
     <div id="push"></div>
 </div>
 
-<footer>
+<footer class="navbar navbar-default">
     <nav class="navbar navbar-default">
-        <div class="navbar-collapse">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#footer-collapse">
+                <span class="sr-only">{% trans "Open the menu" %}</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse" id="footer-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="{% url 'about' 'fr' %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;
+                <li><a href="{% url 'about' LANGUAGE_CODE %}"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;
                     {% trans "Mangaki project" %}</a></li>
                 <li><a href="{% url 'faq' %}"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;
                     {% trans "FAQ" %}</a></li>
@@ -164,9 +165,10 @@
                     {% trans "Legal mentions" %}</a></li>
                 <li><a href="{% url 'cgu' %}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;
                     {% trans "Guidelines" %}</a></li>
+                <li><a href="http://research.mangaki.fr"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;
+                    {% trans "Blog" %}</a></li>
                 <li><a href="https://twitter.com/mangakifr" target="_blank">@mangakifr</a></li>
-                <li><a href="mailto:jj@mangaki.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;{% trans "Contact:" %}
-                    jj@mangaki.fr</a></li>
+                <li><a href="mailto:jj@mangaki.fr"><span class="glyphicon glyphicon-envelope"></span>&nbsp;{% trans "Contact us" %}</a></li>
                 <li><a href="https://github.com/mangaki/mangaki/issues" target="_blank"><span
                         class="glyphicon glyphicon-fire"></span>&nbsp;{% trans "Report a bug" %}</a></li>
                 <li><a href="https://paypal.me/mangaki" target="_blank"><span

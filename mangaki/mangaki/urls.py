@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
@@ -21,7 +22,6 @@ urlpatterns = [
     url(r'^$', views.index, name='home'),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works, name='get-work'),
     url(r'^data/reco/(?P<algo>\w+)/(?P<category>\w+)\.json$', views.get_reco_algo_list, name='get-reco-algo-list'),
-    url(r'^data/reco_dpp/(?P<category>\w+)\.json$', views.get_reco_list_dpp, name='get-dpp-list'),
     url(r'^getuser/(?P<work_id>\w+)\.json$', views.get_user_for_recommendations, name='get-user-for-reco'),
     url(r'^getuser\.json$', views.get_users, name='get-user'),
     url(r'^recommend/(?P<work_id>\w+)/(?P<target_id>\w+)$', views.recommend_work, name='reco-work'),
@@ -44,11 +44,9 @@ urlpatterns = [
     url(r'^u/(?P<username>.+?)/?$', views.get_profile_works, name='profile'),
 
     url(r'^reco/$', views.get_reco, name='reco'),
-    url(r'^reco_dpp/$', views.get_reco_dpp, name='reco_dpp'),
     url(r'^artists/$', views.ArtistList.as_view(), name='artist-list'),
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing, name='add-pairing'),
-    url(r'^vote_dpp/(?P<work_id>\d+)$', views.dpp_work, name='vote-dpp'),
     url(r'^vote/(?P<work_id>\d+)$', views.rate_work, name='vote'),
     url(r'^research/$', views.update_research, name='research'),
     url(r'^admin/', admin.site.urls),
@@ -68,12 +66,11 @@ urlpatterns = [
     url(r'^top/(?P<category_slug>[\w-]+)/$', views.top, name='top'),
     url(r'^(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='work-list'),
     url(r'^(?P<category>[\w-]+)/(?P<pk>\d+)$', views.WorkDetail.as_view(), name='work-detail'),
-    url(r'^dpp/(?P<category>[\w-]+)/$', views.WorkList.as_view(), name='dpp-works', kwargs={'dpp': True})
 ]
 
-handler404 = views.generic_error_view("Le contenu que tu cherches est introuvable.", 404)
-handler403 = views.generic_error_view("L'accès au contenu que tu cherches est refusé.", 403)
-handler400 = views.generic_error_view("Ta requête est incorrecte.", 400)
+handler404 = views.generic_error_view(_("The page you're looking for was not found (yet?)."), 404)
+handler403 = views.generic_error_view(_("You don't have access to this page."), 403)
+handler400 = views.generic_error_view(_("This request is incorrect. What did you try to do?"), 400)
 
 if DEBUG:  # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-files-uploaded-by-a-user-during-development
     import debug_toolbar
