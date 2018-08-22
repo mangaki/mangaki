@@ -17,12 +17,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         nb_clusters = int(options.get('nb')[0])
 
-        clusters = WorkCluster.objects.order_by('-id').filter(status='unprocessed')#.annotate(Count('rating')).order_by('-rating__count')[0]
+        clusters = WorkCluster.objects.order_by('-id').filter(status='unprocessed')
         self.stdout.write('%d WorkClusters' % (clusters.count()))
 
         c = 0
         for cluster in clusters:
-            if cluster.get_difficulty() < 1:
+            if cluster.difficulty < 1:
                 merge_works(None, WorkCluster.objects.filter(id=cluster.id), force=True)
                 c += 1
                 self.stdout.write(self.style.SUCCESS('%s was merged' % str(cluster)))

@@ -591,7 +591,8 @@ class WorkCluster(models.Model):
     merged_on = models.DateTimeField(blank=True, null=True)
     origin = models.ForeignKey(Suggestion, related_name='origin_suggestion', on_delete=models.CASCADE, blank=True, null=True)
 
-    def get_difficulty(self):
+    @cached_property
+    def difficulty(self):
         works_to_merge_qs = self.works.order_by('id').prefetch_related('rating_set', 'genre')
         work_dicts_to_merge = list(works_to_merge_qs.values())
         field_changeset = get_field_changeset(work_dicts_to_merge)

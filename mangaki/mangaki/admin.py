@@ -519,7 +519,7 @@ class TaggedWorkAdmin(admin.ModelAdmin):
 
 @admin.register(WorkCluster)
 class WorkClusterAdmin(admin.ModelAdmin):
-    list_display = ('user', 'get_work_titles', 'resulting_work', 'reported_on', 'merged_on', 'checker', 'status', 'get_difficulty')
+    list_display = ('user', 'get_work_titles', 'resulting_work', 'reported_on', 'merged_on', 'checker', 'status', 'difficulty')
     list_filter = ('status',)
     list_select_related = ('user', 'resulting_work', 'checker')
     raw_id_fields = ('user', 'works', 'checker', 'resulting_work')
@@ -546,13 +546,6 @@ class WorkClusterAdmin(admin.ModelAdmin):
         self.message_user(request, "Le rejet de %s a été réalisé avec succès." % message_bit)
 
     reject.short_description = "Rejeter les clusters sélectionnés"
-
-    def get_difficulty(self, obj):
-        works_to_merge_qs = obj.works.order_by('id').prefetch_related('rating_set', 'genre')
-        work_dicts_to_merge = list(works_to_merge_qs.values())
-        field_changeset = get_field_changeset(work_dicts_to_merge)
-        difficulty = sum(data[4] for data in field_changeset)
-        return difficulty
 
     def get_work_titles(self, obj):
         cluster_works = obj.works.all()  # Does not include redirected works

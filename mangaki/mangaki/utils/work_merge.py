@@ -1,5 +1,4 @@
 from typing import List
-import re
 
 from django.db.models import Max, Case, When, Value, IntegerField
 from django.utils import timezone
