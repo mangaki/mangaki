@@ -1,7 +1,7 @@
 # This file was generated from test2.xlsx
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-08-19 21:44+0900\n"
+"PO-Revision-Date: 2018-08-22 17:54+0900\n"
 "Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -409,6 +409,9 @@ msgstr "Mangakiは何ですか？"
 msgid "Anime"
 msgstr "アニメ"
 
+msgid "Manga"
+msgstr "マンガ"
+
 msgid "Mangas"
 msgstr "マンガ"
 
@@ -424,8 +427,8 @@ msgstr "提案"
 msgid "Log in"
 msgstr "ログイン"
 
-msgid "Welcome, <strong>%(user)s</strong>!"
-msgstr "ようこそ、<強い>％（利用者）の</ strong>の！"
+msgid "Welcome"
+msgstr "ようこそ"
 
 msgid "Log out"
 msgstr "ログアウト"

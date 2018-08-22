@@ -106,9 +106,7 @@
                                     class="glyphicon glyphicon-user"></span>&nbsp;{% trans "Signup" %}</a></li>
                         {% else %}
                             <li><a href="{% url 'profile' user.username %}">
-                                {% blocktrans with username=user.username trimmed %}
-                                Welcome, <strong>{{ user }}</strong>!
-                                {% endblocktrans %}
+                                {% trans "Welcome" %} <strong>{{ user.username }}!</strong>
                             </a>
                             </li>
                             <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;{% trans "Log out" %}</a>

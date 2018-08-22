@@ -1,7 +1,7 @@
 # This file was generated from test2.xlsx
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-08-19 21:44+0900\n"
+"PO-Revision-Date: 2018-08-22 17:54+0900\n"
 "Language: zh-hans\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -401,6 +401,9 @@ msgstr "什么是Mangaki？"
 msgid "Anime"
 msgstr "动漫"
 
+msgid "Manga"
+msgstr "曼加斯"
+
 msgid "Mangas"
 msgstr "曼加斯"
 
@@ -416,8 +419,8 @@ msgstr "建议"
 msgid "Log in"
 msgstr "登录"
 
-msgid "Welcome, <strong>%(user)s</strong>!"
-msgstr "欢迎，的<strong>％（用户）类</强>！"
+msgid "Welcome"
+msgstr "欢迎"
 
 msgid "Log out"
 msgstr "登出"
@@ -882,7 +885,7 @@ msgid ""
 msgstr "您将要使用％（PROVIDER_NAME）的账户连接到％（SITE_NAME）秒。为了做到这一点，请填写以下表格："
 
 msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
-msgstr "%(date)s在Mangaki%(category)s的顶部%(size)s的"
+msgstr "%(date)s在Mangaki%(category)s的顶部%(size)s"
 
 msgid "Top 20 of %(category)s on Mangaki"
 msgstr "％的前20名（类别）S ON Mangaki"

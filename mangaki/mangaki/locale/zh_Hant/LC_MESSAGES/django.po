@@ -1,7 +1,7 @@
 # This file was generated from test2.xlsx
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-08-19 21:44+0900\n"
+"PO-Revision-Date: 2018-08-22 17:54+0900\n"
 "Language: zh-hant\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -401,6 +401,9 @@ msgstr "什麼是Mangaki？"
 msgid "Anime"
 msgstr "動漫"
 
+msgid "Manga"
+msgstr "曼加斯"
+
 msgid "Mangas"
 msgstr "曼加斯"
 
@@ -416,8 +419,8 @@ msgstr "建議"
 msgid "Log in"
 msgstr "登錄"
 
-msgid "Welcome, <strong>%(user)s</strong>!"
-msgstr "歡迎，的<strong>％（用戶）類</強>！"
+msgid "Welcome"
+msgstr "歡迎"
 
 msgid "Log out"
 msgstr "登出"
