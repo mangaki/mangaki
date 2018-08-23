@@ -39,7 +39,7 @@ Requires Python 3.4 up to 3.6, PostgreSQL 9.3 up to 10, Redis 4.0, and preferabl
 
 And voilà! You can access Mangaki at http://localhost:8000.
 
-#### Running background tasks (Celery)
+### Running background tasks (Celery)
 
 Background tasks represent:
 
@@ -47,7 +47,7 @@ Background tasks represent:
 - looking for duplicates in the database;
 - (in a near future) improve Mangaki models.
 
-They are optional, but if you want to try them:
+These are optional, but if you want to try them:
 
      # Ensure that your working directory contains manage.py
      celery -B -A mangaki:celery_app worker -l INFO
@@ -60,7 +60,15 @@ If you can read something like this:
 
 The worker is ready to receive background tasks (e.g. MAL imports).
 
+### VM install
+
+You can also [install Mangaki in a VM](https://github.com/mangaki/mangaki/wiki/How-to-install-Mangaki-using-a-virtual-machine-(simple-but-takes-2-GB)) using our amazing Ansible playbooks.
+
+It's simple but takes 2 GB.
+
 ## Populate the database with a few fixtures
+
+The database starts empty, but you can populate a few works:
 
     ./manage.py loaddata ../fixtures/{partners,seed_data}.json
     ./manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
