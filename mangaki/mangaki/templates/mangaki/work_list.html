@@ -9,11 +9,9 @@
             <span>
                 <h3><strong>
                     {% trans "Cheatsheet for key shortcuts" %}
-                    <!-- Cheatsheet pour les raccourcis clavier -->
                 </strong></h3>
             </span>
             <h4>{% trans "Moves" %}</h4>
-            <!-- <h4>Déplacements</h4> -->
             <ul>
                 <li>Aller à gauche: <kbd>←</kbd></li>
                 <li>Aller à droite: <kbd>→</kbd></li>
@@ -40,14 +38,11 @@
                                 Rate a few cards below, or using the search bar.<br />
                                 Then click <a class="alert-link" href="{{ reco_url }}">Recommendations</a> to see what Mangaki recommends!
                             {% endblocktrans %}
-                            <!-- Notez quelques <em>{{ category }}s</em>, via les listes ci-dessous ou la barre de recherche &mdash; puis cliquez sur <a class="alert-link" href="{{ reco_url }}">Recommandations</a> pour voir ce que vous conseille <em>Mangaki</em>&nbsp;! -->
                         {% else %}
                             {% url "account_signup" as signup_url %}
-                            {% blocktrans trimmed %}
-                                New on Mangaki? Start rating some works below! Then see your recommendations, and <a href="{{ signup_url }}?next={{ request.get_full_path|urlencode }}">sign up</a> to keep your ratings.
+                            {% blocktrans trimmed with next_url=request.get_full_path|urlencode %}
+                                New on Mangaki? Start rating some works below! Then see your recommendations, and <a href="{{ signup_url }}?next={{ next_url }}">sign up</a> to keep your ratings.
                             {% endblocktrans %}
-                            <!-- Nouveau sur Mangaki ? <a href="{{ signup_url }}?next={{ request.get_full_path|urlencode }}">Inscrivez-vous</a> puis
-                                <a href="{{ login_url }}?next={{ request.get_full_path|urlencode }}">connectez-vous</a> pour noter ces <em>{{ category }}s</em> -->
                         {% endif %}
                     </p>
                 </div>
@@ -91,7 +86,7 @@
                 {% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' and not is_dpp %}
                     <form method="GET">
                         <div class="input-group">
-                            <input class="search-input form-control {{category}}" placeholder="{% blocktrans %}Enter the title of some {{category}} (currently {{ objects_count }} works)"{% endblocktrans %} type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
+                            <input class="search-input form-control {{category}}" placeholder="{% blocktrans %}Enter the title of some {{category}} (currently {{ objects_count }} works){% endblocktrans %}" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
                             <span class="input-group-btn">
         <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
           </span>

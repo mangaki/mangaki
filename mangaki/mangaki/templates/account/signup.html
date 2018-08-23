@@ -50,7 +50,7 @@
     {% bootstrap_field form.password2 show_label=False addon_before='<span class="glyphicon glyphicon-lock"></span>' %}
   <div class="checkbox">
       <label>
-          {{ form.newsletter_ok }} {% trans "Subscribe to Mangaki's newsletter" %} ({% trans "some waifus/husbandos in your mails?" %})
+          {{ form.newsletter_ok }} {% trans "Subscribe to Mangaki newsletter" %} ({% trans "some waifus/husbandos in your mails?" %})
       </label>
   </div>
   <div class="checkbox">
@@ -80,8 +80,6 @@
   {% endif %}
 </div>
 
-  <!-- En vous inscrivant, vous acceptez que vos notes soient enregistrées par Mangaki pour maintenir votre profil à jour, vous recommander des anime, et améliorer les recommandations que reçoivent les autres utilisateurs. <a href="{% url 'faq' %}">Comment ça marche ?</a><br />
-  Vous pouvez mettre à jour vos options dans votre profil. -->
 <p class="text-center">
   {% trans "By subscribing, you accept that your ratings may be saved by Mangaki to keep your profile up-to-date, recommend anime to you, and improve other users' recommendations." %}
   <a href="{% url 'faq' %}">{% trans "How does it work?" %}</a><br />

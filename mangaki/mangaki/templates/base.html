@@ -106,9 +106,7 @@
                                     class="glyphicon glyphicon-user"></span>&nbsp;{% trans "Signup" %}</a></li>
                         {% else %}
                             <li><a href="{% url 'profile' user.username %}">
-                                {% blocktrans with username=user.username trimmed %}
-                                Welcome, <strong>{{ user }}</strong>!
-                                {% endblocktrans %}
+                                {% trans "Welcome" %} <strong>{{ user.username }}!</strong>
                             </a>
                             </li>
                             <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;{% trans "Log out" %}</a>
@@ -132,7 +130,6 @@
                     {% blocktrans trimmed %}
                     You rated a few works anonymously, you can <a href="{{ profile }}">see them</a>, don't forget to <a href="{{ signup_url }}">subscribe</a> to save them!
                     {% endblocktrans %}
-                    <!-- Vous avez noté certaines œuvres de manière anonyme, vous pouvez <a href="{% url 'my-profile' %}">les voir</a>, n'oubliez pas de vous <a href="{% url 'account_signup' %}">inscrire</a> pour pouvoir les sauvegarder! -->
                 </div>
             </div>
         </div>

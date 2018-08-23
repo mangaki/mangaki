@@ -1,7 +1,7 @@
 # This file was generated from test2.xlsx
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-08-19 21:44+0900\n"
+"PO-Revision-Date: 2018-08-23 19:25+0900\n"
 "Language: zh-hant\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -401,6 +401,9 @@ msgstr "什麼是Mangaki？"
 msgid "Anime"
 msgstr "動漫"
 
+msgid "Manga"
+msgstr "曼加斯"
+
 msgid "Mangas"
 msgstr "曼加斯"
 
@@ -416,8 +419,8 @@ msgstr "建議"
 msgid "Log in"
 msgstr "登錄"
 
-msgid "Welcome, <strong>%(user)s</strong>!"
-msgstr "歡迎，的<strong>％（用戶）類</強>！"
+msgid "Welcome"
+msgstr "歡迎"
 
 msgid "Log out"
 msgstr "登出"
@@ -516,7 +519,7 @@ msgid "You asked an admin for help"
 msgstr "你問管理員求助"
 
 msgid "Reopen cette suggestion"
-msgstr "重新打開CETTE建議"
+msgstr "重新打開這個建議"
 
 msgid "This work belongs to this cluster:"
 msgstr "這項工作屬於這一組："
@@ -739,12 +742,11 @@ msgstr ""
 
 msgid ""
 "New on Mangaki? Start rating some works below! Then see your "
-"recommendations, and <a "
-"href=\"%(signup_url)s?next=%(request.get_full_path|urlencode)s\">sign up</a>"
-" to keep your ratings."
+"recommendations, and <a href=\"%(signup_url)s?next=%(next_url)s\">sign "
+"up</a> to keep your ratings."
 msgstr ""
 "新上Mangaki？開始評分低於一些作品！然後看到你的建議，並<a "
-"href=\"%(signup_url)s?next=%(request.get_full_path|urlencode)s\">註冊以保證您的評級。"
+"href=\"%(signup_url)s?next=%(next_url)s\">註冊以保證您的評級。"
 
 msgid "Mosaic"
 msgstr "鑲嵌"
@@ -771,8 +773,8 @@ msgid "A-Z"
 msgstr "A-Z"
 
 msgid ""
-"Enter the title of some %(category)s (currently %(objects_count)s works)\""
-msgstr "輸入的某些％（類別）S（當前％（objects_count）的作品）的標題“"
+"Enter the title of some %(category)s (currently %(objects_count)s works)"
+msgstr "輸入的某些%(category)s（當前%(objects_count)s的作品）的標題"
 
 msgid "Hint: press Enter to trigger the search"
 msgstr "提示：按Enter鍵觸發搜索"
@@ -790,7 +792,7 @@ msgid "<a href=\"%(signup_url)s\">Signup</a> to save them"
 msgstr "<a href=\"%(signup_url)s\">註冊</a>來拯救他們"
 
 msgid "Subscribed since %(member_days)s days"
-msgstr "自％（member_days）訂閱小號天"
+msgstr "自%(member_days)s訂閱小號天"
 
 msgid "Rated works"
 msgstr "額定工作"
@@ -813,8 +815,8 @@ msgstr "發送建議"
 msgid "was recommended to"
 msgstr "被推薦"
 
-msgid "Received recommandations"
-msgstr "收到recommandations"
+msgid "Received recommendations"
+msgstr "收到建議"
 
 msgid "was recommended to you by"
 msgstr "被推薦給你"
@@ -852,8 +854,8 @@ msgstr "讀"
 msgid "My recommendations"
 msgstr "我的建議"
 
-msgid "{{ profile.username }}'s profile is not disclosed publicly."
-msgstr "{{profile.username}}的個人資料沒有公開披露。"
+msgid "%(username)s's profile is not disclosed publicly."
+msgstr "%(username)s的配置文件沒有公開披露。"
 
 msgid "Account Connections"
 msgstr "帳戶連接"
@@ -879,13 +881,10 @@ msgstr "註冊"
 msgid ""
 "You are about to use your %(provider_name)s account to connect to "
 "%(site_name)s. In order to do so, please fill the following form:"
-msgstr "您將要使用％（PROVIDER_NAME）的賬戶連接到％（SITE_NAME）秒。為了做到這一點，請填寫以下表格："
+msgstr "您將要使用%(provider_name)s的賬戶連接到%(site_name)s秒。為了做到這一點，請填寫以下表格："
 
 msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
 msgstr "%(date)s在Mangaki%(category)s的頂部%(size)s"
-
-msgid "Top 20 of %(category)s on Mangaki"
-msgstr "％的前20名（類別）S ON Mangaki"
 
 msgid "Name"
 msgstr "名稱"

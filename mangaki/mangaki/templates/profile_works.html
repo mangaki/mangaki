@@ -55,7 +55,7 @@
             {% endif %}
         </div>
     {% else %}
-        <p class="well">{% trans "{{ profile.username }}'s profile is not disclosed publicly." %}</p>
+        <p class="well">{% blocktrans trimmed with username=profile.username %}{{ username }}'s profile is not disclosed publicly.{% endblocktrans %}</p>
     {% endif %}
     <br/>
     <br/>
