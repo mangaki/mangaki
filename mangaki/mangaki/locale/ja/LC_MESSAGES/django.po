@@ -1,7 +1,7 @@
 # This file was generated from test2.xlsx
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-08-22 17:54+0900\n"
+"PO-Revision-Date: 2018-08-23 19:25+0900\n"
 "Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -527,7 +527,7 @@ msgid "You asked an admin for help"
 msgstr "あなたは助けのために管理者を尋ねました"
 
 msgid "Reopen cette suggestion"
-msgstr "cetteの提案を再度開きます"
+msgstr "この提案を再度開きます"
 
 msgid "This work belongs to this cluster:"
 msgstr "この作品は、このクラスタに属しています："
@@ -755,11 +755,10 @@ msgstr ""
 
 msgid ""
 "New on Mangaki? Start rating some works below! Then see your "
-"recommendations, and <a "
-"href=\"%(signup_url)s?next=%(request.get_full_path|urlencode)s\">sign up</a>"
-" to keep your ratings."
+"recommendations, and <a href=\"%(signup_url)s?next=%(next_url)s\">sign "
+"up</a> to keep your ratings."
 msgstr ""
-"Mangakiの新しいですか？以下のいくつかの作品を評価開始！次に、あなたの提言を見て、<aは、あなたの評価を維持するために</a>にサインアップhref=\"%(signup_url)s?next=%(request.get_full_path|urlencode)s\">。"
+"Mangakiの新しいですか？以下のいくつかの作品を評価開始！次に、あなたの提言を見て、<aは、あなたの評価を維持するために</a>にサインアップhref=\"%(signup_url)s?next=%(next_url)s\">。"
 
 msgid "Mosaic"
 msgstr "モザイク"
@@ -783,11 +782,11 @@ msgid "Random"
 msgstr "ランダム"
 
 msgid "A-Z"
-msgstr "-Z"
+msgstr "A-Z"
 
 msgid ""
-"Enter the title of some %(category)s (currently %(objects_count)s works)\""
-msgstr "「いくつか％（カテゴリ）S（現在％（objects_count）の作品）のタイトルを入力します。"
+"Enter the title of some %(category)s (currently %(objects_count)s works)"
+msgstr "「いくつか%(category)s（現在%(objects_count)sの作品）のタイトルを入力します。"
 
 msgid "Hint: press Enter to trigger the search"
 msgstr "ヒント：Enterキーを押して検索をトリガします"
@@ -805,7 +804,7 @@ msgid "<a href=\"%(signup_url)s\">Signup</a> to save them"
 msgstr "<a href=\"%(signup_url)s\">申し込み</a>に保存します"
 
 msgid "Subscribed since %(member_days)s days"
-msgstr "％（member_days）の時代から加入"
+msgstr "%(member_days)sの時代から加入"
 
 msgid "Rated works"
 msgstr "定格作品"
@@ -828,8 +827,8 @@ msgstr "送信された勧告"
 msgid "was recommended to"
 msgstr "に推奨されていました"
 
-msgid "Received recommandations"
-msgstr "受信recommandations"
+msgid "Received recommendations"
+msgstr "受信勧告"
 
 msgid "was recommended to you by"
 msgstr "によってあなたに推奨されました"
@@ -867,8 +866,8 @@ msgstr "読む"
 msgid "My recommendations"
 msgstr "私の提言"
 
-msgid "{{ profile.username }}'s profile is not disclosed publicly."
-msgstr "{{profile.username}}のプロファイルは公に開示されていません。"
+msgid "%(username)s's profile is not disclosed publicly."
+msgstr "%(username)sさんのプロフィールは一般に公開されていません。"
 
 msgid "Account Connections"
 msgstr "アカウントの接続"
@@ -895,13 +894,10 @@ msgid ""
 "You are about to use your %(provider_name)s account to connect to "
 "%(site_name)s. In order to do so, please fill the following form:"
 msgstr ""
-"あなたは（SITE_NAME）■％に接続します％（PROVIDER_NAME）のアカウントを使用しようとしています。そうするためには、以下のフォームに必要事項を記入してください。"
+"あなたは%(site_name)sに接続します%(provider_name)sのアカウントを使用しようとしています。そうするためには、以下のフォームに必要事項を記入してください。"
 
 msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
 msgstr "%(date)sのMangakiの%(category)sトップ%(size)s"
-
-msgid "Top 20 of %(category)s on Mangaki"
-msgstr "％のトップ20 Mangaki上（カテゴリ）■"
 
 msgid "Name"
 msgstr "名"
@@ -928,10 +924,10 @@ msgid "This request is incorrect. What did you try to do?"
 msgstr "この要求が正しくありません。何を試しましたか？"
 
 msgid "Love"
-msgstr "愛"
+msgstr "大好き"
 
 msgid "Like"
-msgstr "以下のような"
+msgstr "好き"
 
 msgid "Neutral"
 msgstr "中性"

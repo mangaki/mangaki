@@ -7,9 +7,7 @@
 {% get_providers as socialaccount_providers %}
 <div class="row featured text-center">
     <h1>{% trans "Mangaki, anime and manga recommendation" %}</h1>
-    <!-- Mangaki, la recommandation d'anime et manga. -->
     <h3 style="margin-bottom: 1em">{% trans "Rate your favorite series and discover new ones!" %}</h3>
-    <!-- Notez vos séries favorites, on vous en fera découvrir d'autres&nbsp;! -->
     <div class="row text-center margin">
         <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">{% trans "I prefer anime" %}</a>
         <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'manga' %}">{% trans "I prefer manga" %}</a>
