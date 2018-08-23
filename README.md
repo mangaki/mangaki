@@ -4,25 +4,30 @@
 [![CircleCI](https://circleci.com/gh/mangaki/mangaki.svg?style=svg)](https://circleci.com/gh/mangaki/mangaki)
 [![Codecov](https://img.shields.io/codecov/c/github/mangaki/mangaki.svg)](https://codecov.io/gh/mangaki/mangaki/)
 
-Here is Mangaki's installation manual. Welcome!  
-Also available [in French](README-fr.md).
+Welcome to Mangaki!  
+This README is also available [in French](README-fr.md).
 
-## Install
+## What to do from here?
 
-### VM install (super simple but requires 6 GB)
+### AI for Manga & Anime
 
-Requires [Vagrant](https://www.vagrantup.com/downloads.html).
+![AI for Manga & Anime](http://research.mangaki.fr/public/img/aima/aima-banner.png)
 
-    vagrant up
-    vagrant provision  # May be required
-    vagrant ssh  # Will open a tmux that
-    # You can detach by pressing Ctrl + b then d
+[Read about our keynote](http://research.mangaki.fr/2018/07/15/ai-for-manga-and-anime/) at Anime Expo, Los Angeles in July 2018.
 
-And voilà! You can access Mangaki at http://192.168.33.10:8000 (or http://app.mangaki.dev if you have `vagrant-hostupdater`).
+### Mangaki on Earth (MoE): visualizing anime embeddings
 
-### Full install
+![Visualize anime embeddings](http://research.mangaki.fr/public/img/embeddings.png)
 
-Requires Python 3.4 → 3.6, PostgreSQL 9.3 → 10, Redis 4.0, and preferably `pwgen`.
+- See [our blog post](http://research.mangaki.fr/2018/08/23/mangaki-on-earth-visualize-anime-embeddings/)
+- Our map [Mangaki on Earth](https://mangaki.fr/map)
+- Browse [other interesting notebooks](https://github.com/mangaki/notebooks).
+
+## Install Mangaki
+
+### Running the web server
+
+Requires Python 3.4 up to 3.6, PostgreSQL 9.3 up to 10, Redis 4.0, and preferably `pwgen`.
 
     ./config.sh
     python3 -m venv venv
@@ -30,29 +35,40 @@ Requires Python 3.4 → 3.6, PostgreSQL 9.3 → 10, Redis 4.0, and preferably `p
     pip install -r requirements/dev.txt
     cd mangaki
     ./manage.py migrate
-
-#### Running the background worker (Celery)
-
-This step is mandatory only if you need background tasks which is required for features such as MAL imports.
-
-     # Ensure that your working directory is where manage.py is. (i.e. ls in this folder should show you manage.py)
-     celery -B -A mangaki:celery_app worker -l INFO
-
-If you can read something along these lines:
-
-```console
-[2017-10-29 14:34:47,810: INFO/MainProcess] celery@your_hostname ready.
-```
-
-The worker is ready to receive background tasks (e.g. MAL imports).
-
-#### Running the web server
-
     ./manage.py runserver
 
 And voilà! You can access Mangaki at http://localhost:8000.
 
-## Some perks
+### Running background tasks (Celery)
+
+Background tasks represent:
+
+- importing anime from another database;
+- looking for duplicates in the database;
+- (in a near future) improve Mangaki models.
+
+These are optional, but if you want to try them:
+
+     # Ensure that your working directory contains manage.py
+     celery -B -A mangaki:celery_app worker -l INFO
+
+If you can read something like this:
+
+```console
+[2018-08-23 13:37:42,000: INFO/MainProcess] celery@your_hostname ready.
+```
+
+The worker is ready to receive background tasks (e.g. MAL imports).
+
+### VM install
+
+You can also [install Mangaki in a VM](https://github.com/mangaki/mangaki/wiki/How-to-install-Mangaki-using-a-virtual-machine-(simple-but-takes-2-GB)) using our amazing Ansible playbooks.
+
+It's simple but takes 2 GB.
+
+## Populate the database with a few fixtures
+
+The database starts empty, but you can populate a few works:
 
     ./manage.py loaddata ../fixtures/{partners,seed_data}.json
     ./manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
