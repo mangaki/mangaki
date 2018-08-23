@@ -1,7 +1,9 @@
 # coding=utf-8
 import os.path
 import tempfile
+from enum import IntEnum
 from urllib.parse import urlparse
+from collections import defaultdict
 
 import requests
 from django.conf import settings
@@ -15,6 +17,7 @@ from django.db import models, transaction
 from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
 from django.db.models.functions import Cast
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext as _
 
 from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
                              CLUSTER_CHOICES, RELATION_TYPE_CHOICES, SUGGESTION_PROBLEM_CHOICES)
@@ -123,7 +126,7 @@ class Category(models.Model):
     name = models.CharField(max_length=128)
 
     def __str__(self):
-        return self.name
+        return _(self.name)
 
 
 class Work(models.Model):
@@ -133,7 +136,8 @@ class Work(models.Model):
     ext_poster = models.CharField(max_length=128, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
-    date = models.DateField(blank=True, null=True) # Should be renamed to start_date
+    # Should be renamed to start_date
+    date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     synopsis = models.TextField(blank=True, default='')
     ext_synopsis = models.TextField(blank=True, default='')
@@ -442,8 +446,8 @@ class Suggestion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     work = models.ForeignKey(Work, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
-    problem = models.CharField(verbose_name='Partie concernée', max_length=8, choices=SUGGESTION_PROBLEM_CHOICES, default='ref')
-    message = models.TextField(verbose_name='Proposition', blank=True)
+    problem = models.CharField(verbose_name=_('Type'), max_length=8, choices=SUGGESTION_PROBLEM_CHOICES, default='ref')
+    message = models.TextField(verbose_name=_('Suggestion'), blank=True)
     is_checked = models.BooleanField(default=False)
 
     def __str__(self):
@@ -488,6 +492,95 @@ class Evidence(models.Model):
             self.suggestion.pk
         )
 
+UNKNOWN_VALUES = {
+    'anidb_aid': {0},
+    'editor_id': {1},
+    'studio_id': {1}
+}
+
+def not_empty_field(choice, field=None):
+    """
+    Test if a work field is not empty, i.e. None or value in default unknown values.
+
+    Args:
+        field (Any): value of the field
+
+    Returns: False if empty, True otherwise.
+
+    >>> not_empty_field('Inconnu')
+    False
+    >>> not_empty_field('')
+    False
+    >>> not_empty_field(None)
+    False
+    >>> not_empty_field('anime')
+    True
+    >>> not_empty_field(1, 'studio_id')
+    False
+    >>> not_empty_field(0, 'anidb_aid')
+    False
+    """
+    return (choice is not None and
+            choice not in {'Inconnu', ''} and
+            choice not in UNKNOWN_VALUES.get(field, []))
+
+PRECOMPUTED_FIELDS = {'sum_ratings',
+                      'nb_ratings',
+                      'nb_likes',
+                      'nb_dislikes',
+                      'controversy',
+                      'title_search',
+                      'redirect_id'}
+
+class ActionType(IntEnum):
+    DO_NOTHING = 0
+    JUST_CONFIRM = 1
+    CHOICE_REQUIRED = 2
+
+def get_field_changeset(works):
+    rows = defaultdict(list)
+    for work in works:
+        for field in work:
+            rows[field].append(work[field])
+
+    for field, choices in rows.items():
+        difficulty = 0
+        suggested = None
+
+        filtered_choices = list(set(filter(lambda choice: not_empty_field(choice, field), choices)))
+
+        if field == 'id':
+            action = ActionType.JUST_CONFIRM
+            suggested = min(int(choice) for choice in choices)
+        elif field in PRECOMPUTED_FIELDS:
+            action = ActionType.DO_NOTHING
+        # All mostly None
+        elif len(filtered_choices) == 0:
+            action = ActionType.JUST_CONFIRM
+            suggested = 'Inconnu' if 'Inconnu' in choices else None
+        # Only one choice if we remove all empty choices
+        elif len(filtered_choices) == 1:
+            action = ActionType.JUST_CONFIRM
+            suggested = filtered_choices[0]
+        elif field == 'ext_poster':
+            difficulty = 0.5
+            action = ActionType.JUST_CONFIRM
+            suggested = filtered_choices[-1]
+        elif field == 'source':
+            difficulty = 100
+            action = ActionType.CHOICE_REQUIRED
+        elif field == 'date':
+            difficulty = 1000
+            action = ActionType.CHOICE_REQUIRED
+        elif field == 'category_id':
+            difficulty = 10000
+            action = ActionType.CHOICE_REQUIRED
+        else:
+            difficulty = 1
+            action = ActionType.CHOICE_REQUIRED
+
+        yield (field, choices, action, suggested, difficulty)
+
 
 class WorkCluster(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -499,8 +592,16 @@ class WorkCluster(models.Model):
     merged_on = models.DateTimeField(blank=True, null=True)
     origin = models.ForeignKey(Suggestion, related_name='origin_suggestion', on_delete=models.CASCADE, blank=True, null=True)
 
+    @cached_property
+    def difficulty(self):
+        works_to_merge_qs = self.works.order_by('id').prefetch_related('rating_set', 'genre')
+        work_dicts_to_merge = list(works_to_merge_qs.values())
+        field_changeset = get_field_changeset(work_dicts_to_merge)
+        difficulty = sum(data[4] for data in field_changeset)
+        return difficulty
+
     def __str__(self):
-        return 'WorkCluster %s' % '-'.join([str(work.id) for work in self.works.all()])
+        return 'WorkCluster ({})'.format(', '.join(str(work) for work in self.works.all()))
 
 
 class Announcement(models.Model):

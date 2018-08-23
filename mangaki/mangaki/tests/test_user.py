@@ -4,8 +4,7 @@ from django.contrib.auth import get_user_model
 from mangaki.models import Profile
 
 
-class UserTest(TestCase):
-    
+class UserTest(TestCase):  
     def setUp(self):
         self.User = get_user_model()
 

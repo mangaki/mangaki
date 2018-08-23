@@ -1,9 +1,10 @@
 import json
-import time
 import os
+import logging
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from mangaki.algo.side import SideInformation
 
 import numpy as np
 import pandas as pd
@@ -11,20 +12,24 @@ from sklearn.metrics.pairwise import euclidean_distances
 from PIL import Image, ImageFont, ImageDraw
 
 
-NUMBER_CLOSESTS = 5
+NUMBER_CLOSEST = 5
 CATEGORY_WEIGHTS = {'character': 1, 'rating': 1, 'general': 1, 'copyright': 1}
 
-def create_collage(width, height, poster_ids):
-    cols = len(poster_ids)
-    collage = Image.new('RGB', (width*cols, height))
-    draw = ImageDraw.Draw(collage)
+def create_collage(width, height, poster_ids, stdout):
     filenames = [os.path.join(settings.STATIC_ROOT, 'img/posters/{}.jpg'.format(pid)) for pid in poster_ids]
 
     ims = []
     for poster in filenames:
-        im = Image.open(poster)
-        im.thumbnail((width, height))
-        ims.append(im)
+        try:
+            im = Image.open(poster)
+            im.thumbnail((width, height))
+            ims.append(im)
+        except FileNotFoundError:
+            stdout.write('Poster {:s} not found'.format(poster))
+
+    cols = len(ims)
+    collage = Image.new('RGB', (width*cols, height))
+    draw = ImageDraw.Draw(collage)
 
     x = 0
     for col in range(cols):
@@ -52,7 +57,8 @@ def create_collage(width, height, poster_ids):
     collages_path = os.path.join(settings.STATIC_ROOT, 'img/posters_collages')
     if not os.path.exists(collages_path):
         os.makedirs(collages_path)
-    collage.save(os.path.join(settings.STATIC_ROOT, 'img/posters_collages/collage_{}.jpg'.format(poster_ids[0])))
+    if cols > 0:
+        collage.save(os.path.join(settings.STATIC_ROOT, 'img/posters_collages/collage_{}.jpg'.format(poster_ids[0])))
 
 
 class Command(BaseCommand):
@@ -67,27 +73,10 @@ class Command(BaseCommand):
         id_wanted = options['poster_id'][0]
         poster_wanted = '{}.jpg'.format(id_wanted)
 
-        number_neighbors = options['limit'] if options['limit'] else NUMBER_CLOSESTS
+        number_neighbors = options['limit'] if options['limit'] else NUMBER_CLOSEST
 
-        processed_data = {}
-        df = None
-
-        # Open the JSON i2v file
-        with open(os.path.join(settings.DATA_DIR, 'mangaki_i2v.json'), encoding='utf-8') as f_i2v:
-            i2v = json.load(f_i2v)
-
-            # Let's make a {poster_id: tags} dict
-            for poster in i2v:
-                tags_dict = {}
-                poster_id = int(os.path.splitext(poster)[0])
-                for category, tags in i2v[poster].items():
-                    for tag, weight in tags:
-                        tags_dict[tag] = weight * CATEGORY_WEIGHTS[category]
-                processed_data[poster_id] = tags_dict
-
-            df = pd.DataFrame(processed_data).fillna(0).transpose()
-            i2v = None
-            processed_data = None
+        side = SideInformation()
+        df = pd.SparseDataFrame(side.T)
 
         if not id_wanted in df.index:
             self.stdout.write('Could not find {} ...'.format(id_wanted))
@@ -106,6 +95,6 @@ class Command(BaseCommand):
             if options['collage']:
                 id_list = [id_wanted]
                 id_list.extend(closests)
-                create_collage(90, 150, id_list)
+                create_collage(90, 150, id_list, self.stdout)
         else:
             self.stdout.write('Could not find {} ...'.format(id_wanted))

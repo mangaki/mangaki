@@ -1,18 +1,19 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load staticfiles %}
 {% load posters %}
 
-{% block title %}Suggestion #{{ suggestion.pk }} - Mangaki{% endblock %}
+{% block title %}{% trans "Suggestion" %} #{{ suggestion.pk }} - Mangaki{% endblock %}
 
 {% block body %}
 
 <div class="page-header">
-    <h1>Suggestion #{{ suggestion.pk }}</h1>
+    <h1>{% trans "Suggestion" %} #{{ suggestion.pk }}</h1>
 </div>
 
 {% if suggestion.is_checked %}
 <div class="alert alert-info">
-    <span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Ce problème a été marqué comme résolu !
+    <span class="glyphicon glyphicon-lock" aria-hidden="true"></span> {% trans "This problem was marked as solved!" %}
 </div>
 {% endif %}
 
@@ -29,8 +30,8 @@
         <div class="input-group">
             <span class="input-group-btn">
                 <button class="btn btn-primary" type="button" id="copy-share-link" data-toggle="tooltip"
-                        data-placement="top" data-copy="{{ request.build_absolute_uri }}" title="Copier">
-                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Lien de partage
+                        data-placement="top" data-copy="{{ request.build_absolute_uri }}" title="{% trans "Copy" %}">
+                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span> {% trans "Sharing link" %}
                 </button>
             </span>
             <input type="text" class="form-control" id="input-share-link" value="{{ request.build_absolute_uri }}">
@@ -52,13 +53,13 @@
                     <span id="disagrees_count">{{ suggestion.count_disagrees }}</span>
                 </span>
             </strong></div>
-            <h4><strong>Problème&nbsp;:</strong>
+            <h4><strong>{% trans "Problem:" %}</strong>
                 {{ suggestion.get_problem_display }}
             </h4>
         </p>
 
         <p>
-            <h5><strong>Envoyé par&nbsp;:</strong>
+            <h5><strong>{% trans "Reported by:" %}</strong>
                 <a href="{% url "profile" suggestion.user %}">{{ suggestion.user }}</a>
                 <small>({{ suggestion.date }})</small>
             </h5>
@@ -97,21 +98,21 @@
                     {% if evidence.agrees and can_auto_fix %}
                         <p align="center">
                             <button type="submit" class="btn btn-xs btn-primary" value="True" name="auto_fix">
-                                Résoudre automatiquement le problème
+                                {% trans "Solve the problem automatically" %}
                             </button>
                         </p>
                     {% elif not evidence.agrees and can_close %}
                         <p align="center">
                             <button type="submit" class="btn btn-xs btn-default" value="True" name="close_suggestion">
-                                Fermer cette suggestion
+                                {% trans "Close this suggestion" %}
                             </button>
                         </p>
                     {% endif %}
                 <p align="center">
                     {% if not evidence.needs_help %}
-                    <button type="submit" class="btn btn-xs btn-primary" value="True" name="needs_help">Demander l'aide d'un administrateur</button>
+                    <button type="submit" class="btn btn-xs btn-primary" value="True" name="needs_help">{% trans "Ask an admin for help" %}</button>
                     {% else %}
-                    <button type="submit" class="btn btn-xs btn-default" disabled>Vous avez demandé l'aide d'un administrateur</button>
+                    <button type="submit" class="btn btn-xs btn-default" disabled>{% trans "You asked an admin for help" %}</button>
                     {% endif %}
                 </p>
                 <input type="hidden" name="agrees" value="{{ evidence.agrees }}">
@@ -122,9 +123,13 @@
             <hr/>
             <p align="center">
                 {% if evidence.agrees %}
-                Vous avez <strong><span class="text-success">approuvé <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span></span></strong> cette suggestion.
+                    {% blocktrans trimmed %}
+                    You <strong><span class="text-success">approved <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span></span></strong> this suggestion.
+                    {% endblocktrans %}
                 {% else %}
-                Vous avez <strong><span class="text-danger">rejeté <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span></span></strong> cette suggestion.
+                    {% blocktrans trimmed %}
+                    You <strong><span class="text-danger">rejected <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span></span></strong> this suggestion.
+                    {% endblocktrans %}
                 {% endif %}
             </p>
             <form id="evidence_form" action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST">
@@ -133,21 +138,21 @@
                 <p align="center">
                     {% if can_reopen %}
                         <button type="submit" class="btn btn-primary" name="re_open" value="True">
-                            Réouvrir cette suggestion
+                            {% trans "Reopen this suggestion" %}
                         </button>
                     {% endif %}
                 </p>
             </form>
             {% if evidence.needs_help %}
             <p align="center">
-                Vous avez demandé <strong>l'aide d'un administrateur</strong>.
+                {% trans "You asked <strong>an admin for help</strong>." %}
             </p>
             {% endif %}
         {% endif %}
 
         {% for cluster, color in clusters %}
             <hr/>
-            <p><strong>Cette œuvre est présente dans ce cluster&nbsp;:</strong></p>
+            <p><strong>{% trans "This work belongs to this cluster:" %}</strong></p>
             <div class="cards-grid no-rating">
                 {% for work in cluster.works.all %}
                     {% if work != suggestion.work %}
@@ -157,12 +162,12 @@
             </div>
             <hr/>
             <p>
-                Ce cluster est <strong><span class="{{ color }}">{{ cluster.get_status_display.lower }}</span></strong>
-                {% if cluster.checker %} par <a href="{% url "profile" cluster.checker %}">{{ cluster.checker }}</a>{% endif %}.
+                {% trans "This cluster is" %} <strong><span class="{{ color }}">{{ cluster.get_status_display.lower }}</span></strong>
+                {% if cluster.checker %} {% trans "by" %} <a href="{% url "profile" cluster.checker %}">{{ cluster.checker }}</a>{% endif %}.
             </p>
             {% if cluster.resulting_work %}
             <p>
-                Ce cluster a été fusionné :
+                {% trans "This cluster was merged:" %}
                 <a href="{% url "work-detail" cluster.resulting_work.category.slug cluster.resulting_work.pk %}">{{ cluster.resulting_work }}</a>.
                 <small>({{ cluster.merged_on }})</small>
             </p>
@@ -180,15 +185,15 @@
     <ul class="pager">
         <li class="previous {% if not previous_id %} disabled {% endif %}">
             <a {% if previous_id %}href="{% url "fix-suggestion" previous_id %}"{% endif %}>
-                <span aria-hidden="true">&larr;</span> Précédent
+                <span aria-hidden="true">&larr;</span> {% trans "Previous" %}
             </a>
         </li>
         <li>
-            <a href="/fix/">Retour</a>
+            <a href="/fix/">{% trans "Back" %}</a>
         </li>
         <li class="next {% if not next_id %} disabled {% endif %}">
             <a {% if next_id %}href="{% url "fix-suggestion" next_id %}"{% endif %}>
-                Suivant <span aria-hidden="true">&rarr;</span>
+                {% trans "Next" %} <span aria-hidden="true">&rarr;</span>
             </a>
         </li>
     </ul>
@@ -210,7 +215,7 @@
             copyTextArea.select();
             try {
                 var successful = document.execCommand('copy');
-                var msg = successful ? 'Lien copié !' : 'Lien non copié …';
+                var msg = successful ? '{% trans "Copied link!" %}' : '{% trans "Link was not copied" %}';
                 el.attr('data-original-title', msg).tooltip('show');
             } catch (err) {
                 console.log('Le lien n\'a pas pu être copié …');

@@ -68,7 +68,8 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'bootstrap3',
     'django_js_reverse',
-    'rest_framework'
+    'rest_framework',
+    'django_celery_beat'
 )
 
 if config.has_section('sentry'):
@@ -88,13 +89,13 @@ if config.has_section('allauth'):
 
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.locale.LocaleMiddleware'
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 )
 
 if DEBUG:
@@ -236,6 +237,7 @@ REST_FRAMEWORK = {
 REDIS_URL = config.get('celery', 'broker_url', fallback='redis://')
 CELERY_BROKER_URL = config.get('celery', 'broker_url', fallback='redis://')
 CELERY_RESULT_BACKEND = config.get('celery', 'result_backend', fallback='redis://')
+CELERY_BEAT_SCHEDULER = config.get('celery', 'scheduler', fallback='django_celery_beat.schedulers:DatabaseScheduler')
 
 EMAIL_BACKEND = config.get('email', 'EMAIL_BACKEND', fallback='django.core.mail.backends.smtp.EmailBackend')
 if config.has_section('smtp'):
@@ -251,11 +253,13 @@ if config.has_section('smtp'):
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
-LANGUAGE_CODE = 'fr'
+LANGUAGE_CODE = 'en'
 LANGUAGES = [
-    ('fr', _('Français')),
-    ('en', _('English')),
-    ('ja', _('日本語'))
+    ('fr', 'Français'),
+    ('en', 'English'),
+    ('ja', '日本語'),
+    ('zh-hans', '简体中文'),
+    ('zh-hant', '繁體中文')
 ]
 TIME_ZONE = 'UTC'
 USE_I18N = True

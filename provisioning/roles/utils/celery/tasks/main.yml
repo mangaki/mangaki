@@ -20,3 +20,10 @@
     state: present
   become: true
   when: start
+
+- name: Run Celery beat.
+  supervisorctl:
+    name: '{{ celery_beat_name }}'
+    state: present
+  become: true
+  when: celery_beat

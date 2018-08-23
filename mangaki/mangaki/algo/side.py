@@ -1,6 +1,7 @@
 from django.conf import settings
 from scipy.sparse import load_npz, issparse
 from sklearn.preprocessing import scale
+import numpy as np
 import os.path
 
 
@@ -16,8 +17,12 @@ class SideInformation:
     def load(self):
         # Load in CSC format if no matrix provided.
         if self.T is None:
-            self.T = load_npz(os.path.join(settings.DATA_DIR, 'tags',
-                                           'tag-matrix.npz')).tocsc()
+            tags_path = os.path.join(settings.DATA_DIR, 'tags',
+                                     'tag-matrix.npz')
+            if os.path.isfile(tags_path):
+                self.T = load_npz(tags_path)
+            else:
+                self.T = np.random.random((10000, 20))
         _, self.nb_tags = self.T.shape
 
     def preprocess(self, perform_scaling, with_mean):

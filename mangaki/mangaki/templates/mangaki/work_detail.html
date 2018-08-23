@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load bootstrap3 %}
 {% load posters %}
 
@@ -32,7 +33,7 @@
         <h1>{{ object.title }}</h1>
 {#  FIXME: it is definitely not how we should show this. #}
 {#        {% if object.worktitle_set.count != 0 %}#}
-{#            <p> Titres alternatifs :#}
+{#            <p> {% trans "Alternative titles" %} :#}
 {#            {% for title in object.worktitle_set.all %}#}
 {#            <p>&nbsp;&nbsp;&nbsp;{{title.language}} : {{title.title}} </p>#}
 {#        #}
@@ -49,42 +50,44 @@
     
 
 	{% if object.category.slug == 'anime' %}
-	  <p>Nombre d'épisodes : {{ object.nb_episodes }}</p>
+	  <p>{% trans "Number of episodes:" %} {{ object.nb_episodes }}</p>
 	{% elif object.category.slug == 'manga' %}
-	  <p>Titre original : <em>{{ object.vo_title }}</em></p>
+	  <p>{% trans "Original title:" %} <em>{{ object.vo_title }}</em></p>
 	{% endif %}
 
         {% for staff in object.staff_set.all %}
-            <p>{{ staff.role.name }}&nbsp;: <a href="{% url 'artist-detail' staff.artist.id %}">{{ staff.artist }}</a></p>
+            <p>{% trans staff.role.name %} – <a href="{% url 'artist-detail' staff.artist.id %}">{{ staff.artist }}</a></p>
         {% endfor %}
 	{% if object.category.slug == 'anime' or object.category.slug == 'manga' %}
-	  <p>Éditeur : {{ object.editor }}</p>
-	  <p>Origine : {{ object.origin }}</p>
-	  <p>Genres : {{ genres }}</p>
+	  <p>{% trans "Editor:" %} {{ object.editor }}</p>
+	  <p>{% trans "Origin:" %} {{ object.origin }}</p>
+	  <p>{% trans "Genres:" %} {{ genres }}</p>
 	  {% if object.category.slug == 'anime' %}
-	    <p>Type : {{ object.anime_type }}</p>
+	    <p>{% trans "Type:" %} {{ object.anime_type }}</p>
 	  {% elif object.category.slug == 'manga' %}
-	    <p>Type : {{ object.manga_type }}</p>
+	    <p>{% trans "Type:" %} {{ object.manga_type }}</p>
 	  {% endif %}
 	{% elif object.category.slug == 'album' %}
-	  <p>Code catalogue : {{ object.catalog_number }}</p>
+	  <p>{% trans "Catalog number:" %} {{ object.catalog_number }}</p>
 	  {% if object.vgmdb_aid %}
-	    <p><a href="http://vgmdb.net/album/{{ object.vgmdb_aid }}">Retrouvez cet album sur VGMdb</a></p>
+	    <p><a href="http://vgmdb.net/album/{{ object.vgmdb_aid }}">{% trans "Find this album on VGMdb" %}</a></p>
 	  {% endif %}
 	{% endif %}
     </div>
     <div class="col-sm-6 col-md-5">
         {% if stats %}
-        <h3>Statistiques <small>({% if object.category.slug == 'anime' %}vu{% elif object.category.slug == 'manga' %}lu{% endif %} par {{ seen_percent }}&nbsp;% des membres qui l'ont noté)</small></h3>
+        <h3>{% trans "Stats" %}</h3>
         <div style="max-width: 420px; max-height: 200px">
           <canvas id="stats" />
         </div>
         {% endif %}
         {% if references %}
-          <h3>Références</h3>
+          <h3>{% trans "References" %}</h3>
           <ul>
           {% for url, name in references %}
-              <li><a href="{{ url }}" target="_blank">Voir sur {{ name }}</a></li>
+              <li><a href="{{ url }}" target="_blank">
+                {% blocktrans %}See on {{ name }}{% endblocktrans %}
+              </a></li>
           {% endfor %}
           </ul>
         {% endif %}
@@ -95,43 +98,31 @@
     <div class="well">
       {{ object.synopsis|safe }}
       {% if object.category.slug == 'manga' %}
-	(cc) <a href="http://manga-news.com/" target="_blank">Manga-News</a>
+	(cc) <a href="http://manga-news.com/">Manga-News</a>
       {% endif %}
     </div>
 {% endif %}
 
 {% if user.is_authenticated %}
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#suggestionModal">Proposer une modification</button>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#suggestionModal">{% trans "Suggest an edit for this page" %}</button>
 
 <form class="typeahead-demo {{ user.username }}">
-  {% if object.category.slug == 'anime' %}
-    <input type="text" data-username="{{ user.username }}" class="typeahead" placeholder="Conseiller cet anime à un utilisateur" />
-  {% elif object.category.slug == 'manga'%}
-    <input type="text" data-username="{{ user.username }}" class="typeahead" placeholder="Conseiller ce manga à un utilisateur" />
-  {% elif object.category.slug == 'album' %}
-      <input type="text" data-username="{{ user.username }}" class="typeahead" placeholder="Conseiller cet album à un utilisateur" />
-  {% endif %}
+  <input type="text" data-username="{{ user.username }}" class="typeahead" placeholder="{% trans "Suggest this work to a user on Mangaki" %}" />
 </form>
-  {% if object.category.slug == 'anime' %}
-<div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">Cet utilisateur a déjà vu l'anime que vous voulez lui recommander</div>
-  {% elif object.category.slug == 'manga' %}
-<div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">Cet utilisateur a déjà lu le manga que vous voulez lui recommander</div>
-  {% elif object.category.slug == 'album' %}
-<div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">Cet utilisateur a déjà écouté l'album que vous voulez lui recommander</div>
-  {% endif %}
-<div class="alert alert-success" role="alert" id="success-reco" style="display: none">La recommandation a bien été effectuée</div>
+<div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">{% trans "This user already knows this work" %}</div>
+<div class="alert alert-success" role="alert" id="success-reco" style="display: none">{% trans "Suggestion successfully sent!" %}</div>
 
 <div class="modal fade" id="suggestionModal" tabindex="-1" role="dialog" aria-labelledby="suggestionModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="suggestionModalLabel">Proposer une amélioration pour {{ object.title }}</h4>
+        <h4 class="modal-title" id="suggestionModalLabel">{% trans "Suggest an edit for" %} {{ object.title }}</h4>
       </div>
-      <h5 style="text-indent:2em">Bienvenue sur l’interface d’amélioration de Mangaki :</h5>
+      <h5 style="text-indent:2em">{% trans "Thanks for improving Mangaki!" %}</h5>
       <ol>
-      <li>Indiquez quelle partie de la fiche est concernée par votre proposition</li>
-      <li>Écrivez-nous votre idée/solution, et envoyez&nbsp;!</li>
+      <li>{% trans "Please indicate what part of the work has a problem." %}</li>
+      <li>{% trans "Sketch your solution, and submit it!" %}</li>
       </ol>
       <form id="suggestion" action="{{ object.get_absolute_url }}" method="POST">
       {% csrf_token %}
@@ -142,8 +133,8 @@
       </div>
       </form>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-        <button type="button" class="btn btn-primary" onclick="suggestion('{{ object.category.slug }}')">Envoyer</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
+        <button type="button" class="btn btn-primary" onclick="suggestion('{{ object.category.slug }}')">{% trans "Submit" %}</button>
       </div>
     </div>
   </div>

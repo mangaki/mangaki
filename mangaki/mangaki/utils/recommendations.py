@@ -56,11 +56,13 @@ def get_reco_algo(request, algo_name='knn', category='all'):
         dataset, algo = fit_algo(algo_name, triplets)
 
     if algo_name == 'knn':
-        framed_rated_works = pd.DataFrame(list(current_user_ratings(request).items()), columns=['work_id', 'choice'])
-        framed_rated_works['work_id'] = dataset.encode_works(framed_rated_works['work_id'])
+        available_works = set(dataset.encode_work.keys())
+        framed_rated_works = (pd.DataFrame(list(current_user_ratings(request).items()), columns=['work_id', 'choice'])
+                              .query('work_id in @available_works'))
+        framed_rated_works['encoded_work_id'] = dataset.encode_works(framed_rated_works['work_id'])
         framed_rated_works['rating'] = framed_rated_works['choice'].map(rating_values)
-        nb_rated_works = len(framed_rated_works['work_id'])
-        ratings_from_user = coo_matrix((framed_rated_works['rating'],([0.] * nb_rated_works, framed_rated_works['work_id'])), shape=(1, algo.nb_works))
+        nb_rated_works = len(framed_rated_works)
+        ratings_from_user = coo_matrix((framed_rated_works['rating'],([0.] * nb_rated_works, framed_rated_works['encoded_work_id'])), shape=(1, algo.nb_works))
         ratings_from_user = ratings_from_user.tocsr()
 
         #Expands knn.M with current user ratings (vstack is too slow)

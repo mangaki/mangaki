@@ -28,7 +28,7 @@
   tags: action
 
 - name: Compile locale messages.
-  shell: '{{ mangaki_sync_manage }} compilemessages'
+  shell: 'cd {{ mangaki_sync_home }} && {{ mangaki_sync_manage }} compilemessages'
   environment: '{{ mangaki_sync_env }}'
   become: true
   become_user: '{{ mangaki_sync_user }}'

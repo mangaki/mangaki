@@ -1,17 +1,18 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load staticfiles %}
 {% load posters %}
 
-{% block title %}Grille NSFW {% if suggestions.paginator.page_range|length > 1 %}- Page {{ suggestions.number }} {% endif %}- Mangaki{% endblock %}
+{% block title %}{% trans "NSFW grid" %} {% if suggestions.paginator.page_range|length > 1 %}- {% trans "Page" %} {{ suggestions.number }} {% endif %}- Mangaki{% endblock %}
 
 {% block body %}
 
 <div class="page-header">
     <a href="{% url "fix-index" %}" class="btn btn-sm btn-info pull-right" style="margin-top: 8px;">
-        <span class="glyphicon glyphicon-list" aria-hidden="true"></span> Retour aux suggestions
+        <span class="glyphicon glyphicon-list" aria-hidden="true"></span> {% trans "Back to suggestions" %}
     </a>
 
-    <h1>Grille NSFW</h1>
+    <h1>{% trans "NSFW grid" %}</h1>
 </div>
 
 {% if suggestions_with_states %}
@@ -20,8 +21,7 @@
     {% if request.user.profile.nsfw_ok or not request.user.nsfw_ok and request.GET.nsfw_ok is not None %}
     <div class="alert clearfix" style="padding: 0 15px;">
     <p class="pull-left" style="margin: 5px 0 0;">
-        Cliquez sur <strong>&laquo; C'est NSFW ! &raquo;</strong> si vous pensez qu'une œuvre est NSFW
-        <span class="text-muted small">({{ count_nsfw_left }} œuvres dans la grille)</span>
+        <span class="text-muted small">({{ count_nsfw_left }} {% trans "works in the grid" %})</span>
     </p>
 
     <form action="{% url "update-evidence" %}?next={{ request.get_full_path }}" method="POST" class="form-group skip-form">
@@ -31,7 +31,7 @@
         <input type="hidden" name="agrees" value="{{ supposed_nsfw|yesno:'False,True' }}">
         {% endfor %}
         <button class="btn btn-sm btn-link pull-right">
-            Marquer les œuvres restantes comme non NSFW{% if suggestions.paginator.page_range|length > 1 %} et passer à la suite{% endif %}
+            {% trans "Mark remaining works as SFW" %}{% if suggestions.paginator.page_range|length > 1 %} {% trans "and continue" %}{% endif %}
         </button>
     </form>
     </div>
@@ -40,15 +40,18 @@
 
     {% if not request.user.profile.nsfw_ok and request.GET.nsfw_ok is None %}
     <div class="alert alert-warning">
-        <strong>Attention !</strong> Vous {{ request.user.is_anonymous|yesno:"n'êtes pas connecté et ne voyez donc par défaut pas,avez indiqué sur votre profil ne pas vouloir voir" }} les œuvres marquées NSFW.
-        Souhaitez-vous tout de même les voir ? <a href="{{ request.build_absolute_uri }}{{ request.GET.page|yesno:'&,?' }}nsfw_ok">Oui</a> / <a href="{% url "fix-index" %}">Non</a>.
+        <strong>{% trans "Attention!" %}</strong> {{ request.user.is_anonymous|yesno:_("You are not logged in so by default you can't browse NSFW works,In your profile you stated that you didn't want to browse NSFW works") }}.
+        {% trans "Display anyway?" %} <a href="{{ request.build_absolute_uri }}{{ request.GET.page|yesno:'&,?' }}nsfw_ok">{% trans "Yes" %}</a> / <a href="{% url "fix-index" %}">{% trans "No" %}</a>.
     </div>
     {% endif %}
 
     {% if not request.user.profile.nsfw_ok and request.GET.nsfw_ok is not None %}
     <div class="alert alert-warning">
-        <strong>Rappel :</strong> Vous avez accepté de voir les œuvres marquées NSFW sur cette grille temporairement.
-        Cliquez <a href="{% url "fix-index" %}">ici</a> pour revenir en arrière.
+        <strong>{% trans "Remainder:" %}</strong> {% trans "You agreed to see NSFW works on this grid temporarily." %}
+        {% url "fix-index" as go_back_url %}
+        {% blocktrans trimmed %}
+        <a href="{{ go_back_url }}">Click here</a> to go back.
+        {% endblocktrans %}
     </div>
     {% endif %}
 
@@ -67,19 +70,18 @@
                     <button style="width: 100%;" class="btn {{ says_is_nsfw|yesno:'btn-success,btn-success,btn-default' }}"
                             type="submit" name="agrees" value="{{ supposed_nsfw|yesno:'True,False' }}"
                             {% if says_is_nsfw is not None %}disabled{% endif %}>
-                            C'est NSFW !
+                            {% trans "It's NSFW!" %}
                     </button>
                 </form>
 
                 <div class="small text-muted text-right">
-                    Signalée <em>{{ supposed_nsfw|yesno:'NSFW,non NSFW' }}</em> par
+                    {% trans "Reported" %} <em>{{ supposed_nsfw|yesno:_('NSFW,SFW') }}</em> {% trans "by" %}
                     <a href="{% url "profile" suggestion.user %}">{{ suggestion.user.username }}</a>.
                 </div>
             </div>
 
             <div class="nsfw-form-post text-muted small text-center" style="margin: 20px 0 0; display: none;">
-                Merci de votre vote.<br/>
-                Un administrateur interviendra aussi rapidement que possible !
+                {% trans "Thanks for voting. An admin will help asap!" %}
             </div>
             {% endif %}
         </div>
@@ -94,7 +96,7 @@
 {% else %}
 
     <div class="alert alert-warning text-center" style="vertical-align: center;">
-        <strong>Aucun résultat à afficher :</strong> soit aucune œuvre n'a été marquée NSFW ou non NSFW, soit vous avez déjà donné votre avis.
+        {% trans "<strong>No result:</strong> either no work was reported as NSFW/SFW, or you gave your advice already." %}
     </div>
 
 {% endif %}
@@ -125,7 +127,7 @@
 
                 if ($(".skip-form input[name='suggestion']").length === 0) {
                     $(".skip-form button").fadeOut(200, function() {
-                        $(this).text('Rafraîchir la page et passer à la suite').fadeIn(200);
+                        $(this).text('{% trans "Refresh and see more" %}').fadeIn(200);
                     });
                 }
             }

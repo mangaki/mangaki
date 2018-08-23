@@ -8,6 +8,7 @@ flake8
 tensorflow
 fastFM
 pywFM
+surprise
 typing
 # Linting
 git-lint

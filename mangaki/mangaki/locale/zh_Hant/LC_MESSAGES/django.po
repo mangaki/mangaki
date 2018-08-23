@@ -1,0 +1,929 @@
+# This file was generated from test2.xlsx
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2018-08-23 19:25+0900\n"
+"Language: zh-hant\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: xls-to-po 1.0\n"
+
+msgid "Japan"
+msgstr "日本"
+
+msgid "Korea"
+msgstr "韓國"
+
+msgid "France"
+msgstr "法國"
+
+msgid "China"
+msgstr "中國"
+
+msgid "United States"
+msgstr "美國"
+
+msgid "Germany"
+msgstr "德國"
+
+msgid "Taiwan"
+msgstr "台灣"
+
+msgid "Spain"
+msgstr "西班牙"
+
+msgid "UK"
+msgstr "聯合王國"
+
+msgid "Hong Kong"
+msgstr "香港"
+
+msgid "Italia"
+msgstr "意大利"
+
+msgid "International"
+msgstr "國際"
+
+msgid "Seinen"
+msgstr "Seinen"
+
+msgid "Shonen"
+msgstr "少年"
+
+msgid "Shojo"
+msgstr "少女"
+
+msgid "Yaoi"
+msgstr "八追"
+
+msgid "Sonyun-Manhwa"
+msgstr "Sonyun，韓國漫畫"
+
+msgid "Kodomo"
+msgstr "小孩子"
+
+msgid "Ecchi-Hentai"
+msgstr "Ecchi  - 無盡"
+
+msgid "Global-Manga"
+msgstr "全球漫畫"
+
+msgid "Manhua"
+msgstr "張曼華"
+
+msgid "Josei"
+msgstr "城聖"
+
+msgid "Sunjung-Sunjeong"
+msgstr "Sunjung-Sunjeong"
+
+msgid "Chungnyun"
+msgstr "Chungnyun"
+
+msgid "Yuri"
+msgstr "尤里"
+
+msgid "Dojinshi-Parody"
+msgstr "同人志蠢事"
+
+msgid "Manhwa"
+msgstr "韓國漫畫"
+
+msgid "Yonkoma"
+msgstr "四格漫畫"
+
+msgid "Directors"
+msgstr "導演"
+
+msgid "Authors"
+msgstr "作者"
+
+msgid "Composers"
+msgstr "作曲家"
+
+msgid "Unprocessed"
+msgstr "生"
+
+msgid "Accepted"
+msgstr "公認"
+
+msgid "Rejected"
+msgstr "拒絕"
+
+msgid "Unknown"
+msgstr "未知"
+
+msgid "Prequel"
+msgstr "前傳"
+
+msgid "Sequel"
+msgstr "續集"
+
+msgid "Summary"
+msgstr "概要"
+
+msgid "Side story"
+msgstr "番外篇"
+
+msgid "Parent story"
+msgstr "父母的故事"
+
+msgid "Alternative setting"
+msgstr "可選擇設置"
+
+msgid "Same setting"
+msgstr "相同的設置"
+
+msgid "Special"
+msgstr "特別"
+
+msgid "Adaptation"
+msgstr "適應"
+
+msgid "Wrong title"
+msgstr "錯題"
+
+msgid "Wrong poster"
+msgstr "錯海報"
+
+msgid "Synopsis contains mistakes"
+msgstr "簡介包含錯誤"
+
+msgid "Wrong author"
+msgstr "筆者錯誤"
+
+msgid "Wrong composer"
+msgstr "作曲家錯誤"
+
+msgid "This is a duplicate"
+msgstr "這是一個重複"
+
+msgid "Work is Not Safe for Work"
+msgstr "工作是不安全的工作"
+
+msgid "Work is actually Safe for Work"
+msgstr "工作是工作，其實安全"
+
+msgid "Suggest a reference URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"
+msgstr "推薦的參考URL（MyAnimeList，AniDB，Icotaku，VGMdb等）"
+
+msgid "Director"
+msgstr "導演"
+
+msgid "Composer"
+msgstr "作曲家"
+
+msgid "Author"
+msgstr "作者"
+
+msgid "Mangaka"
+msgstr "漫畫家"
+
+msgid "Screenwriter"
+msgstr "編劇"
+
+msgid "Import my ratings"
+msgstr "導入我的收視率"
+
+msgid "Subscribe to Mangaki newsletter"
+msgstr "訂閱Mangaki通訊"
+
+msgid "My data can be released anonymously for research"
+msgstr "我的數據可以匿名發布研究"
+
+msgid "Type"
+msgstr "類型"
+
+msgid "Suggestion"
+msgstr "建議"
+
+msgid "What series should you watch next?"
+msgstr "什麼系列，你應該看未來？"
+
+msgid ""
+"Mangaki is an anime/manga recommendation website made by an organization of "
+"otakus."
+msgstr "Mangaki是otakus的一個組織做出的動畫/漫畫推薦網站。"
+
+msgid ""
+"Tell him what you watched or read, and our algorithm (open source) will find"
+" new precious pearls for you to discover!"
+msgstr "告訴他你觀看或閱讀什麼，以及我們的算法（開放源代碼）會找到你來發現新的珍貴的珍珠！"
+
+msgid "Join us!"
+msgstr "加入我們！"
+
+msgid "Contact us"
+msgstr "聯繫我們"
+
+msgid "Browse the wiki"
+msgstr "瀏覽維基"
+
+msgid "See the code on GitHub"
+msgstr "在Github上查看代碼"
+
+msgid "Learn data science through Mangaki"
+msgstr "通過Mangaki了解科學數據"
+
+msgid ""
+"Our algorithm is open source, so you can understand it, and improve it!"
+msgstr "我們的算法是開源的，所以你可以理解它，完善它！"
+
+msgid ""
+"Do you know: nearest neighbors, singular value decomposition, Netflix prize,"
+" autoencoder?"
+msgstr "你知道：最近的鄰居，奇異值分解，Netflix的獎金，自動編碼？"
+
+msgid "Come and learn all that on our GitHub repo or in our organization!"
+msgstr "快來學習一切對我們的GitHub庫或在我們的組織！"
+
+msgid "Browse the research blog"
+msgstr "瀏覽研究博客"
+
+msgid "Account Deleted"
+msgstr "帳戶已刪除"
+
+msgid "Account deleted!"
+msgstr "帳戶刪除！"
+
+msgid "Confirm E-mail Address"
+msgstr "確認電子郵箱地址"
+
+msgid ""
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
+"address for user %(user_display)s."
+msgstr "請確認<a href=\"mailto:%(email)s\">％（電子郵件）■</a>是一個電子郵件地址的用戶％（user_display）秒。"
+
+msgid "Confirm"
+msgstr "確認"
+
+msgid ""
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+msgstr "該E-mail確認鏈接過期或無效。請<a href=\"%(email_url)s\">發出新的電子郵件確認申請</a>。"
+
+msgid "Sign In"
+msgstr "簽到"
+
+msgid ""
+"Please sign in with one of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign in "
+"below:"
+msgstr "請與您現有的第三方帳戶登入。或者，<a href=\"%(signup_url)s\">註冊</a>一％（SITE_NAME）的賬戶和下方登錄："
+
+msgid "or"
+msgstr "要么"
+
+msgid ""
+"If you have not created an account yet, then please <a "
+"href=\"%(signup_url)s\">sign up</a> first."
+msgstr "如果您尚未創建一個帳戶，然後請<a href=\"%(signup_url)s\">先註冊</a>。"
+
+msgid ""
+"You rated a few works anonymously on this computer. These ratings will be "
+"lost if you login to an existing account. You should <a "
+"href=\"%(signup_url)s\">sign up</a> to save them.\""
+msgstr ""
+"您的評價幾個作品匿名在此計算機上。如果您登錄到現有帳戶這些評級都將丟失。您應該<a "
+"href=\"%(signup_url)s\">註冊</a>救他們“。"
+
+msgid "Forgot Password?"
+msgstr "忘記密碼？"
+
+msgid "Sign Out"
+msgstr "登出"
+
+msgid "Are you sure you want to sign out?"
+msgstr "您確定要退出嗎？"
+
+msgid "Password Reset"
+msgstr "重設密碼"
+
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll send you"
+" an e-mail allowing you to reset it."
+msgstr "忘記了你的密碼？請在下面輸入您的E-mail地址，我們會向您發送一封電子郵件，讓您重置。"
+
+msgid "Reset My Password"
+msgstr "重置我的密碼"
+
+msgid "Please contact us if you have any trouble resetting your password."
+msgstr "如果您有重置密碼的任何問題，請聯繫我們。"
+
+msgid ""
+"We have sent you an e-mail. Please contact us if you do not receive it "
+"within a few minutes."
+msgstr "我們已經向您發出一封電子郵件。請聯繫我們，如果你沒有在幾分鐘之內收到它。"
+
+msgid "Change Password"
+msgstr "更改密碼"
+
+msgid "Bad Token"
+msgstr "壞令牌"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
+"reset</a>."
+msgstr "密碼重置鏈接是無效的，可能是因為它已經被使用。請申請一個<a href=\"%(passwd_reset_url)s\">新的密碼重置</A>。"
+
+msgid "change password"
+msgstr "更改密碼"
+
+msgid "Your password is now changed."
+msgstr "您的密碼現已更改。"
+
+msgid "Signup"
+msgstr "註冊"
+
+msgid "Join Mangaki"
+msgstr "加入Mangaki"
+
+msgid "And contribute to the creation of a better world."
+msgstr "並有助於創造一個更美好的世界。"
+
+msgid ""
+"If you have already an account, you can <a href=\"%(login_url)s\">login</a>."
+msgstr "如果你已經有一個帳戶，您可以<a href=\"%(login_url)s\">登錄</A>。"
+
+msgid ""
+"You already rated a few works. They will be imported to your profile if you "
+"check the box <strong>Import my ratings</strong> below!"
+msgstr "你已經評級的幾個作品。他們將被導入到您的個人資料，如果你勾選<strong>導入我的收視率</ STRONG>下面！"
+
+msgid "Subscribe to Mangaki's newsletter"
+msgstr "訂閱Mangaki的簡訊"
+
+msgid "some waifus/husbandos in your mails?"
+msgstr "在你的郵件一些waifus / husbandos？"
+
+msgid "My data can be used anonymously for research"
+msgstr "我的數據可以被匿名用於科研"
+
+msgid "Import my ratings"
+msgstr "導入我的收視率"
+
+msgid "Sign In &raquo;"
+msgstr "登錄資訊＆raquo;"
+
+msgid "My works"
+msgstr "我的作品"
+
+msgid ""
+"By subscribing, you accept that your ratings may be saved by Mangaki to keep"
+" your profile up-to-date, recommend anime to you, and improve other users' "
+"recommendations."
+msgstr "通過訂閱，你接受你的評級可能被Mangaki保存，讓您的個人資料上最新，動漫推薦給你，並提高其他用戶的建議。"
+
+msgid "How does it work?"
+msgstr "它是如何工作的？"
+
+msgid "You can update your options in your profile."
+msgstr "您可以在您的個人資料更新你的選擇。"
+
+msgid "Home"
+msgstr "家"
+
+msgid "Yes, I'm sure"
+msgstr "是，我確定"
+
+msgid "No, take me back"
+msgstr "不，我回來"
+
+msgid "Mangaki is an anime & manga recommendation website"
+msgstr "Mangaki是動畫和漫畫推薦網站"
+
+msgid "Open the menu"
+msgstr "打開菜單"
+
+msgid "What is Mangaki?"
+msgstr "什麼是Mangaki？"
+
+msgid "Anime"
+msgstr "動漫"
+
+msgid "Manga"
+msgstr "曼加斯"
+
+msgid "Mangas"
+msgstr "曼加斯"
+
+msgid "Recommendations"
+msgstr "建議"
+
+msgid "Top 20"
+msgstr "前20名"
+
+msgid "Suggestions"
+msgstr "建議"
+
+msgid "Log in"
+msgstr "登錄"
+
+msgid "Welcome"
+msgstr "歡迎"
+
+msgid "Log out"
+msgstr "登出"
+
+msgid ""
+"You rated a few works anonymously, you can <a href=\"%(profile)s\">see "
+"them</a>, don't forget to <a href=\"%(signup_url)s\">subscribe</a> to save "
+"them!"
+msgstr ""
+"您的評價幾個作品匿名，您可以<a href=\"%(profile)s\">看到他們</A>，不要忘了<a "
+"href=\"%(signup_url)s\">訂閱</A>來拯救他們！"
+
+msgid "Mangaki project"
+msgstr "Mangaki項目"
+
+msgid "FAQ"
+msgstr "常問問題"
+
+msgid "Legal mentions"
+msgstr "相關法律"
+
+msgid "Guidelines"
+msgstr "方針"
+
+msgid "Blog"
+msgstr "博客"
+
+msgid "Report a bug"
+msgstr "報告bug"
+
+msgid "Donate"
+msgstr "捐"
+
+msgid "Version:"
+msgstr "版："
+
+msgid "Suggestion list"
+msgstr "建議列表"
+
+msgid "Page"
+msgstr "頁"
+
+msgid "Go to the NSFW grid"
+msgstr "轉至NSFW電網"
+
+msgid "This problem is solved,This problem is ongoing"
+msgstr "這個問題就解決了，這個問題是正在進行"
+
+msgid "Problem:"
+msgstr "問題："
+
+msgid "Reported by:"
+msgstr "報導："
+
+msgid "Target:"
+msgstr "目標："
+
+msgid ""
+"You <strong><span class=\"text-success\">approved <span class=\"glyphicon "
+"glyphicon-thumbs-up\" aria-hidden=\"true\"></span></span></strong> this "
+"suggestion."
+msgstr ""
+"您<strong>的<span class =“TEXT-成功”>批准的<span class =“glyphicon "
+"glyphicon，豎起大拇指”ARIA隱藏=“真”> </ SPAN> </ SPAN> </ STRONG>這個建議。"
+
+msgid ""
+"You <strong><span class=\"text-danger\">rejected <span class=\"glyphicon "
+"glyphicon-thumbs-down\" aria-hidden=\"true\"></span></span></strong> this "
+"suggestion."
+msgstr ""
+"您<strong>的<span class =“TEXT-危險”>拒絕的<span class =“glyphicon "
+"glyphicon，拇指向下”ARIA隱藏=“真”> </ SPAN> </ SPAN> </ STRONG>這個建議。"
+
+msgid "You asked <strong>an admin for help</strong>."
+msgstr "你問的<strong>管理員的幫助</ strong>即可。"
+
+msgid "This problem was marked as solved!"
+msgstr "被標記這個問題，因為解決了！"
+
+msgid "Copy"
+msgstr "複製"
+
+msgid "Sharing link"
+msgstr "分享鏈接"
+
+msgid "Solve the problem automatically"
+msgstr "自動解決問題"
+
+msgid "Close this suggestion"
+msgstr "關閉此建議"
+
+msgid "Ask an admin for help"
+msgstr "尋求幫助管理員"
+
+msgid "You asked an admin for help"
+msgstr "你問管理員求助"
+
+msgid "Reopen cette suggestion"
+msgstr "重新打開這個建議"
+
+msgid "This work belongs to this cluster:"
+msgstr "這項工作屬於這一組："
+
+msgid "This cluster is"
+msgstr "這個星團"
+
+msgid "by"
+msgstr "通過"
+
+msgid "This cluster was merged:"
+msgstr "這個集群被合併："
+
+msgid "Previous"
+msgstr "以前"
+
+msgid "Back"
+msgstr "背部"
+
+msgid "Next"
+msgstr "下一個"
+
+msgid "Copied link!"
+msgstr "複製鏈接！"
+
+msgid "Link was not copied"
+msgstr "鏈接不複製"
+
+msgid "NSFW grid"
+msgstr "NSFW電網"
+
+msgid "Back to suggestions"
+msgstr "返回到推薦"
+
+msgid "works in the grid"
+msgstr "工作在網格"
+
+msgid "Mark remaining works as SFW"
+msgstr "馬克其餘作品SFW"
+
+msgid "and continue"
+msgstr "並繼續"
+
+msgid "Attention!"
+msgstr "注意！"
+
+msgid ""
+"You are not logged in so by default you can't browse NSFW works,In your "
+"profile you stated that you didn't want to browse NSFW works"
+msgstr "您還沒有登錄所以在默認情況下，你不能瀏覽NSFW作品，在您的個人資料，你說，你不想瀏覽NSFW作品"
+
+msgid "Display anyway?"
+msgstr "反正顯示？"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "沒有"
+
+msgid "Remainder:"
+msgstr "餘："
+
+msgid "You agreed to see NSFW works on this grid temporarily."
+msgstr "你答應見NSFW工作在該網格暫時的。"
+
+msgid "<a href=\"%(go_back_url)s\">Click here</a> to go back."
+msgstr "<a href=\"%(go_back_url)s\">點擊此處</a>回去。"
+
+msgid "It's NSFW!"
+msgstr "這是NSFW！"
+
+msgid "Reported"
+msgstr "報導"
+
+msgid "NSFW,SFW"
+msgstr "NSFW，SFW"
+
+msgid "Thanks for voting. An admin will help asap!"
+msgstr "感謝您的投票。管理員將幫助盡快！"
+
+msgid ""
+"<strong>No result:</strong> either no work was reported as NSFW/SFW, or you "
+"gave your advice already."
+msgstr "<strong>否結果：</ STRONG>無論什麼工作都報告為NSFW / SFW，或者你給你的建議了。"
+
+msgid "Refresh and see more"
+msgstr "刷新和看到更多"
+
+msgid "Mangaki, anime and manga recommendation"
+msgstr "Mangaki，動畫和漫畫推薦"
+
+msgid "Rate your favorite series and discover new ones!"
+msgstr "給您喜愛的系列，並發現新的！"
+
+msgid "I prefer anime"
+msgstr "我喜歡動漫"
+
+msgid "I prefer manga"
+msgstr "我更喜歡漫畫"
+
+msgid "Artists"
+msgstr "藝術家"
+
+msgid "Hint: You can press Enter to trigger the search"
+msgstr "提示：您可以按Enter鍵觸發搜索"
+
+msgid "Icons"
+msgstr "圖標"
+
+msgid ""
+"The icons we used for the ratings are created by <a "
+"href=\"http://www.flaticon.com/authors/dave-gandy\">Dave Gandy</a> for <a "
+"href=\"http://fontawesome.io\">fontawesome</a>. The SVG version comes from "
+"<a href=\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
+msgstr ""
+"// fontawesome：我們用於評級的圖標由<a href=\"http://www.flaticon.com/authors/dave-"
+"gandy\">戴夫甘迪</a>獲取<A HREF =“HTTP創建。 IO“> fontawesome </A>。 SVG的版本來自<a "
+"href=\"http://www.flaticon.com/packs/font-awesome\"> flaticon </A>。"
+
+msgid ""
+"Here are some recommendations that you might like.<br /> Rate them and "
+"reload to get new ones."
+msgstr "下面是一些你可能會喜歡的建議。<br />評價他們，並重新加載以獲取新的。"
+
+msgid "All"
+msgstr "所有"
+
+msgid "Anime only"
+msgstr "僅動漫"
+
+msgid "Manga only"
+msgstr "只有漫畫"
+
+msgid ""
+"I want new recommendations! <br class=\"visible-xs\">(After you rate those.)"
+msgstr "我想新的建議！ <br class=\"visible-xs\">（後您的評分。）"
+
+msgid ""
+"To receive recommandations, you should at least <a "
+"href=\"%(work_list_url)s\">rate an anime</a>!"
+msgstr "要接收recommandations，你至少應該<a href=\"%(work_list_url)s\">率動漫</A>！"
+
+msgid "Number of episodes:"
+msgstr "發作次數："
+
+msgid "Original title:"
+msgstr "原標題："
+
+msgid "Editor:"
+msgstr "編輯："
+
+msgid "Origin:"
+msgstr "起源："
+
+msgid "Genres:"
+msgstr "流派："
+
+msgid "Type:"
+msgstr "類型："
+
+msgid "Catalog number:"
+msgstr "目錄編號："
+
+msgid "Find this album on VGMdb"
+msgstr "查找VGMdb這張專輯"
+
+msgid "Stats"
+msgstr "統計"
+
+msgid "References"
+msgstr "參考"
+
+msgid "See on %(name)s"
+msgstr "查看％（名稱）■"
+
+msgid "Suggest an edit for this page"
+msgstr "建議此頁面的編輯"
+
+msgid "Suggest this work to a user on Mangaki"
+msgstr "建議這項工作對Mangaki用戶"
+
+msgid "This user already knows this work"
+msgstr "此用戶已經知道這個工作"
+
+msgid "Suggestion successfully sent!"
+msgstr "建議發送成功！"
+
+msgid "Suggest an edit for"
+msgstr "建議對編輯"
+
+msgid "Thanks for improving Mangaki!"
+msgstr "感謝提高Mangaki！"
+
+msgid "Please indicate what part of the work has a problem."
+msgstr "請說明工作的一部分有問題。"
+
+msgid "Sketch your solution, and submit it!"
+msgstr "畫出您的解決方案，並提交！"
+
+msgid "Close"
+msgstr "關"
+
+msgid "Submit"
+msgstr "提交"
+
+msgid "Cheatsheet for key shortcuts"
+msgstr "為的cheatsheet快捷鍵"
+
+msgid "Moves"
+msgstr "移動"
+
+msgid ""
+"Rate a few cards below, or using the search bar.<br /> Then click <a "
+"class=\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what "
+"Mangaki recommends!"
+msgstr ""
+"為一些卡的下方，或者使用搜索欄。<br />然後點擊<a class=\"alert-link\" "
+"href=\"%(reco_url)s\">建議</a>來看看Mangaki建議什麼！"
+
+msgid ""
+"New on Mangaki? Start rating some works below! Then see your "
+"recommendations, and <a href=\"%(signup_url)s?next=%(next_url)s\">sign "
+"up</a> to keep your ratings."
+msgstr ""
+"新上Mangaki？開始評分低於一些作品！然後看到你的建議，並<a "
+"href=\"%(signup_url)s?next=%(next_url)s\">註冊以保證您的評級。"
+
+msgid "Mosaic"
+msgstr "鑲嵌"
+
+msgid "Recent"
+msgstr "最近"
+
+msgid "Top"
+msgstr "最佳"
+
+msgid "Popular"
+msgstr "流行"
+
+msgid "Pearls"
+msgstr "珍珠"
+
+msgid "Controversial"
+msgstr "爭論的"
+
+msgid "Random"
+msgstr "隨機"
+
+msgid "A-Z"
+msgstr "A-Z"
+
+msgid ""
+"Enter the title of some %(category)s (currently %(objects_count)s works)"
+msgstr "輸入的某些%(category)s（當前%(objects_count)s的作品）的標題"
+
+msgid "Hint: press Enter to trigger the search"
+msgstr "提示：按Enter鍵觸發搜索"
+
+msgid "Get recommendations now"
+msgstr "現在獲取建議"
+
+msgid "See more…"
+msgstr "查看更多…"
+
+msgid "Your ratings"
+msgstr "您的評分"
+
+msgid "<a href=\"%(signup_url)s\">Signup</a> to save them"
+msgstr "<a href=\"%(signup_url)s\">註冊</a>來拯救他們"
+
+msgid "Subscribed since %(member_days)s days"
+msgstr "自%(member_days)s訂閱小號天"
+
+msgid "Rated works"
+msgstr "額定工作"
+
+msgid "My settings"
+msgstr "我的設置"
+
+msgid "Delete all my ratings"
+msgstr "刪除所有我的收視率"
+
+msgid "Export all my data"
+msgstr "導出我的所有數據"
+
+msgid "My profile is public"
+msgstr "我的個人資料已公開"
+
+msgid "Sent recommendations"
+msgstr "發送建議"
+
+msgid "was recommended to"
+msgstr "被推薦"
+
+msgid "Received recommendations"
+msgstr "收到建議"
+
+msgid "was recommended to you by"
+msgstr "被推薦給你"
+
+msgid "(This list is empty.)"
+msgstr "（這個列表是空的。）"
+
+msgid "Delete all received recommendations"
+msgstr "刪除所有收到的建議"
+
+msgid "Ask Mangaki to sort!"
+msgstr "問Mangaki排序！"
+
+msgid "seen by"
+msgstr "見一斑"
+
+msgid "watchlist"
+msgstr "監視列表"
+
+msgid "read by"
+msgstr "通過閱讀"
+
+msgid "wishlist"
+msgstr "願望清單"
+
+msgid "Recommendations to"
+msgstr "建議"
+
+msgid "seen"
+msgstr "看到"
+
+msgid "read"
+msgstr "讀"
+
+msgid "My recommendations"
+msgstr "我的建議"
+
+msgid "%(username)s's profile is not disclosed publicly."
+msgstr "%(username)s的配置文件沒有公開披露。"
+
+msgid "Account Connections"
+msgstr "帳戶連接"
+
+msgid ""
+"You can sign in to your account using any of the following third party "
+"accounts:"
+msgstr "您可以登錄到使用下列任何第三方賬戶的您的帳戶："
+
+msgid "Remove"
+msgstr "去掉"
+
+msgid ""
+"You currently have no social network accounts connected to this account."
+msgstr "您目前沒有連接到這個帳戶沒有社交網絡帳戶。"
+
+msgid "Add a 3rd Party Account"
+msgstr "添加第三方帳號"
+
+msgid "Sign Up"
+msgstr "註冊"
+
+msgid ""
+"You are about to use your %(provider_name)s account to connect to "
+"%(site_name)s. In order to do so, please fill the following form:"
+msgstr "您將要使用%(provider_name)s的賬戶連接到%(site_name)s秒。為了做到這一點，請填寫以下表格："
+
+msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
+msgstr "%(date)s在Mangaki%(category)s的頂部%(size)s"
+
+msgid "Name"
+msgstr "名稱"
+
+msgid "Score"
+msgstr "得分了"
+
+msgid "Number of ratings"
+msgstr "數個"
+
+msgid "Number of favorites"
+msgstr "收藏夾數"
+
+msgid "No results."
+msgstr "沒有結果。"
+
+msgid "The page you're looking for was not found (yet?)."
+msgstr "你要找的頁面不存在（沒有？）。"
+
+msgid "You don't have access to this page."
+msgstr "您沒有訪問此頁面。"
+
+msgid "This request is incorrect. What did you try to do?"
+msgstr "這個請求是不正確。那你嘗試做？"
+
+msgid "Love"
+msgstr "愛"
+
+msgid "Like"
+msgstr "喜歡"
+
+msgid "Neutral"
+msgstr "中性"
+
+msgid "Dislike"
+msgstr "反感"
+
+msgid "I want to see"
+msgstr "我想看看"
+
+msgid "I don't want to see"
+msgstr "我不希望看到"

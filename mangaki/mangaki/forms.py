@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 from mangaki.models import Suggestion, Rating, Profile
 from mangaki.utils.ratings import get_anonymous_ratings, clear_anonymous_ratings
 from mangaki.choices import SUGGESTION_PROBLEM_CHOICES
@@ -22,10 +23,10 @@ class SuggestionForm(forms.ModelForm):
 
 
 class SignupForm(forms.Form):
-    import_ratings = forms.BooleanField(required=False, initial=True, label="Importer mes notes")
-    newsletter_ok = forms.BooleanField(required=False, initial=False, label="S'abonner à la newsletter de Mangaki")
+    import_ratings = forms.BooleanField(required=False, initial=True, label=_("Import my ratings"))
+    newsletter_ok = forms.BooleanField(required=False, initial=False, label=_("Subscribe to Mangaki newsletter"))
     research_ok = forms.BooleanField(required=False, initial=False,
-                                     label="Participer à l'amélioration des algorithmes de Mangaki")
+                                     label=_("My data can be released anonymously for research"))
 
     def signup(self, request, user):
         if self.cleaned_data['import_ratings']:

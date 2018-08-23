@@ -1,7 +1,8 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block body %}
-<h1>Artistes</h1>
+<h1>{% trans "Artists" %}</h1>
 <hr />
 
 <form method="GET">
@@ -11,7 +12,7 @@
   <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
     </span>
   </div>
-  <span class="help-block" style="float: right">Astuce&nbsp;: Vous pouvez appuyer sur la touche "Entrée" de votre clavier pour lancer la recherche</span>
+  <span class="help-block" style="float: right">{% trans "Hint: You can press Enter to trigger the search" %}</span>
 </form>
 
 <div class="row">

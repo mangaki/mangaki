@@ -8,10 +8,12 @@
 {% block anonymous_rating_banner %} {% endblock %}
 
 {% block body %}
-<h2 class="text-center">Rejoignez Mangaki <span class="text-nowrap">／人◕ ‿‿ ◕人＼</span></h2>
+<h2 class="text-center">{% trans "Join Mangaki" %} <span class="text-nowrap">／人◕ ‿‿ ◕人＼</span></h2>
 <p class="text-center">
-  Et participez à la création d'un monde meilleur.  Si vous avez déjà un
-  compte, vous pouvez <a href="{{ login_url }}">vous connecter ici</a>.
+  {% trans "And contribute to the creation of a better world." %}<br />
+  {% blocktrans trimmed %}
+  If you have already an account, you can <a href="{{ login_url }}">login</a>.
+  {% endblocktrans %}
 </p>
 
 {% get_providers as socialaccount_providers %}
@@ -29,9 +31,7 @@
   {% if ratings %}
   <div class="col-xs-12">
     <div class="alert alert-info" role="alert">
-      Vous avez d&eacute;j&agrave; not&eacute; certaines œuvres. Importez-les
-      automatiquement sur votre nouveau compte en cochant la case "Importer mes
-      notes" ci-dessous&nbsp;!
+      {% trans "You already rated a few works. They will be imported to your profile if you check the box <strong>Import my ratings</strong> below!" %}
     </div>
   </div>
   {% endif %}
@@ -50,43 +50,40 @@
     {% bootstrap_field form.password2 show_label=False addon_before='<span class="glyphicon glyphicon-lock"></span>' %}
   <div class="checkbox">
       <label>
-          {{ form.newsletter_ok }} S'abonner à la newsletter de Mangaki (un peu de waifus dans vos emails ?)
+          {{ form.newsletter_ok }} {% trans "Subscribe to Mangaki newsletter" %} ({% trans "some waifus/husbandos in your mails?" %})
       </label>
   </div>
   <div class="checkbox">
       <label>
-          {{ form.research_ok }} Participer à l'amélioration des algorithmes de Mangaki
+          {{ form.research_ok }} {% trans "My data can be used anonymously for research" %}
       </label>
   </div>
     {% if ratings %}
     <div class="checkbox">
       <label>
-        {{ form.import_ratings }} Importer <a href="#my-ratings">mes notes</a>
+        {{ form.import_ratings }} {% trans "Import my ratings" %}
       </label>
     </div>
     {% endif %}
     {% buttons %}
-    {% bootstrap_button button_type="submit" button_class="btn-primary" extra_classes="btn-block" content="Inscription &raquo;" %}
+      <button class="btn btn-primary btn-block" type="submit">{% trans "Sign In &raquo;" %}</button>
     {% endbuttons %}
   </form>
   {% if ratings %}
   <div class="col-xs-12 col-sm-6">
-    <h3 class="text-center" id="my-ratings">Mes notes</h3>
+    <h3 class="text-center" id="my-ratings">{% trans "My works" %}</h3>
     {% for category, works in ratings %}
-    <h4>{{ category.name }}</h4>
-    {% include "works_no_poster.html" with works=works category=category.slug only %}
+      <h4>{{ category.name }}</h4>
+      {% include "works_no_poster.html" with works=works category=category.slug config=meta.config only %}
     {% endfor %}
   </div>
   {% endif %}
 </div>
 
 <p class="text-center">
-  En vous inscrivant, vous acceptez que vos notes soient enregistrées par Mangaki pour maintenir votre profil à jour, vous recommander des anime, et améliorer les recommandations que reçoivent les autres utilisateurs. <a href="{% url 'faq' %}">Comment ça marche ?</a><br />
-  Vous pouvez mettre à jour vos options dans votre profil.
-</p>
-<p class="text-center">
-  By subscribing, you accept that your ratings may be saved by Mangaki to keep your profile up-to-date, recommend anime to you, and improve other users' recommendations. <a href="{% url 'faq' %}">How does it work?</a><br />
-  You can update your options in your profile.
+  {% trans "By subscribing, you accept that your ratings may be saved by Mangaki to keep your profile up-to-date, recommend anime to you, and improve other users' recommendations." %}
+  <a href="{% url 'faq' %}">{% trans "How does it work?" %}</a><br />
+  {% trans "You can update your options in your profile." %}
 </p>
 
 {% endblock %}

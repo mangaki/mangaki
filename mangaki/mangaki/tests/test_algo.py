@@ -34,14 +34,14 @@ class AlgoTest(TestCase):
         for algo_name in RecommendationAlgorithm.list_available_algorithms():
             algo = RecommendationAlgorithm.instantiate_algorithm(algo_name)
             algo.set_parameters(self.nb_users, self.nb_works)
-            if algo_name in {'balse', 'lasso', 'xals', 'gbr'}:
+            if algo_name in {'balse', 'fma', 'gbr', 'lasso', 'xals'}:
                 algo.nb_tags = self.nb_tags
                 algo.T = self.T
             algo.fit(self.X_train, self.y_train)
             with self.settings(PICKLE_DIR=SNAPSHOT_DIR_TEST):
                 if algo.is_serializable:
                     algo.save(None)
-                    algo.load(algo.get_backup_filename())
+                    algo.load(None)
                     os.remove(os.path.join(SNAPSHOT_DIR_TEST, algo.get_backup_filename()))
             y_pred = algo.predict(self.X_test)
             logging.debug('rmse=%.3f algo=%s',

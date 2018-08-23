@@ -16,6 +16,7 @@ from .knn2 import MangakiKNN2
 from .pca import MangakiPCA
 from .sgd import MangakiSGD
 from .svd import MangakiSVD
+from .ssvd import MangakiSSVD
 from .wals import MangakiWALS
 from .xals import MangakiXALS
 from .zero import MangakiZero

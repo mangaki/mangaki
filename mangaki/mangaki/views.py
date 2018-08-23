@@ -25,6 +25,7 @@ from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.timezone import utc
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.defaults import server_error
 from django.views.generic import View
@@ -79,63 +80,32 @@ RATING_COLORS = {
     'wontsee': {'normal': '#5bc0de', 'highlight': '#31b0d5'}
 }
 
-FEATURED = {
-    'utamonogatari': 14293,
-    'coo': 378,
-    'colorful': 9944,
-    'crayon': 3125,
-    'nausicaa': 1289,
-    'godfathers': 330,
-    'souvenirs': 2696,
-    'silent': 2238,
-    'night': 18416,
-    'fireworks': 18331
-}
-
-DPP_UI_CONFIG_FOR_RATINGS = {
-    'ui': [
-        {
-            'name': "like",
-            'title': "J'aime"
-        },
-        {
-            'name': "dislike",
-            'title': "Je n'aime pas"
-        },
-        {
-            'name': "dontknow",
-            'title': "Je ne connais pas"
-        }
-    ],
-    'endpoint': reverse_lazy('vote-dpp')
-}
-
 VANILLA_UI_CONFIG_FOR_RATINGS = {
     'ui': [
         {
             'name': 'favorite',
-            'title': "J'adore"
+            'title': _("Love")
         },
         {
             'name': "like",
-            'title': "J'aime"
+            'title': _("Like")
         },
         {
             'name': "neutral",
-            'title': "Neutre"
+            'title': _("Neutral")
         },
         {
             'name': "dislike",
-            'title': "Je n'aime pas"
+            'title': _("Dislike")
         },
         {
             'name': 'willsee',
-            'title': "Je veux voir",
+            'title': _("I want to see"),
             'extra_classes': ['rating_separator']
         },
         {
             'name': 'wontsee',
-            'title': "Je ne veux pas voir"
+            'title': _("I don't want to see")
         }
     ],
     'endpoint': reverse_lazy('vote')
@@ -293,18 +263,12 @@ class WorkList(WorkListMixin, ListView):
         else:
             return sort
 
-    @property
-    def is_dpp(self):
-        return self.kwargs.get('dpp', False)
-
     def get_queryset(self):
         search_text = self.search_query
         self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
 
-        if self.is_dpp:
-            self.queryset = self.queryset.exclude(coldstartrating__user=self.request.user).dpp(10)
-        elif sort_mode == 'new':
+        if sort_mode == 'new':
             self.queryset = self.queryset.filter(date__isnull=False).order_by('-date')
         elif sort_mode == 'top':
             self.queryset = self.queryset.top()
@@ -329,9 +293,9 @@ class WorkList(WorkListMixin, ListView):
             raise Http404
 
         if search_text:
-            self.queryset = self.queryset.filter(Q(title__icontains=search_text) | Q(worktitle__title__icontains=search_text))
+            self.queryset = self.queryset.filter(Q(title__icontains=search_text) | Q(worktitle__title__icontains=search_text)).distinct('id', 'nb_ratings')  # https://stackoverflow.com/questions/20582966/django-order-by-filter-with-distinct
 
-        self.queryset = self.queryset.only('pk', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
+        self.queryset = self.queryset.only('id', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
         return self.queryset
 
@@ -347,13 +311,12 @@ class WorkList(WorkListMixin, ListView):
         context['sort_mode'] = sort_mode
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
-        context['is_dpp'] = self.is_dpp
-        context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS if not self.is_dpp else DPP_UI_CONFIG_FOR_RATINGS
+        context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS
         context['enable_kb_shortcuts'] = (False if self.request.user.is_anonymous
         else self.request.user.profile.keyboard_shortcuts_enabled)
         context['objects_count'] = self.category.work_set.count()
 
-        if sort_mode == 'mosaic' and not self.is_dpp:
+        if sort_mode == 'mosaic':
             context['object_list'] = [
                 {
                     'slot_type': slot_sort_type,
@@ -585,18 +548,10 @@ def about(request, lang):
 
 
 def events(request):
-    user_ratings = {}
-    if request.user.is_authenticated:
-        for rating in Rating.objects.filter(work_id__in=FEATURED.values(), user=request.user):
-            user_ratings[rating.work_id] = rating.choice
-    featured_works = Work.objects.in_bulk(FEATURED.values())
     context = {
         'wakanim': Partner.objects.get(pk=12),
         'config': VANILLA_UI_CONFIG_FOR_RATINGS
     }
-    for work_tag, work_id in FEATURED.items():
-        context[work_tag] = featured_works[work_id]
-        context['{}_rating'.format(work_tag)] = user_ratings.get(work_id)
     return render(
         request, 'events.html', context)
 
@@ -643,20 +598,6 @@ def rate_work(request, work_id):
 
     else:
         return HttpResponse()
-
-
-# FIXME @login_required
-def dpp_work(request, work_id):
-    if request.user.is_authenticated() and request.method == 'POST':
-        work = get_object_or_404(Work, id=work_id)
-        choice = request.POST.get('choice', '')
-        if choice not in ['like', 'dislike', 'dontknow']:
-            raise SuspiciousOperation(
-                "Attempted access denied. There are only 3 ratings here: like, dislike and dontknow")
-        ColdStartRating.objects.update_or_create(user=request.user, work=work, defaults={'choice': choice})
-        return HttpResponse(choice)
-    else:
-        raise Http404
 
 
 def recommend_work(request, work_id, target_id):
@@ -722,17 +663,6 @@ def get_reco_algo_list(request, algo, category):
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 
-def get_reco_list_dpp(request, category):
-    reco_list_dpp = []
-    data = get_reco_algo(request, 'knn', category)
-    works = data['works']
-    for work_id in data['work_ids']:
-        work = works[work_id]
-        reco_list_dpp.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
-                              'category': work.category.slug})
-    return HttpResponse(json.dumps(reco_list_dpp), content_type='application/json')
-
-
 def remove_all_anon_ratings(request):
     if request.method == 'POST':
         clear_anonymous_ratings(request.session)
@@ -786,17 +716,6 @@ def get_reco(request):
                       'category': category,
                       'algo': algo_name,
                       'config': VANILLA_UI_CONFIG_FOR_RATINGS
-                  })
-
-
-def get_reco_dpp(request):
-    category = request.GET.get('category', 'all')
-    reco_list = [Work(title='Chargement…', ext_poster='/static/img/chiro.gif') for _ in range(4)]
-    return render(request, 'mangaki/reco_list_dpp.html',
-                  {
-                      'reco_list': reco_list,
-                      'category': category,
-                      'config': DPP_UI_CONFIG_FOR_RATINGS
                   })
 
 
@@ -1108,6 +1027,7 @@ class AnonymousRatingsMixin:
             ])
             for category_id, works_list in works.items()
         ]
+        context['meta'] = {'config': VANILLA_UI_CONFIG_FOR_RATINGS}  
         return context
 
 
