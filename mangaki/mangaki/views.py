@@ -462,6 +462,7 @@ def get_profile_works(request,
 
     seen_works = status == "seen"
     algo_name = request.GET.get('algo', None)
+    flat = request.GET.get('flat', None)
     # FIXME: We should move natural sorting on the database-side.
     # This way, we can keep a queryset until the end.
     # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
@@ -507,7 +508,8 @@ def get_profile_works(request,
             'seen': seen_works,
             'algo_name': algo_name,
             'section': 'works',
-            'status': status
+            'status': status,
+            'flat': flat
         },
         'profile': {
             'seen_anime_count': counts['seen_anime'],

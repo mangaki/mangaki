@@ -8,6 +8,10 @@
             <a href="?page={{ ratings.number }}&algo=als">perles</a>
         </p>
     {% endif %}
-    {% include "works_no_poster.html" with disabled=meta.ratings_disabled works=ratings category=meta.category config=meta.config %}
+    {% if meta.flat %}
+        {% include "works_no_poster.html" with disabled=meta.ratings_disabled works=ratings category=meta.category config=meta.config %}
+    {% else %}
+        {% include "works.html" with disabled=meta.ratings_disabled works=ratings category=meta.category config=meta.config %}
+    {% endif %}
     {% include "pagination.html" with page_obj=ratings paginator=ratings.paginator algo=meta.algo_name %}
 </div>
