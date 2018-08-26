@@ -707,7 +707,7 @@ def get_reco(request):
     if current_user_ratings(request):
         reco_list = [{
             'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
-        } for _ in range(4)]
+        } for _ in range(8)]
     else:
         reco_list = []
     return render(request, 'mangaki/reco_list.html',
