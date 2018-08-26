@@ -427,6 +427,10 @@ ul.checklist .list-icon {
   font-family: 'Economica', 'Open Sans', sans-serif;
 }
 
+.work-card__title a {
+  color: white;
+}
+
 .work-card__media {
   height: 100%;
   width: 100%;
@@ -527,7 +531,7 @@ ul.checklist .list-icon {
 }
 
 .work-cover__wrapper:before {
-  content: attr(data-category);
+  content: attr(data-category-display);
   /* Inspired by https://codepen.io/eode9/pen/twkKm */
   width: 120px;
   background: #a83333;

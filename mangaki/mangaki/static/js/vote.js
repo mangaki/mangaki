@@ -138,11 +138,14 @@ Card.prototype.hydrate = function (work) {
 
   // FIXME: We should use a solution that doesn't require monkey-patching HTML
   // with jQuery in the future, but for now that is the easiest way.
+  var card_url = '/' + this.category + '/' + work.id;
+  console.log(work);
   $el.find('.work-card__media').css('background-image', 'url("' + work.poster + '")');
-  $el.find('.work-card__title').text(work.title);
-  $el.find('.work-cover__wrapper').attr('data-category', work.category);
+  $el.find('.work-card__title').html('<a href="' + card_url + '">' + work.title + '</a>');
+  $el.find('.work-cover__wrapper').attr('data-category', work.category_slug);
+  $el.find('.work-cover__wrapper').attr('data-category-display', work.category);
   $el.find('.work-card__synopsis').html(work.synopsis);
-  $el.find('.work-card__link').attr('href', '/' + this.category + '/' + work.id);
+  $el.find('.work-card__link').attr('href', card_url);
   $el.find('.ratings .rating__checkbox').attr('name', 'rating[' + work.id + ']').each(function () {
     this.checked = false;
   });
