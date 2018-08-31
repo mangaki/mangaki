@@ -1,6 +1,7 @@
 version: 2
 jobs:
   update_apt_and_pip_and_install_minimal_dep:
+    machine: true
     steps:
       - run: |
           sudo apt-get update
@@ -9,6 +10,7 @@ jobs:
           pip install -r requirements/dev.txt
 
   install_ansible:
+    machine: true
     steps:
       - run: |
           sudo apt-add-repository ppa:ansible/ansible -y
@@ -16,6 +18,7 @@ jobs:
           sudo apt-get install -y ansible
 
   prepare_db_and_mangaki:
+    machine: true
     steps:
       - checkout
       - run: |
@@ -26,6 +29,7 @@ jobs:
           python mangaki/manage.py ranking
           python mangaki/manage.py top --all
   test:
+    machine: true
     environment:
       TEST_REPORTS: /tmp/test-reports
       ARTIFACTS: /tmp/artifacts
@@ -45,6 +49,7 @@ jobs:
           path: /tmp/test-reports
 
   push_beta:
+    machine: true
     steps:
       - deploy: ./provisioning/scripts/deploy_beta.sh
 workflows:
