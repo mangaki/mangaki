@@ -15,9 +15,9 @@ jobs:
       - run: |
           sudo apt-get update
           sudo apt-get install -y software-properties-common python-dev libopenblas-dev postgresql-client
-          pip install --upgrade pip
-          pip install numpy>=1.13  # Necessary for Surprise…
-          pip install -r requirements/dev.txt
+          sudo pip install --upgrade pip
+          sudo pip install numpy>=1.13  # Necessary for Surprise…
+          sudo pip install -r requirements/dev.txt
           psql -d circle_test -c "create extension if not exists pg_trgm;
                                 create extension if not exists unaccent"
           cp .circle_mangaki_settings.ini mangaki/settings.ini
