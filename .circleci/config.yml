@@ -64,7 +64,9 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: sudo pip install --upgrade pip
+      - run:
+          name: Upgrade pip
+          command: sudo pip install --upgrade pip
       - deploy: ./provisioning/scripts/deploy_beta.sh
 workflows:
   version: 2
@@ -76,4 +78,6 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - raito/cci2-deploy
