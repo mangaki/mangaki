@@ -61,7 +61,8 @@ jobs:
           path: /tmp/test-reports
 
   push_beta:
-    docker: ansible/ansible:ubuntu64
+    docker:
+      - image: ansible/ansible:ubuntu64
     steps:
       - checkout
       - run:
