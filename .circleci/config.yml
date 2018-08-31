@@ -63,8 +63,10 @@ jobs:
   push_beta:
     docker:
       - image: williamyeh/ansible:ubuntu16.04
+    working_directory: ~/mangaki
     steps:
-      - checkout
+      - checkout:
+          path: ~/mangaki
       - run:
           name: Install Ansible
           command: pip install ansible
