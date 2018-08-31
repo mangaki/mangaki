@@ -64,12 +64,12 @@ workflows:
           filters:
             branches:
               only: master
-      - prepare_db:
+      - prepare_db_and_mangaki:
           requires:
             - update_apt_and_pip_and_install_minimal_dep
       - test:
           requires:
-            - prepare_db
+            - prepare_db_and_mangaki
       - push_beta:
           requires:
             - test
