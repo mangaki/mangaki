@@ -1,41 +1,32 @@
 version: 2
 jobs:
-  update_apt_and_pip_and_install_minimal_dep:
-    machine: true
+  build:
+    docker:
+      - image: circleci/python:3.6-stretch-browsers
+      - image: circleci/postgres:9.6.2-alpine-ram
+        environment:
+          POSTGRES_USER: mangaki
+          POSTGRES_DB: circle_test
+    environment:
+      TEST_REPORTS: /tmp/test-reports
+      ARTIFACTS: /tmp/artifacts
     steps:
       - checkout
       - run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common python-dev libopenblas-dev
-          pip install --upgrade pip
-          pip install numpy>=1.13  # Necessary for Surprise…
-          pip install -r requirements/dev.txt
-
-  install_ansible:
-    machine: true
-    steps:
-      - run: |
+          sudo apt-get install -y software-properties-common python-dev libopenblas-dev postgresql-client
           sudo apt-add-repository ppa:ansible/ansible -y
           sudo apt-get update
           sudo apt-get install -y ansible
-
-  prepare_db_and_mangaki:
-    machine: true
-    steps:
-      - run: |
+          pip install --upgrade pip
+          pip install numpy>=1.13  # Necessary for Surprise…
+          pip install -r requirements/dev.txt
           psql -d circle_test -c "create extension if not exists pg_trgm;
                                 create extension if not exists unaccent"
           cp .circle_mangaki_settings.ini mangaki/settings.ini
           python mangaki/manage.py migrate
           python mangaki/manage.py ranking
           python mangaki/manage.py top --all
-  test:
-    machine: true
-    environment:
-      TEST_REPORTS: /tmp/test-reports
-      ARTIFACTS: /tmp/artifacts
-    steps:
-      - run: |
           mkdir -p $TEST_REPORTS
           mkdir -p $ARTIFACTS
           python manage.py collectstatic --no-input
@@ -52,27 +43,21 @@ jobs:
   push_beta:
     machine: true
     steps:
+      - run: |
+          sudo apt-get update
+          sudo apt-add-repository ppa:ansible/ansible -y
+          sudo apt-get update
+          sudo apt-get install -y ansible
+          pip install --upgrade pip
       - deploy: ./provisioning/scripts/deploy_beta.sh
 workflows:
   version: 2
   build_and_test_and_deploy:
     jobs:
-      - update_apt_and_pip_and_install_minimal_dep
-      - install_ansible:
-          requires:
-            - update_apt_and_pip_and_install_minimal_dep
-          filters:
-            branches:
-              only: master
-      - prepare_db_and_mangaki:
-          requires:
-            - update_apt_and_pip_and_install_minimal_dep
-      - test:
-          requires:
-            - prepare_db_and_mangaki
+      - build
       - push_beta:
           requires:
-            - test
+            - build
           filters:
             branches:
               only: master
