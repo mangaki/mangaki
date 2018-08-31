@@ -11,6 +11,7 @@ jobs:
     environment:
       TEST_REPORTS: /tmp/test-reports
       ARTIFACTS: /tmp/artifacts
+      MATPLOTLIBRC: tests
     steps:
       - checkout:
           path: ~/mangaki
@@ -62,8 +63,8 @@ jobs:
   push_beta:
     machine: true
     steps:
-      - run: |
-          sudo pip install --upgrade pip
+      - checkout
+      - run: sudo pip install --upgrade pip
       - deploy: ./provisioning/scripts/deploy_beta.sh
 workflows:
   version: 2
