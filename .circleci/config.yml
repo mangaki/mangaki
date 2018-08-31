@@ -35,7 +35,7 @@ jobs:
           mkdir -p $ARTIFACTS
           python manage.py collectstatic --no-input
           mkdir -p $TEST_REPORTS/django
-          coverage run manage.py test --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
+          coverage run manage.py test --with-xunit --xunit-file=$TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
           coverage html -d $ARTIFACTS
           bash <(curl -s https://codecov.io/bash)
       - store_artifacts:
