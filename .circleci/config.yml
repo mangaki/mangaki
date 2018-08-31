@@ -68,11 +68,17 @@ jobs:
       - checkout:
           path: ~/mangaki
       - run:
-          name: Install Ansible
-          command: pip install ansible
+          name: Setup environment
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install ansible
       - run:
           name: Deploying the beta instance using Ansible
-          command: ./provisioning/scripts/deploy_beta.sh
+          command: |
+            . venv/bin/activate
+            ./provisioning/scripts/deploy_beta.sh
 workflows:
   version: 2
   build_and_test_and_deploy:
