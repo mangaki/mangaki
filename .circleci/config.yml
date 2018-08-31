@@ -46,11 +46,11 @@ jobs:
           python mangaki/manage.py top --all
           mkdir -p $TEST_REPORTS
           mkdir -p $ARTIFACTS
-          python manage.py collectstatic --no-input
+          cd mangaki && python manage.py collectstatic --no-input
           mkdir -p $TEST_REPORTS/django
-          coverage run manage.py test --with-xunit --xunit-file=$TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
-          coverage html -d $ARTIFACTS
-          bash <(curl -s https://codecov.io/bash)
+          cd mangaki && coverage run manage.py test --with-xunit --xunit-file=$TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
+          cd mangaki && coverage html -d $ARTIFACTS
+          cd mangaki && bash <(curl -s https://codecov.io/bash)
       - store_artifacts:
           path: /tmp/artifacts
           destination: build
