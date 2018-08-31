@@ -13,7 +13,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-        key: deps-{{ Branch }}-{{ checksum "requirements/dev.txt" }}
+          key: deps-{{ Branch }}-{{ checksum "requirements/dev.txt" }}
       - run: |
           sudo apt-get update
           sudo apt-get install -y software-properties-common python-dev libopenblas-dev postgresql-client
@@ -23,9 +23,9 @@ jobs:
           pip install numpy>=1.13  # Necessary for Surprise…
           pip install -r requirements/dev.txt
       - save_cache:
-        key: deps-{{ Branch }}-{{ checksum "requirements/dev.txt" }}
-        paths:
-          - "venv"
+          key: deps-{{ Branch }}-{{ checksum "requirements/dev.txt" }}
+          paths:
+            - "venv"
       - run:
           name: Waiting for Postgres to be ready
           command: |
