@@ -29,7 +29,7 @@ jobs:
             done
             echo Failed waiting for Postgres && exit 1
       - run: |
-          psql -h localhost -d circle_test -c "create extension if not exists pg_trgm;
+          psql -h localhost -u mangaki -d circle_test -c "create extension if not exists pg_trgm;
                                 create extension if not exists unaccent"
           cp .circle_mangaki_settings.ini mangaki/settings.ini
           python mangaki/manage.py migrate
