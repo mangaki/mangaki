@@ -3,6 +3,7 @@ jobs:
   update_apt_and_pip_and_install_minimal_dep:
     machine: true
     steps:
+      - checkout
       - run: |
           sudo apt-get update
           sudo apt-get install -y software-properties-common python-dev libopenblas-dev
@@ -20,7 +21,6 @@ jobs:
   prepare_db_and_mangaki:
     machine: true
     steps:
-      - checkout
       - run: |
           psql -d circle_test -c "create extension if not exists pg_trgm;
                                 create extension if not exists unaccent"
