@@ -61,12 +61,12 @@ jobs:
           path: /tmp/test-reports
 
   push_beta:
-    machine: true
+    docker: ansible/ansible:ubuntu64
     steps:
       - checkout
       - run:
-          name: Upgrade pip
-          command: sudo pip install --upgrade pip
+          name: Upgrade pip and install Ansible
+          command: pip install --upgrade pip && pip install ansible
       - run:
           name: Deploying the beta instance using Ansible
           command: ./provisioning/scripts/deploy_beta.sh
