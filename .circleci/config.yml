@@ -66,8 +66,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Upgrade pip and install Ansible
-          command: sudo pip install --upgrade pip && sudo pip install ansible
+          name: Install Ansible
+          command: pip install ansible
       - run:
           name: Deploying the beta instance using Ansible
           command: ./provisioning/scripts/deploy_beta.sh
