@@ -15,9 +15,6 @@ jobs:
       - run: |
           sudo apt-get update
           sudo apt-get install -y software-properties-common python-dev libopenblas-dev postgresql-client
-          sudo apt-add-repository ppa:ansible/ansible -y
-          sudo apt-get update
-          sudo apt-get install -y ansible
           pip install --upgrade pip
           pip install numpy>=1.13  # Necessary for Surprise…
           pip install -r requirements/dev.txt
@@ -44,10 +41,6 @@ jobs:
     machine: true
     steps:
       - run: |
-          sudo apt-get update
-          sudo apt-add-repository ppa:ansible/ansible -y
-          sudo apt-get update
-          sudo apt-get install -y ansible
           pip install --upgrade pip
       - deploy: ./provisioning/scripts/deploy_beta.sh
 workflows:
