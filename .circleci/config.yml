@@ -15,7 +15,7 @@ jobs:
       - checkout:
           path: ~/mangaki
       - restore_cache:
-          key: deps-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/requirements/dev.txt" }}
       - run: |
           sudo apt-get update
           sudo apt-get install -y software-properties-common python-dev libopenblas-dev postgresql-client
@@ -23,9 +23,9 @@ jobs:
           . venv/bin/activate
           pip install --upgrade pip
           pip install numpy>=1.13  # Necessary for Surprise…
-          pip install -r requirements/dev.txt
+          pip install -r ~/mangaki/requirements/dev.txt
       - save_cache:
-          key: deps-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/requirements/dev.txt" }}
           paths:
             - "venv"
       - run:
@@ -41,7 +41,7 @@ jobs:
       - run: |
           psql -h localhost -U mangaki -d circle_test -c "create extension if not exists pg_trgm;
                                 create extension if not exists unaccent"
-          cp .circle_mangaki_settings.ini mangaki/settings.ini
+          cp ~/mangaki/.circle_mangaki_settings.ini settings.ini
           . venv/bin/activate
           python manage.py migrate
           python manage.py ranking
