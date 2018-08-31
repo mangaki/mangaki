@@ -62,7 +62,7 @@ jobs:
 
   push_beta:
     docker:
-      - image: ansible/ansible:ubuntu64
+      - image: williamyeh/ansible:ubuntu16.04
     steps:
       - checkout
       - run:
