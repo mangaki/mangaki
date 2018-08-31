@@ -3,41 +3,41 @@ jobs:
   update_apt_and_pip_and_install_minimal_dep:
     steps:
       - run: |
-        sudo apt-get update
-        sudo apt-get install -y software-properties-common python-dev libopenblas-dev
-        pip install --upgrade pip
-        pip install -r requirements/dev.txt
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common python-dev libopenblas-dev
+          pip install --upgrade pip
+          pip install -r requirements/dev.txt
 
   install_ansible:
     steps:
       - run: |
-        sudo apt-add-repository ppa:ansible/ansible -y
-        sudo apt-get update
-        sudo apt-get install -y ansible
+          sudo apt-add-repository ppa:ansible/ansible -y
+          sudo apt-get update
+          sudo apt-get install -y ansible
 
   prepare_db_and_mangaki:
     steps:
       - checkout
       - run: |
-        psql -d circle_test -c "create extension if not exists pg_trgm;
-                              create extension if not exists unaccent"
-        cp .circle_mangaki_settings.ini mangaki/settings.ini
-        python mangaki/manage.py migrate
-        python mangaki/manage.py ranking
-        python mangaki/manage.py top --all
+          psql -d circle_test -c "create extension if not exists pg_trgm;
+                                create extension if not exists unaccent"
+          cp .circle_mangaki_settings.ini mangaki/settings.ini
+          python mangaki/manage.py migrate
+          python mangaki/manage.py ranking
+          python mangaki/manage.py top --all
   test:
     environment:
       TEST_REPORTS: /tmp/test-reports
       ARTIFACTS: /tmp/artifacts
     steps:
       - run: |
-        mkdir -p $TEST_REPORTS
-        mkdir -p $ARTIFACTS
-        python manage.py collectstatic --no-input
-        mkdir -p $TEST_REPORTS/django
-        coverage run manage.py test --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
-        coverage html -d $ARTIFACTS
-        bash <(curl -s https://codecov.io/bash)
+          mkdir -p $TEST_REPORTS
+          mkdir -p $ARTIFACTS
+          python manage.py collectstatic --no-input
+          mkdir -p $TEST_REPORTS/django
+          coverage run manage.py test --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
+          coverage html -d $ARTIFACTS
+          bash <(curl -s https://codecov.io/bash)
       - store_artifacts:
           path: /tmp/artifacts
           destination: build
