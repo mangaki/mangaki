@@ -12,7 +12,7 @@ jobs:
       TEST_REPORTS: /tmp/test-reports
       ARTIFACTS: /tmp/artifacts
     steps:
-      - checkout
+      - checkout:
           path: ~/mangaki
       - restore_cache:
           key: deps-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
