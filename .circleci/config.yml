@@ -1,6 +1,7 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/mangaki/mangaki
     docker:
       - image: circleci/python:3.6-stretch-browsers
       - image: circleci/postgres:9.6.10-alpine-ram
@@ -12,8 +13,9 @@ jobs:
       ARTIFACTS: /tmp/artifacts
     steps:
       - checkout
+          path: ~/mangaki
       - restore_cache:
-          key: deps-{{ Branch }}-{{ checksum "requirements/dev.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
       - run: |
           sudo apt-get update
           sudo apt-get install -y software-properties-common python-dev libopenblas-dev postgresql-client
@@ -23,7 +25,7 @@ jobs:
           pip install numpy>=1.13  # Necessary for Surprise…
           pip install -r requirements/dev.txt
       - save_cache:
-          key: deps-{{ Branch }}-{{ checksum "requirements/dev.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "requirements/dev.txt" }}
           paths:
             - "venv"
       - run:
@@ -41,16 +43,16 @@ jobs:
                                 create extension if not exists unaccent"
           cp .circle_mangaki_settings.ini mangaki/settings.ini
           . venv/bin/activate
-          python mangaki/manage.py migrate
-          python mangaki/manage.py ranking
-          python mangaki/manage.py top --all
+          python manage.py migrate
+          python manage.py ranking
+          python manage.py top --all
           mkdir -p $TEST_REPORTS
           mkdir -p $ARTIFACTS
-          cd mangaki && python manage.py collectstatic --no-input
+          python manage.py collectstatic --no-input
           mkdir -p $TEST_REPORTS/django
-          cd mangaki && coverage run manage.py test --with-xunit --xunit-file=$TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
-          cd mangaki && coverage html -d $ARTIFACTS
-          cd mangaki && bash <(curl -s https://codecov.io/bash)
+          coverage run manage.py test --with-xunit --xunit-file=$TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
+          coverage html -d $ARTIFACTS
+          bash <(curl -s https://codecov.io/bash)
       - store_artifacts:
           path: /tmp/artifacts
           destination: build
