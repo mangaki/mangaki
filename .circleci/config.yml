@@ -67,9 +67,13 @@ jobs:
     steps:
       - checkout:
           path: ~/mangaki
+      - add_ssh_keys:
+          fingerprints:
+            - "6b:53:99:19:90:0b:26:94:68:aa:89:6f:be:54:01:41"
       - run:
           name: Setup environment
           command: |
+            apt-get install git
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
