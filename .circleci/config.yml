@@ -64,8 +64,6 @@ jobs:
     docker:
       - image: mangaki/mangaki-deploy-environment
     working_directory: ~/mangaki
-    environment:
-      ANSIBLE_HOST_KEY_CHECKING: "False"
     steps:
       - checkout:
           path: ~/mangaki
