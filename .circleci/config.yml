@@ -61,11 +61,19 @@ jobs:
           path: /tmp/test-reports
 
   push_beta:
-    machine: true
+    docker:
+      - image: mangaki/mangaki-deploy-environment
+    working_directory: ~/mangaki
     steps:
-      - checkout
-      - run: sudo pip install --upgrade pip
-      - deploy: ./provisioning/scripts/deploy_beta.sh
+      - checkout:
+          path: ~/mangaki
+      - add_ssh_keys:
+          fingerprints:
+            - "6b:53:99:19:90:0b:26:94:68:aa:89:6f:be:54:01:41"
+      - run:
+          name: Deploying the beta instance using Ansible
+          command: |
+            ./provisioning/scripts/deploy_beta.sh
 workflows:
   version: 2
   build_and_test_and_deploy:
@@ -76,4 +84,6 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - raito/cci2-deploy
