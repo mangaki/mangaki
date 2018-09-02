@@ -20,7 +20,7 @@ setup(
         'natsort',
         'django-js-reverse',
         'scikit-learn>=0.18,<0.19',
-        'scipy',
+        'scipy>=1',
         'pandas',
         'fastFM',
         'surprise',
