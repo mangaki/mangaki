@@ -59,7 +59,7 @@ msgid "Sonyun-Manhwa"
 msgstr "韩国少年漫画"
 
 msgid "Kodomo"
-msgstr "小孩子"
+msgstr "儿童"
 
 msgid "Ecchi-Hentai"
 msgstr "H漫"
@@ -83,7 +83,7 @@ msgid "Yuri"
 msgstr "百合"
 
 msgid "Dojinshi-Parody"
-msgstr "同人志蠢事"
+msgstr "同人志"
 
 msgid "Manhwa"
 msgstr "韩国漫画"
@@ -128,31 +128,31 @@ msgid "Parent story"
 msgstr "父母的故事"
 
 msgid "Alternative setting"
-msgstr "可选择设置"
+msgstr "备选设置"
 
 msgid "Same setting"
-msgstr "相同的设置"
+msgstr "相同设置"
 
 msgid "Special"
-msgstr "特别"
+msgstr "特别篇"
 
 msgid "Adaptation"
 msgstr "适应"
 
 msgid "Wrong title"
-msgstr "错题"
+msgstr "标题错误"
 
 msgid "Wrong poster"
-msgstr "错海报"
+msgstr "海报错误"
 
 msgid "Synopsis contains mistakes"
 msgstr "简介包含错误"
 
 msgid "Wrong author"
-msgstr "笔者错误"
+msgstr "作者错误"
 
 msgid "Wrong composer"
-msgstr "作曲家错误"
+msgstr "作曲错误"
 
 msgid "This is a duplicate"
 msgstr "这是一个重复"
@@ -167,10 +167,10 @@ msgid "Suggest a reference URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"
 msgstr "推荐的参考URL（MyAnimeList，AniDB，Icotaku，VGMdb等）"
 
 msgid "Director"
-msgstr "導演"
+msgstr "导演"
 
 msgid "Composer"
-msgstr "作曲家"
+msgstr "作曲"
 
 msgid "Author"
 msgstr "作者"
@@ -182,13 +182,13 @@ msgid "Screenwriter"
 msgstr "编剧"
 
 msgid "Import my ratings"
-msgstr "导入我的收视率"
+msgstr "导入我的评分"
 
 msgid "Subscribe to Mangaki newsletter"
-msgstr "订阅Mangaki通讯"
+msgstr "订阅Mangaki资讯"
 
 msgid "My data can be released anonymously for research"
-msgstr "我的数据可以匿名发布研究"
+msgstr "我的数据可以匿名作为研究只用"
 
 msgid "Type"
 msgstr "类型"
@@ -197,17 +197,17 @@ msgid "Suggestion"
 msgstr "建议"
 
 msgid "What series should you watch next?"
-msgstr "什么系列，你应该看未来？"
+msgstr "您之后要看什么系列？"
 
 msgid ""
 "Mangaki is an anime/manga recommendation website made by an organization of "
 "otakus."
-msgstr "Mangaki是otakus的一个组织做出的动画/漫画推荐网站。"
+msgstr "Mangaki是一群宅男建立的动画/漫画推荐网站。"
 
 msgid ""
 "Tell him what you watched or read, and our algorithm (open source) will find"
 " new precious pearls for you to discover!"
-msgstr "告诉他你观看或阅读什么，以及我们的算法（开放源代码）会找到你来发现新的珍贵的珍珠！"
+msgstr "告诉他您观看或阅读过什么，以及我们的（开放）算法会帮您发现新的珠玉！"
 
 msgid "Join us!"
 msgstr "加入我们！"
@@ -222,19 +222,19 @@ msgid "See the code on GitHub"
 msgstr "在Github上查看代码"
 
 msgid "Learn data science through Mangaki"
-msgstr "通过Mangaki了解科学数据"
+msgstr "通过Mangaki了解数据科学"
 
 msgid ""
 "Our algorithm is open source, so you can understand it, and improve it!"
-msgstr "我们的算法是开源的，所以你可以理解它，完善它！"
+msgstr "我们的算法是开源的，所以您可以理解并完善它！"
 
 msgid ""
 "Do you know: nearest neighbors, singular value decomposition, Netflix prize,"
 " autoencoder?"
-msgstr "你知道：最近的邻居，奇异值分解，Netflix的奖金，自动编码？"
+msgstr "您了解邻近算法、奇异值分解，网飞公司组织的比赛和自编码器吗？"
 
 msgid "Come and learn all that on our GitHub repo or in our organization!"
-msgstr "快来学习一切对我们的GitHub库或在我们的组织！"
+msgstr "快来和我们一起学习吧，关注我们的GitHub库和组织！"
 
 msgid "Browse the research blog"
 msgstr "浏览研究博客"
@@ -243,7 +243,7 @@ msgid "Account Deleted"
 msgstr "帐户已删除"
 
 msgid "Account deleted!"
-msgstr "帐户删除！"
+msgstr "帐户已删除！"
 
 msgid "Confirm E-mail Address"
 msgstr "确认电子邮箱地址"
@@ -262,29 +262,29 @@ msgid ""
 msgstr "该E-mail确认链接过期或无效。请<a href=\"%(email_url)s\">发出新的电子邮件确认申请</a>。"
 
 msgid "Sign In"
-msgstr "签到"
+msgstr "登录"
 
 msgid ""
 "Please sign in with one of your existing third party accounts. Or, <a "
 "href=\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign in "
 "below:"
-msgstr "请与您现有的第三方帐户登入。或者，<a href=\"%(signup_url)s\">注册</a>一％（SITE_NAME）的账户和下方登录："
+msgstr "请使用您现有的第三方帐户登录，或者，<a href=\"%(signup_url)s\">注册</a>一个％（SITE_NAME）的账户并在下方登录："
 
 msgid "or"
-msgstr "要么"
+msgstr "或者"
 
 msgid ""
 "If you have not created an account yet, then please <a "
 "href=\"%(signup_url)s\">sign up</a> first."
-msgstr "如果您尚未创建一个帐户，然后请<a href=\"%(signup_url)s\">先注册</a>。"
+msgstr "如果您尚未创建帐户，请<a href=\"%(signup_url)s\">先注册</a>。"
 
 msgid ""
 "You rated a few works anonymously on this computer. These ratings will be "
 "lost if you login to an existing account. You should <a "
 "href=\"%(signup_url)s\">sign up</a> to save them.\""
 msgstr ""
-"您的评价几个作品匿名在此计算机上。如果您登录到现有帐户这些评级都将丢失。您应该<a "
-"href=\"%(signup_url)s\">注册</a>救他们“。"
+"您已在此计算机上匿名发表了数个评价。如果您登录到一个现有帐户，这些评分都将丢失。您可以现在<a "
+"href=\"%(signup_url)s\">注册</a>一个新账户来保存它们“。"
 
 msgid "Forgot Password?"
 msgstr "忘记密码？"
@@ -301,7 +301,7 @@ msgstr "重设密码"
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll send you"
 " an e-mail allowing you to reset it."
-msgstr "忘记了你的密码？请在下面输入您的E-mail地址，我们会向您发送一封电子邮件，让您重置。"
+msgstr "您忘记了密码？请在下面输入您的电子邮箱地址，我们会向您发送一封电子邮件来进行重置。"
 
 msgid "Reset My Password"
 msgstr "重置我的密码"
@@ -312,19 +312,19 @@ msgstr "如果您有重置密码的任何问题，请联系我们。"
 msgid ""
 "We have sent you an e-mail. Please contact us if you do not receive it "
 "within a few minutes."
-msgstr "我们已经向您发出一封电子邮件。请联系我们，如果你没有在几分钟之内收到它。"
+msgstr "我们已经向您发出一封电子邮件。如果您没有在几分钟之内收到它请联系我们。"
 
 msgid "Change Password"
 msgstr "更改密码"
 
 msgid "Bad Token"
-msgstr "坏令牌"
+msgstr "令牌损坏"
 
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
 "reset</a>."
-msgstr "密码重置链接是无效的，可能是因为它已经被使用。请申请一个<a href=\"%(passwd_reset_url)s\">新的密码重置</A>。"
+msgstr "密码重置链接是无效的，可能是因为它已经被使用。请申请一个<a href=\"%(passwd_reset_url)s\">新的密码重置请求</A>。"
 
 msgid "change password"
 msgstr "更改密码"
@@ -339,19 +339,19 @@ msgid "Join Mangaki"
 msgstr "加入Mangaki"
 
 msgid "And contribute to the creation of a better world."
-msgstr "并有助于创造一个更美好的世界。"
+msgstr "和我们一起创造一个更美好的世界。"
 
 msgid ""
 "If you have already an account, you can <a href=\"%(login_url)s\">login</a>."
-msgstr "如果你已经有一个帐户，您可以<a href=\"%(login_url)s\">登录</A>。"
+msgstr "如果您已经拥有一个帐户，您可以<a href=\"%(login_url)s\">登录</A>。"
 
 msgid ""
 "You already rated a few works. They will be imported to your profile if you "
 "check the box <strong>Import my ratings</strong> below!"
-msgstr "你已经评级的几个作品。他们将被导入到您的个人资料，如果你勾选<strong>导入我的收视率</ STRONG>下面！"
+msgstr "您已经对几部作品做出评分。如果您需要将它们导入您的个人资料，请勾选下方的<strong>导入我的评分</ STRONG>选项！"
 
 msgid "Subscribe to Mangaki's newsletter"
-msgstr "订阅Mangaki的简讯"
+msgstr "订阅Mangaki的资讯"
 
 msgid "some waifus/husbandos in your mails?"
 msgstr "在你的邮件一些waifus / husbandos？"
@@ -372,7 +372,7 @@ msgid ""
 "By subscribing, you accept that your ratings may be saved by Mangaki to keep"
 " your profile up-to-date, recommend anime to you, and improve other users' "
 "recommendations."
-msgstr "通过订阅，你接受你的评级可能被Mangaki保存，让您的个人资料上最新，动漫推荐给你，并提高其他用户的建议。"
+msgstr "订阅代表您接受Mangaki可能会在您的个人资料更新保存您的评分，并以此向您推荐新的动漫，及帮助改善向其他用户的推荐。"
 
 msgid "How does it work?"
 msgstr "网站是如何运作的？"
