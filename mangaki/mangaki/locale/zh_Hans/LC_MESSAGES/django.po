@@ -32,7 +32,7 @@ msgid "Spain"
 msgstr "西班牙"
 
 msgid "UK"
-msgstr "联合王国"
+msgstr "英国"
 
 msgid "Hong Kong"
 msgstr "香港"
@@ -44,7 +44,7 @@ msgid "International"
 msgstr "国际"
 
 msgid "Seinen"
-msgstr "Seinen"
+msgstr "青年"
 
 msgid "Shonen"
 msgstr "少年"
