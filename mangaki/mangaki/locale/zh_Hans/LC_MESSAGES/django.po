@@ -56,31 +56,31 @@ msgid "Yaoi"
 msgstr "八追"
 
 msgid "Sonyun-Manhwa"
-msgstr "Sonyun，韩国漫画"
+msgstr "韩国少年漫画"
 
 msgid "Kodomo"
 msgstr "小孩子"
 
 msgid "Ecchi-Hentai"
-msgstr "Ecchi  - 无尽"
+msgstr "H漫"
 
 msgid "Global-Manga"
 msgstr "全球漫画"
 
 msgid "Manhua"
-msgstr "张曼华"
+msgstr "漫画"
 
 msgid "Josei"
-msgstr "城圣"
+msgstr "女性"
 
 msgid "Sunjung-Sunjeong"
-msgstr "Sunjung-Sunjeong"
+msgstr "韩国少女漫画"
 
 msgid "Chungnyun"
-msgstr "Chungnyun"
+msgstr "韩国青年漫画"
 
 msgid "Yuri"
-msgstr "尤里"
+msgstr "百合"
 
 msgid "Dojinshi-Parody"
 msgstr "同人志蠢事"
@@ -92,19 +92,19 @@ msgid "Yonkoma"
 msgstr "四格漫画"
 
 msgid "Directors"
-msgstr "導演"
+msgstr "导演"
 
 msgid "Authors"
 msgstr "作者"
 
 msgid "Composers"
-msgstr "作曲家"
+msgstr "作曲"
 
 msgid "Unprocessed"
-msgstr "生"
+msgstr "生肉"
 
 msgid "Accepted"
-msgstr "公认"
+msgstr "接受"
 
 msgid "Rejected"
 msgstr "拒绝"
