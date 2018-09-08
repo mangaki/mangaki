@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from mangaki.algo import get_algo_backup
+from zero import get_algo_backup
 
 
 class Command(BaseCommand):

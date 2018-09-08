@@ -29,7 +29,7 @@ class RecoTest(TestCase):
         ]
         works = Work.objects.bulk_create(works)
 
-        # This will work as long as mangaki.algo.dataset.RATED_BY_AT_LEAST <= 2
+        # This will work as long as zero.dataset.RATED_BY_AT_LEAST <= 2
         ratings = ([Rating(user=otaku, work=work, choice='like') for work in works] + 
                    [Rating(user=otaku2, work=work, choice='dislike') for work in works] +
                    [Rating(user=user, work=works[0], choice='dislike')])

@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.sparse import coo_matrix
 
 from mangaki.models import Rating, Work
-from mangaki.algo.fit_algo import fit_algo, get_algo_backup, get_dataset_backup
+from zero.fit_algo import fit_algo, get_algo_backup, get_dataset_backup
 from mangaki.utils.chrono import Chrono
 from mangaki.utils.ratings import current_user_ratings
 from mangaki.utils.values import rating_values
@@ -48,7 +48,10 @@ def get_reco_algo(request, algo_name='knn', category='all'):
 
     try:
         algo = get_algo_backup(algo_name)
+        print('algo', algo)
         dataset = get_dataset_backup(algo_name)
+        print(dataset.encode_work.keys())
+        print(dataset.decode_work.keys())
     except FileNotFoundError:
         triplets = list(
             Rating.objects.values_list('user_id', 'work_id', 'choice'))
@@ -81,6 +84,8 @@ def get_reco_algo(request, algo_name='knn', category='all'):
         category_filter = dataset.interesting_works
 
     filtered_works = list((dataset.interesting_works & category_filter) - set(already_rated_works))
+    print('wow, many', len(filtered_works))
+    print(filtered_works[:5])
     chrono.save('remove already rated')
 
     pos_of_best = get_pos_of_best_works_for_user_via_algo(algo, dataset, request.user.id, filtered_works, limit=NB_RECO)

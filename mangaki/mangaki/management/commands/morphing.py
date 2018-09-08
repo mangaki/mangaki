@@ -5,7 +5,7 @@ import json
 from math import floor
 import numpy as np
 from mangaki.settings import DATA_DIR
-from mangaki.algo.side import SideInformation
+from zero.side import SideInformation
 
 
 def load_poster_tags():

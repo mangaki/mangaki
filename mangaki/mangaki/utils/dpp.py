@@ -3,7 +3,7 @@ from random import sample
 import numpy as np
 
 from mangaki.utils import dpplib
-from mangaki.algo import get_algo_backup, get_dataset_backup
+from zero import get_algo_backup, get_dataset_backup
 
 
 class MangakiUniform:

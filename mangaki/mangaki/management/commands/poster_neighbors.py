@@ -4,7 +4,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from mangaki.algo.side import SideInformation
+from zero.side import SideInformation
 
 import numpy as np
 import pandas as pd

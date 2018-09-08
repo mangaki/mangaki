@@ -11,8 +11,8 @@ from sklearn.model_selection import ShuffleSplit
 
 import mangaki.utils.logging as mangaki_logging
 from mangaki.settings import DATA_DIR, TEST_DATA_DIR
-from mangaki.algo import Dataset
-from mangaki.algo import RecommendationAlgorithm
+from zero import Dataset
+from zero import RecommendationAlgorithm
 from mangaki.utils.values import rating_values
 
 FILENAMES = {
