@@ -101,18 +101,6 @@ class CommandTest(TestCase):
         management.call_command('lookup', 'lion', stdout=self.stdout)
         self.assertIn(str(self.anime.id), self.stdout.getvalue())
 
-    def test_morphing1(self):
-        management.call_command('morphing', self.anime.id, 2, stdout=self.stdout)
-        self.assertIn(str(self.anime.id), self.stdout.getvalue())
-
-    def test_morphing2(self):
-        management.call_command('morphing', self.anime.id, 2, '--other', stdout=self.stdout)
-        self.assertIn(str(self.anime.id), self.stdout.getvalue())
-
-    def test_poster_neighbors(self):
-        management.call_command('poster_neighbors', self.anime.id, '--collage', stdout=self.stdout)
-        self.assertIn(str(self.anime.id), self.stdout.getvalue())
-
     def test_ranking(self):
         management.call_command('ranking')
         self.assertTrue(True)
