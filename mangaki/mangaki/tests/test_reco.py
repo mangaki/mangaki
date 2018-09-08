@@ -49,8 +49,8 @@ class RecoTest(TestCase):
         with self.settings(PICKLE_DIR=SNAPSHOT_DIR_TEST):
             response = self.client.get(reco_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
-        os.remove(os.path.join(SNAPSHOT_DIR_TEST, 'als-20.pickle'))
-        os.remove(os.path.join(SNAPSHOT_DIR_TEST, 'ratings-als-20.pickle'))
+        os.remove(os.path.join('als-20.pickle'))
+        os.remove(os.path.join('ratings-als-20.pickle'))
 
     def test_knn_reco_with_new_works(self):
         self.client.login(username='test', password='test')
@@ -65,5 +65,5 @@ class RecoTest(TestCase):
         with self.settings(PICKLE_DIR=SNAPSHOT_DIR_TEST):
             response = self.client.get(reco_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
-        os.remove(os.path.join(SNAPSHOT_DIR_TEST, 'knn-20.pickle'))
-        os.remove(os.path.join(SNAPSHOT_DIR_TEST, 'ratings-knn-20.pickle'))
+        os.remove(os.path.join('knn-20.pickle'))
+        os.remove(os.path.join('ratings-knn-20.pickle'))
