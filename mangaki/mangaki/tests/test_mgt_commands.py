@@ -75,14 +75,6 @@ class CommandTest(TestCase):
                                 stdout=self.stdout)
         self.assertIn('---', self.stdout.getvalue())
 
-    def test_compare(self):
-        management.call_command('compare', 'dummy', '-em', 'dcg', '-em', 'mae',
-                                '-em', 'ndcg', '--experiment-filename',
-                                os.path.join(settings.TEST_DATA_DIR,
-                                             'experiments', 'default.json'),
-                                stdout=self.stdout)
-        self.assertTrue(True)
-
     def test_fit_algo(self):
         management.call_command('fit_algo', 'zero', stdout=self.stdout)
         self.assertEquals(self.stdout.getvalue(),
@@ -99,18 +91,6 @@ class CommandTest(TestCase):
 
     def test_lookup(self):
         management.call_command('lookup', 'lion', stdout=self.stdout)
-        self.assertIn(str(self.anime.id), self.stdout.getvalue())
-
-    def test_morphing1(self):
-        management.call_command('morphing', self.anime.id, 2, stdout=self.stdout)
-        self.assertIn(str(self.anime.id), self.stdout.getvalue())
-
-    def test_morphing2(self):
-        management.call_command('morphing', self.anime.id, 2, '--other', stdout=self.stdout)
-        self.assertIn(str(self.anime.id), self.stdout.getvalue())
-
-    def test_poster_neighbors(self):
-        management.call_command('poster_neighbors', self.anime.id, '--collage', stdout=self.stdout)
         self.assertIn(str(self.anime.id), self.stdout.getvalue())
 
     def test_ranking(self):

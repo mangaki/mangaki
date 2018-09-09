@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-from mangaki.algo import RecommendationAlgorithm
+from zero import RecommendationAlgorithm
 
 
 class MangakiConfig(AppConfig):

@@ -654,9 +654,9 @@ def get_works(request, category):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-def get_reco_algo_list(request, algo, category):
+def get_reco_algo_list(request, algo_name, category):
     reco_list = []
-    data = get_reco_algo(request, algo, category)
+    data = get_reco_algo(request, algo_name, category)
     works = data['works']
     for work_id in data['work_ids']:
         work = works[work_id]

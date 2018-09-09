@@ -23,7 +23,7 @@ jobs:
           python3 -m venv venv
           . venv/bin/activate
           pip install --upgrade pip
-          pip install numpy>=1.13  # Necessary for Surprise…
+          pip install --upgrade --force-reinstall git+https://github.com/mangaki/zero  # Mangaki Zero
           pip install -r ~/mangaki/requirements/dev.txt
       - save_cache:
           key: deps-{{ .Branch }}-{{ checksum "~/mangaki/requirements/dev.txt" }}
