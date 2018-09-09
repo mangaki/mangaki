@@ -39,7 +39,7 @@
 {% block extrajs %}
 {% if reco_list|length > 0 %}
 <script>
-$.getJSON('{% url 'get-reco-algo-list' algo=algo category=category %}', function(data) {
+$.getJSON('{% url 'get-reco-algo-list' algo_name=algo_name category=category %}', function(data) {
   data.forEach(function(work, i) {
     new Card($('.cards-grid .work-card:nth-child(' + (i+1) + ')'), '{{ category }}').hydrate(work);
   });
