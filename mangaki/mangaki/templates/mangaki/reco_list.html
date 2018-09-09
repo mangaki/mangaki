@@ -14,17 +14,17 @@
     </div>
 </div>
     <ul class="nav nav-tabs">
-        <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo }}">{% trans "All" %}</a></li>
-        <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo }}&amp;category=anime">
+        <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo_name }}">{% trans "All" %}</a></li>
+        <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=anime">
             {% trans "Anime only" %}</a></li>
-        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo }}&amp;category=manga">{% trans "Manga only" %}</a></li>
+        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=manga">{% trans "Manga only" %}</a></li>
     </ul>
     <br />
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 {% include "works.html" with works=reco_list %}
 <div class="row margin">
     <div class="col-xs-12">
-        <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}&amp;algo={{ algo }}" style="display: block; margin: auto">{% blocktrans %}I want new recommendations! <br class="visible-xs">(After you rate those.){% endblocktrans %}</a>
+        <a class="btn btn-primary btn-lg" href="{% url 'reco' %}?category={{ category }}&amp;algo={{ algo_name }}" style="display: block; margin: auto">{% blocktrans %}I want new recommendations! <br class="visible-xs">(After you rate those.){% endblocktrans %}</a>
     </div>
 </div>
 {% else %}
