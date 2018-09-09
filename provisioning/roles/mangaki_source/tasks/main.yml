@@ -35,6 +35,7 @@
   with_items:
     - 'pip'
     - 'setuptools'
+    - 'git+https://github.com/mangaki/zero'
 
 - name: Ensure packaged project is present.
   copy:
