@@ -724,7 +724,7 @@ def get_reco(request):
                   {
                       'reco_list': reco_list,
                       'category': category,
-                      'algo': algo_name,
+                      'algo_name': algo_name,
                       'config': VANILLA_UI_CONFIG_FOR_RATINGS
                   })
 
