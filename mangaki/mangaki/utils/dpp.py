@@ -3,7 +3,7 @@ from random import sample
 import numpy as np
 
 from mangaki.utils import dpplib
-from mangaki.algo import get_algo_backup, get_dataset_backup
+from mangaki.utils.fit_algo import get_algo_backup
 
 
 class MangakiUniform:
@@ -24,10 +24,9 @@ class MangakiDPP:
 
     def load_from_algo(self, algo_name):
         algo = get_algo_backup(algo_name)
-        dataset = get_dataset_backup(algo_name)
-        available_work_ids = list(set(self.work_ids) & set(dataset.encode_work.keys()))
+        available_work_ids = list(set(self.work_ids) & set(algo.dataset.encode_work.keys()))
         self.work_ids = np.array(available_work_ids)
-        self.vectors = algo.VT.T[dataset.encode_works(available_work_ids)]
+        self.vectors = algo.VT.T[algo.dataset.encode_works(available_work_ids)]
         self.preprocess()
 
     def preprocess(self, indices=None):

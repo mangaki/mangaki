@@ -37,7 +37,7 @@ ActionTypeColors = {
 
 class MergeErrors(Enum):
     NO_ID = 'no ID'
-    FIELDS_MISSING = 'fields missings'
+    FIELDS_MISSING = 'missing fields'
     NOT_ENOUGH_WORKS = 'not enough works'
 
 
@@ -522,7 +522,7 @@ class WorkClusterAdmin(admin.ModelAdmin):
     list_display = ('user', 'get_work_titles', 'resulting_work', 'reported_on', 'merged_on', 'checker', 'status', 'difficulty')
     list_filter = ('status',)
     list_select_related = ('user', 'resulting_work', 'checker')
-    raw_id_fields = ('user', 'works', 'checker', 'resulting_work')
+    raw_id_fields = ('user', 'works', 'checker', 'resulting_work', 'origin')
     actions = ('trigger_merge', 'reject')
 
     def get_queryset(self, request):
@@ -574,6 +574,7 @@ class SuggestionAdmin(admin.ModelAdmin):
     list_filter = ('problem',)
     actions = ['check_suggestions', 'uncheck_suggestions']
     raw_id_fields = ('work',)
+    search_fields = ('work__title', 'user__username')
 
     def view_on_site(self, obj):
         return obj.work.get_absolute_url()

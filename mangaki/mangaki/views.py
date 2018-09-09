@@ -255,6 +255,9 @@ class WorkList(WorkListMixin, ListView):
     def flat(self):
         return self.request.GET.get('flat', 0)
 
+    def watchlist_user(self):
+        return self.request.GET.get('watchlist', None)
+
     def sort_mode(self):
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
@@ -265,7 +268,12 @@ class WorkList(WorkListMixin, ListView):
 
     def get_queryset(self):
         search_text = self.search_query
-        self.queryset = self.category.work_set
+        watchlist_user = self.watchlist_user()
+        if watchlist_user is not None:
+            work_ids = Rating.objects.filter(work__category=self.category,user__username=watchlist_user,choice='willsee').values_list('work_id', flat=True)
+            self.queryset = Work.objects.filter(id__in=work_ids)
+        else:
+            self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
 
         if sort_mode == 'new':
@@ -462,6 +470,7 @@ def get_profile_works(request,
 
     seen_works = status == "seen"
     algo_name = request.GET.get('algo', None)
+    flat = request.GET.get('flat', None)
     # FIXME: We should move natural sorting on the database-side.
     # This way, we can keep a queryset until the end.
     # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
@@ -507,7 +516,8 @@ def get_profile_works(request,
             'seen': seen_works,
             'algo_name': algo_name,
             'section': 'works',
-            'status': status
+            'status': status,
+            'flat': flat
         },
         'profile': {
             'seen_anime_count': counts['seen_anime'],
@@ -652,9 +662,9 @@ def get_works(request, category):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-def get_reco_algo_list(request, algo, category):
+def get_reco_algo_list(request, algo_name, category):
     reco_list = []
-    data = get_reco_algo(request, algo, category)
+    data = get_reco_algo(request, algo_name, category)
     works = data['works']
     for work_id in data['work_ids']:
         work = works[work_id]
@@ -707,7 +717,7 @@ def get_reco(request):
     if current_user_ratings(request):
         reco_list = [{
             'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
-        } for _ in range(4)]
+        } for _ in range(8)]
     else:
         reco_list = []
     return render(request, 'mangaki/reco_list.html',

@@ -69,7 +69,8 @@ class CardSlotQuerySerializer(serializers.Serializer):
 
 
 class CardSlotSerializer(serializers.ModelSerializer):
-    category = serializers.CharField(source='category.slug')
+    category = serializers.StringRelatedField(many=False)
+    category_slug = serializers.CharField(source='category.slug')
     poster = serializers.SerializerMethodField()
 
     def get_poster(self, work: Work):
@@ -78,6 +79,7 @@ class CardSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Work
         fields = ('id',
+                  'category_slug',
                   'category',
                   'title',
                   'poster',
