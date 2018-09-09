@@ -255,6 +255,9 @@ class WorkList(WorkListMixin, ListView):
     def flat(self):
         return self.request.GET.get('flat', 0)
 
+    def watchlist_user(self):
+        return self.request.GET.get('watchlist', None)
+
     def sort_mode(self):
         default = 'mosaic'
         sort = self.request.GET.get('sort', default)
@@ -265,7 +268,12 @@ class WorkList(WorkListMixin, ListView):
 
     def get_queryset(self):
         search_text = self.search_query
-        self.queryset = self.category.work_set
+        watchlist_user = self.watchlist_user()
+        if watchlist_user is not None:
+            work_ids = Rating.objects.filter(work__category=self.category,user__username=watchlist_user,choice='willsee').values_list('work_id', flat=True)
+            self.queryset = Work.objects.filter(id__in=work_ids)
+        else:
+            self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
 
         if sort_mode == 'new':
