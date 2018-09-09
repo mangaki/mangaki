@@ -4,6 +4,7 @@ markdown
 django-bootstrap3==8.2.*
 psycopg2-binary
 numpy>=1.13
+scipy>=1
 pandas
 beautifulsoup4
 natsort
@@ -18,8 +19,6 @@ celery>=4.2
 django-celery-beat==1.1.*
 redis==2.10.*
 python-redis-lock==3.2.*
-Pillow>=4.1
-dedupe==1.7.*
 setuptools-scm==1.15.*
 django-sendfile==0.3.*
 git+https://github.com/mangaki/zero

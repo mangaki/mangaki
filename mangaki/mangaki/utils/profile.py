@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from mangaki.models import Rating, Work, Category, Recommendation
-from zero import get_algo_backup, get_dataset_backup
+from mangaki.utils.fit_algo import get_algo_backup
 from mangaki.utils.ratings import get_anonymous_ratings
 from mangaki.utils.recommendations import get_pos_of_best_works_for_user_via_algo
 
@@ -77,8 +77,7 @@ def build_profile_compare_function(algo_name: Optional[str],
         try:
             work_ids = [rating.work_id for rating in ratings]
             algo = get_algo_backup(algo_name)
-            dataset = get_dataset_backup(algo_name)
-            best_pos = get_pos_of_best_works_for_user_via_algo(algo, dataset, user.id, work_ids)
+            best_pos = get_pos_of_best_works_for_user_via_algo(algo, user.id, work_ids)
             ranking = defaultdict(lambda: len(ratings))
             for rank, pos in enumerate(best_pos):
                 ranking[ratings[pos].id] = rank

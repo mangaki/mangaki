@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 
-from zero import get_algo_backup
+from mangaki.utils.fit_algo import get_algo_backup
+from django.conf import settings
 
 
 class Command(BaseCommand):
@@ -16,7 +17,7 @@ class Command(BaseCommand):
         if algo.M is None:
             algo.unzip()
             if algo.is_serializable:
-                algo.save(algo.get_backup_filename())
-            self.stdout.write(self.style.SUCCESS('Successfully unzipped %s (%.1f MB)' % (algo_name, algo.size)))
+                algo.save(settings.ML_SNAPSHOT_ROOT)
+            self.stdout.write(self.style.SUCCESS('Successfully unzipped %s (%.1f MB)' % (algo_name, algo.size / 1e6)))
         else:
             self.stdout.write(self.style.WARNING('Pickle of %s is already unzipped' % algo_name))

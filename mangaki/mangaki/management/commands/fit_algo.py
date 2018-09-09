@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from mangaki.models import Rating, Work
-from zero.fit_algo import fit_algo
+from mangaki.utils.fit_algo import fit_algo
 
 
 class Command(BaseCommand):
@@ -23,5 +23,5 @@ class Command(BaseCommand):
             titles = {work_id: title for work_id, title, _ in meta_triplets}
             categories = {work_id: cat_id for work_id, _, cat_id in meta_triplets}
 
-        _, algo = fit_algo(algo_name, triplets, titles=titles, categories=categories, output_csv=output_csv)
+        algo = fit_algo(algo_name, triplets, titles=titles, categories=categories, output_csv=output_csv)
         self.stdout.write(self.style.SUCCESS('Successfully fit %s (%.1f MB)' % (algo_name, algo.size / 1e6)))

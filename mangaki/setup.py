@@ -19,8 +19,8 @@ setup(
         'beautifulsoup4',
         'natsort',
         'django-js-reverse',
-        'scikit-learn>=0.18,<0.19',
         'pandas',
+        'scipy>=1',
         'typing>=3.6,<4',
         'raven>=6.1.0,<7',
         'djangorestframework>=3.6,<4',
@@ -29,7 +29,6 @@ setup(
         'redis>=2.10,<3',
         'python-redis-lock>=3.2,<4',
         'django-celery-beat>=1.1,<2',
-        'Pillow>=4.1,<5',
         'setuptools_scm>=1.15,<2',
         'django-sendfile>=0.3,<1'
     ],
