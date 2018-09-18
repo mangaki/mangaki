@@ -1,5 +1,4 @@
 from django.conf import settings
-# from mangaki.models import Rating
 
 from zero.dataset import Dataset
 from zero.recommendation_algorithm import RecommendationAlgorithm
