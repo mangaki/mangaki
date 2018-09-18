@@ -225,18 +225,18 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ratings = current_user_ratings(self.request, context['object_list'])
+        work_list = list(context['object_list'])
+        ratings = current_user_ratings(self.request, work_list)
 
-        for work in context['object_list']:
+        for work in work_list:
             work.rating = ratings.get(work.id, None)
 
         context['object_list'] = [
             {
                 'work': work
             }
-            for work in context['object_list']
+            for work in work_list
         ]
-
         return context
 
 

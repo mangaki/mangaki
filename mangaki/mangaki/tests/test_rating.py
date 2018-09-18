@@ -64,19 +64,15 @@ class RatingTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('checked', response.content.decode('utf-8'))
 
-        # Popular anime with posters contains rating
+        # Anime with posters contains rating
         anime_list_url = reverse('work-list', args=['anime'])
-        response = self.client.get(anime_list_url, {'sort': 'popularity'})
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('checked', response.content.decode('utf-8'))
+        for sort_mode in {'popularity', 'controversy'}:
+            response = self.client.get(anime_list_url, {'sort': sort_mode})
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('checked', response.content.decode('utf-8'))
 
         # Popular anime without posters contains rating
         response = self.client.get(anime_list_url, {'sort': 'popularity',
                                                    'flat': True})
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('checked', response.content.decode('utf-8'))
-
-        # Controversial anime without posters contains rating
-        response = self.client.get(anime_list_url, {'sort': 'controversy'})
         self.assertEqual(response.status_code, 200)
         self.assertIn('checked', response.content.decode('utf-8'))
