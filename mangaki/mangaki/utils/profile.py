@@ -86,7 +86,7 @@ def build_profile_compare_function(algo_name: Optional[str],
                 return ordering.index(item.choice), ranking[item.id]
 
             return special_compare_function
-        except:  # Two possible reasons: no backup or user not in backup
+        except Exception as e:  # Two possible reasons: no backup or user not in backup
             pass
 
     return default_compare_function
