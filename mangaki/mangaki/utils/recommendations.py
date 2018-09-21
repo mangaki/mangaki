@@ -24,8 +24,8 @@ def get_algo_backup_or_fit_knn(algo_name):
     return algo
 
 
-def get_personalized_ranking(algo, user_id, work_ids, enc_rated_works, ratings,
-                             limit=None):
+def get_personalized_ranking(algo, user_id, work_ids, enc_rated_works=[],
+                             ratings=[], limit=None):
     if user_id in algo.dataset.encode_user:
         encoded_user_id = algo.dataset.encode_user[user_id]
         X_test = np.asarray([[encoded_user_id,
