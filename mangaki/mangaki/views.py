@@ -50,7 +50,7 @@ from mangaki.utils.profile import (
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.tokens import compute_token, KYOTO_SALT
-from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
+from mangaki.utils.recommendations import get_reco_algo
 from irl.models import Partner
 
 
@@ -713,7 +713,7 @@ def remove_all_reco(request, targetname):
 
 def get_reco(request):
     category = request.GET.get('category', 'all')
-    algo_name = request.GET.get('algo', 'svd' if user_exists_in_backup(request.user, 'svd') else 'knn')
+    algo_name = request.GET.get('algo', 'als')
     if current_user_ratings(request):
         reco_list = [{
             'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
