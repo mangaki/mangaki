@@ -675,7 +675,7 @@ def get_reco_algo_list(request, algo_name, category):
         reco_list.append({'id': work.id, 'title': work.title,
                           'poster': work.ext_poster, 'synopsis': work.synopsis,
                           'category_slug': work.category.slug,
-                          'category': categories[work.category.slug]})
+                          'category': str(categories[work.category.slug])})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 
