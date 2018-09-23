@@ -27,14 +27,6 @@ body {
     flex-flow: row;
 }
 
-/************
- *  HEADER  *
- ************/
-/* Header nav */
-header nav.navbar {
-    margin: 0;
-}
-
 /**********
  *  BODY  *
  **********/
@@ -42,20 +34,11 @@ header nav.navbar {
 .margin { margin: 0 0 30px 0;} 
 .margin10top { margin-top: 10px ;}
 
-/* Margin for body to prevent unused space from the header/footer nav menu. */
-body > .container {
-    
-}
-
 #wrapper {
     margin: 0 auto -52px;
     min-height: 100%;
     height: auto !important;
     height: 100%;
-}
-
-footer, #push {
-    height: 52px;
 }
 
 .featured {
@@ -113,22 +96,6 @@ white-space: normal;
 /************
  *  FOOTER  *
  ************/
-/* Centering the content in the footer nav menu. */
-footer .navbar-collapse {
-    text-align: center;
-}
-footer .navbar-nav {
-    display: inline-block;
-    float: none;
-    margin: 0;
-}
-
-/* Footer is not fixed on small devices. */
-@media(min-width: 768px) and (max-width: 1000px) {
-    footer .navbar-fixed-bottom {
-    position: inherit;
-    }
-}
 .copyright{
 
 font-size: 9px;

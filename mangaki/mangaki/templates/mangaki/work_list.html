@@ -50,22 +50,22 @@
 
             <div class="col-12">
                 <ul class="nav nav-tabs">
-                    <li class="nav-item" role="presentation"{% if sort_mode == 'mosaic' %} class="active"{% endif %}>
-                        <a class="nav-link" href="{% url 'work-list' category %}">{% trans "Mosaic" %}</a></li>
-                    <li class="nav-item" role="presentation"{% if sort_mode == 'new' %} class="active"{% endif %}>
-                        <a class="nav-link" href="{% url 'work-list' category %}?sort=new">{% trans "Recent" %}</a></li>
-                    <li class="nav-item" role="presentation"{% if sort_mode == 'top' %} class="active"{% endif %}>
-                        <a class="nav-link" href="{% url 'work-list' category %}?sort=top">{% trans "Top" %}</a></li>
-                    <li class="nav-item" role="presentation"{% if sort_mode == 'popularity' %} class="active"{% endif %}>
-                        <a class="nav-link" href="{% url 'work-list' category %}?sort=popularity">{% trans "Popular" %}</a></li>
-                    <li class="nav-item" role="presentation"{% if sort_mode == 'pearls' %} class="active"{% endif %}>
-                        <a class="nav-link" href="{% url 'work-list' category %}?sort=pearls">{% trans "Pearls" %}</a></li>
-                    <li class="nav-item" role="presentation"{% if sort_mode == 'controversy' %} class="active"{% endif %}>
-                        <a class="nav-link" href="{% url 'work-list' category %}?sort=controversy">{% trans "Controversial" %}</a></li>
-                    <li class="nav-item" role="presentation"{% if sort_mode == 'random' %} class="active"{% endif %}>
-                        <a class="nav-link" href="{% url 'work-list' category %}?sort=random">{% trans "Random" %}</a></li>
-                    <li class="nav-item" role="presentation"{% if sort_mode == 'alpha' %} class="active"{% endif %}>
-                        <a class="nav-link" href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">{% trans "A-Z" %}</a></li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link{% if sort_mode == 'mosaic' %} active{% endif %}" href="{% url 'work-list' category %}">{% trans "Mosaic" %}</a></li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link{% if sort_mode == 'new' %} active{% endif %}" href="{% url 'work-list' category %}?sort=new">{% trans "Recent" %}</a></li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link{% if sort_mode == 'top' %} active{% endif %}" href="{% url 'work-list' category %}?sort=top">{% trans "Top" %}</a></li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link{% if sort_mode == 'popularity' %} active{% endif %}" href="{% url 'work-list' category %}?sort=popularity">{% trans "Popular" %}</a></li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link{% if sort_mode == 'pearls' %} active{% endif %}" href="{% url 'work-list' category %}?sort=pearls">{% trans "Pearls" %}</a></li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link{% if sort_mode == 'controversy' %} active{% endif %}" href="{% url 'work-list' category %}?sort=controversy">{% trans "Controversial" %}</a></li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link{% if sort_mode == 'random' %} active{% endif %}" href="{% url 'work-list' category %}?sort=random">{% trans "Random" %}</a></li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link{% if sort_mode == 'alpha' %} active{% endif %}" href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">{% trans "A-Z" %}</a></li>
                 </ul>
             </div>
 

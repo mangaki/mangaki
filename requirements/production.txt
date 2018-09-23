@@ -1,6 +1,6 @@
 Django==1.11.*
 django-allauth==0.28
-markdown
+markdown<3  # https://github.com/encode/django-rest-framework/issues/6203
 django-bootstrap3==8.2.*
 psycopg2-binary
 numpy>=1.13

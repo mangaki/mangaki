@@ -14,10 +14,15 @@
     </div>
 </div>
     <ul class="nav nav-tabs">
-        <li role="presentation"{% if category == 'all' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo_name }}">{% trans "All" %}</a></li>
-        <li role="presentation"{% if category == 'anime' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=anime">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link{% if category == 'all' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}">{% trans "All" %}</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link{% if category == 'anime' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=anime">
             {% trans "Anime only" %}</a></li>
-        <li role="presentation"{% if category == 'manga' %} class="active"{% endif %}><a href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=manga">{% trans "Manga only" %}</a></li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link{% if category == 'manga' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=manga">{% trans "Manga only" %}</a>
+        </li>
     </ul>
     <br />
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
