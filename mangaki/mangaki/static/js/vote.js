@@ -77,7 +77,7 @@ $(function () {
     $(ratings).find('.rating[title]').tooltip({
       'container': 'body',
       'placement': function () {
-        return ratings.offsetHeight > ratings.offsetWidth ? 'auto left' : 'auto top';
+        return ratings.offsetHeight > ratings.offsetWidth ? 'right' : 'top';
       },
     });
   });
