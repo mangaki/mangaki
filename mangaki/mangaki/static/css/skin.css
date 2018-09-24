@@ -8,7 +8,6 @@ html {
 body {
     background: #fdfdfd;
     font-family:'Open Sans', sans-serif;
-    height: 100%;
 }
 
 .jumbotron {
@@ -33,13 +32,6 @@ body {
 
 .margin { margin: 0 0 30px 0;} 
 .margin10top { margin-top: 10px ;}
-
-#wrapper {
-    margin: 0 auto -52px;
-    min-height: 100%;
-    height: auto !important;
-    height: 100%;
-}
 
 .featured {
     padding-top: 2em;

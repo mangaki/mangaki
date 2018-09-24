@@ -24,136 +24,134 @@
     <link href="https://fonts.googleapis.com/css?family=Economica|Open+Sans" rel="stylesheet">
 </head>
 
-<body>
-<div id="wrapper">
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="/static/img/mangakiwhite.png" width="100" />
-            </a>
+<body class="d-flex flex-column h-100">
 
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu-collapse" aria-controls="menu-collapse" aria-expanded="false" aria-label="{% trans "Toggle navigation" %}">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="/static/img/mangakiwhite.png" width="100" />
+        </a>
 
-            <div class="collapse navbar-collapse" id="menu-collapse">
-                <ul class="nav navbar-nav mr-auto">
-                    <li class="nav-item dropdown">
-                        {% get_current_language as LANGUAGE_CODE %}
-                        <a href="#" class="nav-link dropdown-toggle" id="language-submenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-globe"></span>&nbsp;{{ LANGUAGE_CODE }}</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu-collapse" aria-controls="menu-collapse" aria-expanded="false" aria-label="{% trans "Toggle navigation" %}">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-                        <script>
-                            function sendlang(lang) {
-                                $.post('/i18n/setlang/', {language: lang}, data => {
-                                    if (window.location.pathname.substring(0, 6) == '/about') {
-                                        window.location.href = '/about';
-                                    } else {
-                                        window.location.reload();
-                                    }
-                                });
-                            }
-                        </script>
+        <div class="collapse navbar-collapse" id="menu-collapse">
+            <ul class="nav navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    <a href="#" class="nav-link dropdown-toggle" id="language-submenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-globe"></span>&nbsp;{{ LANGUAGE_CODE }}</a>
 
-                        {% get_available_languages as LANGUAGES %}
-                        <div class="dropdown-menu" aria-labelledby="language-submenu">
-                            {% for lang_code, lang_name in LANGUAGES %}
-                                <a class="dropdown-item" href="javascript:sendlang('{{ lang_code }}')">{{ lang_name }}</a>
-                            {% endfor %}
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'work-list' 'anime' %}">
-                            {% trans "Anime" %}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'work-list' 'manga' %}">
-                            {% trans "Mangas" %}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'reco' %}">
-                            {% trans "Recommendations" %}
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="top20-submenu" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {% trans "Top 20" %}
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="top20-submenu">
-                            <a class="dropdown-item" href="{% url 'top' 'directors' %}">{% trans "Directors" %}</a>
-                            <a class="dropdown-item" href="{% url 'top' 'composers' %}">{% trans "Composers" %}</a>
-                            <a class="dropdown-item" href="{% url 'top' 'authors' %}">{% trans "Authors" %}</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="contribute-submenu" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {% trans "Contribute" %}
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="contribute-submenu">
-                            <a class="dropdown-item" href="{% url 'fix-index' %}">{% trans "Suggestions" %}</a>
-                            <a class="dropdown-item" href="https://github.com/mangaki/mangaki/issues" target="_blank"><span class="glyphicon glyphicon-fire"></span>&nbsp;{% trans "Report a bug" %}</a>
-                            <a class="dropdown-item" href="https://paypal.me/mangaki" target="_blank"><span
-                        class="glyphicon glyphicon-heart"></span>&nbsp;{% trans "Donate" %}</a>
-                        </div>
-                    </li>
-                </ul>
+                    <script>
+                        function sendlang(lang) {
+                            $.post('/i18n/setlang/', {language: lang}, data => {
+                                if (window.location.pathname.substring(0, 6) == '/about') {
+                                    window.location.href = '/about';
+                                } else {
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    </script>
 
-                <ul class="nav navbar-nav">
-                {% if not user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"><span
-                            class="glyphicon glyphicon-log-in"></span>&nbsp;{% trans "Log in" %}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}"><span
-                            class="glyphicon glyphicon-user"></span>&nbsp;{% trans "Signup" %}</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="{% url 'profile' user.username %}" id="profile-submenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {% trans "Welcome" %} <strong>{{ user.username }}!</strong>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profile-submenu">
-                            <a class="dropdown-item" href="{% url 'profile-works' user.username meta.category|default:"anime" meta.status|default:"seen" %}">
-                                {% trans "Rated works" %}
-                            </a>
-                            <a class="dropdown-item" href="{% url 'profile-preferences' user.username %}">
-                                {% trans "My settings" %}
-                            </a>
-                            <a class="dropdown-item" href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;{% trans "Log out" %}</a>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                    </li>
-                {% endif %}
-                </ul>
-            </div>
-        </nav>
-    </header>
+                    {% get_available_languages as LANGUAGES %}
+                    <div class="dropdown-menu" aria-labelledby="language-submenu">
+                        {% for lang_code, lang_name in LANGUAGES %}
+                            <a class="dropdown-item" href="javascript:sendlang('{{ lang_code }}')">{{ lang_name }}</a>
+                        {% endfor %}
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'work-list' 'anime' %}">
+                        {% trans "Anime" %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'work-list' 'manga' %}">
+                        {% trans "Mangas" %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'reco' %}">
+                        {% trans "Recommendations" %}
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="top20-submenu" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {% trans "Top 20" %}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="top20-submenu">
+                        <a class="dropdown-item" href="{% url 'top' 'directors' %}">{% trans "Directors" %}</a>
+                        <a class="dropdown-item" href="{% url 'top' 'composers' %}">{% trans "Composers" %}</a>
+                        <a class="dropdown-item" href="{% url 'top' 'authors' %}">{% trans "Authors" %}</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="contribute-submenu" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {% trans "Contribute" %}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="contribute-submenu">
+                        <a class="dropdown-item" href="{% url 'fix-index' %}">{% trans "Suggestions" %}</a>
+                        <a class="dropdown-item" href="https://github.com/mangaki/mangaki/issues" target="_blank"><span class="glyphicon glyphicon-fire"></span>&nbsp;{% trans "Report a bug" %}</a>
+                        <a class="dropdown-item" href="https://paypal.me/mangaki" target="_blank"><span
+                    class="glyphicon glyphicon-heart"></span>&nbsp;{% trans "Donate" %}</a>
+                    </div>
+                </li>
+            </ul>
 
-    <div class="container">
-        {% block anonymous_rating_banner %}
-        {% if request|has_anonymous_ratings %}
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="alert alert-warning">
-                    {% url 'my-profile' as profile %}
-                    {% url 'account_signup' as signup_url %}
-                    {% blocktrans trimmed %}
-                    You rated a few works anonymously, you can <a href="{{ profile }}">see them</a>, don't forget to <a href="{{ signup_url }}">subscribe</a> to save them!
-                    {% endblocktrans %}
-                </div>
+            <ul class="nav navbar-nav">
+            {% if not user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"><span
+                        class="glyphicon glyphicon-log-in"></span>&nbsp;{% trans "Log in" %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'account_signup' %}?next={{ request.get_full_path|urlencode }}"><span
+                        class="glyphicon glyphicon-user"></span>&nbsp;{% trans "Signup" %}</a>
+                </li>
+            {% else %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="{% url 'profile' user.username %}" id="profile-submenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {% trans "Welcome" %} <strong>{{ user.username }}!</strong>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profile-submenu">
+                        <a class="dropdown-item" href="{% url 'profile-works' user.username meta.category|default:"anime" meta.status|default:"seen" %}">
+                            {% trans "Rated works" %}
+                        </a>
+                        <a class="dropdown-item" href="{% url 'profile-preferences' user.username %}">
+                            {% trans "My settings" %}
+                        </a>
+                        <a class="dropdown-item" href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbsp;{% trans "Log out" %}</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                </li>
+            {% endif %}
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<div class="container">
+    {% block anonymous_rating_banner %}
+    {% if request|has_anonymous_ratings %}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-warning">
+                {% url 'my-profile' as profile %}
+                {% url 'account_signup' as signup_url %}
+                {% blocktrans trimmed %}
+                You rated a few works anonymously, you can <a href="{{ profile }}">see them</a>, don't forget to <a href="{{ signup_url }}">subscribe</a> to save them!
+                {% endblocktrans %}
             </div>
         </div>
-        {% endif %}
-        {% endblock %}
-        {% block body %}{% endblock %}
     </div>
-    <div id="push"></div>
+    {% endif %}
+    {% endblock %}
+    {% block body %}{% endblock %}
 </div>
 
-<footer>
+<footer class="mt-auto">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#footer-collapse" aria-controls="footer-collapse" aria-expanded="false" aria-label="{% trans "Toggle navigation" %}">
             <span class="navbar-toggler-icon"></span>
@@ -216,5 +214,6 @@
 $("nav [href='{{ request.path }}']").not("[class=inactive]").parent("li").addClass('active');
 </script>
 {% block extrajs %}{% endblock %}
+
 </body>
 </html>
