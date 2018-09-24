@@ -1,5 +1,5 @@
 {% load anonymous_ratings %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 {% load i18n %}
 {% load version %}
 
@@ -76,6 +76,11 @@
                         {% trans "Recommendations" %}
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'artist-list' %}">
+                        {% trans "Artists" %}
+                    </a>
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="top20-submenu" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {% trans "Top 20" %}
@@ -132,7 +137,7 @@
     </nav>
 </header>
 
-<div class="container">
+<div class="container pt-4 pb-4">
     {% block anonymous_rating_banner %}
     {% if request|has_anonymous_ratings %}
     <div class="row">

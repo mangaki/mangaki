@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load anonymous_ratings %}
+{% load bootstrap4 %}
 
 {% block body %}
     <div class="fb-container">
@@ -87,9 +88,9 @@
                     <form method="GET">
                         <div class="input-group">
                             <input class="search-input form-control {{category}}" placeholder="{% blocktrans %}Enter the title of some {{category}} (currently {{ objects_count }} works){% endblocktrans %}" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
-                            <span class="input-group-btn">
-        <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
-          </span>
+                            <div class="input-group-append">
+                                <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                            </div>
                         </div>
                         <span class="help-block" style="float: right">{% trans "Hint: press Enter to trigger the search" %}</span>
                     </form>
@@ -104,16 +105,18 @@
             </div>
 
             {% if user.is_authenticated %}
-                <div class="row">
-                    <div class="col-md-12 col-sm-12">
-                        <a class="btn btn-primary btn-lg btn-block" href="{% url 'reco' %}?category={{ category }}">{% trans "Get recommendations now" %}</a>
-                    </div>
-                </div>
+            <a class="btn btn-primary btn-lg mx-auto" href="{% url 'reco' %}?category={{ category }}">{% trans "Get recommendations now" %}</a>
             {% endif %}
-            <br/>
-            {% include "pagination.html" %}
+            
         </div>
     </div>
+
+    {% if paginator.page_range|length > 1 %}
+    <nav aria-label="Navigation over works">
+        {% bootstrap_pagination page_obj size="small" justify_content="center" extra=request.GET.urlencode %}
+    </nav>
+    {% endif %}
+
 {% endblock %}
 
 {% block extrajs %}

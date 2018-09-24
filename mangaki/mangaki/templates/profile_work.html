@@ -1,3 +1,4 @@
+{% load bootstrap4 %}
 {% load i18n %}
 
 <div class="col-md-12">
@@ -13,5 +14,9 @@
     {% else %}
         {% include "works.html" with disabled=meta.ratings_disabled works=ratings category=meta.category config=meta.config %}
     {% endif %}
-    {% include "pagination.html" with page_obj=ratings paginator=ratings.paginator algo=meta.algo_name %}
+    {% if ratings.paginator.page_range|length > 1 %}
+    <nav aria-label="Navigation over works">
+        {% bootstrap_pagination ratings size="small" justify_content="center" extra=request.GET.urlencode %}
+    </nav>
+    {% endif %}
 </div>
