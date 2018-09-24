@@ -38,20 +38,6 @@
             {% endif %}
         </div>
         <div class="col-xs-4 col-lg-4">
-            {% if meta.is_me and not meta.is_anonymous %}
-                <ul class="nav nav-tabs">
-                    <li role="presentation" {% if meta.profile_section == 'works' %} class="active" {% endif %}>
-                        <a href="{% url 'profile-works' profile.username meta.category|default:"anime" meta.status|default:"seen" %}">
-                            {% trans "Rated works" %}
-                        </a>
-                    </li>
-                    <li role="presentation" {% if meta.profile_section == 'preferences' %} class="active" {% endif %}>
-                        <a href="{% url 'profile-preferences' profile.username %}">
-                            {% trans "My settings" %}
-                        </a>
-                    </li>
-                </ul>
-            {% endif %}
             {% if meta.is_anonymous %}
                 <br />
                 <br />
