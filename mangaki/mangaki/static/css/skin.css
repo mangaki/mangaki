@@ -33,11 +33,6 @@ body {
 .margin { margin: 0 0 30px 0;} 
 .margin10top { margin-top: 10px ;}
 
-.featured {
-    padding-top: 2em;
-    padding-bottom: 2em;
-}
-
 .well {
   min-height: 20px;
   padding: 19px;
@@ -69,16 +64,8 @@ background-image: linear-gradient(to right,rgba(0,0,0,0) 0,rgba(0,0,0,0) 100%);
  *  BUTTON  *
  **********/
 .btn-mangaki{
-color: #fff;
-background-color: #E84C15;
-
-}
-.btn-lg{
-padding: 25px 25px;
-font-size: 20px;
-line-height: 1.33;
-border-radius: 5px;
-white-space: normal;
+  color: #fff;
+  background-color: #E84C15;
 }
 
 .btn-nowrap {

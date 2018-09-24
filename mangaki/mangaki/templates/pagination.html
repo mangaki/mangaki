@@ -1,0 +1,7 @@
+{% load bootstrap4 %}
+
+{% if paginator.page_range|length > 1 %}
+<nav aria-label="Navigation over pages">
+    {% bootstrap_pagination page=page_obj size="small" justify_content="center" extra=request.GET.urlencode %}
+</nav>
+{% endif %}

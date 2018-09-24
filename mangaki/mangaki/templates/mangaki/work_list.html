@@ -107,15 +107,11 @@
             {% if user.is_authenticated %}
             <a class="btn btn-primary btn-lg mx-auto" href="{% url 'reco' %}?category={{ category }}">{% trans "Get recommendations now" %}</a>
             {% endif %}
-            
+
         </div>
     </div>
 
-    {% if paginator.page_range|length > 1 %}
-    <nav aria-label="Navigation over works">
-        {% bootstrap_pagination page_obj size="small" justify_content="center" extra=request.GET.urlencode %}
-    </nav>
-    {% endif %}
+    {% include "pagination.html" %}
 
 {% endblock %}
 

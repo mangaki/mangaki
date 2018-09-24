@@ -14,9 +14,6 @@
     {% else %}
         {% include "works.html" with disabled=meta.ratings_disabled works=ratings category=meta.category config=meta.config %}
     {% endif %}
-    {% if ratings.paginator.page_range|length > 1 %}
-    <nav aria-label="Navigation over works">
-        {% bootstrap_pagination ratings size="small" justify_content="center" extra=request.GET.urlencode %}
-    </nav>
-    {% endif %}
+    
+    {% include "pagination.html" with page_obj=ratings paginator=ratings.paginator %}
 </div>
