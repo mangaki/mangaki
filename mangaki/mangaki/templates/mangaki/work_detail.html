@@ -107,7 +107,7 @@
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#suggestionModal">{% trans "Suggest an edit for this page" %}</button>
 
 <form class="typeahead-demo {{ user.username }}">
-  <input type="text" data-username="{{ user.username }}" class="typeahead" placeholder="{% trans "Suggest this work to a user on Mangaki" %}" />
+  <input type="text" data-username="{{ user.username }}" class="search-input form-control typeahead" placeholder="{% trans "Suggest this work to a user on Mangaki" %}" />
 </form>
 <div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">{% trans "This user already knows this work" %}</div>
 <div class="alert alert-success" role="alert" id="success-reco" style="display: none">{% trans "Suggestion successfully sent!" %}</div>
