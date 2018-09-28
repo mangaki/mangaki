@@ -3,14 +3,13 @@
 
 {% block body %}
 {% if reco_list|length > 0 %}
-<div class="col-md-12 col-sm-12">
     <div class="alert alert-secondary">
         {% blocktrans trimmed %}
             Here are some recommendations that you might like.<br />
             Rate them and reload to get new ones.
         {% endblocktrans %}
     </div>
-</div>
+
     <ul class="nav nav-tabs">
         <li class="nav-item" role="presentation">
             <a class="nav-link{% if category == 'all' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}">{% trans "All" %}</a>
@@ -26,9 +25,7 @@
 <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
 {% include "works.html" with works=reco_list %}
 
-<div class="row">
-    <a class="btn btn-primary btn-lg mx-auto" href="{% url 'reco' %}?category={{ category }}&amp;algo={{ algo_name }}">{% blocktrans %}I want new recommendations! <br class="visible-xs">(After you rate those.){% endblocktrans %}</a>
-</div>
+<a class="btn btn-primary btn-lg btn-block mx-auto" style="white-space: normal" href="{% url 'reco' %}?category={{ category }}&amp;algo={{ algo_name }}">{% blocktrans %}I want new recommendations! <br class="visible-xs">(After you rate those.){% endblocktrans %}</a>
 
 {% else %}
     {% url 'work-list' 'anime' as work_list_url %}
