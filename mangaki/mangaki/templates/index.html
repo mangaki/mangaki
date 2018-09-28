@@ -5,16 +5,16 @@
 {% load account socialaccount %}
 
 {% get_providers as socialaccount_providers %}
-<div class="row container pt-5 pb-5 text-center">
+<div class="pt-5 pb-5 text-center">
     <h1 class="mx-auto">{% trans "Mangaki, anime and manga recommendation" %}</h1>
     <h3 class="mx-auto">{% trans "Rate your favorite series and discover new ones!" %}</h3>
 </div>
 <div class="text-center pb-5">
-    <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'anime' %}">{% trans "I prefer anime" %}</a> 
-    <a class="btn btn-mangaki btn-lg" href="{% url 'work-list' 'manga' %}">{% trans "I prefer manga" %}</a>
+    <a class="btn btn-danger btn-mangaki btn-lg mb-2" href="{% url 'work-list' 'anime' %}">{% trans "I prefer anime" %}</a> 
+    <a class="btn btn-danger btn-mangaki btn-lg mb-2" href="{% url 'work-list' 'manga' %}">{% trans "I prefer manga" %}</a>
 </div>
 
-<div class="partners row">
+<div class="partners">
 	{% for partner in partners %}
     <div class="col-xs-6 col-sm-4 col-md-2">
         <a href="http://{{ partner.url }}" target="_blank" title="{{ partner.name }}"><img  src="/static/img/sponsors/small/{{ partner.image }}" /></a>
