@@ -36,7 +36,7 @@
   </div>
   {% endif %}
   <form 
-      class="col-12 col-sm-6 {% if not ratings %}col-sm-offset-3{% endif %}"
+      class="col-12 col-sm-6 {% if not ratings %}offset-sm-3{% endif %}"
       id="signup_form"
       method="post" action="{% url 'account_signup' %}">
     {% csrf_token %}
