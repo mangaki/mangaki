@@ -16,9 +16,9 @@
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link{% if category == 'anime' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=anime">
-            {% trans "Anime only" %}</a></li>
+            {% trans "Anime" %}</a></li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link{% if category == 'manga' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=manga">{% trans "Manga only" %}</a>
+            <a class="nav-link{% if category == 'manga' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=manga">{% trans "Manga" %}</a>
         </li>
     </ul>
     <br />
