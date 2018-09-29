@@ -42,11 +42,16 @@ for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
     </div>
   </div>
   {% endif %}
+
   <form class="login col-12 col-sm-6 offset-sm-3" method="POST" action="{% url 'account_login' %}">
     {% csrf_token %}
     {% if redirect_field_value %}
     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
     {% endif %}
+
+    {% for err in form.non_field_errors %}
+      <p class="alert alert-danger">{{ err }}</p>
+    {% endfor %}
 
     {% bootstrap_field form.login show_label=False addon_before='<span class="glyphicon glyphicon-user"></span>' %}
     {% bootstrap_field form.password show_label=False addon_before='<span class="glyphicon glyphicon-lock"></span>' %}
