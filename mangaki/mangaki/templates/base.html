@@ -141,7 +141,7 @@
     {% block anonymous_rating_banner %}
     {% if request|has_anonymous_ratings %}
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-12">
             <div class="alert alert-warning">
                 {% url 'my-profile' as profile %}
                 {% url 'account_signup' as signup_url %}

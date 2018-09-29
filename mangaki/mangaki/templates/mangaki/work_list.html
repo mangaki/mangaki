@@ -44,41 +44,50 @@
         </ul>
     </div>
     {% endif %}
-        
-    <ul class="nav nav-tabs mb-2">
-        <li role="presentation" class="nav-item">
-            <a class="nav-link{% if sort_mode == 'mosaic' %} active{% endif %}" href="{% url 'work-list' category %}">{% trans "Mosaic" %}</a></li>
-        <li role="presentation" class="nav-item">
-            <a class="nav-link{% if sort_mode == 'new' %} active{% endif %}" href="{% url 'work-list' category %}?sort=new">{% trans "Recent" %}</a></li>
-        <li role="presentation" class="nav-item">
-            <a class="nav-link{% if sort_mode == 'top' %} active{% endif %}" href="{% url 'work-list' category %}?sort=top">{% trans "Top" %}</a></li>
-        <li role="presentation" class="nav-item">
-            <a class="nav-link{% if sort_mode == 'popularity' %} active{% endif %}" href="{% url 'work-list' category %}?sort=popularity">{% trans "Popular" %}</a></li>
-        <li role="presentation" class="nav-item">
-            <a class="nav-link{% if sort_mode == 'pearls' %} active{% endif %}" href="{% url 'work-list' category %}?sort=pearls">{% trans "Pearls" %}</a></li>
-        <li role="presentation" class="nav-item">
-            <a class="nav-link{% if sort_mode == 'controversy' %} active{% endif %}" href="{% url 'work-list' category %}?sort=controversy">{% trans "Controversial" %}</a></li>
-        <li role="presentation" class="nav-item">
-            <a class="nav-link{% if sort_mode == 'random' %} active{% endif %}" href="{% url 'work-list' category %}?sort=random">{% trans "Random" %}</a></li>
-        <li role="presentation" class="nav-item">
-            <a class="nav-link{% if sort_mode == 'alpha' %} active{% endif %}" href="{% url 'work-list' category %}?sort=alpha&amp;letter={% if letter %}{{ letter }}{% else %}0{% endif %}">{% trans "A-Z" %}</a></li>
-    </ul>
 
-    
+    {% include "search.html" %}
 
-    {% if sort_mode == 'alpha' %}
-    <select class="form-control" onchange="window.location = '{% url 'work-list' category %}?sort=alpha&amp;letter=' + this.value;">
-        {% for letter_ in "0ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
-        <option
-            {% if letter_ == letter %}selected{% endif %}>
-                {{letter_}}
-            </a>
-        </option>
+    <div class="form-row">
+
+        <!-- Desktop tabs -->
+        <ul class="nav nav-tabs mt-2 mb-2 d-none d-lg-flex">
+        {% for sort_mode_, sort_name in sort_modes %}
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if sort_mode == sort_mode_ %} active{% endif %}"
+                   href="{% url 'work-list' category %}?sort={{ sort_mode_ }}">
+                    {{ sort_name }}
+                </a>
+            </li>
         {% endfor %}
-    </select>
-    {% elif user.is_authenticated and sort_mode != 'alpha' and sort_mode != 'random' and not is_dpp %}
-        {% include "search.html" %}
-    {% endif %}
+        </ul>
+
+        <!-- Medium devices -->
+        <div class="dropdown mt-2 d-block d-lg-none col-6">
+            <button class="btn btn-danger btn-mangaki dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{ sort_mode_display }}
+            </button>
+            <div class="dropdown-menu">
+            {% for sort_mode_, sort_name in sort_modes %}
+                <a class="dropdown-item{% if sort_mode == sort_mode_ %} active{% endif %}"
+                   href="{% url 'work-list' category %}?sort={{ sort_mode_ }}">
+                    {{ sort_name }}
+                </a>
+            {% endfor %}
+            </div>
+        </div>
+
+        {% if sort_mode == 'alpha' %}
+        <select class="col-6 offset-lg-3 mt-2 form-control" onchange="window.location = '{% url 'work-list' category %}?sort=alpha&amp;letter=' + this.value;">
+            {% for letter_ in "0ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+            <option
+                {% if letter_ == letter %}selected{% endif %}>
+                    {{letter_}}
+                </a>
+            </option>
+            {% endfor %}
+        </select>
+        {% endif %}
+    </div>
 
     {% if flat %}
         {% include "works_no_poster.html" with works=object_list %}

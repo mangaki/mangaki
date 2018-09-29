@@ -35,7 +35,7 @@ from django.views.generic.list import ListView
 from markdown import markdown
 from natsort import natsorted
 
-from mangaki.choices import TOP_CATEGORY_CHOICES
+from mangaki.choices import TOP_CATEGORY_CHOICES, SORT_MODE_CHOICES
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
@@ -317,6 +317,8 @@ class WorkList(WorkListMixin, ListView):
         context['search'] = search_text
         context['flat'] = flat
         context['sort_mode'] = sort_mode
+        context['sort_mode_display'] = dict(SORT_MODE_CHOICES)[sort_mode]
+        context['sort_modes'] = SORT_MODE_CHOICES
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
         context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS
