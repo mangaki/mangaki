@@ -80,3 +80,14 @@ STAFF_TYPICAL_CHOICES = (
     _('Mangaka'),
     _('Screenwriter')
 )
+
+SORT_MODE_CHOICES = (
+    ('mosaic', _('Mosaic')),
+    ('new', _('Recent')),
+    ('top', _('Top')),
+    ('popularity', _('Popular')),
+    ('pearls', _('Pearls')),
+    ('controversy', _('Controversial')),
+    ('random', _('Random')),
+    ('alpha', _('A-Z'))
+)

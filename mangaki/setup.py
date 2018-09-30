@@ -13,7 +13,7 @@ setup(
         'Django>=1.11,<2',
         'django-allauth>=0.28',
         'Markdown>=2.6,<3',
-        'django-bootstrap3>=8.2,<9',
+        'django-bootstrap4',
         'psycopg2-binary>=2.7,<3',
         'numpy',
         'beautifulsoup4',

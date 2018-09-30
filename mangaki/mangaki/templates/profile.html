@@ -6,7 +6,7 @@
 
     <div class="row">
         {% if not meta.is_anonymous %}
-            <div class="col-xs-2">
+            <div class="col-2">
 {# FIXME: Someday, we should uncomment this, but before, we have to data migrate avatars since death of meta.mangaki.fr#}
 {#                {% if profile.avatar_url %}#}
 {#                    <img src="{{ profile.avatar_url }}" alt="Avatar de {{ profile.username }}" id="avatar" />#}
@@ -16,7 +16,7 @@
             </div>
         {% endif %}
 
-        <div class="col-xs-6 col-lg-6">
+        <div class="col-12 col-lg-6">
             {% if not meta.is_anonymous %}
                 <h1>{{ profile.username }}</h1>
             {% else %}
@@ -37,24 +37,8 @@
                 </p>
             {% endif %}
         </div>
-        <div class="col-xs-4 col-lg-4">
-            {% if meta.is_me and not meta.is_anonymous %}
-                <ul class="nav nav-tabs">
-                    <li role="presentation" {% if meta.profile_section == 'works' %} class="active" {% endif %}>
-                        <a href="{% url 'profile-works' profile.username meta.category|default:"anime" meta.status|default:"seen" %}">
-                            {% trans "Rated works" %}
-                        </a>
-                    </li>
-                    <li role="presentation" {% if meta.profile_section == 'preferences' %} class="active" {% endif %}>
-                        <a href="{% url 'profile-preferences' profile.username %}">
-                            {% trans "My settings" %}
-                        </a>
-                    </li>
-                </ul>
-            {% endif %}
+        <div class="col-12 col-lg-4 mb-2">
             {% if meta.is_anonymous %}
-                <br />
-                <br />
                 <form method="POST" action="{% url 'remove-all-anon-ratings' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">{% trans "Delete all my ratings" %}</button>

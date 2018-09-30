@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<div class="clearfix">
+    <form method="GET">
+        <div class="input-group">
+            <input class="search-input form-control {{category}}" placeholder="{% trans "Search" %}…" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
+            <div class="input-group-append">
+                <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+            </div>
+        </div>
+    </form>
+</div>

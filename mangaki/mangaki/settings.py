@@ -66,7 +66,7 @@ INSTALLED_APPS = (
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'bootstrap3',
+    'bootstrap4',
     'django_js_reverse',
     'rest_framework',
     'django_celery_beat'

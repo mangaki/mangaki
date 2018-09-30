@@ -5,43 +5,43 @@
 {% if not meta.is_anonymous and meta.can_see and not meta.is_me %}
         <ul class="nav nav-tabs">
 
-            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile-works' profile.username 'anime' 'seen' %}"><em>{% trans "Anime" %}</em> {% trans "seen by" %} {{ profile.username }} <span
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'anime' and meta.seen %} active{% endif %}" href="{% url 'profile-works' profile.username 'anime' 'seen' %}"><em>{% trans "Anime" %}</em> {% trans "seen by" %} {{ profile.username }} <span
                     class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile-works' profile.username 'anime' 'unseen' %}"><em>{% trans "Anime" %}</em> {% trans "watchlist" %} {% trans "by" %} {{ profile.username }} <span
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'anime' and not meta.seen %} active{% endif %}" href="{% url 'profile-works' profile.username 'anime' 'unseen' %}"><em>{% trans "Anime" %}</em> {% trans "watchlist" %} {% trans "by" %} {{ profile.username }} <span
                     class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
 
-            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile-works' profile.username 'manga' 'seen' %}"><em>{% trans "Mangas" %}</em> {% trans "read by" %} {{ profile.username }} <span
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'manga' and meta.seen %} active{% endif %}" href="{% url 'profile-works' profile.username 'manga' 'seen' %}"><em>{% trans "Mangas" %}</em> {% trans "read by" %} {{ profile.username }} <span
                     class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'profile-works' profile.username 'manga' 'unseen' %}"><em>{% trans "Mangas" %}</em> {% trans "wishlist" %} {% trans "by" %} {{ profile.username }} <span
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'manga' and not meta.seen %} active{% endif %}" href="{% url 'profile-works' profile.username 'manga' 'unseen' %}"><em>{% trans "Mangas" %}</em> {% trans "wishlist" %} {% trans "by" %} {{ profile.username }} <span
                     class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
 
-            <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
-                    href="{% url 'profile-works' profile.username 'recommendation' %}?category=recommendation">{% trans "Recommendations to" %} {{ profile.username }} <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'recommendation' %} active{% endif %}" href="{% url 'profile-works' profile.username 'recommendation' %}?category=recommendation">{% trans "Recommendations to" %} {{ profile.username }} <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
         </ul>
     {% elif meta.is_anonymous or meta.is_me %}
         <ul class="nav nav-tabs">
 
-            <li role="presentation"{% if meta.category == 'anime' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'seen' %}"><em>{% trans "Anime" %}</em> {% trans "seen" %} <span
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'anime' and meta.seen %} active{% endif %}" href="{% url 'my-profile' 'anime' 'seen' %}"><em>{% trans "Anime" %}</em> {% trans "seen" %} <span
                     class="badge alert-info">{{ profile.seen_anime_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'anime' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'anime' 'unseen' %}"><em>{% trans "Anime" %}</em> {% trans "watchlist" %} <span
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'anime' and not meta.seen %} active{% endif %}" href="{% url 'my-profile' 'anime' 'unseen' %}"><em>{% trans "Anime" %}</em> {% trans "watchlist" %} <span
                     class="badge alert-info">{{ profile.unseen_anime_count }}</span></a></li>
 
-            <li role="presentation"{% if meta.category == 'manga' and meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'manga' 'seen' %}"><em>{% trans "Mangas" %}</em> {% trans "read" %} <span
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'manga' and meta.seen %} active{% endif %}" href="{% url 'my-profile' 'manga' 'seen' %}"><em>{% trans "Mangas" %}</em> {% trans "read" %} <span
                     class="badge alert-info">{{ profile.seen_manga_count }}</span></a></li>
-            <li role="presentation"{% if meta.category == 'manga' and not meta.seen %} class="active"{% endif %}><a
-                    href="{% url 'my-profile' 'manga' 'unseen' %}"><em>{% trans "Mangas" %}</em> {% trans "wishlist" %} <span
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'manga' and not meta.seen %} active{% endif %}" href="{% url 'my-profile' 'manga' 'unseen' %}"><em>{% trans "Mangas" %}</em> {% trans "wishlist" %} <span
                     class="badge alert-info">{{ profile.unseen_manga_count }}</span></a></li>
 
             {% if not meta.is_anonymous %}
-                <li role="presentation"{% if meta.category == 'recommendation' %} class="active"{% endif %}><a
-                        href="{% url 'profile-works' profile.username 'recommendation' %}?category=recommendation">{% trans "My recommendations" %}
+            <li role="presentation" class="nav-item">
+                <a class="nav-link{% if meta.category == 'recommendation' %} active{% endif %}" href="{% url 'profile-works' profile.username 'recommendation' %}?category=recommendation">{% trans "My recommendations" %}
                     <span class="badge alert-info">{{ profile.reco_count }}</span></a></li>
             {% endif %}
         </ul>
@@ -57,7 +57,4 @@
     {% else %}
         <p class="well">{% blocktrans trimmed with username=profile.username %}{{ username }}'s profile is not disclosed publicly.{% endblocktrans %}</p>
     {% endif %}
-    <br/>
-    <br/>
-    <br/>
 {% endblock %}

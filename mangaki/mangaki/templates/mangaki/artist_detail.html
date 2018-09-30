@@ -9,7 +9,7 @@
 {% if user.is_authenticated %}
 Signaler une œuvre manquante pour {{ artist }} ?
 <form class="typeahead-demo {{ category }}">
-  <input type="text" data-category="{{ category }}" class="typeahead" placeholder="Entrez un titre d'anime…" />
+  <input type="text" data-category="{{ category }}" class="typeahead search-input form-control" placeholder="Entrez un titre d'anime…" />
 </form>
 {% endif %}
 

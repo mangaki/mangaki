@@ -2,7 +2,7 @@
 
 {% load i18n %}
 {% load account socialaccount %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 
 {% block head_title %}{% trans "Signup" %}{% endblock %}
 {% block anonymous_rating_banner %} {% endblock %}
@@ -29,14 +29,14 @@
 
 <div class="row">
   {% if ratings %}
-  <div class="col-xs-12">
+  <div class="col-12">
     <div class="alert alert-info" role="alert">
       {% trans "You already rated a few works. They will be imported to your profile if you check the box <strong>Import my ratings</strong> below!" %}
     </div>
   </div>
   {% endif %}
   <form 
-      class="col-xs-12 col-sm-6 {% if not ratings %}col-sm-offset-3{% endif %}"
+      class="col-12 col-sm-6 {% if not ratings %}offset-sm-3{% endif %}"
       id="signup_form"
       method="post" action="{% url 'account_signup' %}">
     {% csrf_token %}
@@ -70,7 +70,7 @@
     {% endbuttons %}
   </form>
   {% if ratings %}
-  <div class="col-xs-12 col-sm-6">
+  <div class="col-12 col-sm-6">
     <h3 class="text-center" id="my-ratings">{% trans "My works" %}</h3>
     {% for category, works in ratings %}
       <h4>{{ category.name }}</h4>
