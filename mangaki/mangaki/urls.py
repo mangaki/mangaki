@@ -54,7 +54,6 @@ urlpatterns = [
     url(r'^faq/$', views.faq_index, name='faq'),
     url(r'^legal/$', views.legal_mentions, name='legal'),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}, name='cgu'),
-    url(r'^events/$', views.events, name='events'),
 
     url(r'^fix/$', views.fix_index, name='fix-index'),
     url(r'^fix/suggestion/$', views.fix_index, name='fix-index'),
