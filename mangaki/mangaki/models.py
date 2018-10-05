@@ -12,7 +12,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models, transaction
 from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
 from django.db.models.functions import Cast
@@ -130,7 +130,7 @@ class Category(models.Model):
 
 
 class Work(models.Model):
-    redirect = models.ForeignKey('Work', blank=True, null=True)
+    redirect = models.ForeignKey('Work', on_delete=models.SET_NULL, blank=True, null=True)
     title = models.CharField(max_length=255)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
     ext_poster = models.CharField(max_length=128, db_index=True)
@@ -224,14 +224,14 @@ class Work(models.Model):
 
 
 class WorkTitle(models.Model):
-    work = models.ForeignKey('Work')
+    work = models.ForeignKey('Work', on_delete=models.CASCADE)
     # 255 should be safe, we have seen titles of 187 characters in Japanese.
     # So we could expect longer titles in English.
     title = models.CharField(max_length=255, blank=True, db_index=True)
     title_search = SearchVectorField('title')
-    language = models.ForeignKey('Language',
+    language = models.ForeignKey('Language', on_delete=models.SET_NULL,
                                  null=True)
-    ext_language = models.ForeignKey('ExtLanguage',
+    ext_language = models.ForeignKey('ExtLanguage', on_delete=models.SET_NULL,
                                      null=True)
     type = models.CharField(max_length=9, choices=(
                             ('main', 'principal'),
@@ -271,7 +271,7 @@ class ExtLanguage(models.Model):
         max_length=8,
         db_index=True
     )
-    lang = models.ForeignKey('Language')
+    lang = models.ForeignKey('Language', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('ext_lang', 'source')
@@ -349,8 +349,8 @@ class Tag(models.Model):
 
 
 class TaggedWork(models.Model):
-    work = models.ForeignKey('Work')
-    tag = models.ForeignKey('Tag')
+    work = models.ForeignKey('Work', on_delete=models.CASCADE)
+    tag = models.ForeignKey('Tag', on_delete=models.CASCADE)
     weight = models.IntegerField(default=0)
 
     class Meta:
@@ -583,12 +583,12 @@ def get_field_changeset(works):
 
 
 class WorkCluster(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     works = models.ManyToManyField(Work)
     reported_on = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=11, choices=CLUSTER_CHOICES, default='unprocessed')
     checker = models.ForeignKey(User, related_name='reported_clusters', on_delete=models.CASCADE, blank=True, null=True)
-    resulting_work = models.ForeignKey(Work, related_name='clusters', blank=True, null=True)
+    resulting_work = models.ForeignKey(Work, on_delete=models.SET_NULL, related_name='clusters', blank=True, null=True)
     merged_on = models.DateTimeField(blank=True, null=True)
     origin = models.ForeignKey(Suggestion, related_name='origin_suggestion', on_delete=models.CASCADE, blank=True, null=True)
 
@@ -664,23 +664,6 @@ class Ranking(models.Model):
     score = models.FloatField()
     nb_ratings = models.PositiveIntegerField()
     nb_stars = models.PositiveIntegerField()
-
-
-class ColdStartRating(models.Model):
-    user = models.ForeignKey(User, related_name='cold_start_rating')
-    work = models.ForeignKey(Work)
-    choice = models.CharField(max_length=8, choices=(
-        ('like', 'J\'aime'),
-        ('dislike', 'Je n\'aime pas'),
-        ('dontknow', 'Je ne connais pas')
-    ))
-    date = models.DateField(auto_now=True)
-
-    class Meta:
-        unique_together = ('user', 'work')
-
-    def __str__(self):
-        return '%s %s %s' % (self.user, self.choice, self.work)
 
 
 class FAQTheme(models.Model):

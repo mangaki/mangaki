@@ -1,5 +1,5 @@
-Django==1.11.*
-django-allauth==0.28
+Django==2.0.8
+django-allauth==0.38.0
 markdown<3  # https://github.com/encode/django-rest-framework/issues/6203
 django-bootstrap4
 psycopg2-binary
@@ -8,12 +8,12 @@ scipy>=1
 pandas
 beautifulsoup4
 natsort
-django-js-reverse
+django-js-reverse==0.8.2
 responses==0.5.1
 jinja2
 lxml==3.6.*
 raven==6.1.*
-djangorestframework==3.6.*
+djangorestframework==3.8.2
 coreapi==2.3.*
 celery>=4.2
 django-celery-beat==1.1.*

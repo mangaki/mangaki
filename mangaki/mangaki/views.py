@@ -38,7 +38,7 @@ from natsort import natsorted
 from mangaki.choices import TOP_CATEGORY_CHOICES, SORT_MODE_CHOICES
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
-from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
+from mangaki.models import (Artist, Category, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
 from mangaki.utils.mal import client
 from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
@@ -393,7 +393,7 @@ def get_profile(request,
         user = get_object_or_404(User.objects.select_related('profile'), username=username)
     else:
         user = request.user
-        is_anonymous = not request.user.is_authenticated()
+        is_anonymous = not request.user.is_authenticated
 
     if is_anonymous or username is None:
         is_shared = True
@@ -437,7 +437,7 @@ def get_profile(request,
 
 def get_profile_preferences(request,
                             username: str = None):
-    if username is None and request.user.is_authenticated():
+    if username is None and request.user.is_authenticated:
         return redirect('profile-preferences', request.user.username, permanent=True)
 
     user, ctx = get_profile(request, username)
@@ -459,7 +459,7 @@ def get_profile_works(request,
                       username: str = None,
                       category: str = None,
                       status: str = None):
-    if username is None and request.user.is_authenticated():
+    if username is None and request.user.is_authenticated:
         return redirect('profile-works', request.user.username, category or 'anime', status or 'seen', permanent=True)
 
     user, ctx = get_profile(request, username)

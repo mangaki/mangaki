@@ -4,7 +4,7 @@ import os
 import shutil
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 
 from mangaki.models import Category, Work, Rating
