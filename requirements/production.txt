@@ -1,4 +1,4 @@
-Django==1.11.*
+Django==1.11.15
 django-allauth==0.28
 markdown<3  # https://github.com/encode/django-rest-framework/issues/6203
 django-bootstrap4
@@ -10,7 +10,6 @@ beautifulsoup4
 natsort
 django-js-reverse
 responses==0.5.1
-jinja2
 lxml==3.6.*
 raven==6.1.*
 djangorestframework==3.6.*

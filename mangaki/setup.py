@@ -10,7 +10,7 @@ setup(
     url='https://mangaki.fr',
     python_requires='>=3.4',
     install_requires=[
-        'Django>=1.11,<2',
+        'Django==1.11.15',
         'django-allauth>=0.28',
         'Markdown>=2.6,<3',
         'django-bootstrap4',
