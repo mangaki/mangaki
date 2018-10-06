@@ -987,13 +987,13 @@ def update_evidence(request):
             evidence.save()
 
     next_url = request.GET.get('next')
-    if next_url and is_safe_url(url=next_url, host=request.get_host()):
+    if next_url and is_safe_url(url=next_url, allowed_hosts=request.get_host()):
         return redirect(next_url)
     return redirect('fix-index')
 
 
 def generic_error_view(error, error_code):
-    def error_view(request):
+    def error_view(request, exception=None):
         try:
             trope = Trope.objects.order_by('?').first()
         except DatabaseError:
