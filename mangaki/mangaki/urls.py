@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
+from django.urls import path
 from django.contrib import admin
 from django_js_reverse.views import urls_js
 
@@ -76,5 +77,5 @@ if DEBUG:  # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-
     import debug_toolbar
 
     urlpatterns += [
-                       url(r'^__debug__/', include(debug_toolbar.urls)),
+                       path('__debug__/', include(debug_toolbar.urls)),
                    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

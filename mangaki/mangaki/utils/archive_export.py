@@ -14,7 +14,6 @@ from mangaki.models import (
     WorkCluster,
     Recommendation,
     Pairing,
-    ColdStartRating,
     UserBackgroundTask,
     UserArchive
 )
@@ -54,7 +53,6 @@ target_models = {
     WorkCluster: export_workclusters,
     Recommendation: ['target_user__username', 'work__title'],
     Pairing: ['date', 'artist__name', 'work__title', 'is_checked'],
-    ColdStartRating: ['work__title', 'choice', 'date'],
     UserBackgroundTask: ['created_on', 'task_id', 'tag'],
     UserArchive: export_archive_records
 }
@@ -70,7 +68,6 @@ target_filenames = {
     WorkCluster: 'work_clusters.csv',
     Recommendation: 'recommendations.csv',
     Pairing: 'pairings.csv',
-    ColdStartRating: 'cold_start_ratings.csv',
     UserBackgroundTask: 'user_background_tasks.csv',
     UserArchive: 'user_archives.csv'
 }
