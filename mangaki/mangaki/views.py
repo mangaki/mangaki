@@ -225,18 +225,18 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ratings = current_user_ratings(self.request, context['object_list'])
+        work_list = list(context['object_list'])
+        ratings = current_user_ratings(self.request, work_list)
 
-        for work in context['object_list']:
+        for work in work_list:
             work.rating = ratings.get(work.id, None)
 
         context['object_list'] = [
             {
                 'work': work
             }
-            for work in context['object_list']
+            for work in work_list
         ]
-
         return context
 
 
@@ -488,6 +488,13 @@ def get_profile_works(request,
                                                       ratings,
                                                       user)
     rating_list = natsorted(ratings, key=compare_function)
+
+    work_rating_list = []
+    for rating in rating_list:
+        work = rating.work
+        work.rating = rating.choice
+        work_rating_list.append({'work': work})
+
     if category == 'recommendation':
         received_recommendation_list, sent_recommendation_list = get_profile_recommendations(
             ctx['meta']['is_anonymous'],
@@ -502,15 +509,15 @@ def get_profile_works(request,
     else:
         reco_count = len(received_recommendation_list)
 
-    paginator = Paginator(rating_list, RATINGS_PER_PAGE)
+    paginator = Paginator(work_rating_list, RATINGS_PER_PAGE)
     page = request.GET.get('page')
 
     try:
-        ratings = paginator.page(page)
+        paginated_work_rating_list = paginator.page(page)
     except PageNotAnInteger:
-        ratings = paginator.page(1)
+        paginated_work_rating_list = paginator.page(1)
     except EmptyPage:
-        ratings = paginator.page(paginator.num_pages)
+        paginated_work_rating_list = paginator.page(paginator.num_pages)
 
     new_ctx = {
         'meta': {
@@ -529,7 +536,7 @@ def get_profile_works(request,
             'reco_count': reco_count,
             'username': user.username
         },
-        'ratings': ratings,
+        'work_rating_list': paginated_work_rating_list,
         'recommendations': {
             'received': received_recommendation_list,
             'sent': sent_recommendation_list

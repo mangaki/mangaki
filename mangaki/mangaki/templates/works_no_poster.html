@@ -1,7 +1,7 @@
 {% load static %}
 {% static 'img/ratings.svg' as rating_svg_link %}
-{% for object in works %}
-  {% with work=object.work rating=object.choice %}
+{% for work_meta in works %}
+  {% with work=work_meta.work rating=work_meta.work.rating %}
     <div class="flatlist">
         <a href="{% url 'work-detail' category work.id %}">{{ work.title }}</a>
         <div class="ratings ratings_small {% if disabled %} ratings_disabled{% endif %}" style="float: right">
