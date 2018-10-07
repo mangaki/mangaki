@@ -8,7 +8,7 @@ typing
 # Linting
 git-lint
 pylint
-pep8
+pycodestyle
 yamllint
 html-linter
 # Testing
