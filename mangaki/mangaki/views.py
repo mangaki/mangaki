@@ -566,15 +566,6 @@ def about(request, lang):
     return render(request, 'about.html')
 
 
-def events(request):
-    context = {
-        'wakanim': Partner.objects.get(pk=12),
-        'config': VANILLA_UI_CONFIG_FOR_RATINGS
-    }
-    return render(
-        request, 'events.html', context)
-
-
 def top(request, category_slug):
     categories = dict(TOP_CATEGORY_CHOICES)
     if category_slug not in categories:
