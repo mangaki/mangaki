@@ -42,6 +42,12 @@ TOP_CATEGORY_CHOICES = (
     ("composers", _("Composers"))
 )
 
+WORK_CATEGORY_CHOICES = (
+    ('anime', _('Anime')),
+    ('manga', _('Manga')),
+    ('album', _('Album')),
+)
+
 CLUSTER_CHOICES = (
     ('unprocessed', _("Unprocessed")),
     ('accepted', _("Accepted")),

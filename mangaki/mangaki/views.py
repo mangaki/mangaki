@@ -35,7 +35,8 @@ from django.views.generic.list import ListView
 from markdown import markdown
 from natsort import natsorted
 
-from mangaki.choices import TOP_CATEGORY_CHOICES, SORT_MODE_CHOICES
+from mangaki.choices import (TOP_CATEGORY_CHOICES, WORK_CATEGORY_CHOICES,
+                             SORT_MODE_CHOICES)
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
 from mangaki.models import (Artist, Category, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
@@ -666,10 +667,13 @@ def get_reco_algo_list(request, algo_name, category):
     reco_list = []
     data = get_reco_algo(request, algo_name, category)
     works = data['works']
+    categories = dict(WORK_CATEGORY_CHOICES)
     for work_id in data['work_ids']:
         work = works[work_id]
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
-                          'category': work.category.slug})
+        reco_list.append({'id': work.id, 'title': work.title,
+                          'poster': work.ext_poster, 'synopsis': work.synopsis,
+                          'category_slug': work.category.slug,
+                          'category': str(categories[work.category.slug])})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 
