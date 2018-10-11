@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('mangaki', '0094_auto_20180508_0941'),
+        ('mangaki', '0095_auto_20180826_1148'),
     ]
 
     operations = [
@@ -25,19 +25,6 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('work', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mangaki.Work')),
             ],
-        ),
-        migrations.AlterModelOptions(
-            name='faqentry',
-            options={'verbose_name_plural': 'FAQ entries'},
-        ),
-        migrations.AlterModelOptions(
-            name='faqtheme',
-            options={'verbose_name_plural': 'FAQ themes'},
-        ),
-        migrations.AlterField(
-            model_name='top',
-            name='category',
-            field=models.CharField(choices=[('directors', 'Directors'), ('authors', 'Authors'), ('composers', 'Composers')], max_length=10, unique_for_date='date'),
         ),
         migrations.AlterUniqueTogether(
             name='externalrating',
