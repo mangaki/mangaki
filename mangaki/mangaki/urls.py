@@ -49,7 +49,7 @@ urlpatterns = [
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing, name='add-pairing'),
     url(r'^vote/(?P<work_id>\d+)$', views.rate_work, name='vote'),
-    url(r'^research/$', views.update_research, name='research'),
+    url(r'^settings/$', views.update_settings, name='settings'),
     url(r'^admin/', admin.site.urls),
     url(r'^about/(?P<lang>[\w-]*)$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),

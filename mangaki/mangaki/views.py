@@ -50,7 +50,7 @@ from mangaki.utils.profile import (
 )
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
-from mangaki.utils.tokens import compute_token, KYOTO_SALT
+from mangaki.utils.tokens import compute_token, NEWS_SALT
 from mangaki.utils.recommendations import get_reco_algo
 from irl.models import Partner
 
@@ -733,13 +733,8 @@ def get_reco(request):
                   })
 
 
-def update_research(request):
+def update_settings(request):
     is_ok = None
-    if request.user.is_authenticated and request.method == 'POST' and 'research_ok' in request.POST:  # Toggle on one's profile
-        username = request.user.username
-        is_ok = request.POST.get('research_ok') == 'true'
-        Profile.objects.filter(user__username=username).update(research_ok=is_ok)
-        return HttpResponse()
     if request.method == 'POST':  # Confirmed from mail link
         is_ok = 'yes' in request.POST
         username = request.POST.get('username')
@@ -747,23 +742,24 @@ def update_research(request):
     elif request.method == 'GET':  # Clicked on mail link
         username = request.GET.get('username')
         token = request.GET.get('token')
-    expected_token = compute_token(KYOTO_SALT, username)
-    if not constant_time_compare(token, expected_token):  # If the token is invalid
-        # Add an error message
-        messages.error(request, 'Vous n\'êtes pas autorisé à effectuer cette action.')
-        return render(request, 'research.html', status=401)  # Unauthorized
+    expected_token = compute_token(NEWS_SALT, username)
+    if not constant_time_compare(token, expected_token):
+        # If the token is invalid, add an error message
+        messages.error(request,
+            'Vous n\'êtes pas autorisé à effectuer cette action.')
+        return render(request, 'settings.html', status=401)  # Unauthorized
     elif is_ok is not None:
         message = 'Votre profil a bien été mis à jour. '
         if is_ok:
-            message += 'Merci. Vos données seront présentes dans le data challenge de Kyoto.'
+            message += 'Profitez bien de Mangaki !'
         else:
-            message += 'Vos données ne feront pas partie du data challenge de Kyoto.'
-        Profile.objects.filter(user__username=username).update(research_ok=is_ok)
+            message += 'Vous ne recevrez plus de mails de notre part.'
+        Profile.objects.filter(
+            user__username=username).update(newsletter_ok=is_ok)
         messages.success(request, message)
-        return render(request, 'research.html')
-    return render(request, 'research.html', {'username': username, 'token': token})
-
-
+        return render(request, 'settings.html')
+    return render(request, 'settings.html', {'username': username,
+                                             'token': token})
 
 
 def add_pairing(request, artist_id, work_id):
