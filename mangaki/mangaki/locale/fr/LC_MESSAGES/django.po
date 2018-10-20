@@ -559,7 +559,7 @@ msgstr "Demander de l'aide à un administrateur"
 msgid "You asked an admin for help"
 msgstr "Vous avez demandé l'aide d'un administrateur"
 
-msgid "Reopen cette suggestion"
+msgid "Reopen this suggestion"
 msgstr "Rouvrez cette suggestion"
 
 msgid "This work belongs to this cluster:"
@@ -604,7 +604,7 @@ msgstr "Marquer les œuvres restantes comme SFW"
 msgid "and continue"
 msgstr "et continuer"
 
-msgid "Attention!"
+msgid "Attention !"
 msgstr "Attention !"
 
 msgid ""
@@ -634,7 +634,7 @@ msgstr ""
 msgid "<a href=\"%(go_back_url)s\">Click here</a> to go back."
 msgstr "<a href=\"%(go_back_url)s\">Cliquez ici</a> pour revenir en arrière."
 
-msgid "It's NSFW!"
+msgid "It's NSFW ! "
 msgstr "C'est NSFW !"
 
 msgid "Reported"
@@ -643,7 +643,7 @@ msgstr "Signalé"
 msgid "NSFW,SFW"
 msgstr "NSFW,SFW"
 
-msgid "Thanks for voting. An admin will help asap!"
+msgid "Thanks for voting. An admin will help asap !"
 msgstr "Merci d'avoir voté. Un admin vous aidera dès que possible !"
 
 msgid ""
@@ -659,7 +659,7 @@ msgstr "Actualiser et voir plus"
 msgid "Mangaki, anime and manga recommendation"
 msgstr "Mangaki, la recommandation d'anime et manga."
 
-msgid "Rate your favorite series and discover new ones!"
+msgid "Rate your favorite series and discover new ones !"
 msgstr "Notez vos séries favorites et découvrez-en d'autres !"
 
 msgid "I prefer anime"
