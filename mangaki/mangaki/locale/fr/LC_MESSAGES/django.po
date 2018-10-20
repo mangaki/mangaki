@@ -559,7 +559,7 @@ msgstr "Demander de l'aide à un administrateur"
 msgid "You asked an admin for help"
 msgstr "Vous avez demandé l'aide d'un administrateur"
 
-msgid "Reopen cette suggestion"
+msgid "Reopen this suggestion"
 msgstr "Rouvrez cette suggestion"
 
 msgid "This work belongs to this cluster:"
