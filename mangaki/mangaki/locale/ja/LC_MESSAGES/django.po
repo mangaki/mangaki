@@ -872,7 +872,7 @@ msgid "Delete all received recommendations"
 msgstr "受信したすべての勧告を削除します。"
 
 msgid "Ask Mangaki to sort!"
-msgstr "ソートするMangakiを依頼！"
+msgstr "Mangakiにソートを依頼！"
 
 msgid "seen by"
 msgstr "で見られる"
