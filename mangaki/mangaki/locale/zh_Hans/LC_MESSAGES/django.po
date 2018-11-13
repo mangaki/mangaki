@@ -413,6 +413,9 @@ msgstr "建议"
 msgid "Top 20"
 msgstr "排行前20"
 
+msgid "Contribute"
+msgstr "参与贡献"
+
 msgid "Suggestions"
 msgstr "建议"
 
