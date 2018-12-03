@@ -101,13 +101,13 @@ msgid "Composers"
 msgstr "作曲"
 
 msgid "Unprocessed"
-msgstr "生肉"
+msgstr "尚未处理"
 
 msgid "Accepted"
-msgstr "接受"
+msgstr "已接受"
 
 msgid "Rejected"
-msgstr "拒绝"
+msgstr "已拒绝"
 
 msgid "Unknown"
 msgstr "未知"
@@ -146,16 +146,16 @@ msgid "Wrong poster"
 msgstr "错误的海报"
 
 msgid "Synopsis contains mistakes"
-msgstr "简介有问题"
+msgstr "简介包含错误"
 
 msgid "Wrong author"
-msgstr "错误的作者"
+msgstr "作者有误"
 
 msgid "Wrong composer"
-msgstr "错误的作曲"
+msgstr "作曲有误"
 
 msgid "This is a duplicate"
-msgstr "本条目为重复出现"
+msgstr "本条目已存在"
 
 msgid "Work is Not Safe for Work"
 msgstr "本作品不适合在公共场合观看(NSFW)"
@@ -312,7 +312,7 @@ msgstr "如果您有重置密码的任何问题，请联系我们。"
 msgid ""
 "We have sent you an e-mail. Please contact us if you do not receive it "
 "within a few minutes."
-msgstr "我们已经向您发出一封电子邮件。如果您没有在几分钟之内收到它请联系我们。"
+msgstr "我们已经向您发出一封电子邮件。如果您没有在几分钟之内收到请联系我们。"
 
 msgid "Change Password"
 msgstr "更改密码"
@@ -324,26 +324,26 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
 "reset</a>."
-msgstr "密码重置链接是无效的，可能是因为它已经被使用。请申请一个<a href=\"%(passwd_reset_url)s\">新的密码重置请求</A>。"
+msgstr "密码重置链接是无效的，可能是因为它已经被使用。请发送一个<a href=\"%(passwd_reset_url)s\">新的密码重置请求</A>。"
 
 msgid "change password"
 msgstr "更改密码"
 
 msgid "Your password is now changed."
-msgstr "您的密码现已更改。"
+msgstr "您的密码已更改。"
 
 msgid "Signup"
 msgstr "注册"
 
 msgid "Join Mangaki"
-msgstr "加入Mangaki"
+msgstr "加入 Mangaki"
 
 msgid "And contribute to the creation of a better world."
 msgstr "和我们一起创造一个更美好的世界。"
 
 msgid ""
 "If you have already an account, you can <a href=\"%(login_url)s\">login</a>."
-msgstr "如果您已经拥有一个帐户，您可以<a href=\"%(login_url)s\">登录</A>。"
+msgstr "如果您已经注册过，您可以<a href=\"%(login_url)s\">登录</A>。"
 
 msgid ""
 "You already rated a few works. They will be imported to your profile if you "
@@ -351,10 +351,10 @@ msgid ""
 msgstr "您已经对几部作品做出评分。如果您需要将它们导入您的个人资料，请勾选下方的<strong>导入我的评分</ STRONG>选项！"
 
 msgid "Subscribe to Mangaki's newsletter"
-msgstr "订阅Mangaki的资讯"
+msgstr "订阅 Mangaki 的资讯"
 
 msgid "some waifus/husbandos in your mails?"
-msgstr "在你的邮件一些waifus / husbandos？"
+msgstr "在你的邮件一些 waifus/husbandos？"
 
 msgid "My data can be used anonymously for research"
 msgstr "我的数据可以被匿名用于科研"
@@ -363,7 +363,7 @@ msgid "Import my ratings"
 msgstr "导入我的评分"
 
 msgid "Sign In &raquo;"
-msgstr "登录资讯＆raquo;"
+msgstr "登录＆raquo;"
 
 msgid "My works"
 msgstr "我的作品"
@@ -372,7 +372,7 @@ msgid ""
 "By subscribing, you accept that your ratings may be saved by Mangaki to keep"
 " your profile up-to-date, recommend anime to you, and improve other users' "
 "recommendations."
-msgstr "订阅代表您接受Mangaki可能会在您的个人资料更新保存您的评分，并以此向您推荐新的动漫，及帮助改善向其他用户的推荐。"
+msgstr "订阅代表您接受 Mangaki 可能会在您的个人资料更新保存您的评分，并以此向您推荐新的动漫，及帮助改善向其他用户的推荐。"
 
 msgid "How does it work?"
 msgstr "网站是如何运作的？"
@@ -387,16 +387,16 @@ msgid "Yes, I'm sure"
 msgstr "是，我确定"
 
 msgid "No, take me back"
-msgstr "不，快拉我回来>.<"
+msgstr "不，快把我拉回来>.<"
 
 msgid "Mangaki is an anime & manga recommendation website"
-msgstr "Mangaki是一个集动画和漫画推荐于一体的网站"
+msgstr "Mangaki 是一个集动画和漫画推荐于一体的网站"
 
 msgid "Open the menu"
 msgstr "打开菜单"
 
 msgid "What is Mangaki?"
-msgstr "什么是Mangaki？"
+msgstr "什么是 Mangaki？"
 
 msgid "Anime"
 msgstr "动画"
@@ -412,6 +412,9 @@ msgstr "建议"
 
 msgid "Top 20"
 msgstr "排行前20"
+
+msgid "Contribute"
+msgstr "参与贡献"
 
 msgid "Suggestions"
 msgstr "建议"
@@ -430,7 +433,7 @@ msgid ""
 "them</a>, don't forget to <a href=\"%(signup_url)s\">subscribe</a> to save "
 "them!"
 msgstr ""
-"您的评价几个作品匿名，您可以<a href=\"%(profile)s\">看到他们</A>，不要忘了<a "
+"您已匿名评价了几项作品，您可以<a href=\"%(profile)s\">看到他们</A>，不要忘了<a "
 "href=\"%(signup_url)s\">订阅</A>来拯救他们！"
 
 msgid "Mangaki project"
@@ -464,10 +467,10 @@ msgid "Page"
 msgstr "页"
 
 msgid "Go to the NSFW grid"
-msgstr "转至NSFW电网"
+msgstr "转至 NSFW 网格"
 
 msgid "This problem is solved,This problem is ongoing"
-msgstr "这个问题已解决，这个问题仍在处理中"
+msgstr "此问题已解决，此问题仍在处理中"
 
 msgid "Problem:"
 msgstr "问题："
@@ -476,23 +479,25 @@ msgid "Reported by:"
 msgstr "报告人："
 
 msgid "Target:"
-msgstr "目标："
+msgstr "对象："
 
 msgid ""
 "You <strong><span class=\"text-success\">approved <span class=\"glyphicon "
 "glyphicon-thumbs-up\" aria-hidden=\"true\"></span></span></strong> this "
 "suggestion."
 msgstr ""
-"您<strong>的<span class = “TEXT-成功”>批准的<span class = “glyphicon "
-"glyphicon，竖起大拇指” ARIA隐藏= “真”> </ SPAN> </ SPAN> </ STRONG>这个建议。"
+"您<strong><span class=\"text-success\">通过了<span class=\"glyphicon "
+"glyphicon-thumbs-up\" aria-hidden=\"true\"></span></span></strong>这条"
+"建议。"
 
 msgid ""
 "You <strong><span class=\"text-danger\">rejected <span class=\"glyphicon "
 "glyphicon-thumbs-down\" aria-hidden=\"true\"></span></span></strong> this "
 "suggestion."
 msgstr ""
-"您<strong>的<span class = “TEXT-危险”>拒绝的<span class = “glyphicon "
-"glyphicon，拇指向下” ARIA隐藏= “真”> </ SPAN> </ SPAN> </ STRONG>这个建议。"
+"您<strong><span class=\"text-danger\">拒绝了<span class=\"glyphicon "
+"glyphicon-thumbs-down\" aria-hidden=\"true\"></span></span></strong>这条"
+"建议。"
 
 msgid "You asked <strong>an admin for help</strong>."
 msgstr "您已向<strong>管理员求助</ strong>。"
@@ -522,43 +527,43 @@ msgid "Reopen cette suggestion"
 msgstr "重新打开这条建议"
 
 msgid "This work belongs to this cluster:"
-msgstr "这项工作属于这一组："
+msgstr "此作平属于以下群组："
 
 msgid "This cluster is"
-msgstr "这个星团"
+msgstr "这个群组"
 
 msgid "by"
 msgstr "通过"
 
 msgid "This cluster was merged:"
-msgstr "这个集群被合并："
+msgstr "此群组已合并："
 
 msgid "Previous"
-msgstr "以前"
+msgstr "上一页"
 
 msgid "Back"
-msgstr "背部"
+msgstr "返回"
 
 msgid "Next"
-msgstr "下一个"
+msgstr "下一页"
 
 msgid "Copied link!"
-msgstr "复制链接！"
+msgstr "链接已复制！"
 
 msgid "Link was not copied"
-msgstr "链接不复制"
+msgstr "链接未复制"
 
 msgid "NSFW grid"
-msgstr "NSFW电网"
+msgstr "NSFW 网格"
 
 msgid "Back to suggestions"
-msgstr "返回到推荐"
+msgstr "返回推荐页面"
 
 msgid "works in the grid"
-msgstr "工作在网格"
+msgstr "网格中的作品"
 
 msgid "Mark remaining works as SFW"
-msgstr "将剩余作品标记为SFW"
+msgstr "将剩余作品标记为 SFW"
 
 msgid "and continue"
 msgstr "并继续"
@@ -569,7 +574,7 @@ msgstr "注意！"
 msgid ""
 "You are not logged in so by default you can't browse NSFW works,In your "
 "profile you stated that you didn't want to browse NSFW works"
-msgstr "您还没有登录，所以在默认情况下您不能浏览NSFW作品，在您的个人资料，你说，你不想浏览NSFW作品"
+msgstr "您还没有登录，所以在默认情况下您不能浏览 NSFW 作品，在您的个人资料，您表示不想浏览 NSFW 作品"
 
 msgid "Display anyway?"
 msgstr "仍然显示？"
@@ -584,13 +589,13 @@ msgid "Remainder:"
 msgstr "提醒："
 
 msgid "You agreed to see NSFW works on this grid temporarily."
-msgstr "你答应见NSFW工作在该网格暂时的。"
+msgstr "您同意暂时浏览在此网格中的 NSFW 作品。"
 
 msgid "<a href=\"%(go_back_url)s\">Click here</a> to go back."
-msgstr "<a href=\"%(go_back_url)s\">点击此处</a>回去。"
+msgstr "<a href=\"%(go_back_url)s\">点击此处</a>返回。"
 
 msgid "It's NSFW!"
-msgstr "这是NSFW！"
+msgstr "这是 NSFW 作品！"
 
 msgid "Reported"
 msgstr "报告已提交"
@@ -604,16 +609,16 @@ msgstr "感谢您的投票。管理员将尽快进行处理！"
 msgid ""
 "<strong>No result:</strong> either no work was reported as NSFW/SFW, or you "
 "gave your advice already."
-msgstr "<strong>否结果：</ STRONG>无论什么工作都报告为NSFW / SFW，或者你给你的建议了。"
+msgstr "<strong>无结果：</ STRONG>没有被报告为 NSFW/SFW 的作品，或者您已给出了您的建议。"
 
 msgid "Refresh and see more"
-msgstr "刷新和看到更多"
+msgstr "刷新浏览更多"
 
 msgid "Mangaki, anime and manga recommendation"
 msgstr "Mangaki，动画和漫画推荐"
 
 msgid "Rate your favorite series and discover new ones!"
-msgstr "给您喜爱的系列打分，同时发掘新天地！"
+msgstr "给您喜爱的系列打分，打开一片新天地！"
 
 msgid "I prefer anime"
 msgstr "我更喜欢动画"
@@ -625,7 +630,7 @@ msgid "Artists"
 msgstr "艺术家"
 
 msgid "Hint: You can press Enter to trigger the search"
-msgstr "提示：您可以按Enter键触发搜索"
+msgstr "提示：您可以按回车键开始搜索"
 
 msgid "Icons"
 msgstr "图标"
@@ -636,14 +641,14 @@ msgid ""
 "href=\"http://fontawesome.io\">fontawesome</a>. The SVG version comes from "
 "<a href=\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
 msgstr ""
-"// fontawesome：我们用于评级的图标由<a href=\"http://www.flaticon.com/authors/dave-"
-"gandy\">Dave Gandy</a>创作<A HREF =“HTTP创建。 IO“> fontawesome </A>。 SVG的版本来自<a "
+"// fontawesome：我们用于评级的图标来自于<a href=\"http://www.flaticon.com/authors/dave-"
+"gandy\"> Dave Gandy </a>为<A HREF =“HTTP创建。 IO“> fontawesome </A>进行的创作。SVG的版本来自<a "
 "href=\"http://www.flaticon.com/packs/font-awesome\"> flaticon </A>。"
 
 msgid ""
 "Here are some recommendations that you might like.<br /> Rate them and "
 "reload to get new ones."
-msgstr "下面是一些你可能会喜欢的建议。<br />评价他们，并重新加载以获取新的。"
+msgstr "下面是一些您可能会喜欢的推荐。<br />对它们进行打分，然后重新加载以获取新的推荐。"
 
 msgid "All"
 msgstr "所有"
@@ -685,7 +690,7 @@ msgid "Catalog number:"
 msgstr "目录编号："
 
 msgid "Find this album on VGMdb"
-msgstr "查找VGMdb这张专辑"
+msgstr "在 VGMdb 上查找这张专辑"
 
 msgid "Stats"
 msgstr "统计"
@@ -694,25 +699,25 @@ msgid "References"
 msgstr "参考"
 
 msgid "See on %(name)s"
-msgstr "查看％（名称）■"
+msgstr "在 %(name)s 上查看"
 
 msgid "Suggest an edit for this page"
-msgstr "建议此页面的编辑"
+msgstr "向此页面的编辑提出建议"
 
 msgid "Suggest this work to a user on Mangaki"
-msgstr "建议这项工作对Mangaki用户"
+msgstr "向一位 Mangaki 的用户推荐此作品"
 
 msgid "This user already knows this work"
-msgstr "此用户已经知道这个工作"
+msgstr "此用户已经知道本作品"
 
 msgid "Suggestion successfully sent!"
-msgstr "建议发送成功！"
+msgstr "推荐发送成功！"
 
 msgid "Suggest an edit for"
-msgstr "建议对编辑"
+msgstr "提供一条编辑建议"
 
 msgid "Thanks for improving Mangaki!"
-msgstr "感谢您对Mangaki的改进做出的贡献！"
+msgstr "感谢您对 Mangaki 的改进做出的贡献！"
 
 msgid "Please indicate what part of the work has a problem."
 msgstr "请说明作品的哪一部分有问题。"
@@ -727,7 +732,7 @@ msgid "Submit"
 msgstr "提交"
 
 msgid "Cheatsheet for key shortcuts"
-msgstr "快捷键的建议说明书"
+msgstr "快捷键使用指南"
 
 msgid "Moves"
 msgstr "移动"
@@ -737,15 +742,15 @@ msgid ""
 "class=\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what "
 "Mangaki recommends!"
 msgstr ""
-"为一些卡的下方，或者使用搜索栏。<br />然后点击<a class=\"alert-link\" "
-"href=\"%(reco_url)s\">建议</a>来看看Mangaki建议什么！"
+"给下方的一些卡片打分，或者使用搜索栏，<br />点击<a class=\"alert-link\" "
+"href=\"%(reco_url)s\">推荐</a>来看看 Mangaki 有什么推荐！"
 
 msgid ""
 "New on Mangaki? Start rating some works below! Then see your "
 "recommendations, and <a href=\"%(signup_url)s?next=%(next_url)s\">sign "
 "up</a> to keep your ratings."
 msgstr ""
-"刚加入Mangaki的萌新？先从给下面的一些作品打分开始吧！然后您会获取一些新的推荐，之后还想继续评分的要先<a "
+"刚加入 Mangaki 的萌新？先从给下面的一些作品打分开始吧！然后您会获取一些新的推荐，之后还想继续评分的要先<a "
 "href=\"%(signup_url)s?next=%(next_url)s\">注册</a>哦(๑•̀ㅂ•́)و✧。"
 
 msgid "Mosaic"
@@ -819,7 +824,7 @@ msgid "Received recommendations"
 msgstr "收到的推荐"
 
 msgid "was recommended to you by"
-msgstr "被推荐给你"
+msgstr "被推荐给您"
 
 msgid "(This list is empty.)"
 msgstr "（这个列表是空的。）"
@@ -828,7 +833,7 @@ msgid "Delete all received recommendations"
 msgstr "删除收到的所有推荐"
 
 msgid "Ask Mangaki to sort!"
-msgstr "让Mangaki为您排序！"
+msgstr "让 Mangaki 为您排序！"
 
 msgid "seen by"
 msgstr "观看过的用户有"
@@ -855,7 +860,7 @@ msgid "My recommendations"
 msgstr "我的推荐"
 
 msgid "%(username)s's profile is not disclosed publicly."
-msgstr "%(username)s的用户资料暂不对外公开。"
+msgstr "%(username)s 的用户资料暂不对外公开。"
 
 msgid "Account Connections"
 msgstr "账户联结"
@@ -908,7 +913,7 @@ msgid "You don't have access to this page."
 msgstr "您没有访问此页面的权限。"
 
 msgid "This request is incorrect. What did you try to do?"
-msgstr "这个请求是不正确。那你尝试做？"
+msgstr "这个请求是不正确的。您希望做什么？"
 
 msgid "Love"
 msgstr "大爱"
