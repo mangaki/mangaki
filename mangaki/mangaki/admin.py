@@ -175,6 +175,10 @@ class TaggedWorkInline(admin.TabularInline):
     model = TaggedWork
     fields = ('work', 'tag', 'weight')
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('work', 'tag')
+
 
 class StaffInline(admin.TabularInline):
     model = Staff
