@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # PostgreSQL
-createdb mangaki
-createuser django
+sudo -u postgres createdb mangaki
+sudo -u postgres createuser django
 export DB_PASSWORD=$(pwgen -s -c 30 1)
-psql -d mangaki -c \
+sudo -u postgres psql -d mangaki -c \
   "alter user django with password '$DB_PASSWORD'; \
   grant all privileges on database mangaki to django; \
   create extension if not exists pg_trgm; \
