@@ -11,7 +11,7 @@ responses==0.5.1
 markdown==3.0.1
 jinja2  # For tokens and newsletter
 # API
-lxml==3.6.*
+lxml==4.4.*
 beautifulsoup4
 coreapi==2.3.*
 # Tasks
