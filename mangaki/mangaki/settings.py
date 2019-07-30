@@ -69,7 +69,11 @@ INSTALLED_APPS = (
     'bootstrap4',
     'django_js_reverse',
     'rest_framework',
-    'django_celery_beat'
+    'django_celery_beat',
+    'massmailer',
+    'crispy_forms',
+    'django_bootstrap_breadcrumbs',
+    'reversion',
 )
 
 if config.has_section('sentry'):

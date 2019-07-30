@@ -18,6 +18,8 @@ urlpatterns = [
 
     url('i18n/', include('django.conf.urls.i18n')),
 
+    url('mailing/', include('massmailer.urls')),
+
     url(r'^jsreverse/$', urls_js, name='js_reverse'),
     url(r'^api/', include(apipatterns)),
     url(r'^$', views.index, name='home'),
