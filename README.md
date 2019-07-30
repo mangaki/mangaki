@@ -25,17 +25,36 @@ This README is also available [in French](README-fr.md).
 
 ## Install Mangaki
 
+### Database setup
+
+You need to have PostgreSQL >9.3 running on your machine. You also need an
+user that will have access to the database. The easiest way to achieve that is
+simply to create an account which has the same name as your username, which
+can create databases, and which is a superuser (for CREATE EXTENSION):
+
+    sudo -u postgres createuser --superuser --createdb $USER
+
+Then create the database, and add the required extensions:
+
+    createdb mangaki
+    psql -d mangaki -c \
+        "create extension if not exists pg_trgm; \
+         create extension if not exists unaccent"
+
 ### Running the web server
 
-Requires Python 3.4 up to 3.6, PostgreSQL 9.3 up to 10, Redis 4.0, and preferably `pwgen`.
+First, copy the configuration. The default parameters are already supposed to
+work, so you shouldn't need to change anything:
 
-    ./config.sh
+    cp mangaki/settings{.template,}.ini
+
+You can then install the Django environment:
+
     python3 -m venv venv
-    . venv/bin/activate
+    source venv/bin/activate
     pip install -r requirements/dev.txt
-    cd mangaki
-    ./manage.py migrate
-    ./manage.py runserver
+    ./mangaki/manage.py migrate
+    ./mangaki/manage.py runserver
 
 And voilà! You can access Mangaki at http://localhost:8000.
 
