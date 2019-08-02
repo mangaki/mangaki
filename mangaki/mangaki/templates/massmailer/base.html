@@ -1,16 +1,9 @@
 {% extends "base.html" %}
 {% load django_bootstrap_breadcrumbs %}
-{% load static %}
-
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'massmailer/vendor/bootstrap.min.css' %}"/>
-<link rel="stylesheet" href="{% static 'massmailer/vendor/font-awesome/css/font-awesome.min.css' %}"/>
-{% endblock %}
 
 {% block body %}
     {% block breadcrumbs %}
         {% clear_breadcrumbs %}
-        {% breadcrumb_for 'massmailer:dashboard' %}Mailing{% endbreadcrumb_for %}
     {% endblock %}
     {% render_breadcrumbs "django_bootstrap_breadcrumbs/bootstrap3.html" %}
 
@@ -18,7 +11,5 @@
 {% endblock %}
 
 {% block extrajs %}
-    <script src="{% static 'massmailer/vendor/jquery.min.js' %}"></script>
-    <script src="{% static 'massmailer/vendor/bootstrap.min.js' %}"></script>
     {% block extra_script %}{% endblock %}
 {% endblock %}
