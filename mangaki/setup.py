@@ -10,7 +10,7 @@ setup(
     url='https://mangaki.fr',
     python_requires='>=3.4',
     install_requires=[
-        'Django==2.1.2',
+        'Django==2.2.4',
         'django-allauth==0.38',
         'Markdown==3.0.1',
         'django-bootstrap4',
@@ -22,7 +22,7 @@ setup(
         'pandas',
         'typing>=3.6,<4',
         'raven>=6.1.0,<7',
-        'djangorestframework==3.8.2',
+        'djangorestframework==3.9.3',
         'coreapi>=2.3,<3',
         'celery>=4.2,<5',
         'redis>=2.10,<3',
