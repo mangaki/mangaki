@@ -109,10 +109,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': config.get('pgsql', 'DB_NAME', fallback='mangaki'),
-        'USER': config.get('pgsql', 'DB_USER', fallback='django'),
-        'PASSWORD': config.get('secrets', 'DB_PASSWORD'),
-        'HOST': config.get('pgsql', 'DB_HOST', fallback='127.0.0.1'),
-        'PORT': '5432',
+        'USER': config.get('pgsql', 'DB_USER', fallback=''),
+        'PASSWORD': config.get('secrets', 'DB_PASSWORD', fallback=''),
+        'HOST': config.get('pgsql', 'DB_HOST', fallback=''),
+        'PORT': config.get('pgsql', 'DB_PORT', fallback=''),
     }
 }
 
