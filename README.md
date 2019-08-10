@@ -1,6 +1,5 @@
 # Mangaki
 
-[![Dependency Status](https://dependencyci.com/github/mangaki/mangaki/badge)](https://dependencyci.com/github/mangaki/mangaki)
 [![CircleCI](https://circleci.com/gh/mangaki/mangaki.svg?style=svg)](https://circleci.com/gh/mangaki/mangaki)
 [![Codecov](https://img.shields.io/codecov/c/github/mangaki/mangaki.svg)](https://codecov.io/gh/mangaki/mangaki/)
 
