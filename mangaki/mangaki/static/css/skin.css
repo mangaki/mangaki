@@ -297,7 +297,7 @@ ul.checklist .list-icon {
 }
 
 /* Colors for the various ratings we use. */
-.rating_favorite .rating__button { background-color: #f8d549; }
+.rating_favorite .rating__button, .badge-favorite { background-color: #f8d549; }
 .rating_like .rating__button { background-color: #5cb85c; }
 .rating_neutral .rating__button { background-color: #f0ad4e; }
 .rating_dislike .rating__button { background-color: #d9534f; }

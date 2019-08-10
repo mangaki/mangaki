@@ -21,6 +21,28 @@
     </div>
     {% endif %}
 
+<div class="col-xs-12 text-center" style="padding: 10px 0">
+    <span class="badge badge-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
+    <span class="badge badge-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
+    <span class="badge badge-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
+    <span class="badge badge-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+    <span class="badge badge-primary"><span class="glyphicon glyphicon-eye-open"></span> {% spaceless %}
+      {% if category == 'manga' %}
+      Je veux lire
+      {% else %}
+      Je veux voir
+      {% endif %}
+    {% endspaceless %}</span>
+
+    <span class="badge badge-info"><span class="glyphicon glyphicon-eye-close"></span> {% spaceless %}
+      {% if category == 'manga' %}
+      Je ne veux pas lire
+      {% else %}
+      Je ne veux pas voir
+      {% endif %}
+    {% endspaceless %}</span>
+</div>
+
     {% if enable_kb_shortcuts %}
     <div class="row well shortcuts-explanations-container">
         <span>
