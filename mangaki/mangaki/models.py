@@ -184,7 +184,11 @@ class Work(models.Model):
     def poster_url(self):
         if self.int_poster:
             return self.int_poster.url
-        return self.ext_poster
+        int_path = '/static/img/posters/{}.jpg'.format(self.id)
+        if os.path.isfile(os.path.join('mangaki', 'mangaki', int_path)):
+            return int_path
+        else:
+            return self.ext_poster
 
     def safe_poster(self, user):
         if self.id is None:
