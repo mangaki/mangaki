@@ -182,13 +182,13 @@ class Work(models.Model):
 
     @property
     def poster_url(self):
-        if self.int_poster:
+        if self.int_poster:  # 1. Internal poster as FileField
             return self.int_poster.url
-        int_path = '/static/img/posters/{}.jpg'.format(self.id)
+        int_path = '/static/img/posters/{}.jpg'.format(self.id)  # 2. Retrieved
         if os.path.isfile(os.path.join('mangaki', 'mangaki', int_path)):
             return int_path
         else:
-            return self.ext_poster
+            return self.ext_poster  # 3. Otherwise, external link
 
     def safe_poster(self, user):
         if self.id is None:
