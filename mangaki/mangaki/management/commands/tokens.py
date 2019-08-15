@@ -29,7 +29,7 @@ class Command(BaseCommand):
                     '{} {}'.format(username, compute_token(salt, username))))
 
         else:
-            filename = os.path.join(settings.DATA_DIR, options['email_template'])
+            filename = options['email_template']
             with open(filename, 'r') as f:
                 newsletter = yaml.safe_load(f)
             message = Template(newsletter['body'])
@@ -39,15 +39,17 @@ class Command(BaseCommand):
                 queryset = queryset.filter(username__in=usernames)
 
             nb_mails = queryset.count()
+            self.stdout.write('Sending {:d} mails'.format(nb_mails))
             for rank, user in enumerate(queryset, start=1):
                 if user.email:
                     token = compute_token(salt, user.username)
-                    ok = send_mail(
-                        newsletter['subject'],
-                        message.render(username=user.username, token=token),
-                        newsletter['from'], [user.email], fail_silently=False)
-                    prefix = '[{} / {}]'.format(rank, nb_mails)
-                    if ok:
-                        self.stdout.write(self.style.SUCCESS('{}: {} OK'.format(prefix, user.username)))
-                    else:
-                        self.stdout.write(self.style.ERROR('{}: {} NOK'.format(prefix, user.username)))
+                    if input('OK? {:s} '.format(user.username)) == 'y':
+                        ok = send_mail(
+                            newsletter['subject'],
+                            message.render(username=user.username, token=token),
+                            newsletter['from'], [user.email], fail_silently=False)
+                        prefix = '[{} / {}]'.format(rank, nb_mails)
+                        if ok:
+                            self.stdout.write(self.style.SUCCESS('{}: {} OK'.format(prefix, user.username)))
+                        else:
+                            self.stdout.write(self.style.ERROR('{}: {} NOK'.format(prefix, user.username)))

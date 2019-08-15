@@ -13,7 +13,6 @@ from mangaki.models import (
     Suggestion,
     Pairing,
     Reference,
-    ColdStartRating,
     WorkTitle,
     Work
 )
@@ -170,7 +169,7 @@ class WorkClusterMergeHandler:
         Trope.objects.filter(origin_id__in=work_ids).update(origin_id=self.target_work.id)
         TaggedWork.objects.filter(work_id__in=work_ids).exclude(tag_id__in=existing_tag_ids).update(
             work_id=self.target_work.id)
-        for model in [WorkTitle, Suggestion, Recommendation, Pairing, ColdStartRating]:
+        for model in [WorkTitle, Suggestion, Recommendation, Pairing]:
             model.objects.filter(work_id__in=work_ids).update(work_id=self.target_work.id)
 
         Work.objects.filter(id__in=work_ids).exclude(id=self.target_work.id).update(redirect=self.target_work)

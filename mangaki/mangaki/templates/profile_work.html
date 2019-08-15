@@ -1,3 +1,4 @@
+{% load bootstrap4 %}
 {% load i18n %}
 
 <div class="col-md-12">
@@ -9,9 +10,10 @@
         </p>
     {% endif %}
     {% if meta.flat %}
-        {% include "works_no_poster.html" with disabled=meta.ratings_disabled works=ratings category=meta.category config=meta.config %}
+        {% include "works_no_poster.html" with disabled=meta.ratings_disabled works=work_rating_list category=meta.category config=meta.config %}
     {% else %}
-        {% include "works.html" with disabled=meta.ratings_disabled works=ratings category=meta.category config=meta.config %}
+        {% include "works.html" with disabled=meta.ratings_disabled works=work_rating_list category=meta.category config=meta.config %}
     {% endif %}
-    {% include "pagination.html" with page_obj=ratings paginator=ratings.paginator algo=meta.algo_name %}
+
+    {% include "pagination.html" with page_obj=work_rating_list paginator=work_rating_list.paginator %}
 </div>

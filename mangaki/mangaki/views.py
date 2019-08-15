@@ -35,10 +35,11 @@ from django.views.generic.list import ListView
 from markdown import markdown
 from natsort import natsorted
 
-from mangaki.choices import TOP_CATEGORY_CHOICES
+from mangaki.choices import (TOP_CATEGORY_CHOICES, WORK_CATEGORY_CHOICES,
+                             SORT_MODE_CHOICES)
 from mangaki.forms import SuggestionForm
 from mangaki.mixins import AjaxableResponseMixin, JSONResponseMixin
-from mangaki.models import (Artist, Category, ColdStartRating, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
+from mangaki.models import (Artist, Category, FAQTheme, Page, Pairing, Profile, Ranking, Rating,
                             Recommendation, Staff, Suggestion, Evidence, Top, Trope, Work, WorkCluster)
 from mangaki.utils.mal import client
 from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
@@ -49,8 +50,8 @@ from mangaki.utils.profile import (
 )
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
-from mangaki.utils.tokens import compute_token, KYOTO_SALT
-from mangaki.utils.recommendations import get_reco_algo, user_exists_in_backup, get_pos_of_best_works_for_user_via_algo
+from mangaki.utils.tokens import compute_token, NEWS_SALT
+from mangaki.utils.recommendations import get_reco_algo
 from irl.models import Partner
 
 
@@ -225,18 +226,18 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 class WorkListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ratings = current_user_ratings(self.request, context['object_list'])
+        work_list = list(context['object_list'])
+        ratings = current_user_ratings(self.request, work_list)
 
-        for work in context['object_list']:
+        for work in work_list:
             work.rating = ratings.get(work.id, None)
 
         context['object_list'] = [
             {
                 'work': work
             }
-            for work in context['object_list']
+            for work in work_list
         ]
-
         return context
 
 
@@ -301,7 +302,7 @@ class WorkList(WorkListMixin, ListView):
             raise Http404
 
         if search_text:
-            self.queryset = self.queryset.filter(Q(title__icontains=search_text) | Q(worktitle__title__icontains=search_text)).distinct('id', 'nb_ratings')  # https://stackoverflow.com/questions/20582966/django-order-by-filter-with-distinct
+            self.queryset = self.queryset.filter(Q(title__search=search_text) | Q(worktitle__title__search=search_text)).distinct('id', 'nb_ratings')  # https://stackoverflow.com/questions/20582966/django-order-by-filter-with-distinct
 
         self.queryset = self.queryset.only('id', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
@@ -317,6 +318,8 @@ class WorkList(WorkListMixin, ListView):
         context['search'] = search_text
         context['flat'] = flat
         context['sort_mode'] = sort_mode
+        context['sort_mode_display'] = dict(SORT_MODE_CHOICES)[sort_mode]
+        context['sort_modes'] = SORT_MODE_CHOICES
         context['letter'] = self.request.GET.get('letter', '')
         context['category'] = self.category.slug
         context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS
@@ -391,7 +394,7 @@ def get_profile(request,
         user = get_object_or_404(User.objects.select_related('profile'), username=username)
     else:
         user = request.user
-        is_anonymous = not request.user.is_authenticated()
+        is_anonymous = not request.user.is_authenticated
 
     if is_anonymous or username is None:
         is_shared = True
@@ -435,7 +438,7 @@ def get_profile(request,
 
 def get_profile_preferences(request,
                             username: str = None):
-    if username is None and request.user.is_authenticated():
+    if username is None and request.user.is_authenticated:
         return redirect('profile-preferences', request.user.username, permanent=True)
 
     user, ctx = get_profile(request, username)
@@ -457,7 +460,7 @@ def get_profile_works(request,
                       username: str = None,
                       category: str = None,
                       status: str = None):
-    if username is None and request.user.is_authenticated():
+    if username is None and request.user.is_authenticated:
         return redirect('profile-works', request.user.username, category or 'anime', status or 'seen', permanent=True)
 
     user, ctx = get_profile(request, username)
@@ -486,6 +489,13 @@ def get_profile_works(request,
                                                       ratings,
                                                       user)
     rating_list = natsorted(ratings, key=compare_function)
+
+    work_rating_list = []
+    for rating in rating_list:
+        work = rating.work
+        work.rating = rating.choice
+        work_rating_list.append({'work': work})
+
     if category == 'recommendation':
         received_recommendation_list, sent_recommendation_list = get_profile_recommendations(
             ctx['meta']['is_anonymous'],
@@ -500,15 +510,15 @@ def get_profile_works(request,
     else:
         reco_count = len(received_recommendation_list)
 
-    paginator = Paginator(rating_list, RATINGS_PER_PAGE)
+    paginator = Paginator(work_rating_list, RATINGS_PER_PAGE)
     page = request.GET.get('page')
 
     try:
-        ratings = paginator.page(page)
+        paginated_work_rating_list = paginator.page(page)
     except PageNotAnInteger:
-        ratings = paginator.page(1)
+        paginated_work_rating_list = paginator.page(1)
     except EmptyPage:
-        ratings = paginator.page(paginator.num_pages)
+        paginated_work_rating_list = paginator.page(paginator.num_pages)
 
     new_ctx = {
         'meta': {
@@ -527,7 +537,7 @@ def get_profile_works(request,
             'reco_count': reco_count,
             'username': user.username
         },
-        'ratings': ratings,
+        'work_rating_list': paginated_work_rating_list,
         'recommendations': {
             'received': received_recommendation_list,
             'sent': sent_recommendation_list
@@ -555,15 +565,6 @@ def about(request, lang):
         translation.activate(lang)
         request.session[translation.LANGUAGE_SESSION_KEY] = lang
     return render(request, 'about.html')
-
-
-def events(request):
-    context = {
-        'wakanim': Partner.objects.get(pk=12),
-        'config': VANILLA_UI_CONFIG_FOR_RATINGS
-    }
-    return render(
-        request, 'events.html', context)
 
 
 def top(request, category_slug):
@@ -666,10 +667,13 @@ def get_reco_algo_list(request, algo_name, category):
     reco_list = []
     data = get_reco_algo(request, algo_name, category)
     works = data['works']
+    categories = dict(WORK_CATEGORY_CHOICES)
     for work_id in data['work_ids']:
         work = works[work_id]
-        reco_list.append({'id': work.id, 'title': work.title, 'poster': work.ext_poster, 'synopsis': work.synopsis,
-                          'category': work.category.slug})
+        reco_list.append({'id': work.id, 'title': work.title,
+                          'poster': work.ext_poster, 'synopsis': work.synopsis,
+                          'category_slug': work.category.slug,
+                          'category': str(categories[work.category.slug])})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 
@@ -713,7 +717,7 @@ def remove_all_reco(request, targetname):
 
 def get_reco(request):
     category = request.GET.get('category', 'all')
-    algo_name = request.GET.get('algo', 'svd' if user_exists_in_backup(request.user, 'svd') else 'knn')
+    algo_name = request.GET.get('algo', 'als')
     if current_user_ratings(request):
         reco_list = [{
             'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
@@ -724,18 +728,13 @@ def get_reco(request):
                   {
                       'reco_list': reco_list,
                       'category': category,
-                      'algo': algo_name,
+                      'algo_name': algo_name,
                       'config': VANILLA_UI_CONFIG_FOR_RATINGS
                   })
 
 
-def update_research(request):
+def update_settings(request):
     is_ok = None
-    if request.user.is_authenticated and request.method == 'POST' and 'research_ok' in request.POST:  # Toggle on one's profile
-        username = request.user.username
-        is_ok = request.POST.get('research_ok') == 'true'
-        Profile.objects.filter(user__username=username).update(research_ok=is_ok)
-        return HttpResponse()
     if request.method == 'POST':  # Confirmed from mail link
         is_ok = 'yes' in request.POST
         username = request.POST.get('username')
@@ -743,23 +742,24 @@ def update_research(request):
     elif request.method == 'GET':  # Clicked on mail link
         username = request.GET.get('username')
         token = request.GET.get('token')
-    expected_token = compute_token(KYOTO_SALT, username)
-    if not constant_time_compare(token, expected_token):  # If the token is invalid
-        # Add an error message
-        messages.error(request, 'Vous n\'êtes pas autorisé à effectuer cette action.')
-        return render(request, 'research.html', status=401)  # Unauthorized
+    expected_token = compute_token(NEWS_SALT, username)
+    if not constant_time_compare(token, expected_token):
+        # If the token is invalid, add an error message
+        messages.error(request,
+            'Vous n\'êtes pas autorisé à effectuer cette action.')
+        return render(request, 'settings.html', status=401)  # Unauthorized
     elif is_ok is not None:
         message = 'Votre profil a bien été mis à jour. '
         if is_ok:
-            message += 'Merci. Vos données seront présentes dans le data challenge de Kyoto.'
+            message += 'Profitez bien de Mangaki !'
         else:
-            message += 'Vos données ne feront pas partie du data challenge de Kyoto.'
-        Profile.objects.filter(user__username=username).update(research_ok=is_ok)
+            message += 'Vous ne recevrez plus de mails de notre part.'
+        Profile.objects.filter(
+            user__username=username).update(newsletter_ok=is_ok)
         messages.success(request, message)
-        return render(request, 'research.html')
-    return render(request, 'research.html', {'username': username, 'token': token})
-
-
+        return render(request, 'settings.html')
+    return render(request, 'settings.html', {'username': username,
+                                             'token': token})
 
 
 def add_pairing(request, artist_id, work_id):
@@ -985,13 +985,13 @@ def update_evidence(request):
             evidence.save()
 
     next_url = request.GET.get('next')
-    if next_url and is_safe_url(url=next_url, host=request.get_host()):
+    if next_url and is_safe_url(url=next_url, allowed_hosts=request.get_host()):
         return redirect(next_url)
     return redirect('fix-index')
 
 
 def generic_error_view(error, error_code):
-    def error_view(request):
+    def error_view(request, exception=None):
         try:
             trope = Trope.objects.order_by('?').first()
         except DatabaseError:

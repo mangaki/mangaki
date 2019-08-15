@@ -1,16 +1,20 @@
 import logging
 import json
 import os
+import shutil
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 
 from mangaki.models import Category, Work, Rating
 import time
 
 
-ML_SNAPSHOT_ROOT_TEST = '/tmp/test_reco_{:d}'.format(int(round(time.time())))
+ML_SNAPSHOT_ROOT_TEST = '/tmp/test_reco/'
+
+def get_path(key):
+    return os.path.join(ML_SNAPSHOT_ROOT_TEST, '{:s}'.format(key))
 
 
 class RecoTest(TestCase):
@@ -29,6 +33,7 @@ class RecoTest(TestCase):
             Work(title='Manga A', category=manga),
         ]
         works = Work.objects.bulk_create(works)
+        self.work = works[0]
 
         # This will work as long as zero.dataset.RATED_BY_AT_LEAST <= 2
         ratings = ([Rating(user=otaku, work=work, choice='like') for work in works] + 
@@ -38,8 +43,17 @@ class RecoTest(TestCase):
 
         if not os.path.exists(ML_SNAPSHOT_ROOT_TEST):
             os.makedirs(ML_SNAPSHOT_ROOT_TEST)
+            for key in {'svd', 'als', 'knn', 'knn-anonymous'}:
+                path = get_path(key)
+                if not os.path.exists(path):
+                    os.makedirs(path)
 
     def test_reco_url(self, **kwargs):
+        self.client.login(username='test', password='test')
+        reco_url = reverse_lazy('reco')
+        response = self.client.get(reco_url)
+
+    def test_svd_reco_url(self, **kwargs):
         self.client.login(username='test', password='test')
         reco_url = reverse_lazy('get-reco-algo-list', args=['svd', 'all'])
         self.assertEqual(reco_url, '/data/reco/svd/all.json')
@@ -47,10 +61,10 @@ class RecoTest(TestCase):
     def test_als_reco(self):
         self.client.login(username='test', password='test')
         reco_url = reverse_lazy('get-reco-algo-list', args=['als', 'all'])
-        with self.settings(ML_SNAPSHOT_ROOT=ML_SNAPSHOT_ROOT_TEST):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
             response = self.client.get(reco_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
-        os.remove(os.path.join(ML_SNAPSHOT_ROOT_TEST, 'als-20.pickle'))
+        os.remove(os.path.join(get_path('als'), 'knn-20.pickle'))
 
     def test_knn_reco_with_new_works(self):
         self.client.login(username='test', password='test')
@@ -58,18 +72,36 @@ class RecoTest(TestCase):
         self.assertEqual(self.user.rating_set.count(), 1)
 
         reco_url = reverse_lazy('get-reco-algo-list', args=['knn', 'all'])
-        with self.settings(ML_SNAPSHOT_ROOT=ML_SNAPSHOT_ROOT_TEST):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('knn')):
             response = self.client.get(reco_url)  # Create pickle
+        print(response.content.decode('utf-8'))
+
         # Here comes a new challenger
+        print('Mais avant', self.user.id)
         work = Work.objects.create(title='New anime', nb_episodes=0, category=self.anime_category)
         rating = Rating.objects.create(user=get_user_model().objects.get(username='test'), work=work, choice='like')
+        print('En fait son ID est', get_user_model().objects.get(username='test').id)
         # They now have two ratings
         self.assertEqual(self.user.rating_set.count(), 2)
 
-        with self.settings(ML_SNAPSHOT_ROOT=ML_SNAPSHOT_ROOT_TEST):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('knn')):
             response = self.client.get(reco_url)
+
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
-        os.remove(os.path.join(ML_SNAPSHOT_ROOT_TEST, 'knn-20.pickle'))
+        os.remove(os.path.join(get_path('knn'), 'knn-20.pickle'))
+
+    def test_anonymous_reco(self):
+        vote_url = reverse_lazy('vote', args=[self.work.id])
+        response = self.client.post(vote_url, {'choice': 'like'})
+
+        reco_url = reverse_lazy('get-reco-algo-list', args=['knn', 'all'])
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('knn-anonymous')):
+            response = self.client.get(reco_url)  # Create pickle
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
+        os.remove(os.path.join(get_path('knn-anonymous'), 'knn-20.pickle'))
 
     def tearDown(self):
-        os.removedirs(ML_SNAPSHOT_ROOT_TEST)
+        shutil.rmtree(ML_SNAPSHOT_ROOT_TEST)

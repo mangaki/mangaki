@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if works %}
-    <div class="col-xs-12 cards-grid">
+    <div class="col-12 cards-grid">
         {% for work_meta in works %}
             {% with work_meta.slot_type as slot_type %}
             {% with work_meta.work as work %}
@@ -13,7 +13,7 @@
         {% endfor %}
     </div>
 {% else %}
-    <div class="col-xs-12">
+    <div class="col-12">
         <div class="panel panel-default">
             <div class="panel-body">{% trans "No results." %}</div>
         </div>

@@ -1,7 +1,6 @@
 Mangaki
 =======
 
-[![Dependency Status](https://dependencyci.com/github/mangaki/mangaki/badge)](https://dependencyci.com/github/mangaki/mangaki)
 [![CircleCI](https://circleci.com/gh/mangaki/mangaki.svg?style=svg)](https://circleci.com/gh/mangaki/mangaki)
 [![Codecov](https://img.shields.io/codecov/c/github/mangaki/mangaki.svg)]()
 
@@ -29,56 +28,40 @@ Si vous n'avez jamais fait de Django, je vous renvoie vers [leur super tutoriel]
 Configurer PostgreSQL
 ---------------------
 
+Vous allez avoir besoin d'un utilisateur qui a accès à la base de données. La
+façon la plus simple de faire ça est simplement de créer un compte qui a le
+même nom que votre nom d'utilisateur, qui peut créer des bases de données, et
+qui est un super-utilisateur (pour CREATE EXTENSION) :
+
+    sudo -u postgres createuser --superuser --createdb $USER
+
 Vous aurez besoin de l'utilitaire `pwgen` pour générer un mot de passe
 aléatoire lors de la configuration.
 
-    sudo -u postgres -H createdb mangaki
-    sudo -u postgres -H createuser django
-    export DB_PASSWORD=$(pwgen -s -c 30 1)
-    sudo -u postgres -H DB_PASSWORD=$DB_PASSWORD psql -d mangaki -c \
-      "alter user django with password '$DB_PASSWORD'; \
-      grant all privileges on database mangaki to django; \
-      create extension if not exists pg_trgm; \
-      create extension if not exists unaccent"
+Ensuite, vous pouvez créer la base de données et ajouter les extensions
+requises :
+
+    createdb mangaki
+    psql -d mangaki -c \
+        "create extension if not exists pg_trgm; \
+         create extension if not exists unaccent"
 
 
-Configurer un environnement virtuel
------------------------------------
+Lancer un serveur de développement
+----------------------------------
 
-Il est fortement recommandé d'installer les dépendances de Mangaki dans un
-environnement virtuel, ce qui est fait par les commandes ci-dessous.
-    
+Premièrement, copiez la configuration. Les paramètres par défaut sont censés
+marcher, donc vous ne devriez pas avoir besoin de changer quoi que ce soit :
+
+    cp mangaki/settings{.template,}.ini
+
+Ensuite, vous pouvez installer l'environnement de Django :
+
     python3 -m venv venv
-    . venv/bin/activate
+    source venv/bin/activate
     pip install -r requirements/dev.txt
-
-Pour activer l'environnement virtuel dans le futur, il faudra faire
-
-    . venv/bin/activate
-
-
-Configurer Mangaki
-------------------
-
-Pour configurer Mangaki, il faut créer un fichier `settings.ini` à la racine de
-l'application. Pour une installation de développement, il suffit de faire :
-
-    cat > mangaki/settings.ini <<EOF
-    [debug]
-    DEBUG = True
-    DEBUG_VUE_JS = True
-
-    [secrets]
-    SECRET_KEY = $(pwgen -s -c 60 1)
-    DB_PASSWORD = ${DB_PASSWORD}
-
-    [celery]
-    BROKER_URL = redis://
-    RESULT_BACKEND = redis://
-
-    [email]
-    EMAIL_BACKEND = django.core.mail.backends.console.EmailBackend
-    EOF
+    ./mangaki/manage.py migrate
+    ./mangaki/manage.py runserver
 
 Si vous souhaitez mettre en production une instance de Mangaki, le fichier de
 configuration est un peu plus complexe - regardez dans `settings.template.ini`

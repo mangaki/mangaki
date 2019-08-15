@@ -1,6 +1,7 @@
+from django.conf import settings
+
 from zero.dataset import Dataset
 from zero.recommendation_algorithm import RecommendationAlgorithm
-from django.conf import settings
 
 
 def fit_algo(algo_name, triplets, titles=None, categories=None,

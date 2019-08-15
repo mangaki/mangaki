@@ -170,7 +170,7 @@ class AniDBTest(TestCase):
                    'anidb/shimoneta.xml']
 
         with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
-            for filename, infos in animes_sources.items():
+            for filename, _ in animes_sources.items():
                 rsps.add(
                     responses.GET,
                     AniDB.BASE_URL,
@@ -178,6 +178,7 @@ class AniDBTest(TestCase):
                     status=200,
                     content_type='application/xml'
                 )
+            for filename, infos in animes_sources.items():
                 animes[filename] = self.anidb.get_or_update_work(infos[0])
 
         for filename in are_nsfw:
@@ -205,7 +206,7 @@ class AniDBTest(TestCase):
         }
 
         with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
-            for filename, anidb_aid in animes_sources.items():
+            for filename, _ in animes_sources.items():
                 for _ in range(2):
                     rsps.add(
                         responses.GET,
@@ -215,6 +216,7 @@ class AniDBTest(TestCase):
                         content_type='application/xml'
                     )
 
+            for filename, anidb_aid in animes_sources.items():
                 animes[filename] = self.anidb.get_or_update_work(anidb_aid)
                 related_animes[filename] = self.anidb.get_related_animes(anidb_aid=anidb_aid)
 

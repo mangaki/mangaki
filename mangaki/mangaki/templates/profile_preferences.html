@@ -2,73 +2,71 @@
 {% load i18n %}
 
 {% block profile_section %}
-    <div class="row">
-        <div id="profile_settings_container">
-            <div class="col-sm-4 col-xs-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Options de vie privée</div>
-                    <div class="panel-body">
-                        <button class="btn btn-danger btn-nowrap center-block" @click="deleteAccountModal = true">
-                            Supprimer mon compte
-                        </button>
-                        <modal v-cloak v-if="deleteAccountModal">
-                            <h3 slot="header">
-                                Êtes-vous sûrs de vouloir supprimer votre compte ?
-                            </h3>
-                            <div slot="body">
-                                Cette action est <strong>irréversible</strong> et toutes vos données seront immédiatement effacées.
+    <div class="row" id="profile_settings_container">
+        <div class="col-sm-4 col-6">
+            <div class="card">
+                <div class="card-header">Options de vie privée</div>
+                <div class="card-body">
+                    <button class="btn btn-danger btn-nowrap center-block" @click="deleteAccountModal = true">
+                        Supprimer mon compte
+                    </button>
+                    <modal v-cloak v-if="deleteAccountModal">
+                        <h3 slot="header">
+                            Êtes-vous sûrs de vouloir supprimer votre compte ?
+                        </h3>
+                        <div slot="body">
+                            Cette action est <strong>irréversible</strong> et toutes vos données seront immédiatement effacées.
 
-                                Au préalable, il est recommandé d'exporter vos données, si vous veniez à changer d'avis.
-                            </div>
-                            <div class="modal-buttons-right" slot="footer">
-                                <button class="btn btn-danger" @click="deleteAccount">Supprimer</button>
-                                <button class="btn btn-default" @click="deleteAccountModal = false">Annuler</button>
-                            </div>
-                        </modal>
-                        <hr />
-                        <button class="btn btn-primary btn-nowrap center-block" v-on:click="exportData">
-                            {% trans "Export all my data" %}
-                        </button>
-                        <hr />
-                        <bs-light-switch v-model="isShared">
-                            {% trans "My profile is public" %}
-                        </bs-light-switch>
-                        <hr />
-                        <bs-light-switch v-model="acceptsResearchUsage">
-                            Participer à l'amélioration des algorithmes de Mangaki&nbsp;:
-                        </bs-light-switch>
-                        <hr />
-                        <bs-light-switch v-model="receivesNewsletter">
-                            Recevoir la newsletter&nbsp;:
-                        </bs-light-switch>
-                    </div>
+                            Au préalable, il est recommandé d'exporter vos données, si vous veniez à changer d'avis.
+                        </div>
+                        <div class="modal-buttons-right" slot="footer">
+                            <button class="btn btn-danger" @click="deleteAccount">Supprimer</button>
+                            <button class="btn btn-default" @click="deleteAccountModal = false">Annuler</button>
+                        </div>
+                    </modal>
+                    <hr />
+                    <button class="btn btn-primary btn-nowrap center-block" v-on:click="exportData">
+                        {% trans "Export all my data" %}
+                    </button>
+                    <hr />
+                    <bs-light-switch v-model="isShared">
+                        {% trans "My profile is public" %}
+                    </bs-light-switch>
+                    <hr />
+                    <bs-light-switch v-model="acceptsResearchUsage">
+                        Participer à l'amélioration des algorithmes de Mangaki&nbsp;:
+                    </bs-light-switch>
+                    <hr />
+                    <bs-light-switch v-model="receivesNewsletter">
+                        Recevoir la newsletter&nbsp;:
+                    </bs-light-switch>
                 </div>
             </div>
+        </div>
 
-            <div class="col-sm-4 col-xs-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Préférences en vrac</div>
-                    <div class="panel-body">
-                        <bs-light-switch v-model="acceptsNSFW">
-                            Afficher visuels pour public averti&nbsp;:
-                        </bs-light-switch>
-                        <hr />
-                        <bs-light-switch v-model="enableKbShortcuts">
-                            Activer les raccourcis clavier sur la mosaique&nbsp;:
-                        </bs-light-switch>
-                    </div>
+        <div class="col-sm-4 col-6">
+            <div class="card">
+                <div class="card-header">Préférences en vrac</div>
+                <div class="card-body">
+                    <bs-light-switch v-model="acceptsNSFW">
+                        Afficher visuels pour public averti&nbsp;:
+                    </bs-light-switch>
+                    <hr />
+                    <bs-light-switch v-model="enableKbShortcuts">
+                        Activer les raccourcis clavier sur la mosaique&nbsp;:
+                    </bs-light-switch>
                 </div>
             </div>
         </div>
         {% if meta.mal.is_available %}
-            <div class="col-sm-4 col-xs-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Imports de données</div>
-                    <div class="panel-body">
-                        {% include "profile_mal_importer.html" %}
-                    </div>
+        <div class="col-sm-4 col-12">
+            <div class="card">
+                <div class="card-header">Imports de données</div>
+                <div class="card-body">
+                    {% include "profile_mal_importer.html" %}
                 </div>
             </div>
+        </div>
         {% endif %}
     </div>
 {% endblock %}

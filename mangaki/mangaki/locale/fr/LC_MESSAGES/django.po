@@ -158,10 +158,10 @@ msgid "This is a duplicate"
 msgstr "C'est un doublon"
 
 msgid "Work is Not Safe for Work"
-msgstr "L'œuvre est SFW "
+msgstr "L'œuvre est NSFW "
 
 msgid "Work is actually Safe for Work"
-msgstr "L'œuvre est NSFW"
+msgstr "L'œuvre est SFW"
 
 msgid "Suggest a reference URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"
 msgstr ""
@@ -219,7 +219,7 @@ msgid "Join us!"
 msgstr "Rejoignez-nous !"
 
 msgid "Contact us"
-msgstr "Contactez nous"
+msgstr "Contactez-nous"
 
 msgid "Browse the wiki"
 msgstr "Parcourir le wiki"
@@ -559,7 +559,7 @@ msgstr "Demander de l'aide à un administrateur"
 msgid "You asked an admin for help"
 msgstr "Vous avez demandé l'aide d'un administrateur"
 
-msgid "Reopen cette suggestion"
+msgid "Reopen this suggestion"
 msgstr "Rouvrez cette suggestion"
 
 msgid "This work belongs to this cluster:"

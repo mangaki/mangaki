@@ -2,7 +2,7 @@
 
 {% load i18n %}
 {% load account socialaccount %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
 {% block anonymous_rating_banner %} {% endblock %}
@@ -30,7 +30,7 @@ for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
 
 <div class="row">
   {% if ratings %}
-  <div class="col-xs-12 col-sm-6 col-sm-offset-3">
+  <div class="col-12 col-sm-6 offset-sm-3">
     <div class="alert alert-warning" role="alert">
       {% blocktrans trimmed %}
       You rated a few works anonymously on this computer. These ratings will be lost if you login to an existing account. You should <a href="{{ signup_url }}">sign up</a> to save them."
@@ -42,11 +42,16 @@ for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
     </div>
   </div>
   {% endif %}
-  <form class="login col-xs-12 col-sm-6 col-sm-offset-3" method="POST" action="{% url 'account_login' %}">
+
+  <form class="login col-12 col-sm-6 offset-sm-3" method="POST" action="{% url 'account_login' %}">
     {% csrf_token %}
     {% if redirect_field_value %}
     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
     {% endif %}
+
+    {% for err in form.non_field_errors %}
+      <p class="alert alert-danger">{{ err }}</p>
+    {% endfor %}
 
     {% bootstrap_field form.login show_label=False addon_before='<span class="glyphicon glyphicon-user"></span>' %}
     {% bootstrap_field form.password show_label=False addon_before='<span class="glyphicon glyphicon-lock"></span>' %}

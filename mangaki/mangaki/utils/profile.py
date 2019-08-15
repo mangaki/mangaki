@@ -7,7 +7,7 @@ from django.utils import timezone
 from mangaki.models import Rating, Work, Category, Recommendation
 from mangaki.utils.fit_algo import get_algo_backup
 from mangaki.utils.ratings import get_anonymous_ratings
-from mangaki.utils.recommendations import get_pos_of_best_works_for_user_via_algo
+from mangaki.utils.recommendations import get_personalized_ranking
 
 SEE_CHOICES = {
     'seen': ('favorite', 'like', 'dislike', 'neutral'),
@@ -77,7 +77,7 @@ def build_profile_compare_function(algo_name: Optional[str],
         try:
             work_ids = [rating.work_id for rating in ratings]
             algo = get_algo_backup(algo_name)
-            best_pos = get_pos_of_best_works_for_user_via_algo(algo, user.id, work_ids)
+            best_pos = get_personalized_ranking(algo, user.id, work_ids)
             ranking = defaultdict(lambda: len(ratings))
             for rank, pos in enumerate(best_pos):
                 ranking[ratings[pos].id] = rank
@@ -86,7 +86,7 @@ def build_profile_compare_function(algo_name: Optional[str],
                 return ordering.index(item.choice), ranking[item.id]
 
             return special_compare_function
-        except:  # Two possible reasons: no backup or user not in backup
+        except Exception as e:  # Two possible reasons: no backup or user not in backup
             pass
 
     return default_compare_function

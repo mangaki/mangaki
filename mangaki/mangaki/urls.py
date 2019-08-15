@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
+from django.urls import path
 from django.contrib import admin
 from django_js_reverse.views import urls_js
 
@@ -48,13 +49,12 @@ urlpatterns = [
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing, name='add-pairing'),
     url(r'^vote/(?P<work_id>\d+)$', views.rate_work, name='vote'),
-    url(r'^research/$', views.update_research, name='research'),
+    url(r'^settings/$', views.update_settings, name='settings'),
     url(r'^admin/', admin.site.urls),
     url(r'^about/(?P<lang>[\w-]*)$', views.about, name='about'),
     url(r'^faq/$', views.faq_index, name='faq'),
     url(r'^legal/$', views.legal_mentions, name='legal'),
     url(r'^cgu/$', views.MarkdownView.as_view(), kwargs={'slug': 'cgu'}, name='cgu'),
-    url(r'^events/$', views.events, name='events'),
 
     url(r'^fix/$', views.fix_index, name='fix-index'),
     url(r'^fix/suggestion/$', views.fix_index, name='fix-index'),
@@ -76,5 +76,5 @@ if DEBUG:  # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-
     import debug_toolbar
 
     urlpatterns += [
-                       url(r'^__debug__/', include(debug_toolbar.urls)),
+                       path('__debug__/', include(debug_toolbar.urls)),
                    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

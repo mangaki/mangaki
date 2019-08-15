@@ -5,15 +5,7 @@
 <h1>{% trans "Artists" %}</h1>
 <hr />
 
-<form method="GET">
-  <div class="input-group">
-    <input class="search-input form-control" placeholder="Entrez un titre d'artiste (actuellement {{ nb_artists}})" type="search" name="search" {% if search %} value="{{ search }}" {% endif %} />
-    <span class="input-group-btn">
-  <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
-    </span>
-  </div>
-  <span class="help-block" style="float: right">{% trans "Hint: You can press Enter to trigger the search" %}</span>
-</form>
+{% include "search.html" %}
 
 <div class="row">
   <div class="col-md-12">

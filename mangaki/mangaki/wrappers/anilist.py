@@ -795,7 +795,7 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
 
         # Build genres for this Work
         genres = [Genre.objects.get_or_create(title=genre)[0] for genre in entry.genres]
-        work.genre.set(genres, bulk=True, clear=(not created_work))
+        work.genre.set(genres, clear=(not created_work))
 
         # Create WorkTitle entries in the database for this Work
         build_work_titles(work, titles)

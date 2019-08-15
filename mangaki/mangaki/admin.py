@@ -4,7 +4,7 @@ import logging
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.admin import helpers
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.db.models import Count
 from django.template.response import TemplateResponse
@@ -14,7 +14,7 @@ from mangaki.models import (
     Work, TaggedWork, WorkTitle, Genre, Track, Tag, Artist, Studio, Editor, Rating, Page,
     Suggestion, Evidence, Announcement, Recommendation, Pairing, Reference, Top, Ranking,
     Role, Staff, FAQTheme,
-    FAQEntry, ColdStartRating, Trope, Language,
+    FAQEntry, Trope, Language,
     ExtLanguage, WorkCluster,
     UserBackgroundTask,
     ActionType,
@@ -174,6 +174,10 @@ logger = logging.getLogger(__name__)
 class TaggedWorkInline(admin.TabularInline):
     model = TaggedWork
     fields = ('work', 'tag', 'weight')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('work', 'tag')
 
 
 class StaffInline(admin.TabularInline):
@@ -712,7 +716,6 @@ admin.site.register(Rating)
 admin.site.register(Page)
 admin.site.register(FAQEntry)
 admin.site.register(Recommendation)
-admin.site.register(ColdStartRating)
 admin.site.register(Trope)
 admin.site.register(Language)
 admin.site.register(ExtLanguage)

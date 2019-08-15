@@ -42,6 +42,12 @@ TOP_CATEGORY_CHOICES = (
     ("composers", _("Composers"))
 )
 
+WORK_CATEGORY_CHOICES = (
+    ('anime', _('Anime')),
+    ('manga', _('Manga')),
+    ('album', _('Album')),
+)
+
 CLUSTER_CHOICES = (
     ('unprocessed', _("Unprocessed")),
     ('accepted', _("Accepted")),
@@ -79,4 +85,15 @@ STAFF_TYPICAL_CHOICES = (
     _('Author'),
     _('Mangaka'),
     _('Screenwriter')
+)
+
+SORT_MODE_CHOICES = (
+    ('mosaic', _('Mosaic')),
+    ('new', _('Recent')),
+    ('top', _('Top')),
+    ('popularity', _('Popular')),
+    ('pearls', _('Pearls')),
+    ('controversy', _('Controversial')),
+    ('random', _('Random')),
+    ('alpha', _('A-Z'))
 )

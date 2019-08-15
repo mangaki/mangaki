@@ -1,24 +1,28 @@
-Django==1.11.*
-django-allauth==0.28
-markdown
-django-bootstrap3==8.2.*
-psycopg2-binary
-numpy>=1.13
-scipy>=1
-pandas
-beautifulsoup4
-natsort
-django-js-reverse
-responses==0.5.1
-jinja2
-lxml==3.6.*
-raven==6.1.*
-djangorestframework==3.6.*
-coreapi==2.3.*
-celery>=4.2
+# Django
+Django==2.2.4
+django-allauth==0.38.0
+django-bootstrap4
 django-celery-beat==1.1.*
+django-js-reverse==0.8.2
+django-sendfile==0.3.*
+djangorestframework==3.9.3
+psycopg2-binary
+responses==0.10.6
+markdown==3.0.1
+jinja2  # For tokens and newsletter
+# API
+lxml==4.4.*
+beautifulsoup4
+coreapi==2.3.*
+# Tasks
+celery>=4.2
 redis==2.10.*
 python-redis-lock==3.2.*
+raven==6.1.*
+# Version number
 setuptools-scm==1.15.*
-django-sendfile==0.3.*
+# Algo
+numpy>=1.13
+pandas
+natsort  # Used for sorting profile, will be removed
 git+https://github.com/mangaki/zero

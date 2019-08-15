@@ -15,8 +15,8 @@
 </div>
 
 {% for suggestion in suggestions %}
-<div class="panel panel-default">
-    <h3 class="panel-heading panel-title">
+<div class="card mb-3">
+    <h3 class="card-header card-title">
         <a href="{% url "fix-suggestion" suggestion.id %}" class="text-primary">{% trans "Suggestion" %} #{{ suggestion.id }}</a>
         <span class="small font-weight-bold">
             &nbsp;&nbsp;<span class="glyphicon glyphicon-{{ suggestion.is_checked|yesno:'lock,flag' }}" aria-hidden="true"></span>
@@ -48,7 +48,7 @@
         {% if request.user.is_authenticated %}
         {% for evidence in suggestion.evidence_set.all %}
         {% if request.user == evidence.user %}
-        <div class="panel-footer small">
+        <div class="card-footer small">
             {% if evidence.agrees %}
             <div>
                 {% blocktrans trimmed %}

@@ -1,7 +1,7 @@
 from unittest.mock import patch, Mock
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib import admin
 
@@ -95,7 +95,7 @@ class MergeTest(TestCase):
             'fields_to_choose': '',
             'fields_required': ''
         }
-        with self.assertNumQueries(40):
+        with self.assertNumQueries(39):
             self.client.post(merge_url, context)
         self.assertEqual(list(Rating.objects.filter(user__in=self.users).values_list('choice', flat=True)), ['favorite'] * 4)
         self.assertEqual(Work.all_objects.filter(redirect__isnull=True).count(), 1)
