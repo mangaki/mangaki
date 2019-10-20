@@ -3,7 +3,7 @@ Django==2.2.4
 django-allauth==0.38.0
 django-bootstrap4
 django-celery-beat==1.1.*
-django-js-reverse==0.8.2
+django-js-reverse==0.9.1
 django-sendfile==0.3.*
 djangorestframework==3.9.3
 psycopg2-binary
