@@ -1,0 +1,52 @@
+[tool.poetry]
+name = "mangaki"
+version = "0.6.1"
+description = "Open source website for anime and manga recommendations"
+authors = ["Basile Clément <Elarnon@users.noreply.github.com>, Ryan Lahfa <masterancpp@gmail.com>, Jill-Jênn Vie <vie@jill-jenn.net>"]
+licence = "GPL-3.0"
+homepage = "https://mangaki.fr"
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.6"
+Django = "^2.2"
+django-allauth = "^0.38"
+django-bootstrap4 = "*"
+django-celery-beat="^1.1"
+django-js-reverse="^0.9"
+django-sendfile="^0.3"
+djangorestframework="^3.9"
+psycopg2-binary="*"
+responses="^0.10"
+markdown="^3.0"
+jinja2="*"
+lxml="^4.4"
+beautifulsoup4="*"
+coreapi="^2.3"
+celery="^4.2"
+redis="^2.10"
+python-redis-lock="^3.2"
+raven="^6.1"
+setuptools-scm="^1.15"
+mangaki_zero = {git="https://github.com/mangaki/zero", branch="raito/poetry"}
+
+[tool.poetry.dev-dependencies]
+django-debug-toolbar="^1.10"
+django-extensions="*"
+django-nose="*"
+flake8="*"
+typing="*"
+git-lint="*"
+pylint="*"
+pycodestyle="*"
+yamllint="*"
+html-linter="*"
+factory_boy="*"
+coverage="*"
+django_coverage_plugin="*"
+hypothesis="^3.56"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
