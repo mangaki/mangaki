@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block subtitle %}{% trans "About" %}{% endblock subtitle %}
+
 {% block body %}
 <div>
-    <h1 style="margin-bottom: 0.6em; text-align: center">{% trans "What series should you watch next?" %} </h1>
+  <h1>{% trans "About" %}</h1>
+    <h2 style="margin-bottom: 0.6em; text-align: center">{% trans "What series should you watch next?" %} </h2>
 
     <figure style="float: left; margin-top: 1em; margin-right: 1em">
         <img src="/static/img/chiro.png" alt="Chiro" height="128">
@@ -20,7 +23,7 @@
 </div>
 <hr />
 <div>
-    <h1 style="margin-bottom: 0.6em; text-align: center">{% trans "Learn data science through Mangaki" %}</h1>
+    <h2 style="margin-bottom: 0.6em; text-align: center">{% trans "Learn data science through Mangaki" %}</h2>
 
     <figure style="float: left; margin-top: 1em; margin-right: 1em">
         <img src="/static/img/chiro.png" alt="Chiro" height="128">
