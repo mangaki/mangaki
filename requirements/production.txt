@@ -20,7 +20,7 @@ redis==2.10.*
 python-redis-lock==3.2.*
 raven==6.1.*
 # Version number
-setuptools-scm==1.15.*
+setuptools-scm==1.17.0
 # Algo
 numpy>=1.13
 pandas
