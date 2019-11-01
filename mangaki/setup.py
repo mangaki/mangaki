@@ -18,7 +18,7 @@ setup(
         'numpy>=1.13',
         'beautifulsoup4',
         'natsort',
-        'django-js-reverse==0.8.2',
+        'django-js-reverse==0.9.1',
         'pandas',
         'typing>=3.6,<4',
         'raven>=6.1.0,<7',
