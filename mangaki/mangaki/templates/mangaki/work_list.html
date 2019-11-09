@@ -3,7 +3,10 @@
 {% load anonymous_ratings %}
 {% load bootstrap4 %}
 
+{% block subtitle %}{{ category|title }}{% endblock subtitle %}
+
 {% block body %}
+    <h1>{{ category|title }}</h1>
     {% if not request|has_anonymous_ratings %}
     <div class="alert alert-info">
         {% if user.is_authenticated %}

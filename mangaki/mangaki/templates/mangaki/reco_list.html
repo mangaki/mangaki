@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block subtitle %}{% trans "Recommendations" %}{% endblock %}
+
 {% block body %}
 {% if reco_list|length > 0 %}
+    <h1>{% trans "Recommendations" %}</h1>
     <div class="alert alert-secondary">
         {% blocktrans trimmed %}
             Here are some recommendations that you might like.<br />
