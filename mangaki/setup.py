@@ -33,7 +33,7 @@ setup(
     ],
     packages=find_packages(),
     include_package_data=True,
-    use_scm_version={'root': '..'},
-    setup_requires=['setuptools_scm'],
+    # use_scm_version={'root': '..'},
+    # setup_requires=['setuptools_scm'],
     zip_safe=False,
 )
