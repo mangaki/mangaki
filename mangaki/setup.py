@@ -28,7 +28,7 @@ setup(
         'redis>=2.10,<3',
         'python-redis-lock>=3.2,<4',
         'django-celery-beat>=1.1,<2',
-        # 'setuptools-scm==1.17.0',
+        'setuptools-scm==1.17.0',
         'django-sendfile>=0.3,<1'
     ],
     packages=find_packages(),
