@@ -1,5 +1,5 @@
 # Django
-Django==2.2.4
+Django==2.2.10
 django-allauth==0.38.0
 django-bootstrap4
 django-celery-beat==1.1.*
