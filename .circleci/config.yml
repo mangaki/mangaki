@@ -39,14 +39,13 @@ jobs:
           psql -h localhost -U mangaki -d circle_test -c "create extension if not exists pg_trgm;
                                 create extension if not exists unaccent"
           cp ~/mangaki/.circle_mangaki_settings.ini settings.ini
-          . venv/bin/activate
-          python manage.py migrate
-          python manage.py ranking
-          python manage.py top --all
+          poetry run ./manage.py migrate
+          poetry run ./manage.py ranking
+          poetry run ./manage.py top --all
           mkdir -p $TEST_REPORTS
           mkdir -p $ARTIFACTS
-          python manage.py collectstatic --no-input
-          py.test --cov-report=xml --cov=mangaki --junitxml=$TEST_REPORTS/junit.xml tests/
+          poetry run ./manage.py collectstatic --no-input
+          poetry run py.test --cov-report=xml --cov=mangaki --junitxml=$TEST_REPORTS/junit.xml tests/
           cp coverage.xml $ARTIFACTS/
           bash <(curl -s https://codecov.io/bash)
       - store_artifacts:
