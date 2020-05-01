@@ -54,7 +54,7 @@ pytest-cov = "^2.8.1"
 
 [tool.coverage.run]
 source = ["mangaki", "irl"]
-omit = ["*/tests/*.py", "*/migrations/*.py", "wsgi.py", "manage.py", "setup.py"]
+omit = ["*/tests/*.py", "*/migrations/*.py", "*/wsgi.py", "*/manage.py", "*/setup.py"]
 plugins = ["django_coverage_plugin"]
 
 [tool.coverage.report]
