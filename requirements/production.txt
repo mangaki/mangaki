@@ -19,10 +19,10 @@ celery>=4.2
 redis==2.10.*
 python-redis-lock==3.2.*
 raven==6.1.*
-# Version number
-setuptools-scm==1.17.0
 # Algo
-numpy>=1.13
+numpy
 pandas
 natsort  # Used for sorting profile, will be removed
 git+https://github.com/mangaki/zero
+# Version number
+setuptools-scm>=3.4.1

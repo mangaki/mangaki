@@ -8,7 +8,11 @@ from django.test import TestCase
 from mangaki.models import Category, Editor, Studio, Work, RelatedWork, Role, Staff, Artist, TaggedWork, Tag
 from mangaki.utils.anidb import to_python_datetime, AniDB, diff_between_anidb_and_local_tags
 
+import pytest
 
+pytestmark = pytest.mark.django_db
+
+@pytest.mark.django_db
 class AniDBTest(TestCase):
     @staticmethod
     def create_anime(**kwargs):

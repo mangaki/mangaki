@@ -16,19 +16,15 @@ jobs:
       - checkout:
           path: ~/mangaki
       - restore_cache:
-          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/requirements/dev.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/poetry.lock" }}
       - run: |
           sudo apt-get update
           sudo apt-get install -y software-properties-common python-dev libopenblas-dev postgresql-client
-          python3 -m venv venv
-          . venv/bin/activate
-          pip install --upgrade pip
-          pip install --upgrade --force-reinstall git+https://github.com/mangaki/zero  # Mangaki Zero
-          pip install -r ~/mangaki/requirements/dev.txt
+          poetry install
       - save_cache:
-          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/requirements/dev.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/poetry.lock" }}
           paths:
-            - "venv"
+            - /home/circleci/.cache/pypoetry/virtualenvs
       - run:
           name: Waiting for Postgres to be ready
           command: |
@@ -50,9 +46,8 @@ jobs:
           mkdir -p $TEST_REPORTS
           mkdir -p $ARTIFACTS
           python manage.py collectstatic --no-input
-          mkdir -p $TEST_REPORTS/django
-          coverage run manage.py test --with-xunit --xunit-file=$TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
-          coverage html -d $ARTIFACTS
+          py.test --cov-report=xml --cov=mangaki --junitxml=$TEST_REPORTS/junit.xml tests/
+          cp coverage.xml $ARTIFACTS/
           bash <(curl -s https://codecov.io/bash)
       - store_artifacts:
           path: /tmp/artifacts
