@@ -3,7 +3,7 @@
 [![CircleCI](https://circleci.com/gh/mangaki/mangaki.svg?style=svg)](https://circleci.com/gh/mangaki/mangaki)
 [![Codecov](https://img.shields.io/codecov/c/github/mangaki/mangaki.svg)](https://codecov.io/gh/mangaki/mangaki/)
 
-Welcome to Mangaki!  
+Welcome to Mangaki!
 This README is also available [in French](README-fr.md).
 
 ## What to do from here?
@@ -56,7 +56,7 @@ You can then install the Django environment:
     ./mangaki/manage.py migrate
     ./mangaki/manage.py runserver
 
-And voilà! You can access Mangaki at http://localhost:8000.
+And voilà! You can access Mangaki at <http://localhost:8000>.
 
 ### Running background tasks (Celery)
 
@@ -68,8 +68,8 @@ Background tasks represent:
 
 These are optional, but if you want to try them:
 
-     # Ensure that your working directory contains manage.py
-     celery -B -A mangaki:celery_app worker -l INFO
+     # The PYTHONPATH hack is necessary. If you don't like it, read the Nix section.
+     PYTHONPATH=$PYTHONPATH:`pwd`/mangaki celery -B -A mangaki:celery_app worker -l INFO
 
 If you can read something like this:
 
@@ -109,7 +109,7 @@ Please read the `default.nix` and add your use cases, you can run `nix-shell -f 
 
 ### QEMU install
 
-Just run `nix-shell -f default.nix -A vm --command "run-mangaki-vm"`, enjoy Mangaki on `localhost:8000`.
+Just run `nix-shell -f default.nix -A vm --command "run-mangaki-vm"`, enjoy Mangaki on <https://localhost:8000>
 
 ### VM install
 
@@ -138,4 +138,4 @@ See also our interesting [Jupyter notebooks](https://github.com/mangaki/notebook
 
 - Feel free to contact us at jj@mangaki.fr
 - Found a bug? [Create an issue](https://github.com/mangaki/mangaki/issues/new).
-- Stay in touch with our blog: http://research.mangaki.fr
+- Stay in touch with our blog: <http://research.mangaki.fr>
