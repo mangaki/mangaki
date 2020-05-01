@@ -34,7 +34,7 @@ in
       # Poetry for the venv.
       # Poetry2Nix.cli to update the Zero hashes.
       # nixfmt to reformat the *.nix files.
-      buildInputs = [ pkgs.poetry pkgs.poetry2nix.cli python pkgs.nixfmt ];
+      buildInputs = [ pkgs.poetry pkgs.poetry2nix.cli python pkgs.nixfmt pkgs.mdl ];
       # We need to expose libstdc++ & friends in our shell.
       shellHook = ''
          export PYTHONPATH=$PYTHONPATH:`pwd`/mangaki # We enforce this in order to not have to deal with this ugly shit of doing ./mangaki/manage.py ; django-admin is enough. Also, it fix something which I don't want to investigate.
