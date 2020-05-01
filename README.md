@@ -42,6 +42,8 @@ Then create the database, and add the required extensions:
 
 ### Running the web server
 
+You will need Python ≥ 3.7 and Poetry.
+
 First, copy the configuration. The default parameters are already supposed to
 work, so you shouldn't need to change anything:
 
@@ -77,6 +79,38 @@ If you can read something like this:
 
 The worker is ready to receive background tasks (e.g. MAL imports).
 
+## New: Nix-based installation
+
+Ensure you have a fairly recent Nix (> 2.0) and have `direnv`.
+
+Allow the `.envrc` to run.
+
+### Database setup
+
+### Running the web server
+
+### Poetry maintainer version
+
+If you use `direnv`, you will always have `poetry`, `poetry2nix` and `nixfmt` automagically installed in your shell.
+
+Moreover, `DJANGO_SETTINGS_MODULE` & `PYTHONPATH` is automatically propagated.
+
+Thus, you can replace `./managki/manage.py` by `django-admin` from wherever you are in your filesystem.
+
+Also, you can drop the `PYTHONPATH` hack to run Celery, it will just work out of the box, from wherever you are in your filesystem again. :-)
+
+### I don't want to figure out too much version
+
+Just do `nix-shell -f default.nix -A wheeledShell`, enjoy `django-admin` and `celery` without any hack.
+
+### I want to do something arbitrary complex
+
+Please read the `default.nix` and add your use cases, you can run `nix-shell -f default.nix -A sourceShell` to recompile everything, including NumPy & SciPy, note that it's going to be a bit long.
+
+### QEMU install
+
+Just run `nix-shell -f default.nix -A vm --command "run-mangaki-vm"`, enjoy Mangaki on `localhost:8000`.
+
 ### VM install
 
 You can also [install Mangaki in a VM](https://github.com/mangaki/mangaki/wiki/How-to-install-Mangaki-using-a-virtual-machine-(simple-but-takes-2-GB)) using our amazing Ansible playbooks.
@@ -87,10 +121,10 @@ It's simple but takes 2 GB.
 
 The database starts empty, but you can populate a few works:
 
-    ./manage.py loaddata ../fixtures/{partners,seed_data}.json
-    ./manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
-    ./manage.py top --all  # Compute the Top 20 directors, etc. Should be done regularly.
-    ./manage.py test       # Run all tests
+    ./mangaki/manage.py loaddata ../fixtures/{partners,seed_data}.json
+    ./mangaki/manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
+    ./mangaki/manage.py top --all  # Compute the Top 20 directors, etc. Should be done regularly.
+    py.test mangaki/               # Run all tests
 
 See also our interesting [Jupyter notebooks](https://github.com/mangaki/notebooks), in another repository.
 
