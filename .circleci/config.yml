@@ -56,7 +56,7 @@ jobs:
 
   push_beta:
     docker:
-      - image: mangaki/mangaki-deploy-environment
+      - image: mangaki/mangaki-deploy-environment:v2
     working_directory: ~/mangaki
     steps:
       - checkout:
