@@ -6,7 +6,7 @@
   with_items:
     - 'postgresql'
     - 'postgresql-contrib' # For extensions, e.g. unaccent and pg_trgm
-    - 'python-psycopg2'    # For management by ansible
+    - 'python3-psycopg2'    # For management by ansible
   become: true
 
 - name: Ensure PostgreSQL is running.
