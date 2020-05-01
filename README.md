@@ -49,9 +49,8 @@ work, so you shouldn't need to change anything:
 
 You can then install the Django environment:
 
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements/dev.txt
+    poetry install
+    poetry shell
     ./mangaki/manage.py migrate
     ./mangaki/manage.py runserver
 
