@@ -15,12 +15,8 @@ setup(
         'Markdown==3.0.1',
         'django-bootstrap4',
         'psycopg2-binary',
-        'numpy>=1.13',
         'beautifulsoup4',
-        'natsort',
         'django-js-reverse==0.9.1',
-        'pandas',
-        'typing>=3.6,<4',
         'raven>=6.1.0,<7',
         'djangorestframework==3.9.3',
         'coreapi>=2.3,<3',
@@ -33,7 +29,12 @@ setup(
     ],
     packages=find_packages(),
     include_package_data=True,
-    # use_scm_version={'root': '..'},
-    # setup_requires=['setuptools_scm'],
+    use_scm_version={
+        "root": "..",
+        "relative_to": __file__,
+        "local_scheme": "node-and-timestamp",
+        "version_scheme": "post-release"
+    },
+    setup_requires=['setuptools_scm'],
     zip_safe=False,
 )
