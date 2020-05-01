@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/mangaki/mangaki
+    working_directory: ~/mangaki/
     docker:
       - image: circleci/python:3.7.7-stretch
       - image: circleci/postgres:9.6.10-alpine-ram
@@ -38,14 +38,14 @@ jobs:
       - run: |
           psql -h localhost -U mangaki -d circle_test -c "create extension if not exists pg_trgm;
                                 create extension if not exists unaccent"
-          cp ~/mangaki/.circle_mangaki_settings.ini settings.ini
-          poetry run ./manage.py migrate
-          poetry run ./manage.py ranking
-          poetry run ./manage.py top --all
+          cp ~/mangaki/.circle_mangaki_settings.ini mangaki/settings.ini
+          poetry run ./mangaki/manage.py migrate
+          poetry run ./mangaki/manage.py ranking
+          poetry run ./mangaki/manage.py top --all
           mkdir -p $TEST_REPORTS
           mkdir -p $ARTIFACTS
-          poetry run ./manage.py collectstatic --no-input
-          poetry run py.test --cov-report=xml --cov=mangaki --junitxml=$TEST_REPORTS/junit.xml tests/
+          poetry run ./mangaki/manage.py collectstatic --no-input
+          poetry run py.test --cov-report=xml --cov=mangaki --junitxml=$TEST_REPORTS/junit.xml mangaki/
           cp coverage.xml $ARTIFACTS/
           bash <(curl -s https://codecov.io/bash)
       - store_artifacts:
