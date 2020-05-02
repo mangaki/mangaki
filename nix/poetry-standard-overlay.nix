@@ -44,7 +44,6 @@ self: super: (justUseWheels exceptions super {
   pyscopg2 = null;
   psycopg2-binary = null;
   lxml = null;
-  shellingham = null;
 
   mccabe = super.mccabe.overridePythonAttrs (old: {
     buildInputs = old.buildInputs ++ [ self.pytest-runner ];
