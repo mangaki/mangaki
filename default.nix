@@ -1,11 +1,13 @@
-{ useMKL ? false, useWheels ? true, pkgs ? import <nixpkgs> {
-  config.allowUnfree = useMKL;
-  overlays = [ (import ./nix/nixpkgs-overlays.nix) ];
-}, lib ? pkgs.lib, python ? pkgs.python3 }:
+{ useWheels ? true
+, pkgs ? import <nixpkgs> {}
+, lib ? pkgs.lib
+, pythonSelector ? "python3"
+, python ? pkgs.${pythonPackageName}
+}:
 let
   composeOverlays = overlays: lib.foldl' lib.composeExtensions (self: super: {}) overlays;
   gitOverrides = import ./nix/poetry-git-overlay.nix { inherit pkgs; };
-  standardOverrides = import ./nix/standard-poetry-overlay.nix { inherit pkgs; goForWheels = useWheels; };
+  standardOverrides = import ./nix/poetry-standard-overlay.nix { inherit pkgs useWheels; };
   localOverrides = composeOverlays [ gitOverrides standardOverrides ];
   mkPoetryAppEnv =
     { projectDir ? null
@@ -28,7 +30,6 @@ let
 
   finalOverrides = pkgs.poetry2nix.overrides.withoutDefaults localOverrides;
 in
-  assert useWheels -> !useMKL;
   {
     poetryShell = pkgs.mkShell {
       # Poetry for the venv.
@@ -37,8 +38,6 @@ in
       buildInputs = [ pkgs.poetry pkgs.poetry2nix.cli python pkgs.nixfmt pkgs.mdl ];
       # We need to expose libstdc++ & friends in our shell.
       shellHook = ''
-         export PYTHONPATH=$PYTHONPATH:`pwd`/mangaki # We enforce this in order to not have to deal with this ugly shit of doing ./mangaki/manage.py ; django-admin is enough. Also, it fix something which I don't want to investigate.
-         # TODO: investigate the interaction between django-bootstrap4 versioning mechanism (setuptools-scm) and our project structure (mangaki/mangaki).
          export DJANGO_SETTINGS_MODULE="mangaki.settings" # Cheap.
          export LD_LIBRARY_PATH=${lib.makeLibraryPath [pkgs.stdenv.cc.cc]}
       '';
