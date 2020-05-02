@@ -1,5 +1,6 @@
 .DS_Store
 venv
+.venv
 db.sqlite3
 *.pyc
 data/
