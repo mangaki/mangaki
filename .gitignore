@@ -20,6 +20,11 @@ media
 /provisioning/env_vars/
 *.mo
 .hypothesis
+.mypy_cache
+# Packaging
+.eggs
+dist/
+mangaki.egg-info/
 # Merci JJ <3
 /mangaki/debug.log
 # Configuration de Visual Studio Code
