@@ -1,9 +1,16 @@
-{ pkgs, lib ? pkgs.lib, goForWheels ? false }:
-self: super: {
-  numpy = (if goForWheels then
-    super.numpy.override { preferWheel = true; }
-  else
-    super.numpy.overridePythonAttrs (old:
+{ pkgs, lib ? pkgs.lib, useWheels ? false }:
+let
+  justUseWheels = exceptions: overrides: (lib.mapAttrs
+    (name: value:
+    if useWheels then super.${name}.override { preferWheel = true; } else value)
+    builtins.removeAttrs overrides exceptions) // exceptions;
+  exceptions = [
+    "mccabe"
+    "zipp"
+  ];
+in
+self: super: justUseWheels exceptions {
+  numpy = super.numpy.overridePythonAttrs (old:
       let
         blas = old.passthru.args.blas or pkgs.openblasCompat;
         blasImplementation = lib.nameFromURL blas.name "-";
@@ -32,18 +39,12 @@ self: super: {
         };
       }));
 
-  scipy =
-    if goForWheels then super.scipy.override { preferWheel = true; } else null;
-  pandas =
-    if goForWheels then super.pandas.override { preferWheel = true; } else null;
-  pyscopg2 = if goForWheels then
-    super.pyscopg2.override { preferWheel = true; }
-  else
-    null;
-  psycopg2-binary = if goForWheels then
-    super.psycopg2-binary.override { preferWheel = true; }
-  else
-    null;
+  scipy = null;
+  pandas = null;
+  pyscopg2 = null;
+  psycopg2-binary = null;
+  lxml = null;
+
   mccabe = super.mccabe.overridePythonAttrs (old: {
     buildInputs = old.buildInputs ++ [ self.pytest-runner ];
     doCheck = false;
@@ -60,6 +61,4 @@ self: super: {
     super.zipp).overridePythonAttrs (old: {
       propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.toml ];
     });
-  lxml =
-    if goForWheels then super.lxml.override { preferWheel = true; } else null;
 }
