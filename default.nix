@@ -2,7 +2,7 @@
 , pkgs ? import <nixpkgs> {}
 , lib ? pkgs.lib
 , pythonSelector ? "python3"
-, python ? pkgs.${pythonPackageName}
+, python ? pkgs.${pythonSelector}
 }:
 let
   composeOverlays = overlays: lib.foldl' lib.composeExtensions (self: super: {}) overlays;

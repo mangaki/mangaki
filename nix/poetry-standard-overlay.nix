@@ -1,15 +1,15 @@
 { pkgs, lib ? pkgs.lib, useWheels ? false }:
 let
-  justUseWheels = exceptions: overrides: (lib.mapAttrs
+  justUseWheels = exceptions: super: overrides: ((lib.mapAttrs
     (name: value:
     if useWheels then super.${name}.override { preferWheel = true; } else value)
-    builtins.removeAttrs overrides exceptions) // exceptions;
+    (builtins.removeAttrs overrides exceptions)) // (lib.getAttrs exceptions overrides));
   exceptions = [
     "mccabe"
     "zipp"
   ];
 in
-self: super: justUseWheels exceptions {
+self: super: (justUseWheels exceptions super {
   numpy = super.numpy.overridePythonAttrs (old:
       let
         blas = old.passthru.args.blas or pkgs.openblasCompat;
@@ -37,13 +37,14 @@ self: super: justUseWheels exceptions {
           blas = blas;
           inherit blasImplementation cfg;
         };
-      }));
+      });
 
   scipy = null;
   pandas = null;
   pyscopg2 = null;
   psycopg2-binary = null;
   lxml = null;
+  shellingham = null;
 
   mccabe = super.mccabe.overridePythonAttrs (old: {
     buildInputs = old.buildInputs ++ [ self.pytest-runner ];
@@ -61,4 +62,4 @@ self: super: justUseWheels exceptions {
     super.zipp).overridePythonAttrs (old: {
       propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.toml ];
     });
-}
+})
