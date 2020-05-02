@@ -2,7 +2,6 @@
 - name: Ensure PostgreSQL is installed and up-to-date.
   apt:
     name: '{{ item }}'
-    update_cache: 'yes'
     state: 'latest'
   with_items:
     - 'postgresql'
