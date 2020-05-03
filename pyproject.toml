@@ -33,7 +33,7 @@ redis="^3.2" # main
 python-redis-lock="^3.2" # main
 raven="^6.1" # main
 setuptools-scm="^3.4" # main
-mangaki-zero = {git="https://github.com/mangaki/zero", branch="master"} # main
+mangaki-zero = "^1.0" # main
 natsort = "^7.0.1" # main
 
 [tool.poetry.dev-dependencies]
