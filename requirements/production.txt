@@ -1,4 +1,5 @@
 beautifulsoup4
+mangaki-zero
 celery==4.*,>=4.2.0
 coreapi==2.*,>=2.3.0
 django==2.*,>=2.2.0
@@ -10,7 +11,6 @@ django-sendfile==0.*,>=0.3.0
 djangorestframework==3.*,>=3.9.0
 jinja2
 lxml==4.*,>=4.4.0
-git+https://github.com/mangaki/zero@master#egg=zero
 markdown==3.*,>=3.0.0
 natsort==7.*,>=7.0.1
 psycopg2-binary
