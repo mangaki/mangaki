@@ -8,9 +8,14 @@ let
       DEBUG = cfg.devMode;
       DEBUG_VUE_JS = cfg.devMode;
     };
-    email = {
-      EMAIL_BACKEND = if cfg.devMode then "django.core.mail.backends.console.EmailBackend" else "django.core.mail.backends.smtp.EmailBackend";
-    };
+    email =
+      let
+        consoleBackend = "django.core.mail.backends.console.EmailBackend";
+        smtpBackend = "django.core.mail.backends.smtp.EmailBackend";
+      in
+      {
+        EMAIL_BACKEND = if cfg.devMode then consoleBackend else smtpBackend;
+      };
     secrets = (optionalAttrs (!cfg.useLocalDatabase && cfg.databaseConfig.password != null) {
       DB_PASSWORD = cfg.databaseConfig.password;
     })
