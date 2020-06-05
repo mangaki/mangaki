@@ -14,7 +14,7 @@ Vagrant.configure(2) do |config|
     # For a complete reference, please see the online documentation at
     # https://docs.vagrantup.com.
     #
-    config.vm.box = "debian/contrib-jessie64"
+    config.vm.box = "debian/contrib-buster64"
 
     config.vm.synced_folder ".", "/vagrant"
 
