@@ -20,7 +20,7 @@ class AniDBTest(TestCase):
             return f.read()
 
     def setUp(self):
-        self.anidb = AniDB('test_client', 1)
+        self.anidb = AniDB('testclient', 1)
         self.no_anidb = AniDB()
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
 
