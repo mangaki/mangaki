@@ -27,6 +27,7 @@
           blas = prev.blas.override { blasProvider = final.mkl; };
 
           mangaki = callPackage ./nix/pkgs/mangaki { };
+          mangaki-env = callPackage ./nix/pkgs/mangaki/env.nix { };
 
         };
 
@@ -34,7 +35,7 @@
       packages = forAllSystems (system:
         {
           inherit (nixpkgsFor.${system})
-            mangaki;
+            mangaki mangaki-env;
         });
 
       # The default package for 'nix build'. This makes sense if the
