@@ -1,5 +1,9 @@
-{ useWheels ? true, pkgs ? import <nixpkgs> { }, lib ? pkgs.lib
-, pythonSelector ? "python3", python ? pkgs.${pythonSelector} }:
+{ useWheels ? true
+, pkgs ? import <nixpkgs> { }
+, lib ? pkgs.lib
+, pythonSelector ? "python3"
+, python ? pkgs.${pythonSelector}
+}:
 let
   composeOverlays = overlays:
     lib.foldl' lib.composeExtensions (self: super: { }) overlays;
@@ -7,9 +11,13 @@ let
   standardOverrides =
     import ./nix/poetry-standard-overlay.nix { inherit pkgs useWheels; };
   localOverrides = composeOverlays [ gitOverrides standardOverrides ];
-  mkPoetryAppEnv = { projectDir ? null
+  mkPoetryAppEnv =
+    { projectDir ? null
     , pyproject ? projectDir + "/pyproject.toml"
-    , poetrylock ? projectDir + "/poetry.lock", overrides, python ? python, ...
+    , poetrylock ? projectDir + "/poetry.lock"
+    , overrides
+    , python ? python
+    , ...
     }@attrs:
     let
       app =
@@ -17,7 +25,8 @@ let
       env = pkgs.poetry2nix.mkPoetryEnv {
         inherit pyproject poetrylock overrides python;
       };
-    in env.override (old: { extraLibs = (old.extraLibs or [ ]) ++ [ app ]; });
+    in
+    env.override (old: { extraLibs = (old.extraLibs or [ ]) ++ [ app ]; });
 
   finalOverrides = pkgs.poetry2nix.overrides.withoutDefaults localOverrides;
   mangakiNiceEnvHook = ''
@@ -29,7 +38,8 @@ let
     filter = filterNixFiles;
     src = pkgs.poetry2nix.cleanPythonSources { src = ./.; };
   };
-in rec {
+in
+rec {
   poetryShell = pkgs.mkShell {
     # Poetry for the venv.
     # Poetry2Nix.cli to update the Zero hashes.
