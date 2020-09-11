@@ -1,10 +1,9 @@
-{
-  useTLS ? false
-  , forwardedPort ? if useTLS then 8443 else 8000
-  , devMode ? true
-  , editableMode ? devMode # enable local changes on the host to be transfered to the VM through 9p mount.
-  , allowedHosts ? [ "127.0.0.1" ]
-  , domainName ? null
+{ useTLS ? false
+, forwardedPort ? if useTLS then 8443 else 8000
+, devMode ? true
+, editableMode ? devMode # enable local changes on the host to be transfered to the VM through 9p mount.
+, allowedHosts ? [ "127.0.0.1" ]
+, domainName ? null
 }:
 { config, pkgs, lib, ... }:
 {
