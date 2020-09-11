@@ -30,3 +30,6 @@ mangaki.egg-info/
 /mangaki/debug.log
 # Configuration de Visual Studio Code
 .vscode/
+# Nix
+result
+result-*
