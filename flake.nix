@@ -26,8 +26,36 @@
           lapack = prev.lapack.override { lapackProvider = final.mkl; };
           blas = prev.blas.override { blasProvider = final.mkl; };
 
-          mangaki = callPackage ./nix/pkgs/mangaki { };
-          mangaki-env = callPackage ./nix/pkgs/mangaki/env.nix { };
+          mangaki = (callPackage ./nix/pkgs/mangaki { }).overrideAttrs(oldAttrs:
+            {
+              # Can't add anything to `passthru` from poetry2nix
+              passthru = (oldAttrs.passthru or {}) // {
+
+                env = callPackage ./nix/pkgs/mangaki/env.nix { };
+
+                static = stdenvNoCC.mkDerivation {
+                  pname = "mangaki-static";
+                  inherit (oldAttrs) version;
+                  phases = [ "installPhase" ];
+
+                  nativeBuildInputs = [ mangaki ];
+
+                  installPhase = ''
+                    export DJANGO_SETTINGS_MODULE="mangaki.settings"
+                    mkdir -p $out
+                    cat <<EOF > settings.ini
+                    [secrets]
+                      SECRET_KEY = dontusethisorgetfired
+                    [deployment]
+                      STATIC_ROOT = $out
+                    EOF
+                    export MANGAKI_SETTINGS_PATH=./settings.ini
+                    django-admin collectstatic
+                  '';
+                };
+
+              };
+            });
 
         };
 
@@ -35,7 +63,7 @@
       packages = forAllSystems (system:
         {
           inherit (nixpkgsFor.${system})
-            mangaki mangaki-env;
+            mangaki;
         });
 
       # The default package for 'nix build'. This makes sense if the
@@ -53,7 +81,7 @@
           buildInputs = [
             poetry
             poetry2nix.cli
-            mangaki-env
+            mangaki.env
           ];
 
           shellHook = ''
