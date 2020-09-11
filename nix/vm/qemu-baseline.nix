@@ -1,7 +1,4 @@
 { config, pkgs, lib, ... }:
-let
-  inherit (builtins) toString;
-in
 {
   fileSystems."/".device = "/dev/disk/by-label/nixos";
   boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "virtio_balloon" "virtio_blk" "virtio_pci" "virtio_ring" ];
