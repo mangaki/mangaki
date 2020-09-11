@@ -11,7 +11,7 @@
   imports = [
     ./qemu-baseline.nix # QEMU specific stuff.
     ../modules/mangaki.nix # Mangaki's module.
-    ./mangaki-vm.nix # Mangaki's VM-specific additions.
+    # ./mangaki-vm.nix # Mangaki's VM-specific additions.
   ];
 
   # TODO: figure out how to realize the editable mode
@@ -28,12 +28,12 @@
   services.mangaki = {
     enable = true;
     inherit useTLS devMode allowedHosts domainName;
-    staticRoot = pkgs.mangakiPackages.static;
-    package = pkgs.mangakiPackages.env;
+    staticRoot = pkgs.mangaki.static;
+    # package = pkgs.mangaki.env;
   };
 
-  services.mangaki-vm = {
-    enable = true;
-    inherit forwardedPort editableMode;
-  };
+  # services.mangaki-vm = {
+  #   enable = true;
+  #   inherit forwardedPort editableMode;
+  # };
 }
