@@ -22,12 +22,12 @@ let
     // (optionalAttrs cfg.mal.enable {
       MAL_PASS = cfg.mal.password;
     });
-    deployment = optionalAttrs !cfg.devMode {
+    deployment = optionalAttrs (!cfg.devMode) {
       MEDIA_ROOT = "/srv/mangaki/media";
       DATA_ROOT = "/srv/mangaki/data";
       STATIC_ROOT = cfg.staticRoot;
     };
-    hosts = optionalAttrs !cfg.devMode {
+    hosts = optionalAttrs (!cfg.devMode) {
       ALLOWED_HOSTS = cfg.allowedHosts;
     };
     mal = {
@@ -47,17 +47,17 @@ let
     sentry = (optionalAttrs (!cfg.devMode && cfg.sentry.dsn != null) {
       DSN = cfg.sentry.dsn;
     });
-    smtp = (optionalAttrs cfg.email.useSMTP {
-      EMAIL_HOST = cfg.email.host;
-      EMAIL_HOST_PASSWORD = cfg.email.password;
-      EMAIL_HOST_USER = cfg.email.user;
-      EMAIL_PORT = cfg.email.port;
-      EMAIL_SSL_CERTFILE = cfg.email.sslCertFile;
-      EMAIL_SSL_KEYFILE = cfg.email.sslKeyFile;
-      EMAIL_TIMEOUT = cfg.email.timeout;
-      EMAIL_USE_SSL = cfg.email.useSSL;
-      EMAIL_USE_TLS = cfg.email.useTLS;
-    });
+    # smtp = (optionalAttrs cfg.email.useSMTP {
+    #   EMAIL_HOST = cfg.email.host;
+    #   EMAIL_HOST_PASSWORD = cfg.email.password;
+    #   EMAIL_HOST_USER = cfg.email.user;
+    #   EMAIL_PORT = cfg.email.port;
+    #   EMAIL_SSL_CERTFILE = cfg.email.sslCertFile;
+    #   EMAIL_SSL_KEYFILE = cfg.email.sslKeyFile;
+    #   EMAIL_TIMEOUT = cfg.email.timeout;
+    #   EMAIL_USE_SSL = cfg.email.useSSL;
+    #   EMAIL_USE_TLS = cfg.email.useTLS;
+    # });
   };
 in
 {
@@ -137,7 +137,7 @@ in
       };
     };
     lifecycle = {
-      performInitialMigration = mkOption {
+      performInitialMigrations = mkOption {
         default = true;
         description = ''
           This will create a systemd oneshot for initial migration.
@@ -228,14 +228,14 @@ in
         assertion = !cfg.useLocalRedis -> cfg.redisConfig != null;
         message = "If local Redis instance is not used, Redis instance configuration must be set.";
       }
-      {
-        assertion = cfg.email.useSMTP -> cfg.email.host != null && cfg.email.password != null;
-        message = "If SMTP is enabled, SMTP host and password must be set.";
-      }
+      # {
+      #   assertion = cfg.email.useSMTP -> cfg.email.host != null && cfg.email.password != null;
+      #   message = "If SMTP is enabled, SMTP host and password must be set.";
+      # }
     ];
 
     warnings = []
-    ++ (optional !cfg.lifecycle.performInitialMigrations [ "You disabled initial migration setup, this can have unexpected effects. "]);
+    ++ (optional (!cfg.lifecycle.performInitialMigrations) [ "You disabled initial migration setup, this can have unexpected effects. "]);
 
     services.redis.enable = cfg.useLocalRedis; # Redis set.
     services.postgresql = mkIf cfg.useLocalDatabase {
@@ -248,7 +248,7 @@ in
           };
         }
       ]; # Mangaki user set.
-      initialScript = ''
+      initialScript = pkgs.writeText "mangaki-postgresql-init.sql" ''
         CREATE DATABASE mangaki;
         \c mangaki
         CREATE EXTENSION IF NOT EXISTS pg_trgm;
@@ -265,12 +265,12 @@ in
     # systemd service for Celery.
 
     # Set up NGINX.
-    services.nginx = mkIf !cfg.devMode {
+    services.nginx = mkIf (!cfg.devMode) {
       enable = !cfg.devMode;
     };
 
     # Set up Gunicorn/uWSGI (?)
-    services.uwsgi = mkIf !cfg.devMode {
+    services.uwsgi = mkIf (!cfg.devMode) {
       enable = !cfg.devMode;
       instance = {
         type = "normal";

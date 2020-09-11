@@ -1,5 +1,8 @@
 { config, pkgs, lib, ... }:
-inherit (builtins) toString;
+
+let
+  inherit (builtins) toString;
+in
 {
   fileSystems."/".device = "/dev/disk/by-label/nixos";
   boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "virtio_balloon" "virtio_blk" "virtio_pci" "virtio_ring" ];
@@ -24,13 +27,13 @@ inherit (builtins) toString;
   virtualisation.diskSize = 1024;
   virtualisation.graphics = true; # false after.
 
-  virtualisation.options = 
-  let
-    extPort = config.services.mangaki-vm.forwardedPort;
-    intPort =
-      if config.services.mangaki.useTLS then 443
-      else 80;
-  in
-  # Forward the ports.
-  [ "-net user,hostfwd=tcp::${toString extPort}-:${toString intPort}" ];
+  # virtualisation.options =
+  # let
+  #   extPort = config.services.mangaki-vm.forwardedPort;
+  #   intPort =
+  #     if config.services.mangaki.useTLS then 443
+  #     else 80;
+  # in
+  # # Forward the ports.
+  # [ "-net user,hostfwd=tcp::${toString extPort}-:${toString intPort}" ];
 }
