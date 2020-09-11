@@ -19,9 +19,10 @@ let
     secrets = (optionalAttrs (!cfg.useLocalDatabase && cfg.databaseConfig.password != null) {
       DB_PASSWORD = cfg.databaseConfig.password;
     })
-    // (optionalAttrs cfg.mal.enable {
-      MAL_PASS = cfg.mal.password;
-    });
+      # // (optionalAttrs cfg.mal.enable {
+      #   MAL_PASS = cfg.mal.password;
+      # })
+      ;
     deployment = optionalAttrs (!cfg.devMode) {
       MEDIA_ROOT = "/srv/mangaki/media";
       DATA_ROOT = "/srv/mangaki/data";
@@ -30,14 +31,14 @@ let
     hosts = optionalAttrs (!cfg.devMode) {
       ALLOWED_HOSTS = cfg.allowedHosts;
     };
-    mal = {
-      MAL_USER = cfg.mal.user;
-      MAL_USER_AGENT = cfg.mal.userAgent;
-    };
-    anidb = {
-      ANIDB_CLIENT = cfg.anidb.client;
-      ANIDB_VERSION = cfg.anidb.version;
-    };
+    # mal = {
+    #   MAL_USER = cfg.mal.user;
+    #   MAL_USER_AGENT = cfg.mal.userAgent;
+    # };
+    # anidb = {
+    #   ANIDB_CLIENT = cfg.anidb.client;
+    #   ANIDB_VERSION = cfg.anidb.version;
+    # };
     pgsql = {
       DB_HOST = if cfg.useLocalDatabase then "127.0.0.1" else cfg.databaseConfig.host;
       DB_NAME = if cfg.useLocalDatabase then "mangaki" else cfg.databaseConfig.name;
