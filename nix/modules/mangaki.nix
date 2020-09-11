@@ -3,6 +3,7 @@ with lib;
 # FIXME: move from password to passwordFile.
 let
   cfg = config.services.mangaki;
+
   defaultSettings = {
     debug = {
       DEBUG = cfg.devMode;
@@ -60,6 +61,20 @@ let
     #   EMAIL_USE_TLS = cfg.email.useTLS;
     # });
   };
+
+  configSource = with generators; toINI
+    {
+      mkKeyValue = mkKeyValueDefault
+        {
+          # Not sure if this is a strict requirement but the default config come with true/false like this
+          mkValueString = v:
+            if true == v then "True"
+            else if false == v then "False"
+            else mkValueStringDefault { } v;
+        } "=";
+    }
+    cfg.settings;
+  configFile = pkgs.writeText "settings.ini" configSource;
 in
 {
   imports = [ ];
@@ -237,6 +252,8 @@ in
 
     warnings = [ ]
       ++ (optional (!cfg.lifecycle.performInitialMigrations) [ "You disabled initial migration setup, this can have unexpected effects. " ]);
+
+    environment.variables."MANGAKI_SETTINGS_PATH" = toString configFile;
 
     services.redis.enable = cfg.useLocalRedis; # Redis set.
     services.postgresql = mkIf cfg.useLocalDatabase {
