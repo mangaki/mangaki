@@ -43,6 +43,25 @@
       # package.
       defaultPackage = forAllSystems (system: self.packages.${system}.mangaki);
 
+      # Development environment
+      devShell = forAllSystems (system:
+        let
+          pkgSet = nixpkgsFor.${system};
+        in
+        with pkgSet;
+        mkShell {
+          buildInputs = [
+            poetry
+            poetry2nix.cli
+            mangaki-env
+          ];
+
+          shellHook = ''
+            export DJANGO_SETTINGS_MODULE="mangaki.settings" # Cheap.
+            export MANGAKI_SETTINGS_PATH="$(pwd)"/mangaki/settings.ini # Cheap too.
+          '';
+        });
+
       # A NixOS module, if applicable (e.g. if the package provides a system service).
       nixosModules.mangaki = import ./nix/modules/mangaki.nix;
 
