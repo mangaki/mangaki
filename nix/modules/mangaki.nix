@@ -68,7 +68,7 @@ in
     devMode = mkEnableOption "the development mode (non-production setup)";
     useTLS = mkEnableOption "TLS on the web server";
     staticRoot = mkOption {
-      example = "mangakiPackages.static";
+      example = "mangaki.static";
       description = ''
         In **production** mode, the package to use for static data, which will be used as static root.
         Note that, as its name indicates it, static data never change during the lifecycle of the service.
@@ -259,7 +259,7 @@ in
     # User activation script for directory initialization.
     # systemd oneshot for initial migration.
     # systemd oneshot for fixture loading.
-    # systemd timers for ranking & top --all in production mode. 
+    # systemd timers for ranking & top --all in production mode.
     # systemd timers for backup of PGSQL.
 
     # systemd service for Celery.
