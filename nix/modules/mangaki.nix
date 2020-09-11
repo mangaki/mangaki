@@ -61,7 +61,7 @@ let
   };
 in
 {
-  imports = [];
+  imports = [ ];
 
   options.services.mangaki = {
     enable = mkEnableOption "the mangaki service";
@@ -234,8 +234,8 @@ in
       # }
     ];
 
-    warnings = []
-    ++ (optional (!cfg.lifecycle.performInitialMigrations) [ "You disabled initial migration setup, this can have unexpected effects. "]);
+    warnings = [ ]
+      ++ (optional (!cfg.lifecycle.performInitialMigrations) [ "You disabled initial migration setup, this can have unexpected effects. " ]);
 
     services.redis.enable = cfg.useLocalRedis; # Redis set.
     services.postgresql = mkIf cfg.useLocalDatabase {

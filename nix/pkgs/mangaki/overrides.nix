@@ -1,5 +1,4 @@
 { pkgs, lib ? pkgs.lib, useWheels ? true }:
-
 let
   composeOverlays = overlays:
     lib.foldl' lib.composeExtensions (self: super: { }) overlays;
@@ -7,4 +6,5 @@ let
   standardOverrides =
     import ./poetry-standard-overlay.nix { inherit pkgs useWheels; };
   localOverrides = composeOverlays [ gitOverrides standardOverrides ];
-in localOverrides
+in
+localOverrides

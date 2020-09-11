@@ -1,14 +1,17 @@
 { pkgs, lib ? pkgs.lib, useWheels ? false }:
 let
   justUseWheels = exceptions: super: overrides:
-    ((lib.mapAttrs (name: value:
-      if useWheels then
-        super.${name}.override { preferWheel = true; }
-      else
-        value) (builtins.removeAttrs overrides exceptions))
-      // (lib.getAttrs exceptions overrides));
+    ((lib.mapAttrs
+      (name: value:
+        if useWheels then
+          super.${name}.override { preferWheel = true; }
+        else
+          value)
+      (builtins.removeAttrs overrides exceptions))
+    // (lib.getAttrs exceptions overrides));
   exceptions = [ "mccabe" "zipp" ];
-in self: super:
+in
+self: super:
 (justUseWheels exceptions super {
   numpy = super.numpy.overridePythonAttrs (old:
     let
@@ -26,7 +29,8 @@ in self: super:
           };
         });
       };
-    in {
+    in
+    {
       nativeBuildInputs = old.nativeBuildInputs ++ [ pkgs.gfortran ];
       buildInputs = old.buildInputs ++ [ blas self.cython ];
       enableParallelBuilding = true;
@@ -59,6 +63,6 @@ in self: super:
     }))
   else
     super.zipp).overridePythonAttrs (old: {
-      propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.toml ];
-    });
+    propagatedBuildInputs = old.propagatedBuildInputs ++ [ self.toml ];
+  });
 })
