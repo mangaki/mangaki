@@ -265,7 +265,8 @@ in
     warnings = [ ]
       ++ (optional (!cfg.lifecycle.performInitialMigrations) [ "You disabled initial migration setup, this can have unexpected effects. " ]);
 
-    environment.variables."MANGAKI_SETTINGS_PATH" = toString configFile;
+    environment.variables.MANGAKI_SETTINGS_PATH = toString configFile;
+    environment.variables.DJANGO_SETTINGS_MODULE = "mangaki.settings";
 
     services.redis.enable = cfg.useLocalRedis; # Redis set.
     services.postgresql = mkIf cfg.useLocalDatabase {
