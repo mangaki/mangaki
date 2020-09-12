@@ -348,7 +348,7 @@ in
       requires = [ "mangaki.service" ];
       wantedBy = [ "multi-user.target" ];
 
-      description = "Mangaki ranking timer";
+      description = "Mangaki daily ranking";
       path = [ pkgs.mangaki.env ];
       environment = mangakiEnv;
 
@@ -368,7 +368,7 @@ in
       requires = [ "mangaki.service" ];
       wantedBy = [ "multi-user.target" ];
 
-      description = "Mangaki top timer";
+      description = "Mangaki daily top calculation";
       path = [ pkgs.mangaki.env ];
       environment = mangakiEnv;
 
