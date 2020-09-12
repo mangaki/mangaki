@@ -82,6 +82,7 @@
             poetry
             poetry2nix.cli
             mangaki.env
+            nixpkgs-fmt
           ];
 
           shellHook = ''
