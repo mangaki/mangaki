@@ -298,6 +298,31 @@ in
 
     # User activation script for directory initialization.
     # systemd oneshot for initial migration.
+    systemd.services.mangaki = {
+      after = [ "postgresql.service" ];
+      requires = [ "postgresql.service" ];
+      wantedBy = [ "multi-user.target" ];
+
+      description = "Mangaki service";
+      path = [ pkgs.mangaki.env ];
+      environment.MANGAKI_SETTINGS_PATH = toString configFile;
+      environment.DJANGO_SETTINGS_MODULE = "mangaki.settings";
+
+      serviceConfig = {
+        User = "mangaki";
+        Group = "mangaki";
+
+        StateDirectory = "mangaki";
+        StateDirectoryMode = "0750";
+        WorkingDirectory = "/var/lib/mangaki";
+      };
+
+      # TODO: django-admin runserver bugs out looking like it fails to parse bash
+      script = ''
+        django-admin migrate
+        python ${pkgs.mangaki.src}/mangaki/manage.py runserver
+      '';
+    };
     # systemd oneshot for fixture loading.
     # systemd timers for ranking & top --all in production mode.
     # systemd timers for backup of PGSQL.
