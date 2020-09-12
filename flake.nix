@@ -91,6 +91,40 @@
           '';
         });
 
+      # NixOS system configuration, if applicable
+      nixosConfigurations.vm = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux"; # Hardcoded
+        modules = [
+          ({ modulesPath, pkgs, ... }: {
+            imports = [ (modulesPath + "/virtualisation/qemu-vm.nix") ];
+            virtualisation.qemu.options = [ "-vga virtio" ];
+
+            environment.systemPackages = with pkgs; [ st unzip ripgrep chromium ];
+            networking.networkmanager.enable = true;
+
+            services.xserver.enable = true;
+            services.xserver.layout = "us";
+            services.xserver.windowManager.i3.enable = true;
+            services.xserver.displayManager.lightdm.enable = true;
+          })
+
+          # Flake specific support
+          ({ ... }: {
+            nixpkgs.overlays = [ self.overlay ];
+          })
+
+          # Mangaki configuration
+          ({ ... }: {
+            imports =
+              [
+                (import ./nix/vm/standalone-configuration.nix { })
+              ];
+
+            services.mangaki.devMode = true;
+          })
+        ];
+      };
+
       # A NixOS module, if applicable (e.g. if the package provides a system service).
       nixosModules.mangaki = import ./nix/modules/mangaki.nix;
 
