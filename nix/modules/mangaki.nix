@@ -327,7 +327,7 @@ in
       };
 
       preStart = ''
-        if [ -f .initialized ]; then
+        if [ ! -f .initialized ]; then
           django-admin migrate
           touch .initialized
         fi
