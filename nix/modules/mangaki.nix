@@ -50,11 +50,12 @@ let
     #   ANIDB_VERSION = cfg.anidb.version;
     # };
 
-    pgsql = {
-      DB_HOST = if cfg.useLocalDatabase then "127.0.0.1" else cfg.databaseConfig.host;
-      DB_NAME = if cfg.useLocalDatabase then "mangaki" else cfg.databaseConfig.name;
-      DB_USER = if cfg.useLocalDatabase then "mangaki" else cfg.databasConfig.user;
-    };
+    # NOTE: This actually just breaks the communication
+    # pgsql = {
+    #   DB_HOST = if cfg.useLocalDatabase then "127.0.0.1" else cfg.databaseConfig.host;
+    #   DB_NAME = if cfg.useLocalDatabase then "mangaki" else cfg.databaseConfig.name;
+    #   DB_USER = if cfg.useLocalDatabase then "mangaki" else cfg.databasConfig.user;
+    # };
 
     # It's preferable to let users configure explicitly the DSN in development mode.
     # sentry = (optionalAttrs (!cfg.devMode && cfg.sentry.dsn != null) {
