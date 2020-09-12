@@ -385,6 +385,24 @@ in
     # systemd timers for backup of PGSQL.
 
     # systemd service for Celery.
+    systemd.services.mangaki-worker = {
+      after = [ "mangaki.service" ];
+      requires = [ "mangaki.service" ];
+      wantedBy = [ "multi-user.target" ];
+
+      description = "Mangaki background tasks runner";
+      path = [ pkgs.mangaki.env ];
+      environment = mangakiEnv;
+
+      serviceConfig = {
+        User = "mangaki";
+        Group = "mangaki";
+      };
+
+      script = ''
+        celery -B -A mangaki:celery_app worker -l INFO
+      '';
+    };
 
     # Set up NGINX.
     services.nginx = mkIf (!cfg.devMode) {
