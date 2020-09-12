@@ -9,6 +9,7 @@ let
       DEBUG = cfg.devMode;
       DEBUG_VUE_JS = cfg.devMode;
     };
+
     email =
       let
         consoleBackend = "django.core.mail.backends.console.EmailBackend";
@@ -17,9 +18,13 @@ let
       {
         EMAIL_BACKEND = if cfg.devMode then consoleBackend else smtpBackend;
       };
-    secrets = (optionalAttrs (!cfg.useLocalDatabase && cfg.databaseConfig.password != null) {
-      DB_PASSWORD = cfg.databaseConfig.password;
-    })
+
+    secrets = {
+      SECRET_KEY = "CHANGE_ME";
+    }
+      // (optionalAttrs (!cfg.useLocalDatabase && cfg.databaseConfig.password != null) {
+        DB_PASSWORD = cfg.databaseConfig.password;
+      })
       # // (optionalAttrs cfg.mal.enable {
       #   MAL_PASS = cfg.mal.password;
       # })
