@@ -310,5 +310,14 @@ in
     # Set up systemd unit for Django development server.
 
     # Throw some Let's Encrypt or snakeoil.
+
+    users = {
+      users.mangaki = {
+        group = "mangaki";
+        description = "Mangaki user";
+      };
+
+      groups.mangaki = { };
+    };
   };
 }
