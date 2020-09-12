@@ -91,6 +91,11 @@ let
     }
     cfg.settings;
   configFile = pkgs.writeText "settings.ini" configSource;
+
+  mangakiEnv = {
+    MANGAKI_SETTINGS_PATH = toString configFile;
+    DJANGO_SETTINGS_MODULE = "mangaki.settings";
+  };
 in
 {
   imports = [ ];
@@ -278,8 +283,9 @@ in
           sudo -u mangaki DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE MANGAKI_SETTINGS_PATH=$MANGAKI_SETTINGS_PATH django-admin top --all
         '';
       in [ pkgs.mangaki.env initWrapper ];
-    environment.variables.MANGAKI_SETTINGS_PATH = toString configFile;
-    environment.variables.DJANGO_SETTINGS_MODULE = "mangaki.settings";
+    environment.variables = {
+      inherit (mangakiEnv) MANGAKI_SETTINGS_PATH DJANGO_SETTINGS_MODULE;
+    };
 
     services.redis.enable = cfg.useLocalRedis; # Redis set.
     services.postgresql = mkIf cfg.useLocalDatabase {
@@ -309,8 +315,7 @@ in
 
       description = "Mangaki service";
       path = [ pkgs.mangaki.env ];
-      environment.MANGAKI_SETTINGS_PATH = toString configFile;
-      environment.DJANGO_SETTINGS_MODULE = "mangaki.settings";
+      environment = mangakiEnv;
 
       serviceConfig = {
         User = "mangaki";
