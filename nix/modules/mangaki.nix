@@ -29,40 +29,43 @@ let
       #   MAL_PASS = cfg.mal.password;
       # })
       ;
+  }
+    // optionalAttrs (!cfg.devMode) {
+      deployment = {
+        MEDIA_ROOT = "/srv/mangaki/media";
+        STATIC_ROOT = cfg.staticRoot;
+        DATA_ROOT = "/srv/mangaki/data";
+      };
 
-    # deployment = optionalAttrs (!cfg.devMode) {
-    #   MEDIA_ROOT = "/srv/mangaki/media";
-    #   STATIC_ROOT = cfg.staticRoot;
-    #   DATA_ROOT = "/srv/mangaki/data";
-    # };
-
-    # hosts = optionalAttrs (!cfg.devMode) {
-    #   ALLOWED_HOSTS = cfg.allowedHosts;
-    # };
-
-    # mal = {
-    #   MAL_USER = cfg.mal.user;
-    #   MAL_USER_AGENT = cfg.mal.userAgent;
-    # };
-
-    # anidb = {
-    #   ANIDB_CLIENT = cfg.anidb.client;
-    #   ANIDB_VERSION = cfg.anidb.version;
-    # };
-
-    # NOTE: This actually just breaks the communication
-    # pgsql = {
-    #   DB_HOST = if cfg.useLocalDatabase then "127.0.0.1" else cfg.databaseConfig.host;
-    #   DB_NAME = if cfg.useLocalDatabase then "mangaki" else cfg.databaseConfig.name;
-    #   DB_USER = if cfg.useLocalDatabase then "mangaki" else cfg.databasConfig.user;
-    # };
-
-    # It's preferable to let users configure explicitly the DSN in development mode.
-    # sentry = (optionalAttrs (!cfg.devMode && cfg.sentry.dsn != null) {
-    #   DSN = cfg.sentry.dsn;
-    # });
-
-    # smtp = (optionalAttrs cfg.email.useSMTP {
+      hosts = {
+        ALLOWED_HOSTS = cfg.allowedHosts;
+      };
+    }
+    # // optionalAttrs (cfg.mal.user != "" && cfg.mal.userAgent != "") {
+    #   mal = {
+    #     MAL_USER = cfg.mal.user;
+    #     MAL_USER_AGENT = cfg.mal.userAgent;
+    #   };
+    # }
+    # // optionalAttrs (cfg.anidb.client != "" && cfg.anidb.version != "") {
+    #   anidb = {
+    #     ANIDB_CLIENT = cfg.anidb.client;
+    #     ANIDB_VERSION = cfg.anidb.version;
+    #   };
+    # }
+    // optionalAttrs (!cfg.useLocalDatabase) {
+      pgsql = {
+        DB_HOST = cfg.databaseConfig.host;
+        DB_NAME = cfg.databaseConfig.name;
+        DB_USER = cfg.databasConfig.user;
+      };
+    }
+    // optionalAttrs (!cfg.devMode && cfg.sentry.dsn != null) {
+      sentry = {
+        DSN = cfg.sentry.dsn;
+      };
+    }
+    # // optionalAttrs (cfg.email.useSMTP) {
     #   EMAIL_HOST = cfg.email.host;
     #   EMAIL_HOST_PASSWORD = cfg.email.password;
     #   EMAIL_HOST_USER = cfg.email.user;
@@ -72,8 +75,8 @@ let
     #   EMAIL_TIMEOUT = cfg.email.timeout;
     #   EMAIL_USE_SSL = cfg.email.useSSL;
     #   EMAIL_USE_TLS = cfg.email.useTLS;
-    # });
-  };
+    # }
+    ;
 
   configSource = with generators; toINI
     {
