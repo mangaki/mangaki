@@ -340,6 +340,53 @@ in
     };
     # systemd oneshot for fixture loading.
     # systemd timers for ranking & top --all in production mode.
+    systemd.timers = genAttrs
+      [ "mangaki-ranking" "mangaki-top" ]
+      (service: {
+        wantedBy = [ "timers.target" ];
+        description = "Run ${service}.service every hours";
+        timerConfig.OnUnitActiveSec = "1h";
+      });
+
+    systemd.services.mangaki-ranking = {
+      after = [ "mangaki.service" ];
+      requires = [ "mangaki.service" ];
+      wantedBy = [ "multi-user.target" ];
+
+      description = "Mangaki ranking timer";
+      path = [ pkgs.mangaki.env ];
+      environment = mangakiEnv;
+
+      serviceConfig = {
+        Type = "oneshot";
+        User = "mangaki";
+        Group = "mangaki";
+      };
+
+      script = ''
+        django-admin ranking
+      '';
+    };
+
+    systemd.services.mangaki-top = {
+      after = [ "mangaki.service" ];
+      requires = [ "mangaki.service" ];
+      wantedBy = [ "multi-user.target" ];
+
+      description = "Mangaki top timer";
+      path = [ pkgs.mangaki.env ];
+      environment = mangakiEnv;
+
+      serviceConfig = {
+        Type = "oneshot";
+        User = "mangaki";
+        Group = "mangaki";
+      };
+
+      script = ''
+        django-admin top --all
+      '';
+    };
     # systemd timers for backup of PGSQL.
 
     # systemd service for Celery.
