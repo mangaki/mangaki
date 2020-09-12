@@ -33,3 +33,5 @@ mangaki.egg-info/
 # Nix
 result
 result-*
+# Qemu images
+*.qcow2
