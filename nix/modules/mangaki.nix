@@ -96,26 +96,25 @@ in
     devMode = mkEnableOption "the development mode (non-production setup)";
     useTLS = mkEnableOption "TLS on the web server";
     staticRoot = mkOption {
-      example = "mangaki.static";
+      type = types.package;
+      default = mangaki.static;
       description = ''
         In **production** mode, the package to use for static data, which will be used as static root.
         Note that, as its name indicates it, static data never change during the lifecycle of the service.
         As a result, static root is read-only.
         It can only be changed through changes in the static derivation.
       '';
-      type = types.str;
     };
     allowedHosts = mkOption {
-      example = ''
-        [ "127.0.0.1" "steinsgate.dev" ]
-      '';
-      default = [ "127.0.0.1" ];
       type = types.listOf types.str;
+      default = [ "127.0.0.1" ];
+      example = [ "127.0.0.1" "steinsgate.dev" ];
       description = ''
         List of allowed hosts (Django parameter).
       '';
     };
     settings = mkOption {
+      type = types.attrs;
       default = defaultSettings;
       example = ''
         {
@@ -129,10 +128,10 @@ in
 
         It will be deep merged otherwise.
       '';
-      type = types.attrs;
     };
     nginx = {
       enable = mkOption {
+        type = types.bool;
         default = !cfg.devMode;
         description = ''
           This will use NGINX as a web server which will reverse proxy the uWSGI endpoint.
@@ -143,17 +142,19 @@ in
     };
     backups = {
       enable = mkOption {
+        type = types.bool;
         default = !cfg.devMode;
         description = ''
           This will create a systemd timer to backup periodically (by default, weekly) the database using pg_dump.
         '';
-        type = types.bool;
       };
       periodicity = mkOption {
+        type = types.str;
         default = "weekly";
         description = "The periodicity to use to auto-backup the database.";
       };
       postBackupScript = mkOption {
+        type = types.str;
         default = "";
         description = ''
           More than often, you will wish for a way to execute custom commands after a successful backup.
@@ -161,11 +162,11 @@ in
           And remove the old backups in order to not clog up the disk space on the machine.
           Here, you can give a script to execute as a string.
         '';
-        type = types.str;
       };
     };
     lifecycle = {
       performInitialMigrations = mkOption {
+        type = types.bool;
         default = true;
         description = ''
           This will create a systemd oneshot for initial migration.
@@ -173,26 +174,26 @@ in
 
           Though, you might want to handle migrations yourself (in case of already created DBs).
         '';
-        type = types.bool;
       };
       runTimersForRanking = mkOption {
+        type = types.bool;
         default = true;
         description = ''
           This will create a systemd timer for ranking and tops.
         '';
-        type = types.bool;
       };
     };
     useLocalDatabase = mkOption {
+      type = types.bool;
       default = true;
       description = ''
         Whether to let this service create automatically a sensible PostgreSQL database locally.
 
         You want this disabled whenever you have an external PostgreSQL database.
       '';
-      type = types.bool;
     };
     databaseConfig = mkOption {
+      type = types.nullOr (types.submodule dbOptions);
       default = null;
       description = ''
         Submodule configuration for the PostgreSQL database.
@@ -205,18 +206,18 @@ in
           password = "ararararararagi"; # or null, for trusted auth.
         }
       '';
-      type = types.nullOr (types.submodule dbOptions);
     };
     useLocalRedis = mkOption {
+      type = types.bool;
       default = true;
       description = ''
         Whether to let this service create automatically a sensible Redis instance locally.
 
         You want this disabled whenever you have an external Redis instance.
       '';
-      type = types.bool;
     };
     redisConfig = mkOption {
+      type = types.nullOr (types.submodule redisOptions);
       default = null;
       description = ''
         Submodule configuration for the Redis instance.
@@ -229,9 +230,9 @@ in
           password = "charaznableisredlikeredis"; # or null, for trusted authentication.
         }
       '';
-      type = types.nullOr (types.submodule redisOptions);
     };
     domainName = mkOption {
+      type = types.nullOr types.str;
       default = null;
       example = "mangaki.fr";
       description = ''
@@ -242,7 +243,6 @@ in
         e.g. mangaki.dev → <VM IP>
         Useful to test production mode locally.
       '';
-      type = types.nullOr types.str;
     };
   };
 
