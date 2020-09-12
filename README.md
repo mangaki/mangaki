@@ -109,7 +109,7 @@ Please read the `default.nix` and add your use cases, you can run `nix-shell -f 
 
 ### QEMU install
 
-Just run `nix-shell -f default.nix -A vm --command "run-mangaki-vm"`, enjoy Mangaki on <https://localhost:8000>
+Just run `nix-build -A nixosConfigurations.vm.config.system.build.vm` and `result/bin/run-nixos-vm`, enjoy Mangaki on <https://localhost:8000>
 
 ### VM install
 
