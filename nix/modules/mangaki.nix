@@ -29,31 +29,38 @@ let
       #   MAL_PASS = cfg.mal.password;
       # })
       ;
-    deployment = optionalAttrs (!cfg.devMode) {
-      MEDIA_ROOT = "/srv/mangaki/media";
-      DATA_ROOT = "/srv/mangaki/data";
-      STATIC_ROOT = cfg.staticRoot;
-    };
-    hosts = optionalAttrs (!cfg.devMode) {
-      ALLOWED_HOSTS = cfg.allowedHosts;
-    };
+
+    # deployment = optionalAttrs (!cfg.devMode) {
+    #   MEDIA_ROOT = "/srv/mangaki/media";
+    #   STATIC_ROOT = cfg.staticRoot;
+    #   DATA_ROOT = "/srv/mangaki/data";
+    # };
+
+    # hosts = optionalAttrs (!cfg.devMode) {
+    #   ALLOWED_HOSTS = cfg.allowedHosts;
+    # };
+
     # mal = {
     #   MAL_USER = cfg.mal.user;
     #   MAL_USER_AGENT = cfg.mal.userAgent;
     # };
+
     # anidb = {
     #   ANIDB_CLIENT = cfg.anidb.client;
     #   ANIDB_VERSION = cfg.anidb.version;
     # };
+
     pgsql = {
       DB_HOST = if cfg.useLocalDatabase then "127.0.0.1" else cfg.databaseConfig.host;
       DB_NAME = if cfg.useLocalDatabase then "mangaki" else cfg.databaseConfig.name;
       DB_USER = if cfg.useLocalDatabase then "mangaki" else cfg.databasConfig.user;
     };
+
     # It's preferable to let users configure explicitly the DSN in development mode.
-    sentry = (optionalAttrs (!cfg.devMode && cfg.sentry.dsn != null) {
-      DSN = cfg.sentry.dsn;
-    });
+    # sentry = (optionalAttrs (!cfg.devMode && cfg.sentry.dsn != null) {
+    #   DSN = cfg.sentry.dsn;
+    # });
+
     # smtp = (optionalAttrs cfg.email.useSMTP {
     #   EMAIL_HOST = cfg.email.host;
     #   EMAIL_HOST_PASSWORD = cfg.email.password;
