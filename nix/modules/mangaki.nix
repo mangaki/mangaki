@@ -326,9 +326,15 @@ in
         WorkingDirectory = "/var/lib/mangaki";
       };
 
+      preStart = ''
+        if [ -f .initialized ]; then
+          django-admin migrate
+          touch .initialized
+        fi
+      '';
+
       # TODO: django-admin runserver bugs out looking like it fails to parse bash
       script = ''
-        django-admin migrate
         python ${pkgs.mangaki.src}/mangaki/manage.py runserver
       '';
     };
