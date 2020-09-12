@@ -265,6 +265,15 @@ in
     warnings = [ ]
       ++ (optional (!cfg.lifecycle.performInitialMigrations) [ "You disabled initial migration setup, this can have unexpected effects. " ]);
 
+    environment.systemPackages =
+      let
+        # TODO: Remove this ugly monster
+        initWrapper = pkgs.writeShellScriptBin "mangaki-init" ''
+          sudo -u mangaki DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE MANGAKI_SETTINGS_PATH=$MANGAKI_SETTINGS_PATH django-admin loaddata ${pkgs.mangaki.src}/fixtures/{partners,seed_data}.json
+          sudo -u mangaki DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE MANGAKI_SETTINGS_PATH=$MANGAKI_SETTINGS_PATH django-admin ranking
+          sudo -u mangaki DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE MANGAKI_SETTINGS_PATH=$MANGAKI_SETTINGS_PATH django-admin top --all
+        '';
+      in [ pkgs.mangaki.env initWrapper ];
     environment.variables.MANGAKI_SETTINGS_PATH = toString configFile;
     environment.variables.DJANGO_SETTINGS_MODULE = "mangaki.settings";
 
