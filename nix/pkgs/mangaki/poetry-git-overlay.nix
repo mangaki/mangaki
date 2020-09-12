@@ -2,10 +2,11 @@
 self: super: {
 
   mangaki-zero = super.mangaki-zero.overridePythonAttrs (old: {
-    src = pkgs.fetchgit {
-      url = "https://github.com/mangaki/zero";
-      rev = "680e93c1ef1726e2a68b362f2cde1dd9e139f2f3";
-      sha256 = "161rmiyvd3x7wcmwxfhnh8vngq7kcrvcmmnsqxyjyfi2msc232ac";
+    src = pkgs.fetchFromGitHub {
+      owner = "mangaki";
+      repo = "zero";
+      rev = "v1.0.1";
+      sha256 = "03c7vz4cilpa6c72n22zfppy0xfppqphcc7nyniinkdwig1wb260";
     };
 
     format = "pyproject";
