@@ -246,7 +246,7 @@ in
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
     assertions = [
       {
         assertion = !cfg.useLocalDatabase -> cfg.databaseConfig != null;
