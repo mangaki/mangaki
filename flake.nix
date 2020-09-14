@@ -4,7 +4,10 @@
   # Nixpkgs / NixOS version to use.
   inputs.nixpkgs = { type = "github"; owner = "NixOS"; repo = "nixpkgs"; ref = "nixos-20.03"; };
 
-  outputs = { self, nixpkgs }@inputs:
+  # Flake compatability shim
+  inputs.flake-compat = { type = "github"; owner = "edolstra"; repo = "flake-compat"; flake = false; };
+
+  outputs = { self, nixpkgs, ... }@inputs:
     let
       # System types to support.
       supportedSystems = [ "x86_64-linux" ];
