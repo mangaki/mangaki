@@ -720,5 +720,4 @@ admin.site.register(Trope)
 admin.site.register(Language)
 admin.site.register(ExtLanguage)
 admin.site.register(UserBackgroundTask)
-
 admin.site.site_header = "Administration Mangaki"
