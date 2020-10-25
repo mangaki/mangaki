@@ -675,6 +675,7 @@ class PairingAdmin(admin.ModelAdmin):
 @admin.register(Reference)
 class ReferenceAdmin(admin.ModelAdmin):
     list_display = ['work', 'url']
+    raw_id_fields = ('work', 'suggestions')
 
 
 class RankingInline(admin.TabularInline):
