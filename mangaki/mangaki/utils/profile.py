@@ -11,7 +11,7 @@ from mangaki.utils.recommendations import get_personalized_ranking
 
 SEE_CHOICES = {
     'seen': ('favorite', 'like', 'dislike', 'neutral'),
-    'unseen': ('willsee', 'wontsee'),
+    'unseen': ('willsee',),
     'willsee': ('willsee',),
     'wontsee': ('wontsee',)
 }
