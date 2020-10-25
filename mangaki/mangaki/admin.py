@@ -216,7 +216,7 @@ class FAQAdmin(admin.ModelAdmin):
 
 @admin.register(Work)
 class WorkAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'title')
+    search_fields = ('id', 'title', 'worktitle__title')
     list_display = ('id', 'category', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter)
     raw_id_fields = ('redirect',)
