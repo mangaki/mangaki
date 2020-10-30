@@ -18,7 +18,6 @@ def create_if_not_exists(model, title):
 def run():
     with open('../data/manga-news/anime.csv') as f:
         next(f)
-        artists = {}
         anime_data = []
         for i, line in enumerate(f):
             title, vo_title, studio, author, editor, anime_type, genre1, genre2, nb_episodes, origin, synopsis, poster = line.split(';;')

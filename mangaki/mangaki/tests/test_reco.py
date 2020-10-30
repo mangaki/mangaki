@@ -50,7 +50,7 @@ class RecoTest(TestCase):
     def test_reco_url(self, **kwargs):
         self.client.login(username='test', password='test')
         reco_url = reverse_lazy('reco')
-        response = self.client.get(reco_url)
+        self.client.get(reco_url)
 
     def test_svd_reco_url(self, **kwargs):
         self.client.login(username='test', password='test')

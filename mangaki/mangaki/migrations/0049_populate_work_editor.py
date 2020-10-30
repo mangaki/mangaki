@@ -6,7 +6,7 @@ from django.db import migrations
 
 
 def move_editor_to_work(apps, schema_editor):
-    Work = apps.get_model("mangaki", "Work")
+    apps.get_model("mangaki", "Work")
     Anime = apps.get_model("mangaki", "Anime")
     Manga = apps.get_model("mangaki", "Manga")
     Editor = apps.get_model("mangaki", "Editor")
@@ -22,7 +22,7 @@ def move_editor_to_work(apps, schema_editor):
 
 
 def move_editor_from_work(apps, schema_editor):
-    Work = apps.get_model("mangaki", "Work")
+    apps.get_model("mangaki", "Work")
     Anime = apps.get_model("mangaki", "Anime")
     Manga = apps.get_model("mangaki", "Manga")
 

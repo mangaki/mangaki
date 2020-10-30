@@ -8,7 +8,7 @@ def run():
     with open('../data/manga-news/manga.csv') as f:
         next(f)
         artists = {}
-        hipsters = Counter()
+        Counter()
         for i, line in enumerate(f):
             # print(len(line.split(';;')))
             title, vo_title, writer, mangaka, editor, origin, genre1, genre2, manga_type, synopsis, poster = line.split(';;')

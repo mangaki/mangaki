@@ -53,7 +53,7 @@ def get_reco_algo(request, algo_name='als', category='all'):
 
     algo = get_algo_backup_or_fit_knn(algo_name)
 
-    available_works = set(algo.dataset.encode_work.keys())
+    set(algo.dataset.encode_work.keys())
     df_rated_works = (pd.DataFrame(list(user_ratings.items()),
                                    columns=['work_id', 'choice'])
                       .query('work_id in @available_works'))

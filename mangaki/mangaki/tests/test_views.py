@@ -212,7 +212,7 @@ class AnonymousViewsTest(WorkFactoryMixin, TestCase):
         response = self.client.get('/u/dummy')
         self.assertEqual(response.status_code, 404)
 
-        target = self.User.objects.create_user('dummy')
+        self.User.objects.create_user('dummy')
         response = self.client.get('/u/dummy')
         self.assertEqual(response.status_code, 301)
 
