@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 
 def move_origin_to_work(apps, schema_editor):
-    apps.get_model("mangaki", "Work")
+    Work = apps.get_model("mangaki", "Work")
     Anime = apps.get_model("mangaki", "Anime")
     Manga = apps.get_model("mangaki", "Manga")
 
@@ -21,7 +21,7 @@ def move_origin_to_work(apps, schema_editor):
 
 
 def move_origin_from_work(apps, schema_editor):
-    apps.get_model("mangaki", "Work")
+    Work = apps.get_model("mangaki", "Work")
     Anime = apps.get_model("mangaki", "Anime")
     Manga = apps.get_model("mangaki", "Manga")
 
