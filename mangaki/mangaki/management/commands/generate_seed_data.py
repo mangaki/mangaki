@@ -1,10 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from mangaki.models import Artist, ArtistSpelling, Category, Editor, Genre, Ranking, Role, Staff, Studio, Top, Track, Work
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.sessions.models import Session
-from django.db import connection, connections
-from django.utils import timezone
 from io import StringIO
 
 import json

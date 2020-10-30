@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-from django.db.models import F
 
 
 def move_origin_to_work(apps, schema_editor):

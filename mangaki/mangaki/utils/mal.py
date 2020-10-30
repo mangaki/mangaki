@@ -15,8 +15,7 @@ from functools import reduce
 from django.conf import settings
 
 from django.contrib.auth.models import User
-from django.contrib.postgres.search import SearchQuery
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet
 from django.utils.functional import cached_property
 from django.db import transaction
 

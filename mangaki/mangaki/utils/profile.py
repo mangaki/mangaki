@@ -2,7 +2,6 @@ from collections import Counter, defaultdict
 from typing import Tuple, List, Any, Dict, Optional
 
 from django.contrib.auth.models import User
-from django.utils import timezone
 
 from mangaki.models import Rating, Work, Category, Recommendation
 from mangaki.utils.fit_algo import get_algo_backup

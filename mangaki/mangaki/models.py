@@ -14,7 +14,7 @@ from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.urls import reverse
 from django.db import models, transaction
-from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
+from django.db.models import CharField, ExpressionWrapper, F, FloatField, Func, Lookup, Value
 from django.db.models.functions import Cast
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _

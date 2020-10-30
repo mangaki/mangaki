@@ -1,5 +1,4 @@
 from mangaki.models import Artist, Anime, Genre, Studio, Editor
-from django.db.utils import IntegrityError, DataError
 import re
 from collections import namedtuple
 

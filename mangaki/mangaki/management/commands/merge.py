@@ -1,6 +1,5 @@
 
 from django.core.management.base import BaseCommand
-from django.db.models import Count
 
 from mangaki.models import Rating, Work, WorkCluster
 from mangaki.admin import merge_works

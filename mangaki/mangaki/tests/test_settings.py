@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from mangaki.models import Profile
 from mangaki.utils.tokens import compute_token, NEWS_SALT
-from django.conf import settings
 
 
 class SettingsTest(TestCase):
