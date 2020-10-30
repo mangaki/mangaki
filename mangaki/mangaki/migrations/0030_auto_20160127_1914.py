@@ -61,7 +61,7 @@ SET
 FROM nb WHERE nb.work_id = mangaki_work.id;
 """,
              "CREATE INDEX mangaki_work_random ON mangaki_work (category_id) WHERE nb_dislikes <= 17 AND nb_likes >= ((nb_dislikes * 3.0)) AND nb_ratings >= 28;",
-            ],
+             ],
             "DROP INDEX IF EXISTS mangaki_work_random;"
         ),
         migrations.AlterIndexTogether(

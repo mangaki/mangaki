@@ -23,7 +23,7 @@ class RefreshFromAniDBTest(TestCase):
         responses.add(
             responses.GET,
             AniDB.BASE_URL,
-            body=RefreshFromAniDBTest.read_fixture('anidb/'+filename),
+            body=RefreshFromAniDBTest.read_fixture('anidb/' + filename),
             status=200,
             content_type='application/xml'
         )
@@ -90,7 +90,7 @@ class RefreshFromAniDBTest(TestCase):
             'weights': ['0', '0', '400'],
             'anidb_tag_ids': ['5851', '4055', '3831'],
             'tag_operations': ['added', 'added', 'added'],
-            'tag_checkboxes': [str(hibike.pk)+':5851', str(hibike.pk)+':4055', str(hibike.pk)+':3831']
+            'tag_checkboxes': [str(hibike.pk) + ':5851', str(hibike.pk) + ':4055', str(hibike.pk) + ':3831']
         }
 
         response = self.client.post(refresh_tags_from_anidb_url, context)

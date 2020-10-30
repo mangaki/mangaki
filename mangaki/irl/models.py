@@ -10,4 +10,4 @@ class Partner(models.Model):
     image = models.CharField(max_length=32, verbose_name="Fichier logo")
 
     class Meta:
-        ordering = ['name'] 
+        ordering = ['name']

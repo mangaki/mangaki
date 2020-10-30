@@ -8,6 +8,7 @@ from django.test import TestCase
 from mangaki.models import Category, Editor, Studio, Work, RelatedWork, Role, Staff, Artist, TaggedWork, Tag
 from mangaki.utils.anidb import to_python_datetime, AniDB, diff_between_anidb_and_local_tags
 
+
 class AniDBTest(TestCase):
     @staticmethod
     def create_anime(**kwargs):
@@ -224,9 +225,9 @@ class AniDBTest(TestCase):
             self.anidb._build_related_animes(animes[filename], related_animes[filename])
 
         relations = RelatedWork.objects.filter(
-                        child_work__anidb_aid__in=animes_sources.values(),
-                        parent_work__anidb_aid__in=animes_sources.values()
-                    )
+            child_work__anidb_aid__in=animes_sources.values(),
+            parent_work__anidb_aid__in=animes_sources.values()
+        )
 
         # Checks that anime are created if missing but not all data is retrieved from AniDB
         self.assertEqual(Work.objects.get(title='Sangatsu no Lion meets Bump of Chicken').ext_synopsis, '')

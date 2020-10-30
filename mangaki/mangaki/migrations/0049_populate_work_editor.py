@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def move_editor_to_work(apps, schema_editor):
     Work = apps.get_model("mangaki", "Work")
     Anime = apps.get_model("mangaki", "Anime")
@@ -31,7 +32,6 @@ def move_editor_from_work(apps, schema_editor):
     for manga in Manga.objects.all():
         manga.deprecated_editor = manga.editor.title
         manga.save()
-
 
 
 class Migration(migrations.Migration):

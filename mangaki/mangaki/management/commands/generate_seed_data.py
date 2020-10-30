@@ -22,11 +22,13 @@ PARAMETERS = {
     }
 }
 
+
 def create_fixture(*parameters):
     buf = StringIO()
     call_command('dumpdata', *parameters, stdout=buf)
     buf.seek(0)
     return buf
+
 
 def limit(mapping, items):
     limited_items = []
@@ -45,6 +47,7 @@ def limit(mapping, items):
 
     return limited_items
 
+
 def fix_work_ids(items):
     new_items = []
     work_ids = set([i['pk'] for i in items if i['model'] == 'mangaki.work'])
@@ -55,8 +58,10 @@ def fix_work_ids(items):
 
     return new_items
 
+
 def test_anime(model_row):
     return model_row['model'] == 'mangaki.work' and model_row['fields']['category'] == 1
+
 
 def test_manga(model_row):
     return model_row['model'] == 'mangaki.work' and model_row['fields']['category'] == 2
@@ -92,7 +97,7 @@ class Command(BaseCommand):
 
         models = ['mangaki.{}'.format(model.__name__.lower()) for model in models_to_dump]
         fixture_data = json.loads(create_fixture(*models).read())
-        print ('Limiting the data.')
+        print('Limiting the data.')
 
         # Limit animes and mangas
         mapping = {

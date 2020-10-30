@@ -6,6 +6,7 @@ class AjaxableResponseMixin(object):
     Mixin to add AJAX support to a form.
     Must be used with an object-based FormView (e.g. CreateView)
     """
+
     def form_invalid(self, form):
         response = super(AjaxableResponseMixin, self).form_invalid(form)
         if self.request.is_ajax():
@@ -29,6 +30,7 @@ class JSONResponseMixin(object):
     """
     A mixin that can be used to render a JSON response.
     """
+
     def render_to_json_response(self, context, **response_kwargs):
         """
         Returns a JSON response, transforming 'context' to make the payload.

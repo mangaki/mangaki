@@ -32,7 +32,7 @@ SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 try:
     REPO_DIR = os.path.dirname(BASE_DIR)
     VERSION = get_version(REPO_DIR)
-except:
+except BaseException:
     VERSION = None
 
 # Step 2: if we are a nice package.
@@ -162,6 +162,7 @@ def get_sentry_handler(config_instance) -> str:
     if config_instance.has_section('sentry'):
         return 'raven.contrib.django.raven_compat.handlers.SentryHandler'
     return 'logging.NullHandler'
+
 
 LOGGING = {
     'version': 1,

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+
 def move_vo_title_to_work(apps, schema_editor):
     Manga = apps.get_model("mangaki", "Manga")
 
@@ -12,6 +13,7 @@ def move_vo_title_to_work(apps, schema_editor):
     for manga in Manga.objects.all():
         manga.vo_title = manga.deprecated_vo_title
         manga.save()
+
 
 def move_vo_title_from_work(apps, schema_editor):
     Manga = apps.get_model("mangaki", "Manga")

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+
 def move_vgmdb_aid_to_work(apps, schema_editor):
     Album = apps.get_model("mangaki", "Album")
 
@@ -13,12 +14,14 @@ def move_vgmdb_aid_to_work(apps, schema_editor):
         album.vgmdb_aid = album.deprecated_vgmdb_aid
         album.save()
 
+
 def move_vgmdb_aid_from_work(apps, schema_editor):
     Album = apps.get_model("mangaki", "Album")
 
     for album in Album.objects.all():
         album.deprecated_vgmdb_aid = album.vgmdb_aid
         album.save()
+
 
 class Migration(migrations.Migration):
 

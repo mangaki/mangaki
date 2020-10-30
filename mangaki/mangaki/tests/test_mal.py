@@ -41,7 +41,7 @@ class MALTest(TestCase):
     @responses.activate
     def test_mal_client_exceptions(self, choice, query):
         work_type = MALWorks(choice(list(map(lambda x: x.value, MALWorks))))
-        catch_all = re.compile('https?://myanimelist\.net/api/.*')
+        catch_all = re.compile(r'https?://myanimelist\.net/api/.*')
         for status_code in [400, 401, 403, 500, 502]:
             with self.subTest("Testing {} status code through MAL API search wrapper".format(status_code),
                               status_code=status_code):
@@ -58,7 +58,7 @@ class MALTest(TestCase):
     def test_mal_search_one_work(self):
         responses.add(
             responses.GET,
-            re.compile('https?://myanimelist\.net/api/.*/search.xml\?q=.*'),
+            re.compile(r'https?://myanimelist\.net/api/.*/search.xml\?q=.*'),
             body=self.search_fixture,
             status=200,
             content_type='application/xml'
@@ -86,7 +86,7 @@ class MALTest(TestCase):
     def test_mal_list_works_from_a_user(self):
         responses.add(
             responses.GET,
-            re.compile('https?://myanimelist\.net/malappinfo.php\?.*'),
+            re.compile(r'https?://myanimelist\.net/malappinfo.php\?.*'),
             body=self.list_fixture,
             status=200,
             content_type='application/xml'
@@ -100,7 +100,7 @@ class MALTest(TestCase):
     def test_mal_malformed_xml(self):
         responses.add(
             responses.GET,
-            re.compile('https?://myanimelist\.net/malappinfo.php\?.*'),
+            re.compile(r'https?://myanimelist\.net/malappinfo.php\?.*'),
             body='<xml><myinfo>42</myinfo><anime></anime></xml>',
             status=200,
             content_type='application/xml'

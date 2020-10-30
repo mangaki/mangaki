@@ -112,6 +112,7 @@ VANILLA_UI_CONFIG_FOR_RATINGS = {
     'endpoint': reverse_lazy('vote')
 }
 
+
 def deep_dict_merge(source: Dict, destination: Dict,
                     _path: Optional[List] = None) -> Dict:
     """
@@ -134,7 +135,7 @@ def deep_dict_merge(source: Dict, destination: Dict,
         if key in destination:
             if isinstance(source[key], dict) and isinstance(destination[key], dict):
                 deep_dict_merge(source[key], destination[key],
-                      _path + [key])
+                                _path + [key])
             elif source[key] == destination[key]:
                 pass
             else:
@@ -147,6 +148,7 @@ def deep_dict_merge(source: Dict, destination: Dict,
             destination[key] = source[key]
 
     return destination
+
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseMixin, SingleObjectMixin, View):
@@ -271,7 +273,7 @@ class WorkList(WorkListMixin, ListView):
         search_text = self.search_query
         watchlist_user = self.watchlist_user()
         if watchlist_user is not None:
-            work_ids = Rating.objects.filter(work__category=self.category,user__username=watchlist_user,choice='willsee').values_list('work_id', flat=True)
+            work_ids = Rating.objects.filter(work__category=self.category, user__username=watchlist_user, choice='willsee').values_list('work_id', flat=True)
             self.queryset = Work.objects.filter(id__in=work_ids)
         else:
             self.queryset = self.category.work_set
@@ -324,7 +326,7 @@ class WorkList(WorkListMixin, ListView):
         context['category'] = self.category.slug
         context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS
         context['enable_kb_shortcuts'] = (False if self.request.user.is_anonymous
-        else self.request.user.profile.keyboard_shortcuts_enabled)
+                                          else self.request.user.profile.keyboard_shortcuts_enabled)
         context['objects_count'] = self.category.work_set.count()
 
         if sort_mode == 'mosaic':
@@ -448,7 +450,7 @@ def get_profile_preferences(request,
 
     new_ctx = {
         'meta': {
-           'section': 'preferences'
+            'section': 'preferences'
         }
     }
 
@@ -692,7 +694,7 @@ def remove_reco(request, work_id, username, targetname):
         target = get_object_or_404(User, username=targetname)
         if Rating.objects.filter(user=target, work=work,
                                  choice__in=['favorite', 'like', 'neutral', 'dislike']).count() == 0 and (
-                    request.user == user or request.user == target):
+                request.user == user or request.user == target):
             Recommendation.objects.get(work=work, user=user, target_user=target).delete()
 
         return HttpResponse()
@@ -746,7 +748,7 @@ def update_settings(request):
     if not constant_time_compare(token, expected_token):
         # If the token is invalid, add an error message
         messages.error(request,
-            'Vous n\'êtes pas autorisé à effectuer cette action.')
+                       'Vous n\'êtes pas autorisé à effectuer cette action.')
         return render(request, 'settings.html', status=401)  # Unauthorized
     elif is_ok is not None:
         message = 'Votre profil a bien été mis à jour. '
@@ -790,7 +792,7 @@ def fix_index(request):
         'work__category', 'evidence_set__user').annotate(
             count_agrees=Count(Case(When(evidence__agrees=True, then=1))),
             count_disagrees=Count(Case(When(evidence__agrees=False, then=1)))
-        ).all().order_by('is_checked', '-date')
+    ).all().order_by('is_checked', '-date')
 
     paginator = Paginator(suggestion_list, FIXES_PER_PAGE)
     page = request.GET.get('page')
@@ -841,7 +843,7 @@ def fix_suggestion(request, suggestion_id):
 
     # Get the previous suggestion, ie. more recent and of the same checked status
     previous_suggestions_ids = Suggestion.objects.filter(date__gt=suggestion.date,
-        is_checked=suggestion.is_checked).order_by('date').values_list('id', flat=True)
+                                                         is_checked=suggestion.is_checked).order_by('date').values_list('id', flat=True)
 
     # If there is no more recent suggestion, and was checked, just pick from not checked suggestions
     if not previous_suggestions_ids and suggestion.is_checked:
@@ -849,7 +851,7 @@ def fix_suggestion(request, suggestion_id):
 
     # Get the next suggestion, ie. less recent and of the same checked status
     next_suggestions_ids = Suggestion.objects.filter(date__lt=suggestion.date,
-        is_checked=suggestion.is_checked).order_by('-date').values_list('id', flat=True)
+                                                     is_checked=suggestion.is_checked).order_by('-date').values_list('id', flat=True)
 
     # If there is no less recent suggestion, and wasn't checked, just pick from checked suggestions
     if not next_suggestions_ids and not suggestion.is_checked:
@@ -874,13 +876,13 @@ def nsfw_grid(request):
 
     user_evidences = Evidence.objects.filter(user=user)
     nsfw_suggestion_list = Suggestion.objects.select_related(
-                'work', 'user', 'work__category'
-            ).prefetch_related('evidence_set__user').filter(
-                problem__in=('nsfw', 'n_nsfw'),
-                is_checked=False
-            ).exclude(
-                work__in=user_evidences.values('suggestion__work')
-            ).order_by('work', '-date', '-work__sum_ratings').distinct('work')
+        'work', 'user', 'work__category'
+    ).prefetch_related('evidence_set__user').filter(
+        problem__in=('nsfw', 'n_nsfw'),
+        is_checked=False
+    ).exclude(
+        work__in=user_evidences.values('suggestion__work')
+    ).order_by('work', '-date', '-work__sum_ratings').distinct('work')
 
     paginator = Paginator(nsfw_suggestion_list, NSFW_GRID_PER_PAGE)
     count_nsfw_left = paginator.count
@@ -902,7 +904,7 @@ def nsfw_grid(request):
             if evidence.user == request.user:
                 agrees_with_problem = evidence.agrees
                 agrees = ((agrees_with_problem and suggestion.problem == 'nsfw')
-                       or (not agrees_with_problem and not suggestion.problem == 'nsfw'))
+                          or (not agrees_with_problem and not suggestion.problem == 'nsfw'))
                 nsfw_states.append(agrees)
                 break
         else:
@@ -959,7 +961,7 @@ def update_evidence(request):
                 pass
         elif close:
             try:
-               Suggestion.objects.filter(pk=suggestion_id).update(is_checked=True)
+                Suggestion.objects.filter(pk=suggestion_id).update(is_checked=True)
             except ObjectDoesNotExist:
                 pass
         elif reopen:
@@ -1015,8 +1017,8 @@ class AnonymousRatingsMixin:
         ratings = get_anonymous_ratings(self.request.session)
         works = (
             Work.objects.filter(id__in=ratings)
-                .order_by('title')
-                .group_by_category()
+            .order_by('title')
+            .group_by_category()
         )
         categories = Category.objects.filter(id__in=works).in_bulk()
         # Build the tree of ratings. This is a list of pairs (category, works)
@@ -1037,7 +1039,7 @@ class AnonymousRatingsMixin:
             ])
             for category_id, works_list in works.items()
         ]
-        context['meta'] = {'config': VANILLA_UI_CONFIG_FOR_RATINGS}  
+        context['meta'] = {'config': VANILLA_UI_CONFIG_FOR_RATINGS}
         return context
 
 

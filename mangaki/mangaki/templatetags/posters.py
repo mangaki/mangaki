@@ -3,6 +3,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 
 register = template.Library()
 
+
 @register.simple_tag(takes_context=True)
 def poster_url(context, work, bypass_nsfw_settings=None):
     if work is None:

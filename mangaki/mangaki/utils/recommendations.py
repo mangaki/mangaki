@@ -56,7 +56,7 @@ def get_reco_algo(request, algo_name='als', category='all'):
     available_works = set(algo.dataset.encode_work.keys())
     df_rated_works = (pd.DataFrame(list(user_ratings.items()),
                                    columns=['work_id', 'choice'])
-                        .query('work_id in @available_works'))
+                      .query('work_id in @available_works'))
     enc_rated_works = df_rated_works['work_id'].map(algo.dataset.encode_work)
     user_rating_values = df_rated_works['choice'].map(rating_values)
 

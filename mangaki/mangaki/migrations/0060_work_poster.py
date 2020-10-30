@@ -34,5 +34,5 @@ class Migration(migrations.Migration):
             save_poster_path,
             migrations.RunPython.noop,
             atomic=True,
-       ),
+        ),
     ]

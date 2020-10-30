@@ -10,6 +10,7 @@ from mangaki.models import Work
 MAX_ATTEMPTS = 5
 BACKOFF_DELAY = 2
 
+
 class Command(BaseCommand):
     """
     Recherche par titre chaque Work sur AniList afin de finalement récupérer les
@@ -44,7 +45,7 @@ class Command(BaseCommand):
         missed_titles = {}
 
         count = works.count()
-        self.stdout.write('Number of works : '+str(count)+'\n\n')
+        self.stdout.write('Number of works : ' + str(count) + '\n\n')
 
         for work in works:
             title_display = work.title.encode('utf8')
@@ -68,16 +69,16 @@ class Command(BaseCommand):
             # Couldn't fetch data even after retrying : exit
             if tries >= MAX_ATTEMPTS - 1:
                 self.stderr.write(self.style.ERROR('\nBanned from AniList ...'))
-                self.stderr.write(self.style.ERROR('--- Latest Work ID : '+str(work.pk)+' ---'))
+                self.stderr.write(self.style.ERROR('--- Latest Work ID : ' + str(work.pk) + ' ---'))
                 break
 
             # Work couldn't be found on Anilist
             if not anilist_result:
                 missed_titles[work.id] = work.title
-                self.stdout.write(self.style.WARNING('Could not match "'+str(title_display)+'" on AniList'))
+                self.stdout.write(self.style.WARNING('Could not match "' + str(title_display) + '" on AniList'))
                 continue
 
-            self.stdout.write('> Working on : '+str(title_display))
+            self.stdout.write('> Working on : ' + str(title_display))
 
             dict_key = '{}.jpg'.format(work.pk)
             tags_list = []
@@ -87,7 +88,7 @@ class Command(BaseCommand):
 
             for tag in anilist_result.tags:
                 tag_name = tag['name']
-                tag_weight = tag['votes']/100
+                tag_weight = tag['votes'] / 100
                 if tag_weight != 0:
                     tags_list.append([tag_name, tag_weight])
                     all_tags.add(tag_name)
@@ -102,4 +103,4 @@ class Command(BaseCommand):
         with open('missed_anilist_titles.json', 'w', encoding='utf-8') as f:
             json.dump(missed_titles, f)
 
-        self.stdout.write(self.style.SUCCESS('--- Number of different tags : '+str(len(all_tags))+' ---'))
+        self.stdout.write(self.style.SUCCESS('--- Number of different tags : ' + str(len(all_tags)) + ' ---'))

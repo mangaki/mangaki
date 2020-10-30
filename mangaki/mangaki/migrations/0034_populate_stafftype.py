@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def create_stafftype(apps, schema_editor):
     Role = apps.get_model("mangaki", "Role")
     Role.objects.create(name="Scénariste", slug="writer")
@@ -11,6 +12,7 @@ def create_stafftype(apps, schema_editor):
     Role.objects.create(name="Auteur", slug="author")
     Role.objects.create(name="Compositeur", slug="composer")
     Role.objects.create(name="Réalisateur", slug="director")
+
 
 class Migration(migrations.Migration):
 

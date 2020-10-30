@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+
 def move_anime_type_to_work(apps, schema_editor):
     Anime = apps.get_model("mangaki", "Anime")
 
@@ -13,12 +14,14 @@ def move_anime_type_to_work(apps, schema_editor):
         anime.anime_type = anime.deprecated_anime_type
         anime.save()
 
+
 def move_anime_type_from_work(apps, schema_editor):
     Anime = apps.get_model("mangaki", "Anime")
 
     for anime in Anime.objects.all():
         anime.deprecated_anime_type = anime.anime_type
         anime.save()
+
 
 class Migration(migrations.Migration):
 

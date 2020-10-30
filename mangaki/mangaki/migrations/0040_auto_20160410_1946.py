@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+
 def move_nb_episodes_to_work(apps, schema_editor):
     Anime = apps.get_model("mangaki", "Anime")
 
@@ -13,12 +14,14 @@ def move_nb_episodes_to_work(apps, schema_editor):
         anime.nb_episodes = anime.deprecated_nb_episodes
         anime.save()
 
+
 def move_nb_episodes_from_work(apps, schema_editor):
     Anime = apps.get_model("mangaki", "Anime")
 
     for anime in Anime.objects.all():
         anime.deprecated_nb_episodes = anime.nb_episodes
         anime.save()
+
 
 class Migration(migrations.Migration):
 

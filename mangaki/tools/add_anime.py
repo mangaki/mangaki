@@ -57,4 +57,5 @@ def run():
             anime.synopsis = data.synopsis  # The most important!
             anime.save()
 
+
 run()

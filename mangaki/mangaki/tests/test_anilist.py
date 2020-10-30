@@ -117,11 +117,11 @@ class AniListTest(TestCase):
         })
 
         self.assertCountEqual(hibike.tags, [
-            { 'anilist_tag_id': 110, 'name': 'Band', 'spoiler': False, 'votes': 100 },
-            { 'anilist_tag_id': 46, 'name': 'School', 'spoiler': False, 'votes': 79 },
-            { 'anilist_tag_id': 98, 'name': 'Female Protagonist', 'spoiler': False, 'votes': 79 },
-            { 'anilist_tag_id': 84, 'name': 'School Club', 'spoiler': False, 'votes': 73 },
-            { 'anilist_tag_id': 50, 'name': 'Seinen', 'spoiler': False, 'votes': 33 }
+            {'anilist_tag_id': 110, 'name': 'Band', 'spoiler': False, 'votes': 100},
+            {'anilist_tag_id': 46, 'name': 'School', 'spoiler': False, 'votes': 79},
+            {'anilist_tag_id': 98, 'name': 'Female Protagonist', 'spoiler': False, 'votes': 79},
+            {'anilist_tag_id': 84, 'name': 'School Club', 'spoiler': False, 'votes': 73},
+            {'anilist_tag_id': 50, 'name': 'Seinen', 'spoiler': False, 'votes': 33}
         ])
 
         self.assertEqual(len(hibike.staff), 13)

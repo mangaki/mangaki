@@ -10,6 +10,7 @@ from mangaki.models import Work
 ATTEMPTS_THRESHOLD = 5
 BACKOFF_DELAY = 2
 
+
 class Command(BaseCommand):
     """
     Utilise les valeurs d'AniDB ID déjà présentes dans la base de données
@@ -39,7 +40,7 @@ class Command(BaseCommand):
         all_tags = set()
 
         count = works.count()
-        self.stdout.write('Number of works : '+str(count)+'\n\n')
+        self.stdout.write('Number of works : ' + str(count) + '\n\n')
 
         for work in works:
             title_display = work.title
@@ -55,7 +56,7 @@ class Command(BaseCommand):
                     # Retrieve tags for the current Work
                     work_tags = client.get_tags(anidb_aid=work.anidb_aid)
                     break
-                except:
+                except BaseException:
                     delay = BACKOFF_DELAY**tries
 
                     message = 'Sleep : Retrying {} in {} seconds ...'.format(title_display, delay)
@@ -90,4 +91,4 @@ class Command(BaseCommand):
         with open('anidb_tags.json', 'w', encoding='utf-8') as f:
             json.dump(final_tags, f)
 
-        self.stdout.write(self.style.SUCCESS('--- Number of different tags : '+str(len(all_tags))+' ---'))
+        self.stdout.write(self.style.SUCCESS('--- Number of different tags : ' + str(len(all_tags)) + ' ---'))
