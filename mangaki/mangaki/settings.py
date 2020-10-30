@@ -8,7 +8,6 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import configparser
-import json
 import os
 from setuptools_scm import get_version
 from pkg_resources import get_distribution, DistributionNotFound

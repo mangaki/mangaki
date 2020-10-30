@@ -1,7 +1,7 @@
 from mangaki.models import Artist, Anime, Genre, Studio, Editor
 from django.db.utils import IntegrityError, DataError
 import re
-from collections import Counter, namedtuple
+from collections import namedtuple
 
 
 AnimeData = namedtuple('AnimeData', 'title vo_title studio author editor anime_type genre1 genre2 nb_episodes origin synopsis poster')

@@ -1,7 +1,6 @@
 from django.db import models
 from mangaki.models import Work
 from django.contrib.auth.models import User
-import locale
 
 
 class Partner(models.Model):

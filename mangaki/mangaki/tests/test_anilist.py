@@ -1,5 +1,4 @@
 from datetime import datetime
-from urllib.parse import urljoin
 import os
 
 import responses

@@ -1,4 +1,3 @@
-import logging
 import json
 import os
 import shutil
@@ -8,7 +7,6 @@ from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 
 from mangaki.models import Category, Work, Rating
-import time
 
 
 ML_SNAPSHOT_ROOT_TEST = '/tmp/test_reco/'

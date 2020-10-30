@@ -2,7 +2,6 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from slugify import slugify
 import json
-import os
 
 def link(slug):
     b = BeautifulSoup(urlopen('http://www.animeka.com/search/index.html?req=%s' % slug)) # &go_search=1&cat=search&zone_series=1&zone_episodes=1&zone_studios=1&zone_pers=1&zone_seriesf=1&zone_rlz=1&zone_team=1&type_search=all

@@ -2,8 +2,7 @@ import datetime
 import json
 from collections import Counter, OrderedDict
 from itertools import zip_longest
-from typing import List, Dict, Any, Tuple, Optional
-from urllib.parse import urlencode
+from typing import Dict, List, Optional
 
 import allauth.account.views
 

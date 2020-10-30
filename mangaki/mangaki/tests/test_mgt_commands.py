@@ -1,7 +1,6 @@
 from io import StringIO
 import responses
 import os.path
-import logging
 import re
 
 from django.test import TestCase

@@ -5,7 +5,6 @@ from mangaki.utils.tokens import compute_token
 from django.contrib.auth import get_user_model
 from django.db import connection
 from django.conf import settings
-import os
 import yaml
 from jinja2 import Template
 

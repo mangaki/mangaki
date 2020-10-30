@@ -1,6 +1,5 @@
 import json
 from django.conf import settings
-import os.path
 import requests
 
 BASE_URL = "http://vgmdb.info/"
