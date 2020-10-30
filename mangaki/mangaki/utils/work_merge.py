@@ -154,8 +154,8 @@ class WorkClusterMergeHandler:
 
         # Clean up the rest.
         remaining_references_ids = (
-            all_references_ids -
-            (set(list(kept_references.values())) | set(list(target_work_references.values())))
+            all_references_ids
+            - (set(list(kept_references.values())) | set(list(target_work_references.values())))
         )
 
         Reference.objects.filter(id__in=remaining_references_ids).delete()

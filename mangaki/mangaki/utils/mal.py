@@ -539,8 +539,8 @@ def import_mal(mal_username: str, mangaki_username: str,
                     user_work.poster,
                     user_work.mal_id)
 
-                if (work and
-                        not any(work.id in container for container in (scores, wontsee, willsee))):
+                if (work
+                   and not any(work.id in container for container in (scores, wontsee, willsee))):
                     if user_work.status == MALStatus.completed:
                         scores[work.id] = user_work.score
                     elif user_work.status == MALStatus.dropped:

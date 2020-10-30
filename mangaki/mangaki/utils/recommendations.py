@@ -71,8 +71,8 @@ def get_reco_algo(request, algo_name='als', category='all'):
         category_filter &= set(Work.objects.filter(category__slug=category)
                                            .values_list('id', flat=True))
 
-    filtered_works = list((algo.dataset.interesting_works & category_filter) -
-                          set(already_rated_works))
+    filtered_works = list((algo.dataset.interesting_works & category_filter)
+                          - set(already_rated_works))
     chrono.save('remove already rated, left {:d}'.format(len(filtered_works)))
 
     pos_of_best = get_personalized_ranking(algo, request.user.id,

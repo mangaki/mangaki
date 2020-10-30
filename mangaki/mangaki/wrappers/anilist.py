@@ -369,8 +369,7 @@ class AniList(metaclass=Singleton):
     def rate_limited(self):
         return (
             self.rate_limit_reset_timestamp is not None
-            and
-            self.rate_limit_reset_timestamp >= int(datetime.now().timestamp())
+            and self.rate_limit_reset_timestamp >= int(datetime.now().timestamp())
         )
 
     def _request(self,

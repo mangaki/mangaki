@@ -12,6 +12,8 @@ import os
 from setuptools_scm import get_version
 from pkg_resources import get_distribution, DistributionNotFound
 
+__all__ = []
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 FIXTURE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
 TEST_DATA_DIR = os.path.join(BASE_DIR, 'tests', 'data')
@@ -72,7 +74,7 @@ INSTALLED_APPS = (
 
 if config.has_section('sentry'):
     import raven
-
+    __all__ += ['raven']
     INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
 
     RAVEN_CONFIG = {

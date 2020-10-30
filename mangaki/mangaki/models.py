@@ -211,7 +211,7 @@ class Work(models.Model):
 
         try:
             r = session.get(url, timeout=5, stream=True)
-        except requests.RequestException as e:
+        except requests.RequestException:
             return False
 
         try:
@@ -527,9 +527,9 @@ def not_empty_field(choice, field=None):
     >>> not_empty_field(0, 'anidb_aid')
     False
     """
-    return (choice is not None and
-            choice not in {'Inconnu', ''} and
-            choice not in UNKNOWN_VALUES.get(field, []))
+    return (choice is not None
+            and choice not in {'Inconnu', ''}
+            and choice not in UNKNOWN_VALUES.get(field, []))
 
 
 PRECOMPUTED_FIELDS = {'sum_ratings',

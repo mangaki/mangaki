@@ -5,9 +5,9 @@ def esym_poly(k, lam):
     N = lam.size
     E = np.zeros((k + 1, N + 1))
     E[0, :] = np.ones((1, N + 1))
-    for l in range(1, k + 1):
+    for ltemp in range(1, k + 1):
         for n in range(1, N + 1):
-            E[l, n] = E[l, n - 1] + lam[n - 1] * E[l - 1, n - 1]
+            E[ltemp, n] = E[ltemp, n - 1] + lam[n - 1] * E[ltemp - 1, n - 1]
 
     return E
 

@@ -559,11 +559,11 @@ class WorkClusterAdmin(admin.ModelAdmin):
                 else:
                     return '#'
             return (
-                '<ul>' +
-                format_html_join('', '<li>{} ({}<a href="{}">{}</a>)</li>',
-                                 ((work.title, 'was ' if work.redirect is not None else '',
-                                   get_admin_url(work), work.id) for work in cluster_works)) +
-                '</ul>'
+                '<ul>'
+                + format_html_join('', '<li>{} ({}<a href="{}">{}</a>)</li>',
+                                   ((work.title, 'was ' if work.redirect is not None else '',
+                                    get_admin_url(work), work.id) for work in cluster_works))
+                + '</ul>'
             )
         else:
             return '(all deleted)'
