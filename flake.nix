@@ -117,13 +117,14 @@
           })
 
           # Mangaki configuration
-          ({ ... }: {
+          ({ useTLS ? false, ... }: {
             imports =
               [
-                (import ./nix/vm/standalone-configuration.nix { })
+                (import ./nix/vm/standalone-configuration.nix {
+                  inherit useTLS;
+                  devMode = true;
+                })
               ];
-
-            services.mangaki.devMode = true;
           })
         ];
       };
@@ -132,6 +133,30 @@
       nixosModules.mangaki = import ./nix/modules/mangaki.nix;
 
       # Tests run by 'nix flake check' and by Hydra.
-      checks = forAllSystems (system: self.packages.${system});
+      checks = forAllSystems (system: self.packages.${system} // {
+        # VM test on website availability.
+        mangaki-host-test =
+          with import (nixpkgs + "/nixos/lib/testing-python.nix")
+          { inherit system; };
+
+          makeTest {
+            nodes.client = { ... }: {
+              imports = [ self.nixosModules.mangaki ];
+              nixpkgs.overlays = [ self.overlay ];
+
+              services.mangaki.enable = true;
+            };
+
+            testScript = ''
+              start_all()
+
+              client.wait_for_unit("mangaki.service")
+              client.wait_for_open_port(8000)
+              client.succeed("curl http://localhost:8000")
+
+              client.shutdown()
+            '';
+          };
+      });
     };
 }

@@ -106,12 +106,28 @@ in
     useTLS = mkEnableOption "TLS on the web server";
     staticRoot = mkOption {
       type = types.package;
-      default = mangaki.static;
+      default = pkgs.mangaki.static;
       description = ''
         In **production** mode, the package to use for static data, which will be used as static root.
         Note that, as its name indicates it, static data never change during the lifecycle of the service.
         As a result, static root is read-only.
         It can only be changed through changes in the static derivation.
+      '';
+    };
+    sourcePath = mkOption {
+      type = types.str;
+      default = pkgs.mangaki.src;
+      description = ''
+        In **production** mode, the package to use for source, is the mangaki package.
+        As a result, the source is read-only.
+        Though, in editable mode, a mutable path can be passed, e.g. /run/mangaki.
+      '';
+    };
+    envPackage = mkOption {
+      type = types.package;
+      default = pkgs.mangaki.env;
+      description = ''
+        This is the Mangaki Python's environment: its dependencies.
       '';
     };
     allowedHosts = mkOption {
@@ -274,7 +290,7 @@ in
     warnings = [ ]
       ++ (optional (!cfg.lifecycle.performInitialMigrations) [ "You disabled initial migration setup, this can have unexpected effects. " ]);
 
-    environment.systemPackages = [ pkgs.mangaki.env ];
+    environment.systemPackages = [ cfg.envPackage ];
     environment.variables = {
       inherit (mangakiEnv) MANGAKI_SETTINGS_PATH DJANGO_SETTINGS_MODULE;
     };
@@ -306,7 +322,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki service";
-      path = [ pkgs.mangaki.env ];
+      path = [ cfg.envPackage ];
       environment = mangakiEnv;
 
       serviceConfig = {
@@ -322,7 +338,7 @@ in
         # Initialize database
         if [ ! -f .initialized ]; then
           django-admin migrate
-          django-admin loaddata ${pkgs.mangaki.src}/fixtures/{partners,seed_data}.json
+          django-admin loaddata ${cfg.sourcePath}/fixtures/{partners,seed_data}.json
 
           touch .initialized
         fi
@@ -330,7 +346,7 @@ in
 
       # TODO: django-admin runserver bugs out looking like it fails to parse bash
       script = ''
-        python ${pkgs.mangaki.src}/mangaki/manage.py runserver
+        python ${cfg.sourcePath}/mangaki/manage.py runserver
       '';
     };
     # systemd oneshot for fixture loading.
@@ -349,7 +365,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki daily ranking";
-      path = [ pkgs.mangaki.env ];
+      path = [ cfg.envPackage ];
       environment = mangakiEnv;
 
       serviceConfig = {
@@ -369,7 +385,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki daily top calculation";
-      path = [ pkgs.mangaki.env ];
+      path = [ cfg.envPackage ];
       environment = mangakiEnv;
 
       serviceConfig = {
@@ -382,7 +398,7 @@ in
         django-admin top --all
       '';
     };
-    # systemd timers for backup of PGSQL.
+    # TODO: systemd timers for backup of PGSQL.
 
     # systemd service for Celery.
     systemd.services.mangaki-worker = {
@@ -391,7 +407,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki background tasks runner";
-      path = [ pkgs.mangaki.env ];
+      path = [ cfg.envPackage ];
       environment = mangakiEnv;
 
       serviceConfig = {
@@ -405,6 +421,7 @@ in
     };
 
     # Set up NGINX.
+    # TODO: Throw some Let's Encrypt or snakeoil.
     services.nginx = mkIf (!cfg.devMode) {
       enable = !cfg.devMode;
     };
@@ -416,9 +433,8 @@ in
         type = "normal";
       };
     };
-    # Set up systemd unit for Django development server.
 
-    # Throw some Let's Encrypt or snakeoil.
+    # TODO: Set up systemd unit for Django development server.
 
     users = {
       users.mangaki = {

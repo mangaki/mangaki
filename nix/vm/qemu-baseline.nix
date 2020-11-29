@@ -22,14 +22,4 @@
   virtualisation.memorySize = 1024;
   virtualisation.diskSize = 1024;
   virtualisation.graphics = true; # false after.
-
-  # virtualisation.options =
-  # let
-  #   extPort = config.services.mangaki-vm.forwardedPort;
-  #   intPort =
-  #     if config.services.mangaki.useTLS then 443
-  #     else 80;
-  # in
-  # # Forward the ports.
-  # [ "-net user,hostfwd=tcp::${toString extPort}-:${toString intPort}" ];
 }
