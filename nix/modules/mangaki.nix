@@ -33,12 +33,12 @@ let
     // optionalAttrs (!cfg.devMode) {
       deployment = {
         MEDIA_ROOT = "/srv/mangaki/media";
-        STATIC_ROOT = cfg.staticRoot;
+        STATIC_ROOT = "${cfg.staticRoot}";
         DATA_ROOT = "/srv/mangaki/data";
       };
 
       hosts = {
-        ALLOWED_HOSTS = cfg.allowedHosts;
+        ALLOWED_HOSTS = concatStringsSep "," cfg.allowedHosts;
       };
     }
     # // optionalAttrs (cfg.mal.user != "" && cfg.mal.userAgent != "") {
@@ -60,11 +60,11 @@ let
         DB_USER = cfg.databasConfig.user;
       };
     }
-    // optionalAttrs (!cfg.devMode && cfg.sentry.dsn != null) {
-      sentry = {
-        DSN = cfg.sentry.dsn;
-      };
-    }
+    #// optionalAttrs (!cfg.devMode && cfg.sentry.dsn != null) {
+    #  sentry = {
+    #    DSN = cfg.sentry.dsn;
+    #  };
+    #}
     # // optionalAttrs (cfg.email.useSMTP) {
     #   EMAIL_HOST = cfg.email.host;
     #   EMAIL_HOST_PASSWORD = cfg.email.password;
@@ -96,6 +96,7 @@ let
     MANGAKI_SETTINGS_PATH = toString configFile;
     DJANGO_SETTINGS_MODULE = "mangaki.settings";
   };
+  srcPath = pkgs.mangaki.src; # FIXME: cfg.sourcePath or pkgs.mangaki.src, but it won't work because of builtins.storePath magic.
 in
 {
   imports = [ ];
@@ -115,9 +116,12 @@ in
       '';
     };
     sourcePath = mkOption {
-      type = types.str;
-      default = pkgs.mangaki.src;
+      type = types.nullOr types.src;
+      default = null;
       description = ''
+        Because of Flake/Module system limitations, builtins.storePath cannot be used.
+        As a result, it's not possible to pass around the sourcePath.
+
         In **production** mode, the package to use for source, is the mangaki package.
         As a result, the source is read-only.
         Though, in editable mode, a mutable path can be passed, e.g. /run/mangaki.
@@ -338,7 +342,7 @@ in
         # Initialize database
         if [ ! -f .initialized ]; then
           django-admin migrate
-          django-admin loaddata ${cfg.sourcePath}/fixtures/{partners,seed_data}.json
+          django-admin loaddata ${srcPath}/fixtures/{partners,seed_data}.json
 
           touch .initialized
         fi
@@ -346,7 +350,7 @@ in
 
       # TODO: django-admin runserver bugs out looking like it fails to parse bash
       script = ''
-        python ${cfg.sourcePath}/mangaki/manage.py runserver
+        python ${srcPath}/mangaki/manage.py runserver
       '';
     };
     # systemd oneshot for fixture loading.
@@ -411,13 +415,12 @@ in
       environment = mangakiEnv;
 
       serviceConfig = {
+        Type = "forking";
         User = "mangaki";
         Group = "mangaki";
+        ExecStop = "celery -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid stopwait -l INFO";
+        ExecStart = "celery -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid worker -l INFO";
       };
-
-      script = ''
-        celery -B -A mangaki:celery_app worker -l INFO
-      '';
     };
 
     # Set up NGINX.

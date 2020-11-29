@@ -2,7 +2,7 @@
   description = "Mangaki";
 
   # Nixpkgs / NixOS version to use.
-  inputs.nixpkgs = { type = "github"; owner = "NixOS"; repo = "nixpkgs"; ref = "nixos-20.03"; };
+  inputs.nixpkgs = { type = "github"; owner = "NixOS"; repo = "nixpkgs"; ref = "20.09"; };
 
   # Flake compatability shim
   inputs.flake-compat = { type = "github"; owner = "edolstra"; repo = "flake-compat"; flake = false; };
@@ -123,6 +123,7 @@
                 (import ./nix/vm/standalone-configuration.nix {
                   inherit useTLS;
                   devMode = true;
+                  editableMode = false;
                 })
               ];
           })
@@ -140,7 +141,8 @@
           { inherit system; };
 
           makeTest {
-            nodes.client = { ... }: {
+            name = "web-test";
+            machine = { ... }: {
               imports = [ self.nixosModules.mangaki ];
               nixpkgs.overlays = [ self.overlay ];
 
@@ -150,11 +152,10 @@
             testScript = ''
               start_all()
 
-              client.wait_for_unit("mangaki.service")
-              client.wait_for_open_port(8000)
-              client.succeed("curl http://localhost:8000")
-
-              client.shutdown()
+              machine.wait_for_unit("mangaki.service")
+              machine.wait_for_open_port(8000)
+              machine.succeed("curl http://localhost:8000")
+              machine.shutdown()
             '';
           };
       });

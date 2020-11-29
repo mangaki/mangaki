@@ -17,7 +17,6 @@
     enable = true;
     inherit useTLS devMode allowedHosts domainName;
     staticRoot = pkgs.mangaki.static;
-    sourcePath = pkgs.mangaki.src;
     envPackage = pkgs.mangaki.env;
   };
 

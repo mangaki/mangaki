@@ -35,7 +35,7 @@ in
     };
 
     config = mkIf cfg.enable {
-      assertions [
+      assertions = [
         {
           assertion = cfg.editableMode -> cfg.hostSourcePath != null;
           message = "Editable mode cannot work without an host source path to mount through 9p";
@@ -68,22 +68,19 @@ in
       # But, static paths stays still, because they are not relevant anyway.
       services.mangaki.sourcePath = mkIf cfg.editableMode (mkForce "/run/mangaki");
 
-      virtualisation.qemu.options = mkMerge [
-        "-virtfs local,path=''${cfg.hostSourcePath},security_model=none,mount_tag=srctree"
-      ];
-
-      # FIXME: is there a way to rebuild envPackage magically and restart the service?
-      # or, shall we opt-out Nix for dependencies management?
-
-      # Port forwarding.
-      virtualisation.options =
+      virtualisation.qemu.options = 
         let
           extPort = cfg.forwardedPort;
           intPort =
             if config.services.mangaki.useTLS then 443
             else 80;
         in
-  # Forward the ports.
-      mkIf (extPort != null) [ "-net user,hostfwd=tcp::${toString extPort}-:${toString intPort}" ];
+        mkMerge ([]
+        # Forward the ports.
+        ++ optionals (extPort != null) [ "-net user,hostfwd=tcp::${toString extPort}-:${toString intPort}" ]
+        ++ optionals cfg.editableMode [ "-virtfs local,path=''${cfg.hostSourcePath},security_model=none,mount_tag=srctree" ]);
+
+      # FIXME: is there a way to rebuild envPackage magically and restart the service?
+      # or, shall we opt-out Nix for dependencies management?
     };
   }
