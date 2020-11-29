@@ -145,7 +145,7 @@
             machine = { ... }: {
               imports = [ self.nixosModules.mangaki ];
               nixpkgs.overlays = [ self.overlay ];
-
+              virtualisation.memorySize = 512;
               services.mangaki.enable = true;
             };
 
@@ -155,6 +155,7 @@
               machine.wait_for_unit("mangaki.service")
               machine.wait_for_open_port(8000)
               machine.succeed("curl http://localhost:8000")
+
               machine.shutdown()
             '';
           };

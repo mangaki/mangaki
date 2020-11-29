@@ -434,6 +434,7 @@ in
       enable = !cfg.devMode;
       instance = {
         type = "normal";
+        socket = "/run/uwsgi/uwsgi.sock";
       };
     };
 
