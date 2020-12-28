@@ -395,7 +395,7 @@ in
         Group = "mangaki";
 
         StateDirectory = "mangaki";
-        StateDirectoryMode = "0750";
+        StateDirectoryMode = "0755";
         WorkingDirectory = "/var/lib/mangaki";
       };
       serviceConfig = {
@@ -420,7 +420,7 @@ in
         Group = "mangaki";
 
         StateDirectory = "mangaki";
-        StateDirectoryMode = "0750";
+        StateDirectoryMode = "0755";
         WorkingDirectory = "/var/lib/mangaki";
       };
 
@@ -496,7 +496,7 @@ in
         Group = "mangaki";
 
         StateDirectory = "mangaki";
-        StateDirectoryMode = "0750";
+        StateDirectoryMode = "0755";
         WorkingDirectory = "/var/lib/mangaki";
       };
 
@@ -530,7 +530,7 @@ in
         Group = "mangaki";
 
         RuntimeDirectory = "celery";
-        StateDirectoryMode = "0750";
+        StateDirectoryMode = "0755";
         WorkingDirectory = "/var/lib/mangaki";
 
         ExecStop = "${cfg.envPackage}/bin/celery multi stopwait ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid -l INFO";
@@ -556,7 +556,7 @@ in
         locations."/" = {
           root = cfg.staticRoot;
           extraConfig = ''
-            uwsgi_pass 127.0.0.1:8000;
+            uwsgi_pass unix:/var/lib/mangaki/uwsgi.sock;
             include ${config.services.nginx.package}/conf/uwsgi_params;
           '';
         };
@@ -575,7 +575,7 @@ in
           mangaki = {
             type = "normal";
             http = ":8000";
-            # socket = "${config.services.uwsgi.runDir}/mangaki.sock"; FIXME(Ryan): make this work with NGINX but permissions are not okay.
+            socket = "/var/lib/mangaki/uwsgi.sock";
             pythonPackages = _: [ cfg.appPackage ];
             env = (mapAttrsToList (n: v: "${n}=${v}") mangakiEnv);
             module = "wsgi:application";
@@ -588,7 +588,7 @@ in
             max-requests = 5000;
             chmod-socket = 664; # 664 is already too weak…
             uid = "mangaki";
-            gid = "mangaki";
+            gid = "nginx";
           };
         };
       };
