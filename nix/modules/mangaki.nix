@@ -97,14 +97,25 @@ let
     DJANGO_SETTINGS_MODULE = "mangaki.settings";
   };
   srcPath = if isNull cfg.sourcePath then pkgs.mangaki.src else cfg.sourcePath;
+  # FIXME(Ryan): This script will end up in the /nix/store and compromises password
+  writePGPassScript = with cfg.databaseConfig; ''
+    # Write ~/.pgpass to simplify the operations using pg_* & psql
+    if [! -f ~/.pgpass ]; then
+      touch ~/.pgpass
+      chmod 600 ~/.pgpass
+      echo "${host}:${port}:${name}:${username}:${password}" > ~/.pgpass
+    fi
+  '';
   initialMigrationScript = ''
-  # Initialize database
-  if [ ! -f .initialized ]; then
-    django-admin migrate
-    django-admin loaddata ${srcPath}/fixtures/{partners,seed_data}.json
+    # Initialize database
+    if [ ! -f .initialized ]; then
+      django-admin migrate
+      django-admin loaddata ${srcPath}/fixtures/{partners,seed_data}.json
 
-    touch .initialized
-  fi
+      touch .initialized
+    fi
+
+    ${optionalString (!cfg.useLocalDatabase) writePGPassScript}
   '';
 in
 {
@@ -259,6 +270,7 @@ in
           user = "mangaki";
           host = "db.mangaki.fr";
           port = 5432;
+          name = "clockwork"; # database name
           password = "ararararararagi"; # or null, for trusted auth.
         }
       '';
@@ -330,8 +342,12 @@ in
       # }
     ];
 
-    warnings = [ ]
-      ++ (optional (!cfg.lifecycle.performInitialMigrations) [ "You disabled initial migration setup, this can have unexpected effects. " ]);
+    warnings = concatLists ([
+     (optional (!cfg.lifecycle.performInitialMigrations)
+     "You disabled initial migration setup, this can have unexpected effects.")
+     (optional (!cfg.devMode -> (cfg.settings.secrets.SECRET_KEY == "CHANGE_ME"))
+     "You are deploying a production instance with a default secret key. The server will be vulnerable.")
+    ]);
 
     environment.systemPackages = [ cfg.envPackage ];
     environment.variables = {
@@ -359,9 +375,35 @@ in
 
     # User activation script for directory initialization.
     # systemd oneshot for initial migration.
-    systemd.services.mangaki = mkIf (cfg.devMode) {
+    systemd.services.mangaki-init-db = mkIf (!cfg.devMode) {
       after = [ "postgresql.service" ];
       requires = [ "postgresql.service" ];
+      before = [ "uwsgi.service" ];
+      wantedBy = [ "multi-user.target" ];
+
+      description = "Initialize Mangaki database for the first time";
+      path = [ cfg.envPackage ];
+      environment = mangakiEnv;
+
+      serviceConfig = {
+        User = "mangaki";
+        Group = "mangaki";
+
+        StateDirectory = "mangaki";
+        StateDirectoryMode = "0750";
+        WorkingDirectory = "/var/lib/mangaki";
+      };
+      serviceConfig = {
+        Type = "oneshot";
+        StandardOutput = "journal+console";
+      };
+      script = initialMigrationScript;
+    };
+
+    # Mangaki development server
+    systemd.services.mangaki = mkIf (cfg.devMode) {
+      after = [ "mangaki-init-db.service" "postgresql.service" ];
+      requires = [ "mangaki-init-db.service" "postgresql.service" ];
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki service";
@@ -377,12 +419,11 @@ in
         WorkingDirectory = "/var/lib/mangaki";
       };
 
-      preStart = initialMigrationScript;
-     
       script = ''
         python ${srcPath}/mangaki/manage.py runserver
       '';
     };
+
     # systemd oneshot for fixture loading.
     # systemd timers for ranking & top --all in production mode.
     systemd.timers = genAttrs
@@ -394,8 +435,8 @@ in
       });
 
     systemd.services.mangaki-ranking = {
-      after = [ "mangaki.service" ];
-      requires = [ "mangaki.service" ];
+      after = [ "mangaki-init-db.service" ];
+      requires = [ "mangaki-init-db.service" ];
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki daily ranking";
@@ -414,8 +455,8 @@ in
     };
 
     systemd.services.mangaki-top = {
-      after = [ "mangaki.service" ];
-      requires = [ "mangaki.service" ];
+      after = [ "mangaki-init-db.service" ];
+      requires = [ "mangaki-init-db.service" ];
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki daily top calculation";
@@ -432,28 +473,61 @@ in
         django-admin top --all
       '';
     };
-    # TODO: systemd timers for backup of PGSQL.
+
+    # Backup unit available only *not* in dev mode.
+    systemd.services.mangaki-db-backup = mkIf (!cfg.devMode) {
+      after = [ "postgresql.service" ];
+      requires = [ "postgresql.service" ];
+
+      serviceConfig.Type = "oneshot";
+      path = [ cfg.envPackage ];
+      environment = mangakiEnv;
+
+      serviceConfig = {
+        User = "mangaki";
+        Group = "mangaki";
+
+        StateDirectory = "mangaki";
+        StateDirectoryMode = "0750";
+        WorkingDirectory = "/var/lib/mangaki";
+      };
+
+      script = ''
+        mkdir -p backups
+        today=$(date +"%Y%m%d")
+        ${pkgs.postgresql}/bin/pg_dump \
+          --format=c \
+          ${optionalString (!cfg.useLocalDatabase) "--host ${cfg.databaseConfig.host} --username ${cfg.databaseConfig.username} ${cfg.databaseConfig.database}"}${optionalString (cfg.useLocalDatabase) "mangaki"} > backups/mangaki.$today.dump
+      '';
+    };
 
     # systemd service for Celery.
     systemd.services.mangaki-worker = {
-      after = [ "mangaki.service" ];
-      requires = [ "mangaki.service" ];
+      after = [ "mangaki-init-db.service" "redis.service" ];
+      requires = [ "mangaki-init-db.service" "redis.service" ];
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki background tasks runner";
       path = [ cfg.envPackage ];
       environment = mangakiEnv;
 
-      serviceConfig = {
+      serviceConfig = let
+        workerName = "maho";
+      in
+      {
         Type = "forking";
         User = "mangaki";
         Group = "mangaki";
-        ExecStop = "celery -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid stopwait -l INFO";
-        ExecStart = "celery -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid worker -l INFO";
+
+        RuntimeDirectory = "celery";
+        StateDirectoryMode = "0750";
+        WorkingDirectory = "/var/lib/mangaki";
+
+        ExecStop = "${cfg.envPackage}/bin/celery multi stopwait ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid -l INFO";
+        ExecReload = "${cfg.envPackage}/bin/celery multi restart ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid -l INFO";
+        ExecStart = "${cfg.envPackage}/bin/celery multi start ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid -l INFO";
       };
     };
-
-    # FIXME: write down a systemd oneshot for initial migrations.
 
     # Set up NGINX.
     services.nginx = mkIf (!cfg.devMode) {
@@ -469,17 +543,21 @@ in
         sslCertificateKey = if cfg.useTLS && !cfg.useACME then cfg.sslCertificateKey else null;
         forceSSL = cfg.useTLS && cfg.forceTLS;
         addSSL = cfg.useTLS && !cfg.forceTLS;
-        root = cfg.staticRoot;
-        locations."/".extraConfig = ''
-          uwsgi_pass localhost:8000;
-          include ${config.services.nginx.package}/conf/uwsgi_params;
-        '';
+        locations."/" = {
+          root = cfg.staticRoot;
+          extraConfig = ''
+            uwsgi_pass 127.0.0.1:8000;
+            include ${config.services.nginx.package}/conf/uwsgi_params;
+          '';
+        };
       };
     };
 
     # Set up uWSGI
     services.uwsgi = mkIf (!cfg.devMode) {
       enable = !cfg.devMode;
+      user = "root"; # For privilege dropping.
+      group = "root";
       plugins = [ "python3" ];
       instance = {
         type = "emperor";
@@ -487,7 +565,7 @@ in
           mangaki = {
             type = "normal";
             http = ":8000";
-            socket = "${config.services.uwsgi.runDir}/mangaki.sock"; # FIXME(Ryan): make this work with NGINX but permissions are not okay.
+            # socket = "${config.services.uwsgi.runDir}/mangaki.sock"; FIXME(Ryan): make this work with NGINX but permissions are not okay.
             pythonPackages = _: [ cfg.appPackage ];
             env = (mapAttrsToList (n: v: "${n}=${v}") mangakiEnv);
             module = "wsgi:application";
@@ -495,9 +573,12 @@ in
             pyhome = "${cfg.appPackage}";
             master = true;
             vacuum = true;
+            processes = 2;
             harakiri = 20;
             max-requests = 5000;
             chmod-socket = 664; # 664 is already too weak…
+            uid = "mangaki";
+            gid = "mangaki";
           };
         };
       };

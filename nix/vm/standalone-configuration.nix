@@ -2,7 +2,6 @@
 , forwardedPort ? if useTLS then 8443 else 8000
 , devMode ? true
 , editableMode ? devMode # enable local changes on the host to be transferred to the VM through 9p mount.
-, allowedHosts ? [ "127.0.0.1" ]
 , domainName ? null
 , hostSourcePath ? null
 }:
@@ -16,7 +15,7 @@
 
   services.mangaki = {
     enable = true;
-    inherit useTLS devMode allowedHosts domainName;
+    inherit useTLS devMode domainName;
     staticRoot = pkgs.mangaki.static;
     envPackage = pkgs.mangaki.env;
   };
