@@ -117,6 +117,11 @@ let
 
     ${optionalString (!cfg.useLocalDatabase) writePGPassScript}
   '';
+  mkOneShotShortTimer = service: {
+    wantedBy = [ "timers.target" ];
+    description = "Run ${service}.service every hours";
+    timerConfig.OnUnitActiveSec = "1h";
+  };
 in
 {
   imports = [ ];
@@ -218,7 +223,7 @@ in
       periodicity = mkOption {
         type = types.str;
         default = "weekly";
-        description = "The periodicity to use to auto-backup the database.";
+        description = "The periodicity to use to auto-backup the database. Refer to man 7 systemd.time for exact syntax.";
       };
       postBackupScript = mkOption {
         type = types.str;
@@ -426,13 +431,16 @@ in
 
     # systemd oneshot for fixture loading.
     # systemd timers for ranking & top --all in production mode.
-    systemd.timers = genAttrs
-      [ "mangaki-ranking" "mangaki-top" ]
-      (service: {
-        wantedBy = [ "timers.target" ];
-        description = "Run ${service}.service every hours";
-        timerConfig.OnUnitActiveSec = "1h";
-      });
+    systemd.timers."mangaki-ranking" = mkOneShotShortTimer "mangaki-ranking";
+    systemd.timers."mangaki-top" = mkOneShotShortTimer "mangaki-top";
+    # systemd timer for regular DB backups
+    systemd.timers."mangaki-db-backup" = mkIf (cfg.backups.enable) {
+      wantedBy = [ "timers.target" ];
+      partOf = [ "mangaki-db-backup.service" ];
+      timerConfig.OnCalendar = cfg.backups.periodicity;
+      timerConfig.Persistent = true;
+      description = "Run a backup of Mangaki database on ${cfg.backups.periodicity} periodicity";
+    };
 
     systemd.services.mangaki-ranking = {
       after = [ "mangaki-init-db.service" ];
@@ -475,7 +483,7 @@ in
     };
 
     # Backup unit available only *not* in dev mode.
-    systemd.services.mangaki-db-backup = mkIf (!cfg.devMode) {
+    systemd.services.mangaki-db-backup = mkIf (cfg.backups.enable) {
       after = [ "postgresql.service" ];
       requires = [ "postgresql.service" ];
 
@@ -498,6 +506,8 @@ in
         ${pkgs.postgresql}/bin/pg_dump \
           --format=c \
           ${optionalString (!cfg.useLocalDatabase) "--host ${cfg.databaseConfig.host} --username ${cfg.databaseConfig.username} ${cfg.databaseConfig.database}"}${optionalString (cfg.useLocalDatabase) "mangaki"} > backups/mangaki.$today.dump
+        # Custom post-backup script (if applicable)
+        ${optionalString (cfg.backups.postBackupScript != "") "${cfg.backups.postBackupScript} backups/mangaki.$today.dump"}
       '';
     };
 
