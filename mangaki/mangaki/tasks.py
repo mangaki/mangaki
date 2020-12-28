@@ -10,7 +10,7 @@ from django.db import IntegrityError
 from django.db.models import Count, Q
 
 from mangaki.utils.work_merge import create_work_cluster, merge_work_clusters
-from .celery import app
+from .workers import app
 from django.contrib.auth.models import User
 from django.conf import settings
 
