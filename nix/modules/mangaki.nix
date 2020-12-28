@@ -96,7 +96,16 @@ let
     MANGAKI_SETTINGS_PATH = toString configFile;
     DJANGO_SETTINGS_MODULE = "mangaki.settings";
   };
-  srcPath = pkgs.mangaki.src; # FIXME: cfg.sourcePath or pkgs.mangaki.src, but it won't work because of builtins.storePath magic.
+  srcPath = if isNull cfg.sourcePath then pkgs.mangaki.src else cfg.sourcePath;
+  initialMigrationScript = ''
+  # Initialize database
+  if [ ! -f .initialized ]; then
+    django-admin migrate
+    django-admin loaddata ${srcPath}/fixtures/{partners,seed_data}.json
+
+    touch .initialized
+  fi
+  '';
 in
 {
   imports = [ ];
@@ -104,7 +113,21 @@ in
   options.services.mangaki = {
     enable = mkEnableOption "the mangaki service";
     devMode = mkEnableOption "the development mode (non-production setup)";
+    # TLS
     useTLS = mkEnableOption "TLS on the web server";
+    useACME = mkEnableOption "Let's Encrypt for TLS certificates delivery (require a public domain name)";
+    forceTLS = mkEnableOption "Redirect HTTP on HTTPS";
+    sslCertificate = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = "Path to server SSL certificate.";
+    };
+    sslCertificateKey = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = "Path to server SSL certificate key.";
+    };
+
     staticRoot = mkOption {
       type = types.package;
       default = pkgs.mangaki.static;
@@ -116,12 +139,9 @@ in
       '';
     };
     sourcePath = mkOption {
-      type = types.nullOr types.src;
+      type = types.nullOr types.str;
       default = null;
       description = ''
-        Because of Flake/Module system limitations, builtins.storePath cannot be used.
-        As a result, it's not possible to pass around the sourcePath.
-
         In **production** mode, the package to use for source, is the mangaki package.
         As a result, the source is read-only.
         Though, in editable mode, a mutable path can be passed, e.g. /run/mangaki.
@@ -132,6 +152,13 @@ in
       default = pkgs.mangaki.env;
       description = ''
         This is the Mangaki Python's environment: its dependencies.
+      '';
+    };
+    appPackage = mkOption {
+      type = types.package;
+      default = pkgs.mangaki;
+      description = ''
+        This is the Mangaki Python's application for production deployment.
       '';
     };
     allowedHosts = mkOption {
@@ -285,6 +312,18 @@ in
         assertion = !cfg.useLocalRedis -> cfg.redisConfig != null;
         message = "If local Redis instance is not used, Redis instance configuration must be set.";
       }
+      {
+        assertion = cfg.useTLS -> (cfg.useACME || (cfg.sslCertificate != null && cfg.sslCertificateKey != null));
+        message = "If TLS is enabled, either use Let's Encrypt or provide your own certificates.";
+      }
+      {
+        assertion = cfg.useACME -> cfg.domainName != null;
+        message = "If ACME is used, a domain name must be set, otherwise ACME will fail.";
+      }
+      {
+        assertion = !cfg.devMode -> cfg.domainName != null;
+        message = "If production mode is enabled, a domain name must be set, otherwise NGINX cannot be configured.";
+      }
       # {
       #   assertion = cfg.email.useSMTP -> cfg.email.host != null && cfg.email.password != null;
       #   message = "If SMTP is enabled, SMTP host and password must be set.";
@@ -320,7 +359,7 @@ in
 
     # User activation script for directory initialization.
     # systemd oneshot for initial migration.
-    systemd.services.mangaki = {
+    systemd.services.mangaki = mkIf (cfg.devMode) {
       after = [ "postgresql.service" ];
       requires = [ "postgresql.service" ];
       wantedBy = [ "multi-user.target" ];
@@ -338,17 +377,8 @@ in
         WorkingDirectory = "/var/lib/mangaki";
       };
 
-      preStart = ''
-        # Initialize database
-        if [ ! -f .initialized ]; then
-          django-admin migrate
-          django-admin loaddata ${srcPath}/fixtures/{partners,seed_data}.json
-
-          touch .initialized
-        fi
-      '';
-
-      # TODO: django-admin runserver bugs out looking like it fails to parse bash
+      preStart = initialMigrationScript;
+     
       script = ''
         python ${srcPath}/mangaki/manage.py runserver
       '';
@@ -424,21 +454,52 @@ in
     };
 
     # Set up NGINX.
-    # TODO: Throw some Let's Encrypt or snakeoil.
     services.nginx = mkIf (!cfg.devMode) {
       enable = !cfg.devMode;
+      recommendedOptimisation = !cfg.devMode;
+      recommendedProxySettings = !cfg.devMode;
+      recommendedGzipSettings = !cfg.devMode;
+      recommendedTlsSettings = !cfg.devMode && cfg.useTLS;
+
+      virtualHosts."${cfg.domainName}" = {
+        enableACME = cfg.useTLS && cfg.useACME;
+        sslCertificate = if cfg.useTLS && !cfg.useACME then cfg.sslCertificate else null;
+        sslCertificateKey = if cfg.useTLS && !cfg.useACME then cfg.sslCertificateKey else null;
+        forceSSL = cfg.useTLS && cfg.forceTLS;
+        addSSL = cfg.useTLS && !cfg.forceTLS;
+        root = cfg.staticRoot;
+        locations."/".extraConfig = ''
+          uwsgi_pass unix://${config.services.uwsgi.runDir}/mangaki.sock;
+          include ${config.services.nginx.package}/conf/uwsgi_params;
+        '';
+      };
     };
 
     # Set up Gunicorn/uWSGI (?)
     services.uwsgi = mkIf (!cfg.devMode) {
       enable = !cfg.devMode;
+      plugins = [ "python3" ];
       instance = {
-        type = "normal";
-        socket = "/run/uwsgi/uwsgi.sock";
+        type = "emperor";
+        vassals = {
+          mangaki = {
+            type = "normal";
+            http = ":8000";
+            socket = "${config.services.uwsgi.runDir}/mangaki.sock";
+            pythonPackages = _: [ cfg.appPackage ];
+            env = (mapAttrsToList (n: v: "${n}=${v}") mangakiEnv);
+            module = "wsgi:application";
+            chdir = "${srcPath}/mangaki/mangaki";
+            pyhome = "${cfg.appPackage}";
+            master = true;
+            vacuum = true;
+            harakiri = 20;
+            max-requests = 5000;
+            chmod-socket = 664;
+          };
+        };
       };
     };
-
-    # TODO: Set up systemd unit for Django development server.
 
     users = {
       users.mangaki = {

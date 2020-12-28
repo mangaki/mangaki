@@ -4,6 +4,7 @@
 , editableMode ? devMode # enable local changes on the host to be transferred to the VM through 9p mount.
 , allowedHosts ? [ "127.0.0.1" ]
 , domainName ? null
+, hostSourcePath ? null
 }:
 { config, pkgs, lib, ... }:
 {
@@ -22,6 +23,6 @@
 
   services.mangaki-vm = {
     enable = true;
-    inherit forwardedPort editableMode;
+    inherit forwardedPort editableMode hostSourcePath;
   };
 }

@@ -11,15 +11,23 @@
   };
 
   services.openssh.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 80 443 ];
+  networking.firewall.allowedTCPPorts = [ 22 80 443 8000 ];
+
+  services.mingetty.autologinUser = "root";
+
+  services.mingetty.helpLine = 
+  ''
+    The "root" account has 'test' password initially.
+    You can change it.
+  '';
 
   users = {
     mutableUsers = true;
-    users.root.initialPassword = "DamnTowerOfGodIsNice";
+    users.root.initialPassword = "test"; # Nicer password for QWERTY/AZERTY layout.
   };
 
   # To be on the safe line.
   virtualisation.memorySize = 1024;
   virtualisation.diskSize = 1024;
-  virtualisation.graphics = true; # false after.
+  virtualisation.graphics = false;
 }

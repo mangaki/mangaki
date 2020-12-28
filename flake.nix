@@ -102,13 +102,13 @@
             imports = [ (modulesPath + "/virtualisation/qemu-vm.nix") ];
             virtualisation.qemu.options = [ "-vga virtio" ];
 
-            environment.systemPackages = with pkgs; [ st unzip ripgrep chromium ];
-            networking.networkmanager.enable = true;
+            # environment.systemPackages = with pkgs; [ st unzip ripgrep chromium ];
+            # networking.networkmanager.enable = true;
 
-            services.xserver.enable = true;
-            services.xserver.layout = "us";
-            services.xserver.windowManager.i3.enable = true;
-            services.xserver.displayManager.lightdm.enable = true;
+            # services.xserver.enable = true;
+            # services.xserver.layout = "us";
+            # services.xserver.windowManager.i3.enable = true;
+            # services.xserver.displayManager.lightdm.enable = true;
           })
 
           # Flake specific support
@@ -117,12 +117,13 @@
           })
 
           # Mangaki configuration
-          ({ useTLS ? false, ... }: {
+          ({ ... }: {
             imports =
               [
                 (import ./nix/vm/standalone-configuration.nix {
-                  inherit useTLS;
-                  devMode = true;
+                  useTLS = false;
+                  devMode = false;
+                  domainName = "mangaki.dev";
                   editableMode = false;
                 })
               ];
