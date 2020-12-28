@@ -163,7 +163,7 @@ in
     };
     allowedHosts = mkOption {
       type = types.listOf types.str;
-      default = [ "127.0.0.1" ];
+      default = [ "127.0.0.1" "localhost" ] ++ optionals (cfg.domainName != null) [ cfg.domainName ];
       example = [ "127.0.0.1" "steinsgate.dev" ];
       description = ''
         List of allowed hosts (Django parameter).
@@ -453,6 +453,8 @@ in
       };
     };
 
+    # FIXME: write down a systemd oneshot for initial migrations.
+
     # Set up NGINX.
     services.nginx = mkIf (!cfg.devMode) {
       enable = !cfg.devMode;
@@ -469,13 +471,13 @@ in
         addSSL = cfg.useTLS && !cfg.forceTLS;
         root = cfg.staticRoot;
         locations."/".extraConfig = ''
-          uwsgi_pass unix://${config.services.uwsgi.runDir}/mangaki.sock;
+          uwsgi_pass localhost:8000;
           include ${config.services.nginx.package}/conf/uwsgi_params;
         '';
       };
     };
 
-    # Set up Gunicorn/uWSGI (?)
+    # Set up uWSGI
     services.uwsgi = mkIf (!cfg.devMode) {
       enable = !cfg.devMode;
       plugins = [ "python3" ];
@@ -485,7 +487,7 @@ in
           mangaki = {
             type = "normal";
             http = ":8000";
-            socket = "${config.services.uwsgi.runDir}/mangaki.sock";
+            socket = "${config.services.uwsgi.runDir}/mangaki.sock"; # FIXME(Ryan): make this work with NGINX but permissions are not okay.
             pythonPackages = _: [ cfg.appPackage ];
             env = (mapAttrsToList (n: v: "${n}=${v}") mangakiEnv);
             module = "wsgi:application";
@@ -495,7 +497,7 @@ in
             vacuum = true;
             harakiri = 20;
             max-requests = 5000;
-            chmod-socket = 664;
+            chmod-socket = 664; # 664 is already too weak…
           };
         };
       };
