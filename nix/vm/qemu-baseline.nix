@@ -11,10 +11,9 @@
   };
 
   services.openssh.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22 80 443 8000 ];
+  networking.firewall.allowedTCPPorts = [ 22 80 443 ];
 
   services.mingetty.autologinUser = "root";
-
   services.mingetty.helpLine = 
   ''
     The "root" account has 'test' password initially.
