@@ -148,6 +148,7 @@
               nixpkgs.overlays = [ self.overlay ];
               virtualisation.memorySize = 512;
               services.mangaki.enable = true;
+              services.mangaki.devMode = true;
             };
 
             testScript = ''
