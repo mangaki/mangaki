@@ -9,7 +9,7 @@ let
           value)
       (builtins.removeAttrs overrides exceptions))
     // (lib.getAttrs exceptions overrides));
-  exceptions = [ "mccabe" "zipp" ];
+  exceptions = [ "mccabe" "zipp" "mangaki"];
 in
 self: super:
 (justUseWheels exceptions super {
@@ -48,7 +48,13 @@ self: super:
   pyscopg2 = null;
   psycopg2-binary = null;
   lxml = null;
-
+  # Fix setuptools_scm[toml] behavior…
+  mangaki = super.mangaki.overridePythonAttrs (old: {
+    buildInputs = (old.buildInputs or []) ++ [
+      self.toml
+    ];
+    dontPreferSetupPy = true;
+  });
   mccabe = super.mccabe.overridePythonAttrs (old: {
     buildInputs = old.buildInputs ++ [ self.pytest-runner ];
     doCheck = false;
