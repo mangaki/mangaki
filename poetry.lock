@@ -1052,11 +1052,11 @@ numpy = ">=1.16.5"
 
 [[package]]
 name = "setuptools-scm"
-version = "3.5.0"
+version = "5.0.2"
 description = "the blessed package to manage your versions by scm tags"
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
 [package.extras]
 toml = ["toml"]
@@ -1216,7 +1216,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "92cd2630a5943aba73a3f098eeeefdadac5e650721a3995a85950b03c4fb8d94"
+content-hash = "6e3cc2d2e9154ac09b646c5116598b6a1fe76b424d338ce1f9953349c45a8f0a"
 
 [metadata.files]
 amqp = [
@@ -1842,13 +1842,14 @@ scipy = [
     {file = "scipy-1.6.1.tar.gz", hash = "sha256:c4fceb864890b6168e79b0e714c585dbe2fd4222768ee90bc1aa0f8218691b11"},
 ]
 setuptools-scm = [
-    {file = "setuptools_scm-3.5.0-py2.7.egg", hash = "sha256:fa6511072840d7eaad3ea36cc8849f437fefd85b32499a7f6026cba16ebbf63a"},
-    {file = "setuptools_scm-3.5.0-py2.py3-none-any.whl", hash = "sha256:0d23db3d43e0a43eb7196bcf0eb8a4a2eb0561f621ed7ec44b2fdccfd907e38f"},
-    {file = "setuptools_scm-3.5.0-py3.5.egg", hash = "sha256:783c143363091d3cc0d94766a9a14cdfc7ba8d29741004b6fa806ada7a8bf211"},
-    {file = "setuptools_scm-3.5.0-py3.6.egg", hash = "sha256:0a376ca6f48dfe35d2c2bba246751830247b145aec7b7fb81a52091d04226ce2"},
-    {file = "setuptools_scm-3.5.0-py3.7.egg", hash = "sha256:8a8b4109ee1a114f9ee8f7a83836284cb6429d481bd93daf64908a3d64c7c56e"},
-    {file = "setuptools_scm-3.5.0-py3.8.egg", hash = "sha256:e39c234058c25b529739c516651cde028960812ea4a35ee31ab623e9a62b10c8"},
-    {file = "setuptools_scm-3.5.0.tar.gz", hash = "sha256:5bdf21a05792903cafe7ae0c9501182ab52497614fa6b1750d9dbae7b60c1a87"},
+    {file = "setuptools_scm-5.0.2-py2.7.egg", hash = "sha256:35acc9a3be4fbd4f6f3480eecb3c637dfb5ca1812fe86baf5e6759a0133837cf"},
+    {file = "setuptools_scm-5.0.2-py2.py3-none-any.whl", hash = "sha256:bd5c4e37f74c103e117549f89aeb3c244488c4a6422df786d1a7d03257f16b34"},
+    {file = "setuptools_scm-5.0.2-py3.5.egg", hash = "sha256:0d4fa3743c7a453f31dae9b44fcc0c869125a323c166a6b39e20122f488addb2"},
+    {file = "setuptools_scm-5.0.2-py3.6.egg", hash = "sha256:ce5497a8ff55e81cf88cb402a87dedc7663d2671d5f1303d978ba1afb33c4fb6"},
+    {file = "setuptools_scm-5.0.2-py3.7.egg", hash = "sha256:90be2ecff71d92352f59c6371abe017c0859bc617a545ba6aaf4d96951ba7947"},
+    {file = "setuptools_scm-5.0.2-py3.8.egg", hash = "sha256:2e8706b90910d66668b3f34aea9cceab3c08ba83fedd78de65ff323edc8a1414"},
+    {file = "setuptools_scm-5.0.2-py3.9.egg", hash = "sha256:f23060f0f5b23f26b76e43fb0ef51e5294e4b575f69edab5cfe442635680f2ec"},
+    {file = "setuptools_scm-5.0.2.tar.gz", hash = "sha256:83a0cedd3449e3946307811a4c7b9d89c4b5fd464a2fb5eeccd0a5bb158ae5c8"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
