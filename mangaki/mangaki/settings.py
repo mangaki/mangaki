@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import configparser
 import json
 import os
-from setuptools_scm import get_version
 from pkg_resources import get_distribution, DistributionNotFound
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,7 +33,7 @@ SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 # Step 1: if we are in a Git repository.
 try:
     REPO_DIR = os.path.dirname(BASE_DIR)
-    VERSION = get_version(REPO_DIR)
+    VERSION = None # FIXME: use something proper, get_version(REPO_DIR)
 except:
     VERSION = None
 
