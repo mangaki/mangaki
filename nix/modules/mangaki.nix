@@ -553,8 +553,10 @@ in
         sslCertificateKey = if cfg.useTLS && !cfg.useACME then cfg.sslCertificateKey else null;
         forceSSL = cfg.useTLS && cfg.forceTLS;
         addSSL = cfg.useTLS && !cfg.forceTLS;
-        locations."/" = {
+        locations."/static" = {
           root = cfg.staticRoot;
+        };
+        locations."/" = {
           extraConfig = ''
             uwsgi_pass unix:/var/lib/mangaki/uwsgi.sock;
             include ${config.services.nginx.package}/conf/uwsgi_params;
