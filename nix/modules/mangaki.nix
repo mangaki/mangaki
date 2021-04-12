@@ -533,9 +533,9 @@ in
         StateDirectoryMode = "0755";
         WorkingDirectory = "/var/lib/mangaki";
 
-        ExecStop = "${cfg.envPackage}/bin/celery multi stopwait ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid -l INFO";
-        ExecReload = "${cfg.envPackage}/bin/celery multi restart ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid -l INFO";
-        ExecStart = "${cfg.envPackage}/bin/celery multi start ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid -l INFO";
+        ExecStop = "${cfg.envPackage}/bin/celery multi stopwait ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid --logfile=/run/celery/%n%I.log -l INFO";
+        ExecReload = "${cfg.envPackage}/bin/celery multi restart ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid --logfile=/run/celery/%n%I.log -l INFO";
+        ExecStart = "${cfg.envPackage}/bin/celery multi start ${workerName} -B -A mangaki:celery_app --pidfile=/run/celery/%n.pid --logfile=/run/celery/%n%I.log -l INFO";
       };
     };
 
