@@ -32,7 +32,6 @@ celery="^4.2" # main
 redis="^3.2" # main
 python-redis-lock="^3.2" # main
 raven="^6.1" # main
-setuptools-scm="^5.0" # main
 mangaki-zero = "^1.0" # main
 natsort = "^7.0.1" # main
 
@@ -71,9 +70,6 @@ exclude_lines =  ["pragma: no cover",
 show_missing = true
 skip_covered = true
 
-[tool.setuptools_scm]
-write_to = "mangaki/version.py"
-
 [tool.dephell.main]
 from = {format="poetry", path="pyproject.toml"}
 envs = ["main"]
@@ -95,5 +91,5 @@ envs = ["main", "tests", "dev"]
 to = {format="pip", path="requirements/dev.txt"}
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools_scm[toml]>=3.4"]
+requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
