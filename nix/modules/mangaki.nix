@@ -554,7 +554,7 @@ in
         forceSSL = cfg.useTLS && cfg.forceTLS;
         addSSL = cfg.useTLS && !cfg.forceTLS;
         locations."/static" = {
-          root = cfg.staticRoot;
+          alias = cfg.staticRoot;
         };
         locations."/" = {
           extraConfig = ''
