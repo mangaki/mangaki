@@ -553,7 +553,7 @@ in
         sslCertificateKey = if cfg.useTLS && !cfg.useACME then cfg.sslCertificateKey else null;
         forceSSL = cfg.useTLS && cfg.forceTLS;
         addSSL = cfg.useTLS && !cfg.forceTLS;
-        locations."/static" = {
+        locations."/static/" = {
           alias = cfg.staticRoot;
         };
         locations."/" = {
