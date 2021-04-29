@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2014, Mangaki Authors
+// SPDX-License-Identifier: AGPL-3.0-only
+
 const IMPORT_PROGRESS_POLLING_FREQUENCY = 1000;
 
 Vue.component('loading-spinner', {
