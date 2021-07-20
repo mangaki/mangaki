@@ -27,7 +27,7 @@ msgstr "Chine"
 
 #: mangaki/choices.py:9
 msgid "US"
-msgstr ""
+msgstr "États Unis"
 
 #: mangaki/choices.py:10
 msgid "Germany"
@@ -152,7 +152,7 @@ msgstr "Manga"
 
 #: mangaki/choices.py:48
 msgid "Album"
-msgstr ""
+msgstr "Album"
 
 #: mangaki/choices.py:52
 msgid "Unprocessed"
@@ -236,8 +236,7 @@ msgstr "L'œuvre est SFW"
 
 #: mangaki/choices.py:79
 msgid "Suggest a reference URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"
-msgstr ""
-"Proposer une URL de référence (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"
+msgstr "Proposer une URL de référence (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"
 
 #: mangaki/choices.py:83
 msgid "Director"
@@ -661,7 +660,7 @@ msgstr "Top 20"
 
 #: mangaki/templates/base.html:96
 msgid "Contribute"
-msgstr ""
+msgstr "contribuer"
 
 #: mangaki/templates/base.html:99 mangaki/templates/fix/fix_index.html:14
 msgid "Suggestions"
@@ -1121,11 +1120,11 @@ msgstr "Déplacements"
 
 #: mangaki/templates/mangaki/work_list.html:58
 msgid "to the left"
-msgstr ""
+msgstr "Aller à gauche"
 
 #: mangaki/templates/mangaki/work_list.html:59
 msgid "to the right"
-msgstr ""
+msgstr "Aller à droite"
 
 #: mangaki/templates/mangaki/work_list.html:61
 msgid "Vote"
@@ -1264,11 +1263,11 @@ msgstr "Le profil de %(username)s n'est pas public."
 
 #: mangaki/templates/search.html:6
 msgid "Search"
-msgstr ""
+msgstr "chercher"
 
 #: mangaki/templates/settings.html:11
 msgid "Retourner à la page d'accueil"
-msgstr ""
+msgstr "Retourner à la page d'accueil"
 
 #: mangaki/templates/settings.html:16
 #, fuzzy
@@ -1278,15 +1277,15 @@ msgstr "Références"
 
 #: mangaki/templates/settings.html:17
 msgid "Souhaitez-vous ne plus recevoir de mail ?"
-msgstr ""
+msgstr "Souhaitez-vous ne plus recevoir de mail ?"
 
 #: mangaki/templates/settings.html:20
 msgid "Ne plus recevoir de mail"
-msgstr ""
+msgstr "Ne plus recevoir de mail"
 
 #: mangaki/templates/settings.html:21
 msgid "Continuer à recevoir les mails"
-msgstr ""
+msgstr "Continuer à recevoir les mails"
 
 #: mangaki/templates/socialaccount/connections.html:5
 #: mangaki/templates/socialaccount/connections.html:8
