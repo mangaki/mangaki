@@ -35,7 +35,7 @@ msgstr "中国"
 
 #: mangaki/choices.py:9
 msgid "US"
-msgstr ""
+msgstr "アメリカ"
 
 #: mangaki/choices.py:10
 msgid "Germany"
@@ -160,7 +160,7 @@ msgstr "マンガ"
 
 #: mangaki/choices.py:48
 msgid "Album"
-msgstr ""
+msgstr "アルバム"
 
 #: mangaki/choices.py:52
 msgid "Unprocessed"
@@ -322,7 +322,7 @@ msgstr "提案"
 
 #: mangaki/templates/about.html:4 mangaki/templates/about.html:8
 msgid "About"
-msgstr ""
+msgstr "mangakiについて"
 
 #: mangaki/templates/about.html:9
 msgid "What series should you watch next?"
@@ -637,7 +637,7 @@ msgstr "お気に入りのシリーズを評価し、新しいものを発見！
 
 #: mangaki/templates/base.html:35 mangaki/templates/base.html:161
 msgid "Toggle navigation"
-msgstr ""
+msgstr "ナビをトグル"
 
 #: mangaki/templates/base.html:71 mangaki/templates/profile_works.html:16
 #: mangaki/templates/profile_works.html:19
@@ -661,7 +661,7 @@ msgstr "トップ20"
 
 #: mangaki/templates/base.html:96
 msgid "Contribute"
-msgstr ""
+msgstr "参加"
 
 #: mangaki/templates/base.html:99 mangaki/templates/fix/fix_index.html:14
 msgid "Suggestions"
@@ -1119,15 +1119,15 @@ msgstr "動きます"
 
 #: mangaki/templates/mangaki/work_list.html:58
 msgid "to the left"
-msgstr ""
+msgstr "左に"
 
 #: mangaki/templates/mangaki/work_list.html:59
 msgid "to the right"
-msgstr ""
+msgstr "右に"
 
 #: mangaki/templates/mangaki/work_list.html:61
 msgid "Vote"
-msgstr ""
+msgstr "評価"
 
 #: mangaki/templates/mangaki/work_list.html:63 mangaki/views.py:88
 msgid "Love"
@@ -1262,29 +1262,29 @@ msgstr "%(username)sさんのプロフィールは一般に公開されていま
 
 #: mangaki/templates/search.html:6
 msgid "Search"
-msgstr ""
+msgstr "検索"
 
 #: mangaki/templates/settings.html:11
-msgid "Retourner à la page d'accueil"
-msgstr ""
+msgid "Return to the home page"
+msgstr "ホームページに戻る"
 
 #: mangaki/templates/settings.html:16
 #, fuzzy
 #| msgid "References"
-msgid "Préférences"
+msgid "Preferences"
 msgstr "参照"
 
 #: mangaki/templates/settings.html:17
-msgid "Souhaitez-vous ne plus recevoir de mail ?"
-msgstr ""
+msgid "Would you like to stop receiving emails?"
+msgstr "メールの受信を停止しますか？"
 
 #: mangaki/templates/settings.html:20
-msgid "Ne plus recevoir de mail"
-msgstr ""
+msgid "Stop receiving emails"
+msgstr "メールの受信を停止する"
 
 #: mangaki/templates/settings.html:21
-msgid "Continuer à recevoir les mails"
-msgstr ""
+msgid "Continue receiving emails"
+msgstr "メールの受信を継続する"
 
 #: mangaki/templates/socialaccount/connections.html:5
 #: mangaki/templates/socialaccount/connections.html:8

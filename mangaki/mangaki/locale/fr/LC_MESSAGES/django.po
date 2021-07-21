@@ -314,7 +314,7 @@ msgstr "Suggestion"
 
 #: mangaki/templates/about.html:4 mangaki/templates/about.html:8
 msgid "About"
-msgstr ""
+msgstr "À propos"
 
 #: mangaki/templates/about.html:9
 msgid "What series should you watch next?"
@@ -636,7 +636,7 @@ msgstr "Notez vos séries favorites et découvrez-en d'autres !"
 
 #: mangaki/templates/base.html:35 mangaki/templates/base.html:161
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Activate navigation"
 
 #: mangaki/templates/base.html:71 mangaki/templates/profile_works.html:16
 #: mangaki/templates/profile_works.html:19
@@ -1266,25 +1266,25 @@ msgid "Search"
 msgstr "chercher"
 
 #: mangaki/templates/settings.html:11
-msgid "Retourner à la page d'accueil"
+msgid "Return to the home page"
 msgstr "Retourner à la page d'accueil"
 
 #: mangaki/templates/settings.html:16
 #, fuzzy
 #| msgid "References"
-msgid "Préférences"
-msgstr "Références"
+msgid "Preferences"
+msgstr "Préférences"
 
 #: mangaki/templates/settings.html:17
-msgid "Souhaitez-vous ne plus recevoir de mail ?"
-msgstr "Souhaitez-vous ne plus recevoir de mail ?"
+msgid "Would you like to stop receiving emails?"
+msgstr "Souhaitez-vous ne plus recevoir de mail?"
 
 #: mangaki/templates/settings.html:20
-msgid "Ne plus recevoir de mail"
+msgid "Stop receiving emails"
 msgstr "Ne plus recevoir de mail"
 
 #: mangaki/templates/settings.html:21
-msgid "Continuer à recevoir les mails"
+msgid "Continue receiving emails"
 msgstr "Continuer à recevoir les mails"
 
 #: mangaki/templates/socialaccount/connections.html:5
