@@ -8,6 +8,8 @@
 # Jill-Jênn Vie <jj@mangaki.fr>, 2018
 msgid ""
 msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-07-19 14:53+0000\n"
 "PO-Revision-Date: 2018-08-23 19:25+0900\n"
 "Last-Translator: Tomoko Kozu <tomoko@mangaki.fr>\n"
 "Language: ja\n"
@@ -15,198 +17,318 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 
+#: mangaki/choices.py:5
 msgid "Japan"
 msgstr "日本"
 
+#: mangaki/choices.py:6
 msgid "Korea"
 msgstr "韓国"
 
+#: mangaki/choices.py:7
 msgid "France"
 msgstr "フランス"
 
+#: mangaki/choices.py:8
 msgid "China"
 msgstr "中国"
 
-msgid "United States"
+#: mangaki/choices.py:9
+msgid "US"
 msgstr "アメリカ"
 
+#: mangaki/choices.py:10
 msgid "Germany"
 msgstr "ドイツ"
 
+#: mangaki/choices.py:11
 msgid "Taiwan"
 msgstr "台湾"
 
+#: mangaki/choices.py:12
 msgid "Spain"
 msgstr "スペイン"
 
+#: mangaki/choices.py:13
 msgid "UK"
 msgstr "イギリス"
 
+#: mangaki/choices.py:14
 msgid "Hong Kong"
 msgstr "香港"
 
+#: mangaki/choices.py:15
 msgid "Italia"
 msgstr "イタリア"
 
-msgid "International"
-msgstr "国際"
-
-msgid "Seinen"
-msgstr "青年"
-
-msgid "Shonen"
-msgstr "少年"
-
-msgid "Shojo"
-msgstr "少女"
-
-msgid "Yaoi"
-msgstr "やおい"
-
-msgid "Sonyun-Manhwa"
-msgstr "Sonyun、韓国の漫画"
-
-msgid "Kodomo"
-msgstr "こども"
-
-msgid "Ecchi-Hentai"
-msgstr "エッチ、変態"
-
-msgid "Global-Manga"
-msgstr "グローバル・マンガ"
-
-msgid "Manhua"
-msgstr "中国の漫画"
-
-msgid "Josei"
-msgstr "城西"
-
-msgid "Sunjung-Sunjeong"
-msgstr "Sunjung-Sunjeong"
-
-msgid "Chungnyun"
-msgstr "Chungnyun"
-
-msgid "Yuri"
-msgstr "ユーリ"
-
-msgid "Dojinshi-Parody"
-msgstr "同人誌、パロディー"
-
-msgid "Manhwa"
-msgstr "韓国の漫画"
-
-msgid "Yonkoma"
-msgstr "4コマ漫画"
-
-msgid "Directors"
-msgstr "監督"
-
-msgid "Authors"
-msgstr "著者"
-
-msgid "Composers"
-msgstr "作曲"
-
-msgid "Unprocessed"
-msgstr "未処理"
-
-msgid "Accepted"
-msgstr "容認されました"
-
-msgid "Rejected"
-msgstr "拒否されました"
-
+#: mangaki/choices.py:16 mangaki/choices.py:58
 msgid "Unknown"
 msgstr "未知の"
 
+#: mangaki/choices.py:17
+msgid "International"
+msgstr "国際"
+
+#: mangaki/choices.py:21
+msgid "Seinen"
+msgstr "青年"
+
+#: mangaki/choices.py:22
+msgid "Shonen"
+msgstr "少年"
+
+#: mangaki/choices.py:23
+msgid "Shojo"
+msgstr "少女"
+
+#: mangaki/choices.py:24
+msgid "Yaoi"
+msgstr "やおい"
+
+#: mangaki/choices.py:25
+msgid "Sonyun-Manhwa"
+msgstr "Sonyun、韓国の漫画"
+
+#: mangaki/choices.py:26
+msgid "Kodomo"
+msgstr "こども"
+
+#: mangaki/choices.py:27
+msgid "Ecchi-Hentai"
+msgstr "エッチ、変態"
+
+#: mangaki/choices.py:28
+msgid "Global-Manga"
+msgstr "グローバル・マンガ"
+
+#: mangaki/choices.py:29
+msgid "Manhua"
+msgstr "中国の漫画"
+
+#: mangaki/choices.py:30
+msgid "Josei"
+msgstr "城西"
+
+#: mangaki/choices.py:31
+msgid "Sunjung-Sunjeong"
+msgstr "Sunjung-Sunjeong"
+
+#: mangaki/choices.py:32
+msgid "Chungnyun"
+msgstr "Chungnyun"
+
+#: mangaki/choices.py:33
+msgid "Yuri"
+msgstr "ユーリ"
+
+#: mangaki/choices.py:34
+msgid "Dojinshi-Parody"
+msgstr "同人誌、パロディー"
+
+#: mangaki/choices.py:35
+msgid "Manhwa"
+msgstr "韓国の漫画"
+
+#: mangaki/choices.py:36
+msgid "Yonkoma"
+msgstr "4コマ漫画"
+
+#: mangaki/choices.py:40 mangaki/templates/base.html:89
+msgid "Directors"
+msgstr "監督"
+
+#: mangaki/choices.py:41 mangaki/templates/base.html:91
+msgid "Authors"
+msgstr "著者"
+
+#: mangaki/choices.py:42 mangaki/templates/base.html:90
+msgid "Composers"
+msgstr "作曲"
+
+#: mangaki/choices.py:46 mangaki/templates/base.html:66
+#: mangaki/templates/mangaki/reco_list.html:22
+#: mangaki/templates/profile_works.html:9
+#: mangaki/templates/profile_works.html:12
+#: mangaki/templates/profile_works.html:29
+#: mangaki/templates/profile_works.html:32
+msgid "Anime"
+msgstr "アニメ"
+
+#: mangaki/choices.py:47 mangaki/templates/mangaki/reco_list.html:24
+msgid "Manga"
+msgstr "マンガ"
+
+#: mangaki/choices.py:48
+msgid "Album"
+msgstr "アルバム"
+
+#: mangaki/choices.py:52
+msgid "Unprocessed"
+msgstr "未処理"
+
+#: mangaki/choices.py:53
+msgid "Accepted"
+msgstr "容認されました"
+
+#: mangaki/choices.py:54
+msgid "Rejected"
+msgstr "拒否されました"
+
+#: mangaki/choices.py:59
 msgid "Prequel"
 msgstr "前編"
 
+#: mangaki/choices.py:60
 msgid "Sequel"
 msgstr "後編"
 
+#: mangaki/choices.py:61
 msgid "Summary"
 msgstr "概要"
 
+#: mangaki/choices.py:62
 msgid "Side story"
 msgstr "サイドストーリー"
 
+#: mangaki/choices.py:63
 msgid "Parent story"
 msgstr "親の話"
 
+#: mangaki/choices.py:64
 msgid "Alternative setting"
 msgstr "代替設定"
 
+#: mangaki/choices.py:65
 msgid "Same setting"
 msgstr "同じ設定"
 
+#: mangaki/choices.py:66
 msgid "Special"
 msgstr "特別"
 
+#: mangaki/choices.py:67
 msgid "Adaptation"
 msgstr "適応"
 
+#: mangaki/choices.py:71
 msgid "Wrong title"
 msgstr "間違ったタイトル"
 
+#: mangaki/choices.py:72
 msgid "Wrong poster"
 msgstr "間違ったポスター"
 
+#: mangaki/choices.py:73
 msgid "Synopsis contains mistakes"
 msgstr "あらすじは、ミスを含んでいます"
 
+#: mangaki/choices.py:74
 msgid "Wrong author"
 msgstr "間違った作者"
 
+#: mangaki/choices.py:75
 msgid "Wrong composer"
 msgstr "間違った作曲家"
 
+#: mangaki/choices.py:76
 msgid "This is a duplicate"
 msgstr "これは重複しています"
 
+#: mangaki/choices.py:77
 msgid "Work is Not Safe for Work"
 msgstr "仕事は仕事のために安全ではありません"
 
+#: mangaki/choices.py:78
 msgid "Work is actually Safe for Work"
 msgstr "仕事は仕事のために、実際に安全です"
 
+#: mangaki/choices.py:79
 msgid "Suggest a reference URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"
 msgstr "参照URLを示唆する（MyAnimeList、AniDB、Icotaku、VGMdb、等）"
 
+#: mangaki/choices.py:83
 msgid "Director"
 msgstr "監督"
 
+#: mangaki/choices.py:84
 msgid "Composer"
 msgstr "作曲家"
 
+#: mangaki/choices.py:85
 msgid "Author"
 msgstr "著者"
 
+#: mangaki/choices.py:86
 msgid "Mangaka"
 msgstr "漫画家"
 
+#: mangaki/choices.py:87
 msgid "Screenwriter"
 msgstr "脚本"
 
+#: mangaki/choices.py:91
+msgid "Mosaic"
+msgstr "全体"
+
+#: mangaki/choices.py:92
+msgid "Recent"
+msgstr "最近"
+
+#: mangaki/choices.py:93
+msgid "Top"
+msgstr "トップ"
+
+#: mangaki/choices.py:94
+msgid "Popular"
+msgstr "人気"
+
+#: mangaki/choices.py:95
+msgid "Pearls"
+msgstr "レア"
+
+#: mangaki/choices.py:96
+msgid "Controversial"
+msgstr "癖がある"
+
+#: mangaki/choices.py:97
+msgid "Random"
+msgstr "ランダム"
+
+#: mangaki/choices.py:98
+msgid "A-Z"
+msgstr "アルファベット順"
+
+#: mangaki/forms.py:26
 msgid "Import my ratings"
 msgstr "私の評価をインポート"
 
+#: mangaki/forms.py:27 mangaki/templates/account/signup.html:53
 msgid "Subscribe to Mangaki newsletter"
 msgstr "Mangakiニュースレターを購読します"
 
+#: mangaki/forms.py:29
 msgid "My data can be released anonymously for research"
 msgstr "私のデータは、研究のために匿名で解放することができます"
 
+#: mangaki/models.py:453
 msgid "Type"
 msgstr "タイプ"
 
+#: mangaki/models.py:454 mangaki/templates/fix/fix_index.html:20
+#: mangaki/templates/fix/fix_suggestion.html:6
+#: mangaki/templates/fix/fix_suggestion.html:11
 msgid "Suggestion"
 msgstr "提案"
 
+#: mangaki/templates/about.html:4 mangaki/templates/about.html:8
+msgid "About"
+msgstr "mangakiについて"
+
+#: mangaki/templates/about.html:9
 msgid "What series should you watch next?"
 msgstr "あなたが次見るべきアニメは？"
 
+#: mangaki/templates/about.html:15
 msgid ""
 "Mangaki is an anime/manga recommendation website made by an organization of "
 "otakus."
@@ -214,761 +336,1061 @@ msgstr ""
 "Mangakiは漫画とアニメのお勧めシステムWEBサイトです。このWEBサイトはフランスの"
 "クレイジーな学生達が作ったNPO法人です"
 
+#: mangaki/templates/about.html:17
 msgid ""
-"Tell him what you watched or read, and our algorithm (open source) will find"
-" new precious pearls for you to discover!"
+"Tell him what you watched or read, and our algorithm (open source) will find "
+"new precious pearls for you to discover!"
 msgstr ""
 "あなたが見たアニメや漫画を入力すると、アルゴリズムがあなたのが好きなアニメや"
 "漫画を特定し、教えてくれます"
 
+#: mangaki/templates/about.html:19
 msgid "Join us!"
 msgstr "参加しませんか！"
 
+#: mangaki/templates/about.html:20 mangaki/templates/about.html:37
+#: mangaki/templates/base.html:191
 msgid "Contact us"
 msgstr "お問い合わせ"
 
+#: mangaki/templates/about.html:21
 msgid "Browse the wiki"
 msgstr "ウィキはこちら！"
 
+#: mangaki/templates/about.html:22 mangaki/templates/about.html:39
 msgid "See the code on GitHub"
 msgstr "GitHubでコードを見る"
 
+#: mangaki/templates/about.html:26
 msgid "Learn data science through Mangaki"
 msgstr "Mangakiでデータサイエンスを学ぶ"
 
-msgid ""
-"Our algorithm is open source, so you can understand it, and improve it!"
+#: mangaki/templates/about.html:32
+msgid "Our algorithm is open source, so you can understand it, and improve it!"
 msgstr ""
 "Mangakiのアルゴリズムはオープンソースだから、Mangakiでアルゴリズムを学ぶこと"
 "もできるし、練習することもできる！"
 
+#: mangaki/templates/about.html:34
 msgid ""
-"Do you know: nearest neighbors, singular value decomposition, Netflix prize,"
-" autoencoder?"
+"Do you know: nearest neighbors, singular value decomposition, Netflix prize, "
+"autoencoder?"
 msgstr ""
 "このコンセプト知ってる? k近傍法, 特異値分解, Netflix Prize, オートエンコーダ?"
 
+#: mangaki/templates/about.html:36
 msgid "Come and learn all that on our GitHub repo or in our organization!"
 msgstr "一緒に学ぼう"
 
+#: mangaki/templates/about.html:38
 msgid "Browse the research blog"
 msgstr "研究のブログはこちら"
 
+#: mangaki/templates/account/account_deleted.html:6
 msgid "Account Deleted"
 msgstr "アカウント削除されました"
 
+#: mangaki/templates/account/account_deleted.html:10
 msgid "Account deleted!"
 msgstr "アカウントが削除されました！"
 
+#: mangaki/templates/account/email_confirm.html:6
+#: mangaki/templates/account/email_confirm.html:10
 msgid "Confirm E-mail Address"
 msgstr "メールアドレスを確認"
 
+#: mangaki/templates/account/email_confirm.html:16
+#, python-format
 msgid ""
 "Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
 "address for user %(user_display)s."
 msgstr ""
-"その<a href=\"mailto:%(email)s\">%(email)s</a>のはユーザー%(user_display)s"
-"のための電子メールアドレスであることを確認してください。"
+"その<a href=\"mailto:%(email)s\">%(email)s</a>のはユーザー%(user_display)sの"
+"ための電子メールアドレスであることを確認してください。"
 
+#: mangaki/templates/account/email_confirm.html:20
 msgid "Confirm"
 msgstr "確かめます"
 
+#: mangaki/templates/account/email_confirm.html:27
+#, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a "
-"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This e-mail confirmation link expired or is invalid. Please <a href="
+"\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
-"このメールの確認リンクが期限切れまたは無効です。<a "
-"href=\"%(email_url)s\">新しい電子メール</a>確認要求を発行してください。"
+"このメールの確認リンクが期限切れまたは無効です。<a href=\"%(email_url)s\">新"
+"しい電子メール</a>確認要求を発行してください。"
 
+#: mangaki/templates/account/login.html:7
+#: mangaki/templates/account/login.html:11
+#: mangaki/templates/account/login.html:61
 msgid "Sign In"
 msgstr "サインイン"
 
+#: mangaki/templates/account/login.html:15
+#, python-format
 msgid ""
-"Please sign in with one of your existing third party accounts. Or, <a "
-"href=\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign in "
-"below:"
+"Please sign in with one of your existing third party accounts. Or, <a href="
+"\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign in below:"
 msgstr ""
-"既存のサードパーティのアカウントのいずれかでログインしてください。または、"
-"%(site_name)sアカウントのに<a href=\"%(signup_url)s\">サインアップする</a>と、"
-"以下に署名し:"
+"既存のサードパーティのアカウントのいずれかでログインしてください。また"
+"は、%(site_name)sアカウントのに<a href=\"%(signup_url)s\">サインアップする</"
+"a>と、以下に署名し:"
 
+#: mangaki/templates/account/login.html:23
 msgid "or"
 msgstr "若しくは"
 
+#: mangaki/templates/account/login.html:27
+#, python-format
 msgid ""
-"If you have not created an account yet, then please <a "
-"href=\"%(signup_url)s\">sign up</a> first."
-msgstr "まだアカウントを作成していない場合は、"
-"<a href=\"%(signup_url)s\">サインアップ</a>してください。"
+"If you have not created an account yet, then please <a href=\"%(signup_url)s"
+"\">sign up</a> first."
+msgstr ""
+"まだアカウントを作成していない場合は、<a href=\"%(signup_url)s\">サインアップ"
+"</a>してください。"
 
+#: mangaki/templates/account/login.html:35
+#, python-format
 msgid ""
 "You rated a few works anonymously on this computer. These ratings will be "
-"lost if you login to an existing account. You should <a "
-"href=\"%(signup_url)s\">sign up</a> to save them.\""
+"lost if you login to an existing account. You should <a href=\"%(signup_url)s"
+"\">sign up</a> to save them.\""
 msgstr ""
-"あなたはこのコンピュータに匿名でいくつかの作品を評価しました。"
-"既存のアカウントにログインする場合、これらの評価は失われます。"
-"あなたは、それらを保存するために"
-"<a href=\"%(signup_url)s\">サインアップ</a>する必要があります。"
+"あなたはこのコンピュータに匿名でいくつかの作品を評価しました。既存のアカウン"
+"トにログインする場合、これらの評価は失われます。あなたは、それらを保存するた"
+"めに<a href=\"%(signup_url)s\">サインアップ</a>する必要があります。"
 
+#: mangaki/templates/account/login.html:62
 msgid "Forgot Password?"
 msgstr "パスワードをお忘れですか？"
 
+#: mangaki/templates/account/logout.html:5
+#: mangaki/templates/account/logout.html:8
+#: mangaki/templates/account/logout.html:17
 msgid "Sign Out"
 msgstr "サインアウト"
 
+#: mangaki/templates/account/logout.html:10
 msgid "Are you sure you want to sign out?"
 msgstr "あなたがサインアウトしてもよろしいですか？"
 
+#: mangaki/templates/account/password_reset.html:7
+#: mangaki/templates/account/password_reset.html:11
+#: mangaki/templates/account/password_reset_done.html:6
+#: mangaki/templates/account/password_reset_done.html:9
 msgid "Password Reset"
 msgstr "パスワードのリセット"
 
+#: mangaki/templates/account/password_reset.html:16
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll send you"
-" an e-mail allowing you to reset it."
-msgstr "パスワードを忘れましたか？下にメールアドレスを入力して、我々はあなたがそれをリセットすることができ、あなたに電子メールをお送りします。"
+"Forgotten your password? Enter your e-mail address below, and we'll send you "
+"an e-mail allowing you to reset it."
+msgstr ""
+"パスワードを忘れましたか？下にメールアドレスを入力して、我々はあなたがそれを"
+"リセットすることができ、あなたに電子メールをお送りします。"
 
+#: mangaki/templates/account/password_reset.html:21
 msgid "Reset My Password"
 msgstr "私のパスワードをリセットする"
 
+#: mangaki/templates/account/password_reset.html:24
 msgid "Please contact us if you have any trouble resetting your password."
-msgstr "あなたのパスワードをリセットするすべての問題がある場合は、お問い合わせください。"
+msgstr ""
+"あなたのパスワードをリセットするすべての問題がある場合は、お問い合わせくださ"
+"い。"
 
+#: mangaki/templates/account/password_reset_done.html:15
 msgid ""
 "We have sent you an e-mail. Please contact us if you do not receive it "
 "within a few minutes."
-msgstr "私たちはあなたの電子メールを送ってきました。あなたは数分以内にそれを受信しない場合は、お問い合わせください。"
+msgstr ""
+"私たちはあなたの電子メールを送ってきました。あなたは数分以内にそれを受信しな"
+"い場合は、お問い合わせください。"
 
+#: mangaki/templates/account/password_reset_from_key.html:6
+#: mangaki/templates/account/password_reset_from_key.html:9
+#: mangaki/templates/account/password_reset_from_key_done.html:4
+#: mangaki/templates/account/password_reset_from_key_done.html:7
 msgid "Change Password"
 msgstr "パスワードを変更する"
 
+#: mangaki/templates/account/password_reset_from_key.html:9
 msgid "Bad Token"
 msgstr "バート・トークン"
 
+#: mangaki/templates/account/password_reset_from_key.html:13
+#, python-format
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
-"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
-"reset</a>."
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
+"a>."
 msgstr ""
-"パスワードリセットのリンクは、それが既に使用されている可能性があるため、無効でした。"
-"<a href=\"%(passwd_reset_url)s\">新しいパスワードがリセットする</a>"
-"をリクエストしてください。"
+"パスワードリセットのリンクは、それが既に使用されている可能性があるため、無効"
+"でした。<a href=\"%(passwd_reset_url)s\">新しいパスワードがリセットする</a>を"
+"リクエストしてください。"
 
+#: mangaki/templates/account/password_reset_from_key.html:19
 msgid "change password"
 msgstr "パスワードを変更する"
 
+#: mangaki/templates/account/password_reset_from_key.html:22
+#: mangaki/templates/account/password_reset_from_key_done.html:8
 msgid "Your password is now changed."
 msgstr "パスワードが変更されました。"
 
+#: mangaki/templates/account/signup.html:7 mangaki/templates/base.html:115
+#: mangaki/templates/socialaccount/signup.html:6
 msgid "Signup"
 msgstr "サインアップ"
 
+#: mangaki/templates/account/signup.html:11
 msgid "Join Mangaki"
 msgstr "Mangakiに参加"
 
+#: mangaki/templates/account/signup.html:13
 msgid "And contribute to the creation of a better world."
 msgstr "そして、よりよい世界の創造に貢献しています。"
 
+#: mangaki/templates/account/signup.html:14
+#, python-format
 msgid ""
 "If you have already an account, you can <a href=\"%(login_url)s\">login</a>."
-msgstr "すでにアカウントをお持ちの場合は、"
-"<a href=\"%(login_url)s\">ログイン</a>にすることができます。"
+msgstr ""
+"すでにアカウントをお持ちの場合は、<a href=\"%(login_url)s\">ログイン</a>にす"
+"ることができます。"
 
+#: mangaki/templates/account/signup.html:34
 msgid ""
 "You already rated a few works. They will be imported to your profile if you "
 "check the box <strong>Import my ratings</strong> below!"
 msgstr ""
-"あなたはすでにいくつかの作品を評価しました。"
-"下記の「私の評価をインポート」をチェックすると、あなたのプロファイルにインポートされます！"
+"あなたはすでにいくつかの作品を評価しました。下記の「私の評価をインポート」を"
+"チェックすると、あなたのプロファイルにインポートされます！"
 
-msgid "Subscribe to Mangaki's newsletter"
-msgstr "Mangakiのニュースレターを購読します"
-
+#: mangaki/templates/account/signup.html:53
 msgid "some waifus/husbandos in your mails?"
 msgstr "あなたのメールでのいくつかのwaifus / husbandos？"
 
+#: mangaki/templates/account/signup.html:58
 msgid "My data can be used anonymously for research"
 msgstr "私のデータは、研究のために匿名で使用することができます"
 
+#: mangaki/templates/account/signup.html:64
 msgid "Import my ratings"
 msgstr "私の評価をインポート"
 
+#: mangaki/templates/account/signup.html:69
 msgid "Sign In &raquo;"
 msgstr "サインアップ"
 
+#: mangaki/templates/account/signup.html:74
 msgid "My works"
 msgstr "私の仕事"
 
+#: mangaki/templates/account/signup.html:84
 msgid ""
-"By subscribing, you accept that your ratings may be saved by Mangaki to keep"
-" your profile up-to-date, recommend anime to you, and improve other users' "
+"By subscribing, you accept that your ratings may be saved by Mangaki to keep "
+"your profile up-to-date, recommend anime to you, and improve other users' "
 "recommendations."
 msgstr ""
-"サブスクライブすることで、あなたの評価は、あなたにアニメをお勧め最新プロフィールを維持し、他のユーザの推奨を改善するためにMangakiによって保存することができることを受け入れます。"
+"サブスクライブすることで、あなたの評価は、あなたにアニメをお勧め最新プロ"
+"フィールを維持し、他のユーザの推奨を改善するためにMangakiによって保存すること"
+"ができることを受け入れます。"
 
+#: mangaki/templates/account/signup.html:85
 msgid "How does it work?"
 msgstr "それがどのように動作しますか？"
 
+#: mangaki/templates/account/signup.html:86
 msgid "You can update your options in your profile."
 msgstr "あなたのプロフィールにあなたのオプションを更新することができます。"
 
+#: mangaki/templates/admin/change_default_work_title.html:8
+#: mangaki/templates/admin/merge_selected_confirmation.html:8
+#: mangaki/templates/admin/refresh_poster_confirmation.html:8
+#: mangaki/templates/admin/update_tags_via_anidb.html:8
 msgid "Home"
 msgstr "家"
 
+#: mangaki/templates/admin/change_default_work_title.html:55
+#: mangaki/templates/admin/merge_selected_confirmation.html:68
+#: mangaki/templates/admin/refresh_poster_confirmation.html:38
+#: mangaki/templates/admin/update_tags_via_anidb.html:126
 msgid "Yes, I'm sure"
 msgstr "はい、確かです"
 
+#: mangaki/templates/admin/change_default_work_title.html:56
+#: mangaki/templates/admin/merge_selected_confirmation.html:69
+#: mangaki/templates/admin/refresh_poster_confirmation.html:39
+#: mangaki/templates/admin/update_tags_via_anidb.html:127
 msgid "No, take me back"
 msgstr "いいえ、私を取り戻します"
 
+#: mangaki/templates/base.html:11
 msgid "Mangaki is an anime & manga recommendation website"
 msgstr "Mangakiは、アニメ＆漫画の推薦サイトです"
 
-msgid "Open the menu"
-msgstr "メニューを開きます。"
+#: mangaki/templates/base.html:11 mangaki/templates/index.html:12
+msgid "Rate your favorite series and discover new ones!"
+msgstr "お気に入りのシリーズを評価し、新しいものを発見！"
 
-msgid "What is Mangaki?"
-msgstr "Mangakiは何ですか？"
+#: mangaki/templates/base.html:35 mangaki/templates/base.html:161
+msgid "Toggle navigation"
+msgstr "ナビをトグル"
 
-msgid "Anime"
-msgstr "アニメ"
-
-msgid "Manga"
-msgstr "マンガ"
-
+#: mangaki/templates/base.html:71 mangaki/templates/profile_works.html:16
+#: mangaki/templates/profile_works.html:19
+#: mangaki/templates/profile_works.html:36
+#: mangaki/templates/profile_works.html:39
 msgid "Mangas"
 msgstr "マンガ"
 
+#: mangaki/templates/base.html:76 mangaki/templates/mangaki/reco_list.html:4
+#: mangaki/templates/mangaki/reco_list.html:8
 msgid "Recommendations"
 msgstr "オススメ"
 
+#: mangaki/templates/base.html:81 mangaki/templates/mangaki/artist_list.html:5
+msgid "Artists"
+msgstr "アーティスト"
+
+#: mangaki/templates/base.html:86
 msgid "Top 20"
 msgstr "トップ20"
 
+#: mangaki/templates/base.html:96
+msgid "Contribute"
+msgstr "参加"
+
+#: mangaki/templates/base.html:99 mangaki/templates/fix/fix_index.html:14
 msgid "Suggestions"
 msgstr "提案"
 
-msgid "Log in"
-msgstr "ログイン"
-
-msgid "Welcome"
-msgstr "ようこそ"
-
-msgid "Log out"
-msgstr "ログアウト"
-
-msgid ""
-"You rated a few works anonymously, you can <a href=\"%(profile)s\">see "
-"them</a>, don't forget to <a href=\"%(signup_url)s\">subscribe</a> to save "
-"them!"
-msgstr ""
-"あなたが評価したカードを<a href=\"%(profile)s\">こちら</a>から見ることができます。"
-"もし保存したければ、<a href=\"%(signup_url)s\">サインアップ</a>を忘れないでください。"
-
-msgid "Mangaki project"
-msgstr "Mangakiプロジェクト"
-
-msgid "FAQ"
-msgstr "よくある質問"
-
-msgid "Legal mentions"
-msgstr "法の告示"
-
-msgid "Guidelines"
-msgstr "ガイドライン"
-
-msgid "Blog"
-msgstr "ブログ"
-
+#: mangaki/templates/base.html:100
 msgid "Report a bug"
 msgstr "バグを報告"
 
+#: mangaki/templates/base.html:102
 msgid "Donate"
 msgstr "寄付します"
 
+#: mangaki/templates/base.html:111
+msgid "Log in"
+msgstr "ログイン"
+
+#: mangaki/templates/base.html:120
+msgid "Welcome"
+msgstr "ようこそ"
+
+#: mangaki/templates/base.html:124
+msgid "Rated works"
+msgstr "定格作品"
+
+#: mangaki/templates/base.html:127
+msgid "My settings"
+msgstr "私の設定"
+
+#: mangaki/templates/base.html:129
+msgid "Log out"
+msgstr "ログアウト"
+
+#: mangaki/templates/base.html:148
+#, python-format
+msgid ""
+"You rated a few works anonymously, you can <a href=\"%(profile)s\">see them</"
+"a>, don't forget to <a href=\"%(signup_url)s\">subscribe</a> to save them!"
+msgstr ""
+"あなたが評価したカードを<a href=\"%(profile)s\">こちら</a>から見ることができ"
+"ます。もし保存したければ、<a href=\"%(signup_url)s\">サインアップ</a>を忘れな"
+"いでください。"
+
+#: mangaki/templates/base.html:169
+msgid "Mangaki project"
+msgstr "Mangakiプロジェクト"
+
+#: mangaki/templates/base.html:173
+msgid "FAQ"
+msgstr "よくある質問"
+
+#: mangaki/templates/base.html:177 mangaki/templates/mangaki/legal.html:4
+#: mangaki/templates/mangaki/legal.html:7
+msgid "Legal mentions"
+msgstr "法の告示"
+
+#: mangaki/templates/base.html:181
+msgid "Guidelines"
+msgstr "ガイドライン"
+
+#: mangaki/templates/base.html:185
+msgid "Blog"
+msgstr "ブログ"
+
+#: mangaki/templates/base.html:198
 msgid "Version:"
 msgstr "バージョン："
 
+#: mangaki/templates/fix/fix_index.html:5
 msgid "Suggestion list"
 msgstr "候補リスト"
 
+#: mangaki/templates/fix/fix_index.html:5
+#: mangaki/templates/fix/nsfw_grid.html:6
 msgid "Page"
 msgstr "ページ"
 
+#: mangaki/templates/fix/fix_index.html:12
 msgid "Go to the NSFW grid"
 msgstr "NSFWグリッドに移動します"
 
+#: mangaki/templates/fix/fix_index.html:23
 msgid "This problem is solved,This problem is ongoing"
 msgstr "この問題は解決され、この問題は現在進行中です"
 
+#: mangaki/templates/fix/fix_index.html:36
+#: mangaki/templates/fix/fix_suggestion.html:56
 msgid "Problem:"
 msgstr "問題："
 
+#: mangaki/templates/fix/fix_index.html:38
+#: mangaki/templates/fix/fix_suggestion.html:62
 msgid "Reported by:"
 msgstr "によって報告されました："
 
+#: mangaki/templates/fix/fix_index.html:43
 msgid "Target:"
 msgstr "ターゲット："
 
+#: mangaki/templates/fix/fix_index.html:54
+#: mangaki/templates/fix/fix_suggestion.html:126
 msgid ""
 "You <strong><span class=\"text-success\">approved <span class=\"glyphicon "
 "glyphicon-thumbs-up\" aria-hidden=\"true\"></span></span></strong> this "
 "suggestion."
 msgstr ""
-"あなたは、<スパンクラス= \"テキスト成功\">承認<スパンクラス= \"glyphicon glyphicon-親指アップ\" ARIA-隠さ= "
-"\"真の\"> </ span>を</ span>を</ strong>のこの提案の<strong>。"
+"あなたは、<スパンクラス= \"テキスト成功\">承認<スパンクラス= \"glyphicon "
+"glyphicon-親指アップ\" ARIA-隠さ= \"真の\"> </ span>を</ span>を</ strong>の"
+"この提案の<strong>。"
 
+#: mangaki/templates/fix/fix_index.html:60
+#: mangaki/templates/fix/fix_suggestion.html:130
 msgid ""
 "You <strong><span class=\"text-danger\">rejected <span class=\"glyphicon "
 "glyphicon-thumbs-down\" aria-hidden=\"true\"></span></span></strong> this "
 "suggestion."
 msgstr ""
-"あなたは、<スパンクラス= \"テキスト-危険\">拒否<スパンクラス= \"glyphicon glyphicon-親指ダウン\" ARIA-隠さ= "
-"\"真の\"> </ span>を</ span>を</ strong>のこの提案の<strong>。"
+"あなたは、<スパンクラス= \"テキスト-危険\">拒否<スパンクラス= \"glyphicon "
+"glyphicon-親指ダウン\" ARIA-隠さ= \"真の\"> </ span>を</ span>を</ strong>の"
+"この提案の<strong>。"
 
+#: mangaki/templates/fix/fix_index.html:66
+#: mangaki/templates/fix/fix_suggestion.html:148
 msgid "You asked <strong>an admin for help</strong>."
 msgstr "あなたは、ヘルプ</ strong>のための<strong>管理者に尋ねました。"
 
+#: mangaki/templates/fix/fix_suggestion.html:16
 msgid "This problem was marked as solved!"
 msgstr "解決としてこの問題が顕著でした！"
 
+#: mangaki/templates/fix/fix_suggestion.html:33
 msgid "Copy"
 msgstr "コピー"
 
+#: mangaki/templates/fix/fix_suggestion.html:34
 msgid "Sharing link"
 msgstr "リンクを共有"
 
+#: mangaki/templates/fix/fix_suggestion.html:101
 msgid "Solve the problem automatically"
 msgstr "自動的に問題を解決します"
 
+#: mangaki/templates/fix/fix_suggestion.html:107
 msgid "Close this suggestion"
 msgstr "この提案を閉じます"
 
+#: mangaki/templates/fix/fix_suggestion.html:113
 msgid "Ask an admin for help"
 msgstr "助けのための管理を依頼"
 
+#: mangaki/templates/fix/fix_suggestion.html:115
 msgid "You asked an admin for help"
 msgstr "あなたは助けのために管理者を尋ねました"
 
-msgid "Reopen cette suggestion"
+#: mangaki/templates/fix/fix_suggestion.html:141
+#, fuzzy
+#| msgid "Reopen cette suggestion"
+msgid "Reopen this suggestion"
 msgstr "この提案を再度開きます"
 
+#: mangaki/templates/fix/fix_suggestion.html:155
 msgid "This work belongs to this cluster:"
 msgstr "この作品は、このクラスタに属しています："
 
+#: mangaki/templates/fix/fix_suggestion.html:165
 msgid "This cluster is"
 msgstr "このクラスタはあります"
 
+#: mangaki/templates/fix/fix_suggestion.html:166
+#: mangaki/templates/fix/nsfw_grid.html:78
+#: mangaki/templates/profile_works.html:12
+#: mangaki/templates/profile_works.html:19
 msgid "by"
 msgstr "によって"
 
+#: mangaki/templates/fix/fix_suggestion.html:170
 msgid "This cluster was merged:"
 msgstr "このクラスタは、マージされました："
 
+#: mangaki/templates/fix/fix_suggestion.html:188
 msgid "Previous"
 msgstr "前"
 
+#: mangaki/templates/fix/fix_suggestion.html:192
 msgid "Back"
 msgstr "バック"
 
+#: mangaki/templates/fix/fix_suggestion.html:196
 msgid "Next"
 msgstr "次"
 
+#: mangaki/templates/fix/fix_suggestion.html:218
 msgid "Copied link!"
 msgstr "コピーしたリンク！"
 
+#: mangaki/templates/fix/fix_suggestion.html:218
 msgid "Link was not copied"
 msgstr "リンクがコピーされませんでした。"
 
+#: mangaki/templates/fix/nsfw_grid.html:6
+#: mangaki/templates/fix/nsfw_grid.html:15
 msgid "NSFW grid"
 msgstr "NSFWグリッド"
 
+#: mangaki/templates/fix/nsfw_grid.html:12
 msgid "Back to suggestions"
 msgstr "戻る提案へ"
 
+#: mangaki/templates/fix/nsfw_grid.html:24
 msgid "works in the grid"
 msgstr "グリッドの作品"
 
+#: mangaki/templates/fix/nsfw_grid.html:34
 msgid "Mark remaining works as SFW"
 msgstr "SFWとしてマーク残りの作品"
 
+#: mangaki/templates/fix/nsfw_grid.html:34
 msgid "and continue"
 msgstr "そして、継続"
 
+#: mangaki/templates/fix/nsfw_grid.html:43
 msgid "Attention!"
 msgstr "注意！"
 
+#: mangaki/templates/fix/nsfw_grid.html:43
 msgid ""
 "You are not logged in so by default you can't browse NSFW works,In your "
 "profile you stated that you didn't want to browse NSFW works"
 msgstr ""
-"あなたは、自分のプロフィールでは、あなたがNSFW作品を閲覧したくなかったと述べ、あなたがNSFW作品を閲覧することはできませんデフォルトではそうでは記録されません"
+"あなたは、自分のプロフィールでは、あなたがNSFW作品を閲覧したくなかったと述"
+"べ、あなたがNSFW作品を閲覧することはできませんデフォルトではそうでは記録され"
+"ません"
 
+#: mangaki/templates/fix/nsfw_grid.html:44
 msgid "Display anyway?"
 msgstr "とにかく表示？"
 
+#: mangaki/templates/fix/nsfw_grid.html:44
 msgid "Yes"
 msgstr "はい"
 
+#: mangaki/templates/fix/nsfw_grid.html:44
 msgid "No"
 msgstr "ノー"
 
+#: mangaki/templates/fix/nsfw_grid.html:50
 msgid "Remainder:"
 msgstr "残り："
 
+#: mangaki/templates/fix/nsfw_grid.html:50
 msgid "You agreed to see NSFW works on this grid temporarily."
 msgstr "あなたはNSFWが一時的にこのグリッド上で動作確認するために合意しました。"
 
+#: mangaki/templates/fix/nsfw_grid.html:52
+#, python-format
 msgid "<a href=\"%(go_back_url)s\">Click here</a> to go back."
 msgstr "<a href=\"%(go_back_url)s\">こちらをクリック</a>して戻ってください。"
 
+#: mangaki/templates/fix/nsfw_grid.html:73
 msgid "It's NSFW!"
 msgstr "それはNSFWです！"
 
+#: mangaki/templates/fix/nsfw_grid.html:78
 msgid "Reported"
 msgstr "報告"
 
+#: mangaki/templates/fix/nsfw_grid.html:78
 msgid "NSFW,SFW"
 msgstr "NSFW、SFW"
 
+#: mangaki/templates/fix/nsfw_grid.html:84
 msgid "Thanks for voting. An admin will help asap!"
 msgstr "投票していただきありがとうございます。管理者はできるだけ早く助けます！"
 
+#: mangaki/templates/fix/nsfw_grid.html:99
 msgid ""
 "<strong>No result:</strong> either no work was reported as NSFW/SFW, or you "
 "gave your advice already."
 msgstr ""
-"<strong>いいえ結果は：</ strong>のいずれかに何の仕事がNSFW / "
-"SFWとして報告されていない、またはあなたはすでにあなたのアドバイスを与えました。"
+"<strong>いいえ結果は：</ strong>のいずれかに何の仕事がNSFW / SFWとして報告さ"
+"れていない、またはあなたはすでにあなたのアドバイスを与えました。"
 
+#: mangaki/templates/fix/nsfw_grid.html:130
 msgid "Refresh and see more"
 msgstr "更新し、より多くのを参照してください"
 
+#: mangaki/templates/index.html:4 mangaki/templates/index.html:11
 msgid "Mangaki, anime and manga recommendation"
 msgstr "Mangaki、アニメやマンガの勧告"
 
-msgid "Rate your favorite series and discover new ones!"
-msgstr "お気に入りのシリーズを評価し、新しいものを発見！"
-
+#: mangaki/templates/index.html:15
 msgid "I prefer anime"
 msgstr "アニメ派"
 
+#: mangaki/templates/index.html:16
 msgid "I prefer manga"
 msgstr "マンガ派"
 
-msgid "Artists"
-msgstr "アーティスト"
-
-msgid "Hint: You can press Enter to trigger the search"
-msgstr "ヒント：検索をトリガするためにEnterキーを押すことができます"
-
+#: mangaki/templates/mangaki/legal.html:8
 msgid "Icons"
 msgstr "アイコン"
 
+#: mangaki/templates/mangaki/legal.html:10
 msgid ""
-"The icons we used for the ratings are created by <a "
-"href=\"http://www.flaticon.com/authors/dave-gandy\">Dave Gandy</a> for <a "
-"href=\"http://fontawesome.io\">fontawesome</a>. The SVG version comes from "
-"<a href=\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
+"The icons we used for the ratings are created by <a href=\"http://www."
+"flaticon.com/authors/dave-gandy\">Dave Gandy</a> for <a href=\"http://"
+"fontawesome.io\">fontawesome</a>. The SVG version comes from <a href="
+"\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
 msgstr ""
-"我々は評価のために使用されるアイコンは、"
-"<a href=\"http://www.flaticon.com/authors/dave-gandy\">Dave Gandy</a>"
-"によって作成されます。<a href=\"http://fontawesome.io\">fontawesome</a>。"
-"SVGのバージョンは"
-"<a href=\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>"
-"に由来しています。"
+"我々は評価のために使用されるアイコンは、<a href=\"http://www.flaticon.com/"
+"authors/dave-gandy\">Dave Gandy</a>によって作成されます。<a href=\"http://"
+"fontawesome.io\">fontawesome</a>。SVGのバージョンは<a href=\"http://www."
+"flaticon.com/packs/font-awesome\">flaticon</a>に由来しています。"
 
+#: mangaki/templates/mangaki/reco_list.html:10
 msgid ""
 "Here are some recommendations that you might like.<br /> Rate them and "
 "reload to get new ones."
 msgstr ""
-"あなたの好きなアニメ、漫画はコレですか。<br />"
-"ページを再ロードしてください。"
+"あなたの好きなアニメ、漫画はコレですか。<br />ページを再ロードしてください。"
 
+#: mangaki/templates/mangaki/reco_list.html:18
 msgid "All"
 msgstr "すべて"
 
-msgid "Anime only"
-msgstr "アニメ"
-
-msgid "Manga only"
-msgstr "マンガ"
-
+#: mangaki/templates/mangaki/reco_list.html:31
 msgid ""
 "I want new recommendations! <br class=\"visible-xs\">(After you rate those.)"
 msgstr "新しいオススメをゲットしたい！<br />（カードの評価後にクリックしてね）"
 
+#: mangaki/templates/mangaki/reco_list.html:35
+#, python-format
 msgid ""
-"To receive recommandations, you should at least <a "
-"href=\"%(work_list_url)s\">rate an anime</a>!"
+"To receive recommandations, you should at least <a href=\"%(work_list_url)s"
+"\">rate an anime</a>!"
 msgstr ""
-"オススメを獲るには、<a href=\"%(work_list_url)s\">アニメか漫画</a>"
-"を少なくとも一つは評価してね！"
+"オススメを獲るには、<a href=\"%(work_list_url)s\">アニメか漫画</a>を少なくと"
+"も一つは評価してね！"
 
+#: mangaki/templates/mangaki/work_detail.html:53
 msgid "Number of episodes:"
 msgstr "エピソードの数："
 
+#: mangaki/templates/mangaki/work_detail.html:55
 msgid "Original title:"
 msgstr "原題："
 
+#: mangaki/templates/mangaki/work_detail.html:62
 msgid "Editor:"
 msgstr "編集者："
 
+#: mangaki/templates/mangaki/work_detail.html:63
 msgid "Origin:"
 msgstr "原点："
 
+#: mangaki/templates/mangaki/work_detail.html:64
 msgid "Genres:"
 msgstr "ジャンル："
 
+#: mangaki/templates/mangaki/work_detail.html:66
+#: mangaki/templates/mangaki/work_detail.html:68
 msgid "Type:"
 msgstr "タイプ："
 
+#: mangaki/templates/mangaki/work_detail.html:71
 msgid "Catalog number:"
 msgstr "カタログ番号："
 
+#: mangaki/templates/mangaki/work_detail.html:73
 msgid "Find this album on VGMdb"
 msgstr "VGMdbにこのアルバムを探します"
 
+#: mangaki/templates/mangaki/work_detail.html:79
 msgid "Stats"
 msgstr "統計"
 
+#: mangaki/templates/mangaki/work_detail.html:85
 msgid "References"
 msgstr "参照"
 
+#: mangaki/templates/mangaki/work_detail.html:89
+#, python-format
 msgid "See on %(name)s"
 msgstr "%(name)s"
 
+#: mangaki/templates/mangaki/work_detail.html:107
 msgid "Suggest an edit for this page"
 msgstr "このページの編集を提案します"
 
+#: mangaki/templates/mangaki/work_detail.html:110
 msgid "Suggest this work to a user on Mangaki"
 msgstr "Mangaki上のユーザーに、この作品を提案します"
 
+#: mangaki/templates/mangaki/work_detail.html:112
 msgid "This user already knows this work"
 msgstr "このユーザーはすでにこの作品を知っています"
 
+#: mangaki/templates/mangaki/work_detail.html:113
 msgid "Suggestion successfully sent!"
 msgstr "提案は正常に送信します！"
 
+#: mangaki/templates/mangaki/work_detail.html:120
 msgid "Suggest an edit for"
 msgstr "編集のための提案"
 
+#: mangaki/templates/mangaki/work_detail.html:122
 msgid "Thanks for improving Mangaki!"
 msgstr "Mangakiを改善するためのありがとう！"
 
+#: mangaki/templates/mangaki/work_detail.html:124
 msgid "Please indicate what part of the work has a problem."
 msgstr "問題を抱えている仕事のどの部分明記してください。"
 
+#: mangaki/templates/mangaki/work_detail.html:125
 msgid "Sketch your solution, and submit it!"
 msgstr "あなたのソリューションをスケッチし、それを提出します！"
 
+#: mangaki/templates/mangaki/work_detail.html:136
 msgid "Close"
 msgstr "閉じる"
 
+#: mangaki/templates/mangaki/work_detail.html:137
 msgid "Submit"
 msgstr "提出します"
 
+#: mangaki/templates/mangaki/work_list.html:14
+#, python-format
+msgid ""
+"Rate a few cards below, or using the search bar.<br /> Then click <a class="
+"\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what Mangaki "
+"recommends!"
+msgstr ""
+"下記のカードを評価するか、検索バーより好きな漫画かアニメを検索してね。<br/>次"
+"に<a class=\"alert-link\" href=\"%(reco_url)s\">オススメ</a>ボタンを押した"
+"ら、Mangakiがあなたへのお勧めを教えてくれるよ"
+
+#: mangaki/templates/mangaki/work_list.html:20
+#, python-format
+msgid ""
+"New on Mangaki? Start rating some works below! Then see your "
+"recommendations, and <a href=\"%(signup_url)s?next=%(next_url)s\">sign up</"
+"a> to keep your ratings."
+msgstr ""
+"Mangakiは初めてですか？下記のカードを評価してあなたへのオススメをゲットしま"
+"しょう。もしデータを保存したければ<a href=\"%(signup_url)s?next=%(next_url)s"
+"\">サインアップ</a>してね。"
+
+#: mangaki/templates/mangaki/work_list.html:53
 msgid "Cheatsheet for key shortcuts"
 msgstr "キーショートカットのチートシート"
 
+#: mangaki/templates/mangaki/work_list.html:56
 msgid "Moves"
 msgstr "動きます"
 
-msgid ""
-"Rate a few cards below, or using the search bar.<br /> Then click <a "
-"class=\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what "
-"Mangaki recommends!"
-msgstr ""
-"下記のカードを評価するか、検索バーより好きな漫画かアニメを検索してね。<br/>"
-"次に<a class=\"alert-link\" href=\"%(reco_url)s\">オススメ</a>ボタンを押したら、"
-"Mangakiがあなたへのお勧めを教えてくれるよ"
+#: mangaki/templates/mangaki/work_list.html:58
+msgid "to the left"
+msgstr "左に"
 
-msgid ""
-"New on Mangaki? Start rating some works below! Then see your "
-"recommendations, and <a href=\"%(signup_url)s?next=%(next_url)s\">sign "
-"up</a> to keep your ratings."
-msgstr ""
-"Mangakiは初めてですか？下記のカードを評価してあなたへのオススメをゲットしましょう。"
-"もしデータを保存したければ"
-"<a href=\"%(signup_url)s?next=%(next_url)s\">サインアップ</a>してね。"
+#: mangaki/templates/mangaki/work_list.html:59
+msgid "to the right"
+msgstr "右に"
 
-msgid "Mosaic"
-msgstr "全体"
+#: mangaki/templates/mangaki/work_list.html:61
+msgid "Vote"
+msgstr "評価"
 
-msgid "Recent"
-msgstr "最近"
+#: mangaki/templates/mangaki/work_list.html:63 mangaki/views.py:88
+msgid "Love"
+msgstr "大好き"
 
-msgid "Top"
-msgstr "トップ"
+#: mangaki/templates/mangaki/work_list.html:64 mangaki/views.py:92
+msgid "Like"
+msgstr "好き"
 
-msgid "Popular"
-msgstr "人気"
+#: mangaki/templates/mangaki/work_list.html:65 mangaki/views.py:96
+msgid "Neutral"
+msgstr "普通"
 
-msgid "Pearls"
-msgstr "レア"
+#: mangaki/templates/mangaki/work_list.html:66 mangaki/views.py:100
+msgid "Dislike"
+msgstr "嫌い"
 
-msgid "Controversial"
-msgstr "癖がある"
+#: mangaki/templates/mangaki/work_list.html:67 mangaki/views.py:104
+msgid "I want to see"
+msgstr "見たい"
 
-msgid "Random"
-msgstr "ランダム"
+#: mangaki/templates/mangaki/work_list.html:68 mangaki/views.py:109
+msgid "I don't want to see"
+msgstr "見たくない"
 
-msgid "A-Z"
-msgstr "アルファベット順"
-
-msgid ""
-"Enter the title of some %(category)s (currently %(objects_count)s works)"
-msgstr "「いくつか%(category)s（現在%(objects_count)sの作品）のタイトルを入力します。"
-
-msgid "Hint: press Enter to trigger the search"
-msgstr "ヒント：Enterキーを押して検索をトリガします"
-
+#: mangaki/templates/mangaki/work_list.html:126
 msgid "Get recommendations now"
 msgstr "今の勧告を見ます"
 
+#: mangaki/templates/mangaki/work_rating.html:23
 msgid "See more…"
 msgstr "続きを見る…"
 
+#: mangaki/templates/profile.html:23
 msgid "Your ratings"
 msgstr "あなたの評価"
 
+#: mangaki/templates/profile.html:26
+#, python-format
 msgid "<a href=\"%(signup_url)s\">Signup</a> to save them"
 msgstr "<a href=\"%(signup_url)s\">サインアップ</a>"
 
+#: mangaki/templates/profile.html:34
+#, python-format
 msgid "Subscribed since %(member_days)s days"
 msgstr "%(member_days)sの時代から加入"
 
-msgid "Rated works"
-msgstr "定格作品"
-
-msgid "My settings"
-msgstr "私の設定"
-
+#: mangaki/templates/profile.html:44
 msgid "Delete all my ratings"
 msgstr "すべての私の評価を削除します。"
 
+#: mangaki/templates/profile_preferences.html:11
+#, fuzzy
+#| msgid "Reset My Password"
+msgid "Reset my password"
+msgstr "私のパスワードをリセットする"
+
+#: mangaki/templates/profile_preferences.html:33
 msgid "Export all my data"
 msgstr "すべての私のデータをエクスポートします。"
 
+#: mangaki/templates/profile_preferences.html:37
 msgid "My profile is public"
 msgstr "私のプロフィールは公開され"
 
+#: mangaki/templates/profile_reco.html:4
 msgid "Sent recommendations"
 msgstr "送信された勧告"
 
+#: mangaki/templates/profile_reco.html:7
 msgid "was recommended to"
 msgstr "に推奨されていました"
 
+#: mangaki/templates/profile_reco.html:20
 msgid "Received recommendations"
 msgstr "受信勧告"
 
+#: mangaki/templates/profile_reco.html:23
 msgid "was recommended to you by"
 msgstr "によってあなたに推奨されました"
 
+#: mangaki/templates/profile_reco.html:31
 msgid "(This list is empty.)"
 msgstr "（このリストは空です。）"
 
+#: mangaki/templates/profile_reco.html:37
 msgid "Delete all received recommendations"
 msgstr "受信したすべての勧告を削除します。"
 
+#: mangaki/templates/profile_work.html:7
 msgid "Ask Mangaki to sort!"
 msgstr "Mangakiにソートを依頼！"
 
+#: mangaki/templates/profile_works.html:9
 msgid "seen by"
 msgstr "で見られる"
 
+#: mangaki/templates/profile_works.html:12
+#: mangaki/templates/profile_works.html:32
 msgid "watchlist"
 msgstr "ウォッチリスト"
 
+#: mangaki/templates/profile_works.html:16
 msgid "read by"
 msgstr "で読み取り"
 
+#: mangaki/templates/profile_works.html:19
+#: mangaki/templates/profile_works.html:39
 msgid "wishlist"
 msgstr "ウィッシュリスト"
 
+#: mangaki/templates/profile_works.html:23
 msgid "Recommendations to"
 msgstr "への提言"
 
+#: mangaki/templates/profile_works.html:29
 msgid "seen"
 msgstr "見た"
 
+#: mangaki/templates/profile_works.html:36
 msgid "read"
 msgstr "読んだ"
 
+#: mangaki/templates/profile_works.html:44
 msgid "My recommendations"
 msgstr "私の提言"
 
+#: mangaki/templates/profile_works.html:58
+#, python-format
 msgid "%(username)s's profile is not disclosed publicly."
 msgstr "%(username)sさんのプロフィールは一般に公開されていません。"
 
+#: mangaki/templates/search.html:6
+msgid "Search"
+msgstr "検索"
+
+#: mangaki/templates/settings.html:11
+msgid "Return to the home page"
+msgstr "ホームページに戻る"
+
+#: mangaki/templates/settings.html:16
+#, fuzzy
+#| msgid "References"
+msgid "Preferences"
+msgstr "参照"
+
+#: mangaki/templates/settings.html:17
+msgid "Would you like to stop receiving emails?"
+msgstr "メールの受信を停止しますか？"
+
+#: mangaki/templates/settings.html:20
+msgid "Stop receiving emails"
+msgstr "メールの受信を停止する"
+
+#: mangaki/templates/settings.html:21
+msgid "Continue receiving emails"
+msgstr "メールの受信を継続する"
+
+#: mangaki/templates/socialaccount/connections.html:5
+#: mangaki/templates/socialaccount/connections.html:8
 msgid "Account Connections"
 msgstr "アカウントの接続"
 
+#: mangaki/templates/socialaccount/connections.html:11
 msgid ""
 "You can sign in to your account using any of the following third party "
 "accounts:"
-msgstr "あなたは、次のサードパーティのアカウントのいずれかを使用して、あなたのアカウントにログインすることができます："
+msgstr ""
+"あなたは、次のサードパーティのアカウントのいずれかを使用して、あなたのアカウ"
+"ントにログインすることができます："
 
+#: mangaki/templates/socialaccount/connections.html:35
 msgid "Remove"
 msgstr "取り除きます"
 
+#: mangaki/templates/socialaccount/connections.html:43
 msgid ""
 "You currently have no social network accounts connected to this account."
-msgstr "現在、このアカウントに接続されていないソーシャルネットワークのアカウントを持っていません。"
+msgstr ""
+"現在、このアカウントに接続されていないソーシャルネットワークのアカウントを"
+"持っていません。"
 
+#: mangaki/templates/socialaccount/connections.html:46
 msgid "Add a 3rd Party Account"
 msgstr "サードパーティのアカウントを追加"
 
+#: mangaki/templates/socialaccount/signup.html:9
+#: mangaki/templates/socialaccount/signup.html:21
 msgid "Sign Up"
 msgstr "サインアップ"
 
+#: mangaki/templates/socialaccount/signup.html:11
+#, python-format
 msgid ""
 "You are about to use your %(provider_name)s account to connect to "
 "%(site_name)s. In order to do so, please fill the following form:"
 msgstr ""
-"あなたは%(site_name)sに接続します%(provider_name)sのアカウントを使用しようとしています。そうするためには、以下のフォームに必要事項を記入してください。"
+"あなたは%(site_name)sに接続します%(provider_name)sのアカウントを使用しようと"
+"しています。そうするためには、以下のフォームに必要事項を記入してください。"
 
+#: mangaki/templates/top.html:6 mangaki/templates/top.html:7
+#, python-format
 msgid "Top %(size)s of %(category)s on Mangaki on %(date)s"
 msgstr "%(date)sのMangakiの%(category)sトップ%(size)s"
 
+#: mangaki/templates/top.html:9
 msgid "Name"
 msgstr "名"
 
+#: mangaki/templates/top.html:9
 msgid "Score"
 msgstr "スコア"
 
+#: mangaki/templates/top.html:9
 msgid "Number of ratings"
 msgstr "評価の数"
 
+#: mangaki/templates/top.html:9
 msgid "Number of favorites"
 msgstr "お気に入り数"
 
+#: mangaki/templates/works.html:18
 msgid "No results."
 msgstr "結果がありません。"
 
+#: mangaki/urls.py:71
 msgid "The page you're looking for was not found (yet?)."
 msgstr "あなたが探しているページは（まだ？）が見つかりませんでした。"
 
+#: mangaki/urls.py:72
 msgid "You don't have access to this page."
 msgstr "このページへのアクセス権を持っていません。"
 
+#: mangaki/urls.py:73
 msgid "This request is incorrect. What did you try to do?"
 msgstr "この要求が正しくありません。何を試しましたか？"
 
-msgid "Love"
-msgstr "大好き"
+#~ msgid "United States"
+#~ msgstr "アメリカ"
 
-msgid "Like"
-msgstr "好き"
+#~ msgid "Subscribe to Mangaki's newsletter"
+#~ msgstr "Mangakiのニュースレターを購読します"
 
-msgid "Neutral"
-msgstr "普通"
+#~ msgid "Open the menu"
+#~ msgstr "メニューを開きます。"
 
-msgid "Dislike"
-msgstr "嫌い"
+#~ msgid "What is Mangaki?"
+#~ msgstr "Mangakiは何ですか？"
 
-msgid "I want to see"
-msgstr "見たい"
+#~ msgid "Hint: You can press Enter to trigger the search"
+#~ msgstr "ヒント：検索をトリガするためにEnterキーを押すことができます"
 
-msgid "I don't want to see"
-msgstr "見たくない"
+#~ msgid "Anime only"
+#~ msgstr "アニメ"
+
+#~ msgid "Manga only"
+#~ msgstr "マンガ"
+
+#~ msgid ""
+#~ "Enter the title of some %(category)s (currently %(objects_count)s works)"
+#~ msgstr ""
+#~ "「いくつか%(category)s（現在%(objects_count)sの作品）のタイトルを入力しま"
+#~ "す。"
+
+#~ msgid "Hint: press Enter to trigger the search"
+#~ msgstr "ヒント：Enterキーを押して検索をトリガします"

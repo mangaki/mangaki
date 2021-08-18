@@ -649,9 +649,12 @@ ul.checklist .list-icon {
     }
 }
 
-
 .shortcuts-explanations-container h3 {
     margin-bottom: 25px;
+}
+
+.shortcuts-explanations-container h4 {
+  margin-left: 25px;
 }
 
 /* *******************

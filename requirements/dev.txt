@@ -24,7 +24,7 @@ lxml==4.*,>=4.4.0
 git+https://github.com/mangaki/zero@master#egg=zero
 markdown==3.*,>=3.0.0
 natsort==7.*,>=7.0.1
-psycopg2-binary
+psycopg2-binary>=2.8,<2.9
 pycodestyle
 pylint
 pytest==5.*,>=5.4.1
