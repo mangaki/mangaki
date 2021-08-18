@@ -73,11 +73,11 @@ workflows:
   build_and_test_and_deploy:
     jobs:
       - build
-      - push_beta:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
-                - raito/cci2-deploy
+#      - push_beta:
+#          requires:
+#            - build
+#          filters:
+#            branches:
+#              only:
+#                - master
+#                - raito/cci2-deploy
