@@ -76,8 +76,8 @@ workflows:
 #      - push_beta:
 #          requires:
 #            - build
-          filters:
-            branches:
-              only:
-                - master
-                - raito/cci2-deploy
+#          filters:
+#            branches:
+#              only:
+#                - master
+#                - raito/cci2-deploy
