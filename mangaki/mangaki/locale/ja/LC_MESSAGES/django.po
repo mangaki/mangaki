@@ -9,7 +9,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-19 14:53+0000\n"
+"POT-Creation-Date: 2021-09-05 19:49+0200\n"
 "PO-Revision-Date: 2018-08-23 19:25+0900\n"
 "Last-Translator: Tomoko Kozu <tomoko@mangaki.fr>\n"
 "Language: ja\n"
@@ -1109,6 +1109,40 @@ msgstr ""
 "しょう。もしデータを保存したければ<a href=\"%(signup_url)s?next=%(next_url)s"
 "\">サインアップ</a>してね。"
 
+#: mangaki/templates/mangaki/work_list.html:28
+#: mangaki/templates/mangaki/work_list.html:63 mangaki/views.py:88
+msgid "Love"
+msgstr "大好き"
+
+#: mangaki/templates/mangaki/work_list.html:29
+#: mangaki/templates/mangaki/work_list.html:30
+#: mangaki/templates/mangaki/work_list.html:64 mangaki/views.py:92
+msgid "Like"
+msgstr "好き"
+
+#: mangaki/templates/mangaki/work_list.html:31
+#: mangaki/templates/mangaki/work_list.html:66 mangaki/views.py:100
+msgid "Dislike"
+msgstr "嫌い"
+
+#: mangaki/templates/mangaki/work_list.html:34
+msgid "I want to read"
+msgstr "読みたい"
+
+#: mangaki/templates/mangaki/work_list.html:36
+#: mangaki/templates/mangaki/work_list.html:67 mangaki/views.py:104
+msgid "I want to see"
+msgstr "見たい"
+
+#: mangaki/templates/mangaki/work_list.html:42
+msgid "I don't want to read"
+msgstr "読みたくない"
+
+#: mangaki/templates/mangaki/work_list.html:44
+#: mangaki/templates/mangaki/work_list.html:68 mangaki/views.py:109
+msgid "I don't want to see"
+msgstr "見たくない"
+
 #: mangaki/templates/mangaki/work_list.html:53
 msgid "Cheatsheet for key shortcuts"
 msgstr "キーショートカットのチートシート"
@@ -1129,29 +1163,9 @@ msgstr "右に"
 msgid "Vote"
 msgstr "評価"
 
-#: mangaki/templates/mangaki/work_list.html:63 mangaki/views.py:88
-msgid "Love"
-msgstr "大好き"
-
-#: mangaki/templates/mangaki/work_list.html:64 mangaki/views.py:92
-msgid "Like"
-msgstr "好き"
-
 #: mangaki/templates/mangaki/work_list.html:65 mangaki/views.py:96
 msgid "Neutral"
 msgstr "普通"
-
-#: mangaki/templates/mangaki/work_list.html:66 mangaki/views.py:100
-msgid "Dislike"
-msgstr "嫌い"
-
-#: mangaki/templates/mangaki/work_list.html:67 mangaki/views.py:104
-msgid "I want to see"
-msgstr "見たい"
-
-#: mangaki/templates/mangaki/work_list.html:68 mangaki/views.py:109
-msgid "I don't want to see"
-msgstr "見たくない"
 
 #: mangaki/templates/mangaki/work_list.html:126
 msgid "Get recommendations now"
