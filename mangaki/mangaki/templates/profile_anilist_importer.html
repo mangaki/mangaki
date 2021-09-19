@@ -1,0 +1,30 @@
+<div id="anilist_container">
+    {% verbatim %}
+    <transition-group appear name="fade">
+        <template v-if="showForm">
+            <p key="form_title">Importer depuis AniList&nbsp;:</p>
+            <div key="form_input" class="input-group">
+                <input v-model.lazy="anilist_username" @keyup.enter="importAniList" type="text" class="form-control" placeholder="Ton login"/>
+                <span class="input-group-btn">
+                    <button v-on:click="importAniList" class="btn btn-default">C'est parti!</button>
+                </span>
+            </div>
+        </template>
+        <template v-if="followProgress">
+            <p key="progress_title">Votre AniList est en cours d'importation. Veuillez patienter.</p>
+            <loading-spinner key="spinner"></loading-spinner>
+            <p key="work_title" v-if="currentWorkTitle != null">✓✓ {{ currentWorkTitle }} importé.
+                <span v-if="workCount && currentWorkIndex">({{ currentWorkIndex }} / {{ workCount }})</span>
+            </p>
+        </template>
+        <template v-if="errorMessage">
+            <p key="message">Une erreur est survenue, rechargez la page.</p>
+            <p key="details">Détails : {{ errorMessage }}</p>
+        </template>
+        <template v-if="importFinished">
+            <p key="finished-title">Votre import AniList est désormais terminé.</p>
+            <button class="btn btn-primary" key="reload-page" v-on:click="reloadPage">Cliquez ici pour recharger la page</button>
+        </template>
+    </transition-group>
+    {% endverbatim %}
+</div>

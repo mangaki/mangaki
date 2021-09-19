@@ -60,18 +60,81 @@
                         Activer les raccourcis clavier sur la mosaique&nbsp;:
                     </bs-light-switch>
                 </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Transformation des notes externes</div>
+                    <div class="list-group">
+                        <a href="#"
+                           class="list-group-item"
+                           v-bind:class="{ active: extRatingPolicy == 'strict' }"
+                           @click.prevent="extRatingPolicy = 'strict'">
+                            <h4 class="list-group-item-heading">Politique stricte</h4>
+                            <p class="list-group-item-text">Cette politique se veut très conservative
+                                et ne fournit que peu de favoris à vos œuvres.
+                                Précisément, seules les notes maximales sont considérées comme un favori.
+                                Puis, seules les notes très élévées sont considérées comme des « J'aime ».
+
+                                Elle est conseillée si vous avez des standards élevés.
+                            </p>
+                        </a>
+                        <a href="#"
+                           class="list-group-item"
+                           v-bind:class="{ active: extRatingPolicy == 'standard' }"
+                           @click.prevent="extRatingPolicy = 'standard'">
+                            <h4 class="list-group-item-heading">Politique standard</h4>
+                            <p class="list-group-item-text">
+                                Cette politique se veut raisonnable et considère qu'une œuvre proche de la note maximale
+                                est un favori (à un point près).
+
+                                Elle est conseillée si vous ne savez pas encore trop bien ce que vous aimez.
+                            </p>
+                        </a>
+                        <a href="#"
+                           class="list-group-item"
+                           v-bind:class="{ active: extRatingPolicy == 'gentle' }"
+                           @click.prevent="extRatingPolicy = 'gentle'">
+                            <h4 class="list-group-item-heading">Politique noble</h4>
+                            <p class="list-group-item-text">
+                                Cette politique est très ouverte et considère beaucoup plus d'œuvres comme des favoris.
+                                Elle pénalise peu d'œuvres.
+
+                                Elle est conseillée si vous appréciez un peu de tout.
+                            </p>
+                        </a>
+                    </div>
+                    <div class="panel-body">
+                        <div v-if="!convertingExternalRatings">
+                            <button
+                                type='button'
+                                class="btn btn-primary btn-nowrap center-block"
+                                @click="convertExtRatings">
+                                Reconvertir mes notes importées
+                            </button>
+                        </div>
+                        <div v-else>
+                            <p>Conversion en cours de vos notes importées… Revenez plus tard!</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        {% if meta.mal.is_available %}
         <div class="col-sm-4 col-12">
+            {% if meta.mal.is_available %}
             <div class="card">
-                <div class="card-header">Imports de données</div>
+                <div class="card-header">myAnimeList</div>
                 <div class="card-body">
                     {% include "profile_mal_importer.html" %}
                 </div>
             </div>
+            {% endif %}
+            {% if meta.anilist.is_available %}
+            <div class="card">
+                <div class="card-header">AniList</div>
+                <div class="card-body">
+                    {% include "profile_anilist_importer.html" %}
+                </div>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 {% endblock %}
 
@@ -82,17 +145,24 @@
         <script src="https://unpkg.com/vue@2.5.2/dist/vue.min.js"></script>
     {% endif %}
 
-    {% if meta.mal.is_available %}
-        <script src="/static/js/mal_import.js"></script>
+    {% if meta.mal.is_available or meta.anilist.is_available %}
+        <script src="/static/js/external_import.js"></script>
     {% endif %}
 
     {% if meta.mal.is_available %}
         <script>
         $(document).ready(function () {
             if (INITIAL_DATA.hasPendingMALImport) {
-                MALImporterApp.fetchServerSideTaskId()
+                MALImporterApp.fetchCurrentImport()
                     .then(() => {
                         MALImporterApp.showForm = false;
+                    })
+            }
+
+            if (INITIAL_DATA.hasPendingAniListImport) {
+                AniListImporterApp.fetchCurrentImport()
+                    .then(() => {
+                        AniListImporterApp.showForm = false;
                     })
             }
         });
@@ -106,7 +176,10 @@
             acceptsResearchUsage: {{ user.profile.research_ok|yesno:"true,false" }},
             receivesNewsletter: {{ user.profile.newsletter_ok|yesno:"true,false" }},
             enableKbShortcuts: {{ user.profile.keyboard_shortcuts_enabled|yesno:"true,false" }},
-            hasPendingMALImport: {{ meta.mal.pending_import|yesno:"true,false" }}
+            extRatingPolicy: {% if user.profile.policy %} '{{ user.profile.policy | safe }}' {% else %} null {% endif %},
+            hasPendingMALImport: {{ meta.mal.pending_import|yesno:"true,false" }},
+            hasPendingAniListImport: {{ meta.anilist.pending_import|yesno:"true,false" }},
+            convertingExternalRatings: {{ meta.converting_external_ratings|yesno:"true,false" }}
         };
     </script>
 {% endblock %}

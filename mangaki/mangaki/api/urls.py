@@ -2,8 +2,10 @@ from rest_framework.documentation import include_docs_urls
 from django.conf.urls import url
 
 from mangaki.api.cards import get_card
+from mangaki.api.importation.ext_rating_convert import convert_ratings
 from mangaki.api.tasks import task_status, user_tasks
 from mangaki.api.mal import import_from_mal
+from mangaki.api.importation.anilist import import_from_anilist
 from mangaki.api.user import update_user_profile, delete_user_profile, export_user_data
 
 urlpatterns = [
@@ -15,6 +17,10 @@ urlpatterns = [
         get_card, name='api-get-card'),
     url(r'^mal/import/(?P<mal_username>.+)$',
         import_from_mal, name='api-mal-import'),
+    url(r'^anilist/import/(?P<anilist_username>.+)$',
+        import_from_anilist, name='api-anilist-import'),
+    url(r'^ratings/external/convert',
+        convert_ratings, name='api-convert-external-ratings'),
     url(r'^user/profile$',
         update_user_profile, name='api-update-my-profile'),
     url(r'^user/delete$',
