@@ -109,14 +109,14 @@ def get_card(request: Request, category: str, slot_sort_type: str):
     card_slot_query = card_slot_query_serializer.data
     queryset = (
         Category.objects.get(slug=card_slot_query['category'])
-            .work_set.all()
+        .work_set.all()
     )
 
     rated_works = current_user_ratings(request)
     slot_type_chosen = SlotCardTypes[card_slot_query['slot_type']]
     queryset = (
         slot_dispatchers[slot_type_chosen](queryset)
-            .exclude(id__in=list(rated_works))
+        .exclude(id__in=list(rated_works))
     )
 
     works = queryset[:POSTERS_PER_PAGE]

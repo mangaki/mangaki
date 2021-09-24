@@ -5,6 +5,7 @@ from .models import Profile, Work, Category
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
+
 class ProfileFactory(DjangoModelFactory):
     class Meta:
         model = Profile
@@ -16,6 +17,7 @@ class ProfileFactory(DjangoModelFactory):
     newsletter_ok = factory.Faker('boolean')
     avatar_url = factory.LazyAttribute(lambda o: '{}{}.png'.format(factory.Faker('url').generate({}), o.mal_username))
 
+
 @mute_signals(post_save)
 class UserFactory(DjangoModelFactory):
     class Meta:
@@ -24,6 +26,7 @@ class UserFactory(DjangoModelFactory):
     username = factory.Faker('user_name')
     email = factory.LazyAttribute(lambda o: '{}@mangaki.fr'.format(o.username))
     profile = factory.RelatedFactory(ProfileFactory, 'user')
+
 
 class WorkFactory(DjangoModelFactory):
     class Meta:
@@ -43,6 +46,7 @@ class WorkFactory(DjangoModelFactory):
 
 def create_user(**kwargs):
     return UserFactory.create(**kwargs)
+
 
 def create_user_with_profile(**kwargs):
     profile = kwargs.pop('profile')

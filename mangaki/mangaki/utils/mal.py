@@ -15,8 +15,7 @@ from functools import reduce
 from django.conf import settings
 
 from django.contrib.auth.models import User
-from django.contrib.postgres.search import SearchQuery
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet
 from django.utils.functional import cached_property
 from django.db import transaction
 
@@ -39,6 +38,7 @@ class MyAnimeListLanguages:
     @cached_property
     def english_ext_lang(self):
         return ExtLanguage.objects.select_related('lang').get(source='mal', ext_lang='english')
+
 
 mal_langs = MyAnimeListLanguages()
 
@@ -390,7 +390,7 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
             )
 
             if (title and not first_matching_work
-                and title.upper() in list(map(str.upper, titles))):
+                    and title.upper() in list(map(str.upper, titles))):
                 first_matching_work = work
 
             work_titles = [
@@ -426,7 +426,6 @@ def insert_into_mangaki_database_from_mal(mal_entries: List[MALEntry],
                 url=entry.source_url
             )
 
-
     return first_matching_work
 
 
@@ -445,8 +444,8 @@ def compute_rating_choice_from_mal_score(score: int) -> Optional[str]:
     :type score: int
     :return: None if the score is out of the range, otherwise, [7, 10] => like, [5, 6] => neutral, [0, 4] => dislike.
     :rtype: Optional[str]
-    
-    
+
+
     >>> compute_rating_choice_from_mal_score(8)
     'like'
     >>> compute_rating_choice_from_mal_score(-1)
@@ -474,7 +473,7 @@ def get_or_create_from_mal(work_list: QuerySet,
     """
     Get a work from the current `work_list` (a queryset, filtered by category)
     or create from scratch using MAL as reference.
-    
+
     :param work_list: a QuerySet of works
     :type work_list: QuerySet<Work>
     :param work_type: type of the work considered (e.g. MALWorks.animes)
@@ -540,8 +539,8 @@ def import_mal(mal_username: str, mangaki_username: str,
                     user_work.poster,
                     user_work.mal_id)
 
-                if (work and
-                        not any(work.id in container for container in (scores, wontsee, willsee))):
+                if (work
+                   and not any(work.id in container for container in (scores, wontsee, willsee))):
                     if user_work.status == MALStatus.completed:
                         scores[work.id] = user_work.score
                     elif user_work.status == MALStatus.dropped:

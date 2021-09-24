@@ -51,7 +51,7 @@ def delete_user_profile(request: Request):
 
 
 # Every day.
-USER_EXPORT_DATA_CACHE_PERIOD = 24*3600
+USER_EXPORT_DATA_CACHE_PERIOD = 24 * 3600
 
 
 @api_view(['POST'])

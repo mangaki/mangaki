@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+
 def move_manga_type_to_work(apps, schema_editor):
     Manga = apps.get_model("mangaki", "Manga")
 
@@ -13,12 +14,14 @@ def move_manga_type_to_work(apps, schema_editor):
         manga.manga_type = manga.deprecated_manga_type
         manga.save()
 
+
 def move_manga_type_from_work(apps, schema_editor):
     Manga = apps.get_model("mangaki", "Manga")
 
     for manga in Manga.objects.all():
         manga.deprecated_manga_type = manga.manga_type
         manga.save()
+
 
 class Migration(migrations.Migration):
 

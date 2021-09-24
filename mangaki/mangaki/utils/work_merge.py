@@ -103,11 +103,11 @@ class WorkClusterMergeHandler:
         kept_staff_ids = []
         # Only one query: put self.target_work's Staff objects first in the list
         queryset = (Staff.objects.filter(work__in=self.works_to_merge)
-            .annotate(belongs_to_target_work=Case(
-                When(work_id=self.target_work.id, then=Value(1)),
-                     default=Value(0), output_field=IntegerField()))
-            .order_by('-belongs_to_target_work')
-            .values_list('id', 'work_id', 'artist_id', 'role_id'))
+                    .annotate(belongs_to_target_work=Case(
+                        When(work_id=self.target_work.id, then=Value(1)),
+                        default=Value(0), output_field=IntegerField()))
+                    .order_by('-belongs_to_target_work')
+                    .values_list('id', 'work_id', 'artist_id', 'role_id'))
         for staff_id, work_id, artist_id, role_id in queryset:
             if work_id == self.target_work.id:  # This condition will be met for the first iterations
                 target_work_staff.add((artist_id, role_id))
@@ -154,8 +154,8 @@ class WorkClusterMergeHandler:
 
         # Clean up the rest.
         remaining_references_ids = (
-            all_references_ids -
-            (set(list(kept_references.values())) | set(list(target_work_references.values())))
+            all_references_ids
+            - (set(list(kept_references.values())) | set(list(target_work_references.values())))
         )
 
         Reference.objects.filter(id__in=remaining_references_ids).delete()

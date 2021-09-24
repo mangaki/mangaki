@@ -3,8 +3,10 @@ from mangaki.models import Work
 import requests
 import time
 
+
 class Command(BaseCommand):
     help = 'Downloads posters'
+
     def add_arguments(self, parser):
         parser.add_argument('work_id', nargs='*', type=int)
         parser.add_argument('--check-exists', action='store_true')

@@ -1,7 +1,6 @@
 from io import StringIO
 import responses
 import os.path
-import logging
 import re
 
 from django.test import TestCase
@@ -21,16 +20,16 @@ class CommandTest(TestCase):
 
     def setUp(self):
         self.anime = Work.objects.create(
-                        anidb_aid=11606,
-                        ext_poster='https://mangaki.fr/static/img/favicon.png',
-                        category=Category.objects.get(slug='anime'),
-                        title='Sangatsu no Lion')
+            anidb_aid=11606,
+            ext_poster='https://mangaki.fr/static/img/favicon.png',
+            category=Category.objects.get(slug='anime'),
+            title='Sangatsu no Lion')
         self.anidb_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
         self.anilist_fixture = self.read_fixture('anilist/hibike_euphonium.json')
         self.album = Work.objects.create(
-                        vgmdb_aid=22495,
-                        category=Category.objects.get(slug='album'),
-                        title='BLUE')
+            vgmdb_aid=22495,
+            category=Category.objects.get(slug='album'),
+            title='BLUE')
         self.album_fixture = self.read_fixture('blue_vgmdb.json')
         self.artist = Artist.objects.create(name='Yoko Kanno')
         self.stdout = StringIO()

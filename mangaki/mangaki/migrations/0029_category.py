@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.db.models.deletion
 
+
 def add_categories(apps, schema_editor):
     Category = apps.get_model("mangaki", "Category")
     Category.objects.bulk_create([
@@ -12,6 +13,7 @@ def add_categories(apps, schema_editor):
         Category(slug='manga', name="Manga"),
         Category(slug='album', name="Album"),
     ])
+
 
 def populate_categories(apps, schema_editor):
     Category = apps.get_model("mangaki", "Category")
@@ -22,6 +24,7 @@ def populate_categories(apps, schema_editor):
     Anime.objects.update(category=Category.objects.get(slug='anime'))
     Manga.objects.update(category=Category.objects.get(slug='manga'))
     Album.objects.update(category=Category.objects.get(slug='album'))
+
 
 class Migration(migrations.Migration):
 

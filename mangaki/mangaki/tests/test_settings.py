@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from mangaki.models import Profile
 from mangaki.utils.tokens import compute_token, NEWS_SALT
-from django.conf import settings
 
 
 class SettingsTest(TestCase):
@@ -20,7 +19,7 @@ class SettingsTest(TestCase):
         self.user.profile.newsletter_ok = False
         self.user.profile.save()
         response = self.client.post(self.settings_url,
-            {'yes': 'OK', 'username': self.username, 'token': self.bad_token})
+                                    {'yes': 'OK', 'username': self.username, 'token': self.bad_token})
         self.assertEqual(response.status_code, 401)  # Unauthorized
         self.assertFalse(Profile.objects.get(user=self.user).newsletter_ok)
 
@@ -28,16 +27,16 @@ class SettingsTest(TestCase):
         self.user.profile.newsletter_ok = False
         self.user.profile.save()
         response = self.client.post(self.settings_url,
-            {'yes': 'OK', 'username': self.username, 'token': self.good_token})
+                                    {'yes': 'OK', 'username': self.username, 'token': self.good_token})
         self.assertEqual(response.status_code, 200)  # Authorized
         self.assertTrue(Profile.objects.get(user=self.user).newsletter_ok)
 
     def test_get_settings_when_not_logged_bad_token(self):
         response = self.client.get(self.settings_url,
-            {'username': self.username, 'token': self.bad_token})
+                                   {'username': self.username, 'token': self.bad_token})
         self.assertEqual(response.status_code, 401)  # Unauthorized
 
     def test_get_settings_when_not_logged_good_token(self):
         response = self.client.get(self.settings_url,
-            {'username': self.username, 'token': self.good_token})
+                                   {'username': self.username, 'token': self.good_token})
         self.assertEqual(response.status_code, 200)

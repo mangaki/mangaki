@@ -1,4 +1,3 @@
-import logging
 import json
 import os
 import shutil
@@ -8,10 +7,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 
 from mangaki.models import Category, Work, Rating
-import time
 
 
 ML_SNAPSHOT_ROOT_TEST = '/tmp/test_reco/'
+
 
 def get_path(key):
     return os.path.join(ML_SNAPSHOT_ROOT_TEST, '{:s}'.format(key))
@@ -36,7 +35,7 @@ class RecoTest(TestCase):
         self.work = works[0]
 
         # This will work as long as zero.dataset.RATED_BY_AT_LEAST <= 2
-        ratings = ([Rating(user=otaku, work=work, choice='like') for work in works] + 
+        ratings = ([Rating(user=otaku, work=work, choice='like') for work in works] +
                    [Rating(user=otaku2, work=work, choice='dislike') for work in works] +
                    [Rating(user=self.user, work=works[0], choice='dislike')])
         Rating.objects.bulk_create(ratings)

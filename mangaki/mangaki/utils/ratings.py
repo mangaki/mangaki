@@ -8,7 +8,7 @@ def pk_from_object_or_pk(obj):
 def has_anonymous_ratings(session) -> bool:
     """
     Look if the session contains any ratings.
-    
+
     :param session: Django Session
     :type session: dict-like
     :return: True if the session contains any ratings, False otherwise.

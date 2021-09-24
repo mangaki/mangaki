@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 from django.utils.http import _urlsplit, limited_parse_qsl
 
+
 def infer_source(url):
     if 'myanimelist' in url:
         return 'MAL'
@@ -21,6 +22,7 @@ def infer_source(url):
     else:
         _, netloc, _, _, _ = _urlsplit(url)
         return netloc
+
 
 def infer_identifier(url, source):
     if source == 'MAL':
@@ -46,6 +48,7 @@ def infer_identifier(url, source):
     else:
         raise ValueError('Unknown source')
 
+
 def copy_url_to_id_and_source(apps, schema_editor):
     Reference = apps.get_model('mangaki', 'Reference')
     db_alias = schema_editor.connection.alias
@@ -57,6 +60,7 @@ def copy_url_to_id_and_source(apps, schema_editor):
         except (TypeError, ValueError) as e:
             print('Failed to data-migrate: {} - {} ({})'.format(ref.id, ref.url, e))
             continue
+
 
 def copy_source_field_to_reference(apps, schema_editor):
     Reference = apps.get_model('mangaki', 'Reference')
@@ -80,6 +84,7 @@ def copy_source_field_to_reference(apps, schema_editor):
             print('Failed to data-migrate: {} - {} ({})'.format(ref.id, ref.url, e))
             continue
 
+
 def remove_duplicates(apps, schema_editor):
     Reference = apps.get_model('mangaki', 'Reference')
     db_alias = schema_editor.connection.alias
@@ -101,8 +106,11 @@ def remove_duplicates(apps, schema_editor):
                           .delete())
 
 # migrations.RunPython.noop cause circular reference error…
+
+
 def noop(apps, schema_editor):
     return None
+
 
 class Migration(migrations.Migration):
 

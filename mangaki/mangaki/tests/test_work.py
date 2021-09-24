@@ -22,32 +22,31 @@ class WorkTest(TestCase):
 
     def setUp(self):
         self.anime = self.create_anime(title='STEINS;GATE',
-            source='Ryan',
-            ext_poster='ryan.png',
-            nb_episodes=26, # + 1 with the alternate beta episode.
-            anime_type='Seinen'
-        )
+                                       source='Ryan',
+                                       ext_poster='ryan.png',
+                                       nb_episodes=26,  # + 1 with the alternate beta episode.
+                                       anime_type='Seinen'
+                                       )
 
         self.nsfw_anime = self.create_anime(title='Dakara boku ga H wa dekinai.',
-            source='Not Ryan',
-            ext_poster='dakara.png',
-            nsfw=True,
-            nb_episodes=24, # unsure, but we don't care.
-            anime_type='Ecchi-Hentai'
-        )
-
+                                            source='Not Ryan',
+                                            ext_poster='dakara.png',
+                                            nsfw=True,
+                                            nb_episodes=24,  # unsure, but we don't care.
+                                            anime_type='Ecchi-Hentai'
+                                            )
 
         self.manga = self.create_manga(title='Medaka Box',
-            source='Ryan',
-            ext_poster='zenkichi.png',
-            manga_type='Shonen'
-        )
+                                       source='Ryan',
+                                       ext_poster='zenkichi.png',
+                                       manga_type='Shonen'
+                                       )
 
         self.album = self.create_album(title='Bungou Stray Dogs Original Soundtrack',
-            source='Ryan',
-            ext_poster='atsuchi_and_dazai.png',
-            vgmdb_aid=58065
-        )
+                                       source='Ryan',
+                                       ext_poster='atsuchi_and_dazai.png',
+                                       vgmdb_aid=58065
+                                       )
 
         self.fake_user = create_user_with_profile(username='Raito_Bezarius', profile={
             'nsfw_ok': False
@@ -160,7 +159,7 @@ class WorkTest(TestCase):
 
         self.assertEqual([work.title for work in grouped[anime.id]], ['Anime B', 'Anime A'])
         self.assertEqual([work.title for work in grouped[manga.id]], ['Manga B', 'Manga A'])
-       
+
         grouped = Work.objects.filter(pk__in=works).order_by('title').group_by_category()
         self.assertEqual(len(grouped), 2)
         self.assertEqual(len(grouped[anime.id]), 2)

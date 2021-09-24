@@ -48,6 +48,7 @@ def to_python_datetime(date):
             pass
     raise ValueError('no valid date format found for {}'.format(date))
 
+
 AniDBTag = namedtuple('AniDBTag', ['title', 'weight', 'anidb_tag_id'])
 
 
@@ -277,9 +278,9 @@ class AniDB:
         artists = {artist.name: artist for artist in artists_list}
 
         existing_staff = set(Staff.objects.filter(work=work,
-                                role__in=(nc["role"] for nc in creators),
-                                artist__name__in=(nc["name"] for nc in creators))
-                                .values_list('work', 'role', 'artist'))
+                                                  role__in=(nc["role"] for nc in creators),
+                                                  artist__name__in=(nc["name"] for nc in creators))
+                             .values_list('work', 'role', 'artist'))
         missing_staff = [
             Staff(
                 work=work,
@@ -520,10 +521,12 @@ class AniDB:
 
         return work
 
+
 client = AniDB(
     getattr(settings, 'ANIDB_CLIENT', 'test_client'),
     getattr(settings, 'ANIDB_VERSION', 1)
 )  # FIXME: Such a thing should not exist. It should be created in the test.
+
 
 def diff_between_anidb_and_local_tags(work: Work,
                                       anidb_tags: List[AniDBTag]) -> Dict[str, List[AniDBTag]]:
@@ -544,7 +547,7 @@ def diff_between_anidb_and_local_tags(work: Work,
     for current_tag in current_tags:
         for anidb_tag in anidb_tags:
             if (current_tag.title == anidb_tag.title
-                and current_tag.weight != anidb_tag.weight):
+                    and current_tag.weight != anidb_tag.weight):
                 updated_tags.append(anidb_tag)
 
     return {
@@ -554,6 +557,7 @@ def diff_between_anidb_and_local_tags(work: Work,
         'kept_tags': kept_tags
     }
 
+
 def is_nsfw_based_on_anidb_tags(anidb_tags: List[AniDBTag]) -> bool:
     # FIXME: potentially NSFW tags should be stored somewhere else
     potentially_nsfw_tags = ['nudity', 'ecchi', 'pantsu', 'breasts', 'sex',
@@ -561,7 +565,7 @@ def is_nsfw_based_on_anidb_tags(anidb_tags: List[AniDBTag]) -> bool:
                              'incest', 'pornography', 'shota', 'masturbation',
                              'sexual fantasies', 'anal', 'loli']
 
-     # FIXME: these should be configurable constants
+    # FIXME: these should be configurable constants
     HIGH_NSFW_THRESHOLD = 15
     LOW_NSFW_THRESHOLD = 30
 
@@ -574,8 +578,8 @@ def is_nsfw_based_on_anidb_tags(anidb_tags: List[AniDBTag]) -> bool:
                                if tag.title in potentially_nsfw_tags and tag.weight > 400)
 
     if sum_weight_all_low > 0 and sum_weight_all_high > 0:
-        percent_low_nsfw = (sum_weight_nsfw_low/sum_weight_all_low) * 100
-        percent_high_nsfw = (sum_weight_nsfw_high/sum_weight_all_high) * 100
+        percent_low_nsfw = (sum_weight_nsfw_low / sum_weight_all_low) * 100
+        percent_high_nsfw = (sum_weight_nsfw_high / sum_weight_all_high) * 100
     else:
         return False
 

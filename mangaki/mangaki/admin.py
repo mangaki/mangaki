@@ -62,8 +62,6 @@ def handle_merge_errors(response, request, final_work, nb_merged,
                                  .format(nb_merged, final_work.get_absolute_url(), final_work.title)))
 
 
-
-
 def create_merge_form(works_to_merge_qs):
     work_dicts_to_merge = list(works_to_merge_qs.values())
     field_changeset = get_field_changeset(work_dicts_to_merge)
@@ -168,6 +166,7 @@ def merge_works(request, selected_queryset, force=False):
 
     return nb_works_to_merge, None, TemplateResponse(request, 'admin/merge_selected_confirmation.html', context)
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -244,7 +243,7 @@ class WorkAdmin(admin.ModelAdmin):
     def update_tags_via_anidb(self, request, queryset):
         works = queryset.all()
 
-        if request.POST.get('confirm'): # Updating tags has been confirmed
+        if request.POST.get('confirm'):  # Updating tags has been confirmed
             to_update_work_ids = set(map(int, request.POST.getlist('to_update_work_ids')))
             nb_updates = len(to_update_work_ids)
 
@@ -289,11 +288,11 @@ class WorkAdmin(admin.ModelAdmin):
         # Check for works with missing AniDB AID
         if not all(work.anidb_aid for work in works):
             self.message_user(request,
-            """Certains de vos choix ne possèdent pas d'identifiant AniDB.
+                              """Certains de vos choix ne possèdent pas d'identifiant AniDB.
             Le rafraichissement de leurs tags a été omis. (Détails: {})"""
-            .format(", ".join(map(lambda w: w.title,
-                                  filter(lambda w: not w.anidb_aid, works)))),
-            level=messages.WARNING)
+                              .format(", ".join(map(lambda w: w.title,
+                                                    filter(lambda w: not w.anidb_aid, works)))),
+                              level=messages.WARNING)
 
         # Retrieve and send tags information to the appropriate form
         all_information = {}
@@ -355,10 +354,10 @@ class WorkAdmin(admin.ModelAdmin):
         if not all(work.anidb_aid for work in works):
             offending_works = [work for work in works if not work.anidb_aid]
             self.message_user(request,
-            "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
-            "Leur rafraichissement a été omis. (Détails: {})"
-            .format(", ".join(map(lambda w: w.title, offending_works))),
-            level=messages.WARNING)
+                              "Certains de vos choix ne possèdent pas d'identifiant AniDB. "
+                              "Leur rafraichissement a été omis. (Détails: {})"
+                              .format(", ".join(map(lambda w: w.title, offending_works))),
+                              level=messages.WARNING)
 
         # Check for works that have a duplicate AniDB AID
         aids_with_works = defaultdict(list)
@@ -560,11 +559,11 @@ class WorkClusterAdmin(admin.ModelAdmin):
                 else:
                     return '#'
             return (
-                '<ul>' +
-                format_html_join('', '<li>{} ({}<a href="{}">{}</a>)</li>',
-                    ((work.title, 'was ' if work.redirect is not None else '',
-                      get_admin_url(work), work.id) for work in cluster_works)) +
-                '</ul>'
+                '<ul>'
+                + format_html_join('', '<li>{} ({}<a href="{}">{}</a>)</li>',
+                                   ((work.title, 'was ' if work.redirect is not None else '',
+                                    get_admin_url(work), work.id) for work in cluster_works))
+                + '</ul>'
             )
         else:
             return '(all deleted)'

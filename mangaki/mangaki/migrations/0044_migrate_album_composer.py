@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def populate_staff(apps, schema_editor):
     Role = apps.get_model("mangaki", "Role")
     Staff = apps.get_model("mangaki", "Staff")
@@ -15,6 +16,7 @@ def populate_staff(apps, schema_editor):
         for work in Album.objects.only('pk', 'deprecated_composer_id').all()
         if work.deprecated_composer_id != 1
     ])
+
 
 class Migration(migrations.Migration):
 

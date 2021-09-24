@@ -2,7 +2,6 @@ from collections import Counter, defaultdict
 from typing import Tuple, List, Any, Dict, Optional
 
 from django.contrib.auth.models import User
-from django.utils import timezone
 
 from mangaki.models import Rating, Work, Category, Recommendation
 from mangaki.utils.fit_algo import get_algo_backup
@@ -42,10 +41,10 @@ def get_profile_ratings(request,
     elif can_see:
         ratings = list(
             Rating.objects
-                .filter(user=user,
-                        work__category__slug=category,
-                        choice__in=SEE_CHOICES['seen'] if already_seen else SEE_CHOICES['unseen'])
-                .select_related('work', 'work__category')
+            .filter(user=user,
+                    work__category__slug=category,
+                    choice__in=SEE_CHOICES['seen'] if already_seen else SEE_CHOICES['unseen'])
+            .select_related('work', 'work__category')
         )
 
         categories = Category.objects.all()
@@ -86,7 +85,7 @@ def build_profile_compare_function(algo_name: Optional[str],
                 return ordering.index(item.choice), ranking[item.id]
 
             return special_compare_function
-        except Exception as e:  # Two possible reasons: no backup or user not in backup
+        except Exception:  # Two possible reasons: no backup or user not in backup
             pass
 
     return default_compare_function

@@ -8,11 +8,11 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import configparser
-import json
 import os
 from setuptools_scm import get_version
 from pkg_resources import get_distribution, DistributionNotFound
-from django.utils.translation import ugettext_lazy as _
+
+__all__ = []
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 FIXTURE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
@@ -32,7 +32,7 @@ SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 try:
     REPO_DIR = os.path.dirname(BASE_DIR)
     VERSION = get_version(REPO_DIR)
-except:
+except BaseException:
     VERSION = None
 
 # Step 2: if we are a nice package.
@@ -74,7 +74,7 @@ INSTALLED_APPS = (
 
 if config.has_section('sentry'):
     import raven
-
+    __all__ += ['raven']
     INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
 
     RAVEN_CONFIG = {
@@ -162,6 +162,7 @@ def get_sentry_handler(config_instance) -> str:
     if config_instance.has_section('sentry'):
         return 'raven.contrib.django.raven_compat.handlers.SentryHandler'
     return 'logging.NullHandler'
+
 
 LOGGING = {
     'version': 1,

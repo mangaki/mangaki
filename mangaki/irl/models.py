@@ -1,7 +1,5 @@
 from django.db import models
 from mangaki.models import Work
-from django.contrib.auth.models import User
-import locale
 
 
 class Partner(models.Model):
@@ -10,4 +8,4 @@ class Partner(models.Model):
     image = models.CharField(max_length=32, verbose_name="Fichier logo")
 
     class Meta:
-        ordering = ['name'] 
+        ordering = ['name']

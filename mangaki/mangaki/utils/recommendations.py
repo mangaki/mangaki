@@ -56,7 +56,7 @@ def get_reco_algo(request, algo_name='als', category='all'):
     available_works = set(algo.dataset.encode_work.keys())
     df_rated_works = (pd.DataFrame(list(user_ratings.items()),
                                    columns=['work_id', 'choice'])
-                        .query('work_id in @available_works'))
+                      .query('work_id in @available_works'))
     enc_rated_works = df_rated_works['work_id'].map(algo.dataset.encode_work)
     user_rating_values = df_rated_works['choice'].map(rating_values)
 
@@ -71,8 +71,8 @@ def get_reco_algo(request, algo_name='als', category='all'):
         category_filter &= set(Work.objects.filter(category__slug=category)
                                            .values_list('id', flat=True))
 
-    filtered_works = list((algo.dataset.interesting_works & category_filter) -
-                          set(already_rated_works))
+    filtered_works = list((algo.dataset.interesting_works & category_filter)
+                          - set(already_rated_works))
     chrono.save('remove already rated, left {:d}'.format(len(filtered_works)))
 
     pos_of_best = get_personalized_ranking(algo, request.user.id,

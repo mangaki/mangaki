@@ -1,11 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
-from django.conf import settings
 from mangaki.utils.tokens import compute_token
 from django.contrib.auth import get_user_model
-from django.db import connection
-from django.conf import settings
-import os
 import yaml
 from jinja2 import Template
 

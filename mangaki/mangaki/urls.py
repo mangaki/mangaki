@@ -76,5 +76,5 @@ if DEBUG:  # https://docs.djangoproject.com/en/1.10/howto/static-files/#serving-
     import debug_toolbar
 
     urlpatterns += [
-                       path('__debug__/', include(debug_toolbar.urls)),
-                   ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

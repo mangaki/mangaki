@@ -25,9 +25,10 @@ ANILIST_QUERIES = {
 
 
 def read_graphql_query(filename):
-    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'anilist-graphql-queries', filename+'.graphql')
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'anilist-graphql-queries', filename + '.graphql')
     with open(path, 'r', encoding='utf-8') as f:
         return f.read()
+
 
 def fuzzydate_to_python_datetime(date):
     """
@@ -51,6 +52,7 @@ def fuzzydate_to_python_datetime(date):
     if (date['year'] is None) and (date['month'] is None) and (date['day'] is not None):
         return None
     return datetime(date['year'], date['month'] or 1, date['day'] or 1)
+
 
 def to_anime_season(date):
     """
@@ -263,15 +265,15 @@ class AniListEntry:
     def poster_url(self) -> str:
         return self.work_info['coverImage']['large']
 
-    @property # Only for animes
+    @property  # Only for animes
     def nb_episodes(self) -> Optional[int]:
         return self.work_info['episodes']
 
-    @property # Only for animes
+    @property  # Only for animes
     def episode_length(self) -> Optional[int]:
         return self.work_info['duration']
 
-    @property # Only for mangas
+    @property  # Only for mangas
     def nb_chapters(self) -> Optional[int]:
         return self.work_info['chapters']
 
@@ -279,7 +281,7 @@ class AniListEntry:
     def status(self) -> Optional[AniListStatus]:
         return AniListStatus[self.work_info['status']] if self.work_info['status'] else None
 
-    @property # Only for animes
+    @property  # Only for animes
     def studio(self) -> Optional[str]:
         for studio in self.work_info['studios']['edges']:
             if studio['isMain']:
@@ -367,8 +369,7 @@ class AniList(metaclass=Singleton):
     def rate_limited(self):
         return (
             self.rate_limit_reset_timestamp is not None
-            and
-            self.rate_limit_reset_timestamp >= int(datetime.now().timestamp())
+            and self.rate_limit_reset_timestamp >= int(datetime.now().timestamp())
         )
 
     def _request(self,
@@ -505,7 +506,7 @@ class AniList(metaclass=Singleton):
                 raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
         if data['Page']['pageInfo']['hasNextPage'] and current_page < data['Page']['pageInfo']['lastPage']:
-            yield from self.list_seasonal_animes(year=year, season=season, only_airing=only_airing, current_page=current_page+1)
+            yield from self.list_seasonal_animes(year=year, season=season, only_airing=only_airing, current_page=current_page + 1)
 
     def get_user_list(self,
                       worktype: AniListWorkType,
@@ -552,7 +553,7 @@ class AniList(metaclass=Singleton):
                 raise RuntimeError('Malformed JSON, or AniList changed their API.')
 
         if data['Page']['pageInfo']['hasNextPage'] and current_page < data['Page']['pageInfo']['lastPage']:
-            yield from self.get_user_list(worktype, username, current_page+1)
+            yield from self.get_user_list(worktype, username, current_page + 1)
 
 
 anilist_langs = AniListLanguages()
@@ -642,9 +643,9 @@ def build_related_works(work: Work,
             type=relation.relation_type.name.lower()
         ) for relation in relations
         if related_works[relation.related_id] is not None
-       and related_works[relation.related_id].pk not in existing_child_works
-       and work.pk not in existing_parent_works
-       and work.pk != related_works[relation.related_id].pk  # no self reference.
+        and related_works[relation.related_id].pk not in existing_child_works
+        and work.pk not in existing_parent_works
+        and work.pk != related_works[relation.related_id].pk  # no self reference.
     }
 
     RelatedWork.objects.bulk_create(list(new_relations.values()))
@@ -684,7 +685,7 @@ def build_staff(work: Work,
             artist.anilist_creator_id = creator.id
             artist.save()
             artists[creator.id] = artist
-        except Artist.DoesNotExist: # This artist does not yet exist : will be bulk created
+        except Artist.DoesNotExist:  # This artist does not yet exist : will be bulk created
             artist = Artist(name=name, anilist_creator_id=creator.id)
             artists_to_add[creator.id] = artist
 
@@ -701,10 +702,10 @@ def build_staff(work: Work,
     role_map = staff_roles.role_map
 
     missing_staff = {creator.id: Staff(
-           work=work,
-           role=role_map.get(anilist_roles_map[creator.role]),
-           artist=artists[creator.id]
-        ) for creator in staff if anilist_roles_map.get(creator.role)
+        work=work,
+        role=role_map.get(anilist_roles_map[creator.role]),
+        artist=artists[creator.id]
+    ) for creator in staff if anilist_roles_map.get(creator.role)
         and (work.id, artists[creator.id].id, role_map.get(anilist_roles_map[creator.role]).id) not in existing_staff_artists
     }
 
@@ -762,7 +763,6 @@ def insert_works_into_database_from_anilist(entries: List[AniListEntry],
         studio = None
         if entry.studio:
             studio, _ = Studio.objects.get_or_create(title=entry.studio)
-
 
         work_defaults = {
             'source': entry.anilist_url,

@@ -8,7 +8,7 @@ import logging
 def get_or_create_artist(name):
     try:
         return Artist.objects.filter(name__unaccent=name)[0]
-    except:
+    except BaseException:
         pass
     try:
         return ArtistSpelling.objects.select_related('artist').get(was=name).artist
@@ -28,7 +28,7 @@ def add_to_staff(album, role_slug, artist_name):
     if artist.id not in current_composer_ids:
         Staff(work=album, artist=artist, role=Role.objects.get(slug=role_slug)).save()
         return artist
-       
+
 
 class Command(BaseCommand):
     args = ''
@@ -37,7 +37,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('id', nargs='+', type=int)
 
-    def handle(self, *args, **options):        
+    def handle(self, *args, **options):
         album_id = options.get('id')[0]
         album = Work.objects.filter(category__slug='album').get(id=album_id)
         if album.vgmdb_aid:

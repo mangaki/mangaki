@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+
 def move_catalog_number_to_work(apps, schema_editor):
     Album = apps.get_model("mangaki", "Album")
 
@@ -13,12 +14,14 @@ def move_catalog_number_to_work(apps, schema_editor):
         album.catalog_number = album.deprecated_catalog_number
         album.save()
 
+
 def move_catalog_number_from_work(apps, schema_editor):
     Album = apps.get_model("mangaki", "Album")
 
     for album in Album.objects.all():
         album.deprecated_catalog_number = album.catalog_number
         album.save()
+
 
 class Migration(migrations.Migration):
 

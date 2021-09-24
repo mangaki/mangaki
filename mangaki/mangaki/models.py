@@ -14,7 +14,7 @@ from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.urls import reverse
 from django.db import models, transaction
-from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
+from django.db.models import CharField, ExpressionWrapper, F, FloatField, Func, Lookup, Value
 from django.db.models.functions import Cast
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -72,9 +72,9 @@ class WorkQuerySet(models.QuerySet):
                     .annotate(
                         dislike_rate=ExpressionWrapper(
                             Cast(F('nb_dislikes'), FloatField()) / F('nb_likes'), output_field=FloatField())
-                    )
-                    .filter(nb_ratings__gte=PEARLS_MIN_RATINGS, nb_ratings__lte=PEARLS_MAX_RATINGS, dislike_rate__lte=PEARLS_MAX_DISLIKE_RATE)
-                    .order_by('dislike_rate'))
+        )
+            .filter(nb_ratings__gte=PEARLS_MIN_RATINGS, nb_ratings__lte=PEARLS_MAX_RATINGS, dislike_rate__lte=PEARLS_MAX_DISLIKE_RATE)
+            .order_by('dislike_rate'))
 
     def popular(self):
         return self.order_by('-nb_ratings')
@@ -121,6 +121,7 @@ class WorkQuerySet(models.QuerySet):
 
         return by_category
 
+
 class Category(models.Model):
     slug = models.CharField(max_length=10, db_index=True)
     name = models.CharField(max_length=128)
@@ -132,7 +133,7 @@ class Category(models.Model):
 class Work(models.Model):
     redirect = models.ForeignKey('Work', on_delete=models.SET_NULL, blank=True, null=True)
     title = models.CharField(max_length=255)
-    source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
+    source = models.CharField(max_length=1044, blank=True)  # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
     ext_poster = models.CharField(max_length=128, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
@@ -210,7 +211,7 @@ class Work(models.Model):
 
         try:
             r = session.get(url, timeout=5, stream=True)
-        except requests.RequestException as e:
+        except requests.RequestException:
             return False
 
         try:
@@ -496,11 +497,13 @@ class Evidence(models.Model):
             self.suggestion.pk
         )
 
+
 UNKNOWN_VALUES = {
     'anidb_aid': {0},
     'editor_id': {1},
     'studio_id': {1}
 }
+
 
 def not_empty_field(choice, field=None):
     """
@@ -524,9 +527,10 @@ def not_empty_field(choice, field=None):
     >>> not_empty_field(0, 'anidb_aid')
     False
     """
-    return (choice is not None and
-            choice not in {'Inconnu', ''} and
-            choice not in UNKNOWN_VALUES.get(field, []))
+    return (choice is not None
+            and choice not in {'Inconnu', ''}
+            and choice not in UNKNOWN_VALUES.get(field, []))
+
 
 PRECOMPUTED_FIELDS = {'sum_ratings',
                       'nb_ratings',
@@ -536,10 +540,12 @@ PRECOMPUTED_FIELDS = {'sum_ratings',
                       'title_search',
                       'redirect_id'}
 
+
 class ActionType(IntEnum):
     DO_NOTHING = 0
     JUST_CONFIRM = 1
     CHOICE_REQUIRED = 2
+
 
 def get_field_changeset(works):
     rows = defaultdict(list)
@@ -693,6 +699,7 @@ class FAQEntry(models.Model):
 
     class Meta:
         verbose_name_plural = "FAQ entries"
+
 
 class Trope(models.Model):
     trope = models.CharField(max_length=320)

@@ -10,7 +10,7 @@ def run():
         artists = {}
         hipsters = Counter()
         for i, line in enumerate(f):
-            # print(len(line.split(';;')))
+            # print(len(line.split(';;')))
             title, vo_title, writer, mangaka, editor, origin, genre1, genre2, manga_type, synopsis, poster = line.split(';;')
             for artist in [writer, mangaka]:
                 if artist in artists:
@@ -57,5 +57,6 @@ def run():
                 print('Genres: [%s] [%s]' % (genre1, genre2))
                 print(err)
                 break
+
 
 run()

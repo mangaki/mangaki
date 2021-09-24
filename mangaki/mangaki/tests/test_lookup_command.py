@@ -4,6 +4,7 @@ from django.utils.six import StringIO
 
 from mangaki.models import Work, Category, Editor, Studio
 
+
 class LookupTest(TestCase):
     def setUp(self):
         anime = Category.objects.get(slug='anime')

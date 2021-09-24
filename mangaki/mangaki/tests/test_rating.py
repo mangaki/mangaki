@@ -73,6 +73,6 @@ class RatingTest(TestCase):
 
         # Popular anime without posters contains rating
         response = self.client.get(anime_list_url, {'sort': 'popularity',
-                                                   'flat': True})
+                                                    'flat': True})
         self.assertEqual(response.status_code, 200)
         self.assertIn('checked', response.content.decode('utf-8'))

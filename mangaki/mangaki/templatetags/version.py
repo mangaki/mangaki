@@ -3,6 +3,7 @@ from django.conf import settings
 
 register = template.Library()
 
+
 def parse_mangaki_version(version: str) -> str:
     """
     Parse Mangaki version from a setuptools-scm like string.
@@ -13,6 +14,7 @@ def parse_mangaki_version(version: str) -> str:
     'v0.2.dev32'
     """
     return version.split('+')[0]
+
 
 def parse_mangaki_revision(version: str) -> str:
     """
@@ -33,13 +35,14 @@ def parse_mangaki_revision(version: str) -> str:
             return rev[1:]
         else:
             return ''
-    except:
-        return '' # just go to latest commit on master.
+    except BaseException:
+        return ''  # just go to latest commit on master.
 
 
 @register.simple_tag(takes_context=False)
 def mangaki_version():
     return parse_mangaki_version(settings.VERSION)
+
 
 @register.simple_tag(takes_context=False)
 def mangaki_revision():

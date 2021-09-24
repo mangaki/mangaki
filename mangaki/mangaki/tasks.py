@@ -35,7 +35,7 @@ def get_current_mal_import(user: User):
 
 
 # 10 minutes.
-DEFAULT_LOCK_EXPIRATION_TIME = 10*60
+DEFAULT_LOCK_EXPIRATION_TIME = 10 * 60
 
 
 @app.task(name='look_for_workclusters', ignore_result=True)

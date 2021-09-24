@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def move_studio_to_work(apps, schema_editor):
     Anime = apps.get_model("mangaki", "Anime")
 
@@ -12,6 +13,7 @@ def move_studio_to_work(apps, schema_editor):
     for anime in Anime.objects.all():
         anime.studio = anime.deprecated_studio
         anime.save()
+
 
 def move_studio_from_work(apps, schema_editor):
     Anime = apps.get_model("mangaki", "Anime")

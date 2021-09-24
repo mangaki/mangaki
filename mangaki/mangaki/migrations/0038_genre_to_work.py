@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+
 def move_genre_to_work(apps, schema_editor):
     Work = apps.get_model("mangaki", "Work")
     Anime = apps.get_model("mangaki", "Anime")

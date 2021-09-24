@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def populate_staff(apps, schema_editor):
     Role = apps.get_model("mangaki", "Role")
     Staff = apps.get_model("mangaki", "Staff")
@@ -20,6 +21,7 @@ def populate_staff(apps, schema_editor):
             for work in model.objects.only('pk', field + '_id').all()
             if getattr(work, field + '_id') != 1
         ])
+
 
 class Migration(migrations.Migration):
 
