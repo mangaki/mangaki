@@ -192,7 +192,6 @@
               start_all()
 
               machine.wait_for_unit("mangaki-worker.service")
-              machine.wait_for_unit("mangaki.service")
               machine.wait_for_open_port(8000)
               machine.succeed("curl http://localhost:8000")
 
