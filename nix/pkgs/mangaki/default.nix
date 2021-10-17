@@ -1,10 +1,15 @@
-{ pkgs ? import <nixpkgs> {} }:
-pkgs.poetry2nix.mkPoetryApplication rec {
-  src = ./../../..; # prevents unnecessary sanitizing which causes problems
-  projectDir = src; # so it can find pyproject.toml and poetry.lock
-  overrides = [
-    pkgs.poetry2nix.defaultPoetryOverrides
-    (import ./poetry-standard-overlay.nix)
-    (import ./poetry-git-overlay.nix { inherit pkgs; })
-  ];
-}
+{ pkgs, poetry2nix }:
+let
+  defaultParameters = rec {
+    src = ./../../..; # prevents unnecessary sanitizing which causes problems
+    projectDir = src; # so it can find pyproject.toml and poetry.lock
+    overrides = [
+      (import ./poetry-standard-overlay.nix)
+      (import ./poetry-git-overlay.nix { inherit pkgs; })
+      poetry2nix.defaultPoetryOverrides
+    ];
+  };
+  drv = poetry2nix.mkPoetryApplication defaultParameters;
+  isUsingWheel = pkg: (drv.passthru.python.pkgs.${pkg}.src.isWheel or false);
+in
+  assert isUsingWheel "numpy" && isUsingWheel "scipy" && isUsingWheel "pandas"; drv

@@ -1,11 +1,15 @@
 { pkgs
 , mangaki
+, poetry2nix
 }:
 let
-  env = pkgs.poetry2nix.mkPoetryEnv {
+  env = poetry2nix.mkPoetryEnv {
     projectDir = ./../../..; # so it can find pyproject.toml and poetry.lock
-    overrides = pkgs.poetry2nix.overrides.withDefaults
-      (import ./overrides.nix { inherit pkgs; });
+    overrides = [
+      (import ./poetry-standard-overlay.nix)
+      (import ./poetry-git-overlay.nix { inherit pkgs; })
+      poetry2nix.defaultPoetryOverrides
+    ];
   };
 in
 env.override (old:

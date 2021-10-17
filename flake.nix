@@ -4,10 +4,13 @@
   # Nixpkgs / NixOS version to use.
   inputs.nixpkgs = { type = "github"; owner = "NixOS"; repo = "nixpkgs"; ref = "21.05"; };
 
+  # Poetry2nix version to use
+  inputs.poetry2nix = { type = "github"; owner = "nix-community"; repo = "poetry2nix"; ref = "1.21.0"; };
+
   # Flake compatability shim
   inputs.flake-compat = { type = "github"; owner = "edolstra"; repo = "flake-compat"; flake = false; };
 
-  outputs = { self, nixpkgs, ... }@inputs:
+  outputs = { self, nixpkgs, poetry2nix, ... }@inputs:
     let
       # System types to support.
       supportedSystems = [ "x86_64-linux" ];
@@ -24,6 +27,7 @@
       # A Nixpkgs overlay.
       overlay = final: prev:
         with final;
+        (poetry2nix.overlay final prev) //
         {
 
           lapack = prev.lapack.override { lapackProvider = final.mkl; };
@@ -78,12 +82,13 @@
       devShell = forAllSystems (system:
         let
           pkgSet = nixpkgsFor.${system};
+          poetry2nix-cli = poetry2nix.packages.${system}.poetry2nix;
         in
         with pkgSet;
         mkShell {
           buildInputs = [
             poetry
-            poetry2nix.cli
+            poetry2nix-cli
             mangaki.env
             nixpkgs-fmt
           ];
