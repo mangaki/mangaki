@@ -125,7 +125,7 @@
                   useTLS = false;
                   devMode = true;
                   domainName = "mangaki.dev";
-                  editableMode = true;
+                  editableMode = false;
                 })
               ];
           })
