@@ -17,7 +17,7 @@ class ProfileFactory(DjangoModelFactory):
     is_shared = factory.Faker('boolean')
     nsfw_ok = factory.Faker('boolean')
     newsletter_ok = factory.Faker('boolean')
-    avatar_url = factory.LazyAttribute(lambda o: '{}{}.png'.format(factory.Faker('url').generate({}), o.mal_username))
+    avatar_url = factory.Faker('image_url')
 
 @mute_signals(post_save)
 class UserFactory(DjangoModelFactory):
