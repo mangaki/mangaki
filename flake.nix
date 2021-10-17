@@ -149,7 +149,7 @@
             machine = { ... }: {
               imports = [ self.nixosModules.mangaki ];
               nixpkgs.overlays = [ self.overlay ];
-              virtualisation.memorySize = 1024;
+              virtualisation.memorySize = 2048;
               virtualisation.cores = 2;
               services.mangaki = {
                 enable = true;
@@ -162,8 +162,6 @@
               start_all()
 
               machine.wait_for_unit("uwsgi.service")
-              machine.wait_for_open_port(8000)
-              machine.succeed("curl http://localhost:8000")
               machine.wait_for_unit("nginx.service")
               machine.wait_for_open_port(80)
               machine.succeed("curl -H 'Host: mangaki.test' http://localhost")
