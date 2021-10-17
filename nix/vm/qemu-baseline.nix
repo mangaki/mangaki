@@ -13,8 +13,8 @@
   services.openssh.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 80 443 ];
 
-  services.mingetty.autologinUser = "root";
-  services.mingetty.helpLine = 
+  services.getty.autologinUser = "root";
+  services.getty.helpLine = 
   ''
     The "root" account has 'test' password initially.
     You can change it.

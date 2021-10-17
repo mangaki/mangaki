@@ -600,6 +600,7 @@ in
       users.mangaki = {
         group = "mangaki";
         description = "Mangaki user";
+        isSystemUser = true;
       };
 
       groups.mangaki = { };

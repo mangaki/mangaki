@@ -2,7 +2,7 @@
   description = "Mangaki";
 
   # Nixpkgs / NixOS version to use.
-  inputs.nixpkgs = { type = "github"; owner = "NixOS"; repo = "nixpkgs"; ref = "20.09"; };
+  inputs.nixpkgs = { type = "github"; owner = "NixOS"; repo = "nixpkgs"; ref = "21.05"; };
 
   # Flake compatability shim
   inputs.flake-compat = { type = "github"; owner = "edolstra"; repo = "flake-compat"; flake = false; };
