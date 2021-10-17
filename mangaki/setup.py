@@ -24,7 +24,7 @@ if os.path.exists(readme_path):
 setup(
     long_description=readme,
     name='mangaki',
-    version='0.6.1',
+    version='0.8.0',
     description='Open source website for anime and manga recommendations',
     python_requires='==3.*,>=3.7.0',
     project_urls={"homepage": "https://mangaki.fr"},

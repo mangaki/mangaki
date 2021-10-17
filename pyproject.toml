@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mangaki"
-version = "0.6.1"
+version = "0.8.0"
 description = "Open source website for anime and manga recommendations"
 # Order matters (for maintainer & authoring).
 authors = ["Mangaki team <contact@mangaki.fr>", "Ryan Lahfa <masterancpp@gmail.com>", "Basile Clément <Elarnon@users.noreply.github.com>", "Jill-Jênn Vie <vie@jill-jenn.net>"]
