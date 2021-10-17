@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 from mangaki.models import Artist, Anime, Genre, Studio, Editor
 from django.db.utils import IntegrityError, DataError
 import re

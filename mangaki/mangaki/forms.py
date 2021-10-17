@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from mangaki.models import Suggestion, Rating, Profile

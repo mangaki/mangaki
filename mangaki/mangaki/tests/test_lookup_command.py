@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils.six import StringIO

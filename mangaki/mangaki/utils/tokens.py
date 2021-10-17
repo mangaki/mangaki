@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 from django.utils.crypto import salted_hmac
 from django.conf import settings
 
