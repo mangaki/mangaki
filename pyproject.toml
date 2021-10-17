@@ -22,7 +22,6 @@ django-celery-beat="^1.1" # main
 django-js-reverse="^0.9" # main
 django-sendfile="^0.3" # main
 djangorestframework="^3.9" # main
-psycopg2-binary = "2.8.6" # main
 markdown="^3.0" # main
 jinja2="*" # main
 lxml="^4.4" # main
@@ -34,6 +33,7 @@ python-redis-lock="^3.2" # main
 raven="^6.1" # main
 mangaki-zero = "^1.0" # main
 natsort = "^7.0.1" # main
+psycopg2 = "^2.9.1"
 
 [tool.poetry.dev-dependencies]
 django-debug-toolbar="^2.2" # dev
