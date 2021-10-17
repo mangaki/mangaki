@@ -47,7 +47,7 @@ coverage = {extras = ["toml"], version = "^5.1"} # tests
 django-coverage-plugin="*" # tests
 responses="^0.10" # tests
 pytest = "^5.4.1" # tests
-hypothesis="^3.56" # tests
+hypothesis="^4.0" # tests
 pytest-runner = "^5.2" # tests
 pytest-django = "^3.9.0" # tests
 pytest-xdist = "^1.31.0" # tests
