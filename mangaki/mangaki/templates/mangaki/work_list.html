@@ -3,7 +3,10 @@
 {% load anonymous_ratings %}
 {% load bootstrap4 %}
 
+{% block subtitle %}{{ category|title }}{% endblock subtitle %}
+
 {% block body %}
+    <h1>{{ category|title }}</h1>
     {% if not request|has_anonymous_ratings %}
     <div class="alert alert-info">
         {% if user.is_authenticated %}
@@ -22,23 +25,23 @@
     {% endif %}
 
 <div class="col-xs-12 text-center" style="padding: 10px 0">
-    <span class="badge badge-favorite"><span class="glyphicon glyphicon-star"></span> Mettre en favori</span>
-    <span class="badge badge-success"><span class="glyphicon glyphicon-thumbs-up"></span> J'aime</span>
-    <span class="badge badge-warning"><span class="glyphicon glyphicon-adjust"></span> Neutre</span>
-    <span class="badge badge-danger"><span class="glyphicon glyphicon-thumbs-down"></span> Je n'aime pas</span>
+    <span class="badge badge-favorite"><span class="glyphicon glyphicon-star"></span> {% trans "Love" %}</span>
+    <span class="badge badge-success"><span class="glyphicon glyphicon-thumbs-up"></span> {% trans "Like" %}</span>
+    <span class="badge badge-warning"><span class="glyphicon glyphicon-adjust"></span> {% trans "Neutral" %}</span>
+    <span class="badge badge-danger"><span class="glyphicon glyphicon-thumbs-down"></span> {% trans "Dislike" %}</span>
     <span class="badge badge-primary"><span class="glyphicon glyphicon-eye-open"></span> {% spaceless %}
       {% if category == 'manga' %}
-      Je veux lire
+        {% trans "I want to read" %}
       {% else %}
-      Je veux voir
+        {% trans "I want to see" %}
       {% endif %}
     {% endspaceless %}</span>
 
     <span class="badge badge-info"><span class="glyphicon glyphicon-eye-close"></span> {% spaceless %}
       {% if category == 'manga' %}
-      Je ne veux pas lire
+        {% trans "I don't want to read" %}
       {% else %}
-      Je ne veux pas voir
+        {% trans "I don't want to see" %}
       {% endif %}
     {% endspaceless %}</span>
 </div>
@@ -52,17 +55,17 @@
         </span>
         <h4>{% trans "Moves" %}</h4>
         <ul>
-            <li>Aller à gauche: <kbd>←</kbd></li>
-            <li>Aller à droite: <kbd>→</kbd></li>
+            <li>{% trans "to the left" %}: <kbd>←</kbd></li>
+            <li>{% trans "to the right" %}: <kbd>→</kbd></li>
         </ul>
-        <h4>Voter</h4>
+        <h4>{% trans "Vote" %}</h4>
         <ul>
-            <li>Mettre en favori: <kbd>E</kbd></li>
-            <li>Aimer: <kbd>R</kbd></li>
-            <li>Neutre: <kbd>T</kbd></li>
-            <li>Ne pas aimer: <kbd>Y</kbd></li>
-            <li>Je veux voir: <kbd>G</kbd></li>
-            <li>Je ne veux pas voir: <kbd>H</kbd></li>
+            <li>{% trans "Love" %}: <kbd>E</kbd></li>
+            <li>{% trans "Like" %}: <kbd>R</kbd></li>
+            <li>{% trans "Neutral" %}: <kbd>T</kbd></li>
+            <li>{% trans "Dislike" %}: <kbd>Y</kbd></li>
+            <li>{% trans "I want to see" %}: <kbd>G</kbd></li>
+            <li>{% trans "I don't want to see" %}: <kbd>H</kbd></li>
         </ul>
     </div>
     {% endif %}

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 from django.http import Http404
 
 from rest_framework.decorators import api_view, permission_classes, throttle_classes

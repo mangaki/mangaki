@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: mangaki
+Upstream-Contact: Jill-Jênn Vie <vie@crans.org>
+Source: https://github.com/mangaki/mangaki
+ 
+Files: mangaki/mangaki/migrations/* mangaki/mangaki/static/img/*
+Copyright: 2014, Mangaki Authors
+License: AGPL-3.0-only

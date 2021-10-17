@@ -8,10 +8,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{% trans "Mangaki is an anime & manga recommendation website" %}">
+    <meta name="description" content="{% trans "Mangaki is an anime & manga recommendation website" %} {% trans "Rate your favorite series and discover new ones!" %}">
     {% block opengraph %}{% endblock %}
     {% block twittercard %}{% endblock %}
-    <title>{% block title %}Mangaki{% endblock %}</title>
+    <title>{% block title %}{% block subtitle %}{% endblock subtitle %} · Mangaki, anime & manga recommendations{% endblock %}</title>
     <link rel="icon" href="/static/img/favicon.png">
     <link rel="apple-touch-icon" href="/static/img/touch-icon-iphone.png">
     <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
@@ -21,15 +21,15 @@
     <link rel="stylesheet" href="/static/css/glyphicons.css"/>
     <!-- Social Share Kit CSS -->
     <link rel="stylesheet" href="/static/css/social-share-kit.css"/>
-    <link href="https://fonts.googleapis.com/css?family=Economica|Open+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Economica%7COpen+Sans" rel="stylesheet">
 </head>
 
 <body class="d-flex flex-column h-100">
 
 <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="{% url 'home' %}">
-            <img src="/static/img/mangakiwhite.png" width="100" />
+            <img alt="Mangaki" src="/static/img/mangakiwhite.png" width="100" />
         </a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu-collapse" aria-controls="menu-collapse" aria-expanded="false" aria-label="{% trans "Toggle navigation" %}">
@@ -157,7 +157,7 @@
 </div>
 
 <footer class="mt-auto">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#footer-collapse" aria-controls="footer-collapse" aria-expanded="false" aria-label="{% trans "Toggle navigation" %}">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -203,7 +203,7 @@
     </nav>
 </footer>
 
-<script src="{% url 'js_reverse' %}" type="text/javascript"></script>
+<script src="{% url 'js_reverse' %}"></script>
 <script src="/static/js/jquery-latest.min.js"></script>
 <script src="/static/js/popper.min.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>

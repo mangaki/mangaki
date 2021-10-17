@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 from collections import Counter, defaultdict
 from typing import Tuple, List, Any, Dict, Optional
 
@@ -11,7 +14,7 @@ from mangaki.utils.recommendations import get_personalized_ranking
 
 SEE_CHOICES = {
     'seen': ('favorite', 'like', 'dislike', 'neutral'),
-    'unseen': ('willsee', 'wontsee'),
+    'unseen': ('willsee',),
     'willsee': ('willsee',),
     'wontsee': ('wontsee',)
 }

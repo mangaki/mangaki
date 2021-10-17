@@ -1,12 +1,11 @@
 ---
 - name: Ensure PostgreSQL is installed and up-to-date.
   apt:
-    name: '{{ item }}'
+    name:
+      - 'postgresql'
+      - 'postgresql-contrib' # For extensions, e.g. unaccent and pg_trgm
+      - 'python3-psycopg2'    # For management by ansible
     state: 'latest'
-  with_items:
-    - 'postgresql'
-    - 'postgresql-contrib' # For extensions, e.g. unaccent and pg_trgm
-    - 'python-psycopg2'    # For management by ansible
   become: true
 
 - name: Ensure PostgreSQL is running.

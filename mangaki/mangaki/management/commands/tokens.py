@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
 from django.conf import settings

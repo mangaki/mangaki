@@ -1,9 +1,9 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/mangaki/mangaki
+    working_directory: ~/mangaki/
     docker:
-      - image: circleci/python:3.6-stretch-browsers
+      - image: circleci/python:3.7.7-stretch
       - image: circleci/postgres:9.6.10-alpine-ram
         environment:
           POSTGRES_USER: mangaki
@@ -16,19 +16,15 @@ jobs:
       - checkout:
           path: ~/mangaki
       - restore_cache:
-          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/requirements/dev.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/poetry.lock" }}
       - run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common python-dev libopenblas-dev postgresql-client
-          python3 -m venv venv
-          . venv/bin/activate
-          pip install --upgrade pip
-          pip install --upgrade --force-reinstall git+https://github.com/mangaki/zero  # Mangaki Zero
-          pip install -r ~/mangaki/requirements/dev.txt
+          sudo apt-get install -y software-properties-common python3-dev libopenblas-dev postgresql-client
+          poetry install
       - save_cache:
-          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/requirements/dev.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "~/mangaki/poetry.lock" }}
           paths:
-            - "venv"
+            - /home/circleci/.cache/pypoetry/virtualenvs
       - run:
           name: Waiting for Postgres to be ready
           command: |
@@ -42,17 +38,15 @@ jobs:
       - run: |
           psql -h localhost -U mangaki -d circle_test -c "create extension if not exists pg_trgm;
                                 create extension if not exists unaccent"
-          cp ~/mangaki/.circle_mangaki_settings.ini settings.ini
-          . venv/bin/activate
-          python manage.py migrate
-          python manage.py ranking
-          python manage.py top --all
+          cp ~/mangaki/.circle_mangaki_settings.ini mangaki/settings.ini
+          poetry run ./mangaki/manage.py migrate
+          poetry run ./mangaki/manage.py ranking
+          poetry run ./mangaki/manage.py top --all
           mkdir -p $TEST_REPORTS
           mkdir -p $ARTIFACTS
-          python manage.py collectstatic --no-input
-          mkdir -p $TEST_REPORTS/django
-          coverage run manage.py test --with-xunit --xunit-file=$TEST_REPORTS/django/nosetests.xml --logging-clear-handlers
-          coverage html -d $ARTIFACTS
+          poetry run ./mangaki/manage.py collectstatic --no-input
+          poetry run py.test --cov-report=xml --cov=mangaki --junitxml=$TEST_REPORTS/junit.xml mangaki/
+          cp coverage.xml $ARTIFACTS/
           bash <(curl -s https://codecov.io/bash)
       - store_artifacts:
           path: /tmp/artifacts
@@ -62,7 +56,7 @@ jobs:
 
   push_beta:
     docker:
-      - image: mangaki/mangaki-deploy-environment
+      - image: mangaki/mangaki-deploy-environment:v2
     working_directory: ~/mangaki
     steps:
       - checkout:
@@ -73,17 +67,17 @@ jobs:
       - run:
           name: Deploying the beta instance using Ansible
           command: |
-            ./provisioning/scripts/deploy_beta.sh
+            poetry run ./provisioning/scripts/deploy_beta.sh
 workflows:
   version: 2
   build_and_test_and_deploy:
     jobs:
       - build
-      - push_beta:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
-                - raito/cci2-deploy
+#      - push_beta:
+#          requires:
+#            - build
+#          filters:
+#            branches:
+#              only:
+#                - master
+#                - raito/cci2-deploy

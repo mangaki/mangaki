@@ -17,6 +17,7 @@ fi
 
 # Get a hang of where are we.
 # Prepare a nice package.
+# TODO: poetry build -f sdist — when we stabilize versioning.
 cd mangaki && python setup.py sdist && cd ..
 # Get the path to the package.
 LOCAL_PACKAGE_NAME=$(find "mangaki/dist" -maxdepth 1 -name "*.tar.gz" | xargs ls -t | head -n1)

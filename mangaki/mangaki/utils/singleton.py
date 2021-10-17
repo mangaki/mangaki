@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 class Singleton(type):
     """
     Metaclass to provide Singleton pattern to any class.

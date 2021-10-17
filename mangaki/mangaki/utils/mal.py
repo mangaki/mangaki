@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """
 This module contains multiple functions to interact with MyAnimeList API,
 looking for anime and finding URL of posters.

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 from datetime import datetime
 import os
 
@@ -7,7 +10,6 @@ from django.test import TestCase
 
 from mangaki.models import Category, Editor, Studio, Work, RelatedWork, Role, Staff, Artist, TaggedWork, Tag
 from mangaki.utils.anidb import to_python_datetime, AniDB, diff_between_anidb_and_local_tags
-
 
 class AniDBTest(TestCase):
     @staticmethod
@@ -21,7 +23,7 @@ class AniDBTest(TestCase):
             return f.read()
 
     def setUp(self):
-        self.anidb = AniDB('test_client', 1)
+        self.anidb = AniDB('testclient', 1)
         self.no_anidb = AniDB()
         self.search_fixture = self.read_fixture('search_sangatsu_no_lion.xml')
 

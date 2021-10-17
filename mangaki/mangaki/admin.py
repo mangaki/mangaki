@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 import time
 import logging
 
@@ -216,7 +219,7 @@ class FAQAdmin(admin.ModelAdmin):
 
 @admin.register(Work)
 class WorkAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'title')
+    search_fields = ('id', 'title', 'worktitle__title')
     list_display = ('id', 'category', 'title', 'nsfw')
     list_filter = ('category', 'nsfw', AniDBaidListFilter)
     raw_id_fields = ('redirect',)
@@ -672,9 +675,15 @@ class PairingAdmin(admin.ModelAdmin):
     make_author.short_description = "Valider les appariements sélectionnés pour écriture"
 
 
+@admin.register(Rating)
+class RatingAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user', 'work')
+
+
 @admin.register(Reference)
 class ReferenceAdmin(admin.ModelAdmin):
     list_display = ['work', 'url']
+    raw_id_fields = ('work', 'suggestions')
 
 
 class RankingInline(admin.TabularInline):
@@ -712,7 +721,6 @@ admin.site.register(Genre)
 admin.site.register(Track)
 admin.site.register(Studio)
 admin.site.register(Editor)
-admin.site.register(Rating)
 admin.site.register(Page)
 admin.site.register(FAQEntry)
 admin.site.register(Recommendation)
@@ -720,3 +728,4 @@ admin.site.register(Trope)
 admin.site.register(Language)
 admin.site.register(ExtLanguage)
 admin.site.register(UserBackgroundTask)
+admin.site.site_header = "Administration Mangaki"

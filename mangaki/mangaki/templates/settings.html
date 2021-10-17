@@ -8,17 +8,17 @@
                 {{ message }}
             </p>
         {% endfor %}
-        <a href="{% url 'home' %}" class="btn btn-default">{% trans "Retourner à la page d'accueil" %}</a>
+        <a href="{% url 'home' %}" class="btn btn-default">{% trans "Return to the home page" %}</a>
     {% endif %}
-    {% if token %} 
+    {% if token %}
         <form method="post">
             {% csrf_token %}
-            <h1>{% trans "Préférences" %}</h1>
-            <p>{% trans "Souhaitez-vous ne plus recevoir de mail ?" %}</p>
+            <h1>{% trans "Preferences" %}</h1>
+            <p>{% trans "Would you like to stop receiving emails?" %}</p>
             <input type="hidden" name="username" value="{{ username }}" />
             <input type="hidden" name="token" value="{{ token }}" />
-            <input type="submit" class="btn btn-danger mt-1" name="no" value="{% trans "Ne plus recevoir de mail" %}" />
-            <input type="submit" class="btn btn-primary mt-1" name="yes" value="{% trans "Continuer à recevoir les mails" %}" />
+            <input type="submit" class="btn btn-danger mt-1" name="no" value="{% trans "Stop receiving emails" %}" />
+            <input type="submit" class="btn btn-primary mt-1" name="yes" value="{% trans "Continue receiving emails" %}" />
         </form>
     {% endif %}
 {% endblock %}

@@ -49,9 +49,8 @@ work, so you shouldn't need to change anything:
 
 You can then install the Django environment:
 
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements/dev.txt
+    poetry install
+    poetry shell
     ./mangaki/manage.py migrate
     ./mangaki/manage.py runserver
 
@@ -106,3 +105,7 @@ See also our interesting [Jupyter notebooks](https://github.com/mangaki/notebook
 - Feel free to contact us at jj@mangaki.fr
 - Found a bug? [Create an issue](https://github.com/mangaki/mangaki/issues/new).
 - Stay in touch with our blog: http://research.mangaki.fr
+
+## License information
+
+Mangaki is an open-sourced project licensed under AGPLv3. For accurate information regarding license and copyrights, please check individual files. 

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2014, Mangaki Authors
+# SPDX-License-Identifier: AGPL-3.0-only
+
 # Some of these values have related indexes in the database. Please don't
 # change them without issuing the appropriate migrations.
 TOP_MIN_RATINGS = 80

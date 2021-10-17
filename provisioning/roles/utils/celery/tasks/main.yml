@@ -18,12 +18,12 @@
   supervisorctl:
     name: '{{ celery_name }}'
     state: present
-  become: true
+  become: true|bool
   when: start
 
 - name: Run Celery beat.
   supervisorctl:
     name: '{{ celery_beat_name }}'
     state: present
-  become: true
+  become: true|bool
   when: celery_beat
