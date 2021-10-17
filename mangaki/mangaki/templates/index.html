@@ -19,7 +19,7 @@
 <div class="partners">
 	{% for partner in partners %}
     <div class="col-xs-6 col-sm-4 col-md-2">
-        <a href="http://{{ partner.url }}" target="_blank" title="{{ partner.name }}"><img  src="/static/img/sponsors/small/{{ partner.image }}" /></a>
+        <a href="http://{{ partner.url }}" target="_blank"><img alt="{{ partner.name }}" src="/static/img/sponsors/small/{{ partner.image }}" /></a>
 	</div>
 	{% endfor %}
 </div>
