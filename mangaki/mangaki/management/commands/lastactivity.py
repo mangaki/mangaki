@@ -10,4 +10,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for user, date in User.objects.order_by('-last_login').values_list('username', 'last_login')[:10]:
-            print(user, datetime.datetime.strftime(date, '%d/%m/%Y %H:%M:%S'))
+            if date:
+                print(user, datetime.datetime.strftime(date, '%d/%m/%Y %H:%M:%S'))
