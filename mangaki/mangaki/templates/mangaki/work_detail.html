@@ -84,7 +84,7 @@
         {% if references %}
           <h3>{% trans "References" %}</h3>
           <ul>
-          {% for url, name in references %}
+          {% for url, name in references.items %}
               <li><a href="{{ url }}" target="_blank">
                 {% blocktrans %}See on {{ name }}{% endblocktrans %}
               </a></li>
