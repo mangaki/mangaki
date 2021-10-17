@@ -27,7 +27,7 @@ msgstr "Chine"
 
 #: mangaki/choices.py:9
 msgid "US"
-msgstr "États Unis"
+msgstr "États-Unis"
 
 #: mangaki/choices.py:10
 msgid "Germany"
@@ -660,7 +660,7 @@ msgstr "Top 20"
 
 #: mangaki/templates/base.html:96
 msgid "Contribute"
-msgstr "contribuer"
+msgstr "Contribuer"
 
 #: mangaki/templates/base.html:99 mangaki/templates/fix/fix_index.html:14
 msgid "Suggestions"
@@ -1263,7 +1263,7 @@ msgstr "Le profil de %(username)s n'est pas public."
 
 #: mangaki/templates/search.html:6
 msgid "Search"
-msgstr "chercher"
+msgstr "Recherche"
 
 #: mangaki/templates/settings.html:11
 msgid "Return to the home page"
