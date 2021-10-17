@@ -8,8 +8,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block opengraph %}
     <meta name="description" content="{% trans "Mangaki is an anime & manga recommendation website" %} {% trans "Rate your favorite series and discover new ones!" %}">
-    {% block opengraph %}{% endblock %}
+    {% endblock %}
     {% block twittercard %}{% endblock %}
     <title>{% block title %}{% block subtitle %}{% endblock subtitle %} · Mangaki, anime & manga recommendations{% endblock %}</title>
     <link rel="icon" href="/static/img/favicon.png">
