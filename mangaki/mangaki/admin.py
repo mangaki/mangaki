@@ -672,6 +672,11 @@ class PairingAdmin(admin.ModelAdmin):
     make_author.short_description = "Valider les appariements sélectionnés pour écriture"
 
 
+@admin.register(Rating)
+class RatingAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user', 'work')
+
+
 @admin.register(Reference)
 class ReferenceAdmin(admin.ModelAdmin):
     list_display = ['work', 'url']
@@ -713,7 +718,6 @@ admin.site.register(Genre)
 admin.site.register(Track)
 admin.site.register(Studio)
 admin.site.register(Editor)
-admin.site.register(Rating)
 admin.site.register(Page)
 admin.site.register(FAQEntry)
 admin.site.register(Recommendation)
