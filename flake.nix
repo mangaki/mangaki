@@ -149,7 +149,8 @@
             machine = { ... }: {
               imports = [ self.nixosModules.mangaki ];
               nixpkgs.overlays = [ self.overlay ];
-              virtualisation.memorySize = 768;
+              virtualisation.memorySize = 1024;
+              virtualisation.cores = 2;
               services.mangaki = {
                 enable = true;
                 devMode = false;
@@ -180,7 +181,8 @@
             machine = { ... }: {
               imports = [ self.nixosModules.mangaki ];
               nixpkgs.overlays = [ self.overlay ];
-              virtualisation.memorySize = 768;
+              virtualisation.memorySize = 2048;
+              virtualisation.cores = 2;
               services.mangaki = {
                 enable = true;
                 devMode = true;
@@ -190,6 +192,8 @@
             testScript = ''
               start_all()
 
+              machine.wait_for_unit("postgresql.service")
+              machine.wait_for_unit("mangaki.service")
               machine.wait_for_unit("mangaki-worker.service")
               machine.wait_for_open_port(8000)
               machine.succeed("curl http://localhost:8000")
