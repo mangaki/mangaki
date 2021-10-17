@@ -88,14 +88,15 @@
             nixpkgs-fmt
           ];
 
+          DJANGO_SETTINGS_MODULE = "mangaki.settings";
+
           shellHook = ''
-            export DJANGO_SETTINGS_MODULE="mangaki.settings" # Cheap.
             export MANGAKI_SETTINGS_PATH="$(pwd)"/mangaki/settings.ini # Cheap too.
           '';
         });
 
       # NixOS system configuration, if applicable
-      nixosConfigurations.vm = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.dev = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux"; # Hardcoded
         modules = [
           ({ modulesPath, pkgs, ... }: {
@@ -122,9 +123,9 @@
               [
                 (import ./nix/vm/standalone-configuration.nix {
                   useTLS = false;
-                  devMode = false;
+                  devMode = true;
                   domainName = "mangaki.dev";
-                  editableMode = false;
+                  editableMode = true;
                 })
               ];
           })
@@ -136,6 +137,35 @@
 
       # Tests run by 'nix flake check' and by Hydra.
       checks = forAllSystems (system: self.packages.${system} // {
+        mangaki-prod-test =
+          with import ("${nixpkgs}/nixos/lib/testing-python.nix") { inherit system; };
+          makeTest {
+            name = "prod-test";
+            machine = { ... }: {
+              imports = [ self.nixosModules.mangaki ];
+              nixpkgs.overlays = [ self.overlay ];
+              virtualisation.memorySize = 768;
+              services.mangaki = {
+                enable = true;
+                devMode = false;
+                useTLS = false;
+                domainName = "mangaki.test";
+              };
+            };
+            testScript = ''
+              start_all()
+
+              machine.wait_for_unit("mangaki-worker.service")
+              machine.wait_for_unit("uwsgi.service")
+              machine.wait_for_open_port(8000)
+              machine.succeed("curl http://localhost:8000")
+              machine.wait_for_unit("nginx.service")
+              machine.wait_for_open_port(80)
+              machine.succeed("curl -H 'Host: mangaki.test' http://localhost")
+
+              machine.shutdown()
+            '';
+          };
         # VM test on website availability.
         mangaki-host-test =
           with import (nixpkgs + "/nixos/lib/testing-python.nix")
@@ -146,14 +176,17 @@
             machine = { ... }: {
               imports = [ self.nixosModules.mangaki ];
               nixpkgs.overlays = [ self.overlay ];
-              virtualisation.memorySize = 512;
-              services.mangaki.enable = true;
-              services.mangaki.devMode = true;
+              virtualisation.memorySize = 768;
+              services.mangaki = {
+                enable = true;
+                devMode = true;
+              };
             };
 
             testScript = ''
               start_all()
 
+              machine.wait_for_unit("mangaki-worker.service")
               machine.wait_for_unit("mangaki.service")
               machine.wait_for_open_port(8000)
               machine.succeed("curl http://localhost:8000")

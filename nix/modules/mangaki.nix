@@ -351,7 +351,7 @@ in
      (optional (!cfg.lifecycle.performInitialMigrations)
      "You disabled initial migration setup, this can have unexpected effects.")
      (optional (!cfg.devMode -> (cfg.settings.secrets.SECRET_KEY == "CHANGE_ME"))
-     "You are deploying a production instance with a default secret key. The server will be vulnerable.")
+     "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with a default secret key. The server will be vulnerable.")
     ]);
 
     environment.systemPackages = [ cfg.envPackage ];
@@ -380,10 +380,10 @@ in
 
     # User activation script for directory initialization.
     # systemd oneshot for initial migration.
-    systemd.services.mangaki-init-db = mkIf (!cfg.devMode) {
+    systemd.services.mangaki-init-db = {
       after = [ "postgresql.service" ];
       requires = [ "postgresql.service" ];
-      before = [ "uwsgi.service" ];
+      before = mkIf (!cfg.devMode) [ "uwsgi.service" ];
       wantedBy = [ "multi-user.target" ];
 
       description = "Initialize Mangaki database for the first time";

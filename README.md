@@ -69,7 +69,7 @@ Background tasks represent:
 These are optional, but if you want to try them:
 
      # The PYTHONPATH hack is necessary. If you don't like it, read the Nix section.
-     PYTHONPATH=$PYTHONPATH:`pwd`/mangaki celery -B -A mangaki:celery_app worker -l INFO
+     PYTHONPATH=$PYTHONPATH:`pwd`/mangaki celery worker -B -A mangaki:celery_app -l INFO
 
 If you can read something like this:
 
@@ -87,7 +87,18 @@ Allow the `.envrc` to run.
 
 ### Database setup
 
+Ensure you have a PostgreSQL running: `services.postgresql.enable = true;` might be enough if you are using NixOS.
+
+Create a user the same as in the default installation.
+
 ### Running the web server
+
+`$ django-admin runserver` is enough.
+
+### Running background tasks (Celery)
+
+This requires Redis to be running: `services.redis.enable = true;` does the job.
+`$ celery worker -B -A mangaki:celery_app -l INFO` is enough.
 
 ### Poetry maintainer version
 
@@ -99,19 +110,13 @@ Thus, you can replace `./managki/manage.py` by `django-admin` from wherever you 
 
 Also, you can drop the `PYTHONPATH` hack to run Celery, it will just work out of the box, from wherever you are in your filesystem again. :-)
 
-### I don't want to figure out too much version
-
-Just do `nix-shell -f default.nix -A wheeledShell`, enjoy `django-admin` and `celery` without any hack.
-
-### I want to do something arbitrary complex
-
-Please read the `default.nix` and add your use cases, you can run `nix-shell -f default.nix -A sourceShell` to recompile everything, including NumPy & SciPy, note that it's going to be a bit long.
+To relock overrides, you can run `poetry2nix lock` to update `overrides.nix` (in particular: Mangaki Zero).
 
 ### QEMU install
 
-Just run `nix-build -A nixosConfigurations.vm.config.system.build.vm` and `result/bin/run-nixos-vm`, enjoy Mangaki on <https://localhost:8000>
+Just run `nix-build -A nixosConfigurations.vm.config.system.build.vm` and `result/bin/run-nixos-vm`, enjoy Mangaki on <https://localhost:8000> in the virtual machine.
 
-### VM install
+## VM install
 
 You can also [install Mangaki in a VM](https://github.com/mangaki/mangaki/wiki/How-to-install-Mangaki-using-a-virtual-machine-(simple-but-takes-2-GB)) using our amazing Ansible playbooks.
 
