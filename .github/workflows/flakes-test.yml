@@ -18,4 +18,4 @@ jobs:
           name: mangaki
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           extraPullNames: nix-community
-      - run: nix flake check
+      - run: nix flake check -L
