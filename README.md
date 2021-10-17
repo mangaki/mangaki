@@ -49,10 +49,10 @@ work, so you shouldn't need to change anything:
 
 You can then install the Django environment:
 
-    poetry install
+    poetry install  # Add --no-dev if in production
     poetry shell
     ./mangaki/manage.py migrate
-    ./mangaki/manage.py runserver
+    ./mangaki/manage.py runserver  # If in dev; otherwise install gunicorn or anything by your own means
 
 And voilà! You can access Mangaki at http://localhost:8000.
 
