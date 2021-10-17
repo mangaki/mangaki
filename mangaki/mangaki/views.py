@@ -181,11 +181,14 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
             context['suggestion_form'] = SuggestionForm(work=self.object, instance=Suggestion(user=self.request.user, work=self.object))
         context['rating'] = current_user_rating(self.request, self.object)
 
-        context['references'] = []
+        context['references'] = {}
         for reference in self.object.reference_set.all():
             for domain, name in REFERENCE_DOMAINS:
                 if reference.url.startswith(domain):
-                    context['references'].append((reference.url, name))
+                    context['references'][reference.url] = name
+        if 'AniDB' not in context['references'].values() and self.object.anidb_aid >= 1:
+            url = f'https://anidb.net/anime/{self.object.anidb_aid}'
+            context['references'][url] = 'AniDB'
 
         nb = Counter(Rating.objects.filter(work=self.object).values_list('choice', flat=True))
         labels = OrderedDict([
