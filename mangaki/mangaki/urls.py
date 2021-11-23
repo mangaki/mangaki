@@ -52,6 +52,8 @@ urlpatterns = [
     url(r'^artist/(?P<pk>\d+)$', views.ArtistDetail.as_view(), name='artist-detail'),
     url(r'^artist/(?P<artist_id>\d+)/add/(?P<work_id>\d+)$', views.add_pairing, name='add-pairing'),
     url(r'^vote/(?P<work_id>\d+)$', views.rate_work, name='vote'),
+    url(r'^add_friend/(?P<username>.+?)$', views.add_friend, name='add-friend'),
+    url(r'^del_friend/(?P<username>.+?)$', views.del_friend, name='del-friend'),
     url(r'^settings/$', views.update_settings, name='settings'),
     url(r'^admin/', admin.site.urls),
     url(r'^about/(?P<lang>[\w-]*)$', views.about, name='about'),

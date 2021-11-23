@@ -416,6 +416,8 @@ def get_profile(request,
                    if (can_see and not is_anonymous) else None)
 
     is_me = request.user == user
+    is_friend = not is_anonymous and not is_me \
+            and request.user.profile.friends.filter(pk=user.pk).exists()
     context = {
         'meta': {
             'debug_vue': settings.DEBUG_VUE_JS,
@@ -435,7 +437,8 @@ def get_profile(request,
         'profile': {
             'avatar_url': user.profile.avatar_url if (not is_anonymous and can_see) else None,
             'member_days': member_time.days if member_time else None,
-            'username': user.username
+            'username': user.username,
+            'is_friend': is_friend
         },
     }
 
@@ -615,6 +618,26 @@ def rate_work(request, work_id):
 
     else:
         return HttpResponse()
+
+
+def add_friend(request, username: str = None):
+    if request.user.is_authenticated and request.method == 'GET':
+        target_user = get_object_or_404(User.objects.select_related('profile'),
+                                        username=username)
+        if target_user == request.user:
+            return HttpResponse()
+        request.user.profile.friends.add(target_user)
+    return HttpResponse()
+
+
+def del_friend(request, username):
+    if request.user.is_authenticated and request.method == 'GET':
+        target_user = get_object_or_404(User.objects.select_related('profile'),
+                                        username=username)
+        if target_user == request.user:
+            return HttpResponse()
+        request.user.profile.friends.remove(target_user)
+    return HttpResponse()
 
 
 def recommend_work(request, work_id, target_id):
