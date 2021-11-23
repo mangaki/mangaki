@@ -68,11 +68,11 @@ function loadMenuUser() {
 }
 
 $(document).ready(function() {
-  $('input.typeahead').on('typeahead:selected', function(event, selection) {
+  function handleRequest(event, selection) {
     if (!selection.synopsis) {
-    	if (!selection.work_id)
+    	if (!selection.work_id) {
         location.href = Urls['profile'](selection.username) ;
-      else {
+      } else {
         $.post(Urls['reco-work'](selection.work_id, selection.id), function(status) {
           if (status === 'success') {
             $('#alert-reco').hide();
@@ -82,59 +82,33 @@ $(document).ready(function() {
           else {
             $('#success-reco').hide();
             if($('#alert-reco').css('display') === 'none')
-             $('#alert-reco').show();
-           if (category === 'anime')
-             $('#alert-reco').html('Cet utilisateur a déjà vu l\'anime que vous voulez lui recommander');
-           else
-             $('#alert-reco').html('Cet utilisateur a déjà lu le manga que vous voulez lui recommander');
-           if (status === 'nonsense')
-             $('#alert-reco').html('Vous ne pouvez pas vous adresser vos propres recommandations!');
-           if (status === 'double')
-             $('#alert-reco').html('Vous avez déjà effectué cette recommandation');
-         }
-       });
+              $('#alert-reco').show();
+            if (category === 'anime')
+              $('#alert-reco').html('Cet utilisateur a déjà vu l\'anime que vous voulez lui recommander');
+            else
+              $('#alert-reco').html('Cet utilisateur a déjà lu le manga que vous voulez lui recommander');
+            if (status === 'nonsense')
+              $('#alert-reco').html('Vous ne pouvez pas vous adresser vos propres recommandations!');
+            if (status === 'double')
+              $('#alert-reco').html('Vous avez déjà effectué cette recommandation');
+          }
+        });
       }
     }
     else if(typeof(artistID) !== 'undefined') {
       addPairing(artistID, selection.id);
-    } else
+    } else {
       location.href = Urls['work-detail'](category, selection.id);
-    $(this).val('');
-  }).on('typeahead:autocompleted', function(event, selection) {
-    if (!selection.synopsis) {
-     if (!selection.work_id) { location.href = Urls['profile'](selection.username); }
-     else {
-      $.post(Urls['reco-work'](selection.work_id, selection.id),  function(status) {
-       if (status === 'success') {
-         $('#alert-reco').hide();
-         if($('#success-reco').css('display') === 'none')
-          $('#success-reco').show();
-       }
-        else {
-           $('#success-reco').hide();
-           if($('#alert-reco').css('display') === 'none')
-            $('#alert-reco').show();
-          if (category === 'anime')
-            $('#alert-reco').html('Cet utilisateur a déjà vu l\'anime que vous voulez lui recommander');
-          else
-            $('#alert-reco').html('Cet utilisateur a déjà lu le manga que vous voulez lui recommander');
-          if (status === 'nonsense')
-            $('#alert-reco').html('Vous ne pouvez pas vous adresser vos propres recommandations!');
-          if (status === 'double')
-            $('#alert-reco').html('Vous avez déjà effectué cette recommandation');
-        }
-      });
     }
+    $(this).val('');
   }
-  else if(typeof(artistID) !== 'undefined') {
-    addPairing(artistID, selection.id);
-  } else { location.href = Urls['work-detail'](category, selection.id); }
-  $(this).val('');
-}).on('change', function(object, datum) {
-  pieces.clearPrefetchCache();
-     // lookup($(this).val());
-     // $(this).val('');
-   });
+  $('input.typeahead').on('typeahead:selected', handleRequest)
+                      .on('typeahead:autocompleted', handleRequest)
+                      .on('change', function(object, datum) {
+    pieces.clearPrefetchCache();
+    // lookup($(this).val());
+    // $(this).val('');
+  });
 })
 
 function lookup(query, category) {
