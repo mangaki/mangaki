@@ -12,6 +12,19 @@
             Rate them and reload to get new ones.
         {% endblocktrans %}
     </div>
+    
+    {% if user.is_authenticated %}
+        <div>
+            <form class="typeahead-demo {{ user.username }}">
+                <input type="text" data-username="{{ user.username }}" class="search-input form-control typeahead" placeholder="{% trans "Add one of your friends to recommend with" %}" />
+            </form>
+            <div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">{% trans "This user already knows this work" %}</div>
+        </div>
+        <div class="alert alert-success" id="group-reco" {% if group_reco is None or group_reco|length <= 1 %}style="display: none"{% endif %}>
+            <table>
+            </table>
+        </div>
+    {% endif %}
 
     <ul class="nav nav-tabs">
         <li class="nav-item" role="presentation">
@@ -41,6 +54,10 @@
 {% block extrajs %}
 {% if reco_list|length > 0 %}
 <script>
+{% if user.is_authenticated %}
+    loadMenuFriends();
+    generateGroupTable({{ group_reco|safe }});
+{% endif %}
 $.getJSON('{% url 'get-reco-algo-list' algo_name=algo_name category=category %}', function(data) {
   data.forEach(function(work, i) {
     new Card($('.cards-grid .work-card:nth-child(' + (i+1) + ')'), '{{ category }}').hydrate(work);

@@ -25,6 +25,30 @@ function loadMenu() {
   });
 }
 
+function loadMenuFriends() {
+  pieces = new Bloodhound({
+    datumTokenizer: function(d) { return d.tokens; },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    prefetch: Urls['get-friends'](),
+    remote: Urls['get-friends']() + '?q=%QUERY',
+    dupDetector: function(remoteMatch, localMatch) {
+      return remoteMatch.username === localMatch.username;
+    }
+  });
+
+  pieces.initialize();
+
+  $('.typeahead').typeahead(null, {
+    name: 'pieces',
+    source: pieces.ttAdapter(),
+    templates: {
+      suggestion: Handlebars.compile([
+        '<p class="repo-name">{{ username }}</p>',
+      ].join(''))
+    }
+  });
+}
+
 function loadMenuReco() {
   pieces = new Bloodhound({
     datumTokenizer: function(d) { return d.tokens; },
@@ -67,11 +91,44 @@ function loadMenuUser() {
   });
 }
 
+function toggleFriendGroup(user) {
+  $.post(Urls['toggle-friend'](user), function(group) {
+    group = JSON.parse(group);
+    if(group.length <= 1) {
+      $('#group-reco').hide();
+    } else {
+      $('#group-reco').show();
+      generateGroupTable(group);
+    }
+  });
+}
+
+function generateGroupTable(group) {
+  // Hack to get current user's username
+  username = $("#menu-collapse ul:nth-child(2) li:first a:first strong").html().slice(0, -1);
+  console.log(username);
+  table = $("#group-reco table");
+  table.html("");
+  group.sort();
+  for(const user of group) {
+    table.append(`<tr>
+        <td>` + (user == username ? '' : `<a onclick="toggleFriendGroup('` + user + `')" href="#" title="Remove">X</a>`) + `</td>
+        <!-- <td>avatar?</td> -->
+        <td>` + user + `</td>
+      </tr>
+    `);
+  }
+}
+
 $(document).ready(function() {
   function handleRequest(event, selection) {
     if (!selection.synopsis) {
     	if (!selection.work_id) {
-        location.href = Urls['profile'](selection.username) ;
+        if(selection.type == "group") {
+          toggleFriendGroup(selection.username);
+        } else {
+          location.href = Urls['profile'](selection.username) ;
+        }
       } else {
         $.post(Urls['reco-work'](selection.work_id, selection.id), function(status) {
           if (status === 'success') {

@@ -630,13 +630,32 @@ def add_friend(request, username: str = None):
     return HttpResponse()
 
 
-def del_friend(request, username):
+def del_friend(request, username: str = None):
     if request.user.is_authenticated and request.method == 'GET':
         target_user = get_object_or_404(User.objects.select_related('profile'),
                                         username=username)
         if target_user == request.user:
             return HttpResponse()
         request.user.profile.friends.remove(target_user)
+    return HttpResponse()
+
+
+def toggle_friend(request, username: str = None):
+    if request.user.is_authenticated and request.method == 'POST':
+        target_user = get_object_or_404(User.objects.select_related('profile'),
+                                        username=username)
+        group = set(request.session.setdefault(
+            settings.RECO_GROUP_SESSION_KEY, [request.user.username]))
+        if target_user.username in group:
+            group.remove(target_user.username)
+        # should you be able to recommend with someone with public profile but
+        # who you have not friended yet?
+        elif target_user.profile.is_shared or target_user.profile.friends \
+                .filter(pk=request.user.pk).exists():
+            group.add(target_user.username)
+        group.add(request.user.username)
+        request.session[settings.RECO_GROUP_SESSION_KEY] = list(group)
+        return HttpResponse(json.dumps(list(group)))
     return HttpResponse()
 
 
@@ -667,6 +686,24 @@ def get_user_for_recommendations(request, work_id, query=''):
     for user in User.objects.all() if not query else User.objects.filter(username__icontains=query):
         data.append(
             {'id': user.id, 'username': user.username, 'work_id': work_id, 'tokens': user.username.lower().split()})
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def get_friends(request):
+    query = request.GET.get('q', '')
+    data = []
+
+    if request.user.is_authenticated:
+        oriented_friends = request.user.profile.friends.filter()
+        friends = oriented_friends.all() if not query \
+            else oriented_friends.filter(username__icontains=query)
+        # TODO: only n=10? first results
+        for user in friends.order_by('username')[:10]:
+            # TODO: Improve this to use only one request if possible
+            if True or user.profile.friends.filter(pk=request.user.pk).exists():
+                data.append({'username': user.username,
+                             'type': 'group', # hack for autocomplete.js to know purpose, to clean later
+                             'tokens': user.username.lower().split()})
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
@@ -753,11 +790,17 @@ def get_reco(request):
         } for _ in range(8)]
     else:
         reco_list = []
+    group_reco = None
+    if request.user.is_authenticated:
+        group_reco = request.session.setdefault(
+            settings.RECO_GROUP_SESSION_KEY, [request.user.username]
+        )
     return render(request, 'mangaki/reco_list.html',
                   {
                       'reco_list': reco_list,
                       'category': category,
                       'algo_name': algo_name,
+                      'group_reco': group_reco,
                       'config': VANILLA_UI_CONFIG_FOR_RATINGS
                   })
 

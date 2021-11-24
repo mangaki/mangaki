@@ -30,7 +30,7 @@
             {% endif %}
 
             {% if profile.member_days %}
-                <p>
+                <p> {# TODO: human readable format #}
                     {% blocktrans with member_days=profile.member_days trimmed %}
                     Subscribed since {{ member_days }} days
                     {% endblocktrans %}
