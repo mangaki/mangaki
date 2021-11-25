@@ -621,7 +621,7 @@ def rate_work(request, work_id):
 
 
 def add_friend(request, username: str = None):
-    if request.user.is_authenticated and request.method == 'GET':
+    if request.user.is_authenticated and request.method == 'POST':
         target_user = get_object_or_404(User.objects.select_related('profile'),
                                         username=username)
         if target_user == request.user:
@@ -631,7 +631,7 @@ def add_friend(request, username: str = None):
 
 
 def del_friend(request, username: str = None):
-    if request.user.is_authenticated and request.method == 'GET':
+    if request.user.is_authenticated and request.method == 'POST':
         target_user = get_object_or_404(User.objects.select_related('profile'),
                                         username=username)
         if target_user == request.user:

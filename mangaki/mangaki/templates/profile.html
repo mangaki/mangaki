@@ -99,7 +99,7 @@
                                                          name.indexOf(']'));
                     var endpoint = this.checked ? '/add_friend' : '/del_friend';
 
-                    $.get(endpoint + '/' + friend_username, function (is_friend) {
+                    $.post(endpoint + '/' + friend_username, function (is_friend) {
                         if(is_friend !== this.checked) {
                             this.checked = is_friend;
                         }
