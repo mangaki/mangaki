@@ -83,6 +83,34 @@ def current_user_ratings(request, works=None):
         return dict(qs.values_list('work_id', 'choice'))
 
 
+def friend_ratings(request, friend_id, works=None):
+    """
+    Compute the set of ratings for a friend of the current user.
+    May need to also work with public users
+
+    The user should be logged in.
+
+    If the `works` argument is given, then only the ratings for the given works
+    will be considered.
+
+    Arguments:
+        request -- The Request object we are currently handling.
+        friend_id -- The id of the user ratings to return
+        works   -- An iterable of Work instances or primary keys, or None.
+
+    Returns:
+        ratings -- A dictionary mapping Work primary keys to their rating
+            string ('like', 'dislike', etc.)
+    """
+    if friend_id == request.user.id:
+        return current_user_ratings(request, works)
+    user = request.user.profile.friends.get(id=friend_id)
+    qs = user.rating_set.all()
+    if works is not None:
+        qs = qs.filter(work__in=works)
+    return dict(qs.values_list('work_id', 'choice'))
+
+
 def current_user_rating(request, work):
     """
     Get the rating the current user gave to a specific work.

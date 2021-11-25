@@ -54,7 +54,7 @@ from mangaki.utils.profile import (
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.tokens import compute_token, NEWS_SALT
-from mangaki.utils.recommendations import get_reco_algo
+from mangaki.utils.recommendations import get_reco_algo_generic, get_reco_algo
 from irl.models import Partner
 
 
@@ -650,8 +650,10 @@ def toggle_friend(request, username: str = None):
             group.remove(target_user.username)
         # should you be able to recommend with someone with public profile but
         # who you have not friended yet?
-        elif target_user.profile.is_shared or target_user.profile.friends \
-                .filter(pk=request.user.pk).exists():
+        elif request.user.profile.friends.filter(pk=target_user.pk).exists() \
+                and (target_user.profile.is_shared
+                     or target_user.profile.friends
+                         .filter(pk=request.user.pk).exists()):
             group.add(target_user.username)
         group.add(request.user.username)
         request.session[settings.RECO_GROUP_SESSION_KEY] = list(group)
@@ -731,7 +733,17 @@ def get_works(request, category):
 
 def get_reco_algo_list(request, algo_name, category):
     reco_list = []
-    data = get_reco_algo(request, algo_name, category)
+    if request.user.is_authenticated:
+        group_reco = request.session.setdefault(
+            settings.RECO_GROUP_SESSION_KEY, [request.user.username]
+        )
+        friend_ids = list(
+            request.user.profile.friends.filter(username__in=group_reco)
+                                        .values_list('id')[0]
+        )
+        data = get_reco_algo_generic(request, friend_ids, algo_name, category)
+    else:
+        data = get_reco_algo(request, algo_name, category)
     works = data['works']
     categories = dict(WORK_CATEGORY_CHOICES)
     for work_id in data['work_ids']:
