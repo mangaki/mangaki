@@ -95,8 +95,8 @@ def get_reco_algo(request, algo_name='als', category='all'):
     return {'work_ids': ranked_work_ids, 'works': works}
 
 
-def get_reco_algo_generic(request, users_id=None, algo_name='als',
-                          category='all'):
+def get_group_reco_algo(request, users_id=None, algo_name='als',
+                        category='all'):
     # users_id contain a group to recommend to
     # It should include the current user, which can't be anonymous
     if request.user.is_anonymous:
@@ -108,40 +108,24 @@ def get_reco_algo_generic(request, users_id=None, algo_name='als',
 
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
 
-    users_ratings = {}
+    user_ratings = {}
     tmp = []
     for user_id in users_id:
         ratings = friend_ratings(request, user_id)
         # Ignore users with no ratings
         if len(ratings) > 0:
-            users_ratings[user_id] = ratings
+            user_ratings[user_id] = ratings
             tmp.append(user_id)
     user_id = tmp
 
     # What is already rated for a group? intersection or union of seen works?
     already_rated_works = list(set().union(*[
-        set(ratings) for ratings in users_ratings.values()
+        set(ratings) for ratings in user_ratings.values()
     ]))
 
     chrono.save('get rated works')
 
     algo = get_algo_backup_or_fit_knn(algo_name)
-    # fallback to knn if one user wasn't in the algo backup
-    for user_id in users_id:
-        if user_id not in algo.dataset.encode_user:
-            algo = get_algo_backup_or_fit_knn('knn')
-            break
-    # TODO: Fix this to work if one of the users isn't in the backup
-    encoded_user_ids = [
-        algo.dataset.encode_user[user_id] for user_id in users_id
-    ]
-
-    available_works = set(algo.dataset.encode_work.keys())
-    df_rated_works = []
-    for ratings in users_ratings.values():
-        df_rated_works.append(pd.DataFrame(list(ratings.items()),
-                                           columns=['work_id', 'choice'])
-                                .query('work_id in @available_works'))
 
     # # One user gave the same rating to all works considered in the reco
     # # It may make sense to only use knn for this user, and not all
@@ -164,7 +148,30 @@ def get_reco_algo_generic(request, users_id=None, algo_name='als',
     encoded_work_ids = [algo.dataset.encode_work[work_id]
                         for work_id in filtered_works]
 
+    encoded_user_ids = []
+    extra_users_parameters = []
+    available_works = None
+    for user_id in users_id:
+        # TODO: also recompute parameters if ratings have changed
+        if user_id not in algo.dataset.encode_user:
+            if available_works is None:
+                available_works = set(algo.dataset.encode_work.keys())
+            df_rated_works = (pd.DataFrame(list(user_ratings[user_id].items()),
+                                           columns=['work_id', 'choice'])
+                                .query('work_id in @available_works'))
+            enc_rated_works = df_rated_works['work_id'].map(
+                algo.dataset.encode_work
+            )
+            user_rating_values = df_rated_works['choice'].map(rating_values)
+            extra_users_parameters.append(algo.fit_single_user(
+                enc_rated_works,
+                user_rating_values
+            ))
+        else:
+            encoded_user_ids.append(algo.dataset.encode_user[user_id])
+
     pos_of_best = algo.recommend(encoded_user_ids,
+                                 extra_users_parameters=extra_users_parameters,
                                  item_ids=encoded_work_ids,
                                  k=NB_RECO)['item_id']
     best_work_ids = [filtered_works[pos] for pos in pos_of_best]
