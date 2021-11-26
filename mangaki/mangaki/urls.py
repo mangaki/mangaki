@@ -46,6 +46,7 @@ urlpatterns = [
     url(r'^u/(?P<username>.+?)/works/(?P<category>\w+?)/$', views.get_profile_works, name='profile-works'),
     url(r'^u/(?P<username>.+?)/works/(?P<category>\w+?)/(?P<status>\w+)$', views.get_profile_works, name='profile-works'),
     url(r'^u/(?P<username>.+?)/preferences$', views.get_profile_preferences, name='profile-preferences'),
+    url(r'^profile/friendlist$', views.get_profile_friendlist, name='profile-friendlist'),
     url(r'^u/(?P<username>.+?)/?$', views.get_profile_works, name='profile'),
 
     url(r'^reco/$', views.get_reco, name='reco'),

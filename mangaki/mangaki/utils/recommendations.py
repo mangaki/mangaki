@@ -4,8 +4,6 @@
 import numpy as np
 import pandas as pd
 
-from django.conf import settings
-
 from mangaki.models import Rating, Work
 from mangaki.utils.fit_algo import fit_algo, get_algo_backup
 from mangaki.utils.chrono import Chrono
@@ -97,13 +95,15 @@ def get_reco_algo(request, algo_name='als', category='all'):
     return {'work_ids': ranked_work_ids, 'works': works}
 
 
-# users_id contain the list of activated friends.
-# It should include the current user, which can't be anonymous
 def get_reco_algo_generic(request, users_id=None, algo_name='als',
                           category='all'):
+    # users_id contain a group to recommend to
+    # It should include the current user, which can't be anonymous
+    if request.user.is_anonymous:
+        get_reco_algo(request, algo_name, category)
     if users_id is None:
-        return get_reco_algo(request, algo_name, category)
-    if request.user.id not in users_id:
+        users_id = [request.user.id]
+    elif request.user.id not in users_id:
         users_id.append(request.user.id)
 
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
@@ -131,6 +131,7 @@ def get_reco_algo_generic(request, users_id=None, algo_name='als',
         if user_id not in algo.dataset.encode_user:
             algo = get_algo_backup_or_fit_knn('knn')
             break
+    # TODO: Fix this to work if one of the users isn't in the backup
     encoded_user_ids = [
         algo.dataset.encode_user[user_id] for user_id in users_id
     ]

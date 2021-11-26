@@ -416,8 +416,11 @@ def get_profile(request,
                    if (can_see and not is_anonymous) else None)
 
     is_me = request.user == user
-    is_friend = not is_anonymous and not is_me \
+    if request.user.is_authenticated:
+        is_friend = not is_me \
             and request.user.profile.friends.filter(pk=user.pk).exists()
+    else:
+        is_friend = False
     context = {
         'meta': {
             'debug_vue': settings.DEBUG_VUE_JS,
@@ -462,6 +465,44 @@ def get_profile_preferences(request,
     }
 
     return render(request, 'profile_preferences.html',
+                  deep_dict_merge(ctx, new_ctx))
+
+
+def get_profile_friendlist(request):
+    if not request.user.is_authenticated:
+        return redirect('account_login')
+
+    user, ctx = get_profile(request, request.user.username)
+
+    friendlists = {
+        'mutual': {
+            'name': 'My friends',
+            'friends': []
+        },
+        'pending': {
+            'name': 'My pending friend requests',
+            'friends': []
+        }
+    }
+    for friend in request.user.profile.friends.all():
+        friend_data = {
+            'username': friend.username,
+            'is_shared': friend.profile.is_shared
+        }
+        if friend.profile.is_shared \
+                or friend.profile.friends.filter(pk=request.user.pk).exists():
+            friendlists['mutual']['friends'].append(friend_data)
+        else:
+            friendlists['pending']['friends'].append(friend_data)
+
+    new_ctx = {
+        'meta': {
+           'section': 'friendlist'
+        },
+        'friendlists': friendlists
+    }
+
+    return render(request, 'profile_friendlist.html',
                   deep_dict_merge(ctx, new_ctx))
 
 
@@ -696,7 +737,7 @@ def get_friends(request):
     data = []
 
     if request.user.is_authenticated:
-        oriented_friends = request.user.profile.friends.filter()
+        oriented_friends = request.user.profile.friends
         friends = oriented_friends.all() if not query \
             else oriented_friends.filter(username__icontains=query)
         # TODO: only n=10? first results
@@ -738,8 +779,9 @@ def get_reco_algo_list(request, algo_name, category):
             settings.RECO_GROUP_SESSION_KEY, [request.user.username]
         )
         friend_ids = list(
+            user_id[0] for user_id in
             request.user.profile.friends.filter(username__in=group_reco)
-                                        .values_list('id')[0]
+                                        .values_list('id')
         )
         data = get_reco_algo_generic(request, friend_ids, algo_name, category)
     else:
