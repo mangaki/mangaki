@@ -4,56 +4,69 @@
 {% block subtitle %}{% trans "Recommendations" %}{% endblock %}
 
 {% block body %}
-{% if reco_list|length > 0 %}
-    <h1>{% trans "Recommendations" %}</h1>
-    <div class="alert alert-secondary">
-        {% blocktrans trimmed %}
-            Here are some recommendations that you might like.<br />
-            Rate them and reload to get new ones.
-        {% endblocktrans %}
-    </div>
-    
-    {% if user.is_authenticated %}
-        <div>
-            <form class="typeahead-demo {{ user.username }}">
-                <input type="text" data-username="{{ user.username }}" class="search-input form-control typeahead" placeholder="{% trans "Add one of your friends to recommend with" %}" />
-            </form>
-            <div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">{% trans "This user already knows this work" %}</div>
+    {% if reco_list|length > 0 %}
+        <div class="row">
+            {% if user.is_authenticated %}
+                <div class="col-12 col-md-3 col-xl-2 friend-sidebar" {% if group_reco is None or group_reco|length <= 1 %}style="display: none"{% endif %}>
+                    <div class="card">
+                        <div class="card-header">{% trans "Group" %}</div>
+                        <form class="typeahead-demo {{ user.username }}">
+                            <input type="text" data-username="{{ user.username }}" class="search-input form-control typeahead" placeholder="{% trans "Add a friend" %}" />
+                        </form>
+                        <div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">{% trans "You cannot add this user" %}</div>
+                        <div class="card-body" id="group-reco">
+                        </div>
+                        <a onClick="window.location.reload();" href="#" class="btn btn-primary">Recommend!</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <main class="col bd-content">
+                <h1>{% trans "Recommendations" %}</h1>
+                <div class="alert alert-secondary">
+                    {% blocktrans trimmed %}
+                        Here are some recommendations that you might like.<br />
+                        Rate them and reload to get new ones.
+                    {% endblocktrans %}
+                </div>
+
+                {% if user.is_authenticated %}
+                <div class="single-friend-ta" {% if group_reco|length > 1 %}style="display: none"{% endif %} style="margin-bottom: 1rem;">
+                        <form class="typeahead-demo {{ user.username }}">
+                            <input type="text" data-username="{{ user.username }}" class="search-input form-control typeahead" placeholder="{% trans "Add some of your friends to recommend with" %}" />
+                        </form>
+                        <div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">{% trans "This user already knows this work" %}</div>
+                    </div>
+                {% endif %}
+
+                <ul class="nav nav-tabs">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link{% if category == 'all' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}">{% trans "All" %}</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link{% if category == 'anime' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=anime">
+                        {% trans "Anime" %}</a></li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link{% if category == 'manga' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=manga">{% trans "Manga" %}</a>
+                    </li>
+                </ul>
+                <br />
+            <div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
+            {% include "works.html" with works=reco_list %}
+
+            <a class="btn btn-primary btn-lg btn-block mx-auto" style="white-space: normal" href="{% url 'reco' %}?category={{ category }}&amp;algo={{ algo_name }}">{% blocktrans %}I want new recommendations! <br class="visible-xs">(After you rate those.){% endblocktrans %}</a>
+            </main>
         </div>
-        <div class="alert alert-success" id="group-reco" {% if group_reco is None or group_reco|length <= 1 %}style="display: none"{% endif %}>
-            <table>
-            </table>
-        </div>
-        <button onClick="window.location.reload();">Recommend!</button>
-    {% endif %}
 
-    <ul class="nav nav-tabs">
-        <li class="nav-item" role="presentation">
-            <a class="nav-link{% if category == 'all' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}">{% trans "All" %}</a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link{% if category == 'anime' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=anime">
-            {% trans "Anime" %}</a></li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link{% if category == 'manga' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=manga">{% trans "Manga" %}</a>
-        </li>
-    </ul>
-    <br />
-<div class="alert alert-warning" role="alert" id="sorry" style="display: none"></div>
-{% include "works.html" with works=reco_list %}
-
-<a class="btn btn-primary btn-lg btn-block mx-auto" style="white-space: normal" href="{% url 'reco' %}?category={{ category }}&amp;algo={{ algo_name }}">{% blocktrans %}I want new recommendations! <br class="visible-xs">(After you rate those.){% endblocktrans %}</a>
-
-{% else %}
-    {% url 'work-list' 'anime' as work_list_url %}
-    <p class="well">{% blocktrans trimmed %}
-        To receive recommandations, you should at least <a href="{{ work_list_url }}">rate an anime</a>!
+    {% else %}
+        {% url 'work-list' 'anime' as work_list_url %}
+        <p class="well">{% blocktrans trimmed %}
+            To receive recommandations, you should at least <a href="{{ work_list_url }}">rate an anime</a>!
         {% endblocktrans %}</p>
-{% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block extrajs %}
-{% if reco_list|length > 0 %}
 <script>
 {% if user.is_authenticated %}
     loadMenuFriends();
@@ -65,5 +78,4 @@ $.getJSON('{% url 'get-reco-algo-list' algo_name=algo_name category=category %}'
   });
 });
 </script>
-{% endif %}
 {% endblock %}

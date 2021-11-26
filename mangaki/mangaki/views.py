@@ -838,17 +838,21 @@ def remove_all_reco(request, targetname):
 def get_reco(request):
     category = request.GET.get('category', 'all')
     algo_name = request.GET.get('algo', 'als')
-    if current_user_ratings(request):
-        reco_list = [{
-            'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
-        } for _ in range(8)]
-    else:
-        reco_list = []
     group_reco = None
     if request.user.is_authenticated:
         group_reco = request.session.setdefault(
             settings.RECO_GROUP_SESSION_KEY, [request.user.username]
         )
+    NB_RECO = 8
+    if len(group_reco) > 1:
+        # its likely the rows will be 3 large, so 9 works better than 8
+        NB_RECO = 9
+    if current_user_ratings(request):
+        reco_list = [{
+            'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
+        } for _ in range(NB_RECO)]
+    else:
+        reco_list = []
     return render(request, 'mangaki/reco_list.html',
                   {
                       'reco_list': reco_list,

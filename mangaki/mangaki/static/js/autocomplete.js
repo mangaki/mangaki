@@ -38,14 +38,16 @@ function loadMenuFriends() {
 
   pieces.initialize();
 
-  $('.typeahead').typeahead(null, {
-    name: 'pieces',
-    source: pieces.ttAdapter(),
-    templates: {
-      suggestion: Handlebars.compile([
-        '<p class="repo-name">{{ username }}</p>',
-      ].join(''))
-    }
+  $('.typeahead').each(function() {
+    $(this).typeahead(null, {
+      name: 'pieces',
+      source: pieces.ttAdapter(),
+      templates: {
+        suggestion: Handlebars.compile([
+          '<p class="repo-name">{{ username }}</p>',
+        ].join(''))
+      }
+    });
   });
 }
 
@@ -94,10 +96,14 @@ function loadMenuUser() {
 function toggleFriendGroup(user) {
   $.post(Urls['toggle-friend'](user), function(group) {
     group = JSON.parse(group);
-    if(group.length <= 1) {
-      $('#group-reco').hide();
+    if(group.length == 0 || (group.length == 1 && group[0] == username)) {
+      // $('#group-reco').hide();
+      $(".friend-sidebar").hide();
+      $(".single-friend-ta").show();
     } else {
-      $('#group-reco').show();
+      // $('#group-reco').show();
+      $(".friend-sidebar").show();
+      $(".single-friend-ta").hide();
       generateGroupTable(group);
     }
   });
@@ -106,17 +112,22 @@ function toggleFriendGroup(user) {
 function generateGroupTable(group) {
   // Hack to get current user's username
   username = $("#menu-collapse ul:nth-child(2) li:first a:first strong").html().slice(0, -1);
-  console.log(username);
-  table = $("#group-reco table");
-  table.html("");
-  group.sort();
-  for(const user of group) {
-    table.append(`<tr>
-        <td>` + (user == username ? '' : `<a onclick="toggleFriendGroup('` + user + `')" href="#" title="Remove">X</a>`) + `</td>
-        <!-- <td>avatar?</td> -->
-        <td>` + user + `</td>
-      </tr>
-    `);
+
+  list = $("#group-reco");
+  list.html("");
+  group.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
+  for(let i_user in group) {
+    if(i_user > 0)
+      list.append('<hr \>');
+    // FIXME don't use static address
+    list.append('<a href="/u/' + group[i_user] + '" class="card-link">' + group[i_user] + '</a>');
+    if(group[i_user] != username)
+      list.append(
+        `<button onclick="toggleFriendGroup('` + group[i_user] + `')" type="button" class="float-right close" aria-label="Remove">
+          <span aria-hidden="true">&times;</span>
+        </button>`
+      );
+    list.append('<!-- <td>avatar?</td> -->');
   }
 }
 
