@@ -41,13 +41,13 @@
 
                 <ul class="nav nav-tabs">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link{% if category == 'all' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}">{% trans "All" %}</a>
+                        <a class="nav-link{% if category == 'all' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;merge_type={{ merge_type }}">{% trans "All" %}</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link{% if category == 'anime' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=anime">
+                        <a class="nav-link{% if category == 'anime' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=anime&amp;merge_type={{ merge_type }}">
                         {% trans "Anime" %}</a></li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link{% if category == 'manga' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=manga">{% trans "Manga" %}</a>
+                        <a class="nav-link{% if category == 'manga' %} active{% endif %}" href="{% url 'reco' %}?algo={{ algo_name }}&amp;category=manga&amp;merge_type={{ merge_type }}">{% trans "Manga" %}</a>
                     </li>
                 </ul>
                 <br />

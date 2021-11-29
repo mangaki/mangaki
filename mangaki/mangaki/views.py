@@ -772,7 +772,7 @@ def get_works(request, category):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-def get_reco_algo_list(request, algo_name, category):
+def get_reco_algo_list(request, algo_name, category, merge_type=None):
     reco_list = []
     if request.user.is_authenticated:
         group_reco = request.session.setdefault(
@@ -783,7 +783,8 @@ def get_reco_algo_list(request, algo_name, category):
             request.user.profile.friends.filter(username__in=group_reco)
                                         .values_list('id')
         )
-        data = get_group_reco_algo(request, friend_ids, algo_name, category)
+        data = get_group_reco_algo(request, friend_ids, algo_name, category,
+                                   merge_type)
     else:
         data = get_reco_algo(request, algo_name, category)
     NB_RECO = 8
@@ -842,6 +843,7 @@ def remove_all_reco(request, targetname):
 def get_reco(request):
     category = request.GET.get('category', 'all')
     algo_name = request.GET.get('algo', 'als')
+    merge_type = request.GET.get('merge_type', 'intersection')
     group_reco = None
     if request.user.is_authenticated:
         group_reco = request.session.setdefault(
@@ -859,6 +861,7 @@ def get_reco(request):
                       'reco_list': reco_list,
                       'category': category,
                       'algo_name': algo_name,
+                      'merge_type': merge_type,
                       'group_reco': group_reco,
                       'config': VANILLA_UI_CONFIG_FOR_RATINGS
                   })

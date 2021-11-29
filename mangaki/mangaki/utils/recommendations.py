@@ -96,7 +96,7 @@ def get_reco_algo(request, algo_name='als', category='all'):
 
 
 def get_group_reco_algo(request, users_id=None, algo_name='als',
-                        category='all'):
+                        category='all', merge_type=None):
     # users_id contain a group to recommend to
     # It should include the current user, which can't be anonymous
     if request.user.is_anonymous:
@@ -119,7 +119,10 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
     user_id = tmp
 
     # What is already rated for a group? intersection or union of seen works?
-    already_rated_works = list(set().union(*[
+    # Here we default with intersection
+    merge_function = \
+        set().union if merge_type == 'union' else set().intersection
+    already_rated_works = list(merge_function(*[
         set(ratings) for ratings in user_ratings.values()
     ]))
 
