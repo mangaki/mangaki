@@ -793,12 +793,21 @@ def get_reco_algo_list(request, algo_name, category, merge_type=None):
         NB_RECO = 9
     works = data['works']
     categories = dict(WORK_CATEGORY_CHOICES)
+    ratings_bulk = Rating.objects.filter(user__pk=request.user.pk) \
+                                 .filter(work__id__in=[
+                                     works[work_id].id
+                                     for work_id in data['work_ids'][:NB_RECO]
+                                 ])
+    ratings = dict()
+    for rating in ratings_bulk:
+        ratings[rating.work.id] = rating.choice
     for work_id in data['work_ids'][:NB_RECO]:
         work = works[work_id]
         reco_list.append({'id': work.id, 'title': work.title,
                           'poster': work.ext_poster, 'synopsis': work.synopsis,
                           'category_slug': work.category.slug,
-                          'category': str(categories[work.category.slug])})
+                          'category': str(categories[work.category.slug]),
+                          'rating': ratings.get(work.id, None)})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 
