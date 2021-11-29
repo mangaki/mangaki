@@ -631,12 +631,18 @@ ul.checklist .list-icon {
   overflow: hidden;
   white-space: nowrap;
 }
+
 .group-friend button {
   margin-left: auto;
 }
 
+.friend-sidebar .card-body {
+  padding-top: 6px;
+  padding-bottom: 16px;
+}
+
 #group-reco {
-  max-height: calc(100vh - 6.5rem - 147px);
+  max-height: calc(100vh - 6.5rem - 49px - 58px - 73px);
   overflow-y: auto;
   /* Magic from https://lea.verou.me/2012/04/background-attachment-local/ */
   background: /* Shadow covers */

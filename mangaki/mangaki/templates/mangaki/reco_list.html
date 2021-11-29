@@ -14,7 +14,13 @@
                             <input type="text" data-username="{{ user.username }}" class="search-input form-control typeahead" placeholder="{% trans "Add a friend" %}" />
                         </form>
                         <div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">{% trans "You cannot add this user" %}</div>
-                        <div class="card-body" id="group-reco">
+                        <div class="card-body">
+                            <div id="group-reco"></div>
+                        </div>
+                        <div class="card-footer">
+                            <a {% if merge_type != "intersection" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=intersection"{% endif %}>&cap; Intersection</a>
+                            <br />
+                            <a {% if merge_type != "union" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=union"{% endif %}>&cup; Union</a>
                         </div>
                     </div>
                 {% endif %}
