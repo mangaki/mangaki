@@ -708,7 +708,7 @@ ul.checklist .list-icon {
   fill: rgb(0, 0, 0);
 }
 
-.add_friend .friend__button { background-color: #f8d549; }
+.add_friend .friend__button { background-color: #E84C15; }
 
 .work-card_loading:before {
   content: '';

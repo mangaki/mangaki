@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 from django.conf import settings
+from django.contrib.auth.models import User
 
 
 def pk_from_object_or_pk(obj):
@@ -104,11 +105,18 @@ def friend_ratings(request, friend_id, works=None):
     """
     if friend_id == request.user.id:
         return current_user_ratings(request, works)
-    user = request.user.profile.friends.get(id=friend_id)
-    qs = user.rating_set.all()
-    if works is not None:
-        qs = qs.filter(work__in=works)
-    return dict(qs.values_list('work_id', 'choice'))
+    try:
+        user = request.user.profile.friends.get(id=friend_id)
+        # Check if current user has access to these ratings
+        if not user.profile.is_shared \
+                and not user.profile.friends.filter(pk=request.user.pk).exists():
+            return dict()
+        qs = user.rating_set.all()
+        if works is not None:
+            qs = qs.filter(work__in=works)
+        return dict(qs.values_list('work_id', 'choice'))
+    except User.DoesNotExist:
+        return dict()
 
 
 def current_user_rating(request, work):
