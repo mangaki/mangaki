@@ -622,12 +622,17 @@ ul.checklist .list-icon {
   height: calc(100vh - 6.5rem);
 }
 
-#group-reco .card-link {
-  width: 104px;
-  display: inline-block;
-  white-space: nowrap;
-  overflow: hidden;
+.group-friend {
+  display: flex;
+}
+
+.group-friend a {
   text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.group-friend button {
+  margin-left: auto;
 }
 
 #group-reco {

@@ -124,14 +124,17 @@ function generateGroupTable(group) {
     if(i_user > 0)
       list.append('<hr \>');
     // FIXME don't use static address
-    list.append('<a href="/u/' + group[i_user] + '" class="card-link">' + group[i_user] + '</a>');
+    list.append('<div class="group-friend"></div>');
+    block = list.children().last();
+    block.append('<a href="/u/' + group[i_user] + '" class="card-link">' + group[i_user] + '</a>');
     if(group[i_user] != username)
-      list.append(
+      block.append(
         `<button onclick="toggleFriendGroup('` + group[i_user] + `')" type="button" class="float-right close" aria-label="Remove">
           <span aria-hidden="true">&times;</span>
         </button>`
       );
-    list.append('<!-- <td>avatar?</td> -->');
+    block.append('<!-- <td>avatar?</td> -->');
+    block.append('<div style="clear: both;"></div>');
   }
 }
 
