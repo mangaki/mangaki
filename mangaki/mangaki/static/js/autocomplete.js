@@ -95,17 +95,21 @@ function loadMenuUser() {
 
 function toggleFriendGroup(user) {
   $.post(Urls['toggle-friend'](user), function(group) {
+    emptyRecoCards();
     group = JSON.parse(group);
     if(group.length == 0 || (group.length == 1 && group[0] == username)) {
       // $('#group-reco').hide();
       $(".friend-sidebar").hide();
       $(".single-friend-ta").show();
+      $('.cards-grid .work-card:nth-child(9)').hide();
     } else {
       // $('#group-reco').show();
       $(".friend-sidebar").show();
       $(".single-friend-ta").hide();
+      $('.cards-grid .work-card:nth-child(9)').show();
       generateGroupTable(group);
     }
+    refreshRecoCards();
   });
 }
 

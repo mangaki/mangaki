@@ -72,10 +72,24 @@
     loadMenuFriends();
     generateGroupTable({{ group_reco|safe }});
 {% endif %}
-$.getJSON('{% url 'get-reco-algo-list' algo_name=algo_name category=category %}', function(data) {
-  data.forEach(function(work, i) {
-    new Card($('.cards-grid .work-card:nth-child(' + (i+1) + ')'), '{{ category }}').hydrate(work);
-  });
-});
+function refreshRecoCards() {
+        {% for work in reco_list %}
+        {% endfor %}
+    $.getJSON('{% url 'get-reco-algo-list' algo_name=algo_name category=category merge_type=merge_type %}', function(data) {
+      data.forEach(function(work, i) {
+        new Card($('.cards-grid .work-card:nth-child(' + (i+1) + ')'), '{{ category }}').hydrate(work);
+        console.log(JSON.stringify(work));
+      });
+    });
+}
+function emptyRecoCards() {
+    $('.cards-grid .work-card').each(function() {
+            new Card($(this), '{{ category }}').hydrate({"title":"Chargement…","poster":"/static/img/chiro.gif","synopsis":"","category_slug":"","category":""});
+    });
+}
+{% if group_reco is None or group_reco|length <= 1 %}
+    $('.cards-grid .work-card:nth-child(9)').hide();
+{% endif %}
+refreshRecoCards();
 </script>
 {% endblock %}

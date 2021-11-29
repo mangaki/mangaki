@@ -786,9 +786,13 @@ def get_reco_algo_list(request, algo_name, category):
         data = get_group_reco_algo(request, friend_ids, algo_name, category)
     else:
         data = get_reco_algo(request, algo_name, category)
+    NB_RECO = 8
+    if len(group_reco) > 1:
+        # its likely the rows will be 3 large, so 9 works better than 8
+        NB_RECO = 9
     works = data['works']
     categories = dict(WORK_CATEGORY_CHOICES)
-    for work_id in data['work_ids']:
+    for work_id in data['work_ids'][:NB_RECO]:
         work = works[work_id]
         reco_list.append({'id': work.id, 'title': work.title,
                           'poster': work.ext_poster, 'synopsis': work.synopsis,
@@ -843,10 +847,7 @@ def get_reco(request):
         group_reco = request.session.setdefault(
             settings.RECO_GROUP_SESSION_KEY, [request.user.username]
         )
-    NB_RECO = 8
-    if len(group_reco) > 1:
-        # its likely the rows will be 3 large, so 9 works better than 8
-        NB_RECO = 9
+    NB_RECO = 9
     if current_user_ratings(request):
         reco_list = [{
             'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
