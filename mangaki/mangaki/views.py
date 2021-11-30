@@ -774,10 +774,14 @@ def get_works(request, category):
 
 def get_reco_algo_list(request, algo_name, category, merge_type=None):
     reco_list = []
+    NB_RECO = 8
     if request.user.is_authenticated:
         group_reco = request.session.setdefault(
             settings.RECO_GROUP_SESSION_KEY, [request.user.username]
         )
+        if len(group_reco) > 1:
+            # its likely the rows will be 3 large, so 9 works better than 8
+            NB_RECO = 9
         friend_ids = list(
             user_id[0] for user_id in
             request.user.profile.friends.filter(username__in=group_reco)
@@ -787,10 +791,6 @@ def get_reco_algo_list(request, algo_name, category, merge_type=None):
                                    merge_type)
     else:
         data = get_reco_algo(request, algo_name, category)
-    NB_RECO = 8
-    if len(group_reco) > 1:
-        # its likely the rows will be 3 large, so 9 works better than 8
-        NB_RECO = 9
     works = data['works']
     categories = dict(WORK_CATEGORY_CHOICES)
     ratings_bulk = Rating.objects.filter(user__pk=request.user.pk) \

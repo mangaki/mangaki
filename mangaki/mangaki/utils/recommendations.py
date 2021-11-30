@@ -121,7 +121,7 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
     # What is already rated for a group? intersection or union of seen works?
     # Here we default with intersection
     merge_function = \
-        set().union if merge_type == 'union' else set().intersection
+        set.union if merge_type == 'union' else set.intersection
     already_rated_works = list(merge_function(*[
         set(ratings) for ratings in user_ratings.values()
     ]))
