@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^$', views.index, name='home'),
     url(r'^data/(?P<category>\w+)\.json$', views.get_works, name='get-work'),
     url(r'^data/reco/(?P<algo_name>\w+)/(?P<merge_type>\w+)/(?P<category>\w+)\.json$', views.get_reco_algo_list, name='get-reco-algo-list'),
+    url(r'^data/reco/(?P<algo_name>\w+)/(?P<category>\w+)\.json$', views.get_reco_algo_list, name='get-reco-algo-list'),
     url(r'^getuser/(?P<work_id>\w+)\.json$', views.get_user_for_recommendations, name='get-user-for-reco'),
     url(r'^getuser\.json$', views.get_users, name='get-user'),
     url(r'^getfriends\.json$', views.get_friends, name='get-friends'),
