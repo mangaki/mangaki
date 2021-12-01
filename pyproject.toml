@@ -10,7 +10,7 @@ readme = "README.md"
 
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.7.1"
 Django = "^2.2" # main
 django-allauth = "^0.41" # main
 django-bootstrap4 = "!=1.1.1" # main
@@ -19,7 +19,7 @@ django-js-reverse="^0.9" # main
 django-sendfile="^0.3" # main
 djangorestframework="^3.9" # main
 psycopg2-binary = "2.8.6" # main
-markdown="^3.0" # main
+markdown="=3.3.4" # main
 jinja2="*" # main
 lxml="^4.4" # main
 beautifulsoup4="*" # main
