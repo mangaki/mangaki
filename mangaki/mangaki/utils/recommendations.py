@@ -168,10 +168,10 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
             df_rated_works = (pd.DataFrame(list(user_ratings[user_id].items()),
                                            columns=['work_id', 'choice'])
                                 .query('work_id in @available_works'))
-            enc_rated_works = df_rated_works[user_id]['work_id'].map(
+            enc_rated_works = df_rated_works['work_id'].map(
                 algo.dataset.encode_work
             )
-            user_rating_values = df_rated_works[user_id]['choice'] \
+            user_rating_values = df_rated_works['choice'] \
                 .map(rating_values)
             extra_users_parameters.append(algo.fit_single_user(
                 enc_rated_works,
