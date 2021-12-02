@@ -42,6 +42,39 @@ class RecoTest(TestCase):
         get_url = reverse_lazy('get-friends')
         self.assertEqual(get_url, '/getfriends.json')
 
+    def test_friendlist_url(self, **kwargs):
+        self.client.login(username='test', password='test')
+        friendlist_url = reverse_lazy('profile-friendlist')
+        response = self.client.get(friendlist_url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_self_add(self, **kwargs):
+        self.client.login(username='test', password='test')
+        add_url = reverse_lazy('add-friend', args=['test'])
+        response = self.client.post(add_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.user.friends.count(), 0)
+
+    def test_self_del(self, **kwargs):
+        self.client.login(username='test', password='test')
+        del_url = reverse_lazy('del-friend', args=['test'])
+        response = self.client.post(del_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.user.friends.count(), 0)
+
+    def test_group_toggle(self, **kwargs):
+        self.client.login(username='test', password='test')
+        add_friend_url = reverse_lazy('add-friend', args=['friend'])
+        response = self.client.post(add_friend_url)
+        self.assertEqual(response.status_code, 200)
+        toggle_url = reverse_lazy('toggle-friend', args=['friend'])
+        response = self.client.post(toggle_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 2)
+        response = self.client.post(toggle_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 1)
+
     def test_add_public_friend(self):
         self.client.login(username='test', password='test')
         add_friend_url = reverse_lazy('add-friend', args=['friend'])
