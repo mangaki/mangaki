@@ -743,7 +743,9 @@ def get_friends(request):
         # TODO: only n=10? first results
         for user in friends.order_by('username')[:10]:
             # TODO: Improve this to use only one request if possible
-            if True or user.profile.friends.filter(pk=request.user.pk).exists():
+            if user.profile.is_shared \
+                    or user.profile.friends.filter(pk=request.user.pk) \
+                                           .exists():
                 data.append({'username': user.username,
                              'type': 'group', # hack for autocomplete.js to know purpose, to clean later
                              'tokens': user.username.lower().split()})
