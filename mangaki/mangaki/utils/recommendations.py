@@ -130,12 +130,19 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
 
     algo = get_algo_backup_or_fit_knn(algo_name)
 
-    # # One user gave the same rating to all works considered in the reco
-    # # It may make sense to only use knn for this user, and not all
-    # for user_rating_values in users_rating_values:
-    #     if algo_name == 'als' and len(set(user_rating_values)) == 1:
-    #         algo = get_algo_backup_or_fit_knn('knn')
-    #         break
+    # One user gave the same rating to all works considered in the reco
+    # Currently, we fall back to knn for all users in this case
+    # It may make sense to only use knn for this user, and not all
+    available_works = set(algo.dataset.encode_work.keys())
+    for user_id in users_id:
+        df_rated_works = (pd.DataFrame(list(user_ratings[user_id].items()),
+                                       columns=['work_id', 'choice'])
+                            .query('work_id in @available_works'))
+        user_rating_values = df_rated_works['choice'].map(rating_values)
+        if algo_name == 'als' and len(set(user_rating_values)) == 1:
+            algo = get_algo_backup_or_fit_knn('knn')
+            available_works = None
+            break
 
     chrono.save('retrieve or fit %s' % algo.get_shortname())
 
@@ -153,7 +160,6 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
 
     encoded_user_ids = []
     extra_users_parameters = []
-    available_works = None
     for user_id in users_id:
         # TODO: also recompute parameters if ratings have changed
         if user_id not in algo.dataset.encode_user:
@@ -162,10 +168,11 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
             df_rated_works = (pd.DataFrame(list(user_ratings[user_id].items()),
                                            columns=['work_id', 'choice'])
                                 .query('work_id in @available_works'))
-            enc_rated_works = df_rated_works['work_id'].map(
+            enc_rated_works = df_rated_works[user_id]['work_id'].map(
                 algo.dataset.encode_work
             )
-            user_rating_values = df_rated_works['choice'].map(rating_values)
+            user_rating_values = df_rated_works[user_id]['choice'] \
+                .map(rating_values)
             extra_users_parameters.append(algo.fit_single_user(
                 enc_rated_works,
                 user_rating_values

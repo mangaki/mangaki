@@ -78,6 +78,25 @@ class RecoTest(TestCase):
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
         os.remove(os.path.join(get_path('als'), 'knn-20.pickle'))
 
+    def test_group_reco_custom_embed(self):
+        self.client.login(username='test', password='test')
+        reco_url = reverse_lazy('get-reco-algo-list', args=['als', 'all'])
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
+            response = self.client.get(reco_url)
+        friend2 = get_user_model().objects.create_user(username='friend2',
+                                                       password='test')
+        ratings = [Rating(user=friend2, work=self.work, choice='like')]
+        Rating.objects.bulk_create(ratings)
+        add_friend_url = reverse_lazy('add-friend', args=['friend2'])
+        response = self.client.post(add_friend_url)
+        toggle_friend_url = reverse_lazy('toggle-friend', args=['friend2'])
+        response = self.client.post(toggle_friend_url)
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 2)
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
+            response = self.client.get(reco_url)
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
+        os.remove(os.path.join(get_path('als'), 'knn-20.pickle'))
+
     def test_group_reco_intersection(self):
         self.client.login(username='test', password='test')
         toggle_friend_url = reverse_lazy('toggle-friend', args=['friend'])
