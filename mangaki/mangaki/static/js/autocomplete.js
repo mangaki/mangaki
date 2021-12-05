@@ -127,7 +127,7 @@ function generateGroupTable(group) {
     list.append('<div class="group-friend"></div>');
     block = list.children().last();
     block.append('<a href="/u/' + group[i_user] + '" class="card-link">' + group[i_user] + '</a>');
-    if(group[i_user] != username)
+    if(group[i_user] !== username)
       block.append(
         `<button onclick="toggleFriendGroup('` + group[i_user] + `')" type="button" class="float-right close" aria-label="Remove">
           <span aria-hidden="true">&times;</span>
@@ -142,7 +142,7 @@ $(document).ready(function() {
   function handleRequest(event, selection) {
     if (!selection.synopsis) {
     	if (!selection.work_id) {
-        if(selection.type == "group") {
+        if(selection.type === "group") {
           toggleFriendGroup(selection.username);
         } else {
           location.href = Urls['profile'](selection.username) ;
