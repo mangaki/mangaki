@@ -40,7 +40,7 @@
             {# check if user is different #}
             {% if user.is_authenticated and profile.username != user.username %}
                 {# TODO: change appearance and add proper tooltip #}
-                <label class="add_friend" title="Add friend">
+                <label class="add_friend" title="{% trans "Add friend" %}">
                     <span class="sr-only">{% trans "Add friend" %}</span>
                     <input
                             type="checkbox"

@@ -21,9 +21,9 @@
                             <div id="group-reco" class="group-collapse collapse show"></div>
                         </div>
                         <div class="card-footer group-collapse collapse show">
-                            <a {% if merge_type != "intersection" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=intersection"{% endif %}>&cap; Intersection</a>
+                            <a {% if merge_type != "intersection" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=intersection"{% endif %}>&cap; {% trans "Intersection" %}</a>
                             <br />
-                            <a {% if merge_type != "union" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=union"{% endif %}>&cup; Union</a>
+                            <a {% if merge_type != "union" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=union"{% endif %}>&cup; {% trans "Union" %}</a>
                         </div>
                     </div>
                 {% endif %}

@@ -14,9 +14,9 @@
                             </a>
                             <p class="card-text float-right">
                                 {% if friend.is_shared %}
-                                    public
+                                    {% trans "public" %}
                                 {% else %}
-                                    private
+                                    {% trans "private" %}
                                 {% endif %}
                             </p>
                             {% if not forloop.last %}
