@@ -616,6 +616,7 @@ ul.checklist .list-icon {
   }
 }
 
+@media (min-width: 753px)
 .friend-sidebar {
   position: sticky;
   top: 1.5rem;
@@ -641,8 +642,14 @@ ul.checklist .list-icon {
   padding-bottom: 16px;
 }
 
+.friend-sidebar form span {
+    width: 100%;
+}
+
 #group-reco {
   max-height: calc(100vh - 6.5rem - 49px - 58px - 73px);
+  padding-top: 6px;
+  padding-bottom: 16px;
   overflow-y: auto;
   /* Magic from https://lea.verou.me/2012/04/background-attachment-local/ */
   background: /* Shadow covers */

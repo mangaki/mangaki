@@ -9,15 +9,18 @@
             {% if user.is_authenticated %}
                 <div class="col-12 col-md-3 col-xl-2 friend-sidebar" {% if group_reco is None or group_reco|length <= 1 %}style="display: none"{% endif %}>
                     <div class="card">
-                        <div class="card-header">{% trans "Group" %}</div>
-                        <form class="typeahead-demo {{ user.username }}">
+                        <div class="card-header group-collapse collapse show">{% trans "Group" %}</div>
+                        <form class="typeahead-demo {{ user.username }} d-flex align-items-center">
                             <input type="text" data-username="{{ user.username }}" class="search-input form-control typeahead" placeholder="{% trans "Add a friend" %}" />
+                            <button class="btn btn-link group-list-toggle d-md-none p-0 ml-3" type="button" data-toggle="collapse" data-target=".group-collapse" aria-expanded="true" aria-label="Toggle group list">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30" focusable="false"><title>Menu</title><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path></svg>
+                            </button>
                         </form>
                         <div class="alert alert-danger" role="alert" id="alert-reco" style="display: none">{% trans "You cannot add this user" %}</div>
-                        <div class="card-body">
-                            <div id="group-reco"></div>
+                        <div class="card-body" style="padding-top: 0; padding-bottom: 0">
+                            <div id="group-reco" class="group-collapse collapse show"></div>
                         </div>
-                        <div class="card-footer">
+                        <div class="card-footer group-collapse collapse show">
                             <a {% if merge_type != "intersection" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=intersection"{% endif %}>&cap; Intersection</a>
                             <br />
                             <a {% if merge_type != "union" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=union"{% endif %}>&cup; Union</a>
