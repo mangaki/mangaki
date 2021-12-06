@@ -3,7 +3,7 @@
 
 {% block profile_section %}
     <div class="row" id="profile_settings_container">
-        <div class="col-sm-4 col-6">
+        <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 20px">
             <div class="card">
                 <div class="card-header">Options de vie privée</div>
                 <div class="card-body">
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <div class="col-sm-4 col-6">
+        <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 20px">
             <div class="card">
                 <div class="card-header">Préférences en vrac</div>
                 <div class="card-body">
@@ -62,8 +62,9 @@
                 </div>
             </div>
         </div>
+
         {% if meta.mal.is_available %}
-        <div class="col-sm-4 col-12">
+        <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 20px">
             <div class="card">
                 <div class="card-header">Imports de données</div>
                 <div class="card-body">

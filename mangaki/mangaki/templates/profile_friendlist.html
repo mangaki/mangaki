@@ -4,7 +4,7 @@
 {% block profile_section %}
     <div class="row" id="profile_friends_container">
         {% for _, friendlist in friendlists.items %}
-            <div class="col-sm-4 col-6">
+            <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 20px">
                 <div class="card">
                     <div class="card-header">{% trans friendlist.name %}</div>
                     <div class="card-body">
