@@ -124,6 +124,9 @@
                         <a class="dropdown-item" href="{% url 'profile-works' user.username meta.category|default:"anime" meta.status|default:"seen" %}">
                             {% trans "Rated works" %}
                         </a>
+                        <a class="dropdown-item" href="{% url 'profile-friendlist' %}">
+                            {% trans "My friends" %}
+                        </a>
                         <a class="dropdown-item" href="{% url 'profile-preferences' user.username %}">
                             {% trans "My settings" %}
                         </a>

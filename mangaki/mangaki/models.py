@@ -445,6 +445,7 @@ class Profile(models.Model):
     keyboard_shortcuts_enabled = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
+    friends = models.ManyToManyField(User, related_name="friends")
 
     def get_anime_count(self):
         return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike', 'favorite']).count()
