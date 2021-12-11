@@ -1,0 +1,67 @@
+{% extends "profile.html" %}
+{% load i18n %}
+
+{% block profile_section %}
+    <div class="row" id="profile_friends_container">
+        {% for _, friendlist in friendlists.items %}
+            <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 20px">
+                <div class="card">
+                    <div class="card-header">{% trans friendlist.name %}</div>
+                    <div class="card-body">
+                        {% for friend in friendlist.friends %}
+                            <a class="card-link" href="{% url 'profile' friend.username %}">
+                                {{ friend.username }}
+                            </a>
+                            <p class="card-text float-right">
+                                {% if friend.is_shared %}
+                                    {% trans "public" %}
+                                {% else %}
+                                    {% trans "private" %}
+                                {% endif %}
+                            </p>
+                            {% if not forloop.last %}
+                                <hr />
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+    {% if meta.debug_vue %}
+        <script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
+    {% else %}
+        <script src="https://unpkg.com/vue@2.5.2/dist/vue.min.js"></script>
+    {% endif %}
+
+    {% if meta.mal.is_available %}
+        <script src="/static/js/mal_import.js"></script>
+    {% endif %}
+
+    {% if meta.mal.is_available %}
+        <script>
+        $(document).ready(function () {
+            if (INITIAL_DATA.hasPendingMALImport) {
+                MALImporterApp.fetchServerSideTaskId()
+                    .then(() => {
+                        MALImporterApp.showForm = false;
+                    })
+            }
+        });
+        </script>
+    {% endif %}
+    <script src="/static/js/profile_settings.js"></script>
+    <script>
+        window.INITIAL_DATA = {
+            isShared: {{ user.profile.is_shared|yesno:"true,false" }},
+            acceptsNSFW: {{ user.profile.nsfw_ok|yesno:"true,false" }},
+            acceptsResearchUsage: {{ user.profile.research_ok|yesno:"true,false" }},
+            receivesNewsletter: {{ user.profile.newsletter_ok|yesno:"true,false" }},
+            enableKbShortcuts: {{ user.profile.keyboard_shortcuts_enabled|yesno:"true,false" }},
+            hasPendingMALImport: {{ meta.mal.pending_import|yesno:"true,false" }}
+        };
+    </script>
+{% endblock %}

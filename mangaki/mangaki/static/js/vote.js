@@ -149,8 +149,8 @@ Card.prototype.hydrate = function (work) {
   $el.find('.work-cover__wrapper').attr('data-category-display', work.category);
   $el.find('.work-card__synopsis').html(work.synopsis);
   $el.find('.work-card__link').attr('href', card_url);
-  $el.find('.ratings .rating__checkbox').attr('name', 'rating[' + work.id + ']').each(function () {
-    this.checked = false;
+  $el.find('.ratings .rating__checkbox').attr('name', 'rating[' + work.id + ']').each(function (id, box) {
+    this.checked = box.value === work.rating;
   });
 
   this.work = work;

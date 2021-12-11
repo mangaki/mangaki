@@ -11,6 +11,8 @@
 {% if object.synopsis %}
   <meta property="og:description" content="{{ object.synopsis }}" />
   <meta name="description" content="{{ object.synopsis }}" />
+{% else %}
+  <meta name="description" content="{% trans "Mangaki is an anime & manga recommendation website" %} {% trans "Rate your favorite series and discover new ones!" %}">
 {% endif %}
 {% endblock %}
 
@@ -78,13 +80,13 @@
         {% if stats %}
         <h3>{% trans "Stats" %}</h3>
         <div style="max-width: 420px; max-height: 200px">
-          <canvas id="stats" />
+          <canvas id="stats"></canvas>
         </div>
         {% endif %}
         {% if references %}
           <h3>{% trans "References" %}</h3>
           <ul>
-          {% for url, name in references %}
+          {% for url, name in references.items %}
               <li><a href="{{ url }}" target="_blank">
                 {% blocktrans %}See on {{ name }}{% endblocktrans %}
               </a></li>

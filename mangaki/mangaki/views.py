@@ -54,7 +54,7 @@ from mangaki.utils.profile import (
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.tokens import compute_token, NEWS_SALT
-from mangaki.utils.recommendations import get_reco_algo
+from mangaki.utils.recommendations import get_group_reco_algo, get_reco_algo
 from irl.models import Partner
 
 
@@ -181,11 +181,14 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
             context['suggestion_form'] = SuggestionForm(work=self.object, instance=Suggestion(user=self.request.user, work=self.object))
         context['rating'] = current_user_rating(self.request, self.object)
 
-        context['references'] = []
+        context['references'] = {}
         for reference in self.object.reference_set.all():
             for domain, name in REFERENCE_DOMAINS:
                 if reference.url.startswith(domain):
-                    context['references'].append((reference.url, name))
+                    context['references'][reference.url] = name
+        if 'AniDB' not in context['references'].values() and self.object.anidb_aid >= 1:
+            url = f'https://anidb.net/anime/{self.object.anidb_aid}'
+            context['references'][url] = 'AniDB'
 
         nb = Counter(Rating.objects.filter(work=self.object).values_list('choice', flat=True))
         labels = OrderedDict([
@@ -413,6 +416,11 @@ def get_profile(request,
                    if (can_see and not is_anonymous) else None)
 
     is_me = request.user == user
+    if request.user.is_authenticated:
+        is_friend = not is_me \
+            and request.user.profile.friends.filter(pk=user.pk).exists()
+    else:
+        is_friend = False
     context = {
         'meta': {
             'debug_vue': settings.DEBUG_VUE_JS,
@@ -432,7 +440,8 @@ def get_profile(request,
         'profile': {
             'avatar_url': user.profile.avatar_url if (not is_anonymous and can_see) else None,
             'member_days': member_time.days if member_time else None,
-            'username': user.username
+            'username': user.username,
+            'is_friend': is_friend
         },
     }
 
@@ -456,6 +465,44 @@ def get_profile_preferences(request,
     }
 
     return render(request, 'profile_preferences.html',
+                  deep_dict_merge(ctx, new_ctx))
+
+
+def get_profile_friendlist(request):
+    if not request.user.is_authenticated:
+        return redirect('account_login')
+
+    user, ctx = get_profile(request, request.user.username)
+
+    friendlists = {
+        'mutual': {
+            'name': 'My friends',
+            'friends': []
+        },
+        'pending': {
+            'name': 'My pending friend requests',
+            'friends': []
+        }
+    }
+    for friend in request.user.profile.friends.all():
+        friend_data = {
+            'username': friend.username,
+            'is_shared': friend.profile.is_shared
+        }
+        if friend.profile.is_shared \
+                or friend.profile.friends.filter(pk=request.user.pk).exists():
+            friendlists['mutual']['friends'].append(friend_data)
+        else:
+            friendlists['pending']['friends'].append(friend_data)
+
+    new_ctx = {
+        'meta': {
+           'section': 'friendlist'
+        },
+        'friendlists': friendlists
+    }
+
+    return render(request, 'profile_friendlist.html',
                   deep_dict_merge(ctx, new_ctx))
 
 
@@ -614,6 +661,47 @@ def rate_work(request, work_id):
         return HttpResponse()
 
 
+def add_friend(request, username: str = None):
+    if request.user.is_authenticated and request.method == 'POST':
+        target_user = get_object_or_404(User.objects.select_related('profile'),
+                                        username=username)
+        if target_user == request.user:
+            return HttpResponse()
+        request.user.profile.friends.add(target_user)
+    return HttpResponse()
+
+
+def del_friend(request, username: str = None):
+    if request.user.is_authenticated and request.method == 'POST':
+        target_user = get_object_or_404(User.objects.select_related('profile'),
+                                        username=username)
+        if target_user == request.user:
+            return HttpResponse()
+        request.user.profile.friends.remove(target_user)
+    return HttpResponse()
+
+
+def toggle_friend(request, username: str = None):
+    if request.user.is_authenticated and request.method == 'POST':
+        target_user = get_object_or_404(User.objects.select_related('profile'),
+                                        username=username)
+        group = set(request.session.setdefault(
+            settings.RECO_GROUP_SESSION_KEY, [request.user.username]))
+        if target_user.username in group:
+            group.remove(target_user.username)
+        # should you be able to recommend with someone with public profile but
+        # who you have not friended yet?
+        elif request.user.profile.friends.filter(pk=target_user.pk).exists() \
+                and (target_user.profile.is_shared
+                     or target_user.profile.friends
+                         .filter(pk=request.user.pk).exists()):
+            group.add(target_user.username)
+        group.add(request.user.username)
+        request.session[settings.RECO_GROUP_SESSION_KEY] = list(group)
+        return HttpResponse(json.dumps(list(group)))
+    return HttpResponse()
+
+
 def recommend_work(request, work_id, target_id):
     if request.user.is_authenticated and request.method == 'POST':
         work = get_object_or_404(Work, id=work_id)
@@ -644,6 +732,26 @@ def get_user_for_recommendations(request, work_id, query=''):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
+def get_friends(request):
+    query = request.GET.get('q', '')
+    data = []
+
+    if request.user.is_authenticated:
+        oriented_friends = request.user.profile.friends
+        friends = oriented_friends.all() if not query \
+            else oriented_friends.filter(username__icontains=query)
+        # TODO: only n=10? first results
+        for user in friends.order_by('username')[:10]:
+            # TODO: Improve this to use only one request if possible
+            if user.profile.is_shared \
+                    or user.profile.friends.filter(pk=request.user.pk) \
+                                           .exists():
+                data.append({'username': user.username,
+                             'type': 'group', # hack for autocomplete.js to know purpose, to clean later
+                             'tokens': user.username.lower().split()})
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 class MarkdownView(DetailView):
     model = Page
     slug_field = 'name'
@@ -666,17 +774,42 @@ def get_works(request, category):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-def get_reco_algo_list(request, algo_name, category):
+def get_reco_algo_list(request, algo_name, category, merge_type=None):
     reco_list = []
-    data = get_reco_algo(request, algo_name, category)
+    NB_RECO = 8
+    if request.user.is_authenticated:
+        group_reco = request.session.setdefault(
+            settings.RECO_GROUP_SESSION_KEY, [request.user.username]
+        )
+        if len(group_reco) > 1:
+            # its likely the rows will be 3 large, so 9 works better than 8
+            NB_RECO = 9
+        friend_ids = list(
+            user_id[0] for user_id in
+            request.user.profile.friends.filter(username__in=group_reco)
+                                        .values_list('id')
+        )
+        data = get_group_reco_algo(request, friend_ids, algo_name, category,
+                                   merge_type)
+    else:
+        data = get_reco_algo(request, algo_name, category)
     works = data['works']
     categories = dict(WORK_CATEGORY_CHOICES)
-    for work_id in data['work_ids']:
+    ratings_bulk = Rating.objects.filter(user__pk=request.user.pk) \
+                                 .filter(work__id__in=[
+                                     works[work_id].id
+                                     for work_id in data['work_ids'][:NB_RECO]
+                                 ])
+    ratings = dict()
+    for rating in ratings_bulk:
+        ratings[rating.work.id] = rating.choice
+    for work_id in data['work_ids'][:NB_RECO]:
         work = works[work_id]
         reco_list.append({'id': work.id, 'title': work.title,
                           'poster': work.ext_poster, 'synopsis': work.synopsis,
                           'category_slug': work.category.slug,
-                          'category': str(categories[work.category.slug])})
+                          'category': str(categories[work.category.slug]),
+                          'rating': ratings.get(work.id, None)})
     return HttpResponse(json.dumps(reco_list), content_type='application/json')
 
 
@@ -721,10 +854,17 @@ def remove_all_reco(request, targetname):
 def get_reco(request):
     category = request.GET.get('category', 'all')
     algo_name = request.GET.get('algo', 'als')
+    merge_type = request.GET.get('merge_type', 'intersection')
+    group_reco = None
+    if request.user.is_authenticated:
+        group_reco = request.session.setdefault(
+            settings.RECO_GROUP_SESSION_KEY, [request.user.username]
+        )
+    NB_RECO = 9
     if current_user_ratings(request):
         reco_list = [{
             'work': Work(title='Chargement…', ext_poster='/static/img/chiro.gif')
-        } for _ in range(8)]
+        } for _ in range(NB_RECO)]
     else:
         reco_list = []
     return render(request, 'mangaki/reco_list.html',
@@ -732,6 +872,8 @@ def get_reco(request):
                       'reco_list': reco_list,
                       'category': category,
                       'algo_name': algo_name,
+                      'merge_type': merge_type,
+                      'group_reco': group_reco,
                       'config': VANILLA_UI_CONFIG_FOR_RATINGS
                   })
 

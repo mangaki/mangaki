@@ -30,11 +30,29 @@
             {% endif %}
 
             {% if profile.member_days %}
-                <p>
+                <p> {# TODO: human readable format #}
                     {% blocktrans with member_days=profile.member_days trimmed %}
                     Subscribed since {{ member_days }} days
                     {% endblocktrans %}
                 </p>
+            {% endif %}
+
+            {# check if user is different #}
+            {% if user.is_authenticated and profile.username != user.username %}
+                {# TODO: change appearance and add proper tooltip #}
+                <label class="add_friend" title="{% trans "Add friend" %}">
+                    <span class="sr-only">{% trans "Add friend" %}</span>
+                    <input
+                            type="checkbox"
+                            name="friend[{{ profile.username }}]"
+                            value="friend"
+                            class="friend__checkbox"{% if profile.is_friend %} checked{% endif %}>
+                    <span class="friend__button">
+                        <svg class="friend__icon">
+                            <use xlink:href="/static/img/ratings.svg#favorite"></use>
+                        </svg>
+                    </span>
+                </label>
             {% endif %}
         </div>
         <div class="col-12 col-lg-4 mb-2">
@@ -66,5 +84,37 @@
                 location.reload();
             }, 1000);
         }
+
+        // Setup of friend button
+        //  - Send the friend update to the server when the checkboxes are checked.
+        //  - Ensure tooltip is displayed on hover
+        $('.add_friend').each(function () {
+            var checkboxes = $(this).find('.friend__checkbox');
+            checkboxes.each(function () {
+                $(this).on('change', function () {
+                    var checkbox = this;
+
+                    var name = this.name;
+                    var friend_username = name.substring(name.indexOf('[') + 1,
+                                                         name.indexOf(']'));
+                    var endpoint = this.checked ? '/add_friend' : '/del_friend';
+
+                    $.post(endpoint + '/' + friend_username, function (is_friend) {
+                        if(is_friend !== this.checked) {
+                            this.checked = is_friend;
+                        }
+                    });
+                });
+            });
+
+            // Setup tooltip on the button.
+            $(this).tooltip({
+                'container': 'body',
+                'placement': function () {
+                    //return ratings.offsetHeight > ratings.offsetWidth ? 'right' : 'top';
+                    return 'top';
+                },
+            });
+        });
     </script>
 {% endblock %}

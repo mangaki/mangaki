@@ -17,10 +17,12 @@ jobs:
           path: ~/mangaki
       - restore_cache:
           key: deps-{{ .Branch }}-{{ checksum "~/mangaki/poetry.lock" }}
-      - run: |
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common python3-dev libopenblas-dev postgresql-client
-          poetry install
+      - run:
+          no_output_timeout: 60m
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y software-properties-common python3-dev libopenblas-dev postgresql-client
+            poetry install
       - save_cache:
           key: deps-{{ .Branch }}-{{ checksum "~/mangaki/poetry.lock" }}
           paths:
