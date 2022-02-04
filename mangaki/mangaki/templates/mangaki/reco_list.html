@@ -25,7 +25,7 @@
                             <br />
                             <a {% if merge_type != "intersection" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=intersection"{% endif %}>{% trans "Inédit pour certain·es" %}</a>
                             <br />
-                            <a {% if merge_type != "union" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=union"{% endif %}>{% trans "Inédit pour tout le groupe" %}</a>
+                            <a {% if merge_type != "union" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=union"{% endif %}>{% trans "Inédit pour tou·tes" %}</a>
                         </div>
                     </div>
                 {% endif %}
