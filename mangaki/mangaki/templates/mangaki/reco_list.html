@@ -21,11 +21,11 @@
                             <div id="group-reco" class="group-collapse collapse show"></div>
                         </div>
                         <div class="card-footer group-collapse collapse show">
-                            <a {% if merge_type != "mine" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=mine"{% endif %}>{% trans "Inédit pour moi" %}</a>
+                            <a {% if merge_type != "mine" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=mine"{% endif %}>{% trans "New for me" %}</a>
                             <br />
-                            <a {% if merge_type != "intersection" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=intersection"{% endif %}>{% trans "Inédit pour certain·es" %}</a>
+                            <a {% if merge_type != "intersection" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=intersection"{% endif %}>{% trans "New for some" %}</a>
                             <br />
-                            <a {% if merge_type != "union" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=union"{% endif %}>{% trans "Inédit pour tou·tes" %}</a>
+                            <a {% if merge_type != "union" %}href="{% url 'reco' %}?algo={{ algo_name }}&amp;category={{ category }}&amp;merge_type=union"{% endif %}>{% trans "New for all" %}</a>
                         </div>
                     </div>
                 {% endif %}
