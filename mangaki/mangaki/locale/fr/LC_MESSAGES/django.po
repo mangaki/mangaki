@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-04 14:41+0000\n"
+"POT-Creation-Date: 2022-02-04 17:01+0000\n"
 "PO-Revision-Date: 2018-08-23 19:25+0900\n"
 "Language: fr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -688,7 +688,7 @@ msgstr "Bienvenue"
 msgid "Rated works"
 msgstr "Œuvres notées"
 
-#: mangaki/templates/base.html:128
+#: mangaki/templates/base.html:128 mangaki/views.py:479
 msgid "My friends"
 msgstr "Mes amis"
 
@@ -1430,8 +1430,9 @@ msgstr "Vous n'avez pas accès à cette page."
 msgid "This request is incorrect. What did you try to do?"
 msgstr "Cette demande est incorrecte. Qu'essayez-vous de faire ?"
 
-#~ msgid "My pending friend requests"
-#~ msgstr "Mes demandes d'ami en attente"
+#: mangaki/views.py:483
+msgid "My pending friend requests"
+msgstr "Mes demandes d'ami en attente"
 
 #, fuzzy
 #~| msgid "International"

@@ -6,7 +6,7 @@
         {% for _, friendlist in friendlists.items %}
             <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom: 20px">
                 <div class="card">
-                    <div class="card-header">{% trans friendlist.name %}</div>
+                    <div class="card-header">{{ friendlist.name }}</div>
                     <div class="card-body">
                         {% for friend in friendlist.friends %}
                             <a class="card-link" href="{% url 'profile' friend.username %}">
