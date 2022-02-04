@@ -476,11 +476,11 @@ def get_profile_friendlist(request):
 
     friendlists = {
         'mutual': {
-            'name': 'My friends',
+            'name': _('My friends'),
             'friends': []
         },
         'pending': {
-            'name': 'My pending friend requests',
+            'name': _('My pending friend requests'),
             'friends': []
         }
     }

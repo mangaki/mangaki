@@ -122,8 +122,9 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
     # Here we default with intersection
     merge_function = \
         set.union if merge_type == 'union' else set.intersection
+    users_considered_in_filter = [request.user.id] if merge_type == 'mine' else user_ratings.keys()
     already_rated_works = list(merge_function(*[
-        set(ratings) for ratings in user_ratings.values()
+        set(user_ratings[user_id]) for user_id in users_considered_in_filter
     ]))
 
     chrono.save('get rated works')
