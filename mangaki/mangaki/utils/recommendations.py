@@ -14,15 +14,14 @@ NB_RECO = 10
 CHRONO_ENABLED = True
 
 
-def get_algo_backup_or_fit_knn(algo_name):
+def get_algo_backup_or_fit_svd(algo_name):
     try:
         algo = get_algo_backup(algo_name)
     except FileNotFoundError:
         triplets = list(
             Rating.objects.values_list('user_id', 'work_id', 'choice'))
-        # In the future, we should warn the user it's gonna take a while
-        algo_name = 'knn'
-        algo = fit_algo('knn', triplets)
+        algo_name = 'svd'
+        algo = fit_algo('svd', triplets)
     return algo
 
 
@@ -54,7 +53,7 @@ def get_reco_algo(request, algo_name='als', category='all'):
 
     chrono.save('get rated works')
 
-    algo = get_algo_backup_or_fit_knn(algo_name)
+    algo = get_algo_backup_or_fit_svd(algo_name)
 
     available_works = set(algo.dataset.encode_work.keys())
     df_rated_works = (pd.DataFrame(list(user_ratings.items()),
@@ -65,7 +64,7 @@ def get_reco_algo(request, algo_name='als', category='all'):
 
     # User gave the same rating to all works considered in the reco
     if algo_name == 'als' and len(set(user_rating_values)) == 1:
-        algo = get_algo_backup_or_fit_knn('knn')
+        algo = get_algo_backup_or_fit_svd('svd')
 
     chrono.save('retrieve or fit %s' % algo.get_shortname())
 
@@ -97,55 +96,44 @@ def get_reco_algo(request, algo_name='als', category='all'):
 
 def get_group_reco_algo(request, users_id=None, algo_name='als',
                         category='all', merge_type=None):
-    # users_id contain a group to recommend to
-    # It should include the current user, which can't be anonymous
-    if request.user.is_anonymous:
-        get_reco_algo(request, algo_name, category)
-    if users_id is None:
-        users_id = [request.user.id]
-    elif request.user.id not in users_id:
-        users_id.append(request.user.id)
+    # others_id contain a group to recommend to
+    others_id = users_id
+    if request.user.is_anonymous or users_id is None:
+        others_id = [request.user.id]
+    elif request.user.id in users_id:
+        others_id = [user_id for user_id in users_id
+                     if user_id != request.user.id]
 
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
 
-    user_ratings = {}
-    tmp = []
-    for user_id in users_id:
-        ratings = friend_ratings(request, user_id)
-        # Ignore users with no ratings
-        if len(ratings) > 0:
-            user_ratings[user_id] = ratings
-            tmp.append(user_id)
-    user_id = tmp
+    algo = get_algo_backup_or_fit_svd(algo_name)
+    available_works = set(algo.dataset.encode_work.keys())
+
+    chrono.save('retrieve or fit %s' % algo.get_shortname())
+
+    # Building the training set
+    my_ratings = current_user_ratings(request)  # Myself
+
+
+    triplets = friend_ratings(request, others_id)
+    df = pd.DataFrame(triplets, columns=['user_id', 'work_id', 'choice']).query(
+        'work_id in @available_works')
+    df['encoded_work_id'] = df['work_id'].map(
+        algo.dataset.encode_work)
+    df['rating'] = df['choice'].map(rating_values)
 
     # What is already rated for a group? intersection or union of seen works?
     # Here we default with intersection
     merge_function = \
         set.union if merge_type == 'union' else set.intersection
-    users_considered_in_filter = [request.user.id] if merge_type == 'mine' else user_ratings.keys()
-    already_rated_works = list(merge_function(*[
-        set(user_ratings[user_id]) for user_id in users_considered_in_filter
-    ]))
+    sets_of_rated_works = [set(my_ratings.keys())]
+    if merge_type != 'mine':
+        for user_id in df['user_id'].unique():
+            sets_of_rated_works.append(set(
+                df.query('user_id == @user_id')['work_id'].tolist()))
+    already_rated_works = list(merge_function(*sets_of_rated_works))
 
     chrono.save('get rated works')
-
-    algo = get_algo_backup_or_fit_knn(algo_name)
-
-    # One user gave the same rating to all works considered in the reco
-    # Currently, we fall back to knn for all users in this case
-    # It may make sense to only use knn for this user, and not all
-    available_works = set(algo.dataset.encode_work.keys())
-    for user_id in users_id:
-        df_rated_works = (pd.DataFrame(list(user_ratings[user_id].items()),
-                                       columns=['work_id', 'choice'])
-                            .query('work_id in @available_works'))
-        user_rating_values = df_rated_works['choice'].map(rating_values)
-        if algo_name == 'als' and len(set(user_rating_values)) == 1:
-            algo = get_algo_backup_or_fit_knn('knn')
-            available_works = None
-            break
-
-    chrono.save('retrieve or fit %s' % algo.get_shortname())
 
     category_filter = algo.dataset.interesting_works
     if category != 'all':
@@ -159,30 +147,32 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
     encoded_work_ids = [algo.dataset.encode_work[work_id]
                         for work_id in filtered_works]
 
-    encoded_user_ids = []
-    extra_users_parameters = []
-    for user_id in users_id:
-        # TODO: also recompute parameters if ratings have changed
-        if user_id not in algo.dataset.encode_user:
-            if available_works is None:
-                available_works = set(algo.dataset.encode_work.keys())
-            df_rated_works = (pd.DataFrame(list(user_ratings[user_id].items()),
-                                           columns=['work_id', 'choice'])
-                                .query('work_id in @available_works'))
-            enc_rated_works = df_rated_works['work_id'].map(
-                algo.dataset.encode_work
-            )
-            user_rating_values = df_rated_works['choice'] \
-                .map(rating_values)
-            extra_users_parameters.append(algo.fit_single_user(
-                enc_rated_works,
-                user_rating_values
-            ))
-        else:
-            encoded_user_ids.append(algo.dataset.encode_user[user_id])
+    extra_users_parameters = [algo.fit_single_user(
+        [algo.dataset.encode_work[work_id] for work_id in my_ratings.keys()],
+        [rating_values[choice] for choice in my_ratings.values()]
+    )]
+    for user_id in others_id:
+        user_ratings = df.query("user_id == @user_id")
+        extra_users_parameters.append(algo.fit_single_user(
+            user_ratings['encoded_work_id'],
+            user_ratings['rating']
+        ))  # TODO encrypt
+    # The logic below should be moved elsewhere
+    if algo.get_shortname().startswith('svd'):
+        mean_group = 0
+        feat_group = np.zeros_like(extra_users_parameters[0][1])
+        for mean, feat in extra_users_parameters:
+            mean_group += mean
+            feat_group += feat
+        group_parameters = [
+            mean_group / len(extra_users_parameters),
+            feat_group / len(extra_users_parameters)
+        ]
+    else:
+        group_parameters = extra_users_parameters
 
-    pos_of_best = algo.recommend(encoded_user_ids,
-                                 extra_users_parameters=extra_users_parameters,
+    pos_of_best = algo.recommend(user_ids=[],  # Anonymous & retrained
+                                 extra_users_parameters=group_parameters,
                                  item_ids=encoded_work_ids,
                                  k=NB_RECO)['item_id']
     best_work_ids = [filtered_works[pos] for pos in pos_of_best]
