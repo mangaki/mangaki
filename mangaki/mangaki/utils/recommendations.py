@@ -27,6 +27,27 @@ def get_algo_backup_or_fit_svd(algo_name):
     return algo
 
 
+def get_personalized_ranking(algo, user_id, work_ids, enc_rated_works=[],
+                             ratings=[], limit=None):
+    if user_id in algo.dataset.encode_user:
+        encoded_user_id = algo.dataset.encode_user[user_id]
+        X_test = np.asarray([[encoded_user_id,
+                              algo.dataset.encode_work[work_id]]
+                             for work_id in work_ids])
+        y_pred = algo.predict(X_test)
+    else:
+        user_parameters = algo.fit_single_user(enc_rated_works, ratings)
+        encoded_work_ids = [algo.dataset.encode_work[work_id]
+                            for work_id in work_ids]
+        y_pred = algo.predict_single_user(encoded_work_ids, user_parameters)
+
+    # Get top work indices in decreasing value
+    pos_of_best = y_pred.argsort()[::-1]
+    if limit is not None:
+        pos_of_best = pos_of_best[:limit]  # Up to some limit
+    return pos_of_best
+
+
 def get_group_reco_algo(request, users_id=None, algo_name='als',
                         category='all', merge_type=None):
     # others_id contain a group to recommend to

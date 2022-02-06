@@ -52,7 +52,6 @@ class HomomorphicEncryption:
         self._keygen()
         self._shares = {}
         self._encode(MAX_VALUE)
-        self.debug_embed = None
 
     def _keygen(self):
         self._sk = {user: randint(0, PRIME) for user in self.user_ids}
@@ -63,7 +62,7 @@ class HomomorphicEncryption:
         for x in range(1, MAX_VALUE + 1):
             self.encode[-x] = inv(self.encode[x])
         self.decode = {v: k for k, v in self.encode.items()}
-        print('table', len(self.encode), len(self.decode))
+        assert len(self.encode) == len(self.decode)  # Otherwise PRIME is too small
 
     def encrypt(self, user_id, message: int):
         r = randint(0, PRIME)
@@ -72,22 +71,16 @@ class HomomorphicEncryption:
 
     def encrypt_embeddings(self, user_id, parameters):
         mean, feat = parameters
-        if self.debug_embed is None:
-            self.debug_embed = np.zeros_like(feat)
-        self.debug_embed += feat 
         feat = np.array(feat)
         if self.quantize_round:
             mean = int((10 ** self.quantize_round) * mean.round(self.quantize_round))
             feat = ((10 ** self.quantize_round) * feat.round(self.quantize_round)).astype(int)
-        print('clair', user_id, feat[0])
         encrypted = []
         self._shares[user_id] = np.zeros(1 + len(feat))
         for dim, value in enumerate([mean] + feat.tolist()):
             c1, c2 = self.encrypt(user_id, value)
             self._shares[user_id][dim] = expmod(c1, self._sk[user_id])
             encrypted.append(c2)
-            if dim == 0:
-                print('chiffre', user_id, c2)
         return np.array(encrypted)
 
     def combine_embeddings(self, encrypted_embeddings):
@@ -102,14 +95,10 @@ class HomomorphicEncryption:
         return combined
 
     def decrypt_embeddings(self, encrypted_embeddings):
-        print('debug', self.debug_embed)
-        print('expected', -214, self.encode[-214])
         combined = self.combine_embeddings(encrypted_embeddings)
         inversed_shares = [inv(value) for value in self._combined_shares]
         decrypted = (combined * inversed_shares) % PRIME
-        print(decrypted)
         decoded = np.array([self.decode[value] for value in decrypted], dtype=float)
-        print(decoded, decoded.dtype, type(decoded))
         if self.quantize_round:
             decoded /= 10 ** self.quantize_round
         return decoded[0], decoded[1:]  # Mean, feat

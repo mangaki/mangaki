@@ -21,4 +21,4 @@ class CryptoTest(TestCase):
             encrypted.append(self.he.encrypt_embeddings(user_id, parameters))
         mean, feat = self.he.decrypt_embeddings(encrypted)
         self.assertEqual(mean, 4)
-        self.assertEqual(feat, [5, 2])
+        self.assertSequenceEqual(feat.tolist(), [5, 2])
