@@ -9,6 +9,7 @@ from mangaki.utils.fit_algo import fit_algo, get_algo_backup
 from mangaki.utils.chrono import Chrono
 from mangaki.utils.ratings import current_user_ratings, friend_ratings
 from mangaki.utils.values import rating_values
+from mangaki.utils.crypto import HomomorphicEncryption
 
 NB_RECO = 10
 CHRONO_ENABLED = True
@@ -18,6 +19,7 @@ def get_algo_backup_or_fit_svd(algo_name):
     try:
         algo = get_algo_backup(algo_name)
     except FileNotFoundError:
+        # Fallback to SVD
         triplets = list(
             Rating.objects.values_list('user_id', 'work_id', 'choice'))
         algo_name = 'svd'
@@ -121,6 +123,9 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
     df['encoded_work_id'] = df['work_id'].map(
         algo.dataset.encode_work)
     df['rating'] = df['choice'].map(rating_values)
+    # Ignore those with no ratings in the group
+    participating_other_ids = df['user_id'].unique()
+    group_length = 1 + len(participating_other_ids)
 
     # What is already rated for a group? intersection or union of seen works?
     # Here we default with intersection
@@ -128,7 +133,7 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
         set.union if merge_type == 'union' else set.intersection
     sets_of_rated_works = [set(my_ratings.keys())]
     if merge_type != 'mine':
-        for user_id in df['user_id'].unique():
+        for user_id in participating_other_ids:
             sets_of_rated_works.append(set(
                 df.query('user_id == @user_id')['work_id'].tolist()))
     already_rated_works = list(merge_function(*sets_of_rated_works))
@@ -147,29 +152,35 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
     encoded_work_ids = [algo.dataset.encode_work[work_id]
                         for work_id in filtered_works]
 
-    extra_users_parameters = [algo.fit_single_user(
+    my_mean, my_feat = algo.fit_single_user(
         [algo.dataset.encode_work[work_id] for work_id in my_ratings.keys()],
         [rating_values[choice] for choice in my_ratings.values()]
-    )]
-    for user_id in others_id:
-        user_ratings = df.query("user_id == @user_id")
-        extra_users_parameters.append(algo.fit_single_user(
-            user_ratings['encoded_work_id'],
-            user_ratings['rating']
-        ))  # TODO encrypt
-    # The logic below should be moved elsewhere
-    if algo.get_shortname().startswith('svd'):
-        mean_group = 0
-        feat_group = np.zeros_like(extra_users_parameters[0][1])
-        for mean, feat in extra_users_parameters:
-            mean_group += mean
-            feat_group += feat
-        group_parameters = [
-            mean_group / len(extra_users_parameters),
-            feat_group / len(extra_users_parameters)
-        ]
+    )
+
+    if algo.get_shortname().startswith('svd') and participating_other_ids:
+        he = HomomorphicEncryption(participating_other_ids, quantize_round=1,
+                                   MAX_VALUE=800 * group_length)
+        transform = he.encrypt_embeddings
+        is_encrypted = True
     else:
-        group_parameters = extra_users_parameters
+        transform = lambda parameters: parameters[1]  # Return the embeddings
+        is_encrypted = False
+
+    embeddings = []
+    for user_id in participating_other_ids:
+        user_ratings = df.query("user_id == @user_id")
+        embeddings.append(transform(user_id,
+            algo.fit_single_user(
+                user_ratings['encoded_work_id'],
+                user_ratings['rating']
+            )))
+
+    if is_encrypted:
+        sum_means, sum_feats = he.decrypt_embeddings(embeddings)
+        group_parameters = [[(my_mean + sum_means) / group_length,
+                             (my_feat + sum_feats) / group_length]]
+    else:
+        group_parameters = embeddings
 
     pos_of_best = algo.recommend(user_ids=[],  # Anonymous & retrained
                                  extra_users_parameters=group_parameters,
