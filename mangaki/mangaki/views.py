@@ -54,7 +54,7 @@ from mangaki.utils.profile import (
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
                                    current_user_set_toggle_rating, get_anonymous_ratings)
 from mangaki.utils.tokens import compute_token, NEWS_SALT
-from mangaki.utils.recommendations import get_group_reco_algo, get_reco_algo
+from mangaki.utils.recommendations import get_group_reco_algo
 from irl.models import Partner
 
 
@@ -792,7 +792,7 @@ def get_reco_algo_list(request, algo_name, category, merge_type=None):
         data = get_group_reco_algo(request, friend_ids, algo_name, category,
                                    merge_type)
     else:
-        data = get_reco_algo(request, algo_name, category)
+        data = get_group_reco_algo(request, None, algo_name, category)
     works = data['works']
     categories = dict(WORK_CATEGORY_CHOICES)
     ratings_bulk = Rating.objects.filter(user__pk=request.user.pk) \
