@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-04 17:01+0000\n"
+"POT-Creation-Date: 2022-02-08 17:12+0000\n"
 "PO-Revision-Date: 2018-08-23 19:25+0900\n"
 "Language: fr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -138,7 +138,7 @@ msgid "Composers"
 msgstr "Compositeurs"
 
 #: mangaki/choices.py:49 mangaki/templates/base.html:67
-#: mangaki/templates/mangaki/reco_list.html:58
+#: mangaki/templates/mangaki/reco_list.html:67
 #: mangaki/templates/profile_works.html:9
 #: mangaki/templates/profile_works.html:12
 #: mangaki/templates/profile_works.html:29
@@ -146,7 +146,7 @@ msgstr "Compositeurs"
 msgid "Anime"
 msgstr "Anime"
 
-#: mangaki/choices.py:50 mangaki/templates/mangaki/reco_list.html:60
+#: mangaki/choices.py:50 mangaki/templates/mangaki/reco_list.html:69
 msgid "Manga"
 msgstr "Manga"
 
@@ -1004,7 +1004,7 @@ msgstr "Inédit pour certain·es"
 msgid "New for all"
 msgstr "Inédit pour tou·tes"
 
-#: mangaki/templates/mangaki/reco_list.html:37
+#: mangaki/templates/mangaki/reco_list.html:46
 msgid ""
 "Here are some recommendations that you might like.<br /> Rate them and "
 "reload to get new ones."
@@ -1012,27 +1012,27 @@ msgstr ""
 "Voici quelques recommandations qui pourraient vous intéresser. <br /> Notez-"
 "les et rechargez pour en obtenir d'autres."
 
-#: mangaki/templates/mangaki/reco_list.html:46
+#: mangaki/templates/mangaki/reco_list.html:55
 msgid "Add some of your friends to recommend with"
 msgstr "Ajouter des amis avec qui vous voulez des recommendations"
 
-#: mangaki/templates/mangaki/reco_list.html:48
+#: mangaki/templates/mangaki/reco_list.html:57
 #: mangaki/templates/mangaki/work_detail.html:114
 msgid "This user already knows this work"
 msgstr "Cet utilisateur connaît déjà cette œuvre"
 
-#: mangaki/templates/mangaki/reco_list.html:54
+#: mangaki/templates/mangaki/reco_list.html:63
 msgid "All"
 msgstr "Tout"
 
-#: mangaki/templates/mangaki/reco_list.html:67
+#: mangaki/templates/mangaki/reco_list.html:76
 msgid ""
 "I want new recommendations! <br class=\"visible-xs\">(After you rate those.)"
 msgstr ""
 "Je veux de nouvelles recommandations ! <br class=\"visible-xs\"> (Après "
 "avoir noté celles-ci.)"
 
-#: mangaki/templates/mangaki/reco_list.html:73
+#: mangaki/templates/mangaki/reco_list.html:82
 #, python-format
 msgid ""
 "To receive recommandations, you should at least <a href=\"%(work_list_url)s"
@@ -1429,6 +1429,14 @@ msgstr "Vous n'avez pas accès à cette page."
 #: mangaki/urls.py:82
 msgid "This request is incorrect. What did you try to do?"
 msgstr "Cette demande est incorrecte. Qu'essayez-vous de faire ?"
+
+#: mangaki/utils/recommendations.py:26
+msgid ""
+"We switched to SVD as recommendation algorithm, as {algo_name} was not "
+"available."
+msgstr ""
+"Nous avons choisi l'algorithme de recommandation SVD, car {algo_name} "
+"n'était pas disponible."
 
 #: mangaki/views.py:483
 msgid "My pending friend requests"

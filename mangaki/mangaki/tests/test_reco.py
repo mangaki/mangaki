@@ -26,7 +26,9 @@ class RecoTest(TestCase):
         self.user = get_user_model().objects.create_user(username='test', password='test')
         friend = get_user_model().objects.create_user(username='friend', password='test')
         otaku = get_user_model().objects.create_user(username='otaku', password='test')
-        otaku2 = get_user_model().objects.create_user(username='otaku2', password='test')
+        users = get_user_model().objects.bulk_create([
+            get_user_model()(username=f'otaku{i}', password='test') for i in range(20)
+        ])
         self.anime_category = Category.objects.get(slug='anime')
         manga = Category.objects.get(slug='manga')
 
@@ -38,14 +40,18 @@ class RecoTest(TestCase):
             Work(title='Manga B', category=manga),
             Work(title='Manga A', category=manga),
         ]
+        for _ in range(20):
+            works.append(Work(title='Remplissage', category=manga))
         works = Work.objects.bulk_create(works)
         self.work = works[0]
 
         # This will work as long as zero.dataset.RATED_BY_AT_LEAST <= 2
-        ratings = ([Rating(user=otaku, work=work, choice='like') for work in works] + 
-                   [Rating(user=otaku2, work=work, choice='dislike') for work in works] +
+        ratings = ([Rating(user=otaku, work=work, choice='like') for work in works[2:]] + 
+                   [Rating(user=users[2], work=work, choice='dislike') for work in works[2:]] +
                    [Rating(user=friend, work=work, choice='like') for work in works[:2]] +
                    [Rating(user=self.user, work=works[0], choice='dislike')])
+        for user in users:
+            ratings.append(Rating(user=user, work=works[1], choice='like'))
         Rating.objects.bulk_create(ratings)
 
         if not os.path.exists(ML_SNAPSHOT_ROOT_TEST):
@@ -75,8 +81,8 @@ class RecoTest(TestCase):
         reco_url = reverse_lazy('get-reco-algo-list', args=['als', 'all'])
         with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
             response = self.client.get(reco_url)
-        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
-        os.remove(os.path.join(get_path('als'), 'knn-20.pickle'))
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 8)
+        os.remove(os.path.join(get_path('als'), 'svd-20.pickle'))
 
     def test_group_reco_custom_embed(self):
         self.client.login(username='test', password='test')
@@ -94,8 +100,8 @@ class RecoTest(TestCase):
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 2)
         with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
             response = self.client.get(reco_url)
-        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
-        os.remove(os.path.join(get_path('als'), 'knn-20.pickle'))
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 9)
+        os.remove(os.path.join(get_path('als'), 'svd-20.pickle'))
 
     def test_group_reco_intersection(self):
         self.client.login(username='test', password='test')
@@ -106,7 +112,7 @@ class RecoTest(TestCase):
         with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
             response = self.client.get(reco_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 1)
-        os.remove(os.path.join(get_path('als'), 'knn-20.pickle'))
+        os.remove(os.path.join(get_path('als'), 'svd-20.pickle'))
 
     def test_group_reco_union(self):
         self.client.login(username='test', password='test')
@@ -116,24 +122,24 @@ class RecoTest(TestCase):
         reco_url = reverse_lazy('get-reco-algo-list', args=['als', 'union', 'all'])
         with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
             response = self.client.get(reco_url)
-        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 2)
-        os.remove(os.path.join(get_path('als'), 'knn-20.pickle'))
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 9)
+        os.remove(os.path.join(get_path('als'), 'svd-20.pickle'))
 
     def test_knn_reco_with_new_works(self):
         self.client.login(username='test', password='test')
         # They should have one rating
         self.assertEqual(self.user.rating_set.count(), 1)
+        print('IMPORTANT', os.listdir(get_path('knn')))
 
         reco_url = reverse_lazy('get-reco-algo-list', args=['knn', 'all'])
         with self.settings(ML_SNAPSHOT_ROOT=get_path('knn')):
             response = self.client.get(reco_url)  # Create pickle
         print(response.content.decode('utf-8'))
+        print('IMPORTANT 2', os.listdir(get_path('knn')))
 
         # Here comes a new challenger
-        print('Mais avant', self.user.id)
         work = Work.objects.create(title='New anime', nb_episodes=0, category=self.anime_category)
         rating = Rating.objects.create(user=get_user_model().objects.get(username='test'), work=work, choice='like')
-        print('En fait son ID est', get_user_model().objects.get(username='test').id)
         # They now have two ratings
         self.assertEqual(self.user.rating_set.count(), 2)
 
@@ -141,8 +147,8 @@ class RecoTest(TestCase):
             response = self.client.get(reco_url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
-        os.remove(os.path.join(get_path('knn'), 'knn-20.pickle'))
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 8)
+        os.remove(os.path.join(get_path('knn'), 'svd-20.pickle'))
 
     def test_anonymous_reco(self):
         vote_url = reverse_lazy('vote', args=[self.work.id])
@@ -160,8 +166,8 @@ class RecoTest(TestCase):
             response = self.client.get(reco_url)  # Create pickle
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 3)
-        os.remove(os.path.join(get_path('knn-anonymous'), 'knn-20.pickle'))
+        self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 8)
+        os.remove(os.path.join(get_path('knn-anonymous'), 'svd-20.pickle'))
 
     def tearDown(self):
         shutil.rmtree(ML_SNAPSHOT_ROOT_TEST)

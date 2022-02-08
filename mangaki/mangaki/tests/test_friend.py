@@ -19,7 +19,7 @@ def get_path(key):
     return os.path.join(ML_SNAPSHOT_ROOT_TEST, '{:s}'.format(key))
 
 
-class RecoTest(TestCase):
+class FriendTest(TestCase):
 
     def setUp(self):
         self.user = get_user_model().objects.create_user(username='test', password='test')

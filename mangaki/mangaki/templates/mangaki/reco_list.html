@@ -33,6 +33,15 @@
 
             <main class="col bd-content">
                 <h1>{% trans "Recommendations" %}</h1>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="alert alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}info{% endif %}">
+                            {{ message }}
+                        </p>
+                    {% endfor %}
+                {% endif %}
+                
                 <div class="alert alert-secondary">
                     {% blocktrans trimmed %}
                         Here are some recommendations that you might like.<br />
