@@ -4,6 +4,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+import json
 
 from mangaki.models import Studio, Category, Rating, Editor, Work
 
@@ -37,6 +38,16 @@ class RatingTest(TestCase):
         has_rating = (Rating.objects.filter(user=self.user,
                                             work_id=self.anime.id).exists())
         self.assertFalse(has_rating)
+
+    def test_user_position(self, **kwargs):
+        self.client.login(username='test', password='test')
+        vote_url = reverse('vote', args=[self.anime.id])
+
+        self.client.post(vote_url, {'choice': 'favorite'})
+        response = self.client.get('/api/cards/anime/popularity')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode())
+        self.assertEqual(len(data), 1)
 
     def test_anonymized_rating(self):
         vote_url = reverse('vote', args=[self.anime.id])

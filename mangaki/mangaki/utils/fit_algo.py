@@ -35,7 +35,6 @@ def fit_algo(algo_name, triplets, titles=None, categories=None,
 
 
 def get_algo_backup(algo_name):
-    print('GET ALGO BACKUP', algo_name)
     algo = RecommendationAlgorithm.instantiate_algorithm(algo_name)
     if not algo.is_serializable:
         raise RuntimeError('"{}" is not serializable, cannot load a backup!'
