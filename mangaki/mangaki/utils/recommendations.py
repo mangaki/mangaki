@@ -3,6 +3,8 @@
 
 import numpy as np
 import pandas as pd
+from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
 
 from mangaki.models import Rating, Work
 from mangaki.utils.fit_algo import fit_algo, get_algo_backup
@@ -15,15 +17,22 @@ NB_RECO = 10
 CHRONO_ENABLED = True
 
 
-def get_algo_backup_or_fit_svd(algo_name):
+def get_algo_backup_or_fit_svd(request, algo_name):
     try:
         algo = get_algo_backup(algo_name)
     except FileNotFoundError:
         # Fallback to SVD
+        messages.warning(request,
+            _('We switched to SVD as recommendation algorithm, '
+              'as {algo_name} was not available.').format(
+                algo_name=algo_name.upper()))
         triplets = list(
             Rating.objects.values_list('user_id', 'work_id', 'choice'))
         algo_name = 'svd'
-        algo = fit_algo('svd', triplets)
+        try:
+            algo = get_algo_backup('svd')
+        except FileNotFoundError:
+            algo = fit_algo('svd', triplets)
     return algo
 
 
@@ -60,13 +69,18 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
 
     chrono = Chrono(is_enabled=CHRONO_ENABLED)
 
-    algo = get_algo_backup_or_fit_svd(algo_name)
+    algo = get_algo_backup_or_fit_svd(request, algo_name)
     available_works = set(algo.dataset.encode_work.keys())
 
     chrono.save('retrieve or fit %s' % algo.get_shortname())
 
     # Building the training set
     my_ratings = current_user_ratings(request)  # Myself
+    df_mine = pd.DataFrame(my_ratings.items(), columns=('work_id', 'choice')).query(
+        'work_id in @available_works')
+    df_mine['encoded_work_id'] = df_mine['work_id'].map(
+        algo.dataset.encode_work)
+    df_mine['rating'] = df_mine['choice'].map(rating_values)    
 
     if not request.user.is_anonymous and others_id:
         triplets = friend_ratings(request, others_id)
@@ -85,7 +99,7 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
     # Here we default with intersection
     merge_function = \
         set.union if merge_type == 'union' else set.intersection
-    sets_of_rated_works = [set(my_ratings.keys())]
+    sets_of_rated_works = [set(df_mine['work_id'])]
     if merge_type != 'mine':
         for user_id in participating_other_ids:
             sets_of_rated_works.append(set(
@@ -107,9 +121,7 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
                         for work_id in filtered_works]
 
     my_mean, my_feat = algo.fit_single_user(
-        [algo.dataset.encode_work[work_id] for work_id in my_ratings.keys()],
-        [rating_values[choice] for choice in my_ratings.values()]
-    )
+        df_mine['encoded_work_id'], df_mine['rating'])
 
     if algo.get_shortname().startswith('svd') and participating_other_ids:
         he = HomomorphicEncryption(participating_other_ids, quantize_round=1,
@@ -131,8 +143,8 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
 
     if is_encrypted:
         sum_means, sum_feats = he.decrypt_embeddings(embeddings)
-        group_parameters = [[(my_mean + sum_means) / group_length,
-                             (my_feat + sum_feats) / group_length]]
+        group_parameters = [((my_mean + sum_means) / group_length,
+                             (my_feat + sum_feats) / group_length)]
     else:
         group_parameters = [(my_mean, my_feat)] + embeddings
 

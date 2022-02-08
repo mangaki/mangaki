@@ -129,11 +129,13 @@ class RecoTest(TestCase):
         self.client.login(username='test', password='test')
         # They should have one rating
         self.assertEqual(self.user.rating_set.count(), 1)
+        print('IMPORTANT', os.listdir(get_path('knn')))
 
         reco_url = reverse_lazy('get-reco-algo-list', args=['knn', 'all'])
         with self.settings(ML_SNAPSHOT_ROOT=get_path('knn')):
             response = self.client.get(reco_url)  # Create pickle
         print(response.content.decode('utf-8'))
+        print('IMPORTANT 2', os.listdir(get_path('knn')))
 
         # Here comes a new challenger
         work = Work.objects.create(title='New anime', nb_episodes=0, category=self.anime_category)

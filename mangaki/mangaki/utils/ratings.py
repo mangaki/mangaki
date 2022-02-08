@@ -89,7 +89,7 @@ def current_user_ratings(request, works=None):
 def friend_ratings(request, friend_ids):
     """
     Compute the set of ratings for a friend of the current user.
-    Should also work on public users.
+    Possible: make it work on any public users.
 
     The user should be logged in.
 

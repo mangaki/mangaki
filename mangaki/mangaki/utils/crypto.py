@@ -48,13 +48,13 @@ class HomomorphicEncryption:
     def __init__(self, user_ids, quantize_round=0, MAX_VALUE=10):
         self.user_ids = user_ids
         self.quantize_round = quantize_round
-        self.g = randint(1, PRIME - 1)
+        self.g = randint(2, PRIME - 1)
         self._keygen()
         self._shares = {}
         self._encode(MAX_VALUE)
 
     def _keygen(self):
-        self._sk = {user: randint(0, PRIME) for user in self.user_ids}
+        self._sk = {user: randint(2, PRIME) for user in self.user_ids}
         self._pk = {user: expmod(self.g, self._sk[user]) for user in self.user_ids}
 
     def _encode(self, MAX_VALUE):
@@ -76,7 +76,7 @@ class HomomorphicEncryption:
             mean = int((10 ** self.quantize_round) * mean.round(self.quantize_round))
             feat = ((10 ** self.quantize_round) * feat.round(self.quantize_round)).astype(int)
         encrypted = []
-        self._shares[user_id] = np.zeros(1 + len(feat))
+        self._shares[user_id] = np.zeros(1 + len(feat), dtype=int)
         for dim, value in enumerate([mean] + feat.tolist()):
             c1, c2 = self.encrypt(user_id, value)
             self._shares[user_id][dim] = expmod(c1, self._sk[user_id])
@@ -88,7 +88,7 @@ class HomomorphicEncryption:
         for encrypted_embedding in encrypted_embeddings:
             combined *= encrypted_embedding
             combined %= PRIME
-        self._combined_shares = np.ones_like(encrypted_embeddings[0], dtype=float)
+        self._combined_shares = np.ones_like(encrypted_embeddings[0])
         for user_id in self.user_ids:
             self._combined_shares *= self._shares[user_id]
             self._combined_shares %= PRIME
