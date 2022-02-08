@@ -3,6 +3,8 @@
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import Q
+from mangaki.models import Rating
 
 
 def pk_from_object_or_pk(obj):
@@ -84,39 +86,28 @@ def current_user_ratings(request, works=None):
         return dict(qs.values_list('work_id', 'choice'))
 
 
-def friend_ratings(request, friend_id, works=None):
+def friend_ratings(request, friend_ids):
     """
     Compute the set of ratings for a friend of the current user.
-    May need to also work with public users
+    Possible: make it work on any public users.
 
     The user should be logged in.
-
-    If the `works` argument is given, then only the ratings for the given works
-    will be considered.
 
     Arguments:
         request -- The Request object we are currently handling.
         friend_id -- The id of the user ratings to return
-        works   -- An iterable of Work instances or primary keys, or None.
 
     Returns:
         ratings -- A dictionary mapping Work primary keys to their rating
             string ('like', 'dislike', etc.)
     """
-    if friend_id == request.user.id:
-        return current_user_ratings(request, works)
-    try:
-        user = request.user.profile.friends.get(id=friend_id)
-        # Check if current user has access to these ratings
-        if not user.profile.is_shared \
-                and not user.profile.friends.filter(pk=request.user.pk).exists():
-            return dict()
-        qs = user.rating_set.all()
-        if works is not None:
-            qs = qs.filter(work__in=works)
-        return dict(qs.values_list('work_id', 'choice'))
-    except User.DoesNotExist:
-        return dict()
+    return Rating.objects.filter(
+        user__in=friend_ids).filter(
+        user__in=request.user.profile.friends.values_list('id',
+                                                          flat=True)).filter(
+        Q(user__profile__is_shared=True) |
+        Q(user__profile__friends__id=request.user.id)).values_list(
+        'user_id', 'work_id', 'choice')
 
 
 def current_user_rating(request, work):
