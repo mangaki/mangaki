@@ -54,7 +54,7 @@ class HomomorphicEncryption:
         self._encode(MAX_VALUE)
 
     def _keygen(self):
-        self._sk = {user: randint(2, PRIME) for user in self.user_ids}
+        self._sk = {user: randint(2, PRIME - 2) for user in self.user_ids}
         self._pk = {user: expmod(self.g, self._sk[user]) for user in self.user_ids}
 
     def _encode(self, MAX_VALUE):
