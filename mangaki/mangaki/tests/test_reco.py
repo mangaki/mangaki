@@ -79,7 +79,7 @@ class RecoTest(TestCase):
     def test_als_reco(self):
         self.client.login(username='test', password='test')
         reco_url = reverse_lazy('get-reco-algo-list', args=['als', 'all'])
-        with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('als'), VIZ_ROOT=ML_SNAPSHOT_ROOT_TEST):
             response = self.client.get(reco_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 8)
         os.remove(os.path.join(get_path('als'), 'svd-20.pickle'))
@@ -87,7 +87,7 @@ class RecoTest(TestCase):
     def test_group_reco_custom_embed(self):
         self.client.login(username='test', password='test')
         reco_url = reverse_lazy('get-reco-algo-list', args=['knn', 'all'])
-        with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('als'), VIZ_ROOT=ML_SNAPSHOT_ROOT_TEST):
             response = self.client.get(reco_url)
         friend2 = get_user_model().objects.create_user(username='friend2',
                                                        password='test')
@@ -98,7 +98,7 @@ class RecoTest(TestCase):
         toggle_friend_url = reverse_lazy('toggle-friend', args=['friend2'])
         response = self.client.post(toggle_friend_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 2)
-        with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('als'), VIZ_ROOT=ML_SNAPSHOT_ROOT_TEST):
             response = self.client.get(reco_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 9)
         os.remove(os.path.join(get_path('als'), 'svd-20.pickle'))
@@ -109,7 +109,7 @@ class RecoTest(TestCase):
         response = self.client.post(toggle_friend_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 2)
         reco_url = reverse_lazy('get-reco-algo-list', args=['als', 'intersection', 'anime'])
-        with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('als'), VIZ_ROOT=ML_SNAPSHOT_ROOT_TEST):
             response = self.client.get(reco_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 1)
         os.remove(os.path.join(get_path('als'), 'svd-20.pickle'))
@@ -120,7 +120,7 @@ class RecoTest(TestCase):
         response = self.client.post(toggle_friend_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 2)
         reco_url = reverse_lazy('get-reco-algo-list', args=['als', 'union', 'all'])
-        with self.settings(ML_SNAPSHOT_ROOT=get_path('als')):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('als'), VIZ_ROOT=ML_SNAPSHOT_ROOT_TEST):
             response = self.client.get(reco_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 9)
         os.remove(os.path.join(get_path('als'), 'svd-20.pickle'))
@@ -131,7 +131,7 @@ class RecoTest(TestCase):
         self.assertEqual(self.user.rating_set.count(), 1)
 
         reco_url = reverse_lazy('get-reco-algo-list', args=['svd', 'all'])
-        with self.settings(ML_SNAPSHOT_ROOT=get_path('svd')):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('svd'), VIZ_ROOT=ML_SNAPSHOT_ROOT_TEST):
             response = self.client.get(reco_url)  # Create pickle
 
         # Here comes a new challenger
@@ -140,7 +140,7 @@ class RecoTest(TestCase):
         # They now have two ratings
         self.assertEqual(self.user.rating_set.count(), 2)
 
-        with self.settings(ML_SNAPSHOT_ROOT=get_path('svd')):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('svd'), VIZ_ROOT=ML_SNAPSHOT_ROOT_TEST):
             response = self.client.get(reco_url)
 
         self.assertEqual(response.status_code, 200)
@@ -152,14 +152,14 @@ class RecoTest(TestCase):
         response = self.client.post(vote_url, {'choice': 'like'})
 
         reco_url = reverse_lazy('get-reco-algo-list', args=['als', 'anime'])
-        with self.settings(ML_SNAPSHOT_ROOT=get_path('knn-anonymous')):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('knn-anonymous'), VIZ_ROOT=ML_SNAPSHOT_ROOT_TEST):
             response = self.client.get(reco_url)  # Create pickle
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 1)
 
         reco_url = reverse_lazy('get-reco-algo-list', args=['als', 'all'])
-        with self.settings(ML_SNAPSHOT_ROOT=get_path('knn-anonymous')):
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('knn-anonymous'), VIZ_ROOT=ML_SNAPSHOT_ROOT_TEST):
             response = self.client.get(reco_url)  # Create pickle
 
         self.assertEqual(response.status_code, 200)
