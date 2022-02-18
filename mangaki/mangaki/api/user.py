@@ -114,8 +114,8 @@ def get_user_and_friends_positions(request: Request, algo_name):
     available_works = df_item_pos.index
 
     if not request.user.is_anonymous:
-        friend_ratings = friend_ratings(request)
-        df = pd.DataFrame(friend_ratings, columns=('user_id', 'work_id', 'choice'))
+        ratings = friend_ratings(request)
+        df = pd.DataFrame(ratings, columns=('user_id', 'work_id', 'choice'))
         df_all = pd.concat((df_mine, df), axis=0)
     else:
         df_all = df_mine

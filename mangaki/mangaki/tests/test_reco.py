@@ -9,6 +9,8 @@ import shutil
 from django.test import TestCase
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
+from django.conf import settings
+import responses
 
 from mangaki.models import Category, Work, Rating
 import time
@@ -48,15 +50,15 @@ class RecoTest(TestCase):
         # This will work as long as zero.dataset.RATED_BY_AT_LEAST <= 2
         ratings = ([Rating(user=otaku, work=work, choice='like') for work in works[2:]] + 
                    [Rating(user=users[2], work=work, choice='dislike') for work in works[2:]] +
-                   [Rating(user=friend, work=work, choice='like') for work in works[:2]] +
-                   [Rating(user=self.user, work=works[0], choice='dislike')])
+                   [Rating(user=friend, work=work, choice='favorite') for work in works[:2]] +
+                   [Rating(user=self.user, work=works[0], choice='favorite')])
         for user in users:
             ratings.append(Rating(user=user, work=works[1], choice='like'))
         Rating.objects.bulk_create(ratings)
 
         if not os.path.exists(ML_SNAPSHOT_ROOT_TEST):
             os.makedirs(ML_SNAPSHOT_ROOT_TEST)
-            for key in {'svd', 'als', 'knn', 'knn-anonymous'}:
+            for key in {'svd', 'svd-embeddings', 'als', 'knn', 'knn-anonymous'}:
                 path = get_path(key)
                 if not os.path.exists(path):
                     os.makedirs(path)
@@ -124,6 +126,30 @@ class RecoTest(TestCase):
             response = self.client.get(reco_url)
         self.assertEqual(len(json.loads(response.content.decode('utf-8'))), 9)
         os.remove(os.path.join(get_path('als'), 'svd-20.pickle'))
+
+    @responses.activate
+    def test_user_position_and_friends(self, **kwargs):
+        self.client.login(username='test', password='test')
+        reco_url = reverse_lazy('get-reco-algo-list', args=['svd', 'union', 'all'])
+        with self.settings(ML_SNAPSHOT_ROOT=get_path('svd-embeddings'),
+                           VIZ_ROOT=get_path('svd-embeddings'),
+                           VIZ_URL='https://fake.news'):
+            self.client.get(reco_url)  # Create SVD backup
+
+            with open(f'{settings.VIZ_ROOT}/points-svd.json', 'r') as f:            
+                responses.add(
+                    responses.GET,
+                    f'{settings.VIZ_URL}/points-svd.json',
+                    body=f.read(),
+                    status=200,
+                    content_type='application/json'
+                )
+
+            response = self.client.get('/api/user/position/svd')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode())
+        self.assertEqual(len(data), 2)
+        os.remove(os.path.join(get_path('svd-embeddings'), 'svd-20.pickle'))
 
     def test_svd_reco_with_new_works(self):
         self.client.login(username='test', password='test')
