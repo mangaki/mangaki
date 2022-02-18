@@ -4,17 +4,24 @@
 from datetime import datetime
 
 import django.db
+from django.contrib.auth.models import User
+from django.db.models import Q
 from django.core.files import File
 
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from sendfile import sendfile
 
-from mangaki.models import Profile, UserArchive
+from mangaki.models import Profile, UserArchive, Rating
+from mangaki.utils.ratings import current_user_ratings, friend_ratings
+from mangaki.utils.viz import get_2d_embeddings
 from mangaki.utils.archive_export import export, UserDataArchiveBuilder
+from mangaki.utils.values import rating_values
+import pandas as pd
+import numpy as np
 
 
 class UserProfileSettingsSerializer(serializers.ModelSerializer):
@@ -90,5 +97,42 @@ def export_user_data(request: Request):
             builder.cleanup()
             return sendfile(request, archive.local_archive.path)
         except (OSError, IOError, django.db.Error) as e:
-            print(e)
             return Response({}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def get_user_and_friends_positions(request: Request, algo_name):
+    """
+    Compute the position of user and friends on the map
+    """
+    rated_works = current_user_ratings(request)
+    df_mine = pd.DataFrame(rated_works.items(), columns=('work_id', 'choice'))
+    df_mine['user_id'] = request.user.id if not request.user.is_anonymous else -1
+    df_item_pos = pd.DataFrame(
+        get_2d_embeddings(algo_name)['works']).set_index('work_id')
+    available_works = df_item_pos.index
+
+    if not request.user.is_anonymous:
+        ratings = friend_ratings(request)
+        df = pd.DataFrame(ratings, columns=('user_id', 'work_id', 'choice'))
+        df_all = pd.concat((df_mine, df), axis=0)
+    else:
+        df_all = df_mine
+
+    user_points = []
+    user_ids = df_all['user_id'].unique().tolist()
+    users = User.objects.in_bulk(user_ids)  # Get usernames for display
+    df_all['rating'] = df_all['choice'].map(rating_values)
+    for user_id in user_ids:
+        this_user = df_all.query(
+            'user_id == @user_id and choice == "favorite" and '
+            'work_id in @available_works')
+        if len(this_user):
+            x, y = df_item_pos.loc[this_user['work_id'], ["x", "y"]].mean(axis=0)
+            user_points.append({
+                'title': f'{users[user_id].username}'
+                         if user_id != -1 else 'yourself',
+                'x': x, 'y': y})
+
+    return Response(user_points)

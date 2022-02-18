@@ -21,7 +21,7 @@ djangorestframework="^3.9" # main
 psycopg2-binary = "2.8.6" # main
 markdown="=3.3.4" # main
 jinja2="*" # main
-lxml="^4.4" # main
+lxml="^4.6" # main
 beautifulsoup4="*" # main
 coreapi="^2.3"# main
 celery="^4.2" # main
