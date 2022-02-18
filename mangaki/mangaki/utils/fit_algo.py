@@ -5,6 +5,7 @@ from django.conf import settings
 
 from zero.dataset import Dataset
 from zero.recommendation_algorithm import RecommendationAlgorithm
+from mangaki.utils.viz import dump_2d_embeddings
 
 
 def fit_algo(algo_name, triplets, titles=None, categories=None,
@@ -26,11 +27,14 @@ def fit_algo(algo_name, triplets, titles=None, categories=None,
         if output_csv:
             algo.dataset.save_csv(settings.DATA_ROOT)
 
+    # Save visualization
+    if algo_name in {'als', 'svd'}:
+        dump_2d_embeddings(algo, f'points-{algo_name}.json')
+
     return algo
 
 
 def get_algo_backup(algo_name):
-    print('GET ALGO BACKUP', algo_name)
     algo = RecommendationAlgorithm.instantiate_algorithm(algo_name)
     if not algo.is_serializable:
         raise RuntimeError('"{}" is not serializable, cannot load a backup!'

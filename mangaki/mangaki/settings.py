@@ -277,6 +277,8 @@ STATIC_ROOT = config.get('deployment', 'STATIC_ROOT', fallback=os.path.join(BASE
 MEDIA_ROOT = config.get('deployment', 'MEDIA_ROOT', fallback=os.path.join(BASE_DIR, 'media'))
 DATA_ROOT = config.get('deployment', 'DATA_ROOT', fallback=os.path.join(BASE_DIR, 'data'))
 ML_SNAPSHOT_ROOT = os.path.join(DATA_ROOT, 'snapshots')  # FIXME: rename PICKLE_DIR to SNAPSHOT_DIR
+VIZ_ROOT = config.get('deployment', 'VIZ_ROOT', fallback=os.path.join(DATA_ROOT, 'viz'))
+VIZ_URL = config.get('deployment', 'VIZ_URL', fallback='https://mangaki.fr/map')
 
 if config.has_section('sendfile'):
     SENDFILE_BACKEND = config.get('sendfile', 'backend', fallback='sendfile.backends.simple')
