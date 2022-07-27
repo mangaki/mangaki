@@ -480,7 +480,7 @@ class AniDB:
         creators, studio = self.get_creators(creators_soup=anime.creators)
         tags = self.get_tags(tags_soup=anime.tags)
         related_animes = self.get_related_animes(related_animes_soup=anime.relatedanime)
-        url = str(anime.url.string) if anime.url else None
+        url = f'https://anidb.net/anime/{anidb_aid}'
 
         anime = {
             'title': main_title,
