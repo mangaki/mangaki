@@ -650,6 +650,9 @@ class Reference(models.Model):
             ('work', 'source', 'identifier'),
         )
 
+    def __str__(self):
+        return f'{self.source}:{self.identifier}'
+
 
 class Top(models.Model):
     date = models.DateField(auto_now_add=True)
