@@ -73,7 +73,13 @@ REFERENCE_DOMAINS = (
     ('http://animeka.com', 'Animeka'),
     ('http://vgmdb.net', 'VGMdb'),
     ('http://anidb.net', 'AniDB'),
-    ('https://anidb.net', 'AniDB')
+    ('https://anidb.net', 'AniDB'),
+    ('https://anisearch.com', 'Anisearch'),
+    ('https://notify.moe', 'Notify.moe'),
+    ('https://anime-planet.com', 'Anime Planet'),
+    ('https://anilist.co', 'AniList'),
+    ('https://kitsu.io', 'Kitsu'),
+    ('https://livechart.me', 'LiveChart.me')
 )
 
 RATING_COLORS = {

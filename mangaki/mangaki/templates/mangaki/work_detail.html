@@ -49,7 +49,10 @@
         </div>
     </div>
     <div class="col-sm-6 col-md-3">
-    
+
+  {% if object.date %}
+    <p>{% trans "Date:" %} {{ object.date }}</p>
+  {% endif %}    
 
 	{% if object.category.slug == 'anime' %}
 	  <p>{% trans "Number of episodes:" %} {{ object.nb_episodes }}</p>
