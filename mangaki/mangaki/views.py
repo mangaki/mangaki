@@ -14,11 +14,12 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+# from django.contrib.postgres.search import SearchVector, SearchRank, SearchQuery
 from django.contrib import messages
 from django.core.exceptions import SuspiciousOperation, ObjectDoesNotExist
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import DatabaseError
-from django.db.models import Case, IntegerField, Sum, Value, When, Count, Q
+from django.db.models import Case, IntegerField, When, Count
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -72,7 +73,13 @@ REFERENCE_DOMAINS = (
     ('http://animeka.com', 'Animeka'),
     ('http://vgmdb.net', 'VGMdb'),
     ('http://anidb.net', 'AniDB'),
-    ('https://anidb.net', 'AniDB')
+    ('https://anidb.net', 'AniDB'),
+    ('https://anisearch.com', 'Anisearch'),
+    ('https://notify.moe', 'Notify.moe'),
+    ('https://anime-planet.com', 'Anime Planet'),
+    ('https://anilist.co', 'AniList'),
+    ('https://kitsu.io', 'Kitsu'),
+    ('https://livechart.me', 'LiveChart.me')
 )
 
 RATING_COLORS = {
@@ -308,7 +315,11 @@ class WorkList(WorkListMixin, ListView):
             raise Http404
 
         if search_text:
-            self.queryset = self.queryset.filter(Q(title__search=search_text) | Q(worktitle__title__search=search_text)).distinct('id', 'nb_ratings')  # https://stackoverflow.com/questions/20582966/django-order-by-filter-with-distinct
+            # Another day we can attempt this more sophisticated use:
+            # query = SearchQuery(search_text, search_type='phrase')
+            # rank = SearchRank('titles_search', query)
+            # https://medium.com/finimize-engineering/postgresql-performance-tuning-in-django-c8dd508d0ff6
+            self.queryset = self.queryset.filter(titles_search=search_text)
 
         self.queryset = self.queryset.only('id', 'title', 'int_poster', 'ext_poster', 'nsfw', 'synopsis', 'category__slug')
 
@@ -331,7 +342,6 @@ class WorkList(WorkListMixin, ListView):
         context['config'] = VANILLA_UI_CONFIG_FOR_RATINGS
         context['enable_kb_shortcuts'] = (False if self.request.user.is_anonymous
         else self.request.user.profile.keyboard_shortcuts_enabled)
-        context['objects_count'] = self.category.work_set.count()
 
         if sort_mode == 'mosaic':
             context['object_list'] = [

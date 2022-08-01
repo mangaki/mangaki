@@ -89,6 +89,7 @@ The database starts empty, but you can populate a few works:
 
     ./manage.py loaddata ../fixtures/{partners,seed_data}.json
     ./manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
+    ./manage.py index      # Compute the search indexes. Should be done once in a while.
     ./manage.py top --all  # Compute the Top 20 directors, etc. Should be done regularly.
     ./manage.py test       # Run all tests
 

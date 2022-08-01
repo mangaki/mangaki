@@ -7,6 +7,7 @@ import time
 from django.contrib.auth import get_user_model
 from django.db.models import Max
 from django.test import Client, TestCase
+from django.core import management
 
 from mangaki.models import Category, Editor, Studio, Work, Suggestion, Evidence
 
@@ -18,6 +19,8 @@ class WorkFactoryMixin:
 
         anime = Category.objects.get(slug='anime')
         self.anime = Work.objects.create(title='Title', category=anime)
+
+        management.call_command('index')
 
 
 class AuthenticatedMixin:
