@@ -10,7 +10,7 @@ import re
 from django.test import TestCase
 from django.core import management
 from django.conf import settings
-from mangaki.models import Work, Category, Artist
+from mangaki.models import Work, Category, Artist, WorkTitle
 from mangaki.utils.anidb import AniDB
 from mangaki.wrappers.anilist import AniList
 from mangaki.utils.tokens import compute_token
@@ -28,6 +28,9 @@ class CommandTest(TestCase):
                         ext_poster='https://mangaki.fr/static/img/favicon.png',
                         category=Category.objects.get(slug='anime'),
                         title='Sangatsu no Lion')
+        WorkTitle.objects.create(
+            work_id=self.anime.id,
+            title='March comes in like a lion')
         self.anidb_fixture = self.read_fixture('anidb/sangatsu_no_lion.xml')
         self.anilist_fixture = self.read_fixture('anilist/hibike_euphonium.json')
         self.album = Work.objects.create(
@@ -87,6 +90,17 @@ class CommandTest(TestCase):
         management.call_command('generate_seed_data', 'small',
                                 stdout=self.stdout)
         self.assertEquals(self.stdout.getvalue(), 'Fixture ready.\n')
+
+    def test_index(self):
+        management.call_command('index')
+        # Curiously, both below are empty
+        # self.anime.title_search, self.anime.titles_search
+
+        self.assertEquals(Work.objects.filter(titles_search='lion').count(), 1)
+        self.assertEquals(Work.objects.filter(title_search='lion').count(), 1)
+
+        self.assertEquals(Work.objects.filter(titles_search='march').count(), 1)
+        self.assertEquals(Work.objects.filter(title_search='march').count(), 0)
 
     def test_lastactivity(self):
         management.call_command('lastactivity')
