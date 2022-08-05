@@ -656,6 +656,17 @@ class Reference(models.Model):
             ('work', 'source', 'identifier'),
         )
 
+    def get_url(self):
+        if self.source in {'Icotaku', 'Animeka', 'VGMdb'}:
+            return self.url
+        if self.source == 'AniDB':
+            hostname = 'anidb.net'
+        elif self.source == 'MAL':
+            hostname = 'myanimelist.net'
+        else:
+            hostname = self.source
+        return f'https://{hostname}/anime/{self.identifier}'
+
     def __str__(self):
         return f'{self.source}:{self.identifier}'
 
