@@ -93,6 +93,7 @@ STAFF_TYPICAL_CHOICES = (
 SORT_MODE_CHOICES = (
     ('mosaic', _('Mosaic')),
     ('new', _('Recent')),
+    ('upcoming', _('Upcoming')),
     ('top', _('Top')),
     ('popularity', _('Popular')),
     ('pearls', _('Pearls')),

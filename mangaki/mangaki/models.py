@@ -61,7 +61,7 @@ class SearchSimilarity(Func):
 
 class FilteredWorkManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(redirect__isnull=True)
+        return super().get_queryset().filter(visible=True, redirect__isnull=True)
 
 
 class WorkQuerySet(models.QuerySet):
@@ -148,6 +148,7 @@ class Work(models.Model):
     ext_synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
+    visible = models.BooleanField(default=True)
 
     # Some of these fields do not make sense for some categories of works.
     genre = models.ManyToManyField('Genre')
