@@ -1,6 +1,5 @@
 { config, pkgs, lib, ... }:
 with lib;
-# FIXME: move from password to passwordFile.
 let
   cfg = config.services.mangaki;
 
@@ -20,64 +19,25 @@ let
       };
 
     secrets = {
-      SECRET_KEY = "CHANGE_ME";
-    }
-      // (optionalAttrs (!cfg.useLocalDatabase && cfg.databaseConfig.password != null) {
-        DB_PASSWORD = cfg.databaseConfig.password;
-      })
-      # // (optionalAttrs cfg.mal.enable {
-      #   MAL_PASS = cfg.mal.password;
-      # })
-      ;
+      SECRET_FILE = cfg.secretFile;
+    };
   }
     // optionalAttrs (!cfg.devMode) {
       deployment = {
-        MEDIA_ROOT = "/srv/mangaki/media";
+        MEDIA_ROOT = "/var/lib/mangaki/media";
         STATIC_ROOT = "${cfg.staticRoot}";
-        DATA_ROOT = "/srv/mangaki/data";
+        DATA_ROOT = "/var/lib/mangaki/data";
       };
 
       hosts = {
         ALLOWED_HOSTS = concatStringsSep "," cfg.allowedHosts;
       };
     }
-    # // optionalAttrs (cfg.mal.user != "" && cfg.mal.userAgent != "") {
-    #   mal = {
-    #     MAL_USER = cfg.mal.user;
-    #     MAL_USER_AGENT = cfg.mal.userAgent;
-    #   };
-    # }
-    # // optionalAttrs (cfg.anidb.client != "" && cfg.anidb.version != "") {
-    #   anidb = {
-    #     ANIDB_CLIENT = cfg.anidb.client;
-    #     ANIDB_VERSION = cfg.anidb.version;
-    #   };
-    # }
     // optionalAttrs (!cfg.useLocalDatabase) {
-      pgsql = {
-        DB_HOST = cfg.databaseConfig.host;
-        DB_NAME = cfg.databaseConfig.name;
-        DB_USER = cfg.databasConfig.user;
+      database = {
+        URL = cfg.databaseConnectionUrl;
       };
-    }
-    #// optionalAttrs (!cfg.devMode && cfg.sentry.dsn != null) {
-    #  sentry = {
-    #    DSN = cfg.sentry.dsn;
-    #  };
-    #}
-    # // optionalAttrs (cfg.email.useSMTP) {
-    #   EMAIL_HOST = cfg.email.host;
-    #   EMAIL_HOST_PASSWORD = cfg.email.password;
-    #   EMAIL_HOST_USER = cfg.email.user;
-    #   EMAIL_PORT = cfg.email.port;
-    #   EMAIL_SSL_CERTFILE = cfg.email.sslCertFile;
-    #   EMAIL_SSL_KEYFILE = cfg.email.sslKeyFile;
-    #   EMAIL_TIMEOUT = cfg.email.timeout;
-    #   EMAIL_USE_SSL = cfg.email.useSSL;
-    #   EMAIL_USE_TLS = cfg.email.useTLS;
-    # }
-    ;
-
+    };
   configSource = with generators; toINI
     {
       mkKeyValue = mkKeyValueDefault
@@ -95,17 +55,10 @@ let
   mangakiEnv = {
     MANGAKI_SETTINGS_PATH = toString configFile;
     DJANGO_SETTINGS_MODULE = "mangaki.settings";
+  } // optionalAttrs (cfg.useLocalDatabase) {
+    DATABASE_URL = "postgresql:///mangaki"; # Rely on trusted authentication.
   };
   srcPath = if isNull cfg.sourcePath then pkgs.mangaki.src else cfg.sourcePath;
-  # FIXME(Ryan): This script will end up in the /nix/store and compromises password
-  writePGPassScript = with cfg.databaseConfig; ''
-    # Write ~/.pgpass to simplify the operations using pg_* & psql
-    if [! -f ~/.pgpass ]; then
-      touch ~/.pgpass
-      chmod 600 ~/.pgpass
-      echo "${host}:${port}:${name}:${username}:${password}" > ~/.pgpass
-    fi
-  '';
   initialMigrationScript = ''
     # Initialize database
     if [ ! -f .initialized ]; then
@@ -114,8 +67,6 @@ let
 
       touch .initialized
     fi
-
-    ${optionalString (!cfg.useLocalDatabase) writePGPassScript}
   '';
   mkOneShotShortTimer = service: {
     wantedBy = [ "timers.target" ];
@@ -264,21 +215,13 @@ in
         You want this disabled whenever you have an external PostgreSQL database.
       '';
     };
-    databaseConfig = mkOption {
-      type = types.nullOr (types.submodule dbOptions);
+    databaseConnectionUrl = mkOption {
+      type = types.nullOr types.str;
       default = null;
       description = ''
         Submodule configuration for the PostgreSQL database.
       '';
-      example = ''
-        {
-          user = "mangaki";
-          host = "db.mangaki.fr";
-          port = 5432;
-          name = "clockwork"; # database name
-          password = "ararararararagi"; # or null, for trusted auth.
-        }
-      '';
+      example = "postgresql://mangaki:ararararararagi@db.mangaki.fr:5432/clockwork";
     };
     useLocalRedis = mkOption {
       type = types.bool;
@@ -347,11 +290,13 @@ in
       # }
     ];
 
-    warnings = concatLists ([
+  warnings = concatLists ([
      (optional (!cfg.lifecycle.performInitialMigrations)
      "You disabled initial migration setup, this can have unexpected effects.")
      (optional (!cfg.devMode -> (cfg.settings.secrets.SECRET_KEY == "CHANGE_ME"))
      "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with a default secret key. The server will be vulnerable.")
+     (optional (!cfg.devMode -> (cfg.settings.secrets.SECRET_FILE == null))
+     "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with no secret file. Some secrets may end up in the Nix store which is world-readable.")
     ]);
 
     environment.systemPackages = [ cfg.envPackage ];
