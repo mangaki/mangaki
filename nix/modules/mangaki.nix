@@ -423,8 +423,9 @@ in
       '';
     };
 
-    # Backup unit available only *not* in dev mode.
-    systemd.services.mangaki-db-backup = mkIf (cfg.backups.enable) {
+    # FIXME: repair it for external DBs.
+    # Backup unit available only *not* in dev mode and with local database.
+    systemd.services.mangaki-db-backup = mkIf (cfg.backups.enable && cfg.useLocalDatabase) {
       after = [ "postgresql.service" ];
       requires = [ "postgresql.service" ];
 
@@ -446,7 +447,7 @@ in
         today=$(date +"%Y%m%d")
         ${pkgs.postgresql}/bin/pg_dump \
           --format=c \
-          ${optionalString (!cfg.useLocalDatabase) "--host ${cfg.databaseConfig.host} --username ${cfg.databaseConfig.username} ${cfg.databaseConfig.database}"}${optionalString (cfg.useLocalDatabase) "mangaki"} > backups/mangaki.$today.dump
+          mangaki > backups/mangaki.$today.dump
         # Custom post-backup script (if applicable)
         ${optionalString (cfg.backups.postBackupScript != "") "${cfg.backups.postBackupScript} backups/mangaki.$today.dump"}
       '';

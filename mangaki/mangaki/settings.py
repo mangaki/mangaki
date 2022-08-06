@@ -121,7 +121,7 @@ if DEBUG:
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=config.get('database', 'URL', fallback=config.get('secrets', 'DATABASE_URL')),
+        default=config.get('database', 'URL', fallback=config.get('secrets', 'DATABASE_URL', fallback='')),
         conn_max_age=600)
 }
 
@@ -286,7 +286,7 @@ else:
 
 # External services
 if config.has_section('mal'):
-    MAL_USER = config.get('mal', 'MAL_USER', fallback=config.get('secrets', 'MAL_USER'))
+    MAL_USER = config.get('mal', 'MAL_USER', fallback=config.get('secrets', 'MAL_USER', fallback=''))
     MAL_PASS = config.get('secrets', 'MAL_PASS')
     MAL_USER_AGENT = config.get('mal', 'MAL_USER_AGENT')
 
