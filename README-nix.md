@@ -28,7 +28,7 @@ Create a user the same as in the default installation.
 
 This requires Redis to be running: `services.redis.enable = true;` does the job.
 
-`$ celery worker -B -A mangaki:celery_app -l INFO` is enough.
+`$ celery -A mangaki.workers:app worker -B -l INFO` is enough.
 
 ### For maintainers and updating Poetry lockfiles
 
