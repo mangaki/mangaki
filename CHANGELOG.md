@@ -1,3 +1,14 @@
+# Mangaki v0.8
+
+## Breaking changes
+
+- `[pgsql]` section in settings was removed and replaced by `[database]` with only a field: `URL` which takes a connection string URI, e.g. `postgresql://xxx`.
+
+## New Features
+
+- `[secrets]` accept a `SECRET_FILE` which is merged with `[secrets]` section to separate secrets from the settings file, the format of `SECRET_FILE` is `.env`-style file and loaded using `python-dotenv`.
+- Nix-based setup.
+
 # Mangaki v0.2
 
 # New Features
