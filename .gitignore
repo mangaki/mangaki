@@ -35,3 +35,4 @@ result
 result-*
 # Qemu images
 *.qcow2
+.direnv
