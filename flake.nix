@@ -2,10 +2,10 @@
   description = "Mangaki";
 
   # Nixpkgs / NixOS version to use.
-  inputs.nixpkgs = { type = "github"; owner = "NixOS"; repo = "nixpkgs"; ref = "21.05"; };
+  inputs.nixpkgs = { type = "github"; owner = "NixOS"; repo = "nixpkgs"; ref = "22.05"; };
 
   # Poetry2nix version to use
-  inputs.poetry2nix = { type = "github"; owner = "nix-community"; repo = "poetry2nix"; ref = "1.21.0"; };
+  inputs.poetry2nix = { type = "github"; owner = "nix-community"; repo = "poetry2nix"; ref = "1.31.0"; };
 
   # Flake compatability shim
   inputs.flake-compat = { type = "github"; owner = "edolstra"; repo = "flake-compat"; flake = false; };

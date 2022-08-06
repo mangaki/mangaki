@@ -79,42 +79,9 @@ If you can read something like this:
 
 The worker is ready to receive background tasks (e.g. MAL imports).
 
-## New: Nix-based installation
+## Nix-based install
 
-Ensure you have a fairly recent Nix (> 2.0) and have `direnv`.
-
-Allow the `.envrc` to run.
-
-### Database setup
-
-Ensure you have a PostgreSQL running: `services.postgresql.enable = true;` might be enough if you are using NixOS.
-
-Create a user the same as in the default installation.
-
-### Running the web server
-
-`$ django-admin runserver` is enough.
-
-### Running background tasks (Celery)
-
-This requires Redis to be running: `services.redis.enable = true;` does the job.
-`$ celery worker -B -A mangaki:celery_app -l INFO` is enough.
-
-### Poetry maintainer version
-
-If you use `direnv`, you will always have `poetry`, `poetry2nix` and `nixfmt` automagically installed in your shell.
-
-Moreover, `DJANGO_SETTINGS_MODULE` & `PYTHONPATH` is automatically propagated.
-
-Thus, you can replace `./managki/manage.py` by `django-admin` from wherever you are in your filesystem.
-
-Also, you can drop the `PYTHONPATH` hack to run Celery, it will just work out of the box, from wherever you are in your filesystem again. :-)
-
-To relock overrides, you can run `poetry2nix lock` to update `overrides.nix` (in particular: Mangaki Zero).
-
-### QEMU install
-
-Just run `nix-build -A nixosConfigurations.vm.config.system.build.vm` and `result/bin/run-nixos-vm`, enjoy Mangaki on <https://localhost:8000> in the virtual machine.
+Please check [this file](./README-nix.md) for more information.
 
 ## VM install
 

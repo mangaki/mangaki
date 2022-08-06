@@ -1,4 +1,4 @@
-{ pkgs, poetry2nix }:
+{ pkgs, poetry2nix, lib ? pkgs.lib }:
 let
   defaultParameters = rec {
     src = ./../../..; # prevents unnecessary sanitizing which causes problems
@@ -12,4 +12,5 @@ let
   drv = poetry2nix.mkPoetryApplication defaultParameters;
   isUsingWheel = pkg: (drv.passthru.python.pkgs.${pkg}.src.isWheel or false);
 in
-  assert isUsingWheel "numpy" && isUsingWheel "scipy" && isUsingWheel "pandas"; drv
+  assert isUsingWheel "numpy" && isUsingWheel "scipy" && isUsingWheel "pandas";
+  drv
