@@ -95,6 +95,7 @@ The database starts empty, but you can populate a few works:
 
     ./mangaki/manage.py loaddata ../fixtures/{partners,seed_data}.json
     ./mangaki/manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
+    ./mangaki/manage.py index      # Compute the search indexes. Should be done once in a while.
     ./mangaki/manage.py top --all  # Compute the Top 20 directors, etc. Should be done regularly.
     py.test mangaki/               # Run all tests
 

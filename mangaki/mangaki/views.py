@@ -183,9 +183,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 
         context['references'] = {}
         for reference in self.object.reference_set.all():
-            for domain, name in REFERENCE_DOMAINS:
-                if reference.url.startswith(domain):
-                    context['references'][reference.url] = name
+            context['references'][reference.get_url()] = reference.source
         if 'AniDB' not in context['references'].values() and self.object.anidb_aid >= 1:
             url = f'https://anidb.net/anime/{self.object.anidb_aid}'
             context['references'][url] = 'AniDB'
