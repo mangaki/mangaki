@@ -300,17 +300,6 @@ python-versions = "*"
 Django = ">=1.5"
 
 [[package]]
-name = "django-nose"
-version = "1.4.7"
-description = "Makes your Django tests simple and snappy"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-nose = ">=1.2.1"
-
-[[package]]
 name = "django-sendfile"
 version = "0.3.11"
 description = "Abstraction to offload file uploads to web-server (e.g. Apache with mod_xsendfile) once Django has checked permissions etc."
@@ -616,7 +605,7 @@ secure-aggregation = ["mangaki-zero-aggregation (>=0.1,<0.2)"]
 type = "git"
 url = "https://github.com/mangaki/zero"
 reference = "master"
-resolved_reference = "e39bffbb29e00067120d70ee91959f1717cdb0d2"
+resolved_reference = "d5140b47a7c27f72fdf2ad145645274905282f61"
 
 [[package]]
 name = "markdown"
@@ -659,14 +648,6 @@ python-versions = ">=3.6"
 [package.extras]
 fast = ["fastnumbers (>=2.0.0)"]
 icu = ["PyICU (>=1.0.0)"]
-
-[[package]]
-name = "nose"
-version = "1.3.7"
-description = "nose extends unittest to make testing easier"
-category = "dev"
-optional = false
-python-versions = "*"
 
 [[package]]
 name = "numpy"
@@ -1230,7 +1211,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<4"
-content-hash = "501614aca85dc0f064a6e1700e1203a4d028aa6956a28c8b877a0dcdd9034f7e"
+content-hash = "b043eedbaf608dd077be22e5bebc48dc5bf51fc967f847fe675295ba4ac1dd04"
 
 [metadata.files]
 amqp = [
@@ -1372,10 +1353,6 @@ django-extensions = [
 django-js-reverse = [
     {file = "django-js-reverse-0.9.1.tar.gz", hash = "sha256:2a392d169f44e30b883c30dfcfd917a14167ce8fe196c99d2385b31c90d77aa0"},
     {file = "django_js_reverse-0.9.1-py2.py3-none-any.whl", hash = "sha256:8134c2ab6307c945edfa90671ca65e85d6c1754d48566bdd6464be259cc80c30"},
-]
-django-nose = [
-    {file = "django-nose-1.4.7.tar.gz", hash = "sha256:a4885cd002d65fd2de96e2bb2563ef477c3fbe207009360c015fca5c3b5561b7"},
-    {file = "django_nose-1.4.7-py2.py3-none-any.whl", hash = "sha256:304adc447ee35b889b733d7106004f98aa401d8387ddcada5d4f2239d86790a9"},
 ]
 django-sendfile = [
     {file = "django-sendfile-0.3.11.tar.gz", hash = "sha256:f3065a55e602d002af327fe785449ff0a619b6f46ad2cb84730ccb49b31a73ca"},
@@ -1618,11 +1595,6 @@ mccabe = [
 natsort = [
     {file = "natsort-7.2.0-py3-none-any.whl", hash = "sha256:24f245daf9622683d4d2dfbd6076ba4aa0054074e73bbeea4253b4bfec0ea2bc"},
     {file = "natsort-7.2.0.tar.gz", hash = "sha256:e7054b4e1f47365f141602a742685165a552291b643a214652d0dd9d6cea58d1"},
-]
-nose = [
-    {file = "nose-1.3.7-py2-none-any.whl", hash = "sha256:dadcddc0aefbf99eea214e0f1232b94f2fa9bd98fa8353711dacb112bfcbbb2a"},
-    {file = "nose-1.3.7-py3-none-any.whl", hash = "sha256:9ff7c6cc443f8c51994b34a667bbcf45afd6d945be7477b52e97516fd17c53ac"},
-    {file = "nose-1.3.7.tar.gz", hash = "sha256:f1bffef9cbc82628f6e7d7b40d7e255aefaa1adb6a1b1d26c69a8b79e6208a98"},
 ]
 numpy = [
     {file = "numpy-1.21.1-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:38e8648f9449a549a7dfe8d8755a5979b45b3538520d1e735637ef28e8c2dc50"},

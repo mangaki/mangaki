@@ -39,7 +39,6 @@ dj-database-url = "0.5.0"
 [tool.poetry.dev-dependencies]
 django-debug-toolbar="^2.2" # dev
 django-extensions="*" # dev
-django-nose="*" # legacy-tests
 flake8="*" # dev
 git-lint="*" # dev
 pylint="*" # dev
