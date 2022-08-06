@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 from rest_framework.documentation import include_docs_urls
-from django.conf.urls import re_path
+from django.urls import re_path
 
 from mangaki.api.cards import get_card
 from mangaki.api.tasks import task_status, user_tasks
