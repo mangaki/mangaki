@@ -1,5 +1,6 @@
 .DS_Store
 venv
+.venv
 db.sqlite3
 *.pyc
 data/
@@ -20,7 +21,17 @@ media
 /provisioning/env_vars/
 *.mo
 .hypothesis
+.mypy_cache
+# Packaging
+.eggs
+dist/
+mangaki.egg-info/
 # Merci JJ <3
 /mangaki/debug.log
 # Configuration de Visual Studio Code
 .vscode/
+# Nix
+result
+result-*
+# Qemu images
+*.qcow2

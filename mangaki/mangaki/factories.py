@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 import factory
+import faker
 from factory.django import DjangoModelFactory, mute_signals
 
 from .models import Profile, Work, Category

@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import configparser
 import json
 import os
-from setuptools_scm import get_version
+import dj_database_url
+from dotenv import dotenv_values
 from pkg_resources import get_distribution, DistributionNotFound
 from django.utils.translation import ugettext_lazy as _
 
@@ -25,16 +26,26 @@ config = configparser.ConfigParser(allow_no_value=True, interpolation=None)
 config.read(
     os.environ.get('MANGAKI_SETTINGS_PATH', os.path.join(BASE_DIR, 'settings.ini')))
 
+# Load secret file, if there is any.
+if config.has_section('secrets') and config.has_option('secrets', 'SECRET_FILE'):
+    config.read_dict(
+        { 'secrets': dotenv_values(config.get('secrets', 'SECRET_FILE')) },
+        source=config.get('secrets', 'SECRET_FILE')
+    )
+
 DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
 # Use non-minified version of Vue.js
 DEBUG_VUE_JS = config.getboolean('debug', 'DEBUG_VUE_JS', fallback=False)
 
-SECRET_KEY = config.get('secrets', 'SECRET_KEY')
+if DEBUG:
+    SECRET_KEY = config.get('secrets', 'SECRET_KEY', fallback='CHANGE_ME')
+else:
+    SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 
 # Step 1: if we are in a Git repository.
 try:
     REPO_DIR = os.path.dirname(BASE_DIR)
-    VERSION = get_version(REPO_DIR)
+    VERSION = None # FIXME: use something proper, get_version(REPO_DIR)
 except:
     VERSION = None
 
@@ -109,30 +120,18 @@ if DEBUG:
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config.get('pgsql', 'DB_NAME', fallback='mangaki'),
-        'USER': config.get('pgsql', 'DB_USER', fallback=''),
-        'PASSWORD': config.get('secrets', 'DB_PASSWORD', fallback=''),
-        'HOST': config.get('pgsql', 'DB_HOST', fallback=''),
-        'PORT': config.get('pgsql', 'DB_PORT', fallback=''),
-    }
+    'default': dj_database_url.config(
+        default=config.get('database', 'URL', fallback=config.get('secrets', 'DATABASE_URL', fallback='')),
+        conn_max_age=600)
 }
 
 if DEBUG:
     INSTALLED_APPS += (
         'debug_toolbar',
-        'django_extensions',
-        'django_nose',
+        'django_extensions'
     )
 
     INTERNAL_IPS = ('127.0.0.1',)
-
-    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-    NOSE_ARGS = [
-        '--with-doctest',
-    ]
 
     NOTEBOOK_ARGUMENTS = [
         '--ip=0.0.0.0',
@@ -289,7 +288,7 @@ else:
 
 # External services
 if config.has_section('mal'):
-    MAL_USER = config.get('mal', 'MAL_USER')
+    MAL_USER = config.get('mal', 'MAL_USER', fallback=config.get('secrets', 'MAL_USER', fallback=''))
     MAL_PASS = config.get('secrets', 'MAL_PASS')
     MAL_USER_AGENT = config.get('mal', 'MAL_USER_AGENT')
 
