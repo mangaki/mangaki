@@ -9,7 +9,7 @@ from django.test import TestCase
 
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from django.contrib import admin
+from django.contrib.admin import helpers
 
 from mangaki.models import Work, Category
 from mangaki.utils.anidb import AniDB, client
@@ -56,7 +56,7 @@ class RefreshFromAniDBTest(TestCase):
         refresh_work_from_anidb_url = reverse('admin:mangaki_work_changelist')
         response = self.client.post(
             refresh_work_from_anidb_url,
-            {'action': 'refresh_work_from_anidb', admin.ACTION_CHECKBOX_NAME: self.work_ids},
+            {'action': 'refresh_work_from_anidb', helpers.ACTION_CHECKBOX_NAME: self.work_ids},
             follow=True
         )
         self.assertEqual(response.status_code, 200)
@@ -71,7 +71,7 @@ class RefreshFromAniDBTest(TestCase):
         refresh_tags_from_anidb_url = reverse('admin:mangaki_work_changelist')
         response = self.client.post(
             refresh_tags_from_anidb_url,
-            {'action': 'update_tags_via_anidb', admin.ACTION_CHECKBOX_NAME: self.work_ids},
+            {'action': 'update_tags_via_anidb', helpers.ACTION_CHECKBOX_NAME: self.work_ids},
             follow=True
         )
         self.assertEqual(response.status_code, 200)
@@ -85,7 +85,7 @@ class RefreshFromAniDBTest(TestCase):
         refresh_tags_from_anidb_url = reverse('admin:mangaki_work_changelist')
         context = {
             'action': 'update_tags_via_anidb',
-            admin.ACTION_CHECKBOX_NAME: self.work_ids,
+            helpers.ACTION_CHECKBOX_NAME: self.work_ids,
             'confirm': 1,
             'to_update_work_ids': [str(hibike.pk)],
             'work_ids': [str(hibike.pk), str(hibike.pk), str(hibike.pk)],
