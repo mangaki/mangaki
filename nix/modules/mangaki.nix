@@ -18,10 +18,11 @@ let
         EMAIL_BACKEND = if cfg.devMode then consoleBackend else smtpBackend;
       };
 
-    secrets = {
-      SECRET_FILE = cfg.secretFile;
-    };
+    secrets = {};
   }
+    // optionalAttrs (cfg.useLocalDatabase) {
+      database.URL = "postgresql://";
+    }
     // optionalAttrs (!cfg.devMode) {
       deployment = {
         MEDIA_ROOT = "/var/lib/mangaki/media";
@@ -31,11 +32,6 @@ let
 
       hosts = {
         ALLOWED_HOSTS = concatStringsSep "," cfg.allowedHosts;
-      };
-    }
-    // optionalAttrs (!cfg.useLocalDatabase) {
-      database = {
-        URL = cfg.databaseConnectionUrl;
       };
     };
   configSource = with generators; toINI
@@ -137,7 +133,9 @@ in
       '';
     };
     settings = mkOption {
-      type = types.attrs;
+      type = types.submodule {
+        freeformType = with types; attrsOf attrs;
+      };
       default = defaultSettings;
       example = ''
         {
@@ -215,14 +213,6 @@ in
         You want this disabled whenever you have an external PostgreSQL database.
       '';
     };
-    databaseConnectionUrl = mkOption {
-      type = types.nullOr types.str;
-      default = null;
-      description = ''
-        Submodule configuration for the PostgreSQL database.
-      '';
-      example = "postgresql://mangaki:ararararararagi@db.mangaki.fr:5432/clockwork";
-    };
     useLocalRedis = mkOption {
       type = types.bool;
       default = true;
@@ -265,8 +255,10 @@ in
   config = mkIf cfg.enable {
     assertions = [
       {
-        assertion = !cfg.useLocalDatabase -> cfg.databaseConfig != null;
-        message = "If local database is not used, database configuration must be set.";
+        assertion = !cfg.useLocalDatabase -> (
+          hasAttr "SECRET_FILE" cfg.settings.secrets || hasAttr "URL" (cfg.settings.database or {})
+        );
+        message = "If local database is not used, either a secret file with a database URI or the database URI must be set.";
       }
       {
         assertion = !cfg.useLocalRedis -> cfg.redisConfig != null;
@@ -284,6 +276,10 @@ in
         assertion = !cfg.devMode -> cfg.domainName != null;
         message = "If production mode is enabled, a domain name must be set, otherwise NGINX cannot be configured.";
       }
+      {
+        assertion = !cfg.devMode -> hasAttr "SECRET_KEY" cfg.settings.secrets || hasAttr "SECRET_FILE" cfg.settings.secrets;
+        message = "If production mode is enabled, either a secret file or a secret key must be set in secrets, otherwise Mangaki will not start.";
+      }
       # {
       #   assertion = cfg.email.useSMTP -> cfg.email.host != null && cfg.email.password != null;
       #   message = "If SMTP is enabled, SMTP host and password must be set.";
@@ -295,7 +291,7 @@ in
      "You disabled initial migration setup, this can have unexpected effects.")
      (optional (!cfg.devMode -> (cfg.settings.secrets.SECRET_KEY == "CHANGE_ME"))
      "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with a default secret key. The server will be vulnerable.")
-     (optional (!cfg.devMode -> (cfg.settings.secrets.SECRET_FILE == null))
+     (optional (!cfg.devMode -> (!hasAttr "SECRET_FILE" cfg.settings.secrets || cfg.settings.secrets.SECRET_FILE == null))
      "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with no secret file. Some secrets may end up in the Nix store which is world-readable.")
     ]);
 

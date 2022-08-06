@@ -37,7 +37,10 @@ DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
 # Use non-minified version of Vue.js
 DEBUG_VUE_JS = config.getboolean('debug', 'DEBUG_VUE_JS', fallback=False)
 
-SECRET_KEY = config.get('secrets', 'SECRET_KEY')
+if DEBUG:
+    SECRET_KEY = config.get('secrets', 'SECRET_KEY', fallback='CHANGE_ME')
+else:
+    SECRET_KEY = config.get('secrets', 'SECRET_KEY')
 
 # Step 1: if we are in a Git repository.
 try:
@@ -118,7 +121,7 @@ if DEBUG:
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=config.get('database', 'url'),
+        default=config.get('database', 'URL', fallback=config.get('secrets', 'DATABASE_URL')),
         conn_max_age=600)
 }
 

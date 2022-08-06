@@ -19,13 +19,13 @@
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
 
       # Nixpkgs instantiated for supported system types.
-      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlay ]; });
+      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlays.default ]; });
 
     in
     {
 
       # A Nixpkgs overlay.
-      overlay = final: prev:
+      overlays.default = final: prev:
         with final;
         (poetry2nix.overlay final prev) //
         {
@@ -53,6 +53,7 @@
                     cat <<EOF > settings.ini
                     [secrets]
                       SECRET_KEY = dontusethisorgetfired
+                      DATABASE_URL = sqlite://
                     [deployment]
                       STATIC_ROOT = $out
                     EOF
@@ -69,23 +70,18 @@
       # Provide some binary packages for selected system types.
       packages = forAllSystems (system:
         {
-          inherit (nixpkgsFor.${system})
-            mangaki;
+          inherit (nixpkgsFor.${system}) mangaki;
+          default = nixpkgsFor.${system}.mangaki;
         });
 
-      # The default package for 'nix build'. This makes sense if the
-      # flake provides only one package or there is a clear "main"
-      # package.
-      defaultPackage = forAllSystems (system: self.packages.${system}.mangaki);
-
       # Development environment
-      devShell = forAllSystems (system:
+      devShells = forAllSystems (system:
         let
           pkgSet = nixpkgsFor.${system};
           poetry2nix-cli = poetry2nix.packages.${system}.poetry2nix;
         in
         with pkgSet;
-        mkShell {
+        { default = mkShell {
           buildInputs = [
             poetry
             poetry2nix-cli
@@ -98,7 +94,7 @@
           shellHook = ''
             export MANGAKI_SETTINGS_PATH="$(pwd)"/mangaki/settings.ini # Cheap too.
           '';
-        });
+        }; });
 
       # NixOS system configuration, if applicable
       nixosConfigurations.dev = nixpkgs.lib.nixosSystem {
@@ -119,7 +115,7 @@
 
           # Flake specific support
           ({ ... }: {
-            nixpkgs.overlays = [ self.overlay ];
+            nixpkgs.overlays = [ self.overlays.default ];
           })
 
           # Mangaki configuration
@@ -146,9 +142,9 @@
           with import ("${nixpkgs}/nixos/lib/testing-python.nix") { inherit system; };
           makeTest {
             name = "prod-test";
-            machine = { ... }: {
+            nodes.machine = { ... }: {
               imports = [ self.nixosModules.mangaki ];
-              nixpkgs.overlays = [ self.overlay ];
+              nixpkgs.overlays = [ self.overlays.default ];
               virtualisation.memorySize = 2048;
               virtualisation.cores = 2;
               services.mangaki = {
@@ -156,6 +152,7 @@
                 devMode = false;
                 useTLS = false;
                 domainName = "mangaki.test";
+                settings.secrets.SECRET_KEY = "CHANGE_ME";
               };
             };
             testScript = ''
@@ -176,9 +173,9 @@
 
           makeTest {
             name = "web-test";
-            machine = { ... }: {
+            nodes.machine = { ... }: {
               imports = [ self.nixosModules.mangaki ];
-              nixpkgs.overlays = [ self.overlay ];
+              nixpkgs.overlays = [ self.overlays.default ];
               virtualisation.memorySize = 2048;
               virtualisation.cores = 2;
               services.mangaki = {
