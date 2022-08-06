@@ -99,7 +99,7 @@ def create_merge_form(works_to_merge_qs):
 
 
 @transaction.atomic  # In case trouble happens
-def merge_works(request, selected_queryset, force=False):
+def merge_works(request, selected_queryset, force=False, extra=None):
     user = request.user if request else None
     if selected_queryset.model == WorkCluster:  # Author is reviewing an existing WorkCluster
         from_cluster = True
@@ -128,6 +128,9 @@ def merge_works(request, selected_queryset, force=False):
             rich_context = dict(context)
             for field in suggestions:
                 rich_context[field] = suggestions[field]
+            if extra is not None:
+                for field in extra:
+                    rich_context[field] = extra[field]
             if force:
                 rich_context['confirm'] = True
 
@@ -530,6 +533,7 @@ class WorkClusterAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     list_select_related = ('user', 'resulting_work', 'checker')
     raw_id_fields = ('user', 'works', 'checker', 'resulting_work', 'origin')
+    search_fields = ('id',)
     actions = ('trigger_merge', 'reject')
 
     def get_queryset(self, request):

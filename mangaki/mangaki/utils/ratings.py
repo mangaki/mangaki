@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.db.models import Q
+from mangaki.models import Rating
 
 
 def pk_from_object_or_pk(obj):
@@ -81,6 +84,33 @@ def current_user_ratings(request, works=None):
         if works is not None:
             qs = qs.filter(work__in=works)
         return dict(qs.values_list('work_id', 'choice'))
+
+
+def friend_ratings(request, friend_ids=None):
+    """
+    Compute the set of ratings for a friend of the current user.
+    Possible: make it work on any public users.
+
+    The user should be logged in.
+
+    Arguments:
+        request -- The Request object we are currently handling.
+        friend_id -- The id of the user ratings to return;
+            if None, consider all eligible friends
+
+    Returns:
+        ratings -- A dictionary mapping Work primary keys to their rating
+            string ('like', 'dislike', etc.)
+    """
+    qs = Rating.objects.all()
+    if friend_ids is not None:
+        qs = qs.filter(user__in=friend_ids)
+    return qs.filter(
+        user__in=request.user.profile.friends.values_list('id',
+                                                          flat=True)).filter(
+        Q(user__profile__is_shared=True) |
+        Q(user__profile__friends__id=request.user.id)).values_list(
+        'user_id', 'work_id', 'choice')
 
 
 def current_user_rating(request, work):

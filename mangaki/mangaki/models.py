@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
 from django.core.files import File
 from django.urls import reverse
 from django.db import models, transaction
@@ -137,7 +138,7 @@ class Work(models.Model):
     redirect = models.ForeignKey('Work', on_delete=models.SET_NULL, blank=True, null=True)
     title = models.CharField(max_length=255)
     source = models.CharField(max_length=1044, blank=True) # Rationale: JJ a trouvé que lors de la migration SQLite → PostgreSQL, bah il a pas trop aimé. (max_length empirique)
-    ext_poster = models.CharField(max_length=128, db_index=True)
+    ext_poster = models.CharField(max_length=256, db_index=True)
     int_poster = models.FileField(upload_to='posters/', blank=True, null=True)
     nsfw = models.BooleanField(default=False)
     # Should be renamed to start_date
@@ -170,9 +171,14 @@ class Work(models.Model):
     controversy = models.FloatField(blank=True, null=False, default=0)
 
     # Cache fields for the title deduplication
-    title_search = SearchVectorField('title')
+    title_search = SearchVectorField('title')  # Probably broken
+    search_terms = models.TextField(blank=True, null=True)
+    titles_search = SearchVectorField(null=True)
 
     class Meta:
+        indexes = (
+            GinIndex(fields=['titles_search']),
+        )
         index_together = [
             ['category', 'controversy'],
             ['category', 'nb_ratings'],
@@ -235,8 +241,8 @@ class WorkTitle(models.Model):
     work = models.ForeignKey('Work', on_delete=models.CASCADE)
     # 255 should be safe, we have seen titles of 187 characters in Japanese.
     # So we could expect longer titles in English.
-    title = models.CharField(max_length=255, blank=True, db_index=True)
-    title_search = SearchVectorField('title')
+    title = models.CharField(max_length=300, blank=True, db_index=True)
+    title_search = SearchVectorField('title')  # Probably broken
     language = models.ForeignKey('Language', on_delete=models.SET_NULL,
                                  null=True)
     ext_language = models.ForeignKey('ExtLanguage', on_delete=models.SET_NULL,
@@ -445,6 +451,7 @@ class Profile(models.Model):
     keyboard_shortcuts_enabled = models.BooleanField(default=False)
     avatar_url = models.CharField(max_length=128, default='', blank=True, null=True)
     mal_username = models.CharField(max_length=64, default='', blank=True, null=True)
+    friends = models.ManyToManyField(User, related_name="friends")
 
     def get_anime_count(self):
         return Rating.objects.filter(user=self.user, choice__in=['like', 'neutral', 'dislike', 'favorite']).count()
@@ -648,6 +655,20 @@ class Reference(models.Model):
         unique_together = (
             ('work', 'source', 'identifier'),
         )
+
+    def get_url(self):
+        if self.source in {'Icotaku', 'Animeka', 'VGMdb'}:
+            return self.url
+        if self.source == 'AniDB':
+            hostname = 'anidb.net'
+        elif self.source == 'MAL':
+            hostname = 'myanimelist.net'
+        else:
+            hostname = self.source
+        return f'https://{hostname}/anime/{self.identifier}'
+
+    def __str__(self):
+        return f'{self.source}:{self.identifier}'
 
 
 class Top(models.Model):

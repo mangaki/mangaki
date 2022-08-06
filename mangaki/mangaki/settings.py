@@ -276,6 +276,8 @@ STATIC_ROOT = config.get('deployment', 'STATIC_ROOT', fallback=os.path.join(BASE
 MEDIA_ROOT = config.get('deployment', 'MEDIA_ROOT', fallback=os.path.join(BASE_DIR, 'media'))
 DATA_ROOT = config.get('deployment', 'DATA_ROOT', fallback=os.path.join(BASE_DIR, 'data'))
 ML_SNAPSHOT_ROOT = os.path.join(DATA_ROOT, 'snapshots')  # FIXME: rename PICKLE_DIR to SNAPSHOT_DIR
+VIZ_ROOT = config.get('deployment', 'VIZ_ROOT', fallback=os.path.join(DATA_ROOT, 'viz'))
+VIZ_URL = config.get('deployment', 'VIZ_URL', fallback='https://mangaki.fr/map')
 
 if config.has_section('sendfile'):
     SENDFILE_BACKEND = config.get('sendfile', 'backend', fallback='sendfile.backends.simple')
@@ -301,3 +303,4 @@ JS_REVERSE_OUTPUT_PATH = 'mangaki/mangaki/static/js'
 RECO_ALGORITHMS_VERBOSE_LEVEL = 1
 
 ANONYMOUS_RATINGS_SESSION_KEY = 'mangaki_ratings'
+RECO_GROUP_SESSION_KEY = 'mangaki_reco_group'
