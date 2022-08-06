@@ -26,7 +26,7 @@ def dump_2d_embeddings(algo, filename, N=2025):
     
     M = algo.VT.T[encoded_most_popular_items]
 
-    tsne = manifold.TSNE(n_components=2, init='pca')
+    tsne = manifold.TSNE(n_components=2, init='pca', perplexity=5.0)
     X_tsne = tsne.fit_transform(M)
     
     Work = apps.get_model('mangaki', 'Work')

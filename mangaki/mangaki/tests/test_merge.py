@@ -7,10 +7,11 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.admin import helpers
+from django.utils import timezone
 
 from mangaki import tasks
 from mangaki.models import Work, Category, WorkCluster, Rating, Staff, Role, Artist, Genre, Reference
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from mangaki.utils.work_merge import create_work_cluster, merge_work_clusters
 
@@ -23,9 +24,9 @@ class MergeTest(TestCase):
         for username in 'ABCD':
             self.users.append(get_user_model().objects.create_user(username=username, password='test'))
 
-        today = datetime.now()
-        yesterday = datetime.now() - timedelta(1)
-        tomorrow = datetime.now() + timedelta(1)
+        today = timezone.now()
+        yesterday = timezone.now() - timedelta(1)
+        tomorrow = timezone.now() + timedelta(1)
 
         anime = Category.objects.get(slug='anime')
 
