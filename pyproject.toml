@@ -14,9 +14,9 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.7.1,<4"
-Django = "^2.2" # main
-django-allauth = "^0.41" # main
+python = ">=3.8,<4"
+Django = "^3.2" # main
+django-allauth = "^0.43" # main
 django-bootstrap4 = "!=1.1.1" # main
 django-celery-beat="^2.3" # main
 django-js-reverse="^0.9" # main
@@ -38,7 +38,7 @@ dj-database-url = "0.5.0"
 python-dotenv = "^0.20.0"
 
 [tool.poetry.dev-dependencies]
-django-debug-toolbar="^2.2" # dev
+django-debug-toolbar="^3.2" # dev
 django-extensions="*" # dev
 flake8="*" # dev
 git-lint="*" # dev

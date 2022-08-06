@@ -24,12 +24,12 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpRespon
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone, translation
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.timezone import utc
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.defaults import server_error
 from django.views.generic import View
@@ -1138,7 +1138,7 @@ def update_evidence(request):
             evidence.save()
 
     next_url = request.GET.get('next')
-    if next_url and is_safe_url(url=next_url, allowed_hosts=request.get_host()):
+    if next_url and url_has_allowed_host_and_scheme(url=next_url, allowed_hosts=request.get_host()):
         return redirect(next_url)
     return redirect('fix-index')
 

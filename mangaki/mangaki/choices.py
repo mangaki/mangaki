@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2014, Mangaki Authors
 # SPDX-License-Identifier: AGPL-3.0-only
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 ORIGIN_CHOICES = (

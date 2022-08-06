@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from mangaki.models import Suggestion, Rating, Profile
 from mangaki.utils.ratings import get_anonymous_ratings, clear_anonymous_ratings
 from mangaki.choices import SUGGESTION_PROBLEM_CHOICES

@@ -5,9 +5,9 @@
 Django settings for mangaki project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.9/topics/settings/
+https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.9/ref/settings/
+https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import configparser
@@ -16,7 +16,7 @@ import os
 import dj_database_url
 from dotenv import dotenv_values
 from pkg_resources import get_distribution, DistributionNotFound
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 FIXTURE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
@@ -117,8 +117,9 @@ if DEBUG:
     )
 
 # Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATABASES = {
     'default': dj_database_url.config(
         default=config.get('database', 'URL', fallback=config.get('secrets', 'DATABASE_URL', fallback='')),
@@ -253,7 +254,7 @@ if config.has_section('smtp'):
     EMAIL_SSL_CERTFILE = config.get('smtp', 'EMAIL_SSL_CERTFILE', fallback=None)
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.9/topics/i18n/
+# https://docs.djangoproject.com/en/3.2/topics/i18n/
 LANGUAGE_CODE = 'en'
 LANGUAGES = [
     ('fr', 'Français'),
@@ -268,7 +269,7 @@ USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 

@@ -7,6 +7,7 @@ import django.db
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.core.files import File
+from django.utils import timezone
 
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view, permission_classes
@@ -73,7 +74,7 @@ def export_user_data(request: Request):
     user = request.user
 
     # Cleanup old archives.
-    cache_expiration = datetime.fromtimestamp(datetime.now().timestamp() - USER_EXPORT_DATA_CACHE_PERIOD)
+    cache_expiration = datetime.fromtimestamp(timezone.now().timestamp() - USER_EXPORT_DATA_CACHE_PERIOD)
     for archive in UserArchive.objects.filter(owner=user,
                                               updated_on__lte=cache_expiration).iterator():
         try:

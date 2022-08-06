@@ -52,7 +52,7 @@ class CommandTest(TestCase):
         )
         management.call_command('add_anidb', self.anime.anidb_aid,
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
+        self.assertEqual(self.stdout.getvalue(),
                           "Successfully added Sangatsu no Lion\n")
 
     @responses.activate
@@ -83,24 +83,24 @@ class CommandTest(TestCase):
 
     def test_fit_algo(self):
         management.call_command('fit_algo', 'zero', stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
+        self.assertEqual(self.stdout.getvalue(),
                           "Successfully fit zero (0.0 MB)\n")
 
     def test_generate_seed_data(self):
         management.call_command('generate_seed_data', 'small',
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(), 'Fixture ready.\n')
+        self.assertEqual(self.stdout.getvalue(), 'Fixture ready.\n')
 
     def test_index(self):
         management.call_command('index')
         # Curiously, both below are empty
         # self.anime.title_search, self.anime.titles_search
 
-        self.assertEquals(Work.objects.filter(titles_search='lion').count(), 1)
-        self.assertEquals(Work.objects.filter(title_search='lion').count(), 1)
+        self.assertEqual(Work.objects.filter(titles_search='lion').count(), 1)
+        self.assertEqual(Work.objects.filter(title_search='lion').count(), 1)
 
-        self.assertEquals(Work.objects.filter(titles_search='march').count(), 1)
-        self.assertEquals(Work.objects.filter(title_search='march').count(), 0)
+        self.assertEqual(Work.objects.filter(titles_search='march').count(), 1)
+        self.assertEqual(Work.objects.filter(title_search='march').count(), 0)
 
     def test_lastactivity(self):
         management.call_command('lastactivity')
@@ -125,18 +125,18 @@ class CommandTest(TestCase):
         )
         management.call_command('retrieveposters', self.anime.id,
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
+        self.assertEqual(self.stdout.getvalue(),
                           '1 poster(s) successfully downloaded.\n')
 
     def test_tokens(self):
         management.call_command('tokens', 'DR', '--salt', 'PEPPER',  # HA HA
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
+        self.assertEqual(self.stdout.getvalue(),
                           'DR {:s}\n'.format(compute_token('PEPPER', 'DR')))
 
     def test_top(self):
         management.call_command('top', '--all', stdout=self.stdout)
-        self.assertEquals(len(self.stdout.getvalue().splitlines()), 6)
+        self.assertEqual(len(self.stdout.getvalue().splitlines()), 6)
 
     @responses.activate
     def test_vgmdb(self):
@@ -149,6 +149,6 @@ class CommandTest(TestCase):
         )
         management.call_command('vgmdb', self.album.id,
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
+        self.assertEqual(self.stdout.getvalue(),
                           'Successfully added Yoko Kanno to '
                           'COWBOY BEBOP Original Soundtrack 3 BLUE\n')
