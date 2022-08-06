@@ -203,6 +203,13 @@ in
           This will create a systemd timer for ranking and tops.
         '';
       };
+      runTimersForIndex = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          This will create a systemd timer for index.
+        '';
+      };
     };
     useLocalDatabase = mkOption {
       type = types.bool;
@@ -371,9 +378,11 @@ in
     };
 
     # systemd oneshot for fixture loading.
+    # systemd timer for full text search index.
+    systemd.timers."mangaki-index" = mkIf cfg.lifecycle.runTimersForIndex mkOneShotShortTimer "mangaki-index";
     # systemd timers for ranking & top --all in production mode.
-    systemd.timers."mangaki-ranking" = mkOneShotShortTimer "mangaki-ranking";
-    systemd.timers."mangaki-top" = mkOneShotShortTimer "mangaki-top";
+    systemd.timers."mangaki-ranking" = mkIf cfg.lifecycle.runTimersForRanking mkOneShotShortTimer "mangaki-ranking";
+    systemd.timers."mangaki-top" = mkIf cfg.lifecycle.runTimersForRanking mkOneShotShortTimer "mangaki-top";
     # systemd timer for regular DB backups
     systemd.timers."mangaki-db-backup" = mkIf (cfg.backups.enable) {
       wantedBy = [ "timers.target" ];
@@ -381,6 +390,26 @@ in
       timerConfig.OnCalendar = cfg.backups.periodicity;
       timerConfig.Persistent = true;
       description = "Run a backup of Mangaki database on ${cfg.backups.periodicity} periodicity";
+    };
+
+    systemd.services.mangaki-index = {
+      after = [ "mangaki-init-db.service" ];
+      requires = [ "mangaki-init-db.service" ];
+      wantedBy = [ "multi-user.target" ];
+
+      description = "Mangaki daily ranking";
+      path = [ cfg.envPackage ];
+      environment = mangakiEnv;
+
+      serviceConfig = {
+        Type = "oneshot";
+        User = "mangaki";
+        Group = "mangaki";
+      };
+
+      script = ''
+        django-admin index
+      '';
     };
 
     systemd.services.mangaki-ranking = {
