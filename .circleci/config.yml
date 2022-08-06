@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/mangaki/
     docker:
-      - image: circleci/python:3.8.13
+      - image: circleci/python:3.8.12-buster
       - image: circleci/postgres:10-alpine-ram
         environment:
           POSTGRES_USER: mangaki
