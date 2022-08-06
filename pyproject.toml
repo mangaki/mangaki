@@ -16,7 +16,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.8,<4"
 Django = "^3.2" # main
-django-allauth = "^0.44" # main
+django-allauth = "^0.43" # main
 django-bootstrap4 = "!=1.1.1" # main
 django-celery-beat="^2.3" # main
 django-js-reverse="^0.9" # main
