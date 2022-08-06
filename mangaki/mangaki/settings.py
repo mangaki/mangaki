@@ -16,7 +16,7 @@ import os
 import dj_database_url
 from dotenv import dotenv_values
 from pkg_resources import get_distribution, DistributionNotFound
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 FIXTURE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')

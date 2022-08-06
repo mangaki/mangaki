@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 
 {% block title %}{% trans "Suggestion list" %} {% if suggestions.paginator.page_range|length > 1 %}- {% trans "Page" %} {{ suggestions.number }} {% endif %}- Mangaki{% endblock %}

@@ -26,7 +26,7 @@ This README is also available [in French](README-fr.md).
 
 ### Database setup
 
-You need to have PostgreSQL >9.3 running on your machine. You also need an
+You need to have PostgreSQL ≥10 running on your machine. You also need an
 user that will have access to the database. The easiest way to achieve that is
 simply to create an account which has the same name as your username, which
 can create databases, and which is a superuser (for CREATE EXTENSION):
@@ -42,7 +42,7 @@ Then create the database, and add the required extensions:
 
 ### Running the web server
 
-You will need Python ≥ 3.7 and Poetry.
+You will need Python ≥ 3.8 and Poetry.
 
 First, copy the configuration. The default parameters are already supposed to
 work, so you shouldn't need to change anything:
