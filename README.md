@@ -69,7 +69,7 @@ Background tasks represent:
 These are optional, but if you want to try them:
 
      # The PYTHONPATH hack is necessary. If you don't like it, read the Nix section.
-     PYTHONPATH=$PYTHONPATH:`pwd`/mangaki celery worker -B -A mangaki:celery_app -l INFO
+     PYTHONPATH=$PYTHONPATH:`pwd`/mangaki celery -A mangaki.workers:app worker -B -l INFO
 
 If you can read something like this:
 
