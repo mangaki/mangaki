@@ -379,10 +379,10 @@ in
 
     # systemd oneshot for fixture loading.
     # systemd timer for full text search index.
-    systemd.timers."mangaki-index" = mkIf cfg.lifecycle.runTimersForIndex mkOneShotShortTimer "mangaki-index";
+    systemd.timers."mangaki-index" = mkIf cfg.lifecycle.runTimersForIndex (mkOneShotShortTimer "mangaki-index");
     # systemd timers for ranking & top --all in production mode.
-    systemd.timers."mangaki-ranking" = mkIf cfg.lifecycle.runTimersForRanking mkOneShotShortTimer "mangaki-ranking";
-    systemd.timers."mangaki-top" = mkIf cfg.lifecycle.runTimersForRanking mkOneShotShortTimer "mangaki-top";
+    systemd.timers."mangaki-ranking" = mkIf cfg.lifecycle.runTimersForRanking (mkOneShotShortTimer "mangaki-ranking");
+    systemd.timers."mangaki-top" = mkIf cfg.lifecycle.runTimersForRanking (mkOneShotShortTimer "mangaki-top");
     # systemd timer for regular DB backups
     systemd.timers."mangaki-db-backup" = mkIf (cfg.backups.enable) {
       wantedBy = [ "timers.target" ];
