@@ -3,37 +3,7 @@ with lib;
 let
   cfg = config.services.mangaki;
 
-  defaultSettings = {
-    debug = {
-      DEBUG = cfg.devMode;
-      DEBUG_VUE_JS = cfg.devMode;
-    };
 
-    email =
-      let
-        consoleBackend = "django.core.mail.backends.console.EmailBackend";
-        smtpBackend = "django.core.mail.backends.smtp.EmailBackend";
-      in
-      {
-        EMAIL_BACKEND = if cfg.devMode then consoleBackend else smtpBackend;
-      };
-
-    secrets = {};
-  }
-    // optionalAttrs (cfg.useLocalDatabase) {
-      database.URL = "postgresql://";
-    }
-    // optionalAttrs (!cfg.devMode) {
-      deployment = {
-        MEDIA_ROOT = "/var/lib/mangaki/media";
-        STATIC_ROOT = "${cfg.staticRoot}";
-        DATA_ROOT = "/var/lib/mangaki/data";
-      };
-
-      hosts = {
-        ALLOWED_HOSTS = concatStringsSep "," cfg.allowedHosts;
-      };
-    };
   configSource = with generators; toINI
     {
       mkKeyValue = mkKeyValueDefault
@@ -134,13 +104,12 @@ in
     };
     settings = mkOption {
       type = types.submodule {
-        freeformType = with types; attrsOf attrs;
+        freeformType = with types; attrsOf (attrsOf anything);
       };
-      default = defaultSettings;
       example = ''
         {
           debug = { DEBUG_VUE_JS = false; };
-          sentry = { dsn = "<some dsn>"; };
+          sentry = { DSN = "<some dsn>"; };
         }
       '';
       description = ''
@@ -296,11 +265,41 @@ in
   warnings = concatLists ([
      (optional (!cfg.lifecycle.performInitialMigrations)
      "You disabled initial migration setup, this can have unexpected effects.")
-     ((optional ((!cfg.devMode && !(cfg.settings.secrets ? "SECRET_FILE")) -> cfg.settings.secrets.SECRET_KEY == "CHANGE_ME"))
+     ((optional (!cfg.devMode -> cfg.settings.secrets.SECRET_KEY == "CHANGE_ME" && !(cfg.settings.secrets ? "SECRET_FILE")))
      "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with a default secret key. The server will be vulnerable.")
      (optional (!cfg.devMode -> (!(cfg.settings.secrets ? "SECRET_FILE") || cfg.settings.secrets.SECRET_FILE == null))
      "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with no secret file. Some secrets may end up in the Nix store which is world-readable.")
-    ]);
+   ]);
+
+   services.mangaki.settings = {
+     debug = {
+        DEBUG = lib.mkDefault cfg.devMode;
+        DEBUG_VUE_JS = lib.mkDefault cfg.devMode;
+      };
+
+      secrets = {};
+
+      email =
+        let
+          consoleBackend = "django.core.mail.backends.console.EmailBackend";
+          smtpBackend = "django.core.mail.backends.smtp.EmailBackend";
+        in
+        {
+          EMAIL_BACKEND = lib.mkDefault (if cfg.devMode then consoleBackend else smtpBackend);
+        };
+    } // optionalAttrs (cfg.useLocalDatabase) {
+      database.URL = lib.mkDefault "postgresql://";
+    } // optionalAttrs (!cfg.devMode) {
+      deployment = {
+        MEDIA_ROOT = lib.mkDefault "/var/lib/mangaki/media";
+        STATIC_ROOT = lib.mkDefault "${cfg.staticRoot}";
+        DATA_ROOT = lib.mkDefault "/var/lib/mangaki/data";
+      };
+
+      hosts = {
+        ALLOWED_HOSTS = lib.mkDefault (concatStringsSep "," cfg.allowedHosts);
+      };
+    };
 
     environment.systemPackages = [ cfg.envPackage ];
     environment.variables = {
