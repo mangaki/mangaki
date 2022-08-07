@@ -282,14 +282,20 @@ class WorkList(WorkListMixin, ListView):
         search_text = self.search_query
         watchlist_user = self.watchlist_user()
         if watchlist_user is not None:
-            work_ids = Rating.objects.filter(work__category=self.category,user__username=watchlist_user,choice='willsee').values_list('work_id', flat=True)
+            work_ids = Rating.objects.filter(
+                work__category=self.category, user__username=watchlist_user,
+                choice='willsee').values_list('work_id', flat=True)
             self.queryset = Work.objects.filter(id__in=work_ids)
         else:
             self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
 
         if sort_mode == 'new':
-            self.queryset = self.queryset.filter(date__isnull=False).order_by('-date')
+            self.queryset = self.queryset.filter(
+                date__isnull=False, date__lt=datetime.date.today()).order_by('-date')
+        elif sort_mode == 'upcoming':
+            self.queryset = self.queryset.filter(
+                date__isnull=False, date__gt=datetime.date.today()).order_by('date')            
         elif sort_mode == 'top':
             self.queryset = self.queryset.top()
         elif sort_mode == 'popularity':
