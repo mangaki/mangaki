@@ -104,7 +104,7 @@ in
     };
     settings = mkOption {
       type = types.submodule {
-        freeformType = with types; attrsOf attrs;
+        freeformType = with types; attrsOf (attrsOf anything);
       };
       example = ''
         {
