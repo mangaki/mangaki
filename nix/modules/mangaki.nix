@@ -298,7 +298,7 @@ in
      "You disabled initial migration setup, this can have unexpected effects.")
      ((optional ((!cfg.devMode && !(cfg.settings.secrets ? "SECRET_FILE")) -> cfg.settings.secrets.SECRET_KEY == "CHANGE_ME"))
      "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with a default secret key. The server will be vulnerable.")
-     ((optional (!cfg.devMode -> (cfg.settings.secrets ? "SECRET_FILE") || cfg.settings.secrets.SECRET_FILE == null))
+     (optional (!cfg.devMode -> (!(cfg.settings.secrets ? "SECRET_FILE") || cfg.settings.secrets.SECRET_FILE == null))
      "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with no secret file. Some secrets may end up in the Nix store which is world-readable.")
     ]);
 
@@ -353,8 +353,8 @@ in
     };
 
     systemd.services.mangaki-migrate-db = {
-      after = [ "postgresql.service" ];
-      requires = [ "postgresql.service" ];
+      after = [ "postgresql.service" "mangaki-init-db.service" ];
+      requires = [ "postgresql.service" "mangaki-init-db.service" ];
       before = mkIf (!cfg.devMode) [ "uwsgi.service" ];
       wantedBy = [ "multi-user.target" ];
 
