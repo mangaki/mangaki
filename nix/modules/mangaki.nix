@@ -284,7 +284,7 @@ in
         message = "If production mode is enabled, a domain name must be set, otherwise NGINX cannot be configured.";
       }
       {
-        assertion = !cfg.devMode -> hasAttr "SECRET_KEY" cfg.settings.secrets || hasAttr "SECRET_FILE" cfg.settings.secrets;
+        assertion = !cfg.devMode -> cfg.settings.secrets ? "SECRET_KEY" || cfg.settings.secrets ? "SECRET_FILE";
         message = "If production mode is enabled, either a secret file or a secret key must be set in secrets, otherwise Mangaki will not start.";
       }
       # {
@@ -296,9 +296,9 @@ in
   warnings = concatLists ([
      (optional (!cfg.lifecycle.performInitialMigrations)
      "You disabled initial migration setup, this can have unexpected effects.")
-     (optional (!cfg.devMode -> (cfg.settings.secrets.SECRET_KEY == "CHANGE_ME"))
+     ((optional ((!cfg.devMode && !(cfg.settings.secrets ? "SECRET_FILE")) -> cfg.settings.secrets.SECRET_KEY == "CHANGE_ME"))
      "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with a default secret key. The server will be vulnerable.")
-     (optional (!cfg.devMode -> (!hasAttr "SECRET_FILE" cfg.settings.secrets || cfg.settings.secrets.SECRET_FILE == null))
+     ((optional (!cfg.devMode -> (cfg.settings.secrets ? "SECRET_FILE") || cfg.settings.secrets.SECRET_FILE == null))
      "You are deploying a production (${if isNull cfg.domainName then "no domain name set" else cfg.domainName}) instance with no secret file. Some secrets may end up in the Nix store which is world-readable.")
     ]);
 
@@ -353,6 +353,33 @@ in
       script = initialMigrationScript;
     };
 
+    systemd.services.mangaki-migrate-db = {
+      after = [ "postgresql.service" ];
+      requires = [ "postgresql.service" ];
+      before = mkIf (!cfg.devMode) [ "uwsgi.service" ];
+      wantedBy = [ "multi-user.target" ];
+
+      description = "Migrate Mangaki database (idempotent)";
+      path = [ cfg.envPackage ];
+      environment = mangakiEnv;
+
+      serviceConfig = {
+        User = "mangaki";
+        Group = "mangaki";
+
+        StateDirectory = "mangaki";
+        StateDirectoryMode = "0755";
+        WorkingDirectory = "/var/lib/mangaki";
+      };
+      serviceConfig = {
+        Type = "oneshot";
+        StandardOutput = "journal+console";
+      };
+      script = ''
+        django-admin migrate
+      '';
+    };
+
     # Mangaki development server
     systemd.services.mangaki = mkIf (cfg.devMode) {
       after = [ "mangaki-init-db.service" "postgresql.service" ];
@@ -393,8 +420,8 @@ in
     };
 
     systemd.services.mangaki-index = {
-      after = [ "mangaki-init-db.service" ];
-      requires = [ "mangaki-init-db.service" ];
+      after = [ "mangaki-init-db.service" "mangaki-migrate-db.service" ];
+      requires = [ "mangaki-init-db.service" "mangaki-migrate-db.service" ];
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki daily ranking";
@@ -413,8 +440,8 @@ in
     };
 
     systemd.services.mangaki-ranking = {
-      after = [ "mangaki-init-db.service" ];
-      requires = [ "mangaki-init-db.service" ];
+      after = [ "mangaki-init-db.service" "mangaki-migrate-db.service" ];
+      requires = [ "mangaki-init-db.service" "mangaki-migrate-db.service" ];
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki daily ranking";
@@ -433,8 +460,8 @@ in
     };
 
     systemd.services.mangaki-top = {
-      after = [ "mangaki-init-db.service" ];
-      requires = [ "mangaki-init-db.service" ];
+      after = [ "mangaki-init-db.service" "mangaki-migrate-db.service" ];
+      requires = [ "mangaki-init-db.service" "mangaki-migrate-db.service" ];
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki daily top calculation";
@@ -487,8 +514,8 @@ in
       celeryApp = "mangaki.workers:app";
     in
     {
-      after = [ "mangaki-init-db.service" "redis.service" ];
-      requires = [ "mangaki-init-db.service" "redis.service" ];
+      after = [ "mangaki-init-db.service" "mangaki-migrate-db.service" "redis.service" ];
+      requires = [ "mangaki-init-db.service" "mangaki-migrate-db.service" "redis.service" ];
       wantedBy = [ "multi-user.target" ];
 
       description = "Mangaki background tasks runner";
