@@ -326,7 +326,6 @@ in
       ''; # Extensions & Mangaki database set.
     };
 
-    # User activation script for directory initialization.
     # systemd oneshot for initial migration.
     systemd.services.mangaki-init-db = {
       after = [ "postgresql.service" ];
@@ -424,7 +423,7 @@ in
       requires = [ "mangaki-init-db.service" "mangaki-migrate-db.service" ];
       wantedBy = [ "multi-user.target" ];
 
-      description = "Mangaki daily ranking";
+      description = "Mangaki search index";
       path = [ cfg.envPackage ];
       environment = mangakiEnv;
 
