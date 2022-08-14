@@ -52,8 +52,8 @@ class CommandTest(TestCase):
         )
         management.call_command('add_anidb', self.anime.anidb_aid,
                                 stdout=self.stdout)
-        self.assertEqual(self.stdout.getvalue(),
-                          "Successfully added Sangatsu no Lion\n")
+        self.assertIn("Successfully added Sangatsu no Lion",
+                      self.stdout.getvalue())
 
     @responses.activate
     def test_anidb_tags_to_json(self):
@@ -83,13 +83,13 @@ class CommandTest(TestCase):
 
     def test_fit_algo(self):
         management.call_command('fit_algo', 'zero', stdout=self.stdout)
-        self.assertEqual(self.stdout.getvalue(),
-                          "Successfully fit zero (0.0 MB)\n")
+        self.assertIn("Successfully fit zero (0.0 MB)",
+                      self.stdout.getvalue())
 
     def test_generate_seed_data(self):
         management.call_command('generate_seed_data', 'small',
                                 stdout=self.stdout)
-        self.assertEqual(self.stdout.getvalue(), 'Fixture ready.\n')
+        self.assertIn('Fixture ready.', self.stdout.getvalue())
 
     def test_index(self):
         management.call_command('index')
@@ -125,14 +125,14 @@ class CommandTest(TestCase):
         )
         management.call_command('retrieveposters', self.anime.id,
                                 stdout=self.stdout)
-        self.assertEqual(self.stdout.getvalue(),
-                          '1 poster(s) successfully downloaded.\n')
+        self.assertIn('1 poster(s) successfully downloaded.',
+                         self.stdout.getvalue())
 
     def test_tokens(self):
         management.call_command('tokens', 'DR', '--salt', 'PEPPER',  # HA HA
                                 stdout=self.stdout)
-        self.assertEqual(self.stdout.getvalue(),
-                          'DR {:s}\n'.format(compute_token('PEPPER', 'DR')))
+        self.assertIn('DR {:s}'.format(compute_token('PEPPER', 'DR')),
+                      self.stdout.getvalue())
 
     def test_top(self):
         management.call_command('top', '--all', stdout=self.stdout)
@@ -149,6 +149,6 @@ class CommandTest(TestCase):
         )
         management.call_command('vgmdb', self.album.id,
                                 stdout=self.stdout)
-        self.assertEqual(self.stdout.getvalue(),
-                          'Successfully added Yoko Kanno to '
-                          'COWBOY BEBOP Original Soundtrack 3 BLUE\n')
+        self.assertIn('Successfully added Yoko Kanno to '
+                      'COWBOY BEBOP Original Soundtrack 3 BLUE',
+                      self.stdout.getvalue())
