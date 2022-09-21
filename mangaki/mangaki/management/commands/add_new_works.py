@@ -16,18 +16,17 @@ class Command(BaseCommand):
     help = 'Add new works from Manami'
 
     def add_arguments(self, parser):
-        parser.add_argument('manami_path', type=str,
-                            default='../anime-offline-database')
-        parser.add_argument('--extra_clusters', type=str,
-                            default='notebooks/manami_cluster_backup.json')
+        parser.add_argument('manami_path', type=str)
+        parser.add_argument('--extra_clusters', type=str)
         parser.add_argument('--dry_run', action='store_true', default=False)
 
     def handle(self, *args, **options):
         dry_run = options.get('dry_run')
         extra_clusters_filename = options.get('extra_clusters')
-        manami_cluster_backup = None
-        with open(extra_clusters_filename, encoding='utf-8') as f:
-            manami_cluster_backup = json.load(f)
+        manami_cluster_backup = []
+        if extra_clusters_filename is not None:
+            with open(extra_clusters_filename, encoding='utf-8') as f:
+                manami_cluster_backup = json.load(f)
 
         manami_path = Path(options.get('manami_path'))
         dead = load_dead_entries(manami_path / 'dead-entries')
