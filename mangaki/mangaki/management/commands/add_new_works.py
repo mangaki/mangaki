@@ -7,7 +7,8 @@ import logging
 from django.core.management.base import BaseCommand
 from mangaki.utils.manami import (
     AnimeOfflineDatabase, MangakiDatabase, load_dead_entries,
-    get_clusters_from_ref, describe_clusters, get_manami_map_from_backup)
+    get_clusters_from_ref, describe_clusters, get_manami_map_from_backup,
+    insert_into_mangaki)
 
 
 class Command(BaseCommand):
@@ -51,4 +52,4 @@ class Command(BaseCommand):
         logging.warning('nb mangaki / nb manami: %s', c)
         if not dry_run:
             # Insert into Mangaki those manami_clusters
-            pass
+            insert_into_mangaki(manami, manami_clusters)

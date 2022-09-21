@@ -5,7 +5,9 @@ from collections import Counter, defaultdict
 from urllib.parse import urlparse
 from tryalgo.kruskal import UnionFind
 import pandas as pd
-from mangaki.models import Work, Reference, WorkTitle
+from mangaki.models import Work, Reference, WorkTitle, TaggedWork, Tag
+from django.db import DataError
+from datetime import datetime
 
 
 MAX_MANAMI_ENTRIES = 50000
@@ -448,3 +450,73 @@ def get_manami_map_from_backup(manami, manami_cluster_backup):
             manami_map[manami_id] = manami_ids[0]  # Smallest is representant of cluster
         cluster_length_counter[len(manami_ids)] += 1
     return manami_map
+
+
+def drop_dup(column):
+    return list(set(sum(column.tolist(), start=[])))
+
+
+def combine(column):
+    return Counter(column.astype(str).tolist()).most_common()[0][0]
+
+
+def insert_combined_manami_to_mangaki(to_create, entry):
+    # Parse references
+    anidb_aid = None
+    refs = []
+    for source, identifier in entry['references']:
+        if source == 'AniDB':
+            anidb_aid = identifier
+        refs.append(Reference(source=source, identifier=identifier,
+                              url=ref_to_url((source, identifier))))
+
+    date = None
+    try:
+        date = datetime(int(float(entry['year'])), 1, 1)
+    except ValueError:
+        pass
+    # Create work
+    work, created = Work.objects.get_or_create(
+        title=entry['title'],
+        category_id=1,
+        anime_type=entry['type'],
+        ext_poster=entry['picture'],
+        nb_episodes=entry['episodes'],
+        date=date,
+        anidb_aid=anidb_aid if anidb_aid is not None else 0,
+    )
+
+    # Save references
+    for ref in refs:
+        ref.work_id = work.id
+    to_create['refs'].extend(refs)
+
+    # Create synonyms; tags is boring because of the forced AniDB ID
+    for synonym in entry['synonyms']:
+        to_create['synonyms'].append(WorkTitle(work_id=work.id, title=synonym, type='synonym'))
+
+    # Create available tags
+    for tag in Tag.objects.filter(title__in=entry['tags']):
+        to_create['tags'].append(TaggedWork(work=work, tag=tag))
+
+
+def insert_into_mangaki(manami, manami_clusters):
+    to_create = defaultdict(list)
+    combiner = {
+        field: drop_dup if field in {'sources', 'synonyms', 'relations',
+                                     'tags', 'references'}
+        else combine for field in manami.df.columns
+    }
+    for _, manami_cluster in manami_clusters.items():
+        combined = manami.df.loc[list(manami_cluster)].groupby(
+            lambda _: True).agg(combiner).loc[True]
+        try:
+            insert_combined_manami_to_mangaki(to_create, combined)
+        except DataError as e:
+            print(combined)
+            logging.critical(str(e))
+            break
+
+    Reference.objects.bulk_create(to_create['refs'], ignore_conflicts=True)
+    WorkTitle.objects.bulk_create(to_create['synonyms'], ignore_conflicts=True)
+    TaggedWork.objects.bulk_create(to_create['tags'], ignore_conflicts=True)

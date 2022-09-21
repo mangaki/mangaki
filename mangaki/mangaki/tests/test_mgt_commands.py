@@ -2,10 +2,9 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 from io import StringIO
-import responses
 import os.path
-import logging
 import re
+import responses
 
 from django.test import TestCase
 from django.core import management
@@ -54,6 +53,15 @@ class CommandTest(TestCase):
                                 stdout=self.stdout)
         self.assertIn("Successfully added Sangatsu no Lion",
                       self.stdout.getvalue())
+
+    def test_add_new_works(self):
+        management.call_command('add_new_works', 'tests/data/manami',
+                                '--extra_clusters',
+                                'tests/data/manami_clusters.json',
+                                stdout=self.stdout)
+        self.assertEqual(
+            Work.objects.filter(category__slug='anime').count(),
+            2)  # Added one work
 
     @responses.activate
     def test_anidb_tags_to_json(self):
