@@ -4,6 +4,7 @@
 from io import StringIO
 import os.path
 import re
+from pathlib import Path
 import responses
 
 from django.test import TestCase
@@ -18,7 +19,7 @@ from mangaki.utils.tokens import compute_token
 class CommandTest(TestCase):
     @staticmethod
     def read_fixture(filename):
-        with open(os.path.join(settings.TEST_DATA_DIR, filename), 'r') as f:
+        with open(Path(settings.TEST_DATA_DIR) / filename, 'r') as f:
             return f.read()
 
     def setUp(self):
@@ -55,10 +56,11 @@ class CommandTest(TestCase):
                       self.stdout.getvalue())
 
     def test_add_new_works(self):
-        management.call_command('add_new_works', 'tests/data/manami',
-                                '--extra_clusters',
-                                'tests/data/manami_clusters.json',
-                                stdout=self.stdout)
+        management.call_command(
+            'add_new_works', Path(settings.TEST_DATA_DIR) / 'manami',
+            '--extra_clusters',
+            Path(settings.TEST_DATA_DIR) / 'manami_clusters.json',
+            stdout=self.stdout)
         self.assertEqual(
             Work.objects.filter(category__slug='anime').count(),
             2)  # Added one work
