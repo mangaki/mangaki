@@ -3,15 +3,14 @@ import json
 import re
 from collections import Counter, defaultdict
 from urllib.parse import urlparse
+from datetime import datetime
 from tryalgo.kruskal import UnionFind
 import pandas as pd
-from mangaki.models import Work, Reference, WorkTitle, TaggedWork, Tag
 from django.db import DataError
-from datetime import datetime
+from mangaki.models import Work, Reference, WorkTitle, TaggedWork, Tag
 
 
-MAX_MANAMI_ENTRIES = 50000
-# Invalid means it's already an identified duplicate
+MAX_MANAMI_ENTRIES = 100000
 
 
 KEPT_ANIDB_DUPLICATES = set(map(str, {
@@ -66,10 +65,10 @@ coarse_category = {
 def sanitize(s):
     standard = s.lower()
     standard = re.sub(r'[’`\']', '', standard)
-    standard = re.sub(r'\W', ' ', standard)  # removing non-words characters: special, comma, punctuation
-    standard = re.sub(r'\s+', ' ', standard)  # removing any extra spaces in middle
-    standard = re.sub(r'^\s', ' ', standard)  # removing any extra spaces in beginning
-    standard = re.sub(r'\s$', ' ', standard)  # removing any extra spaces in end
+    standard = re.sub(r'\W', ' ', standard)  # removing non-words characters
+    standard = re.sub(r'\s+', ' ', standard)  # removing spaces at middle
+    standard = re.sub(r'^\s', ' ', standard)  # removing spaces at beginning
+    standard = re.sub(r'\s$', ' ', standard)  # removing spaces at end
     return standard
 
 
@@ -82,7 +81,7 @@ source_of = {
 
 
 # On utilise 'AniDB' et 'MAL' pour coller aux sources Mangaki
-def get_manami_source(url):
+def get_manami_source(url: str) -> str:
     if url == 'https://anidb.net/anime':
         return 'AniDB'
     if url == 'https://myanimelist.net/anime':
@@ -90,15 +89,18 @@ def get_manami_source(url):
     return urlparse(url).netloc
 
 
-def parse_manami_source(source):
+Ref = tuple[str]
+
+
+def parse_manami_source(source: str) -> Ref:
     source_name, identifier = source.rsplit('/', 1)
     try:
         return get_manami_source(source_name), identifier
-    except Exception as e:
-        logging.exception(e)
+    except Exception as exception:
+        logging.exception(exception)
 
 
-def ref_to_url(ref):
+def ref_to_url(ref: Ref) -> str:
     source, identifier = ref
     if source == 'AniDB':
         hostname = 'anidb.net'
@@ -110,9 +112,8 @@ def ref_to_url(ref):
 
 
 class AnimeOfflineDatabase:
-    def __init__(self, path: str, *, filter_sources=None, manami_map=None):
+    def __init__(self, path: str, *, manami_map=None):
         self._path = path
-        self._filter_sources = filter_sources
         self.references = defaultdict(list)
         self.from_title = defaultdict(set)
         self.from_synonym = defaultdict(set)
@@ -124,30 +125,31 @@ class AnimeOfflineDatabase:
             for entry in self._raw['data']:
                 entry['nb_episodes'] = str(entry['episodes'])
                 entry['subcategory'] = coarse_category[entry['type'].lower()]
-                entry['year'] = entry['animeSeason']['year'] if 'year' in entry['animeSeason'] else None
+                entry['year'] = (entry['animeSeason']['year']
+                                 if 'year' in entry['animeSeason'] else None)
 
         for local_id, datum in enumerate(self._raw['data']):
+            main_manami_id = self.manami_map[local_id]
             # Parse sources
             for source in datum['sources']:
                 source, identifier = parse_manami_source(source)
-                if self._filter_sources is not None and source not in self._filter_sources:
-                    continue
-
-                self.references[(source, identifier)].append(self.manami_map[local_id])
-                self._raw['data'][local_id].setdefault('references', []).append((source, identifier))
+                self.references[(source, identifier)].append(main_manami_id)
+                datum.setdefault('references', []).append((source, identifier))
 
             # Setup title reverse search
-            self.from_title[sanitize(datum['title'])].add(self.manami_map[local_id])
+            self.from_title[sanitize(datum['title'])].add(main_manami_id)
             for synonym in datum['synonyms']:
-                self.from_synonym[sanitize(synonym)].add(self.manami_map[local_id])
+                self.from_synonym[sanitize(synonym)].add(main_manami_id)
 
         self.df = pd.DataFrame(self._raw['data'])
-
         self._check()
 
     def _check(self):
         for (source, identifier), manami_entry in self.references.items():
-            assert len(manami_entry) == 1, f"Multiple Manami entries with reference {source}/{identifier}"
+            assert (
+                len(manami_entry) == 1,
+                f"Multiple Manami entries with reference {source}/{identifier}"
+            )
 
     def __getitem__(self, key):
         return self._raw['data'][key]
@@ -156,69 +158,78 @@ class AnimeOfflineDatabase:
         return len(self._raw['data'])
 
     def print_summary(self):
-        if self._filter_sources is None:
-            filters = ''
-        else:
-            filters = ' ({} only)'.format(', '.join(self._filter_sources))
-
-        print('Manami:')
-        print(f'\t{len(self)} animes (with {len(self.from_title)} unique titles)')
-        print(f'\t{len(self.references)} unique references{filters}')
+        logging.info('Manami:')
+        logging.info('\t%d animes (with %d unique titles)',
+                     len(self), len(self.from_title))
+        logging.info(f'\t%d unique references', len(self.references))
 
 
 class MangakiDatabase:
-    def __init__(self, *, filter_sources=None):
-        self._raw = {work['pk']: work for work in Work.objects.filter(category__slug='anime').values(
+    def __init__(self):
+        self._raw = {work['pk']: work for work in Work.objects.filter(
+            category__slug='anime').values(
             'pk', 'title', 'nb_episodes', 'date', 'anime_type', 'nb_ratings')}
-        self._filter_sources = filter_sources
         self.references = defaultdict(set)
         self.from_title = defaultdict(set)
         self.from_synonym = defaultdict(set)
 
         # Extract all Mangaki references
-        redirects = dict(Work.all_objects.filter(redirect__isnull=False).values_list('pk', 'redirect_id'))
+        redirects = dict(Work.all_objects.filter(
+            redirect__isnull=False).values_list('pk', 'redirect_id'))
 
         remember_anidb = {}
-        # We use `Reference.objects` so that we also get duplicated works.  References on duplicated
-        # works should have been moved to the cluster representative, but it doesn't hurt to be
-        # conservative.
+        """
+        We use `Reference.objects` so that we also get duplicated works.
+        References on duplicated works should have been moved to the cluster
+        representative, but it doesn't hurt to be conservative.
+        """
         qs = Reference.objects.filter(work_id__in=Work.objects.all(),
                                       work_id__category__slug='anime') \
                               .values_list('work_id', 'source', 'identifier')
-        if filter_sources is not None:
-            qs = qs.filter(source__in=list(filter_sources))
 
         extra_ref = []
-        for mangaki_id, anidb_id in Work.objects.filter(anidb_aid__gt=0).values_list('id', 'anidb_aid'):
+        for mangaki_id, anidb_id in Work.objects.filter(
+                anidb_aid__gt=0).values_list('id', 'anidb_aid'):
             extra_ref.append((mangaki_id, 'AniDB', str(anidb_id)))
         qs = set(list(qs) + extra_ref)
 
         for mangaki_id, source, identifier in sorted(qs):
+            ref = (source, identifier)
             # Clean up known duplicates.  NB: These are bogus DB entries.
-            # Yes JJ Kruskal I know.
             while mangaki_id in redirects:
                 mangaki_id = redirects[mangaki_id]
 
             if source == 'AniDB':
-                if identifier in remember_anidb and identifier in KEPT_ANIDB_DUPLICATES:
+                """
+                OK this is subtle. We usually do not allow duplicate refs,
+                except for AniDB (e.g. Madoka Magica I, II, III). In this case,
+                the first anime keeps the AniDB ref in this MangakiDatabase
+                object, the other ones not (to avoid unnecessary merges).
+                It works fine in 99% of cases.
+                """
+                if (identifier in remember_anidb and
+                        identifier in KEPT_ANIDB_DUPLICATES):
                     self._raw[mangaki_id].setdefault('sources', [])
                     self._raw[mangaki_id].setdefault('references', [])
-                    continue  # Only for displaying purposes, not merging
+                    continue
                 remember_anidb[identifier] = mangaki_id
-            self._raw[mangaki_id].setdefault('sources', []).append((source, identifier))
-            self._raw[mangaki_id].setdefault('references', []).append((source, identifier))
+            self._raw[mangaki_id].setdefault('sources', []).append(ref)
+            self._raw[mangaki_id].setdefault('references', []).append(ref)
             self.references[(source, identifier)].add(mangaki_id)
 
-        self.missing_refs = {pk for pk, raw in self._raw.items() if 'sources' not in raw}
+        self.missing_refs = {
+            pk for pk, raw in self._raw.items() if 'sources' not in raw}
 
         for pk, work in self._raw.items():
             self.from_title[sanitize(work['title'])].add(pk)
-            self._raw[pk]['year'] = self._raw[pk]['date'].year if self._raw[pk]['date'] else None
-            self._raw[pk]['nb_episodes'] = self._raw[pk]['nb_episodes'].split('x')[0]
-            category = category_from_type[self._raw[pk]['anime_type']]
-            self._raw[pk]['subcategory'] = coarse_category[category.lower()] if category else None
+            work['year'] = work['date'].year if work['date'] else None
+            work['nb_episodes'] = work['nb_episodes'].split('x')[0]
+            category = category_from_type[work['anime_type']]
+            work['subcategory'] = (coarse_category[category.lower()]
+                                   if category else None)
 
-        for work_id, synonym in WorkTitle.objects.values_list('work_id', 'title'):
+        for work_id, synonym in WorkTitle.objects.values_list(
+                'work_id', 'title'):
             while work_id in redirects:
                 work_id = redirects[work_id]
             if work_id not in self._raw:
@@ -236,22 +247,17 @@ class MangakiDatabase:
         return len(self._raw)
 
     def print_summary(self):
-        if self._filter_sources is None:
-            filters = ''
-        else:
-            filters = '{} '.format(', '.join(self._filter_sources))
-
-        print('Mangaki:')
-        print(f'\t{len(self)} animes')
-        print(f'\t{len(self.references)} unique {filters}references')
+        logging.info('Mangaki:')
+        logging.info('\t%d animes', len(self))
+        logging.info('\t%d unique references', len(self.references))
         if self.missing_refs:
-            print(f'    {len(self.missing_refs)} animes with no {filters}references')
+            logging.info('\t%d animes without ref', len(self.missing_refs))
 
 
 def get_clusters_from_ref(manami, dead, manami_cluster_backup=[]):
     references = set()
-    url1 = defaultdict(list)
-    url2 = defaultdict(set)
+    url1 = defaultdict(list)  # Refs on Manami side
+    url2 = defaultdict(set)  # Refs on Mangaki side
 
     # Get all sources of Manami entries
     for manami_id, entry in enumerate(manami):
@@ -269,7 +275,8 @@ def get_clusters_from_ref(manami, dead, manami_cluster_backup=[]):
                 references.add(ref)
 
     # Mangaki works with AniDB ID
-    anidb_id = dict(Work.objects.filter(anidb_aid__gt=0).values_list('id', 'anidb_aid'))
+    anidb_id = dict(Work.objects.filter(
+        anidb_aid__gt=0).values_list('id', 'anidb_aid'))
     for mangaki_id, aid in anidb_id.items():
         if str(aid) not in dead['AniDB']:
             ref1 = ('Mangaki', str(mangaki_id))
@@ -278,7 +285,9 @@ def get_clusters_from_ref(manami, dead, manami_cluster_backup=[]):
             url2[mangaki_id].update([ref1, ref2])
 
     # All Mangaki references
-    for mangaki_id, source, identifier in Reference.objects.filter(work_id__category__slug='anime').values_list('work_id', 'source', 'identifier'):
+    for mangaki_id, source, identifier in Reference.objects.filter(
+            work_id__category__slug='anime').values_list(
+            'work_id', 'source', 'identifier'):
         ref1 = ('Mangaki', str(mangaki_id))
         ref2 = (source, identifier)
         if check_ref(dead, ref2):
@@ -310,7 +319,8 @@ def get_clusters_from_ref(manami, dead, manami_cluster_backup=[]):
                 has_anidb = True
             uf.union(ids[ref], ids['Mangaki', str(mangaki_id)])
         nb_has_anidb += has_anidb
-    logging.info('%d/%d ont un ID AniDB (%.1f %%)', nb_has_anidb, len(url2), nb_has_anidb / len(url2) * 100)
+    logging.info('%d/%d ont un ID AniDB (%.1f %%)',
+                 nb_has_anidb, len(url2), nb_has_anidb / len(url2) * 100)
 
     clusters = defaultdict(list)
     for ref, ref_id in ids.items():
@@ -327,7 +337,7 @@ def load_dead_entries(manami_path):
     return dead
 
 
-def check_ref(dead, ref):
+def check_ref(dead: dict, ref: Ref) -> bool:
     source, identifier = ref
     return source not in dead or identifier not in dead[source]
 
@@ -338,8 +348,10 @@ def describe_refs(manami, mangaki_db, cluster, valid_mangaki_ids):
     other_refs = []
     for source, identifier in cluster:
         if source == 'Mangaki' and int(identifier) in valid_mangaki_ids:
-            mangaki_refs.append((identifier, mangaki_db[int(identifier)]['title']))
-        elif source == 'Manami' and int(identifier) in manami.manami_map.values():
+            mangaki_refs.append(
+                (identifier, mangaki_db[int(identifier)]['title']))
+        elif (source == 'Manami' and
+                int(identifier) in manami.manami_map.values()):
             manami_refs.append((identifier, manami[int(identifier)]['title']))
         elif source not in {'Mangaki', 'Manami'}:
             other_refs.append((source, identifier))
@@ -362,7 +374,6 @@ def describe_clusters(manami, mangaki_db, dead, clusters):
     works = Work.objects.in_bulk()
     c = Counter()
     clusters_by_occ = defaultdict(list)
-    refcount = Counter()
     nb_cdup_mangaki = 0
     nb_cdup_manami = 0
     total_ref = 0
@@ -371,7 +382,8 @@ def describe_clusters(manami, mangaki_db, dead, clusters):
     manami_clusters = {}
     mangaki_clusters = []
     to_create = []
-    valid_mangaki_ids = set(Work.objects.filter(category__slug='anime').values_list('id', flat=True))
+    valid_mangaki_ids = set(Work.objects.filter(
+        category__slug='anime').values_list('id', flat=True))
     for cluster in clusters.values():
         mangaki_refs, manami_refs, other_refs = describe_refs(
             manami, mangaki_db, cluster, valid_mangaki_ids)
@@ -391,29 +403,34 @@ def describe_clusters(manami, mangaki_db, dead, clusters):
 
         if nb_mangaki == 1:
             for source, identifier in other_refs:
-                to_create.append(Reference(work_id=mangaki_refs[0][0], source=source, identifier=identifier))
+                to_create.append(Reference(
+                    work_id=mangaki_refs[0][0], source=source,
+                    identifier=identifier))
 
         if nb_mangaki == 1 and nb_manami in {2, 3}:
-            refcounter, top2 = get_top2_source_count(dead, cluster)
-            nb_ratings = sum(works[int(mangaki_id)].nb_ratings for mangaki_id, _ in mangaki_refs)
+            refcounter, _ = get_top2_source_count(dead, cluster)
+            nb_ratings = sum(works[int(mangaki_id)].nb_ratings
+                             for mangaki_id, _ in mangaki_refs)
             if nb_ratings > 0:
-                print(nb_ratings, mangaki_refs, manami_refs, len(cluster))
+                logging.warning('%d %s %s %d', nb_ratings, mangaki_refs,
+                                manami_refs, len(cluster))
                 logging.critical(refcounter)
 
-            mangaki_clusters.append({int(mangaki_id) for mangaki_id, _ in mangaki_refs})
+            mangaki_clusters.append(
+                {int(mangaki_id) for mangaki_id, _ in mangaki_refs})
 
         if nb_mangaki >= 3 or nb_manami >= 3:  # Have to analyze
             clusters_by_occ[nb_mangaki, nb_manami].append(cluster)
-        if nb_mangaki == 0 and nb_manami == 1:
+        if nb_mangaki == 0 and nb_manami == 1:  # In Manami but not in Mangaki
             manami_ids = [int(manami_id) for manami_id, _ in manami_refs]
             manami_main_id = manami.manami_map[manami_ids[0]]
-            search_queries.append(manami[manami_main_id]['title'])  # In Manami but not in Mangaki
+            search_queries.append(manami[manami_main_id]['title'])
             manami_clusters[manami_main_id] = manami_ids
         if nb_manami == 0:
             for identifier in mangaki_refs:
                 mangaki_not_manami.add(identifier)
         c[nb_mangaki, nb_manami] += 1
-    return c, nb_cdup_mangaki, nb_cdup_manami, total_ref, manami_clusters  # To add
+    return c, nb_cdup_mangaki, nb_cdup_manami, total_ref, manami_clusters
 
 
 def get_manami_map_from_backup(manami, manami_cluster_backup):
@@ -433,16 +450,26 @@ def get_manami_map_from_backup(manami, manami_cluster_backup):
                     manami_ids.add(min(manami.references[ref]))
         manami_ids = list(sorted(manami_ids))
         for manami_id in manami_ids[1:]:
-            manami_map[manami_id] = manami_ids[0]  # Smallest is representant of cluster
+            manami_map[manami_id] = manami_ids[0]  # Smallest = repr of cluster
         cluster_length_counter[len(manami_ids)] += 1
     return manami_map
 
 
-def drop_dup(column):
+def drop_dup(column) -> list:
+    '''
+    Aggregation function for pandas.
+    Takes a pandas column which is a list of lists (e.g. of synonyms)
+    Concatenates everything (sum) removes duplicates (set) and returns a list.
+    '''
     return list(set(sum(column.tolist(), start=[])))
 
 
-def combine(column):
+def keep_most_common(column) -> str:
+    '''
+    Aggregation function for pandas.
+    Takes a pandas column which is a list of attributes (e.g. years)
+    Keeps the most common one.
+    '''
     return Counter(column.astype(str).tolist()).most_common()[0][0]
 
 
@@ -462,7 +489,7 @@ def insert_combined_manami_to_mangaki(to_create, entry):
     except ValueError:
         pass
     # Create work
-    work, created = Work.objects.get_or_create(
+    work, _ = Work.objects.get_or_create(
         title=entry['title'],
         category_id=1,
         anime_type=entry['type'],
@@ -479,7 +506,8 @@ def insert_combined_manami_to_mangaki(to_create, entry):
 
     # Create synonyms; tags is boring because of the forced AniDB ID
     for synonym in entry['synonyms']:
-        to_create['synonyms'].append(WorkTitle(work_id=work.id, title=synonym, type='synonym'))
+        to_create['synonyms'].append(WorkTitle(
+            work_id=work.id, title=synonym, type='synonym'))
 
     # Create available tags
     for tag in Tag.objects.filter(title__in=entry['tags']):
@@ -491,15 +519,15 @@ def insert_into_mangaki(manami, manami_clusters):
     combiner = {
         field: drop_dup if field in {'sources', 'synonyms', 'relations',
                                      'tags', 'references'}
-        else combine for field in manami.df.columns
+        else keep_most_common for field in manami.df.columns
     }
     for _, manami_cluster in manami_clusters.items():
         combined = manami.df.loc[list(manami_cluster)].groupby(
             lambda _: True).agg(combiner).loc[True]
         try:
             insert_combined_manami_to_mangaki(to_create, combined)
-        except DataError as e:
-            logging.exception(e)
+        except DataError as exception:
+            logging.exception(exception)
             break
 
     Reference.objects.bulk_create(to_create['refs'], ignore_conflicts=True)

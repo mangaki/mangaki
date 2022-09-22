@@ -38,7 +38,7 @@ class Command(BaseCommand):
                                                     manami_cluster_backup)
             manami = AnimeOfflineDatabase(
                 manami_path / 'anime-offline-database.json',
-                filter_sources=None, manami_map=manami_map)
+                manami_map=manami_map)
         manami.print_summary()
 
         mangaki_db = MangakiDatabase()
