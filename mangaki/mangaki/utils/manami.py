@@ -123,7 +123,7 @@ class AnimeOfflineDatabase:
             self._raw = json.load(f)
             for entry in self._raw['data']:
                 entry['nb_episodes'] = str(entry['episodes'])
-                entry['subcategory'] = coarse_category[entry[i]['type'].lower()]
+                entry['subcategory'] = coarse_category[entry['type'].lower()]
                 entry['year'] = entry['animeSeason']['year'] if 'year' in entry['animeSeason'] else None
 
         for local_id, datum in enumerate(self._raw['data']):
@@ -133,13 +133,13 @@ class AnimeOfflineDatabase:
                 if self._filter_sources is not None and source not in self._filter_sources:
                     continue
 
-                self.references[(source, identifier)].append(manami_map[local_id])
+                self.references[(source, identifier)].append(self.manami_map[local_id])
                 self._raw['data'][local_id].setdefault('references', []).append((source, identifier))
 
             # Setup title reverse search
-            self.from_title[sanitize(datum['title'])].add(manami_map[local_id])
+            self.from_title[sanitize(datum['title'])].add(self.manami_map[local_id])
             for synonym in datum['synonyms']:
-                self.from_synonym[sanitize(synonym)].add(manami_map[local_id])
+                self.from_synonym[sanitize(synonym)].add(self.manami_map[local_id])
 
         self.df = pd.DataFrame(self._raw['data'])
 
