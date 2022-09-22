@@ -1,3 +1,4 @@
+from typing import Tuple
 import logging
 import json
 import re
@@ -89,7 +90,7 @@ def get_manami_source(url: str) -> str:
     return urlparse(url).netloc
 
 
-Ref = tuple[str]
+Ref = Tuple[str]
 
 
 def parse_manami_source(source: str) -> Ref:
