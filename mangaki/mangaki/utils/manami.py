@@ -63,8 +63,8 @@ coarse_category = {
 }
 
 
-def sanitize(s):
-    standard = s.lower()
+def sanitize(string):
+    standard = string.lower()
     standard = re.sub(r'[’`\']', '', standard)
     standard = re.sub(r'\W', ' ', standard)  # removing non-words characters
     standard = re.sub(r'\s+', ' ', standard)  # removing spaces at middle
@@ -120,7 +120,12 @@ class AnimeOfflineDatabase:
         self.from_synonym = defaultdict(set)
         self.manami_map = (manami_map or
                            {k: k for k in range(MAX_MANAMI_ENTRIES)})
+        self.load_database()
+        self.build_reverse_indexes()
+        self.df = pd.DataFrame(self._raw['data'])
+        self._check()
 
+    def load_database(self):
         with open(self._path, encoding='utf-8') as f:
             self._raw = json.load(f)
             for entry in self._raw['data']:
@@ -129,6 +134,7 @@ class AnimeOfflineDatabase:
                 entry['year'] = (entry['animeSeason']['year']
                                  if 'year' in entry['animeSeason'] else None)
 
+    def build_reverse_indexes(self):
         for local_id, datum in enumerate(self._raw['data']):
             main_manami_id = self.manami_map[local_id]
             # Parse sources
@@ -142,15 +148,10 @@ class AnimeOfflineDatabase:
             for synonym in datum['synonyms']:
                 self.from_synonym[sanitize(synonym)].add(main_manami_id)
 
-        self.df = pd.DataFrame(self._raw['data'])
-        self._check()
-
     def _check(self):
         for (source, identifier), manami_entry in self.references.items():
-            assert (
-                len(manami_entry) == 1,
+            assert len(manami_entry) == 1, \
                 f"Multiple Manami entries with reference {source}/{identifier}"
-            )
 
     def __getitem__(self, key):
         return self._raw['data'][key]
@@ -162,65 +163,27 @@ class AnimeOfflineDatabase:
         logging.info('Manami:')
         logging.info('\t%d animes (with %d unique titles)',
                      len(self), len(self.from_title))
-        logging.info(f'\t%d unique references', len(self.references))
+        logging.info('\t%d unique references', len(self.references))
 
 
 class MangakiDatabase:
     def __init__(self):
-        self._raw = {work['pk']: work for work in Work.objects.filter(
-            category__slug='anime').values(
-            'pk', 'title', 'nb_episodes', 'date', 'anime_type', 'nb_ratings')}
         self.references = defaultdict(set)
         self.from_title = defaultdict(set)
         self.from_synonym = defaultdict(set)
-
-        # Extract all Mangaki references
-        redirects = dict(Work.all_objects.filter(
-            redirect__isnull=False).values_list('pk', 'redirect_id'))
-
-        remember_anidb = {}
-        """
-        We use `Reference.objects` so that we also get duplicated works.
-        References on duplicated works should have been moved to the cluster
-        representative, but it doesn't hurt to be conservative.
-        """
-        qs = Reference.objects.filter(work_id__in=Work.objects.all(),
-                                      work_id__category__slug='anime') \
-                              .values_list('work_id', 'source', 'identifier')
-
-        extra_ref = []
-        for mangaki_id, anidb_id in Work.objects.filter(
-                anidb_aid__gt=0).values_list('id', 'anidb_aid'):
-            extra_ref.append((mangaki_id, 'AniDB', str(anidb_id)))
-        qs = set(list(qs) + extra_ref)
-
-        for mangaki_id, source, identifier in sorted(qs):
-            ref = (source, identifier)
-            # Clean up known duplicates.  NB: These are bogus DB entries.
-            while mangaki_id in redirects:
-                mangaki_id = redirects[mangaki_id]
-
-            if source == 'AniDB':
-                """
-                OK this is subtle. We usually do not allow duplicate refs,
-                except for AniDB (e.g. Madoka Magica I, II, III). In this case,
-                the first anime keeps the AniDB ref in this MangakiDatabase
-                object, the other ones not (to avoid unnecessary merges).
-                It works fine in 99% of cases.
-                """
-                if (identifier in remember_anidb and
-                        identifier in KEPT_ANIDB_DUPLICATES):
-                    self._raw[mangaki_id].setdefault('sources', [])
-                    self._raw[mangaki_id].setdefault('references', [])
-                    continue
-                remember_anidb[identifier] = mangaki_id
-            self._raw[mangaki_id].setdefault('sources', []).append(ref)
-            self._raw[mangaki_id].setdefault('references', []).append(ref)
-            self.references[(source, identifier)].add(mangaki_id)
-
+        self.load_database()
+        self.build_reverse_indexes()
         self.missing_refs = {
             pk for pk, raw in self._raw.items() if 'sources' not in raw}
+        self.df = pd.DataFrame.from_dict(self._raw, orient='index')
 
+    def load_database(self):
+        self._raw = {work['pk']: work for work in Work.objects.filter(
+            category__slug='anime').values(
+            'pk', 'title', 'nb_episodes', 'date', 'anime_type', 'nb_ratings',
+            'anidb_aid')}
+
+        self.anidb_refs = []
         for pk, work in self._raw.items():
             self.from_title[sanitize(work['title'])].add(pk)
             work['year'] = work['date'].year if work['date'] else None
@@ -228,6 +191,47 @@ class MangakiDatabase:
             category = category_from_type[work['anime_type']]
             work['subcategory'] = (coarse_category[category.lower()]
                                    if category else None)
+            if work['anidb_aid'] > 0:
+                self.anidb_refs.append((pk, 'AniDB', work['anidb_aid']))
+
+    def build_reverse_indexes(self):
+        """
+        This is a complicated problem because:
+        1) already merged works redirect to other works
+        2) some references are linked to others (through union-find)
+        3) AniDB refs are in anidb_aid attribute (they may not exist as ref)
+        4) we accept having duplicate references (eg. AniDB Madoka Magica I II)
+        but then we ignore the duplicates, hence the remember_anidb dict
+        """
+        # Redirecting already merged works because of 1)
+        redirects = dict(Work.all_objects.filter(
+            redirect__isnull=False).values_list('pk', 'redirect_id'))
+
+        reference_triplets = set(list(
+            Reference.objects.filter(
+                # This below proves that those are current, unmerged works
+                work_id__in=Work.objects.all(),  # Should be safe to be removed
+                work_id__category__slug='anime').values_list(
+                    'work_id', 'source', 'identifier')
+        ) + self.anidb_refs)  # Extra refs because of 3)
+
+        remember_anidb = {}
+        for mangaki_id, source, identifier in sorted(reference_triplets):
+            ref = (source, identifier)
+
+            while mangaki_id in redirects:
+                mangaki_id = redirects[mangaki_id]
+
+            if source == 'AniDB':
+                if (identifier in remember_anidb and
+                        identifier in KEPT_ANIDB_DUPLICATES):  # Because of 4)
+                    self._raw[mangaki_id].setdefault('sources', [])
+                    self._raw[mangaki_id].setdefault('references', [])
+                    continue  # Skip this AniDB ref because another work has it
+                remember_anidb[identifier] = mangaki_id
+            self._raw[mangaki_id].setdefault('sources', []).append(ref)
+            self._raw[mangaki_id].setdefault('references', []).append(ref)
+            self.references[(source, identifier)].add(mangaki_id)
 
         for work_id, synonym in WorkTitle.objects.values_list(
                 'work_id', 'title'):
@@ -238,8 +242,6 @@ class MangakiDatabase:
 
             self._raw[work_id].setdefault('synonyms', []).append(synonym)
             self.from_synonym[sanitize(synonym)].add(work_id)
-
-        self.df = pd.DataFrame.from_dict(self._raw, orient='index')
 
     def __getitem__(self, key):
         return self._raw[key]
@@ -295,7 +297,7 @@ def get_clusters_from_ref(manami, dead, manami_cluster_backup=[]):
             references.update([ref1, ref2])
             url2[mangaki_id].update([ref1, ref2])
 
-    ids = dict(zip(sorted(references), range(len(references))))
+    ids = {v: k for k, v in enumerate(sorted(references))}
     uf = UnionFind(len(references))
     for manami_id, refs in url1.items():
         for ref in refs:
