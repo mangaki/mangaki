@@ -16,9 +16,13 @@ class Command(BaseCommand):
     help = 'Add new works from Manami'
 
     def add_arguments(self, parser):
-        parser.add_argument('manami_path', type=str)
-        parser.add_argument('--extra_clusters', type=str)
-        parser.add_argument('--dry_run', action='store_true', default=False)
+        parser.add_argument('manami_path', type=str,
+            help="Path to manami-project's anime-offline-database repo")
+        parser.add_argument('--extra_clusters', type=str,
+            help='Path to optional list of lists of URL lists that refer to '
+                 'the same work')
+        parser.add_argument('--dry_run', action='store_true', default=False,
+            help='If true, then it will not modify the database')
 
     def handle(self, *args, **options):
         dry_run = options.get('dry_run')
