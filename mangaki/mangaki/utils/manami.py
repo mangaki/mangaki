@@ -1,4 +1,4 @@
-from typing import Tuple, Set, Dict, DefaultDict, NewType, List
+from typing import Tuple, Set, Dict, DefaultDict, NewType, List, Iterator, Any
 import logging
 import pathlib
 import json
@@ -156,11 +156,14 @@ class AnimeOfflineDatabase:
             assert len(manami_entry) == 1, \
                 f"Multiple Manami entries with reference {source}/{identifier}"
 
-    def __getitem__(self, key: int):
+    def __getitem__(self, key: int) -> dict:
         return self._raw['data'][key]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._raw['data'])
+
+    def __iter__(self) -> Iterator[dict]:
+        return iter(self._raw['data'])
 
     def print_summary(self):
         logging.info('Manami:')
@@ -246,10 +249,10 @@ class MangakiDatabase:
             self._raw[mangaki_id]['synonyms'].append(synonym)
             self.from_synonym[sanitize(synonym)].add(mangaki_id)
 
-    def __getitem__(self, key: int):
+    def __getitem__(self, key: int) -> dict:
         return self._raw[key]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._raw)
 
     def print_summary(self):
@@ -260,7 +263,8 @@ class MangakiDatabase:
             logging.info('\t%d animes without ref', len(self.missing_refs))
 
 
-def get_clusters_from_ref(manami, dead,
+def get_clusters_from_ref(manami: AnimeOfflineDatabase,
+                          dead: Dict[str, Set[str]],
                           manami_cluster_backup=[]) -> Dict[int, List[Ref]]:
     '''
     manami_cluster_backup is read-only, so we can use a mutable default.
@@ -270,6 +274,7 @@ def get_clusters_from_ref(manami, dead,
     url2: DefaultDict[int, Set[Ref]] = defaultdict(set)  # Mangaki refs
 
     # Get all sources of Manami entries
+    entry: Dict[str, Any]
     for manami_id, entry in enumerate(manami):
         references.add(Ref(('Manami', str(manami_id))))
         for ref in entry['references']:
@@ -322,9 +327,9 @@ def get_clusters_from_ref(manami, dead,
                     uf.union(ids[first_ref], ids[ref])
 
     nb_has_anidb = 0
-    for mangaki_id, refs in url2.items():
+    for mangaki_id, mangaki_refs in url2.items():
         has_anidb = False
-        for ref in refs:
+        for ref in mangaki_refs:
             if ref[0] == 'AniDB':
                 has_anidb = True
             uf.union(ids[ref], ids[Ref(('Mangaki', str(mangaki_id)))])
@@ -339,7 +344,7 @@ def get_clusters_from_ref(manami, dead,
     return clusters
 
 
-def load_dead_entries(manami_path: pathlib.Path):
+def load_dead_entries(manami_path: pathlib.Path) -> Dict[str, Set[str]]:
     dead = {}
     for filename in manami_path.glob('*.json'):
         with open(filename, encoding='utf-8') as f:
@@ -347,12 +352,13 @@ def load_dead_entries(manami_path: pathlib.Path):
     return dead
 
 
-def check_ref(dead: Dict[str, str], ref: Ref) -> bool:
+def check_ref(dead: Dict[str, Set[str]], ref: Ref) -> bool:
     source, identifier = ref
     return source not in dead or identifier not in dead[source]
 
 
-def describe_refs(manami, mangaki_db, cluster: List[Ref],
+def describe_refs(manami: AnimeOfflineDatabase, mangaki_db: MangakiDatabase,
+                  cluster: List[Ref],
                   valid_mangaki_ids: Set[int]) -> Tuple[list, list, List[Ref]]:
     '''
     Takes a cluster of works that refer to a unique work, and provides in a
@@ -373,14 +379,14 @@ def describe_refs(manami, mangaki_db, cluster: List[Ref],
     return mangaki_refs, manami_refs, other_refs
 
 
-def get_top2_source_count(dead: Dict[str, str],
+def get_top2_source_count(dead: Dict[str, Set[str]],
                           refs: List[Ref]) -> Tuple[Counter, tuple]:
     c = Counter([ref[0] for ref in refs if check_ref(dead, ref)])
     return c, tuple(value for _, value in c.most_common(2))
 
 
 def describe_clusters(manami: AnimeOfflineDatabase,
-        mangaki_db: MangakiDatabase, dead: Dict[str, str],
+        mangaki_db: MangakiDatabase, dead: Dict[str, Set[str]],
         clusters: Dict[int, List[Ref]]) -> Tuple[Counter, int, int, int, dict]:
     '''
     Each cluster contains a certain number of Mangaki IDs or Manami IDs.
@@ -391,7 +397,7 @@ def describe_clusters(manami: AnimeOfflineDatabase,
     Returns a Counter of those cluster types, and new works from Manami to add.
     '''
     works = Work.objects.in_bulk()
-    c = Counter()
+    c: Counter = Counter()
     clusters_by_occ = defaultdict(list)
     nb_cdup_mangaki = 0
     nb_cdup_manami = 0
@@ -460,7 +466,7 @@ def get_manami_map_from_backup(manami,
     to the same work. This can be used to make the manami_map.
     '''
     manami_map = manami.manami_map
-    cluster_length_counter = Counter()
+    cluster_length_counter: Counter = Counter()
     for manami_cluster in manami_cluster_backup:
         manami_ids = list()
         for url_cluster in manami_cluster:
@@ -493,7 +499,8 @@ def keep_most_common(column: pd.Series) -> str:
     return Counter(column.astype(str).tolist()).most_common()[0][0]
 
 
-def insert_combined_manami_to_mangaki(to_create, entry):
+def insert_combined_manami_to_mangaki(to_create: DefaultDict[str, list],
+                                      entry: Dict[str, Any]):
     # Parse references
     anidb_aid = None
     refs = []
@@ -501,7 +508,7 @@ def insert_combined_manami_to_mangaki(to_create, entry):
         if source == 'AniDB':
             anidb_aid = identifier
         refs.append(Reference(source=source, identifier=identifier,
-                              url=ref_to_url((source, identifier))))
+                              url=ref_to_url(Ref((source, identifier)))))
 
     date = None
     try:
@@ -534,8 +541,9 @@ def insert_combined_manami_to_mangaki(to_create, entry):
         to_create['tags'].append(TaggedWork(work=work, tag=tag))
 
 
-def insert_into_mangaki(manami, manami_clusters):
-    to_create = defaultdict(list)
+def insert_into_mangaki(manami: AnimeOfflineDatabase,
+                        manami_clusters: Dict[int, List[int]]):
+    to_create: DefaultDict[str, list] = defaultdict(list)
     combiner = {
         field: drop_dup if field in {'sources', 'synonyms', 'relations',
                                      'tags', 'references'}
