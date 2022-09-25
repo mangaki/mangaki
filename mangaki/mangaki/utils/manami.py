@@ -1,4 +1,5 @@
-from typing import Tuple, Set, Dict, DefaultDict, NewType, List, Iterator, Any
+from typing import (Tuple, Set, Dict, DefaultDict, NewType, List, Iterator,
+                    Any, Optional)
 import logging
 import pathlib
 import json
@@ -114,7 +115,8 @@ def ref_to_url(ref: Ref) -> str:
 
 
 class AnimeOfflineDatabase:
-    def __init__(self, path: str, *, manami_map=None):
+    def __init__(self, path: str, *,
+                 manami_map: Optional[Dict[int, int]] = None):
         self._path = path
         self.references: DefaultDict[Ref, List[int]] = defaultdict(list)
         self.from_title: DefaultDict[str, Set[int]] = defaultdict(set)
@@ -128,8 +130,7 @@ class AnimeOfflineDatabase:
 
     def load_database(self):
         with open(self._path, encoding='utf-8') as f:
-            # TODO: type _raw
-            self._raw = json.load(f)
+            self._raw: Dict[str, Any] = json.load(f)
             for entry in self._raw['data']:
                 entry['nb_episodes'] = str(entry['episodes'])
                 entry['subcategory'] = coarse_category[entry['type'].lower()]
@@ -162,7 +163,7 @@ class AnimeOfflineDatabase:
     def __len__(self) -> int:
         return len(self._raw['data'])
 
-    def __iter__(self) -> Iterator[dict]:
+    def __iter__(self) -> Iterator[Dict[str, Any]]:
         return iter(self._raw['data'])
 
     def print_summary(self):
@@ -184,11 +185,12 @@ class MangakiDatabase:
         self.df = pd.DataFrame.from_dict(self._raw, orient='index')
 
     def load_database(self):
-        # TODO: type _raw
-        self._raw = {work['pk']: work for work in Work.objects.filter(
-            category__slug='anime').values(
+        self._raw: Dict[int, Dict[str, Any]] = {
+            work_dict['pk']: work_dict for work_dict in Work.objects.filter(
+                category__slug='anime').values(
             'pk', 'title', 'nb_episodes', 'date', 'anime_type', 'nb_ratings',
-            'anidb_aid')}
+            'anidb_aid')
+        }
 
         self.anidb_refs = []
         for pk, work in self._raw.items():
@@ -274,7 +276,6 @@ def get_clusters_from_ref(manami: AnimeOfflineDatabase,
     url2: DefaultDict[int, Set[Ref]] = defaultdict(set)  # Mangaki refs
 
     # Get all sources of Manami entries
-    entry: Dict[str, Any]
     for manami_id, entry in enumerate(manami):
         references.add(Ref(('Manami', str(manami_id))))
         for ref in entry['references']:
