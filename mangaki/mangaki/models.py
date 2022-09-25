@@ -22,7 +22,7 @@ from django.db import models, transaction
 from django.db.models import CharField, F, Func, Lookup, Value, Q, FloatField, ExpressionWrapper
 from django.db.models.functions import Cast
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from mangaki.choices import (ORIGIN_CHOICES, TOP_CATEGORY_CHOICES, TYPE_CHOICES,
                              CLUSTER_CHOICES, RELATION_TYPE_CHOICES, SUGGESTION_PROBLEM_CHOICES)
@@ -61,7 +61,7 @@ class SearchSimilarity(Func):
 
 class FilteredWorkManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(redirect__isnull=True)
+        return super().get_queryset().filter(visible=True, redirect__isnull=True)
 
 
 class WorkQuerySet(models.QuerySet):
@@ -148,6 +148,7 @@ class Work(models.Model):
     ext_synopsis = models.TextField(blank=True, default='')
     category = models.ForeignKey('Category', blank=False, null=False, on_delete=models.PROTECT)
     artists = models.ManyToManyField('Artist', through='Staff', blank=True)
+    visible = models.BooleanField(default=True)
 
     # Some of these fields do not make sense for some categories of works.
     genre = models.ManyToManyField('Genre')
@@ -655,6 +656,17 @@ class Reference(models.Model):
         unique_together = (
             ('work', 'source', 'identifier'),
         )
+
+    def get_url(self):
+        if self.source in {'Icotaku', 'Animeka', 'VGMdb'}:
+            return self.url
+        if self.source == 'AniDB':
+            hostname = 'anidb.net'
+        elif self.source == 'MAL':
+            hostname = 'myanimelist.net'
+        else:
+            hostname = self.source
+        return f'https://{hostname}/anime/{self.identifier}'
 
     def __str__(self):
         return f'{self.source}:{self.identifier}'

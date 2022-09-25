@@ -26,10 +26,6 @@ class Migration(migrations.Migration):
             bases=('mangaki.work',),
         ),
         migrations.RemoveField(
-            model_name='ost',
-            name='work_ptr',
-        ),
-        migrations.RemoveField(
             model_name='track',
             name='ost',
         ),

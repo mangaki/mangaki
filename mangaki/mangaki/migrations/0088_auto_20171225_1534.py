@@ -3,7 +3,8 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-from django.utils.http import _urlsplit, limited_parse_qsl
+from django.utils.http import _urlsplit
+from urllib.parse import parse_qsl
 
 def infer_source(url):
     if 'myanimelist' in url:
@@ -28,7 +29,7 @@ def infer_identifier(url, source):
         return int(url.split('/')[4])
     elif source == 'AniDB':
         _, _, _, query_encoded, _ = _urlsplit(url)
-        query_params = dict(limited_parse_qsl(query_encoded))
+        query_params = dict(parse_qsl(query_encoded))
         return query_params.get('aid', None)
     elif source == 'Manga-News':
         # structure is: protocol://www.manga-news.com/index.php/serie/(identifier)

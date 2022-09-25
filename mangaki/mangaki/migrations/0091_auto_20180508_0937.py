@@ -12,10 +12,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='searchissue',
-            name='user',
-        ),
         migrations.DeleteModel(
             name='SearchIssue',
         ),

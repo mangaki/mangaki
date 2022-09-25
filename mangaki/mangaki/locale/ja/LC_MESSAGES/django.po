@@ -9,7 +9,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-05 19:49+0200\n"
+"POT-Creation-Date: 2022-08-05 14:15+0000\n"
 "PO-Revision-Date: 2018-08-23 19:25+0900\n"
 "Last-Translator: Tomoko Kozu <tomoko@mangaki.fr>\n"
 "Language: ja\n"
@@ -17,136 +17,136 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 
-#: mangaki/choices.py:5
+#: mangaki/choices.py:8
 msgid "Japan"
 msgstr "日本"
 
-#: mangaki/choices.py:6
+#: mangaki/choices.py:9
 msgid "Korea"
 msgstr "韓国"
 
-#: mangaki/choices.py:7
+#: mangaki/choices.py:10
 msgid "France"
 msgstr "フランス"
 
-#: mangaki/choices.py:8
+#: mangaki/choices.py:11
 msgid "China"
 msgstr "中国"
 
-#: mangaki/choices.py:9
+#: mangaki/choices.py:12
 msgid "US"
 msgstr "アメリカ"
 
-#: mangaki/choices.py:10
+#: mangaki/choices.py:13
 msgid "Germany"
 msgstr "ドイツ"
 
-#: mangaki/choices.py:11
+#: mangaki/choices.py:14
 msgid "Taiwan"
 msgstr "台湾"
 
-#: mangaki/choices.py:12
+#: mangaki/choices.py:15
 msgid "Spain"
 msgstr "スペイン"
 
-#: mangaki/choices.py:13
+#: mangaki/choices.py:16
 msgid "UK"
 msgstr "イギリス"
 
-#: mangaki/choices.py:14
+#: mangaki/choices.py:17
 msgid "Hong Kong"
 msgstr "香港"
 
-#: mangaki/choices.py:15
+#: mangaki/choices.py:18
 msgid "Italia"
 msgstr "イタリア"
 
-#: mangaki/choices.py:16 mangaki/choices.py:58
+#: mangaki/choices.py:19 mangaki/choices.py:61
 msgid "Unknown"
 msgstr "未知の"
 
-#: mangaki/choices.py:17
+#: mangaki/choices.py:20
 msgid "International"
 msgstr "国際"
 
-#: mangaki/choices.py:21
+#: mangaki/choices.py:24
 msgid "Seinen"
 msgstr "青年"
 
-#: mangaki/choices.py:22
+#: mangaki/choices.py:25
 msgid "Shonen"
 msgstr "少年"
 
-#: mangaki/choices.py:23
+#: mangaki/choices.py:26
 msgid "Shojo"
 msgstr "少女"
 
-#: mangaki/choices.py:24
+#: mangaki/choices.py:27
 msgid "Yaoi"
 msgstr "やおい"
 
-#: mangaki/choices.py:25
+#: mangaki/choices.py:28
 msgid "Sonyun-Manhwa"
 msgstr "Sonyun、韓国の漫画"
 
-#: mangaki/choices.py:26
+#: mangaki/choices.py:29
 msgid "Kodomo"
 msgstr "こども"
 
-#: mangaki/choices.py:27
+#: mangaki/choices.py:30
 msgid "Ecchi-Hentai"
 msgstr "エッチ、変態"
 
-#: mangaki/choices.py:28
+#: mangaki/choices.py:31
 msgid "Global-Manga"
 msgstr "グローバル・マンガ"
 
-#: mangaki/choices.py:29
+#: mangaki/choices.py:32
 msgid "Manhua"
 msgstr "中国の漫画"
 
-#: mangaki/choices.py:30
+#: mangaki/choices.py:33
 msgid "Josei"
 msgstr "城西"
 
-#: mangaki/choices.py:31
+#: mangaki/choices.py:34
 msgid "Sunjung-Sunjeong"
 msgstr "Sunjung-Sunjeong"
 
-#: mangaki/choices.py:32
+#: mangaki/choices.py:35
 msgid "Chungnyun"
 msgstr "Chungnyun"
 
-#: mangaki/choices.py:33
+#: mangaki/choices.py:36
 msgid "Yuri"
 msgstr "ユーリ"
 
-#: mangaki/choices.py:34
+#: mangaki/choices.py:37
 msgid "Dojinshi-Parody"
 msgstr "同人誌、パロディー"
 
-#: mangaki/choices.py:35
+#: mangaki/choices.py:38
 msgid "Manhwa"
 msgstr "韓国の漫画"
 
-#: mangaki/choices.py:36
+#: mangaki/choices.py:39
 msgid "Yonkoma"
 msgstr "4コマ漫画"
 
-#: mangaki/choices.py:40 mangaki/templates/base.html:89
+#: mangaki/choices.py:43 mangaki/templates/base.html:95
 msgid "Directors"
 msgstr "監督"
 
-#: mangaki/choices.py:41 mangaki/templates/base.html:91
+#: mangaki/choices.py:44 mangaki/templates/base.html:97
 msgid "Authors"
 msgstr "著者"
 
-#: mangaki/choices.py:42 mangaki/templates/base.html:90
+#: mangaki/choices.py:45 mangaki/templates/base.html:96
 msgid "Composers"
 msgstr "作曲"
 
-#: mangaki/choices.py:46 mangaki/templates/base.html:66
-#: mangaki/templates/mangaki/reco_list.html:22
+#: mangaki/choices.py:49 mangaki/templates/base.html:67
+#: mangaki/templates/mangaki/reco_list.html:67
 #: mangaki/templates/profile_works.html:9
 #: mangaki/templates/profile_works.html:12
 #: mangaki/templates/profile_works.html:29
@@ -154,167 +154,171 @@ msgstr "作曲"
 msgid "Anime"
 msgstr "アニメ"
 
-#: mangaki/choices.py:47 mangaki/templates/mangaki/reco_list.html:24
+#: mangaki/choices.py:50 mangaki/templates/mangaki/reco_list.html:69
 msgid "Manga"
 msgstr "マンガ"
 
-#: mangaki/choices.py:48
+#: mangaki/choices.py:51
 msgid "Album"
 msgstr "アルバム"
 
-#: mangaki/choices.py:52
+#: mangaki/choices.py:55
 msgid "Unprocessed"
 msgstr "未処理"
 
-#: mangaki/choices.py:53
+#: mangaki/choices.py:56
 msgid "Accepted"
 msgstr "容認されました"
 
-#: mangaki/choices.py:54
+#: mangaki/choices.py:57
 msgid "Rejected"
 msgstr "拒否されました"
 
-#: mangaki/choices.py:59
+#: mangaki/choices.py:62
 msgid "Prequel"
 msgstr "前編"
 
-#: mangaki/choices.py:60
+#: mangaki/choices.py:63
 msgid "Sequel"
 msgstr "後編"
 
-#: mangaki/choices.py:61
+#: mangaki/choices.py:64
 msgid "Summary"
 msgstr "概要"
 
-#: mangaki/choices.py:62
+#: mangaki/choices.py:65
 msgid "Side story"
 msgstr "サイドストーリー"
 
-#: mangaki/choices.py:63
+#: mangaki/choices.py:66
 msgid "Parent story"
 msgstr "親の話"
 
-#: mangaki/choices.py:64
+#: mangaki/choices.py:67
 msgid "Alternative setting"
 msgstr "代替設定"
 
-#: mangaki/choices.py:65
+#: mangaki/choices.py:68
 msgid "Same setting"
 msgstr "同じ設定"
 
-#: mangaki/choices.py:66
+#: mangaki/choices.py:69
 msgid "Special"
 msgstr "特別"
 
-#: mangaki/choices.py:67
+#: mangaki/choices.py:70
 msgid "Adaptation"
 msgstr "適応"
 
-#: mangaki/choices.py:71
+#: mangaki/choices.py:74
 msgid "Wrong title"
 msgstr "間違ったタイトル"
 
-#: mangaki/choices.py:72
+#: mangaki/choices.py:75
 msgid "Wrong poster"
 msgstr "間違ったポスター"
 
-#: mangaki/choices.py:73
+#: mangaki/choices.py:76
 msgid "Synopsis contains mistakes"
 msgstr "あらすじは、ミスを含んでいます"
 
-#: mangaki/choices.py:74
+#: mangaki/choices.py:77
 msgid "Wrong author"
 msgstr "間違った作者"
 
-#: mangaki/choices.py:75
+#: mangaki/choices.py:78
 msgid "Wrong composer"
 msgstr "間違った作曲家"
 
-#: mangaki/choices.py:76
+#: mangaki/choices.py:79
 msgid "This is a duplicate"
 msgstr "これは重複しています"
 
-#: mangaki/choices.py:77
+#: mangaki/choices.py:80
 msgid "Work is Not Safe for Work"
 msgstr "仕事は仕事のために安全ではありません"
 
-#: mangaki/choices.py:78
+#: mangaki/choices.py:81
 msgid "Work is actually Safe for Work"
 msgstr "仕事は仕事のために、実際に安全です"
 
-#: mangaki/choices.py:79
+#: mangaki/choices.py:82
 msgid "Suggest a reference URL (MyAnimeList, AniDB, Icotaku, VGMdb, etc.)"
 msgstr "参照URLを示唆する（MyAnimeList、AniDB、Icotaku、VGMdb、等）"
 
-#: mangaki/choices.py:83
+#: mangaki/choices.py:86
 msgid "Director"
 msgstr "監督"
 
-#: mangaki/choices.py:84
+#: mangaki/choices.py:87
 msgid "Composer"
 msgstr "作曲家"
 
-#: mangaki/choices.py:85
+#: mangaki/choices.py:88
 msgid "Author"
 msgstr "著者"
 
-#: mangaki/choices.py:86
+#: mangaki/choices.py:89
 msgid "Mangaka"
 msgstr "漫画家"
 
-#: mangaki/choices.py:87
+#: mangaki/choices.py:90
 msgid "Screenwriter"
 msgstr "脚本"
 
-#: mangaki/choices.py:91
+#: mangaki/choices.py:94
 msgid "Mosaic"
 msgstr "全体"
 
-#: mangaki/choices.py:92
+#: mangaki/choices.py:95
 msgid "Recent"
 msgstr "最近"
 
-#: mangaki/choices.py:93
+#: mangaki/choices.py:96
+msgid "Upcoming"
+msgstr "今後"
+
+#: mangaki/choices.py:97
 msgid "Top"
 msgstr "トップ"
 
-#: mangaki/choices.py:94
+#: mangaki/choices.py:98
 msgid "Popular"
 msgstr "人気"
 
-#: mangaki/choices.py:95
+#: mangaki/choices.py:99
 msgid "Pearls"
 msgstr "レア"
 
-#: mangaki/choices.py:96
+#: mangaki/choices.py:100
 msgid "Controversial"
 msgstr "癖がある"
 
-#: mangaki/choices.py:97
+#: mangaki/choices.py:101
 msgid "Random"
 msgstr "ランダム"
 
-#: mangaki/choices.py:98
+#: mangaki/choices.py:102
 msgid "A-Z"
 msgstr "アルファベット順"
 
-#: mangaki/forms.py:26
+#: mangaki/forms.py:29
 msgid "Import my ratings"
 msgstr "私の評価をインポート"
 
-#: mangaki/forms.py:27 mangaki/templates/account/signup.html:53
+#: mangaki/forms.py:30 mangaki/templates/account/signup.html:53
 msgid "Subscribe to Mangaki newsletter"
 msgstr "Mangakiニュースレターを購読します"
 
-#: mangaki/forms.py:29
+#: mangaki/forms.py:32
 msgid "My data can be released anonymously for research"
 msgstr "私のデータは、研究のために匿名で解放することができます"
 
-#: mangaki/models.py:453
+#: mangaki/models.py:465
 msgid "Type"
 msgstr "タイプ"
 
-#: mangaki/models.py:454 mangaki/templates/fix/fix_index.html:20
+#: mangaki/models.py:466 mangaki/templates/fix/fix_index.html:20
 #: mangaki/templates/fix/fix_suggestion.html:6
 #: mangaki/templates/fix/fix_suggestion.html:11
 msgid "Suggestion"
@@ -349,7 +353,7 @@ msgid "Join us!"
 msgstr "参加しませんか！"
 
 #: mangaki/templates/about.html:20 mangaki/templates/about.html:37
-#: mangaki/templates/base.html:191
+#: mangaki/templates/base.html:200
 msgid "Contact us"
 msgstr "お問い合わせ"
 
@@ -539,7 +543,7 @@ msgstr "パスワードを変更する"
 msgid "Your password is now changed."
 msgstr "パスワードが変更されました。"
 
-#: mangaki/templates/account/signup.html:7 mangaki/templates/base.html:115
+#: mangaki/templates/account/signup.html:7 mangaki/templates/base.html:121
 #: mangaki/templates/socialaccount/signup.html:6
 msgid "Signup"
 msgstr "サインアップ"
@@ -627,75 +631,84 @@ msgstr "はい、確かです"
 msgid "No, take me back"
 msgstr "いいえ、私を取り戻します"
 
-#: mangaki/templates/base.html:11
+#: mangaki/templates/base.html:12 mangaki/templates/mangaki/work_detail.html:15
 msgid "Mangaki is an anime & manga recommendation website"
 msgstr "Mangakiは、アニメ＆漫画の推薦サイトです"
 
-#: mangaki/templates/base.html:11 mangaki/templates/index.html:12
+#: mangaki/templates/base.html:12 mangaki/templates/index.html:12
+#: mangaki/templates/mangaki/work_detail.html:15
 msgid "Rate your favorite series and discover new ones!"
 msgstr "お気に入りのシリーズを評価し、新しいものを発見！"
 
-#: mangaki/templates/base.html:35 mangaki/templates/base.html:161
+#: mangaki/templates/base.html:36 mangaki/templates/base.html:170
 msgid "Toggle navigation"
 msgstr "ナビをトグル"
 
-#: mangaki/templates/base.html:71 mangaki/templates/profile_works.html:16
+#: mangaki/templates/base.html:72 mangaki/templates/profile_works.html:16
 #: mangaki/templates/profile_works.html:19
 #: mangaki/templates/profile_works.html:36
 #: mangaki/templates/profile_works.html:39
 msgid "Mangas"
 msgstr "マンガ"
 
-#: mangaki/templates/base.html:76 mangaki/templates/mangaki/reco_list.html:4
-#: mangaki/templates/mangaki/reco_list.html:8
+#: mangaki/templates/base.html:77 mangaki/templates/mangaki/reco_list.html:4
+#: mangaki/templates/mangaki/reco_list.html:35
 msgid "Recommendations"
 msgstr "オススメ"
 
-#: mangaki/templates/base.html:81 mangaki/templates/mangaki/artist_list.html:5
+#: mangaki/templates/base.html:82
+msgid "Map"
+msgstr ""
+
+#: mangaki/templates/base.html:87 mangaki/templates/mangaki/artist_list.html:5
 msgid "Artists"
 msgstr "アーティスト"
 
-#: mangaki/templates/base.html:86
+#: mangaki/templates/base.html:92
 msgid "Top 20"
 msgstr "トップ20"
 
-#: mangaki/templates/base.html:96
+#: mangaki/templates/base.html:102
 msgid "Contribute"
 msgstr "参加"
 
-#: mangaki/templates/base.html:99 mangaki/templates/fix/fix_index.html:14
+#: mangaki/templates/base.html:105 mangaki/templates/fix/fix_index.html:14
 msgid "Suggestions"
 msgstr "提案"
 
-#: mangaki/templates/base.html:100
+#: mangaki/templates/base.html:106
 msgid "Report a bug"
 msgstr "バグを報告"
 
-#: mangaki/templates/base.html:102
+#: mangaki/templates/base.html:108
 msgid "Donate"
 msgstr "寄付します"
 
-#: mangaki/templates/base.html:111
+#: mangaki/templates/base.html:117
 msgid "Log in"
 msgstr "ログイン"
 
-#: mangaki/templates/base.html:120
+#: mangaki/templates/base.html:126
 msgid "Welcome"
 msgstr "ようこそ"
 
-#: mangaki/templates/base.html:124
+#: mangaki/templates/base.html:130
 msgid "Rated works"
 msgstr "定格作品"
 
-#: mangaki/templates/base.html:127
+#: mangaki/templates/base.html:133 mangaki/views.py:493
+msgid "My friends"
+msgstr ""
+
+#: mangaki/templates/base.html:136
 msgid "My settings"
 msgstr "私の設定"
 
-#: mangaki/templates/base.html:129
+#: mangaki/templates/base.html:138
 msgid "Log out"
 msgstr "ログアウト"
 
-#: mangaki/templates/base.html:148
+#: mangaki/templates/base.html:157
 #, python-format
 msgid ""
 "You rated a few works anonymously, you can <a href=\"%(profile)s\">see them</"
@@ -705,28 +718,28 @@ msgstr ""
 "ます。もし保存したければ、<a href=\"%(signup_url)s\">サインアップ</a>を忘れな"
 "いでください。"
 
-#: mangaki/templates/base.html:169
+#: mangaki/templates/base.html:178
 msgid "Mangaki project"
 msgstr "Mangakiプロジェクト"
 
-#: mangaki/templates/base.html:173
+#: mangaki/templates/base.html:182
 msgid "FAQ"
 msgstr "よくある質問"
 
-#: mangaki/templates/base.html:177 mangaki/templates/mangaki/legal.html:4
+#: mangaki/templates/base.html:186 mangaki/templates/mangaki/legal.html:4
 #: mangaki/templates/mangaki/legal.html:7
 msgid "Legal mentions"
 msgstr "法の告示"
 
-#: mangaki/templates/base.html:181
+#: mangaki/templates/base.html:190
 msgid "Guidelines"
 msgstr "ガイドライン"
 
-#: mangaki/templates/base.html:185
+#: mangaki/templates/base.html:194
 msgid "Blog"
 msgstr "ブログ"
 
-#: mangaki/templates/base.html:198
+#: mangaki/templates/base.html:207
 msgid "Version:"
 msgstr "バージョン："
 
@@ -976,23 +989,56 @@ msgstr ""
 "fontawesome.io\">fontawesome</a>。SVGのバージョンは<a href=\"http://www."
 "flaticon.com/packs/font-awesome\">flaticon</a>に由来しています。"
 
-#: mangaki/templates/mangaki/reco_list.html:10
+#: mangaki/templates/mangaki/reco_list.html:12
+msgid "Group"
+msgstr ""
+
+#: mangaki/templates/mangaki/reco_list.html:14
+msgid "Add a friend"
+msgstr ""
+
+#: mangaki/templates/mangaki/reco_list.html:19
+msgid "You cannot add this user"
+msgstr ""
+
+#: mangaki/templates/mangaki/reco_list.html:24
+msgid "New for me"
+msgstr ""
+
+#: mangaki/templates/mangaki/reco_list.html:26
+msgid "New for some"
+msgstr ""
+
+#: mangaki/templates/mangaki/reco_list.html:28
+msgid "New for all"
+msgstr ""
+
+#: mangaki/templates/mangaki/reco_list.html:46
 msgid ""
 "Here are some recommendations that you might like.<br /> Rate them and "
 "reload to get new ones."
 msgstr ""
 "あなたの好きなアニメ、漫画はコレですか。<br />ページを再ロードしてください。"
 
-#: mangaki/templates/mangaki/reco_list.html:18
+#: mangaki/templates/mangaki/reco_list.html:55
+msgid "Add some of your friends to recommend with"
+msgstr ""
+
+#: mangaki/templates/mangaki/reco_list.html:57
+#: mangaki/templates/mangaki/work_detail.html:117
+msgid "This user already knows this work"
+msgstr "このユーザーはすでにこの作品を知っています"
+
+#: mangaki/templates/mangaki/reco_list.html:63
 msgid "All"
 msgstr "すべて"
 
-#: mangaki/templates/mangaki/reco_list.html:31
+#: mangaki/templates/mangaki/reco_list.html:76
 msgid ""
 "I want new recommendations! <br class=\"visible-xs\">(After you rate those.)"
 msgstr "新しいオススメをゲットしたい！<br />（カードの評価後にクリックしてね）"
 
-#: mangaki/templates/mangaki/reco_list.html:35
+#: mangaki/templates/mangaki/reco_list.html:82
 #, python-format
 msgid ""
 "To receive recommandations, you should at least <a href=\"%(work_list_url)s"
@@ -1001,89 +1047,89 @@ msgstr ""
 "オススメを獲るには、<a href=\"%(work_list_url)s\">アニメか漫画</a>を少なくと"
 "も一つは評価してね！"
 
-#: mangaki/templates/mangaki/work_detail.html:53
+#: mangaki/templates/mangaki/work_detail.html:54
+msgid "Date:"
+msgstr ""
+
+#: mangaki/templates/mangaki/work_detail.html:58
 msgid "Number of episodes:"
 msgstr "エピソードの数："
 
-#: mangaki/templates/mangaki/work_detail.html:55
+#: mangaki/templates/mangaki/work_detail.html:60
 msgid "Original title:"
 msgstr "原題："
 
-#: mangaki/templates/mangaki/work_detail.html:62
+#: mangaki/templates/mangaki/work_detail.html:67
 msgid "Editor:"
 msgstr "編集者："
 
-#: mangaki/templates/mangaki/work_detail.html:63
+#: mangaki/templates/mangaki/work_detail.html:68
 msgid "Origin:"
 msgstr "原点："
 
-#: mangaki/templates/mangaki/work_detail.html:64
+#: mangaki/templates/mangaki/work_detail.html:69
 msgid "Genres:"
 msgstr "ジャンル："
 
-#: mangaki/templates/mangaki/work_detail.html:66
-#: mangaki/templates/mangaki/work_detail.html:68
+#: mangaki/templates/mangaki/work_detail.html:71
+#: mangaki/templates/mangaki/work_detail.html:73
 msgid "Type:"
 msgstr "タイプ："
 
-#: mangaki/templates/mangaki/work_detail.html:71
+#: mangaki/templates/mangaki/work_detail.html:76
 msgid "Catalog number:"
 msgstr "カタログ番号："
 
-#: mangaki/templates/mangaki/work_detail.html:73
+#: mangaki/templates/mangaki/work_detail.html:78
 msgid "Find this album on VGMdb"
 msgstr "VGMdbにこのアルバムを探します"
 
-#: mangaki/templates/mangaki/work_detail.html:79
+#: mangaki/templates/mangaki/work_detail.html:84
 msgid "Stats"
 msgstr "統計"
 
-#: mangaki/templates/mangaki/work_detail.html:85
+#: mangaki/templates/mangaki/work_detail.html:90
 msgid "References"
 msgstr "参照"
 
-#: mangaki/templates/mangaki/work_detail.html:89
+#: mangaki/templates/mangaki/work_detail.html:94
 #, python-format
 msgid "See on %(name)s"
 msgstr "%(name)s"
 
-#: mangaki/templates/mangaki/work_detail.html:107
+#: mangaki/templates/mangaki/work_detail.html:112
 msgid "Suggest an edit for this page"
 msgstr "このページの編集を提案します"
 
-#: mangaki/templates/mangaki/work_detail.html:110
+#: mangaki/templates/mangaki/work_detail.html:115
 msgid "Suggest this work to a user on Mangaki"
 msgstr "Mangaki上のユーザーに、この作品を提案します"
 
-#: mangaki/templates/mangaki/work_detail.html:112
-msgid "This user already knows this work"
-msgstr "このユーザーはすでにこの作品を知っています"
-
-#: mangaki/templates/mangaki/work_detail.html:113
+#: mangaki/templates/mangaki/work_detail.html:118
 msgid "Suggestion successfully sent!"
 msgstr "提案は正常に送信します！"
 
-#: mangaki/templates/mangaki/work_detail.html:120
+#: mangaki/templates/mangaki/work_detail.html:125
 msgid "Suggest an edit for"
 msgstr "編集のための提案"
 
-#: mangaki/templates/mangaki/work_detail.html:122
+#: mangaki/templates/mangaki/work_detail.html:127
 msgid "Thanks for improving Mangaki!"
 msgstr "Mangakiを改善するためのありがとう！"
 
-#: mangaki/templates/mangaki/work_detail.html:124
+#: mangaki/templates/mangaki/work_detail.html:129
 msgid "Please indicate what part of the work has a problem."
 msgstr "問題を抱えている仕事のどの部分明記してください。"
 
-#: mangaki/templates/mangaki/work_detail.html:125
+#: mangaki/templates/mangaki/work_detail.html:130
 msgid "Sketch your solution, and submit it!"
 msgstr "あなたのソリューションをスケッチし、それを提出します！"
 
-#: mangaki/templates/mangaki/work_detail.html:136
+#: mangaki/templates/mangaki/work_detail.html:141
 msgid "Close"
 msgstr "閉じる"
 
-#: mangaki/templates/mangaki/work_detail.html:137
+#: mangaki/templates/mangaki/work_detail.html:142
 msgid "Submit"
 msgstr "提出します"
 
@@ -1110,18 +1156,22 @@ msgstr ""
 "\">サインアップ</a>してね。"
 
 #: mangaki/templates/mangaki/work_list.html:28
-#: mangaki/templates/mangaki/work_list.html:63 mangaki/views.py:88
+#: mangaki/templates/mangaki/work_list.html:63 mangaki/views.py:98
 msgid "Love"
 msgstr "大好き"
 
 #: mangaki/templates/mangaki/work_list.html:29
-#: mangaki/templates/mangaki/work_list.html:30
-#: mangaki/templates/mangaki/work_list.html:64 mangaki/views.py:92
+#: mangaki/templates/mangaki/work_list.html:64 mangaki/views.py:102
 msgid "Like"
 msgstr "好き"
 
+#: mangaki/templates/mangaki/work_list.html:30
+#: mangaki/templates/mangaki/work_list.html:65 mangaki/views.py:106
+msgid "Neutral"
+msgstr "普通"
+
 #: mangaki/templates/mangaki/work_list.html:31
-#: mangaki/templates/mangaki/work_list.html:66 mangaki/views.py:100
+#: mangaki/templates/mangaki/work_list.html:66 mangaki/views.py:110
 msgid "Dislike"
 msgstr "嫌い"
 
@@ -1130,7 +1180,7 @@ msgid "I want to read"
 msgstr "読みたい"
 
 #: mangaki/templates/mangaki/work_list.html:36
-#: mangaki/templates/mangaki/work_list.html:67 mangaki/views.py:104
+#: mangaki/templates/mangaki/work_list.html:67 mangaki/views.py:114
 msgid "I want to see"
 msgstr "見たい"
 
@@ -1139,7 +1189,7 @@ msgid "I don't want to read"
 msgstr "読みたくない"
 
 #: mangaki/templates/mangaki/work_list.html:44
-#: mangaki/templates/mangaki/work_list.html:68 mangaki/views.py:109
+#: mangaki/templates/mangaki/work_list.html:68 mangaki/views.py:119
 msgid "I don't want to see"
 msgstr "見たくない"
 
@@ -1163,10 +1213,6 @@ msgstr "右に"
 msgid "Vote"
 msgstr "評価"
 
-#: mangaki/templates/mangaki/work_list.html:65 mangaki/views.py:96
-msgid "Neutral"
-msgstr "普通"
-
 #: mangaki/templates/mangaki/work_list.html:126
 msgid "Get recommendations now"
 msgstr "今の勧告を見ます"
@@ -1189,9 +1235,21 @@ msgstr "<a href=\"%(signup_url)s\">サインアップ</a>"
 msgid "Subscribed since %(member_days)s days"
 msgstr "%(member_days)sの時代から加入"
 
-#: mangaki/templates/profile.html:44
+#: mangaki/templates/profile.html:43 mangaki/templates/profile.html:44
+msgid "Add friend"
+msgstr ""
+
+#: mangaki/templates/profile.html:62
 msgid "Delete all my ratings"
 msgstr "すべての私の評価を削除します。"
+
+#: mangaki/templates/profile_friendlist.html:17
+msgid "public"
+msgstr ""
+
+#: mangaki/templates/profile_friendlist.html:19
+msgid "private"
+msgstr ""
 
 #: mangaki/templates/profile_preferences.html:11
 #, fuzzy
@@ -1367,17 +1425,28 @@ msgstr "お気に入り数"
 msgid "No results."
 msgstr "結果がありません。"
 
-#: mangaki/urls.py:71
+#: mangaki/urls.py:80
 msgid "The page you're looking for was not found (yet?)."
 msgstr "あなたが探しているページは（まだ？）が見つかりませんでした。"
 
-#: mangaki/urls.py:72
+#: mangaki/urls.py:81
 msgid "You don't have access to this page."
 msgstr "このページへのアクセス権を持っていません。"
 
-#: mangaki/urls.py:73
+#: mangaki/urls.py:82
 msgid "This request is incorrect. What did you try to do?"
 msgstr "この要求が正しくありません。何を試しましたか？"
+
+#: mangaki/utils/recommendations.py:26
+#, python-brace-format
+msgid ""
+"We switched to SVD as recommendation algorithm, as {algo_name} was not "
+"available."
+msgstr ""
+
+#: mangaki/views.py:497
+msgid "My pending friend requests"
+msgstr ""
 
 #~ msgid "United States"
 #~ msgstr "アメリカ"

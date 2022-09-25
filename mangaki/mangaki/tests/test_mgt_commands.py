@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 from io import StringIO
-import responses
 import os.path
-import logging
 import re
+from pathlib import Path
+import responses
 
 from django.test import TestCase
 from django.core import management
@@ -19,7 +19,7 @@ from mangaki.utils.tokens import compute_token
 class CommandTest(TestCase):
     @staticmethod
     def read_fixture(filename):
-        with open(os.path.join(settings.TEST_DATA_DIR, filename), 'r') as f:
+        with open(Path(settings.TEST_DATA_DIR) / filename, 'r') as f:
             return f.read()
 
     def setUp(self):
@@ -52,8 +52,18 @@ class CommandTest(TestCase):
         )
         management.call_command('add_anidb', self.anime.anidb_aid,
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
-                          "Successfully added Sangatsu no Lion\n")
+        self.assertIn("Successfully added Sangatsu no Lion",
+                      self.stdout.getvalue())
+
+    def test_add_new_works(self):
+        management.call_command(
+            'add_new_works', Path(settings.TEST_DATA_DIR) / 'manami',
+            '--extra-clusters',
+            Path(settings.TEST_DATA_DIR) / 'manami_clusters.json',
+            stdout=self.stdout)
+        self.assertEqual(
+            Work.objects.filter(category__slug='anime').count(),
+            2)  # Added one work
 
     @responses.activate
     def test_anidb_tags_to_json(self):
@@ -83,24 +93,24 @@ class CommandTest(TestCase):
 
     def test_fit_algo(self):
         management.call_command('fit_algo', 'zero', stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
-                          "Successfully fit zero (0.0 MB)\n")
+        self.assertIn("Successfully fit zero (0.0 MB)",
+                      self.stdout.getvalue())
 
     def test_generate_seed_data(self):
         management.call_command('generate_seed_data', 'small',
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(), 'Fixture ready.\n')
+        self.assertIn('Fixture ready.', self.stdout.getvalue())
 
     def test_index(self):
         management.call_command('index')
         # Curiously, both below are empty
         # self.anime.title_search, self.anime.titles_search
 
-        self.assertEquals(Work.objects.filter(titles_search='lion').count(), 1)
-        self.assertEquals(Work.objects.filter(title_search='lion').count(), 1)
+        self.assertEqual(Work.objects.filter(titles_search='lion').count(), 1)
+        self.assertEqual(Work.objects.filter(title_search='lion').count(), 1)
 
-        self.assertEquals(Work.objects.filter(titles_search='march').count(), 1)
-        self.assertEquals(Work.objects.filter(title_search='march').count(), 0)
+        self.assertEqual(Work.objects.filter(titles_search='march').count(), 1)
+        self.assertEqual(Work.objects.filter(title_search='march').count(), 0)
 
     def test_lastactivity(self):
         management.call_command('lastactivity')
@@ -125,18 +135,18 @@ class CommandTest(TestCase):
         )
         management.call_command('retrieveposters', self.anime.id,
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
-                          '1 poster(s) successfully downloaded.\n')
+        self.assertIn('1 poster(s) successfully downloaded.',
+                         self.stdout.getvalue())
 
     def test_tokens(self):
         management.call_command('tokens', 'DR', '--salt', 'PEPPER',  # HA HA
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
-                          'DR {:s}\n'.format(compute_token('PEPPER', 'DR')))
+        self.assertIn('DR {:s}'.format(compute_token('PEPPER', 'DR')),
+                      self.stdout.getvalue())
 
     def test_top(self):
         management.call_command('top', '--all', stdout=self.stdout)
-        self.assertEquals(len(self.stdout.getvalue().splitlines()), 6)
+        self.assertEqual(len(self.stdout.getvalue().splitlines()), 6)
 
     @responses.activate
     def test_vgmdb(self):
@@ -149,6 +159,6 @@ class CommandTest(TestCase):
         )
         management.call_command('vgmdb', self.album.id,
                                 stdout=self.stdout)
-        self.assertEquals(self.stdout.getvalue(),
-                          'Successfully added Yoko Kanno to '
-                          'COWBOY BEBOP Original Soundtrack 3 BLUE\n')
+        self.assertIn('Successfully added Yoko Kanno to '
+                      'COWBOY BEBOP Original Soundtrack 3 BLUE',
+                      self.stdout.getvalue())

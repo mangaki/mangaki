@@ -13,58 +13,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='album',
-            name='deprecated_composer',
-        ),
-        migrations.RemoveField(
-            model_name='album',
-            name='work_ptr',
-        ),
-        migrations.RemoveField(
-            model_name='anime',
-            name='deprecated_author',
-        ),
-        migrations.RemoveField(
-            model_name='anime',
-            name='deprecated_composer',
-        ),
-        migrations.RemoveField(
-            model_name='anime',
-            name='deprecated_director',
-        ),
-        migrations.RemoveField(
-            model_name='anime',
-            name='deprecated_editor',
-        ),
-        migrations.RemoveField(
-            model_name='anime',
-            name='deprecated_genre',
-        ),
-        migrations.RemoveField(
-            model_name='anime',
-            name='deprecated_studio',
-        ),
-        migrations.RemoveField(
-            model_name='anime',
-            name='work_ptr',
-        ),
-        migrations.RemoveField(
-            model_name='manga',
-            name='deprecated_genre',
-        ),
-        migrations.RemoveField(
-            model_name='manga',
-            name='deprecated_mangaka',
-        ),
-        migrations.RemoveField(
-            model_name='manga',
-            name='deprecated_writer',
-        ),
-        migrations.RemoveField(
-            model_name='manga',
-            name='work_ptr',
-        ),
         migrations.AlterField(
             model_name='track',
             name='album',

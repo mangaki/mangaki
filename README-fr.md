@@ -57,9 +57,8 @@ marcher, donc vous ne devriez pas avoir besoin de changer quoi que ce soit :
 
 Ensuite, vous pouvez installer l'environnement de Django :
 
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements/dev.txt
+    poetry install
+    poetry shell
     ./mangaki/manage.py migrate
     ./mangaki/manage.py runserver
 
@@ -83,10 +82,10 @@ Voilà ! Vous avez une installation de Mangaki fonctionnelle.
 Lancer les tests
 ----------------
 
-    . venv/bin/activate
-    ./mangaki/manage.py test
+    poetry shell
+    py.test mangaki/
 
-Ceci va lancer les [doctests](https://docs.python.org/3.5/library/doctest.html) et les tests unitaires contenus dans chaque application avec un dossier `tests`.
+Ceci va lancer les [doctests](https://docs.python.org/3.8/library/doctest.html) et les tests unitaires contenus dans chaque application avec un dossier `tests`.
 
 Pour calculer la couverture de test, il faut plutôt faire:
 

@@ -1,0 +1,44 @@
+{
+    "data": [
+        {
+            "sources": [
+                "https://myanimelist.net/anime/4242",
+                "https://anidb.net/anime/424242"
+            ],
+            "title": "Death Note",
+            "type": "SPECIAL",
+            "episodes": 1,
+            "animeSeason": {
+                "season": "FALL",
+                "year": 2020
+            },
+            "picture": "https://placekitten.com/420/420",
+            "synonyms": [
+                "Mort note"
+            ],
+            "tags": [
+                "final",
+                "fantasy"
+            ]
+        },
+        {
+            "sources": [
+                "https://myanimelist.net/anime/2121",
+                "https://anidb.net/anime/212121"
+            ],
+            "title": "Aussi Death Note",
+            "type": "SPECIAL",
+            "episodes": 1,
+            "animeSeason": {
+                "season": "FALL",
+                "year": 2020
+            },
+            "picture": "https://placekitten.com/420/420",
+            "synonyms": [],
+            "tags": [
+                "death",
+                "japan"
+            ]
+        }       
+    ]
+}

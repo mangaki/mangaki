@@ -24,12 +24,12 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpRespon
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone, translation
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.timezone import utc
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.defaults import server_error
 from django.views.generic import View
@@ -190,9 +190,7 @@ class WorkDetail(AjaxableResponseMixin, FormMixin, SingleObjectTemplateResponseM
 
         context['references'] = {}
         for reference in self.object.reference_set.all():
-            for domain, name in REFERENCE_DOMAINS:
-                if reference.url.startswith(domain):
-                    context['references'][reference.url] = name
+            context['references'][reference.get_url()] = reference.source
         if 'AniDB' not in context['references'].values() and self.object.anidb_aid >= 1:
             url = f'https://anidb.net/anime/{self.object.anidb_aid}'
             context['references'][url] = 'AniDB'
@@ -284,14 +282,20 @@ class WorkList(WorkListMixin, ListView):
         search_text = self.search_query
         watchlist_user = self.watchlist_user()
         if watchlist_user is not None:
-            work_ids = Rating.objects.filter(work__category=self.category,user__username=watchlist_user,choice='willsee').values_list('work_id', flat=True)
+            work_ids = Rating.objects.filter(
+                work__category=self.category, user__username=watchlist_user,
+                choice='willsee').values_list('work_id', flat=True)
             self.queryset = Work.objects.filter(id__in=work_ids)
         else:
             self.queryset = self.category.work_set
         sort_mode = self.sort_mode()
 
         if sort_mode == 'new':
-            self.queryset = self.queryset.filter(date__isnull=False).order_by('-date')
+            self.queryset = self.queryset.filter(
+                date__isnull=False, date__lt=datetime.date.today()).order_by('-date')
+        elif sort_mode == 'upcoming':
+            self.queryset = self.queryset.filter(
+                date__isnull=False, date__gt=datetime.date.today()).order_by('date')            
         elif sort_mode == 'top':
             self.queryset = self.queryset.top()
         elif sort_mode == 'popularity':
@@ -1140,7 +1144,7 @@ def update_evidence(request):
             evidence.save()
 
     next_url = request.GET.get('next')
-    if next_url and is_safe_url(url=next_url, allowed_hosts=request.get_host()):
+    if next_url and url_has_allowed_host_and_scheme(url=next_url, allowed_hosts=request.get_host()):
         return redirect(next_url)
     return redirect('fix-index')
 

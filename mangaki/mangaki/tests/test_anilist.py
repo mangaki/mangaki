@@ -52,7 +52,7 @@ class AniListTest(TestCase):
             content_type='application/json'
         )
 
-        with self.assertRaisesRegexp(AniListException, 'Error 404 : Not Found.'):
+        with self.assertRaisesRegex(AniListException, 'Error 404 : Not Found.'):
             self.anilist._request(
                 query=read_graphql_query('work-info'),
                 variables={'id': 0}

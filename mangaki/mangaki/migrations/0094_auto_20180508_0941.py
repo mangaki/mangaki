@@ -12,14 +12,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='neighborship',
-            name='neighbor',
-        ),
-        migrations.RemoveField(
-            model_name='neighborship',
-            name='user',
-        ),
         migrations.DeleteModel(
             name='Neighborship',
         ),

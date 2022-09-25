@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2014, Mangaki Authors
 # SPDX-License-Identifier: AGPL-3.0-only
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 ORIGIN_CHOICES = (
@@ -93,6 +93,7 @@ STAFF_TYPICAL_CHOICES = (
 SORT_MODE_CHOICES = (
     ('mosaic', _('Mosaic')),
     ('new', _('Recent')),
+    ('upcoming', _('Upcoming')),
     ('top', _('Top')),
     ('popularity', _('Popular')),
     ('pearls', _('Pearls')),

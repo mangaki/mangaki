@@ -3,7 +3,7 @@
 [![CircleCI](https://circleci.com/gh/mangaki/mangaki.svg?style=svg)](https://circleci.com/gh/mangaki/mangaki)
 [![Codecov](https://img.shields.io/codecov/c/github/mangaki/mangaki.svg)](https://codecov.io/gh/mangaki/mangaki/)
 
-Welcome to Mangaki!  
+Welcome to Mangaki!
 This README is also available [in French](README-fr.md).
 
 ## What to do from here?
@@ -26,7 +26,7 @@ This README is also available [in French](README-fr.md).
 
 ### Database setup
 
-You need to have PostgreSQL >9.3 running on your machine. You also need an
+You need to have PostgreSQL ≥10 running on your machine. You also need an
 user that will have access to the database. The easiest way to achieve that is
 simply to create an account which has the same name as your username, which
 can create databases, and which is a superuser (for CREATE EXTENSION):
@@ -42,6 +42,8 @@ Then create the database, and add the required extensions:
 
 ### Running the web server
 
+You will need Python ≥ 3.8 and Poetry.
+
 First, copy the configuration. The default parameters are already supposed to
 work, so you shouldn't need to change anything:
 
@@ -54,7 +56,7 @@ You can then install the Django environment:
     ./mangaki/manage.py migrate
     ./mangaki/manage.py runserver  # If in dev; otherwise install gunicorn or anything by your own means
 
-And voilà! You can access Mangaki at http://localhost:8000.
+And voilà! You can access Mangaki at <http://localhost:8000>.
 
 ### Running background tasks (Celery)
 
@@ -66,8 +68,8 @@ Background tasks represent:
 
 These are optional, but if you want to try them:
 
-     # Ensure that your working directory contains manage.py
-     celery -B -A mangaki:celery_app worker -l INFO
+     # The PYTHONPATH hack is necessary. If you don't like it, read the Nix section.
+     PYTHONPATH=$PYTHONPATH:`pwd`/mangaki celery -A mangaki.workers:app worker -B -l INFO
 
 If you can read something like this:
 
@@ -77,7 +79,11 @@ If you can read something like this:
 
 The worker is ready to receive background tasks (e.g. MAL imports).
 
-### VM install
+## Nix-based install
+
+Please check [this file](./README-nix.md) for more information.
+
+## VM install
 
 You can also [install Mangaki in a VM](https://github.com/mangaki/mangaki/wiki/How-to-install-Mangaki-using-a-virtual-machine-(simple-but-takes-2-GB)) using our amazing Ansible playbooks.
 
@@ -87,11 +93,11 @@ It's simple but takes 2 GB.
 
 The database starts empty, but you can populate a few works:
 
-    ./manage.py loaddata ../fixtures/{partners,seed_data}.json
-    ./manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
-    ./manage.py index      # Compute the search indexes. Should be done once in a while.
-    ./manage.py top --all  # Compute the Top 20 directors, etc. Should be done regularly.
-    ./manage.py test       # Run all tests
+    ./mangaki/manage.py loaddata ../fixtures/{partners,seed_data}.json
+    ./mangaki/manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
+    ./mangaki/manage.py index      # Compute the search indexes. Should be done once in a while.
+    ./mangaki/manage.py top --all  # Compute the Top 20 directors, etc. Should be done regularly.
+    py.test mangaki/               # Run all tests
 
 See also our interesting [Jupyter notebooks](https://github.com/mangaki/notebooks), in another repository.
 
@@ -110,3 +116,4 @@ See also our interesting [Jupyter notebooks](https://github.com/mangaki/notebook
 ## License information
 
 Mangaki is an open-sourced project licensed under AGPLv3. For accurate information regarding license and copyrights, please check individual files. 
+

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load staticfiles %}
+{% load static %}
 {% load posters %}
 
 {% block title %}{% trans "NSFW grid" %} {% if suggestions.paginator.page_range|length > 1 %}- {% trans "Page" %} {{ suggestions.number }} {% endif %}- Mangaki{% endblock %}

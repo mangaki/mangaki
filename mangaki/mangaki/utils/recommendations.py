@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from mangaki.models import Rating, Work
 from mangaki.utils.fit_algo import fit_algo, get_algo_backup

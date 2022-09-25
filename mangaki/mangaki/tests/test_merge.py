@@ -6,11 +6,12 @@ from unittest.mock import patch, Mock
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from django.contrib import admin
+from django.contrib.admin import helpers
+from django.utils import timezone
 
 from mangaki import tasks
 from mangaki.models import Work, Category, WorkCluster, Rating, Staff, Role, Artist, Genre, Reference
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from mangaki.utils.work_merge import create_work_cluster, merge_work_clusters
 
@@ -23,9 +24,9 @@ class MergeTest(TestCase):
         for username in 'ABCD':
             self.users.append(get_user_model().objects.create_user(username=username, password='test'))
 
-        today = datetime.now()
-        yesterday = datetime.now() - timedelta(1)
-        tomorrow = datetime.now() + timedelta(1)
+        today = timezone.now()
+        yesterday = timezone.now() - timedelta(1)
+        tomorrow = timezone.now() + timedelta(1)
 
         anime = Category.objects.get(slug='anime')
 
@@ -84,7 +85,7 @@ class MergeTest(TestCase):
     def test_merge(self):
         self.client.login(username='test', password='test')
         merge_url = reverse('admin:mangaki_work_changelist')
-        response = self.client.post(merge_url, {'action': 'merge', admin.ACTION_CHECKBOX_NAME: self.work_ids})
+        response = self.client.post(merge_url, {'action': 'merge', helpers.ACTION_CHECKBOX_NAME: self.work_ids})
         self.assertEqual(response.status_code, 200)
 
     def test_merge_confirmed(self):
@@ -92,13 +93,13 @@ class MergeTest(TestCase):
         merge_url = reverse('admin:mangaki_work_changelist')
         context = {
             'action': 'merge',
-            admin.ACTION_CHECKBOX_NAME: self.work_ids,
+            helpers.ACTION_CHECKBOX_NAME: self.work_ids,
             'confirm': 1,
             'id': self.work_ids[0],  # Chosen ID for the canonical work
             'fields_to_choose': '',
             'fields_required': ''
         }
-        with self.assertNumQueries(39):
+        with self.assertNumQueries(37):  # FIXME(Raito): This test is quite fragile, what would be better?
             self.client.post(merge_url, context)
         self.assertEqual(list(Rating.objects.filter(user__in=self.users).values_list('choice', flat=True)), ['favorite'] * 4)
         self.assertEqual(Work.all_objects.filter(redirect__isnull=True).count(), 1)
