@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 from io import StringIO
-import responses
 import os.path
-import logging
 import re
+from pathlib import Path
+import responses
 
 from django.test import TestCase
 from django.core import management
@@ -19,7 +19,7 @@ from mangaki.utils.tokens import compute_token
 class CommandTest(TestCase):
     @staticmethod
     def read_fixture(filename):
-        with open(os.path.join(settings.TEST_DATA_DIR, filename), 'r') as f:
+        with open(Path(settings.TEST_DATA_DIR) / filename, 'r') as f:
             return f.read()
 
     def setUp(self):
@@ -54,6 +54,16 @@ class CommandTest(TestCase):
                                 stdout=self.stdout)
         self.assertIn("Successfully added Sangatsu no Lion",
                       self.stdout.getvalue())
+
+    def test_add_new_works(self):
+        management.call_command(
+            'add_new_works', Path(settings.TEST_DATA_DIR) / 'manami',
+            '--extra-clusters',
+            Path(settings.TEST_DATA_DIR) / 'manami_clusters.json',
+            stdout=self.stdout)
+        self.assertEqual(
+            Work.objects.filter(category__slug='anime').count(),
+            2)  # Added one work
 
     @responses.activate
     def test_anidb_tags_to_json(self):
