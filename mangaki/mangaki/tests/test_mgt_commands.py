@@ -58,7 +58,7 @@ class CommandTest(TestCase):
     def test_add_new_works(self):
         management.call_command(
             'add_new_works', Path(settings.TEST_DATA_DIR) / 'manami',
-            '--extra_clusters',
+            '--extra-clusters',
             Path(settings.TEST_DATA_DIR) / 'manami_clusters.json',
             stdout=self.stdout)
         self.assertEqual(
