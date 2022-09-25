@@ -9,4 +9,14 @@ self: super:
       buildInputs = (old.buildInputs or [ ]) ++ [ self.poetry ];
     }
   );
+  termcolor = super.termcolor.overridePythonAttrs (
+    old: {
+      buildInputs = (old.buildInputs or [ ]) ++ [ self.hatchling self.hatch-vcs ];
+    }
+  );
+  contourpy = super.contourpy.overridePythonAttrs (
+    old: {
+      buildInputs = (old.buildInputs or [ ]) ++ [ self.pybind11 ];
+    }
+  );
 }

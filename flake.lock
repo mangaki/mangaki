@@ -18,11 +18,11 @@
     },
     "flake-utils": {
       "locked": {
-        "lastModified": 1656928814,
-        "narHash": "sha256-RIFfgBuKz6Hp89yRr7+NR5tzIAbn52h8vT6vXkYjZoM=",
+        "lastModified": 1659877975,
+        "narHash": "sha256-zllb8aq3YO3h8B/U0/J1WBgAL8EX5yWf5pMj3G0NAmc=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "7e2a3b3dfd9af950a856d66b0a7d01e3c18aa249",
+        "rev": "c0e246b9b83f637f4681389ecabcb2681b4f3af0",
         "type": "github"
       },
       "original": {
@@ -33,27 +33,27 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1653936696,
-        "narHash": "sha256-M6bJShji9AIDZ7Kh7CPwPBPb/T7RiVev2PAcOi4fxDQ=",
+        "lastModified": 1664017330,
+        "narHash": "sha256-919WZKBTxFdTkzIK6uJXE7hwSPQb7e/ekybxxWaotR4=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "ce6aa13369b667ac2542593170993504932eb836",
+        "rev": "fde244a8c7655bc28616864e2290ad9c95409c2c",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "22.05",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1659799128,
-        "narHash": "sha256-gmD/eQuNlsjx+bGAL45T0U/r/4PF6mtEozAypxlNMHw=",
+        "lastModified": 1664109679,
+        "narHash": "sha256-A4RAZynLyps5W/zd6caRXjZoYjx61MpPaqMRXrm4FAU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "f44841f33d033dda9d50bbc4ba041d9fdb62fc98",
+        "rev": "01188530fdfed7234eabf2e9babdd09f2fe58566",
         "type": "github"
       },
       "original": {
@@ -68,16 +68,16 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1657362323,
-        "narHash": "sha256-0o856HWRRc5q02+vIhlIW4NpeQUDvCv3CuP1w2rZ+ho=",
+        "lastModified": 1663998703,
+        "narHash": "sha256-QqooFECK0JRUFcRBra8Gn10FXs86VS3QeiI14Xz/E4I=",
         "owner": "nix-community",
         "repo": "poetry2nix",
-        "rev": "9deeedd086ee17ef199b67c4d8d5c81d45e6b0a5",
+        "rev": "675a05088a53a9a2c63b848505beaba5acb49cef",
         "type": "github"
       },
       "original": {
         "owner": "nix-community",
-        "ref": "1.31.0",
+        "ref": "master",
         "repo": "poetry2nix",
         "type": "github"
       }
