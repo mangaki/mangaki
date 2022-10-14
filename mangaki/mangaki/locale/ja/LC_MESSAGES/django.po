@@ -9,7 +9,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-05 14:15+0000\n"
+"POT-Creation-Date: 2022-10-13 16:21+0000\n"
 "PO-Revision-Date: 2018-08-23 19:25+0900\n"
 "Last-Translator: Tomoko Kozu <tomoko@mangaki.fr>\n"
 "Language: ja\n"
@@ -419,8 +419,8 @@ msgstr "確かめます"
 #: mangaki/templates/account/email_confirm.html:27
 #, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a href="
-"\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
 "このメールの確認リンクが期限切れまたは無効です。<a href=\"%(email_url)s\">新"
 "しい電子メール</a>確認要求を発行してください。"
@@ -434,8 +434,9 @@ msgstr "サインイン"
 #: mangaki/templates/account/login.html:15
 #, python-format
 msgid ""
-"Please sign in with one of your existing third party accounts. Or, <a href="
-"\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign in below:"
+"Please sign in with one of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign in "
+"below:"
 msgstr ""
 "既存のサードパーティのアカウントのいずれかでログインしてください。また"
 "は、%(site_name)sアカウントのに<a href=\"%(signup_url)s\">サインアップする</"
@@ -448,8 +449,8 @@ msgstr "若しくは"
 #: mangaki/templates/account/login.html:27
 #, python-format
 msgid ""
-"If you have not created an account yet, then please <a href=\"%(signup_url)s"
-"\">sign up</a> first."
+"If you have not created an account yet, then please <a "
+"href=\"%(signup_url)s\">sign up</a> first."
 msgstr ""
 "まだアカウントを作成していない場合は、<a href=\"%(signup_url)s\">サインアップ"
 "</a>してください。"
@@ -458,8 +459,8 @@ msgstr ""
 #, python-format
 msgid ""
 "You rated a few works anonymously on this computer. These ratings will be "
-"lost if you login to an existing account. You should <a href=\"%(signup_url)s"
-"\">sign up</a> to save them.\""
+"lost if you login to an existing account. You should <a "
+"href=\"%(signup_url)s\">sign up</a> to save them.\""
 msgstr ""
 "あなたはこのコンピュータに匿名でいくつかの作品を評価しました。既存のアカウン"
 "トにログインする場合、これらの評価は失われます。あなたは、それらを保存するた"
@@ -658,7 +659,7 @@ msgstr "オススメ"
 
 #: mangaki/templates/base.html:82
 msgid "Map"
-msgstr ""
+msgstr "マップ"
 
 #: mangaki/templates/base.html:87 mangaki/templates/mangaki/artist_list.html:5
 msgid "Artists"
@@ -698,7 +699,7 @@ msgstr "定格作品"
 
 #: mangaki/templates/base.html:133 mangaki/views.py:493
 msgid "My friends"
-msgstr ""
+msgstr "マイフレンド"
 
 #: mangaki/templates/base.html:136
 msgid "My settings"
@@ -981,8 +982,8 @@ msgstr "アイコン"
 msgid ""
 "The icons we used for the ratings are created by <a href=\"http://www."
 "flaticon.com/authors/dave-gandy\">Dave Gandy</a> for <a href=\"http://"
-"fontawesome.io\">fontawesome</a>. The SVG version comes from <a href="
-"\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
+"fontawesome.io\">fontawesome</a>. The SVG version comes from <a "
+"href=\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
 msgstr ""
 "我々は評価のために使用されるアイコンは、<a href=\"http://www.flaticon.com/"
 "authors/dave-gandy\">Dave Gandy</a>によって作成されます。<a href=\"http://"
@@ -991,27 +992,27 @@ msgstr ""
 
 #: mangaki/templates/mangaki/reco_list.html:12
 msgid "Group"
-msgstr ""
+msgstr "グループ"
 
 #: mangaki/templates/mangaki/reco_list.html:14
 msgid "Add a friend"
-msgstr ""
+msgstr "友達を追加"
 
 #: mangaki/templates/mangaki/reco_list.html:19
 msgid "You cannot add this user"
-msgstr ""
+msgstr "ユーザーを追加できません"
 
 #: mangaki/templates/mangaki/reco_list.html:24
 msgid "New for me"
-msgstr ""
+msgstr "あなたは見たことがない"
 
 #: mangaki/templates/mangaki/reco_list.html:26
 msgid "New for some"
-msgstr ""
+msgstr "見たことがない人もいる"
 
 #: mangaki/templates/mangaki/reco_list.html:28
 msgid "New for all"
-msgstr ""
+msgstr "誰も見たことがない"
 
 #: mangaki/templates/mangaki/reco_list.html:46
 msgid ""
@@ -1022,7 +1023,7 @@ msgstr ""
 
 #: mangaki/templates/mangaki/reco_list.html:55
 msgid "Add some of your friends to recommend with"
-msgstr ""
+msgstr "おすすめを友達に追加"
 
 #: mangaki/templates/mangaki/reco_list.html:57
 #: mangaki/templates/mangaki/work_detail.html:117
@@ -1041,15 +1042,15 @@ msgstr "新しいオススメをゲットしたい！<br />（カードの評価
 #: mangaki/templates/mangaki/reco_list.html:82
 #, python-format
 msgid ""
-"To receive recommandations, you should at least <a href=\"%(work_list_url)s"
-"\">rate an anime</a>!"
+"To receive recommandations, you should at least <a "
+"href=\"%(work_list_url)s\">rate an anime</a>!"
 msgstr ""
 "オススメを獲るには、<a href=\"%(work_list_url)s\">アニメか漫画</a>を少なくと"
 "も一つは評価してね！"
 
 #: mangaki/templates/mangaki/work_detail.html:54
 msgid "Date:"
-msgstr ""
+msgstr "日付"
 
 #: mangaki/templates/mangaki/work_detail.html:58
 msgid "Number of episodes:"
@@ -1136,9 +1137,9 @@ msgstr "提出します"
 #: mangaki/templates/mangaki/work_list.html:14
 #, python-format
 msgid ""
-"Rate a few cards below, or using the search bar.<br /> Then click <a class="
-"\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what Mangaki "
-"recommends!"
+"Rate a few cards below, or using the search bar.<br /> Then click <a "
+"class=\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what "
+"Mangaki recommends!"
 msgstr ""
 "下記のカードを評価するか、検索バーより好きな漫画かアニメを検索してね。<br/>次"
 "に<a class=\"alert-link\" href=\"%(reco_url)s\">オススメ</a>ボタンを押した"
@@ -1152,8 +1153,8 @@ msgid ""
 "a> to keep your ratings."
 msgstr ""
 "Mangakiは初めてですか？下記のカードを評価してあなたへのオススメをゲットしま"
-"しょう。もしデータを保存したければ<a href=\"%(signup_url)s?next=%(next_url)s"
-"\">サインアップ</a>してね。"
+"しょう。もしデータを保存したければ<a href=\"%(signup_url)s?"
+"next=%(next_url)s\">サインアップ</a>してね。"
 
 #: mangaki/templates/mangaki/work_list.html:28
 #: mangaki/templates/mangaki/work_list.html:63 mangaki/views.py:98
@@ -1217,7 +1218,7 @@ msgstr "評価"
 msgid "Get recommendations now"
 msgstr "今の勧告を見ます"
 
-#: mangaki/templates/mangaki/work_rating.html:23
+#: mangaki/templates/mangaki/work_rating.html:22
 msgid "See more…"
 msgstr "続きを見る…"
 
@@ -1237,7 +1238,7 @@ msgstr "%(member_days)sの時代から加入"
 
 #: mangaki/templates/profile.html:43 mangaki/templates/profile.html:44
 msgid "Add friend"
-msgstr ""
+msgstr "友達を追加"
 
 #: mangaki/templates/profile.html:62
 msgid "Delete all my ratings"
@@ -1245,11 +1246,11 @@ msgstr "すべての私の評価を削除します。"
 
 #: mangaki/templates/profile_friendlist.html:17
 msgid "public"
-msgstr ""
+msgstr "公開"
 
 #: mangaki/templates/profile_friendlist.html:19
 msgid "private"
-msgstr ""
+msgstr "非公開"
 
 #: mangaki/templates/profile_preferences.html:11
 #, fuzzy
@@ -1427,7 +1428,7 @@ msgstr "結果がありません。"
 
 #: mangaki/urls.py:80
 msgid "The page you're looking for was not found (yet?)."
-msgstr "あなたが探しているページは（まだ？）が見つかりませんでした。"
+msgstr "あなたが探しているページが見つかりません。"
 
 #: mangaki/urls.py:81
 msgid "You don't have access to this page."
@@ -1435,18 +1436,18 @@ msgstr "このページへのアクセス権を持っていません。"
 
 #: mangaki/urls.py:82
 msgid "This request is incorrect. What did you try to do?"
-msgstr "この要求が正しくありません。何を試しましたか？"
+msgstr "この要求は正しくありません。何を試しましたか？"
 
 #: mangaki/utils/recommendations.py:26
 #, python-brace-format
 msgid ""
 "We switched to SVD as recommendation algorithm, as {algo_name} was not "
 "available."
-msgstr ""
+msgstr "{algo_name} が利用できなかったため、推奨アルゴリズムの SVD に切り替えました。"
 
 #: mangaki/views.py:497
 msgid "My pending friend requests"
-msgstr ""
+msgstr "保留中の友達リクエスト"
 
 #~ msgid "United States"
 #~ msgstr "アメリカ"
@@ -1476,4 +1477,4 @@ msgstr ""
 #~ "す。"
 
 #~ msgid "Hint: press Enter to trigger the search"
-#~ msgstr "ヒント：Enterキーを押して検索をトリガします"
+#~ msgstr "ヒント: Enter キーを押して検索を開始します"
