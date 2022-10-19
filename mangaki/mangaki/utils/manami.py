@@ -204,7 +204,7 @@ class MangakiDatabase:
             work['references'] = []
             work['synonyms'] = []
             if work['anidb_aid'] > 0:
-                self.anidb_refs.append((pk, 'AniDB', work['anidb_aid']))
+                self.anidb_refs.append((pk, 'AniDB', str(work['anidb_aid'])))
 
     def build_reverse_indexes(self):
         """
@@ -220,9 +220,8 @@ class MangakiDatabase:
             redirect__isnull=False).values_list('pk', 'redirect_id'))
 
         reference_triplets = set(list(
-            Reference.objects.filter(
-                work__category__slug='anime').values_list(
-                    'work_id', 'source', 'identifier')
+            Reference.objects.filter(work__category__slug='anime').values_list(
+                'work_id', 'source', 'identifier')
         ) + self.anidb_refs)  # Extra refs because of 3)
 
         remember_anidb = {}
