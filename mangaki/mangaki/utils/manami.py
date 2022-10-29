@@ -334,8 +334,9 @@ def get_clusters_from_ref(manami: AnimeOfflineDatabase,
                 has_anidb = True
             uf.union(ids[ref], ids[Ref(('Mangaki', str(mangaki_id)))])
         nb_has_anidb += has_anidb
-    logging.info('%d/%d ont un ID AniDB (%.1f %%)',
-                 nb_has_anidb, len(url2), nb_has_anidb / len(url2) * 100)
+    if url2:
+        logging.info('%d/%d ont un ID AniDB (%.1f %%)',
+                     nb_has_anidb, len(url2), nb_has_anidb / len(url2) * 100)
 
     clusters = defaultdict(list)
     for ref, ref_id in ids.items():
