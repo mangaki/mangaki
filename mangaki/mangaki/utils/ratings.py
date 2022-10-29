@@ -86,7 +86,7 @@ def current_user_ratings(request, works=None):
         return dict(qs.values_list('work_id', 'choice'))
 
 
-def friend_ratings(request, friend_ids=None):
+def friend_ratings(request, friend_ids=None, work_ids=None):
     """
     Compute the set of ratings for a friend of the current user.
     Possible: make it work on any public users.
@@ -95,8 +95,10 @@ def friend_ratings(request, friend_ids=None):
 
     Arguments:
         request -- The Request object we are currently handling.
-        friend_id -- The id of the user ratings to return;
+        friend_ids -- The id of the user ratings to return;
             if None, consider all eligible friends
+        work_ids -- The id of the works to return;
+            if None, consider all eligible works
 
     Returns:
         ratings -- A dictionary mapping Work primary keys to their rating
@@ -105,6 +107,8 @@ def friend_ratings(request, friend_ids=None):
     qs = Rating.objects.all()
     if friend_ids is not None:
         qs = qs.filter(user__in=friend_ids)
+    if work_ids is not None:
+        qs = qs.filter(work__in=work_ids)
     return qs.filter(
         user__in=request.user.profile.friends.values_list('id',
                                                           flat=True)).filter(

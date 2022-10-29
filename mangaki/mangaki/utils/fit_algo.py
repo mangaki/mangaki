@@ -42,3 +42,22 @@ def get_algo_backup(algo_name):
 
     algo.load(settings.ML_SNAPSHOT_ROOT)
     return algo
+
+
+def get_algo_backup_or_fit_svd(request, algo_name):
+    try:
+        algo = get_algo_backup(algo_name)
+    except FileNotFoundError:
+        # Fallback to SVD
+        messages.warning(request,
+            _('We switched to SVD as recommendation algorithm, '
+              'as {algo_name} was not available.').format(
+                algo_name=algo_name.upper()))
+        triplets = list(
+            Rating.objects.values_list('user_id', 'work_id', 'choice'))
+        algo_name = 'svd'
+        try:
+            algo = get_algo_backup('svd')
+        except FileNotFoundError:
+            algo = fit_algo('svd', triplets)
+    return algo

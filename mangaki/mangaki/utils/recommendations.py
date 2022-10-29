@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
 from mangaki.models import Rating, Work
-from mangaki.utils.fit_algo import fit_algo, get_algo_backup
+from mangaki.utils.fit_algo import fit_algo, get_algo_backup_or_fit_svd
 from mangaki.utils.chrono import Chrono
 from mangaki.utils.ratings import current_user_ratings, friend_ratings
 from mangaki.utils.values import rating_values
@@ -17,45 +17,20 @@ NB_RECO = 10
 CHRONO_ENABLED = True
 
 
-def get_algo_backup_or_fit_svd(request, algo_name):
-    try:
-        algo = get_algo_backup(algo_name)
-    except FileNotFoundError:
-        # Fallback to SVD
-        messages.warning(request,
-            _('We switched to SVD as recommendation algorithm, '
-              'as {algo_name} was not available.').format(
-                algo_name=algo_name.upper()))
-        triplets = list(
-            Rating.objects.values_list('user_id', 'work_id', 'choice'))
-        algo_name = 'svd'
-        try:
-            algo = get_algo_backup('svd')
-        except FileNotFoundError:
-            algo = fit_algo('svd', triplets)
-    return algo
+def compute_user_embedding(algo, all_ratings_df):
+    all_ratings_df['encoded_work_id'] = all_ratings_df['work_id'].map(
+        algo.dataset.encode_work)
+    all_ratings_df['rating'] = all_ratings_df['choice'].map(rating_values)      
+    user_mean, user_feat = algo.fit_single_user(
+        all_ratings_df['encoded_work_id'], all_ratings_df['rating'])
+    return user_mean, user_feat
 
-
-def get_personalized_ranking(algo, user_id, work_ids, enc_rated_works=[],
-                             ratings=[], limit=None):
-    if user_id in algo.dataset.encode_user:
-        encoded_user_id = algo.dataset.encode_user[user_id]
-        X_test = np.asarray([[encoded_user_id,
-                              algo.dataset.encode_work[work_id]]
-                             for work_id in work_ids])
-        y_pred = algo.predict(X_test)
-    else:
-        user_parameters = algo.fit_single_user(enc_rated_works, ratings)
-        encoded_work_ids = [algo.dataset.encode_work[work_id]
-                            for work_id in work_ids]
-        y_pred = algo.predict_single_user(encoded_work_ids, user_parameters)
-
-    # Get top work indices in decreasing value
-    pos_of_best = y_pred.argsort()[::-1]
-    if limit is not None:
-        pos_of_best = pos_of_best[:limit]  # Up to some limit
-    return pos_of_best
-
+def get_personalized_ranking(algo, all_ratings_df, work_ids_to_rank):
+    user_mean, user_feat = compute_user_embedding(algo, all_ratings_df)
+    encoded_work_ids = [algo.dataset.encode_work[work_id]
+                        for work_id in work_ids_to_rank]
+    best_pos = algo.recommend([], [(user_mean, user_feat)], encoded_work_ids)
+    return algo.recommend([], [(user_mean, user_feat)], encoded_work_ids)['item_id']
 
 def get_group_reco_algo(request, users_id=None, algo_name='als',
                         category='all', merge_type=None):
@@ -77,15 +52,12 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
     # Building the training set
     my_ratings = current_user_ratings(request)  # Myself
     df_mine = pd.DataFrame(my_ratings.items(), columns=('work_id', 'choice')).query(
-        'work_id in @available_works')
-    df_mine['encoded_work_id'] = df_mine['work_id'].map(
-        algo.dataset.encode_work)
-    df_mine['rating'] = df_mine['choice'].map(rating_values)    
+        'work_id in @available_works')  # Much faster than if in the query
+    my_mean, my_feat = compute_user_embedding(algo, df_mine)
 
     if not request.user.is_anonymous and others_id:
-        triplets = friend_ratings(request, others_id)
-        df = pd.DataFrame(triplets, columns=['user_id', 'work_id', 'choice']).query(
-            'work_id in @available_works')
+        triplets = friend_ratings(request, others_id, available_works)
+        df = pd.DataFrame(triplets, columns=['user_id', 'work_id', 'choice'])
         df['encoded_work_id'] = df['work_id'].map(
             algo.dataset.encode_work)
         df['rating'] = df['choice'].map(rating_values)
@@ -119,9 +91,6 @@ def get_group_reco_algo(request, users_id=None, algo_name='als',
 
     encoded_work_ids = [algo.dataset.encode_work[work_id]
                         for work_id in filtered_works]
-
-    my_mean, my_feat = algo.fit_single_user(
-        df_mine['encoded_work_id'], df_mine['rating'])
 
     if algo.get_shortname().startswith('svd') and participating_other_ids:
         he = HomomorphicEncryption(participating_other_ids, quantize_round=1,

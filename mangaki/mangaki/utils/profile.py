@@ -6,17 +6,20 @@ from typing import Tuple, List, Any, Dict, Optional
 
 from django.contrib.auth.models import User
 from django.utils import timezone
+import pandas as pd
 
 from mangaki.models import Rating, Work, Category, Recommendation
 from mangaki.utils.fit_algo import get_algo_backup
 from mangaki.utils.ratings import get_anonymous_ratings
 from mangaki.utils.recommendations import get_personalized_ranking
 
-SEE_CHOICES = {
-    'seen': ('favorite', 'like', 'dislike', 'neutral'),
-    'unseen': ('willsee',),
-    'willsee': ('willsee',),
-    'wontsee': ('wontsee',)
+seen_status = {
+    'favorite': 'seen',
+    'like': 'seen',
+    'dislike': 'seen',
+    'neutral': 'seen',
+    'willsee': 'unseen',
+    'wontsee': 'unseen'
 }
 
 
@@ -30,69 +33,57 @@ def get_profile_ratings(request,
     if is_anonymous:
         ratings = []
         anon_ratings = get_anonymous_ratings(request.session)
-        works_per_pk = Work.objects.select_related('category').in_bulk(anon_ratings.keys())
-        for pk, choice in anon_ratings.items():
-            rating = Rating()
-            rating.work = works_per_pk[pk]
-            rating.choice = choice
-
-            seen_work = rating.choice not in SEE_CHOICES['unseen']
-            count_key = 'seen_{}' if seen_work else 'unseen_{}'
-            counts[count_key.format(rating.work.category.slug)] += 1
-
-            if already_seen == seen_work and rating.work.category.slug == category:
-                ratings.append(rating)
-    elif can_see:
-        ratings = list(
+        ratings_df = pd.DataFrame(anon_ratings.items(), columns=('work_id', 'choice'))
+        works_df = Work.objects.select_related('category').query(
+            work__in=anon_ratings.keys()).values_list('work_id', 'title', 'category__slug')
+        ratings_df = ratings_df.merge(works_df, on='work_id')
+    elif can_see:  # Current user is allowed to access those ratings
+        ratings_df = pd.DataFrame(
             Rating.objects
-                .filter(user=user,
-                        work__category__slug=category,
-                        choice__in=SEE_CHOICES['seen'] if already_seen else SEE_CHOICES['unseen'])
+                .filter(user=user)
                 .select_related('work', 'work__category')
-        )
-
-        categories = Category.objects.all()
-        for category in categories:
-            qs = Rating.objects.filter(user=user,
-                                       work__category=category)
-
-            seen = qs.filter(choice__in=SEE_CHOICES['seen']).count()
-            unseen = qs.count() - seen
-
-            counts['seen_{}'.format(category.slug)] = seen
-            counts['unseen_{}'.format(category.slug)] = unseen
+                .values_list('work_id', 'choice', 'work__title', 'work__category__slug'),
+            columns=('work_id', 'choice', 'work__title', 'work__category__slug')
+        ).rename(columns={'work__title': 'title', 'work__category__slug': 'category__slug'})
     else:
-        ratings = []
+        return pd.DataFrame(), {}
 
-    return ratings, counts
+    ratings_df['seen'] = ratings_df['choice'].map(seen_status)
+    ratings_df['rating_category'] = ratings_df.apply(
+        lambda row: f"{row['seen']}_{row['category__slug']}", axis=1)
+    counts = ratings_df['rating_category'].value_counts().to_dict()
+    seen_value = 'seen' if already_seen else 'unseen'
+    return ratings_df, ratings_df.query("category__slug == @category and seen == @seen_value"), counts
 
 
-def build_profile_compare_function(algo_name: Optional[str],
-                                   ratings: List[Rating],
-                                   user: User):
-    ordering = ['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee']
+def get_work_rating_list(algo_name: Optional[str],
+                         displayed_ratings_df: pd.DataFrame,
+                         all_ratings_df: pd.DataFrame) -> List:
 
-    # By default, sort by rating then name
-    def default_compare_function(item):
-        return ordering.index(item.choice), item.work.title.lower()
+    ordering = dict(zip(['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee'], list('012345')))
+    displayed_ratings_df['order'] = displayed_ratings_df['choice'].map(ordering)
+    works = Work.objects.in_bulk(displayed_ratings_df['work_id'].tolist())
 
-    if algo_name is not None:
-        try:
-            work_ids = [rating.work_id for rating in ratings]
-            algo = get_algo_backup(algo_name)
-            best_pos = get_personalized_ranking(algo, user.id, work_ids)
-            ranking = defaultdict(lambda: len(ratings))
-            for rank, pos in enumerate(best_pos):
-                ranking[ratings[pos].id] = rank
+    if algo_name is None:  # Default sorting
+        ordered_ratings = displayed_ratings_df.sort_values(['order', 'title'],
+            key=lambda x: x.str.lower())
+    else:
+        algo = get_algo_backup(algo_name)
+        # Limit display to available works in the algorithm
+        available_works = set(algo.dataset.encode_work.keys())
+        displayed_ratings_df = displayed_ratings_df.query('work_id in @available_works')
+        work_ids_to_rank = displayed_ratings_df['work_id'].tolist()
+        ranking = get_personalized_ranking(algo, all_ratings_df, work_ids_to_rank)
+        displayed_ratings_df.index = range(len(work_ids_to_rank))
+        ordered_ratings = displayed_ratings_df.iloc[ranking]
 
-            def special_compare_function(item):
-                return ordering.index(item.choice), ranking[item.id]
+    work_rating_list = []
+    for _, rating in ordered_ratings.iterrows():
+        work = works[rating['work_id']]
+        work.rating = rating['choice']
+        work_rating_list.append({'work': work})
 
-            return special_compare_function
-        except Exception as e:  # Two possible reasons: no backup or user not in backup
-            pass
-
-    return default_compare_function
+    return work_rating_list
 
 
 ProfileRecoList = List[Dict[str, Any]]

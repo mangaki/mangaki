@@ -49,7 +49,7 @@ from mangaki.utils.mal import client
 from mangaki.tasks import import_mal, get_current_mal_import, redis_pool
 from mangaki.utils.profile import (
     get_profile_ratings,
-    build_profile_compare_function,
+    get_work_rating_list,
     get_profile_recommendations
 )
 from mangaki.utils.ratings import (clear_anonymous_ratings, current_user_rating, current_user_ratings,
@@ -539,26 +539,19 @@ def get_profile_works(request,
     algo_name = request.GET.get('algo', None)
     flat = request.GET.get('flat', None)
     # FIXME: We should move natural sorting on the database-side.
-    # This way, we can keep a queryset until the end.
+    # https://docs.djangoproject.com/fr/4.1/ref/models/options/#order-with-respect-to
+    # Needs an external model to decide which way to sort (favorite / like / etc.)
     # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
     # Currently, we load the *entire set* of ratings for a (seen/willsee|wontsee) category of works.
-    ratings, counts = get_profile_ratings(request,
+    all_ratings_df, displayed_ratings_df, counts = get_profile_ratings(request,
                                           category,
                                           seen_works,
                                           ctx['meta']['can_see'],
                                           ctx['meta']['is_anonymous'],
                                           user)
 
-    compare_function = build_profile_compare_function(algo_name,
-                                                      ratings,
-                                                      user)
-    rating_list = natsorted(ratings, key=compare_function)
-
-    work_rating_list = []
-    for rating in rating_list:
-        work = rating.work
-        work.rating = rating.choice
-        work_rating_list.append({'work': work})
+    work_rating_list = get_work_rating_list(
+        algo_name, displayed_ratings_df, all_ratings_df)
 
     if category == 'recommendation':
         received_recommendation_list, sent_recommendation_list = get_profile_recommendations(
