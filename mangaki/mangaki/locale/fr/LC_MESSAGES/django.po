@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-05 14:17+0000\n"
+"POT-Creation-Date: 2022-10-29 12:41+0000\n"
 "PO-Revision-Date: 2018-08-23 19:25+0900\n"
 "Language: fr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -413,8 +413,8 @@ msgstr "Confirmer"
 #: mangaki/templates/account/email_confirm.html:27
 #, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a href="
-"\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
 "Ce lien de confirmation d'e-mail a expiré ou est invalide. S'il vous plaît, "
 "<a href=\"%(email_url)s\">émettez une nouvelle demande de confirmation par e-"
@@ -433,8 +433,9 @@ msgstr "Se connecter"
 #| "href=\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign "
 #| "in below:"
 msgid ""
-"Please sign in with one of your existing third party accounts. Or, <a href="
-"\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign in below:"
+"Please sign in with one of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a> for a %(site_name)s account and sign in "
+"below:"
 msgstr ""
 "S'il vous plaît connectez-vous avec l'un de vos comptes tiers existants. Ou, "
 "<a href=\"%(signup_url)s\">inscrivez-vous</a> sur %(site_name) et connectez-"
@@ -447,18 +448,18 @@ msgstr "ou"
 #: mangaki/templates/account/login.html:27
 #, python-format
 msgid ""
-"If you have not created an account yet, then please <a href=\"%(signup_url)s"
-"\">sign up</a> first."
+"If you have not created an account yet, then please <a "
+"href=\"%(signup_url)s\">sign up</a> first."
 msgstr ""
-"Si vous n'avez pas encore créé de compte, alors s'il vous plaît <a href="
-"\"%(signup_url)s\">inscrivez-vous</a>."
+"Si vous n'avez pas encore créé de compte, alors s'il vous plaît <a "
+"href=\"%(signup_url)s\">inscrivez-vous</a>."
 
 #: mangaki/templates/account/login.html:35
 #, python-format
 msgid ""
 "You rated a few works anonymously on this computer. These ratings will be "
-"lost if you login to an existing account. You should <a href=\"%(signup_url)s"
-"\">sign up</a> to save them.\""
+"lost if you login to an existing account. You should <a "
+"href=\"%(signup_url)s\">sign up</a> to save them.\""
 msgstr ""
 "Vous avez noté quelques œuvres de façon anonyme sur cet ordinateur. Ces "
 "évaluations seront perdues si vous vous connectez à un compte existant. Vous "
@@ -530,8 +531,8 @@ msgid ""
 "a>."
 msgstr ""
 "Le lien de réinitialisation de mot de passe est invalide, peut-être parce "
-"qu'il a déjà été utilisé. S'il vous plaît, demandez <a href="
-"\"%(passwd_reset_url)s\">un nouveau mot de passe</a>."
+"qu'il a déjà été utilisé. S'il vous plaît, demandez <a "
+"href=\"%(passwd_reset_url)s\">un nouveau mot de passe</a>."
 
 #: mangaki/templates/account/password_reset_from_key.html:19
 msgid "change password"
@@ -714,9 +715,9 @@ msgid ""
 "You rated a few works anonymously, you can <a href=\"%(profile)s\">see them</"
 "a>, don't forget to <a href=\"%(signup_url)s\">subscribe</a> to save them!"
 msgstr ""
-"Vous avez noté quelques œuvres de façon anonyme, vous pouvez <a href="
-"\"%(profile)s\">les voir</a>, n'oubliez pas de <a href=\"%(signup_url)s"
-"\">vous inscrire</a> pour les conserver !"
+"Vous avez noté quelques œuvres de façon anonyme, vous pouvez <a "
+"href=\"%(profile)s\">les voir</a>, n'oubliez pas de <a "
+"href=\"%(signup_url)s\">vous inscrire</a> pour les conserver !"
 
 #: mangaki/templates/base.html:178
 msgid "Mangaki project"
@@ -781,8 +782,8 @@ msgid ""
 "glyphicon-thumbs-up\" aria-hidden=\"true\"></span></span></strong> this "
 "suggestion."
 msgstr ""
-"Vous avez <strong><span class=\"text-success\">approuvé<span class="
-"\"glyphicon glyphicon-thumbs-up\" area-hidden=\"true\"></span></span></"
+"Vous avez <strong><span class=\"text-success\">approuvé<span "
+"class=\"glyphicon glyphicon-thumbs-up\" area-hidden=\"true\"></span></span></"
 "strong> cette suggestion."
 
 #: mangaki/templates/fix/fix_index.html:60
@@ -980,13 +981,13 @@ msgstr "Icônes"
 msgid ""
 "The icons we used for the ratings are created by <a href=\"http://www."
 "flaticon.com/authors/dave-gandy\">Dave Gandy</a> for <a href=\"http://"
-"fontawesome.io\">fontawesome</a>. The SVG version comes from <a href="
-"\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
+"fontawesome.io\">fontawesome</a>. The SVG version comes from <a "
+"href=\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
 msgstr ""
-"Les icônes que nous avons utilisées pour les votes sont créées par <a href="
-"\"http://www.flaticon.com/authors/dave-gandy\">Dave Gandy</a> <a href="
-"\"http://fontawesome.io \">fontawesome</a>. La version SVG vient de <a href="
-"\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
+"Les icônes que nous avons utilisées pour les votes sont créées par <a "
+"href=\"http://www.flaticon.com/authors/dave-gandy\">Dave Gandy</a> <a "
+"href=\"http://fontawesome.io \">fontawesome</a>. La version SVG vient de <a "
+"href=\"http://www.flaticon.com/packs/font-awesome\">flaticon</a>."
 
 #: mangaki/templates/mangaki/reco_list.html:12
 msgid "Group"
@@ -1013,12 +1014,13 @@ msgid "New for all"
 msgstr "Inédit pour tou·tes"
 
 #: mangaki/templates/mangaki/reco_list.html:46
-msgid ""
-"Here are some recommendations that you might like.<br /> Rate them and "
-"reload to get new ones."
+msgid "Here are some recommendations that you might like."
 msgstr ""
-"Voici quelques recommandations qui pourraient vous intéresser. <br /> Notez-"
-"les et rechargez pour en obtenir d'autres."
+"Voici quelques recommandations qui pourraient vous intéresser."
+
+#: mangaki/templates/mangaki/reco_list.html:48
+msgid "Sort my watchlist by recommendation."
+msgstr "Trier ma liste d'anime à voir par recommandation."
 
 #: mangaki/templates/mangaki/reco_list.html:55
 msgid "Add some of your friends to recommend with"
@@ -1043,11 +1045,11 @@ msgstr ""
 #: mangaki/templates/mangaki/reco_list.html:82
 #, python-format
 msgid ""
-"To receive recommandations, you should at least <a href=\"%(work_list_url)s"
-"\">rate an anime</a>!"
+"To receive recommandations, you should at least <a "
+"href=\"%(work_list_url)s\">rate an anime</a>!"
 msgstr ""
-"Pour recevoir des recommandations, vous devriez au moins <a href="
-"\"%(work_list_url)s\">noter un anime</a> !"
+"Pour recevoir des recommandations, vous devriez au moins <a "
+"href=\"%(work_list_url)s\">noter un anime</a> !"
 
 #: mangaki/templates/mangaki/work_detail.html:54
 msgid "Date:"
@@ -1138,13 +1140,13 @@ msgstr "Soumettre"
 #: mangaki/templates/mangaki/work_list.html:14
 #, python-format
 msgid ""
-"Rate a few cards below, or using the search bar.<br /> Then click <a class="
-"\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what Mangaki "
-"recommends!"
+"Rate a few cards below, or using the search bar.<br /> Then click <a "
+"class=\"alert-link\" href=\"%(reco_url)s\">Recommendations</a> to see what "
+"Mangaki recommends!"
 msgstr ""
 "Notez quelques œuvres ci-dessous ou en utilisant la barre de recherche. <br /"
-"> Cliquez ensuite sur <a class=\"alert-link\" href=\"%(reco_url)s"
-"\">Recommandations</a> pour voir ce Mangaki recommande !"
+"> Cliquez ensuite sur <a class=\"alert-link\" "
+"href=\"%(reco_url)s\">Recommandations</a> pour voir ce Mangaki recommande !"
 
 #: mangaki/templates/mangaki/work_list.html:20
 #, python-format
@@ -1154,8 +1156,8 @@ msgid ""
 "a> to keep your ratings."
 msgstr ""
 "Nouveau sur Mangaki ? Commencez à noter des œuvres ci-dessous ! Ensuite, "
-"consultez vos recommandations, et <a href=\"%(signup_url)s?next=%(next_url)s"
-"\">inscrivez-vous</a> pour garder vos notes."
+"consultez vos recommandations, et <a href=\"%(signup_url)s?"
+"next=%(next_url)s\">inscrivez-vous</a> pour garder vos notes."
 
 #: mangaki/templates/mangaki/work_list.html:28
 #: mangaki/templates/mangaki/work_list.html:63 mangaki/views.py:98
@@ -1223,7 +1225,7 @@ msgstr "Voter"
 msgid "Get recommendations now"
 msgstr "Obtenez vos recommandations"
 
-#: mangaki/templates/mangaki/work_rating.html:23
+#: mangaki/templates/mangaki/work_rating.html:22
 msgid "See more…"
 msgstr "Voir plus…"
 
