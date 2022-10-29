@@ -28,8 +28,8 @@ This README is also available [in French](README-fr.md).
 
 You need to have PostgreSQL ≥10 running on your machine. You also need an
 user that will have access to the database. The easiest way to achieve that is
-simply to create an account which has the same name as your username, which
-can create databases, and which is a superuser (for CREATE EXTENSION):
+simply to create an account which has the same name as your username,
+can create databases, and is a superuser:
 
     sudo -u postgres createuser --superuser --createdb $USER
 
@@ -44,17 +44,16 @@ Then create the database, and add the required extensions:
 
 You will need Python ≥ 3.8 and Poetry.
 
-First, copy the configuration. The default parameters are already supposed to
-work, so you shouldn't need to change anything:
+First, copy the configuration template.
 
     cp mangaki/settings{.template,}.ini
 
 You can then install the Django environment:
 
-    poetry install  # Add --no-dev if in production
+    poetry install  # Add --no-dev if in production, should take a while
     poetry shell
     ./mangaki/manage.py migrate
-    ./mangaki/manage.py runserver  # If in dev; otherwise install gunicorn or anything by your own means
+    ./mangaki/manage.py runserver  # If in dev; otherwise install gunicorn
 
 And voilà! You can access Mangaki at <http://localhost:8000>.
 
@@ -93,7 +92,8 @@ It's simple but takes 2 GB.
 
 The database starts empty, but you can populate a few works:
 
-    ./mangaki/manage.py loaddata ../fixtures/{partners,seed_data}.json
+    ./mangaki/manage.py loaddata fixtures/{partners,seed_data}.json  # If small seed data
+    ./mangaki/manage.py add_new_works <path_to_manami_data>  # If big seed data (clone manami-project/anime-offline-database somewhere)
     ./mangaki/manage.py ranking    # Compute the anime/manga ranking pages. Should be done regularly.
     ./mangaki/manage.py index      # Compute the search indexes. Should be done once in a while.
     ./mangaki/manage.py top --all  # Compute the Top 20 directors, etc. Should be done regularly.
@@ -116,4 +116,3 @@ See also our interesting [Jupyter notebooks](https://github.com/mangaki/notebook
 ## License information
 
 Mangaki is an open-sourced project licensed under AGPLv3. For accurate information regarding license and copyrights, please check individual files. 
-
