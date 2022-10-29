@@ -43,10 +43,10 @@
                 {% endif %}
                 
                 <div class="alert alert-secondary">
-                    {% blocktrans trimmed %}
-                        Here are some recommendations that you might like.<br />
-                        Rate them and reload to get new ones.
-                    {% endblocktrans %}
+                    {% trans "Here are some recommendations that you might like." %}
+                    <a href="{% url 'profile-works' user.username 'anime' 'unseen' %}?algo=svd">
+                        {% trans "Sort my watchlist by recommendation." %}
+                    </a>
                 </div>
 
                 {% if user.is_authenticated %}
