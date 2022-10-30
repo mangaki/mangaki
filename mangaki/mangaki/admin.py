@@ -197,6 +197,11 @@ class WorkTitleInline(admin.TabularInline):
     fields = ('title', 'language', 'type')
 
 
+class ReferenceInline(admin.TabularInline):
+    model = Reference
+    fields = ('source', 'identifier')
+
+
 class AniDBaidListFilter(admin.SimpleListFilter):
     title = 'AniDB aid'
     parameter_name = 'AniDB aid'
@@ -228,7 +233,7 @@ class WorkAdmin(admin.ModelAdmin):
     raw_id_fields = ('redirect',)
     actions = ['make_nsfw', 'make_sfw', 'refresh_work_from_anidb', 'merge',
                'refresh_work', 'update_tags_via_anidb', 'change_title']
-    inlines = [StaffInline, WorkTitleInline, TaggedWorkInline]
+    inlines = [StaffInline, WorkTitleInline, ReferenceInline, TaggedWorkInline]
     readonly_fields = (
         'sum_ratings',
         'nb_ratings',
