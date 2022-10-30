@@ -21,7 +21,7 @@ def reindex(BATCH_SIZE=1000):
     Work.objects.bulk_update(works, ['search_terms'], BATCH_SIZE)
 
     for i, query in enumerate(connection.queries):
-        logging.warning('%d %f %s', i, query['time'], query['sql'][:30])
+        logging.warning('%d %s %s', i, query['time'], query['sql'][:30])
 
     # Update index
     Work.objects.update(titles_search=SearchVector('title', weight='A') +
