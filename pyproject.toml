@@ -32,7 +32,6 @@ redis="^3.2" # main
 python-redis-lock="^3.2" # main
 raven="^6.1" # main
 mangaki-zero = { git = "https://github.com/mangaki/zero", tag = "v1.2" } # main
-natsort = "^7.0.1" # main
 psycopg2 = "^2.8.6,<2.9"
 dj-database-url = "0.5.0"
 python-dotenv = "^0.20.0"

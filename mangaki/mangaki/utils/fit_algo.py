@@ -5,6 +5,7 @@ from django.conf import settings
 
 from zero.dataset import Dataset
 from zero.recommendation_algorithm import RecommendationAlgorithm
+
 from mangaki.utils.viz import dump_2d_embeddings
 
 
