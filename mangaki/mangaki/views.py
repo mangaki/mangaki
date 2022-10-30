@@ -37,7 +37,6 @@ from django.views.generic.detail import DetailView, SingleObjectMixin, SingleObj
 from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 from markdown import markdown
-from natsort import natsorted
 
 from mangaki.choices import (TOP_CATEGORY_CHOICES, WORK_CATEGORY_CHOICES,
                              SORT_MODE_CHOICES)
@@ -543,12 +542,9 @@ def get_profile_works(request,
     # Needs an external model to decide which way to sort (favorite / like / etc.)
     # Eventually, we pass it as-is to the paginator, so we have better performance and less memory consumption.
     # Currently, we load the *entire set* of ratings for a (seen/willsee|wontsee) category of works.
-    all_ratings_df, displayed_ratings_df, counts = get_profile_ratings(request,
-                                          category,
-                                          seen_works,
-                                          ctx['meta']['can_see'],
-                                          ctx['meta']['is_anonymous'],
-                                          user)
+    all_ratings_df, displayed_ratings_df, counts = get_profile_ratings(
+        request, category, seen_works, ctx['meta']['can_see'],
+        ctx['meta']['is_anonymous'], user)
 
     work_rating_list = get_work_rating_list(
         algo_name, displayed_ratings_df, all_ratings_df)
@@ -587,10 +583,10 @@ def get_profile_works(request,
             'flat': flat
         },
         'profile': {
-            'seen_anime_count': counts['seen_anime'],
-            'seen_manga_count': counts['seen_manga'],
-            'unseen_anime_count': counts['unseen_anime'],
-            'unseen_manga_count': counts['unseen_manga'],
+            'seen_anime_count': counts.get('seen_anime', 0),
+            'seen_manga_count': counts.get('seen_manga', 0),
+            'unseen_anime_count': counts.get('unseen_anime', 0),
+            'unseen_manga_count': counts.get('unseen_manga', 0),
             'reco_count': reco_count,
             'username': user.username
         },

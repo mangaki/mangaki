@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
 from mangaki.models import Rating, Work
-from mangaki.utils.fit_algo import fit_algo, get_algo_backup_or_fit_svd
+from mangaki.utils.fit_algo import fit_algo, get_algo_backup
 from mangaki.utils.chrono import Chrono
 from mangaki.utils.ratings import current_user_ratings, friend_ratings
 from mangaki.utils.values import rating_values
@@ -15,6 +15,28 @@ from mangaki.utils.crypto import HomomorphicEncryption
 
 NB_RECO = 10
 CHRONO_ENABLED = True
+
+
+def get_algo_backup_or_fit_svd(request, algo_name):
+    """
+    Should be here to avoid circular imports
+    """
+    try:
+        algo = get_algo_backup(algo_name)
+    except FileNotFoundError:
+        # Fallback to SVD
+        messages.warning(request,
+            _('We switched to SVD as recommendation algorithm, '
+              'as {algo_name} was not available.').format(
+                algo_name=algo_name.upper()))
+        triplets = list(
+            Rating.objects.values_list('user_id', 'work_id', 'choice'))
+        algo_name = 'svd'
+        try:
+            algo = get_algo_backup('svd')
+        except FileNotFoundError:
+            algo = fit_algo('svd', triplets)
+    return algo
 
 
 def compute_user_embedding(algo, all_ratings_df):
@@ -25,12 +47,14 @@ def compute_user_embedding(algo, all_ratings_df):
         all_ratings_df['encoded_work_id'], all_ratings_df['rating'])
     return user_mean, user_feat
 
+
 def get_personalized_ranking(algo, all_ratings_df, work_ids_to_rank):
     user_mean, user_feat = compute_user_embedding(algo, all_ratings_df)
     encoded_work_ids = [algo.dataset.encode_work[work_id]
                         for work_id in work_ids_to_rank]
     best_pos = algo.recommend([], [(user_mean, user_feat)], encoded_work_ids)
     return algo.recommend([], [(user_mean, user_feat)], encoded_work_ids)['item_id']
+
 
 def get_group_reco_algo(request, users_id=None, algo_name='als',
                         category='all', merge_type=None):

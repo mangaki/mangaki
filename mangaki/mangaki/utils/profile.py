@@ -28,15 +28,17 @@ def get_profile_ratings(request,
                         already_seen: bool,
                         can_see: bool,
                         is_anonymous: bool,
-                        user: User) -> Tuple[List[Rating], Counter]:
-    counts = Counter()
+                        user: User) -> Tuple[pd.DataFrame, pd.DataFrame, Dict]:
     if is_anonymous:
         ratings = []
         anon_ratings = get_anonymous_ratings(request.session)
+        if not anon_ratings:
+            return pd.DataFrame(), pd.DataFrame(), {}
         ratings_df = pd.DataFrame(anon_ratings.items(), columns=('work_id', 'choice'))
-        works_df = Work.objects.select_related('category').query(
-            work__in=anon_ratings.keys()).values_list('work_id', 'title', 'category__slug')
-        ratings_df = ratings_df.merge(works_df, on='work_id')
+        works_df = pd.DataFrame(Work.objects.select_related('category').filter(
+            id__in=ratings_df['work_id']).values_list('id', 'title', 'category__slug'),
+            columns=('id', 'title', 'category__slug'))
+        ratings_df = ratings_df.merge(works_df, left_on='work_id', right_on='id')
     elif can_see:  # Current user is allowed to access those ratings
         ratings_df = pd.DataFrame(
             Rating.objects
@@ -45,8 +47,10 @@ def get_profile_ratings(request,
                 .values_list('work_id', 'choice', 'work__title', 'work__category__slug'),
             columns=('work_id', 'choice', 'work__title', 'work__category__slug')
         ).rename(columns={'work__title': 'title', 'work__category__slug': 'category__slug'})
+        if len(ratings_df) == 0:
+            return pd.DataFrame(), pd.DataFrame(), {}
     else:
-        return pd.DataFrame(), {}
+        return pd.DataFrame(), pd.DataFrame(), {}
 
     ratings_df['seen'] = ratings_df['choice'].map(seen_status)
     ratings_df['rating_category'] = ratings_df.apply(
@@ -59,6 +63,9 @@ def get_profile_ratings(request,
 def get_work_rating_list(algo_name: Optional[str],
                          displayed_ratings_df: pd.DataFrame,
                          all_ratings_df: pd.DataFrame) -> List:
+
+    if len(displayed_ratings_df) == 0:
+        return []
 
     ordering = dict(zip(['favorite', 'willsee', 'like', 'neutral', 'dislike', 'wontsee'], list('012345')))
     displayed_ratings_df['order'] = displayed_ratings_df['choice'].map(ordering)
