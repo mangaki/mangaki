@@ -47,3 +47,7 @@ def mangaki_version():
 @register.simple_tag(takes_context=False)
 def mangaki_revision():
     return parse_mangaki_revision(settings.VERSION)
+
+@register.simple_tag(takes_context=False)
+def show_revision_in_footer():
+    return settings.SHOW_REVISION

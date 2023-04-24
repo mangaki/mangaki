@@ -36,6 +36,8 @@ if config.has_section('secrets') and config.has_option('secrets', 'SECRET_FILE')
 DEBUG = config.getboolean('debug', 'DEBUG', fallback=False)
 # Use non-minified version of Vue.js
 DEBUG_VUE_JS = config.getboolean('debug', 'DEBUG_VUE_JS', fallback=False)
+# Show revision (rather than releases) in the footer of the base HTML template
+SHOW_REVISION = config.get('debug', 'SHOW_REVISION', fallback=not DEBUG)
 
 if DEBUG:
     SECRET_KEY = config.get('secrets', 'SECRET_KEY', fallback='CHANGE_ME')
@@ -58,6 +60,7 @@ except DistributionNotFound:
 
 # Otherwise, let the version be unknown.
 VERSION = VERSION or 'unknown'
+
 
 
 if config.has_section('hosts'):
