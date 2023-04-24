@@ -198,6 +198,10 @@ in
         You want this disabled whenever you have an external Redis instance.
       '';
     };
+    # FIXME: rework this to use a redis connection URI
+    # same mechanism as database connection URI
+    # prefer local socket auth
+    # pass the stuff with systemd
     redisConfig = mkOption {
       type = types.nullOr (types.submodule redisOptions);
       default = null;
@@ -306,7 +310,10 @@ in
       inherit (mangakiEnv) MANGAKI_SETTINGS_PATH DJANGO_SETTINGS_MODULE;
     };
 
-    services.redis.enable = cfg.useLocalRedis; # Redis set.
+    services.redis.servers.mangaki = mkIf cfg.useLocalRedis {
+      enable = true;
+    };
+
     services.postgresql = mkIf cfg.useLocalDatabase {
       enable = cfg.useLocalDatabase; # PostgreSQL set.
       ensureUsers = [
